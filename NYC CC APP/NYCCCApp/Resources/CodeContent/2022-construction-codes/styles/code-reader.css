@@ -1,0 +1,109 @@
+html {
+  -webkit-text-size-adjust: 100%;
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  padding: 22px 20px 96px;
+  background: #ffffff;
+  color: #111111;
+  font: -apple-system-body;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 1.35rem 0 0.65rem;
+  color: #111111;
+  font: -apple-system-headline;
+  font-weight: 700;
+}
+
+h6 {
+  font-size: 1.02rem;
+}
+
+.rbox,
+.Normal-Level,
+.Subarticle,
+.Section,
+.Subsection {
+  max-width: 100%;
+}
+
+.Normal-Level > div {
+  margin: 0.65rem 0;
+}
+
+a,
+link.Jump,
+Link.Jump {
+  color: #2f7d55;
+  text-decoration: none;
+}
+
+table {
+  border-collapse: collapse;
+  max-width: none;
+}
+
+td,
+th {
+  border: 1px solid rgba(80, 80, 80, 0.65);
+  padding: 0.35rem 0.45rem;
+  vertical-align: top;
+}
+
+scrolltable,
+.xsl-table,
+.xsl-table--header,
+.xsl-table--body {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+figure[data-table-ref]:empty {
+  display: none;
+}
+
+annotationdrawer,
+AnnotationDrawer,
+codeoptions,
+CodeOptions,
+.clearfix {
+  display: none !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0f0f10;
+    color: #f5f5f7;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #f5f5f7;
+  }
+
+  a,
+  link.Jump,
+  Link.Jump {
+    color: #70c89b;
+  }
+
+  td,
+  th {
+    border-color: rgba(210, 210, 210, 0.55);
+  }
+}

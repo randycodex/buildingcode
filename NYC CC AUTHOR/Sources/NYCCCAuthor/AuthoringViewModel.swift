@@ -1,0 +1,1286 @@
+import AppKit
+import CommonCrypto
+import Foundation
+import UniformTypeIdentifiers
+
+@MainActor
+final class AuthoringViewModel: ObservableObject {
+    private enum SessionKeys {
+        static let recentDocumentPaths = "NYCCCAuthor.recentDocumentPaths"
+    }
+
+    private struct PublishDocumentSnapshot: Sendable {
+        let filePath: String
+        let htmlContent: String
+    }
+
+    private struct PublishScope: Sendable {
+        let jurisdictionID: Int64
+        let jurisdictionName: String
+        let codeID: Int64
+        let codeName: String
+        let codeSectionID: Int64
+    }
+
+    @Published private(set) var documents: [EditorDocument] = []
+    @Published private(set) var outlineByDocumentID: [UUID: [OutlineItem]] = [:]
+    @Published private(set) var loadingDocumentIDs: Set<UUID> = []
+    @Published var selectedDocumentID: EditorDocument.ID?
+    @Published var selectedOutlineItemID: String?
+    @Published var collapsedOutlineItemIDs: Set<String> = []
+    @Published private(set) var authoringProject: EditorAuthoringProject
+    @Published private(set) var tableManifest: EditorTableManifest?
+    @Published var selectedJurisdictionID: Int64?
+    @Published var selectedCodeID: Int64?
+    @Published var selectedCodeSectionID: Int64?
+    @Published var statusMessage = "Open HTML files, edit them visually, then export structured authored content."
+    @Published var errorMessage: String?
+    @Published private(set) var isPublishing = false
+
+    private let authoringStore = EditorAuthoringStore()
+    private let iOSCodeContentRootURL = URL(
+        fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Resources/CodeContent",
+        isDirectory: true
+    )
+
+    init() {
+        authoringProject = (try? authoringStore.load()) ?? EditorAuthoringProject()
+        Self.ensureDefaultJurisdiction(in: &authoringProject)
+        authoringProject.tableManifest = nil
+        authoringProject.lastTableManifestPath = nil
+        tableManifest = nil
+        selectedJurisdictionID = authoringProject.jurisdictions.first?.id
+        selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == selectedJurisdictionID })?.id ?? authoringProject.codes.first?.id
+        selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == selectedCodeID })?.id
+    }
+
+    var documentTitle: String {
+        selectedDocument?.displayName ?? "No File Selected"
+    }
+
+    var documentCountText: String {
+        switch documents.count {
+        case 0: return "No files open"
+        case 1: return "1 file open"
+        default: return "\(documents.count) files open"
+        }
+    }
+
+    var hasDocuments: Bool { !documents.isEmpty }
+    var hasSelection: Bool { selectedDocument != nil }
+
+    var selectedHTMLContent: String {
+        selectedDocument?.htmlContent ?? ""
+    }
+
+    var selectedBodyContent: String {
+        guard let doc = selectedDocument else { return "" }
+        guard doc.isLoaded else { return "" }
+        return doc.splitBody().body
+    }
+
+    var selectedDocumentIsEmpty: Bool {
+        guard let document = selectedDocument else { return false }
+        guard document.isLoaded else { return false }
+        return document.htmlContent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var selectedOutline: [OutlineItem] {
+        guard let selectedDocument else { return [] }
+        return outlineByDocumentID[selectedDocument.id] ?? []
+    }
+
+    func openDocuments() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.html]
+        panel.allowsMultipleSelection = true
+        panel.canChooseDirectories = false
+        panel.treatsFilePackagesAsDirectories = false
+
+        guard panel.runModal() == .OK else { return }
+        openDocuments(at: panel.urls)
+    }
+
+    func openDocuments(at urls: [URL]) {
+        guard !urls.isEmpty else { return }
+
+        let standardizedURLs = urls.map(\.standardizedFileURL)
+        upsertPlaceholderDocuments(for: standardizedURLs)
+        selectedDocumentID = documents.first(where: {
+            $0.fileURL.standardizedFileURL == standardizedURLs.first
+        })?.id
+        selectedOutlineItemID = nil
+        collapsedOutlineItemIDs = []
+        preloadDocuments(at: standardizedURLs)
+        persistOpenDocumentPaths()
+        statusMessage = standardizedURLs.count == 1
+            ? "Opened and loaded 1 HTML file."
+            : "Opened and loading \(standardizedURLs.count) HTML files."
+    }
+
+    func importTableManifest() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.treatsFilePackagesAsDirectories = false
+        panel.nameFieldStringValue = "table_manifest.json"
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let manifest = try JSONDecoder().decode(EditorTableManifest.self, from: data)
+            authoringProject.tableManifest = manifest
+            authoringProject.lastTableManifestPath = url.path
+            tableManifest = manifest
+            persistAuthoringProject()
+            statusMessage = "Imported table manifest for \(manifest.workbook)."
+        } catch {
+            present(error)
+        }
+    }
+
+    func clearTableManifest() {
+        authoringProject.tableManifest = nil
+        authoringProject.lastTableManifestPath = nil
+        tableManifest = nil
+        persistAuthoringProject()
+        statusMessage = "Cleared table manifest."
+    }
+
+    func deleteTableManifestEntry(id tableID: String) {
+        guard var manifest = authoringProject.tableManifest else { return }
+        guard let index = manifest.tables.firstIndex(where: { $0.id == tableID }) else { return }
+        manifest.tables.remove(at: index)
+        authoringProject.tableManifest = manifest
+        tableManifest = manifest
+        persistAuthoringProject()
+        statusMessage = "Deleted table manifest entry \(tableID)."
+    }
+
+    func restoreLastSessionIfAvailable() {
+        guard documents.isEmpty else { return }
+        let paths = UserDefaults.standard.stringArray(forKey: SessionKeys.recentDocumentPaths) ?? []
+        let urls = paths.map { URL(fileURLWithPath: $0) }.filter { FileManager.default.fileExists(atPath: $0.path) }
+        guard !urls.isEmpty else { return }
+        openDocuments(at: urls)
+        statusMessage = urls.count == 1
+            ? "Reopened 1 file from the last session."
+            : "Reopened \(urls.count) files from the last session."
+    }
+
+    func clearLastSessionRestoreList() {
+        UserDefaults.standard.removeObject(forKey: SessionKeys.recentDocumentPaths)
+    }
+
+    func selectDocument(_ documentID: UUID) {
+        selectedDocumentID = documentID
+        selectedOutlineItemID = nil
+        ensureLoadedDocument(id: documentID)
+    }
+
+    var codeVersions: [EditorAuthoredCode] {
+        guard let selectedJurisdictionID else { return authoringProject.codes }
+        return authoringProject.codes.filter { ($0.jurisdictionID ?? selectedJurisdictionID) == selectedJurisdictionID }
+    }
+
+    var jurisdictions: [EditorAuthoredJurisdiction] {
+        authoringProject.jurisdictions
+    }
+
+    var codeSectionsForSelectedCode: [EditorAuthoredCodeSection] {
+        guard let selectedCodeID else { return authoringProject.codeSections }
+        return authoringProject.codeSections.filter { $0.codeID == selectedCodeID }
+    }
+
+    var selectedCodeVersionName: String {
+        guard let selectedCodeID,
+              let match = authoringProject.codes.first(where: { $0.id == selectedCodeID }) else {
+            return "No code version"
+        }
+        return match.name
+    }
+
+    var selectedCodeSectionName: String {
+        guard let selectedCodeSectionID,
+              let match = authoringProject.codeSections.first(where: { $0.id == selectedCodeSectionID }) else {
+            return "No code section"
+        }
+        return match.name
+    }
+
+    func createCodeVersion(name: String) {
+        let jurisdictionID = selectedJurisdictionID ?? ensureSelectedJurisdiction()
+        let newCode = EditorAuthoredCode(id: authoringProject.nextCodeID, jurisdictionID: jurisdictionID, name: name)
+        authoringProject.nextCodeID += 1
+        authoringProject.codes.append(newCode)
+        selectedCodeID = newCode.id
+        if let firstSection = authoringProject.codeSections.first(where: { $0.codeID == newCode.id }) {
+            selectedCodeSectionID = firstSection.id
+        } else if selectedCodeSectionID == nil, let firstAnySection = authoringProject.codeSections.first {
+            selectedCodeSectionID = firstAnySection.id
+        }
+        persistAuthoringProject()
+    }
+
+    func createJurisdiction(name: String) {
+        let newJurisdiction = EditorAuthoredJurisdiction(id: authoringProject.nextJurisdictionID, name: name)
+        authoringProject.nextJurisdictionID += 1
+        authoringProject.jurisdictions.append(newJurisdiction)
+        selectedJurisdictionID = newJurisdiction.id
+        selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == newJurisdiction.id })?.id
+        selectedCodeSectionID = selectedCodeID.flatMap { codeID in
+            authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
+        }
+        persistAuthoringProject()
+    }
+
+    func deleteSelectedJurisdiction() {
+        guard let selectedJurisdictionID else { return }
+        guard authoringProject.jurisdictions.count > 1 else {
+            statusMessage = "At least one jurisdiction must remain."
+            return
+        }
+
+        let codeIDs = Set(
+            authoringProject.codes
+                .filter { $0.jurisdictionID == selectedJurisdictionID }
+                .map(\.id)
+        )
+        let codeSectionIDs = Set(
+            authoringProject.codeSections
+                .filter { codeIDs.contains($0.codeID) }
+                .map(\.id)
+        )
+
+        authoringProject.jurisdictions.removeAll { $0.id == selectedJurisdictionID }
+        authoringProject.codes.removeAll { codeIDs.contains($0.id) }
+        authoringProject.codeSections.removeAll { codeSectionIDs.contains($0.id) }
+        authoringProject.chapters.removeAll {
+            codeIDs.contains($0.codeID) || codeSectionIDs.contains($0.codeSectionID)
+        }
+
+        let fallbackJurisdiction = authoringProject.jurisdictions.first
+        self.selectedJurisdictionID = fallbackJurisdiction?.id
+        self.selectedCodeID = fallbackJurisdiction.flatMap { jurisdiction in
+            authoringProject.codes.first(where: { $0.jurisdictionID == jurisdiction.id })?.id
+        }
+        self.selectedCodeSectionID = self.selectedCodeID.flatMap { codeID in
+            authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
+        }
+
+        persistAuthoringProject()
+        statusMessage = "Deleted jurisdiction."
+    }
+
+    func deleteSelectedCodeVersion() {
+        guard let selectedCodeID else { return }
+
+        let codeSectionIDs = Set(
+            authoringProject.codeSections
+                .filter { $0.codeID == selectedCodeID }
+                .map(\.id)
+        )
+
+        authoringProject.codes.removeAll { $0.id == selectedCodeID }
+        authoringProject.codeSections.removeAll { codeSectionIDs.contains($0.id) }
+        authoringProject.chapters.removeAll {
+            $0.codeID == selectedCodeID || codeSectionIDs.contains($0.codeSectionID)
+        }
+
+        if let jurisdictionID = selectedJurisdictionID {
+            self.selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == jurisdictionID })?.id
+        } else {
+            self.selectedCodeID = authoringProject.codes.first?.id
+        }
+        self.selectedCodeSectionID = self.selectedCodeID.flatMap { codeID in
+            authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
+        }
+
+        persistAuthoringProject()
+        statusMessage = "Deleted code version."
+    }
+
+    func deleteSelectedCodeSection() {
+        guard let selectedCodeSectionID else { return }
+
+        authoringProject.codeSections.removeAll { $0.id == selectedCodeSectionID }
+        authoringProject.chapters.removeAll { $0.codeSectionID == selectedCodeSectionID }
+
+        if let codeID = selectedCodeID {
+            self.selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
+        } else {
+            self.selectedCodeSectionID = authoringProject.codeSections.first?.id
+        }
+
+        persistAuthoringProject()
+        statusMessage = "Deleted code section."
+    }
+
+    func createCodeSection(name: String) {
+        let jurisdictionID = selectedJurisdictionID ?? ensureSelectedJurisdiction()
+        let codeID = selectedCodeID
+            ?? authoringProject.codes.first(where: { $0.jurisdictionID == jurisdictionID })?.id
+            ?? {
+            let jurisdictionID = selectedJurisdictionID ?? ensureSelectedJurisdiction()
+            let newCode = EditorAuthoredCode(id: authoringProject.nextCodeID, jurisdictionID: jurisdictionID, name: "2022 CONSTRUCTION CODES")
+            authoringProject.nextCodeID += 1
+            authoringProject.codes.append(newCode)
+            selectedCodeID = newCode.id
+            return newCode.id
+        }()
+
+        let newSection = EditorAuthoredCodeSection(id: authoringProject.nextCodeSectionID, codeID: codeID, name: name)
+        authoringProject.nextCodeSectionID += 1
+        authoringProject.codeSections.append(newSection)
+        selectedCodeID = codeID
+        selectedCodeSectionID = newSection.id
+        persistAuthoringProject()
+    }
+
+    func selectCodeVersion(_ id: Int64) {
+        selectedCodeID = id
+        if let code = authoringProject.codes.first(where: { $0.id == id }),
+           let jurisdictionID = code.jurisdictionID {
+            selectedJurisdictionID = jurisdictionID
+        }
+        if let currentSectionID = selectedCodeSectionID,
+           authoringProject.codeSections.contains(where: { $0.id == currentSectionID && $0.codeID == id }) == false {
+            selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == id })?.id
+        }
+    }
+
+    func selectJurisdiction(_ id: Int64) {
+        selectedJurisdictionID = id
+        if let selectedCodeID,
+           authoringProject.codes.contains(where: { $0.id == selectedCodeID && $0.jurisdictionID == id }) {
+            return
+        }
+        selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == id })?.id
+        if let selectedCodeID {
+            selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == selectedCodeID })?.id
+        } else {
+            selectedCodeSectionID = nil
+        }
+    }
+
+    func selectCodeSection(_ id: Int64) {
+        guard let section = authoringProject.codeSections.first(where: { $0.id == id }) else { return }
+        selectedCodeSectionID = section.id
+        selectedCodeID = section.codeID
+    }
+
+    private func upsertPlaceholderDocuments(for urls: [URL]) {
+        for url in urls {
+            if let existingIndex = documents.firstIndex(where: { $0.fileURL.standardizedFileURL == url }) {
+                let existing = documents[existingIndex]
+                documents[existingIndex] = EditorDocument(
+                    id: existing.id,
+                    fileURL: url,
+                    kind: .html,
+                    htmlContent: existing.htmlContent,
+                    isLoaded: existing.isLoaded,
+                    hasUnsavedChanges: existing.hasUnsavedChanges,
+                    lastReplacementCount: existing.lastReplacementCount
+                )
+            } else {
+                documents.append(EditorDocument(fileURL: url, kind: .html, htmlContent: "", isLoaded: false))
+            }
+        }
+        for document in documents where urls.contains(where: { $0.standardizedFileURL == document.fileURL.standardizedFileURL }) {
+            outlineByDocumentID[document.id] = outlineByDocumentID[document.id] ?? []
+        }
+    }
+
+    private func preloadDocuments(at urls: [URL]) {
+        let urlSet = Set(urls.map(\.path))
+        let matchingIDs = documents.compactMap { document in
+            urlSet.contains(document.fileURL.standardizedFileURL.path) ? document.id : nil
+        }
+        for documentID in matchingIDs {
+            ensureLoadedDocument(id: documentID)
+        }
+    }
+
+    private func ensureLoadedDocument(id documentID: UUID) {
+        guard let index = documents.firstIndex(where: { $0.id == documentID }) else { return }
+        guard !documents[index].isLoaded else {
+            if outlineByDocumentID[documentID]?.isEmpty ?? true {
+                loadOutlineIfNeeded(for: documentID)
+            }
+            return
+        }
+        guard loadingDocumentIDs.contains(documentID) == false else { return }
+        loadingDocumentIDs.insert(documentID)
+        let url = documents[index].fileURL
+        Task.detached(priority: .userInitiated) { [weak self] in
+            guard let self else { return }
+            do {
+                let loaded = try Self.loadDocument(from: url)
+                let outline = HTMLAuthoringBridge.buildOutline(for: loaded)
+                await self.applyLoadedDocument(id: documentID, html: loaded.htmlContent, outline: outline)
+            } catch {
+                await self.finishLoadingDocument(id: documentID, error: error)
+            }
+        }
+    }
+
+    private func loadOutlineIfNeeded(for documentID: UUID) {
+        guard let index = documents.firstIndex(where: { $0.id == documentID }) else { return }
+        let document = documents[index]
+        guard document.htmlContent.isEmpty == false else { return }
+        outlineByDocumentID[documentID] = HTMLAuthoringBridge.buildOutline(for: document)
+    }
+
+    private func applyLoadedDocument(id documentID: UUID, html: String, outline: [OutlineItem]) {
+        guard let index = documents.firstIndex(where: { $0.id == documentID }) else { return }
+        documents[index].htmlContent = html
+        documents[index].isLoaded = true
+        outlineByDocumentID[documentID] = outline
+        loadingDocumentIDs.remove(documentID)
+        if selectedDocumentID == documentID {
+            collapsedOutlineItemIDs = collapsedByDefaultIDs(in: outline)
+        }
+        if selectedDocumentID == documentID {
+            selectedOutlineItemID = nil
+        }
+    }
+
+    private func finishLoadingDocument(id documentID: UUID, error: Error) {
+        loadingDocumentIDs.remove(documentID)
+        if errorMessage == nil {
+            errorMessage = error.localizedDescription
+        }
+        statusMessage = "Some files could not be loaded."
+    }
+
+    private func collapsedByDefaultIDs(in items: [OutlineItem]) -> Set<String> {
+        items.reduce(into: Set<String>()) { result, item in
+            if item.kind != .chapter && !item.children.isEmpty {
+                result.insert(item.id)
+            }
+            result.formUnion(collapsedByDefaultIDs(in: item.children))
+        }
+    }
+
+    func updateSelectedHTML(_ html: String) {
+        guard let index = selectedDocumentIndex else { return }
+        guard documents[index].isLoaded else { return }
+        guard !isUnsafeEmptyReplacement(newHTML: html, currentHTML: documents[index].htmlContent, fileName: documents[index].displayName) else {
+            return
+        }
+        guard documents[index].htmlContent != html else { return }
+        documents[index].htmlContent = html
+        documents[index].hasUnsavedChanges = true
+        outlineByDocumentID[documents[index].id] = HTMLAuthoringBridge.buildOutline(for: documents[index])
+    }
+
+    /// Apply a body-only edit (from the WYSIWYG WebView) by splicing the new body
+    /// content into the original full document. Preserves doctype/<html>/<head> and
+    /// any attributes on the existing <body> tag so the file on disk keeps its shape.
+    func updateSelectedBody(_ newBody: String) {
+        guard let index = selectedDocumentIndex else { return }
+        guard documents[index].isLoaded else { return }
+        guard !isUnsafeEmptyReplacement(newHTML: newBody, currentHTML: documents[index].splitBody().body, fileName: documents[index].displayName) else {
+            return
+        }
+        let merged = documents[index].replacingBody(with: newBody)
+        guard documents[index].htmlContent != merged else { return }
+        documents[index].htmlContent = merged
+        documents[index].hasUnsavedChanges = true
+        outlineByDocumentID[documents[index].id] = HTMLAuthoringBridge.buildOutline(for: documents[index])
+    }
+
+    func saveSelectedDocument() {
+        guard let index = selectedDocumentIndex else { return }
+        saveDocument(at: index)
+    }
+
+    func saveAllDocuments() {
+        var savedCount = 0
+        var skippedCount = 0
+        for index in documents.indices {
+            if saveDocument(at: index) {
+                savedCount += 1
+            } else {
+                skippedCount += 1
+            }
+        }
+        if !documents.isEmpty {
+            statusMessage = skippedCount == 0
+                ? "Saved \(savedCount) files."
+                : "Saved \(savedCount) files. Skipped \(skippedCount) unloaded or unsafe file(s)."
+        }
+    }
+
+    func applyHeadingPrefixesToSelected() {
+        guard let index = selectedDocumentIndex else { return }
+        guard documents[index].isLoaded else {
+            statusMessage = "Load the selected file before applying heading prefixes."
+            return
+        }
+        let result = HeadingPrefixTransformer.transform(html: documents[index].htmlContent)
+        documents[index].htmlContent = result.value
+        documents[index].hasUnsavedChanges = result.replacementCount > 0 || documents[index].hasUnsavedChanges
+        outlineByDocumentID[documents[index].id] = HTMLAuthoringBridge.buildOutline(for: documents[index])
+        statusMessage = result.replacementCount == 0
+            ? "No headings matched in \(documents[index].displayName)."
+            : "Applied \(result.replacementCount) prefixes in \(documents[index].displayName)."
+    }
+
+    func applyHeadingPrefixesToAll() {
+        var total = 0
+        var skipped = 0
+        for index in documents.indices {
+            guard documents[index].isLoaded else {
+                skipped += 1
+                continue
+            }
+            let result = HeadingPrefixTransformer.transform(html: documents[index].htmlContent)
+            documents[index].htmlContent = result.value
+            documents[index].hasUnsavedChanges = result.replacementCount > 0 || documents[index].hasUnsavedChanges
+            outlineByDocumentID[documents[index].id] = HTMLAuthoringBridge.buildOutline(for: documents[index])
+            total += result.replacementCount
+        }
+        if skipped > 0 {
+            statusMessage = "Applied \(total) prefixes. Skipped \(skipped) unloaded file(s)."
+        } else {
+            statusMessage = total == 0 ? "No headings matched in the open files." : "Applied \(total) prefixes across open files."
+        }
+    }
+
+    func exportSelectedAsStructuredJSON() {
+        guard let selectedDocument else { return }
+        guard selectedDocument.isLoaded else {
+            statusMessage = "Load the selected file before exporting JSON."
+            return
+        }
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = selectedDocument.fileURL.deletingPathExtension().lastPathComponent + ".authored.json"
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        do {
+            let project = try buildProject(from: [selectedDocument])
+            let data = try JSONEncoder.prettyEditorJSON.encode(project)
+            try data.write(to: url, options: .atomic)
+            statusMessage = "Exported \(url.lastPathComponent)."
+        } catch {
+            present(error)
+        }
+    }
+
+    func exportAllAsStructuredJSON() {
+        guard !documents.isEmpty else { return }
+        guard documents.allSatisfy(\.isLoaded) else {
+            statusMessage = "Load every open file before exporting all JSON."
+            return
+        }
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = "nyc_cc_authored.json"
+
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        do {
+            let project = try buildProject(from: documents)
+            let data = try JSONEncoder.prettyEditorJSON.encode(project)
+            try data.write(to: url, options: .atomic)
+            statusMessage = "Exported \(url.lastPathComponent)."
+        } catch {
+            present(error)
+        }
+    }
+
+    func publishAllToIOSApp() {
+        guard !documents.isEmpty else { return }
+        guard documents.allSatisfy(\.isLoaded) else {
+            statusMessage = "Load every open file before publishing to the iOS app."
+            return
+        }
+        guard !isPublishing else { return }
+
+        let documentSnapshots = documents.map {
+            PublishDocumentSnapshot(filePath: $0.fileURL.path, htmlContent: $0.htmlContent)
+        }
+        let projectSnapshot = authoringProject
+        let selectedCodeIDSnapshot = selectedCodeID
+        let selectedCodeSectionIDSnapshot = selectedCodeSectionID
+        let selectedJurisdictionIDSnapshot = selectedJurisdictionID
+        let codeContentRootURL = iOSCodeContentRootURL
+        let documentCount = documents.count
+
+        isPublishing = true
+        statusMessage = "Publishing \(documentCount) open file(s) to the iOS app..."
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            do {
+                let scope = try Self.resolvePublishScope(
+                    in: projectSnapshot,
+                    selectedJurisdictionID: selectedJurisdictionIDSnapshot,
+                    selectedCodeID: selectedCodeIDSnapshot,
+                    selectedCodeSectionID: selectedCodeSectionIDSnapshot
+                )
+                let project = try Self.buildProjectSnapshot(
+                    from: documentSnapshots,
+                    baseProject: projectSnapshot,
+                    scope: scope
+                )
+                let bundleProject = Self.bundleProjectSnapshot(from: project, scope: scope)
+                try Self.writeBundleProject(bundleProject, scope: scope, to: codeContentRootURL)
+                try Self.publishHTMLBundle(from: documentSnapshots, scope: scope, to: codeContentRootURL)
+                try Self.validatePublishedHTMLBundle(from: documentSnapshots, scope: scope, in: codeContentRootURL)
+
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.persistAuthoringProject(project)
+                    self.isPublishing = false
+                    self.statusMessage = "Published \(documentCount) open file(s) to the iOS app JSON and HTML bundle."
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.isPublishing = false
+                    self.present(error)
+                }
+            }
+        }
+    }
+
+    func exportSelectedAsHTML() {
+        guard let selectedDocument else { return }
+        guard selectedDocument.isLoaded else {
+            statusMessage = "Load the selected file before exporting HTML."
+            return
+        }
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.html]
+        panel.nameFieldStringValue = selectedDocument.displayName
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            try Data(selectedDocument.htmlContent.utf8).write(to: url, options: .atomic)
+            statusMessage = "Exported \(url.lastPathComponent)."
+        } catch {
+            present(error)
+        }
+    }
+
+    private func buildProject(from documents: [EditorDocument]) throws -> EditorAuthoringProject {
+        let scope = try Self.resolvePublishScope(
+            in: authoringProject,
+            selectedJurisdictionID: selectedJurisdictionID,
+            selectedCodeID: selectedCodeID,
+            selectedCodeSectionID: selectedCodeSectionID
+        )
+        let project = try Self.buildProjectSnapshot(
+            from: documents.map { PublishDocumentSnapshot(filePath: $0.fileURL.path, htmlContent: $0.htmlContent) },
+            baseProject: authoringProject,
+            scope: scope
+        )
+        persistAuthoringProject(project)
+        return project
+    }
+
+    private nonisolated static func buildProjectSnapshot(
+        from documents: [PublishDocumentSnapshot],
+        baseProject: EditorAuthoringProject,
+        scope: PublishScope
+    ) throws -> EditorAuthoringProject {
+        var project = baseProject
+        Self.ensureDefaultJurisdiction(in: &project)
+        project.chapters.removeAll {
+            $0.codeID == scope.codeID && $0.codeSectionID == scope.codeSectionID
+        }
+        project.tableManifest = baseProject.tableManifest
+        if let manifest = baseProject.tableManifest {
+            project.tables = try ExcelTableImporter.tables(
+                manifest: manifest,
+                manifestPath: baseProject.lastTableManifestPath
+            )
+        } else {
+            project.tables = []
+        }
+        if project.codes.isEmpty {
+            let jurisdictionID = project.jurisdictions.first?.id
+            project.codes = [EditorAuthoredCode(id: 1, jurisdictionID: jurisdictionID, name: "2022 CONSTRUCTION CODES")]
+            project.nextCodeID = 2
+        }
+        if project.codeSections.isEmpty {
+            let codeID = project.codes.first?.id ?? 1
+            project.codeSections = [EditorAuthoredCodeSection(id: 1, codeID: codeID, name: "BUILDING CODE")]
+            project.nextCodeSectionID = 2
+        }
+
+        var nextChapterID: Int64 = (project.chapters.map(\.id).max() ?? 0) + 1
+        var nextSectionID: Int64 = (
+            project.chapters
+                .flatMap(\.groups)
+                .flatMap(\.sections)
+                .map(\.id)
+                .max() ?? 0
+        ) + 1
+
+        for document in documents {
+            let structuredText = HTMLAuthoringBridge.structuredText(fromHTMLContent: document.htmlContent)
+            let hierarchy = try StructuredTextImporter.parseHierarchy(
+                structuredText,
+                defaults: StructuredImportHierarchyDefaults(
+                    codeVersionName: scope.codeName,
+                    codeSectionName: project.codeSections.first(where: { $0.id == scope.codeSectionID })?.name ?? "BUILDING CODE"
+                )
+            )
+
+            for version in hierarchy.codeVersions {
+                for codeSection in version.codeSections {
+                    for chapter in codeSection.chapters {
+                        let chapterID = nextChapterID
+                        nextChapterID += 1
+
+                        let groups = chapter.groups.map { group in
+                            var sections: [EditorAuthoredSection] = []
+                            let groupBody = group.bodyText.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if !groupBody.isEmpty {
+                                let id = nextSectionID
+                                nextSectionID += 1
+                                sections.append(
+                                    EditorAuthoredSection(
+                                        id: id,
+                                        sectionNumber: Self.sectionNumber(fromGroupHeader: group.headerLine),
+                                        title: Self.sectionTitle(
+                                            fromGroupHeader: group.headerLine,
+                                            headingLine: group.headingLine
+                                        ),
+                                        officialText: groupBody,
+                                        richTextOverrideData: nil,
+                                        kind: .textBlock
+                                    )
+                                )
+                            }
+
+                            sections.append(contentsOf: group.sections.map { section -> EditorAuthoredSection in
+                                let id = nextSectionID
+                                nextSectionID += 1
+                                return EditorAuthoredSection(
+                                    id: id,
+                                    sectionNumber: section.sectionNumber,
+                                    title: section.titleLine,
+                                    officialText: section.bodyText,
+                                    richTextOverrideData: nil,
+                                    kind: .title
+                                )
+                            })
+
+                            return EditorAuthoredSectionGroup(
+                                id: group.headerLine,
+                                headerLine: group.headerLine,
+                                headingLine: group.headingLine,
+                                headerRTFData: nil,
+                                headingRTFData: nil,
+                                sections: sections
+                            )
+                        }
+
+                        project.chapters.append(
+                            EditorAuthoredChapter(
+                                id: chapterID,
+                                codeID: scope.codeID,
+                                codeSectionID: scope.codeSectionID,
+                                chapterNumber: chapter.chapterNumber,
+                                title: chapter.title,
+                                rawDraftText: structuredText,
+                                groups: groups
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        project.nextChapterID = nextChapterID
+        project.nextSectionID = nextSectionID
+        return project
+    }
+
+    private nonisolated static func publishHTMLBundle(
+        from documents: [PublishDocumentSnapshot],
+        scope: PublishScope,
+        to codeContentRootURL: URL?
+    ) throws {
+        guard let codeContentRootURL else { return }
+        let htmlDocuments = documents.filter { snapshot in
+            URL(fileURLWithPath: snapshot.filePath).pathExtension.lowercased() == "html"
+        }
+        guard !htmlDocuments.isEmpty else { return }
+
+        let bundleRootURL = authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
+        let outputURL = bundleRootURL
+            .appendingPathComponent("chapters", isDirectory: true)
+        let assetsURL = bundleRootURL
+            .appendingPathComponent("assets", isDirectory: true)
+
+        if FileManager.default.fileExists(atPath: outputURL.path) {
+            try FileManager.default.removeItem(at: outputURL)
+        }
+        if FileManager.default.fileExists(atPath: assetsURL.path) {
+            try FileManager.default.removeItem(at: assetsURL)
+        }
+        try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: assetsURL, withIntermediateDirectories: true)
+        for snapshot in htmlDocuments {
+            let sourceURL = URL(fileURLWithPath: snapshot.filePath)
+            let destinationURL = outputURL.appendingPathComponent(sourceURL.lastPathComponent)
+            let localizedHTML = try localizingRemoteAssets(
+                in: snapshot.htmlContent,
+                assetsDirectoryURL: assetsURL
+            )
+            try Data(localizedHTML.utf8).write(to: destinationURL, options: .atomic)
+
+            for aliasFileName in chapterAliasFileNames(in: localizedHTML, sourceFileName: sourceURL.lastPathComponent) {
+                let aliasURL = outputURL.appendingPathComponent(aliasFileName, isDirectory: false)
+                try Data(localizedHTML.utf8).write(to: aliasURL, options: .atomic)
+            }
+        }
+    }
+
+    private nonisolated static func chapterAliasFileNames(in html: String, sourceFileName: String) -> [String] {
+        guard let chapterAliasRegex = try? NSRegularExpression(
+            pattern: #"(?i)\bchapter\s+([A-Z]\d+)\s*:"#,
+            options: []
+        ) else {
+            return []
+        }
+        let sourceBaseName = URL(fileURLWithPath: sourceFileName)
+            .deletingPathExtension()
+            .lastPathComponent
+            .uppercased()
+        let nsHTML = html as NSString
+        let matches = chapterAliasRegex.matches(
+            in: html,
+            range: NSRange(location: 0, length: nsHTML.length)
+        )
+
+        var aliases: [String] = []
+        for match in matches {
+            guard match.numberOfRanges > 1 else { continue }
+            let chapterNumber = nsHTML.substring(with: match.range(at: 1)).uppercased()
+            guard chapterNumber != sourceBaseName else { continue }
+            aliases.append("\(chapterNumber).html")
+        }
+        return Array(Set(aliases)).sorted()
+    }
+
+    private nonisolated static func validatePublishedHTMLBundle(
+        from documents: [PublishDocumentSnapshot],
+        scope: PublishScope,
+        in codeContentRootURL: URL?
+    ) throws {
+        guard let codeContentRootURL else { return }
+        let bundleRootURL = authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
+        let chaptersURL = bundleRootURL.appendingPathComponent("chapters", isDirectory: true)
+        let bundleJSONURL = bundleRootURL.appendingPathComponent("bundle.json", isDirectory: false)
+
+        guard FileManager.default.fileExists(atPath: bundleJSONURL.path) else {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1201,
+                userInfo: [NSLocalizedDescriptionKey: "The iOS publish bundle is missing bundle.json."]
+            )
+        }
+
+        let expectedHTMLNames = documents
+            .map { URL(fileURLWithPath: $0.filePath) }
+            .filter { $0.pathExtension.lowercased() == "html" }
+            .map(\.lastPathComponent)
+
+        guard !expectedHTMLNames.isEmpty else {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1202,
+                userInfo: [NSLocalizedDescriptionKey: "No HTML chapters were available to publish."]
+            )
+        }
+
+        var missingChapterNames: [String] = []
+        var remoteAssetChapterNames: [String] = []
+        for fileName in expectedHTMLNames {
+            let chapterURL = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
+            guard FileManager.default.fileExists(atPath: chapterURL.path) else {
+                missingChapterNames.append(fileName)
+                continue
+            }
+
+            let html = (try? String(contentsOf: chapterURL, encoding: .utf8)) ?? ""
+            if html.localizedCaseInsensitiveContains("https://export.amlegal.com") ||
+                html.localizedCaseInsensitiveContains("http://export.amlegal.com") ||
+                html.localizedCaseInsensitiveContains("//export.amlegal.com") {
+                remoteAssetChapterNames.append(fileName)
+            }
+        }
+
+        if !missingChapterNames.isEmpty {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1203,
+                userInfo: [NSLocalizedDescriptionKey: "The iOS publish bundle is missing chapter HTML files: \(missingChapterNames.joined(separator: ", "))."]
+            )
+        }
+
+        if !remoteAssetChapterNames.isEmpty {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1204,
+                userInfo: [NSLocalizedDescriptionKey: "Some published chapter HTML still references remote official assets: \(remoteAssetChapterNames.joined(separator: ", "))."]
+            )
+        }
+    }
+
+    private nonisolated static func localizingRemoteAssets(
+        in html: String,
+        assetsDirectoryURL: URL
+    ) throws -> String {
+        let pattern = #"(src|href)\s*=\s*"((?:https?:)?//[^"]+)""#
+        let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
+        let nsHTML = html as NSString
+        let matches = regex.matches(in: html, options: [], range: NSRange(location: 0, length: nsHTML.length))
+        guard !matches.isEmpty else { return html }
+
+        var localizedHTML = html
+        var replacements: [(original: String, replacement: String)] = []
+        var cache: [String: String] = [:]
+
+        for match in matches.reversed() {
+            guard match.numberOfRanges >= 3 else { continue }
+            let urlString = nsHTML.substring(with: match.range(at: 2))
+            guard urlString.contains("export.amlegal.com") else { continue }
+
+            let replacementPath: String
+            if let cached = cache[urlString] {
+                replacementPath = cached
+            } else {
+                let remoteURL = try normalizedRemoteURL(from: urlString)
+                let localURL = try downloadRemoteAsset(remoteURL, to: assetsDirectoryURL)
+                replacementPath = "../assets/" + localURL.lastPathComponent
+                cache[urlString] = replacementPath
+            }
+            replacements.append((original: urlString, replacement: replacementPath))
+        }
+
+        for replacement in replacements {
+            localizedHTML = localizedHTML.replacingOccurrences(of: replacement.original, with: replacement.replacement)
+        }
+        return localizedHTML
+    }
+
+    private nonisolated static func normalizedRemoteURL(from urlString: String) throws -> URL {
+        let normalized: String
+        if urlString.hasPrefix("//") {
+            normalized = "https:" + urlString
+        } else {
+            normalized = urlString
+        }
+        guard let url = URL(string: normalized) else {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1101,
+                userInfo: [NSLocalizedDescriptionKey: "Could not parse remote asset URL: \(urlString)"]
+            )
+        }
+        return url
+    }
+
+    private nonisolated static func downloadRemoteAsset(
+        _ remoteURL: URL,
+        to assetsDirectoryURL: URL
+    ) throws -> URL {
+        let data = try Data(contentsOf: remoteURL)
+        let ext = preferredAssetExtension(for: remoteURL)
+        let fileName = sha1(remoteURL.absoluteString) + (ext.isEmpty ? "" : ".\(ext)")
+        let outputURL = assetsDirectoryURL.appendingPathComponent(fileName, isDirectory: false)
+        if !FileManager.default.fileExists(atPath: outputURL.path) {
+            try data.write(to: outputURL, options: .atomic)
+        }
+        return outputURL
+    }
+
+    private nonisolated static func preferredAssetExtension(for remoteURL: URL) -> String {
+        let ext = remoteURL.pathExtension.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if !ext.isEmpty { return ext }
+        return "bin"
+    }
+
+    private nonisolated static func sha1(_ value: String) -> String {
+        let data = Data(value.utf8)
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+        data.withUnsafeBytes { bytes in
+            _ = CC_SHA1(bytes.baseAddress, CC_LONG(data.count), &digest)
+        }
+        return digest.map { String(format: "%02x", $0) }.joined()
+    }
+
+    private nonisolated static func writeBundleProject(
+        _ project: EditorAuthoringProject,
+        scope: PublishScope,
+        to codeContentRootURL: URL?
+    ) throws {
+        guard let codeContentRootURL else { return }
+        let outputURL = authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
+            .appendingPathComponent("bundle.json", isDirectory: false)
+        let data = try JSONEncoder.prettyEditorJSON.encode(project)
+        try FileManager.default.createDirectory(
+            at: outputURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try data.write(to: outputURL, options: .atomic)
+    }
+
+    private nonisolated static func bundleProjectSnapshot(
+        from fullProject: EditorAuthoringProject,
+        scope: PublishScope
+    ) -> EditorAuthoringProject {
+        let bundleCodes = fullProject.codes.filter { $0.id == scope.codeID }
+        let bundleCodeSections = fullProject.codeSections.filter { $0.codeID == scope.codeID }
+        let bundleCodeSectionIDs = Set(bundleCodeSections.map(\.id))
+        let bundleChapters = fullProject.chapters.filter {
+            $0.codeID == scope.codeID || bundleCodeSectionIDs.contains($0.codeSectionID)
+        }
+
+        var project = EditorAuthoringProject()
+        project.schemaVersion = fullProject.schemaVersion
+        project.nextCodeID = fullProject.nextCodeID
+        project.nextJurisdictionID = fullProject.nextJurisdictionID
+        project.nextCodeSectionID = fullProject.nextCodeSectionID
+        project.nextChapterID = fullProject.nextChapterID
+        project.nextSectionID = fullProject.nextSectionID
+        project.lastStructuredImportPath = fullProject.lastStructuredImportPath
+        project.lastStructuredImportPaths = fullProject.lastStructuredImportPaths
+        project.lastTableManifestPath = fullProject.lastTableManifestPath
+        project.jurisdictions = fullProject.jurisdictions.filter { $0.id == scope.jurisdictionID }
+        project.codes = bundleCodes
+        project.codeSections = bundleCodeSections
+        project.chapters = bundleChapters
+        project.tableManifest = fullProject.tableManifest
+        project.tables = fullProject.tables
+        return project
+    }
+
+    private nonisolated static func resolvePublishScope(
+        in project: EditorAuthoringProject,
+        selectedJurisdictionID: Int64?,
+        selectedCodeID: Int64?,
+        selectedCodeSectionID: Int64?
+    ) throws -> PublishScope {
+        let jurisdictionID = selectedJurisdictionID
+            ?? project.jurisdictions.first?.id
+            ?? 1
+        guard let jurisdiction = project.jurisdictions.first(where: { $0.id == jurisdictionID }) else {
+            throw NSError(domain: "NYCCCAuthor", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Select a valid jurisdiction before publishing."])
+        }
+
+        let codeID = selectedCodeID
+            ?? project.codes.first(where: { $0.jurisdictionID == jurisdictionID })?.id
+            ?? project.codes.first?.id
+            ?? 1
+        guard let code = project.codes.first(where: { $0.id == codeID }) else {
+            throw NSError(domain: "NYCCCAuthor", code: 1002, userInfo: [NSLocalizedDescriptionKey: "Select a valid code version before publishing."])
+        }
+
+        let codeSectionID = selectedCodeSectionID
+            ?? project.codeSections.first(where: { $0.codeID == codeID })?.id
+            ?? project.codeSections.first?.id
+            ?? 1
+        guard project.codeSections.contains(where: { $0.id == codeSectionID }) else {
+            throw NSError(domain: "NYCCCAuthor", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Select a valid code section before publishing."])
+        }
+
+        return PublishScope(
+            jurisdictionID: jurisdiction.id,
+            jurisdictionName: jurisdiction.name,
+            codeID: code.id,
+            codeName: code.name,
+            codeSectionID: codeSectionID
+        )
+    }
+
+    private nonisolated static func slug(_ value: String) -> String {
+        let lowercased = value.lowercased()
+        let replaced = lowercased.replacingOccurrences(
+            of: #"[^a-z0-9]+"#,
+            with: "-",
+            options: .regularExpression
+        )
+        return replaced.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+    }
+
+    private nonisolated static func authoredBundleRootURL(
+        scope: PublishScope,
+        codeContentRootURL: URL
+    ) -> URL {
+        codeContentRootURL
+            .appendingPathComponent("authored", isDirectory: true)
+            .appendingPathComponent(slug(scope.jurisdictionName), isDirectory: true)
+            .appendingPathComponent(slug(scope.codeName), isDirectory: true)
+    }
+
+    private nonisolated static func sectionNumber(fromGroupHeader headerLine: String) -> String {
+        let trimmed = headerLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.uppercased().hasPrefix("SECTION BC ") {
+            return String(trimmed.dropFirst("SECTION BC ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        if trimmed.uppercased().hasPrefix("SECTION ") {
+            return String(trimmed.dropFirst("SECTION ".count)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return trimmed
+    }
+
+    private nonisolated static func sectionTitle(
+        fromGroupHeader headerLine: String,
+        headingLine: String?
+    ) -> String {
+        let trimmedHeader = headerLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        let displayHeader: String
+        if trimmedHeader.uppercased().hasPrefix("SECTION BC ") {
+            let suffix = String(trimmedHeader.dropFirst("SECTION BC ".count))
+            displayHeader = "Section BC \(suffix)"
+        } else {
+            displayHeader = trimmedHeader
+        }
+
+        guard let headingLine else { return displayHeader }
+        let trimmedHeading = headingLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedHeading.isEmpty else { return displayHeader }
+        let displayHeading = trimmedHeading == trimmedHeading.uppercased()
+            ? trimmedHeading.localizedCapitalized
+            : trimmedHeading
+        return "\(displayHeader): \(displayHeading)"
+    }
+
+    nonisolated private static func loadDocument(from url: URL) throws -> EditorDocument {
+        let data = try Data(contentsOf: url)
+        let html = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .isoLatin1) ?? ""
+        return EditorDocument(fileURL: url, kind: .html, htmlContent: html)
+    }
+
+    @discardableResult
+    private func saveDocument(at index: Int) -> Bool {
+        let url = documents[index].fileURL
+        let html = documents[index].htmlContent
+        let data = Data(html.utf8)
+        do {
+            guard documents[index].isLoaded else {
+                statusMessage = "Skipped unloaded file: \(url.lastPathComponent)"
+                return false
+            }
+            if documents[index].kind == .html,
+               html.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+               let existingAttributes = try? FileManager.default.attributesOfItem(atPath: url.path),
+               let existingSize = existingAttributes[.size] as? NSNumber,
+               existingSize.intValue > 0 {
+                let message = "Refused to overwrite non-empty HTML with empty content: \(url.lastPathComponent)"
+                errorMessage = message
+                statusMessage = message
+                return false
+            }
+            try data.write(to: url, options: .atomic)
+            documents[index].hasUnsavedChanges = false
+            persistOpenDocumentPaths()
+            writeSaveDebugLog(for: url, html: html, bytes: data.count)
+            statusMessage = "Saved \(data.count) bytes → \(url.path)"
+            return true
+        } catch {
+            present(error)
+            return false
+        }
+    }
+
+    private func writeSaveDebugLog(for url: URL, html: String, bytes: Int) {
+        let logURL = url.deletingPathExtension().appendingPathExtension("save-debug.log")
+        let timestamp = ISO8601DateFormatter().string(from: Date())
+        let snippetLength = min(800, html.count)
+        let snippet = String(html.prefix(snippetLength))
+        let entry = """
+        ===== \(timestamp) =====
+        path:  \(url.path)
+        bytes: \(bytes)
+        first \(snippetLength) chars:
+        \(snippet)
+
+        """
+        if let existing = try? Data(contentsOf: logURL),
+           let combined = (String(data: existing, encoding: .utf8).map { $0 + entry }) {
+            try? Data(combined.utf8).write(to: logURL, options: .atomic)
+        } else {
+            try? Data(entry.utf8).write(to: logURL, options: .atomic)
+        }
+    }
+
+    private var selectedDocument: EditorDocument? {
+        guard let selectedDocumentIndex else { return nil }
+        return documents[selectedDocumentIndex]
+    }
+
+    private var selectedDocumentIndex: Int? {
+        guard let selectedDocumentID else { return nil }
+        return documents.firstIndex(where: { $0.id == selectedDocumentID })
+    }
+
+    private func present(_ error: Error) {
+        errorMessage = error.localizedDescription
+        statusMessage = "The last action failed."
+    }
+
+    private func persistOpenDocumentPaths() {
+        let paths = documents.map { $0.fileURL.standardizedFileURL.path }
+        UserDefaults.standard.set(paths, forKey: SessionKeys.recentDocumentPaths)
+    }
+
+    private func persistAuthoringProject(_ project: EditorAuthoringProject? = nil) {
+        do {
+            try authoringStore.save(project ?? authoringProject)
+        } catch {
+            present(error)
+        }
+    }
+
+    private func isUnsafeEmptyReplacement(newHTML: String, currentHTML: String, fileName: String) -> Bool {
+        let newIsEmpty = newHTML.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let currentIsEmpty = currentHTML.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        guard newIsEmpty && !currentIsEmpty else { return false }
+        let message = "Ignored empty editor update for \(fileName)."
+        errorMessage = message
+        statusMessage = message
+        return true
+    }
+
+    private func ensureSelectedJurisdiction() -> Int64 {
+        if let selectedJurisdictionID {
+            return selectedJurisdictionID
+        }
+        Self.ensureDefaultJurisdiction(in: &authoringProject)
+        let id = authoringProject.jurisdictions.first?.id ?? 1
+        selectedJurisdictionID = id
+        return id
+    }
+
+    private nonisolated static func ensureDefaultJurisdiction(in project: inout EditorAuthoringProject) {
+        if project.jurisdictions.isEmpty {
+            project.jurisdictions = [EditorAuthoredJurisdiction(id: 1, name: "New York City")]
+            project.nextJurisdictionID = max(project.nextJurisdictionID, 2)
+        }
+        let fallbackJurisdictionID = project.jurisdictions.first?.id
+        for index in project.codes.indices where project.codes[index].jurisdictionID == nil {
+            project.codes[index].jurisdictionID = fallbackJurisdictionID
+        }
+    }
+}
+
+private extension JSONEncoder {
+    static var prettyEditorJSON: JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return encoder
+    }
+}
