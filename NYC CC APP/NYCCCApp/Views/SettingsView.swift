@@ -9,211 +9,307 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    themePreviewCard
-                        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-                        .listRowBackground(Color.clear)
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Settings")
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundStyle(.primary)
 
-                Section("Jurisdiction") {
-                    if library.availableJurisdictions.isEmpty {
-                        Text("No jurisdiction-specific bundles detected.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Picker("Jurisdiction", selection: Binding(
-                            get: { library.selectedJurisdictionKey },
-                            set: { library.updateSelectedJurisdiction(key: $0) }
-                        )) {
-                            ForEach(library.availableJurisdictions) { jurisdiction in
-                                Text(jurisdiction.name).tag(jurisdiction.id)
-                            }
-                        }
-                        .pickerStyle(.navigationLink)
-                    }
-                }
-
-                Section("Code Version") {
-                    if library.filteredVersions.isEmpty {
-                        Text("No bundled code content detected.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Picker("Version", selection: Binding(
-                            get: { library.selectedVersionFileName },
-                            set: { library.updateSelectedVersion(fileName: $0) }
-                        )) {
-                            ForEach(library.filteredVersions) { version in
-                                Text(version.displayName).tag(version.fileName)
-                            }
-                        }
-                        .pickerStyle(.navigationLink)
-                    }
-                }
-
-                Section("Code Section") {
-                    if library.codeSections.isEmpty {
-                        Text("All sections are currently shown.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Picker("Section", selection: Binding(
-                            get: { library.selectedCodeSectionID },
-                            set: { library.updateSelectedCodeSection(id: $0) }
-                        )) {
-                            Text("All Sections").tag(Optional<Int64>.none)
-
-                            ForEach(library.codeSections) { codeSection in
-                                Text(codeSection.name).tag(Optional(codeSection.id))
-                            }
-                        }
-                        .pickerStyle(.navigationLink)
-                    }
-                }
-
-                Section("Reader Theme") {
-                    Picker("Font", selection: Binding(
-                        get: { library.readerTheme.fontChoice },
-                        set: { newValue in
-                            var theme = library.readerTheme
-                            theme.fontChoice = newValue
-                            library.updateReaderTheme(theme)
-                        }
-                    )) {
-                        ForEach(ReaderFontChoice.allCases) { choice in
-                            Text(choice.displayName).tag(choice)
+                    CodeSurface(accent: accentColor, padding: 0) {
+                        VStack(spacing: 0) {
+                            jurisdictionPicker
+                            Divider()
+                            versionPicker
+                            Divider()
+                            codeSectionPicker
                         }
                     }
 
-                    Picker("Accent", selection: Binding(
-                        get: { library.readerTheme.accentPalette },
-                        set: { newValue in
-                            var theme = library.readerTheme
-                            theme.accentPalette = newValue
-                            library.updateReaderTheme(theme)
-                        }
-                    )) {
-                        ForEach(ReaderAccentPalette.allCases) { palette in
-                            Text(palette.displayName).tag(palette)
-                        }
+                    CodeSurface(accent: accentColor, padding: 16) {
+                        themePreviewCard
+
+                        CodeHairline()
+
+                        fontPicker
+
+                        CodeHairline()
+
+                        accentPicker
+
+                        CodeHairline()
+
+                        fontSizeSlider
+
+                        CodeHairline()
+
+                        lineSpacingSlider
                     }
 
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(ReaderAccentPalette.allCases) { palette in
-                                VStack(spacing: 6) {
-                                    Circle()
-                                        .fill(color(for: palette))
-                                        .frame(width: 18, height: 18)
-                                        .overlay(
-                                            Circle()
-                                                .strokeBorder(
-                                                    palette == library.readerTheme.accentPalette ? Color.primary.opacity(0.35) : .clear,
-                                                    lineWidth: 3
-                                                )
-                                        )
-                                    Text(palette.displayName)
-                                        .font(.caption2)
-                                        .foregroundStyle(.secondary)
-                                }
-                                .frame(width: 72)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
+                    Text("NYC Code (Unofficial) is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 6)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Font Size")
-                            Spacer()
-                            Text("\(Int(library.readerTheme.fontSize)) pt")
-                                .foregroundStyle(.secondary)
-                        }
-                        Slider(value: Binding(
-                            get: { library.readerTheme.fontSize },
-                            set: { newValue in
-                                var theme = library.readerTheme
-                                theme.fontSize = newValue
-                                library.updateReaderTheme(theme)
-                            }
-                        ), in: ReaderTheme.minimumFontSize...ReaderTheme.maximumFontSize, step: 1)
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("Line Spacing")
-                            Spacer()
-                            Text("\(Int(library.readerTheme.lineSpacing))")
-                                .foregroundStyle(.secondary)
-                        }
-                        Slider(value: Binding(
-                            get: { library.readerTheme.lineSpacing },
-                            set: { newValue in
-                                var theme = library.readerTheme
-                                theme.lineSpacing = newValue
-                                library.updateReaderTheme(theme)
-                            }
-                        ), in: 0...12, step: 1)
-                    }
-                }
-
-                Section("Disclaimer") {
-                    Text("NYC Code (Unofficial) is an unofficial reference tool. Verify any legal, permitting, design, or construction decision against the enacted New York City code, agency guidance, and project-specific requirements.")
-                        .font(.body)
-                }
-
-                if let statusMessage = library.statusMessage {
-                    Section("Status") {
+                    if let statusMessage = library.statusMessage {
                         Text(statusMessage)
+                            .font(.footnote)
                             .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.top, 18)
+                .padding(.bottom, 28)
             }
-            .scrollContentBackground(.hidden)
+            .overlay(alignment: .top) {
+                CodeTopContentFade()
+            }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("Settings")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color(uiColor: .systemGroupedBackground), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
+        }
+    }
+
+    private var jurisdictionPicker: some View {
+        Group {
+            if library.availableJurisdictions.isEmpty {
+                HStack {
+                    Text("No jurisdiction-specific bundles detected.")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .padding(16)
+            } else {
+                codeLibraryMenuRow(label: "Jurisdiction") {
+                    Text(selectedJurisdictionName)
+                        .font(.title3.weight(.regular))
+                        .foregroundStyle(.primary)
+                } menu: {
+                    ForEach(library.availableJurisdictions) { jurisdiction in
+                        Button(jurisdiction.name) {
+                            library.updateSelectedJurisdiction(key: jurisdiction.id)
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
+        }
+    }
+
+    private var versionPicker: some View {
+        Group {
+            if library.filteredVersions.isEmpty {
+                HStack {
+                    Text("No bundled code content detected.")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .padding(16)
+            } else {
+                codeLibraryMenuRow(label: "Version") {
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(selectedVersionPrimaryText)
+                            .font(.headline.weight(.regular))
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.trailing)
+                        Text(selectedJurisdictionName)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.trailing)
+                    }
+                } menu: {
+                    ForEach(library.filteredVersions) { version in
+                        Button(version.displayName) {
+                            library.updateSelectedVersion(fileName: version.fileName)
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
+        }
+    }
+
+    private var codeSectionPicker: some View {
+        Group {
+            if library.codeSections.isEmpty {
+                HStack {
+                    Text("All sections are currently shown.")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                .padding(16)
+            } else {
+                codeLibraryMenuRow(label: "Code Section") {
+                    Text(selectedCodeSectionName)
+                        .font(.title3.weight(.regular))
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.trailing)
+                } menu: {
+                    Button("All Sections") {
+                        library.updateSelectedCodeSection(id: nil)
+                    }
+
+                    ForEach(library.codeSections) { codeSection in
+                        Button(codeSection.name) {
+                            library.updateSelectedCodeSection(id: codeSection.id)
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+            }
         }
     }
 
     private var themePreviewCard: some View {
-        CodeSurfaceCard(accent: accentColor) {
-            Text("Reader Preview")
-                .font(.headline)
-            Text("Section BC 1001.2 Scope. This preview mirrors your current reader theme choices so you can tune typography before returning to the code.")
-                .font(previewFont)
+        VStack(alignment: .leading, spacing: 14) {
+            CodeEyebrow(text: "Reader Preview", accent: accentColor)
+
+            Text("SECTION BC 101: GENERAL")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(accentColor)
+
+            Text("101.2 Scope.")
+                .font(.system(size: previewFontSize + 2, weight: .semibold, design: previewDesign))
+                .foregroundStyle(.primary)
+
+            Text("The provisions of this code shall apply to the construction, alteration, movement, addition, replacement, repair, equipment, use and occupancy of every building or structure.")
+                .font(.system(size: previewFontSize, weight: .regular, design: previewDesign))
                 .foregroundStyle(.primary)
                 .lineSpacing(library.readerTheme.lineSpacing)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 CodeStatPill(value: "\(Int(library.readerTheme.fontSize)) pt", label: "type", accent: accentColor)
                 CodeStatPill(value: "\(Int(library.readerTheme.lineSpacing))", label: "spacing", accent: accentColor)
-                CodeStatPill(value: library.readerTheme.accentPalette.displayName, label: "accent", accent: accentColor)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var fontPicker: some View {
+        Picker("Font", selection: Binding(
+            get: { library.readerTheme.fontChoice },
+            set: { newValue in
+                var theme = library.readerTheme
+                theme.fontChoice = newValue
+                library.updateReaderTheme(theme)
+            }
+        )) {
+            ForEach(ReaderFontChoice.allCases) { choice in
+                Text(choice.displayName).tag(choice)
             }
         }
     }
 
-    private var previewFont: Font {
-        switch library.readerTheme.fontChoice {
-        case .system:
-            return .system(size: library.readerTheme.fontSize)
-        case .serif:
-            return .system(size: library.readerTheme.fontSize, design: .serif)
-        case .rounded:
-            return .system(size: library.readerTheme.fontSize, design: .rounded)
-        case .monospaced:
-            return .system(size: library.readerTheme.fontSize, design: .monospaced)
+    private var accentPicker: some View {
+        Picker("Accent", selection: Binding(
+            get: { library.readerTheme.accentPalette },
+            set: { newValue in
+                var theme = library.readerTheme
+                theme.accentPalette = newValue
+                library.updateReaderTheme(theme)
+            }
+        )) {
+            ForEach(ReaderAccentPalette.allCases) { palette in
+                Text(palette.displayName).tag(palette)
+            }
         }
     }
 
-    private func color(for palette: ReaderAccentPalette) -> Color {
-        switch palette {
-        case .civicBlue:
-            return Color(red: 0.11, green: 0.31, blue: 0.57)
-        case .graphite:
-            return Color(red: 0.26, green: 0.27, blue: 0.29)
-        case .forest:
-            return Color(red: 0.18, green: 0.42, blue: 0.30)
-        case .brick:
-            return Color(red: 0.57, green: 0.27, blue: 0.21)
+    private var fontSizeSlider: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Font Size")
+                Spacer()
+                Text("\(Int(library.readerTheme.fontSize)) pt")
+                    .foregroundStyle(.secondary)
+            }
+            Slider(value: Binding(
+                get: { library.readerTheme.fontSize },
+                set: { newValue in
+                    var theme = library.readerTheme
+                    theme.fontSize = newValue
+                    library.updateReaderTheme(theme)
+                }
+            ), in: ReaderTheme.minimumFontSize...ReaderTheme.maximumFontSize, step: 1)
         }
+    }
+
+    private var lineSpacingSlider: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Line Spacing")
+                Spacer()
+                Text("\(Int(library.readerTheme.lineSpacing))")
+                    .foregroundStyle(.secondary)
+            }
+            Slider(value: Binding(
+                get: { library.readerTheme.lineSpacing },
+                set: { newValue in
+                    var theme = library.readerTheme
+                    theme.lineSpacing = newValue
+                    library.updateReaderTheme(theme)
+                }
+            ), in: 0...12, step: 1)
+        }
+    }
+
+    private var previewFontSize: CGFloat {
+        CGFloat(library.readerTheme.fontSize)
+    }
+
+    private var previewDesign: Font.Design {
+        switch library.readerTheme.fontChoice {
+        case .sanFrancisco: return .default
+        case .serif: return .serif
+        case .rounded: return .rounded
+        case .monospaced: return .monospaced
+        }
+    }
+
+    private var selectedJurisdictionName: String {
+        library.availableJurisdictions.first(where: { $0.id == library.selectedJurisdictionKey })?.name ?? "Not Selected"
+    }
+
+    private var selectedVersionPrimaryText: String {
+        library.selectedVersion?.codeVersion.replacingOccurrences(of: "\(selectedJurisdictionName) - ", with: "", options: .caseInsensitive) ?? "Not Selected"
+    }
+
+    private var selectedCodeSectionName: String {
+        if let selectedCodeSectionID = library.selectedCodeSectionID,
+           let selected = library.codeSections.first(where: { $0.id == selectedCodeSectionID }) {
+            return selected.name
+        }
+        return "All Sections"
+    }
+
+    private func codeLibraryMenuRow<Value: View>(
+        label: String,
+        @ViewBuilder value: () -> Value,
+        @ViewBuilder menu: () -> some View
+    ) -> some View {
+        Menu {
+            menu()
+        } label: {
+            HStack(alignment: .center, spacing: 12) {
+                Text(label)
+                    .font(.title3)
+                    .foregroundStyle(.primary)
+
+                Spacer(minLength: 0)
+
+                value()
+
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }
 

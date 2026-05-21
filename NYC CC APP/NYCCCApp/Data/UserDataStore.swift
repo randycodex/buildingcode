@@ -100,6 +100,25 @@ final class UserDataStore {
         return connection.string(at: 0, in: statement)
     }
 
+    func noteEntries(codeVersion: String) throws -> [Int64: String] {
+        let statement = try connection.prepare(
+            """
+            SELECT section_id, body
+            FROM notes
+            WHERE code_version = ?
+            ORDER BY updated_at DESC;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+
+        var entries: [Int64: String] = [:]
+        while try connection.step(statement) == SQLITE_ROW {
+            entries[connection.int64(at: 0, in: statement)] = connection.string(at: 1, in: statement)
+        }
+        return entries
+    }
+
     func saveNote(sectionID: Int64, codeVersion: String, body: String) throws {
         if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let statement = try connection.prepare(

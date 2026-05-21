@@ -8,7 +8,6 @@ struct ReaderView: View {
     @State private var detail: ReaderSectionDetail?
     @State private var references: [ResolvedCodeReference] = []
     @State private var noteBody = ""
-    @State private var noteJustSaved = false
     @State private var isBookmarked = false
     @State private var expandedInlineImage: UIImage?
 
@@ -19,11 +18,9 @@ struct ReaderView: View {
     var body: some View {
         ScrollView {
             if let detail {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 16) {
                     if let sectionGroupLabel = detail.sectionGroupLabel, !sectionGroupLabel.isEmpty {
-                        Text(sectionGroupLabel)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(accentColor)
+                        CodeEyebrow(text: sectionGroupLabel, accent: accentColor)
                     }
 
                     header(detail: detail)
@@ -36,44 +33,21 @@ struct ReaderView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     if !references.isEmpty {
-                        Divider()
+                        CodeHairline().padding(.top, 2)
                         ReferenceListSection(references: references, accent: accentColor)
                     }
 
                     if !detail.figures.isEmpty {
-                        Divider()
+                        CodeHairline().padding(.top, 2)
                         FigureListSection(title: "Official Figures", figures: detail.figures)
                     }
 
                     if !detail.customDiagrams.isEmpty {
-                        Divider()
+                        CodeHairline().padding(.top, 2)
                         FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
                     }
 
-                    Divider()
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Text("Notes")
-                                .font(.headline)
-                            Spacer()
-                            if noteJustSaved {
-                                Label("Saved", systemImage: "checkmark.circle.fill")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(accentColor)
-                            }
-                        }
-
-                        TextEditor(text: $noteBody)
-                            .frame(minHeight: 180)
-                            .padding(10)
-                            .background(Color(uiColor: .secondarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-
-                        Button("Save Note") {
-                            saveNote()
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
+                    notesEditor
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 16)
@@ -89,6 +63,9 @@ struct ReaderView: View {
                 .padding(.top, 80)
             }
         }
+        .overlay(alignment: .top) {
+            CodeTopContentFade()
+        }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
@@ -99,6 +76,7 @@ struct ReaderView: View {
                 } label: {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                 }
+                .accessibilityLabel(isBookmarked ? "Remove bookmark" : "Save bookmark")
             }
         }
         .fullScreenCover(
@@ -125,17 +103,21 @@ struct ReaderView: View {
         VStack(alignment: .leading, spacing: 8) {
             if detail.kind == .textBlock {
                 Text(detail.displayTitle)
-                    .font(.title2.weight(.semibold))
-            } else {
-                Text(detail.sectionNumber)
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(accentColor)
-                Text(detail.displayTitle)
                     .font(.title3.weight(.semibold))
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(detail.sectionNumber)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(accentColor)
+                    Text(detail.displayTitle)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.leading)
+                }
             }
             if detail.kind != .textBlock {
                 Text(detail.chapterTitle)
-                    .font(.subheadline)
+                    .font(.footnote)
                     .foregroundStyle(.secondary)
             }
         }
@@ -144,6 +126,41 @@ struct ReaderView: View {
     private var navigationTitle: String {
         guard let detail else { return "Reader" }
         return detail.kind == .textBlock ? detail.displayTitle : detail.sectionNumber
+    }
+
+    private var notesEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Notes")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $noteBody)
+                    .font(.body)
+                    .scrollContentBackground(.hidden)
+                    .frame(minHeight: 104)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
+                    )
+                    .onChange(of: noteBody) { _, _ in
+                        saveNote()
+                    }
+
+                if noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text("Add a note")
+                        .font(.body)
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 16)
+                        .allowsHitTesting(false)
+                }
+            }
+        }
     }
 
     private func loadContent() async {
@@ -156,20 +173,14 @@ struct ReaderView: View {
         }
         isBookmarked = library.isBookmarked(sectionID: sectionID)
         noteBody = library.noteBody(sectionID: sectionID)
-        noteJustSaved = false
+    }
+
+    private func toggleBookmark() {
+        isBookmarked = library.toggleBookmark(sectionID: sectionID)
     }
 
     private func saveNote() {
         library.saveNote(sectionID: sectionID, body: noteBody)
-        noteJustSaved = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-            noteJustSaved = false
-        }
-    }
-
-    private func toggleBookmark() {
-        library.toggleBookmark(sectionID: sectionID)
-        isBookmarked.toggle()
     }
 
     private struct ReferenceListSection: View {
@@ -192,7 +203,7 @@ struct ReaderView: View {
                         .buttonStyle(.plain)
                     case .chapter(let chapter):
                         NavigationLink {
-                            ChapterSectionsView(chapter: chapter)
+                            ReferenceChapterDestination(chapter: chapter)
                         } label: {
                             ReferenceRow(reference: reference, accent: accent)
                         }
@@ -225,9 +236,7 @@ struct ReaderView: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.tertiary)
             }
-            .padding(12)
-            .background(Color(uiColor: .secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .padding(.vertical, 10)
         }
 
         private var iconName: String {
@@ -264,6 +273,50 @@ struct ReaderView: View {
             }
         }
     }
+
+    private struct ReferenceChapterDestination: View {
+        let chapter: CodeChapter
+
+        @EnvironmentObject private var library: CodeLibraryViewModel
+        @State private var initialSection: CodeSectionSummary?
+
+        private var accentColor: Color {
+            Color(uiColor: library.readerTheme.accentColor)
+        }
+
+        var body: some View {
+            Group {
+                if library.selectedVersion?.contentKind == .authored {
+                    if let initialSection = initialSection ?? library.firstSection(for: chapter) {
+                        ChapterHTMLReaderView(
+                            chapter: chapter,
+                            initialSection: initialSection
+                        )
+                    } else {
+                        VStack(spacing: 12) {
+                            ProgressView()
+                            Text("Opening \(chapter.displayLabel)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+                        .task(id: chapter.id) {
+                            if let cached = library.firstSection(for: chapter) {
+                                initialSection = cached
+                            } else {
+                                initialSection = await library.firstSectionAsync(for: chapter)
+                            }
+                        }
+                    }
+                } else {
+                    ChapterSectionsView(chapter: chapter)
+                }
+            }
+            .navigationTitle(chapter.displayLabel)
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
 }
 
 private struct FigureImageView: View {
@@ -281,11 +334,11 @@ private struct FigureImageView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                            .stroke(Color(uiColor: .separator), lineWidth: 1)
                     )
             } else {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.secondary.opacity(0.12))
+                    .fill(Color(uiColor: .secondarySystemGroupedBackground))
                     .frame(height: 180)
                     .overlay {
                         Label("Image missing from bundle", systemImage: "photo")

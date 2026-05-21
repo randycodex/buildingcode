@@ -8,6 +8,12 @@ struct ContentBlockListView: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
 
+    private var htmlStore: PublishedHTMLContentStore {
+        PublishedHTMLContentStore(
+            relativeRootPath: library.selectedVersion?.authoredHTMLBundlePath
+        )
+    }
+
     var body: some View {
         if detail.contentBlocks.isEmpty {
             AttributedTextView(
@@ -15,23 +21,37 @@ struct ContentBlockListView: View {
                 onOpenImage: onOpenImage
             )
         } else {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 7) {
                 ForEach(detail.contentBlocks) { block in
                     switch block.kind {
                     case .html:
-                        AttributedTextView(
-                            attributedText: attributedText(for: block),
-                            onOpenImage: onOpenImage
-                        )
+                        if let caption = tableCaptionText(for: block) {
+                            TableCaptionTextView(text: caption)
+                        } else {
+                            AttributedTextView(
+                                attributedText: attributedText(for: block),
+                                onOpenImage: onOpenImage
+                            )
+                        }
                     case .table:
                         if let tableID = block.tableID,
                            let table = detail.tableBlocks.first(where: { $0.id == tableID }) {
                             TableBlockView(table: table)
+                        } else if let html = block.html, !html.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            RawTableBlockView(htmlFragment: html, tableID: block.id)
                         } else {
                             MissingTableBlockView(tableID: block.tableID ?? "")
                         }
                     case .image:
-                        ImageBlockPlaceholderView(imageID: block.imageID ?? "", caption: block.caption)
+                        if let imageURL = imageURL(for: block) {
+                            ImageBlockView(
+                                imageURL: imageURL,
+                                caption: block.caption,
+                                onOpenImage: onOpenImage
+                            )
+                        } else {
+                            ImageBlockPlaceholderView(imageID: block.imageID ?? "", caption: block.caption)
+                        }
                     }
                 }
             }
@@ -41,7 +61,41 @@ struct ContentBlockListView: View {
 
     private func attributedText(for block: CodeContentBlock) -> NSAttributedString {
         let text = block.plainText ?? block.html ?? ""
+        if let html = block.html, !html.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return library.renderHTMLTextBlock(html, fallbackText: text)
+        }
         return library.renderPlainTextBlock(text)
+    }
+
+    private func tableCaptionText(for block: CodeContentBlock) -> String? {
+        let text = (block.plainText ?? block.html ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard text.range(of: #"^Table\s+[A-Z]?\d+"#, options: [.regularExpression, .caseInsensitive]) != nil else {
+            return nil
+        }
+        return text
+    }
+
+    private func imageURL(for block: CodeContentBlock) -> URL? {
+        guard let imageID = block.imageID?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !imageID.isEmpty,
+              let readAccessURL = htmlStore.readAccessURL()
+        else {
+            return nil
+        }
+
+        let directURL = readAccessURL.appendingPathComponent(imageID)
+        if FileManager.default.fileExists(atPath: directURL.path) {
+            return directURL
+        }
+
+        let assetURL = readAccessURL.appendingPathComponent("assets", isDirectory: true)
+            .appendingPathComponent(imageID)
+        if FileManager.default.fileExists(atPath: assetURL.path) {
+            return assetURL
+        }
+
+        return nil
     }
 }
 
@@ -49,7 +103,7 @@ private struct MissingTableBlockView: View {
     let tableID: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        CodeSurface(accent: Color.secondary, padding: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "tablecells")
                     .font(.headline)
@@ -61,10 +115,6 @@ private struct MissingTableBlockView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 
@@ -81,7 +131,7 @@ private struct TableBlockView: View {
         VStack(alignment: .leading, spacing: 8) {
             if let caption = table.caption, !caption.isEmpty {
                 Text(caption)
-                    .font(.headline)
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.primary)
             }
 
@@ -98,16 +148,93 @@ private struct TableBlockView: View {
     }
 }
 
+private struct TableCaptionTextView: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.primary)
+            .lineSpacing(2)
+            .padding(.top, 8)
+            .padding(.bottom, 2)
+            .textSelection(.enabled)
+    }
+}
+
+private struct RawTableBlockView: View {
+    let htmlFragment: String
+    let tableID: String
+
+    var body: some View {
+        TableHTMLView(
+            html: TableHTMLRenderer.html(forRawFragment: htmlFragment),
+            tableID: tableID
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct ImageBlockView: View {
+    let imageURL: URL
+    let caption: String?
+    let onOpenImage: ((UIImage) -> Void)?
+
+    @State private var loadedImage: UIImage?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Group {
+                if let loadedImage {
+                    Button {
+                        onOpenImage?(loadedImage)
+                    } label: {
+                        Image(uiImage: loadedImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                        Text("Loading image")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
+                }
+            }
+
+            if let caption, !caption.isEmpty {
+                Text(caption)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .task(id: imageURL) {
+            loadedImage = UIImage(contentsOfFile: imageURL.path)
+        }
+    }
+}
+
 private struct TableHTMLView: View {
     let html: String
     let tableID: String
-    @State private var height: CGFloat = 120
+    @State private var height: CGFloat
     @State private var shouldLoad = false
+
+    init(html: String, tableID: String) {
+        self.html = html
+        self.tableID = tableID
+        _height = State(initialValue: TableHTMLHeightCache.height(for: tableID) ?? 120)
+    }
 
     var body: some View {
         Group {
             if shouldLoad {
-                TableWebView(html: html, height: $height)
+                TableWebView(html: html, tableID: tableID, height: $height)
                     .id(tableID)
                     .frame(height: height)
             } else {
@@ -123,15 +250,27 @@ private struct TableHTMLView: View {
         .onAppear {
             guard !shouldLoad else { return }
             Task { @MainActor in
-                await Task.yield()
+                let delay = UInt64(staggerDelay(for: tableID) * 1_000_000_000)
+                if delay > 0 {
+                    try? await Task.sleep(nanoseconds: delay)
+                } else {
+                    await Task.yield()
+                }
                 shouldLoad = true
             }
         }
+    }
+
+    private func staggerDelay(for id: String) -> Double {
+        guard TableHTMLHeightCache.height(for: id) == nil else { return 0 }
+        let number = Int(id.split(separator: "-").last ?? "") ?? abs(id.hashValue % 12)
+        return min(Double(number % 12) * 0.055, 0.55)
     }
 }
 
 private struct TableWebView: UIViewRepresentable {
     let html: String
+    let tableID: String
     @Binding var height: CGFloat
 
     func makeUIView(context: Context) -> WKWebView {
@@ -145,7 +284,12 @@ private struct TableWebView: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        context.coordinator.heightChanged = { height = max(80, $0) }
+        context.coordinator.tableID = tableID
+        context.coordinator.heightChanged = { newHeight in
+            let resolvedHeight = max(80, newHeight)
+            TableHTMLHeightCache.setHeight(resolvedHeight, for: tableID)
+            height = resolvedHeight
+        }
         guard context.coordinator.loadedHTML != html else { return }
         context.coordinator.loadedHTML = html
         webView.loadHTMLString(html, baseURL: nil)
@@ -158,9 +302,10 @@ private struct TableWebView: UIViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate {
         var heightChanged: ((CGFloat) -> Void)?
         var loadedHTML: String?
+        var tableID: String?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            webView.evaluateJavaScript("document.documentElement.scrollHeight") { result, _ in
+            webView.evaluateJavaScript("Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)") { result, _ in
                 if let value = result as? CGFloat {
                     self.heightChanged?(value)
                 } else if let value = result as? Double {
@@ -179,7 +324,105 @@ private struct TableWebView: UIViewRepresentable {
     }
 }
 
+private enum TableHTMLHeightCache {
+    private static var heights: [String: CGFloat] = [:]
+
+    static func height(for id: String) -> CGFloat? {
+        heights[id]
+    }
+
+    static func setHeight(_ height: CGFloat, for id: String) {
+        heights[id] = height
+    }
+}
+
 private enum TableHTMLRenderer {
+    static func html(forRawFragment fragment: String) -> String {
+        let bodyHTML = fragment
+            .replacingOccurrences(of: "<ScrollTable", with: "<div class=\"scroll-table\"", options: .caseInsensitive)
+            .replacingOccurrences(of: "</ScrollTable>", with: "</div>", options: .caseInsensitive)
+
+        return """
+        <!doctype html>
+        <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            :root { color-scheme: light dark; }
+            html, body {
+              margin: 0;
+              padding: 0;
+              background: transparent;
+              color: #111111;
+              font: -apple-system-body;
+            }
+            .table-wrap, .scroll-table, .xsl-table {
+              overflow-x: auto;
+              width: 100%;
+              -webkit-overflow-scrolling: touch;
+            }
+            .scroll-table:has(.xsl-table--body) > .xsl-table--header,
+            tfoot:empty,
+            tfoot.empty-footer {
+              display: none;
+            }
+            table {
+              border-collapse: collapse;
+              table-layout: auto;
+              width: max-content;
+              min-width: 100%;
+              font-size: 15px;
+              line-height: 1.35;
+              border: 1px solid #c7c7cc;
+              background: rgba(242, 242, 247, 0.78);
+            }
+            th, td {
+              padding: 7px 9px;
+              vertical-align: top;
+              min-width: 72px;
+              overflow-wrap: normal;
+              white-space: normal;
+              border: 1px solid #c7c7cc;
+            }
+            th, td[style*="bold"], b, strong {
+              font-weight: 700;
+            }
+            @media (prefers-color-scheme: dark) {
+              body { color: #f2f2f7; }
+              table {
+                background: rgba(44, 44, 46, 0.72);
+                border-color: #636366;
+              }
+              th, td { border-color: #636366; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="table-wrap">\(bodyHTML)</div>
+          <script>
+            (() => {
+              document.querySelectorAll('.scroll-table').forEach((scrollTable) => {
+                if (scrollTable.querySelector('.xsl-table--body')) {
+                  scrollTable.querySelectorAll(':scope > .xsl-table--header').forEach((header) => header.remove());
+                }
+              });
+              document.querySelectorAll('tfoot').forEach((footer) => {
+                if (!footer.textContent.trim()) {
+                  footer.remove();
+                }
+              });
+              document.querySelectorAll('tr').forEach((row) => {
+                if (!row.textContent.trim() && row.closest('tfoot')) {
+                  row.remove();
+                }
+              });
+            })();
+          </script>
+        </body>
+        </html>
+        """
+    }
+
     static func html(for table: CodeTableBlock) -> String {
         let colGroupHTML = colGroup(for: table)
         let rows = (0..<max(0, table.rowCount)).map { rowIndex in
@@ -335,7 +578,7 @@ private struct ImageBlockPlaceholderView: View {
     let caption: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        CodeSurface(accent: Color.secondary, padding: 12) {
             HStack(spacing: 8) {
                 Image(systemName: "photo")
                     .font(.headline)
@@ -349,9 +592,5 @@ private struct ImageBlockPlaceholderView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }

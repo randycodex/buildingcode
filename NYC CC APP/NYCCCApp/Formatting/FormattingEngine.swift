@@ -10,7 +10,6 @@ struct FormattingRules {
     var headerPattern: String = #"(?im)^SECTION\s+(?:BC\s+)?[A-Z]?\d+.*$"#
     var sectionNumberPattern: String = #"(?m)^[A-Z]?\d{3,4}(?:\.\d+[A-Za-z0-9.\-()]*)*\.?.*$"#
     var exceptionPattern: String = #"(?im)^.*Exception.*$"#
-    var shallPattern: String = #"\bshall\b"#
     var definedTermPattern: String = #"\b[A-Z][A-Z0-9\-]{2,}\b"#
 }
 
@@ -19,7 +18,6 @@ final class FormattingEngine {
     private let headerExpression: NSRegularExpression?
     private let sectionNumberExpression: NSRegularExpression?
     private let exceptionExpression: NSRegularExpression?
-    private let shallExpression: NSRegularExpression?
     private let definedTermExpression: NSRegularExpression?
 
     init(rules: FormattingRules = FormattingRules()) {
@@ -27,7 +25,6 @@ final class FormattingEngine {
         self.headerExpression = try? NSRegularExpression(pattern: rules.headerPattern)
         self.sectionNumberExpression = try? NSRegularExpression(pattern: rules.sectionNumberPattern)
         self.exceptionExpression = try? NSRegularExpression(pattern: rules.exceptionPattern)
-        self.shallExpression = try? NSRegularExpression(pattern: rules.shallPattern)
         self.definedTermExpression = try? NSRegularExpression(pattern: rules.definedTermPattern)
     }
 
@@ -64,16 +61,8 @@ final class FormattingEngine {
             ]
         }
 
-        applyRegex(shallExpression, to: attributed) {
-            [
-                .backgroundColor: theme.highlightColor
-            ]
-        }
-
         applyRegex(definedTermExpression, to: attributed) {
-            [
-                .backgroundColor: theme.definedTermColor
-            ]
+            [:]
         }
 
         applyManualSpans(spans, to: attributed, theme: theme)
@@ -118,7 +107,7 @@ final class FormattingEngine {
             case "underline":
                 attributed.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
             case "highlight":
-                attributed.addAttribute(.backgroundColor, value: theme.manualHighlightColor, range: range)
+                break
             case "accent":
                 attributed.addAttribute(.foregroundColor, value: theme.accentColor, range: range)
             default:

@@ -11,7 +11,7 @@ typealias PlatformColor = NSColor
 #endif
 
 enum ReaderFontChoice: String, CaseIterable, Codable, Identifiable, Sendable {
-    case system
+    case sanFrancisco
     case serif
     case rounded
     case monospaced
@@ -20,8 +20,8 @@ enum ReaderFontChoice: String, CaseIterable, Codable, Identifiable, Sendable {
 
     var displayName: String {
         switch self {
-        case .system:
-            return "System"
+        case .sanFrancisco:
+            return "San Francisco"
         case .serif:
             return "Serif"
         case .rounded:
@@ -33,6 +33,7 @@ enum ReaderFontChoice: String, CaseIterable, Codable, Identifiable, Sendable {
 }
 
 enum ReaderAccentPalette: String, CaseIterable, Codable, Identifiable, Sendable {
+    case monochrome
     case civicBlue
     case graphite
     case forest
@@ -42,6 +43,8 @@ enum ReaderAccentPalette: String, CaseIterable, Codable, Identifiable, Sendable 
 
     var displayName: String {
         switch self {
+        case .monochrome:
+            return "Black & White"
         case .civicBlue:
             return "Civic Blue"
         case .graphite:
@@ -55,6 +58,8 @@ enum ReaderAccentPalette: String, CaseIterable, Codable, Identifiable, Sendable 
 
     var hexColor: String {
         switch self {
+        case .monochrome:
+            return "#111111"
         case .civicBlue:
             return "#1D4F91"
         case .graphite:
@@ -71,11 +76,11 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     static let minimumFontSize: Double = 10
     static let maximumFontSize: Double = 26
 
-    var fontChoice: ReaderFontChoice = .system
+    var fontChoice: ReaderFontChoice = .sanFrancisco
     var fontSize: Double = 17
     var lineSpacing: Double = 5
     var paragraphSpacing: Double = 9
-    var accentPalette: ReaderAccentPalette = .civicBlue
+    var accentPalette: ReaderAccentPalette = .graphite
 
     static let `default` = ReaderTheme()
 
@@ -98,27 +103,34 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     }
 
     var accentColor: PlatformColor {
-        PlatformColor(hex: accentPalette.hexColor) ?? .systemBlueCompatible
+        if accentPalette == .monochrome {
+            return .labelCompatible
+        }
+        return PlatformColor(hex: accentPalette.hexColor) ?? .systemBlueCompatible
     }
 
     var highlightColor: PlatformColor {
-        accentColor.withAlphaComponentCompatible(0.18)
+        PlatformColor(hex: "#DCE7F2") ?? .systemBlueCompatible
     }
 
     var definedTermColor: PlatformColor {
-        accentColor.withAlphaComponentCompatible(0.10)
+        PlatformColor(hex: "#E8EEF3") ?? .systemBlueCompatible
     }
 
     var manualHighlightColor: PlatformColor {
-        accentColor.withAlphaComponentCompatible(0.28)
+        PlatformColor(hex: "#D4E2EF") ?? .systemBlueCompatible
     }
 }
 
 private extension ReaderFontChoice {
     func bodyFont(size: Double) -> PlatformFont {
         switch self {
-        case .system:
+        case .sanFrancisco:
+            #if canImport(UIKit)
+            return UIFont(name: "SFProText-Regular", size: size) ?? .systemFont(ofSize: size)
+            #else
             return .systemFont(ofSize: size)
+            #endif
         case .serif:
             #if canImport(UIKit)
             return UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body), size: size)
@@ -138,8 +150,12 @@ private extension ReaderFontChoice {
 
     func boldFont(size: Double) -> PlatformFont {
         switch self {
-        case .system:
-            return .systemFont(ofSize: size, weight: .semibold)
+        case .sanFrancisco:
+            #if canImport(UIKit)
+            return UIFont(name: "SFProText-Semibold", size: size) ?? .systemFont(ofSize: size, weight: .semibold)
+            #else
+            return .boldSystemFont(ofSize: size)
+            #endif
         case .serif:
             #if canImport(UIKit)
             let descriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline)
@@ -185,6 +201,14 @@ private extension PlatformColor {
         #endif
     }
 
+    static var labelCompatible: PlatformColor {
+        #if canImport(UIKit)
+        return .label
+        #else
+        return .labelColor
+        #endif
+    }
+
     convenience init?(hex: String) {
         let cleaned = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         guard cleaned.count == 6, let value = Int(cleaned, radix: 16) else { return nil }
@@ -198,11 +222,4 @@ private extension PlatformColor {
         #endif
     }
 
-    func withAlphaComponentCompatible(_ alpha: CGFloat) -> PlatformColor {
-        #if canImport(UIKit)
-        return withAlphaComponent(alpha)
-        #else
-        return withAlphaComponent(alpha)
-        #endif
-    }
 }

@@ -10,6 +10,10 @@ struct ChapterHTMLReaderView: View {
     @State private var targetAnchorID: String?
     @State private var selectedAnchor: PublishedHTMLAnchor?
     @State private var anchors: [PublishedHTMLAnchor] = []
+    @State private var openedSection: CodeSectionSummary?
+    @State private var hasActivatedHTMLReader = true
+    @State private var isJumpPickerPresented = false
+    @State private var scrollToTopTrigger = 0
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
@@ -29,14 +33,75 @@ struct ChapterHTMLReaderView: View {
         htmlStore.readAccessURL()
     }
 
+    private var shouldUseNativeAuthoredReader: Bool {
+        guard library.selectedVersion?.contentKind == .authored else { return false }
+        guard !library.sectionGroups(for: chapter).isEmpty else { return false }
+        guard let chapterURL else { return true }
+        return !PublishedHTMLContentStore.containsInlineImages(in: chapterURL)
+    }
+
     private var currentJumpLabel: String {
-        if let selectedAnchor {
-            return selectedAnchor.menuLabel
+        if let selectedAnchor,
+           let selectedTarget = jumpTargets.first(where: { $0.anchorID == selectedAnchor.anchorID || normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(selectedAnchor.sectionNumber) }) {
+            return selectedTarget.menuLabel
         }
-        if let initialAnchor {
-            return initialAnchor.menuLabel
+        if let initialTarget = jumpTargets.first(where: { normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(initialSection.sectionNumber) }) {
+            return initialTarget.menuLabel
         }
-        return "Jump within chapter"
+        return jumpTargets.first?.menuLabel ?? ""
+    }
+
+    private var jumpTargets: [ChapterHTMLJumpTarget] {
+        let sectionAnchors = anchors.filter { $0.level <= 2 }
+        if !sectionAnchors.isEmpty {
+            return sectionAnchors.map {
+                ChapterHTMLJumpTarget(
+                    sectionNumber: $0.sectionNumber,
+                    title: $0.title,
+                    anchorID: $0.anchorID,
+                    level: $0.level
+                )
+            }
+        }
+
+        return library.sectionGroups(for: chapter).map { group in
+            ChapterHTMLJumpTarget(
+                sectionNumber: sectionNumber(from: group.headerLine),
+                title: group.displayLabel,
+                anchorID: nil,
+                level: 2
+            )
+        }
+    }
+
+    private var bookmarkedAnchorIDs: Set<String> {
+        _ = library.bookmarkRevision
+        return Set(anchors.compactMap { anchor in
+            guard let summary = library.sectionSummary(sectionNumber: anchor.sectionNumber),
+                  library.isBookmarked(sectionID: summary.id)
+            else {
+                return nil
+            }
+            return anchor.anchorID
+        })
+    }
+
+    private var bookmarkedSectionNumbers: Set<String> {
+        _ = library.bookmarkRevision
+        var sectionNumbers = Set(library.bookmarks.map { bookmark in
+            normalizedSectionNumber(bookmark.sectionNumber)
+        })
+
+        let anchorSectionNumbers: [String] = anchors.compactMap { anchor -> String? in
+            guard let summary = library.sectionSummary(sectionNumber: anchor.sectionNumber),
+                  library.isBookmarked(sectionID: summary.id)
+            else {
+                return nil
+            }
+            return normalizedSectionNumber(summary.sectionNumber)
+        }
+        sectionNumbers.formUnion(anchorSectionNumbers)
+        return sectionNumbers
     }
 
     private var initialAnchor: PublishedHTMLAnchor? {
@@ -45,17 +110,39 @@ struct ChapterHTMLReaderView: View {
 
     var body: some View {
         Group {
-            if let chapterURL, let readAccessURL {
-                htmlReader(chapterURL: chapterURL, readAccessURL: readAccessURL)
+            if shouldUseNativeAuthoredReader {
+                ChapterReaderView(chapter: chapter, initialSectionID: initialSection.id)
+            } else if let chapterURL, let readAccessURL {
+                if hasActivatedHTMLReader {
+                    htmlReader(chapterURL: chapterURL, readAccessURL: readAccessURL)
+                } else {
+                    chapterLoadingShell
+                }
             } else if library.selectedVersion?.contentKind == .authored {
                 missingAuthoredContentView
             } else {
                 ChapterReaderView(chapter: chapter, initialSectionID: initialSection.id)
             }
         }
-        .navigationTitle(chapter.displayLabel)
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                VStack(spacing: 2) {
+                    Text(chapter.displayLabel + ":")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    Text(chapter.title)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+                .multilineTextAlignment(.center)
+            }
+        }
         .onAppear {
+            library.refreshBookmarks()
             if targetAnchorID == nil {
                 let anchor = initialAnchor
                 selectedAnchor = anchor
@@ -63,8 +150,36 @@ struct ChapterHTMLReaderView: View {
             }
         }
         .task(id: chapter.id) {
+            guard hasActivatedHTMLReader else { return }
             await loadAnchors()
         }
+        .task(id: hasActivatedHTMLReader) {
+            guard hasActivatedHTMLReader else { return }
+            await loadAnchors()
+        }
+        .sheet(isPresented: $isJumpPickerPresented) {
+            jumpPickerSheet
+        }
+        .navigationDestination(item: $openedSection) { section in
+            ReaderView(sectionID: section.id)
+                .environmentObject(library)
+        }
+    }
+
+    private var chapterLoadingShell: some View {
+        Color(uiColor: .systemGroupedBackground)
+            .ignoresSafeArea()
+            .overlay {
+                ProgressView()
+                    .controlSize(.regular)
+                    .tint(Color(uiColor: library.readerTheme.accentColor))
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                jumpBar
+                    .redacted(reason: .placeholder)
+                    .allowsHitTesting(false)
+                    .background(Color(uiColor: .systemGroupedBackground))
+            }
     }
 
     private var missingAuthoredContentView: some View {
@@ -86,61 +201,121 @@ struct ChapterHTMLReaderView: View {
     }
 
     private func htmlReader(chapterURL: URL, readAccessURL: URL) -> some View {
-        VStack(spacing: 0) {
+        ChapterHTMLWebView(
+            chapterURL: chapterURL,
+            readAccessURL: readAccessURL,
+            targetAnchorID: targetAnchorID,
+            readerTheme: library.readerTheme,
+            colorScheme: colorScheme,
+            bookmarkedAnchorIDs: bookmarkedAnchorIDs,
+            bookmarkedSectionNumbers: bookmarkedSectionNumbers,
+            expandAllTrigger: 0,
+            collapseAllTrigger: 0,
+            scrollToTopTrigger: scrollToTopTrigger,
+            onVisibleAnchorChange: { anchorID in
+                guard let anchor = anchors.first(where: { $0.anchorID == anchorID }) else { return }
+                // Prefer subsection-level anchors for the jump label so it reflects the current title.
+                if anchor.level >= 3 || selectedAnchor == nil {
+                    selectedAnchor = anchor
+                }
+            },
+            onOpenSectionForAnchor: { target in
+                openedSection = sectionSummary(for: target)
+            }
+        )
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar
-                .background(Color(uiColor: .systemBackground))
-
-            ChapterHTMLWebView(
-                chapterURL: chapterURL,
-                readAccessURL: readAccessURL,
-                targetAnchorID: targetAnchorID,
-                readerTheme: library.readerTheme,
-                colorScheme: colorScheme
-            )
+                .background(Color(uiColor: .systemGroupedBackground))
         }
-        .background(Color(uiColor: .systemBackground).ignoresSafeArea())
+        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
     }
 
     private var jumpBar: some View {
-        HStack(spacing: 12) {
-            Menu {
-                ForEach(anchors, id: \.anchorID) { anchor in
-                    Button(anchor.menuLabel) {
-                        selectedAnchor = anchor
-                        targetAnchorID = anchor.anchorID
-                    }
-                }
+        HStack(spacing: 10) {
+            Button {
+                isJumpPickerPresented = true
             } label: {
                 HStack(spacing: 8) {
                     Text(currentJumpLabel)
                         .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     Image(systemName: "chevron.down")
-                        .font(.caption.weight(.semibold))
+                        .font(.caption2.weight(.semibold))
                 }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(accentColor)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(Color(uiColor: .secondarySystemBackground))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 11)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
+                )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
+            .disabled(jumpTargets.isEmpty)
 
             Button {
-                if let firstAnchor = anchors.first {
-                    selectedAnchor = firstAnchor
-                    targetAnchorID = firstAnchor.anchorID
+                if let firstTarget = jumpTargets.first {
+                    selectedAnchor = firstTarget.publishedAnchor
+                    targetAnchorID = firstTarget.scrollTarget
                 }
+                scrollToTopTrigger += 1
             } label: {
                 Image(systemName: "arrow.up.to.line")
-                    .font(.headline)
+                    .font(.subheadline.weight(.semibold))
             }
-            .buttonStyle(.bordered)
-            .tint(accentColor)
+            .frame(width: 42, height: 42)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .padding(.horizontal, 16)
-        .padding(.top, 8)
-        .padding(.bottom, 10)
+        .padding(.top, 6)
+        .padding(.bottom, 8)
+    }
+
+    private var jumpPickerSheet: some View {
+        NavigationStack {
+            List {
+                ForEach(jumpTargets) { target in
+                    Button {
+                        selectedAnchor = target.publishedAnchor
+                        targetAnchorID = target.scrollTarget
+                        isJumpPickerPresented = false
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(target.menuLabel)
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(.primary)
+                                .lineLimit(2)
+                            if target.anchorID == selectedAnchor?.anchorID ||
+                                normalizedSectionNumber(target.sectionNumber) == normalizedSectionNumber(selectedAnchor?.sectionNumber ?? "") {
+                                Text("Current")
+                                    .font(.caption)
+                                    .foregroundStyle(accentColor)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            }
+            .navigationTitle("Jump within chapter")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        isJumpPickerPresented = false
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
     private func loadAnchors() async {
@@ -166,11 +341,76 @@ struct ChapterHTMLReaderView: View {
             targetAnchorID = anchor?.anchorID
         }
     }
-
     private func normalizedSectionNumber(_ value: String) -> String {
         value
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
             .uppercased()
+    }
+
+    private func sectionSummary(for target: ChapterHTMLSectionTarget) -> CodeSectionSummary? {
+        if let anchor = anchors.first(where: { $0.anchorID == target.anchorID }),
+           let section = library.sectionSummary(sectionNumber: anchor.sectionNumber) {
+            return section
+        }
+
+        if let sectionNumber = target.sectionNumber,
+           let section = library.sectionSummary(sectionNumber: sectionNumber) {
+            return section
+        }
+
+        if let sectionNumber = target.sectionNumber {
+            let normalizedTarget = normalizedSectionNumber(sectionNumber)
+            if let anchor = anchors.first(where: { normalizedSectionNumber($0.sectionNumber) == normalizedTarget }),
+               let section = library.sectionSummary(sectionNumber: anchor.sectionNumber) {
+                return section
+            }
+        }
+
+        return nil
+    }
+
+    private func sectionNumber(from headerLine: String) -> String {
+        let pattern = #"([A-Z]?\d+(?:\.\d+)*)\b"#
+        guard let expression = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
+            return headerLine
+        }
+        let nsHeader = headerLine as NSString
+        let range = NSRange(location: 0, length: nsHeader.length)
+        guard let match = expression.firstMatch(in: headerLine, range: range) else {
+            return headerLine
+        }
+        return nsHeader.substring(with: match.range(at: 1))
+    }
+}
+
+private struct ChapterHTMLJumpTarget: Identifiable, Hashable {
+    let sectionNumber: String
+    let title: String
+    let anchorID: String?
+    let level: Int
+
+    var id: String {
+        anchorID ?? sectionNumber
+    }
+
+    var menuLabel: String {
+        if title.localizedCaseInsensitiveContains("Section BC \(sectionNumber)") {
+            return title
+        }
+        return "Section BC \(sectionNumber): \(title)"
+    }
+
+    var scrollTarget: String {
+        anchorID ?? sectionNumber
+    }
+
+    var publishedAnchor: PublishedHTMLAnchor {
+        PublishedHTMLAnchor(
+            sectionNumber: sectionNumber,
+            title: title,
+            anchorID: scrollTarget,
+            level: level
+        )
     }
 }

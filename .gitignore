@@ -5,6 +5,7 @@
 .snapshots/
 
 .build/
+.derived/
 DerivedData/
 .DerivedData/
 .DerivedData*/
@@ -14,3 +15,5 @@ Packages/
 *.xcuserstate
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
+
+NYC CC APP/IMG_*.PNG

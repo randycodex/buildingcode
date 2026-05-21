@@ -30,9 +30,6 @@
 		A10000000000000000000019 /* ContentBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* ContentBlockView.swift */; };
 		A1000000000000000000001B /* ChapterHTMLWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001B /* ChapterHTMLWebView.swift */; };
 		A1000000000000000000001C /* ChapterHTMLReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001C /* ChapterHTMLReaderView.swift */; };
-		A1000000000000000000000F /* nyc_code_sample.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* nyc_code_sample.sqlite */; };
-		A10000000000000000000010 /* Figures in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* Figures */; };
-		A10000000000000000000011 /* nyc_code_2022.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* nyc_code_2022.sqlite */; };
 		A10000000000000000000017 /* nyc_code_authored.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* nyc_code_authored.json */; };
 		A1000000000000000000001D /* CodeContent in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* CodeContent */; };
 /* End PBXBuildFile section */
@@ -239,11 +236,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1000000000000000000000F /* nyc_code_sample.sqlite in Resources */,
-				A10000000000000000000011 /* nyc_code_2022.sqlite in Resources */,
 				A10000000000000000000017 /* nyc_code_authored.json in Resources */,
 				A1000000000000000000001D /* CodeContent in Resources */,
-				A10000000000000000000010 /* Figures in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

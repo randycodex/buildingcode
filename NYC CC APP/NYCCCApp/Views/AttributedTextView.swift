@@ -388,7 +388,7 @@ struct ZoomableImageViewer: View {
                     .font(.headline.weight(.bold))
                     .foregroundStyle(.white)
                     .padding(14)
-                    .background(.black.opacity(0.55))
+                    .background(Color.black)
                     .clipShape(Circle())
             }
             .padding(.top, 18)

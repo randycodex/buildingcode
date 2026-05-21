@@ -24,6 +24,9 @@ final class PublishedHTMLContentStore {
         let anchorsBySectionNumber: [String: PublishedHTMLAnchor]
     }
 
+    private static var anchorCache: [String: [PublishedHTMLAnchor]] = [:]
+    private static let anchorCacheLock = NSLock()
+
     private let rootURL: URL?
     private var chapterCache: [String: ChapterCache] = [:]
 
@@ -65,10 +68,41 @@ final class PublishedHTMLContentStore {
     }
 
     static func anchors(in chapterURL: URL) -> [PublishedHTMLAnchor] {
+        let cacheKey = chapterURL.path
+        anchorCacheLock.lock()
+        if let cached = anchorCache[cacheKey] {
+            anchorCacheLock.unlock()
+            return cached
+        }
+        anchorCacheLock.unlock()
+
         guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
             return []
         }
-        return sortedAnchors(parseAnchors(in: html).values)
+        let parsedAnchors = sortedAnchors(parseAnchors(in: html).values)
+
+        anchorCacheLock.lock()
+        anchorCache[cacheKey] = parsedAnchors
+        anchorCacheLock.unlock()
+
+        return parsedAnchors
+    }
+
+    static func containsInlineImages(in chapterURL: URL) -> Bool {
+        guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
+            return false
+        }
+        return html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    static func containsInlineTables(in chapterURL: URL) -> Bool {
+        guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
+            return false
+        }
+        return html.range(
+            of: #"<(?:table|ScrollTable)\b|class="[^"]*\bxsl-table\b"#,
+            options: [.regularExpression, .caseInsensitive]
+        ) != nil
     }
 
     private func chapterCache(chapterNumber: String) -> ChapterCache? {
@@ -77,15 +111,17 @@ final class PublishedHTMLContentStore {
             return cached
         }
 
-        guard let url = chapterURL(chapterNumber: chapterNumber),
-              let html = try? String(contentsOf: url, encoding: .utf8)
-        else {
+        guard let url = chapterURL(chapterNumber: chapterNumber) else {
             return nil
         }
 
         let cache = ChapterCache(
             url: url,
-            anchorsBySectionNumber: Self.parseAnchors(in: html)
+            anchorsBySectionNumber: Dictionary(
+                uniqueKeysWithValues: Self.anchors(in: url).map { anchor in
+                    (Self.normalizedSectionKey(anchor.sectionNumber), anchor)
+                }
+            )
         )
         chapterCache[key] = cache
         return cache
@@ -126,6 +162,52 @@ final class PublishedHTMLContentStore {
     }
 
     private static func parseHeading(_ heading: String) -> (sectionNumber: String, title: String, level: Int)? {
+        if let appendixMatch = firstMatch(
+            in: heading,
+            pattern: #"^Appendix\s+([A-Z0-9]+):?\s*(.*)$"#
+        ) {
+            let title = appendixMatch[2].isEmpty ? "Appendix \(appendixMatch[1])" : appendixMatch[2]
+            return (
+                sectionNumber: appendixMatch[1],
+                title: title,
+                level: 1
+            )
+        }
+
+        if let appendixMatch = firstMatch(
+            in: heading,
+            pattern: #"^#-\s*Appendix\s+([A-Z0-9]+):?\s*(.*)$"#
+        ) {
+            let title = appendixMatch[2].isEmpty ? "Appendix \(appendixMatch[1])" : appendixMatch[2]
+            return (
+                sectionNumber: appendixMatch[1],
+                title: title,
+                level: 1
+            )
+        }
+
+        if let chapterMatch = firstMatch(
+            in: heading,
+            pattern: #"^Chapter\s+([A-Z0-9]+):\s*(.+)$"#
+        ) {
+            return (
+                sectionNumber: chapterMatch[1],
+                title: "Chapter \(chapterMatch[1]): \(chapterMatch[2])",
+                level: 2
+            )
+        }
+
+        if let sectionMatch = firstMatch(
+            in: heading,
+            pattern: #"^Section\s+BC\s+([A-Z0-9.]+):\s*(.+)$"#
+        ) {
+            return (
+                sectionNumber: sectionMatch[1],
+                title: "Section BC \(sectionMatch[1]): \(sectionMatch[2])",
+                level: 2
+            )
+        }
+
         if let sectionMatch = firstMatch(
             in: heading,
             pattern: #"^#--\s*Section\s+BC\s+([A-Z0-9.]+):\s*(.+)$"#
@@ -134,6 +216,17 @@ final class PublishedHTMLContentStore {
                 sectionNumber: sectionMatch[1],
                 title: "Section BC \(sectionMatch[1]): \(sectionMatch[2])",
                 level: 2
+            )
+        }
+
+        if let titleMatch = firstMatch(
+            in: heading,
+            pattern: #"^([A-Z0-9]+(?:\.[A-Z0-9]+)*)\s+(.+)$"#
+        ) {
+            return (
+                sectionNumber: titleMatch[1],
+                title: titleMatch[2],
+                level: 3
             )
         }
 

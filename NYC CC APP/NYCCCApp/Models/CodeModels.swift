@@ -292,28 +292,41 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let id: Int64
     let codeVersion: String
     let chapterNumber: String
+    let chapterTitle: String
     let sectionNumber: String
     let title: String
     let kind: CodeSectionKind
+    let isBookmarked: Bool
+    let noteBody: String
 
     init(
         id: Int64,
         codeVersion: String,
         chapterNumber: String,
+        chapterTitle: String,
         sectionNumber: String,
         title: String,
-        kind: CodeSectionKind = .title
+        kind: CodeSectionKind = .title,
+        isBookmarked: Bool = true,
+        noteBody: String = ""
     ) {
         self.id = id
         self.codeVersion = codeVersion
         self.chapterNumber = chapterNumber
+        self.chapterTitle = chapterTitle
         self.sectionNumber = sectionNumber
         self.title = title
         self.kind = kind
+        self.isBookmarked = isBookmarked
+        self.noteBody = noteBody
     }
 
     var displayTitle: String {
         kind == .textBlock ? title : title.displayTitle(for: sectionNumber)
+    }
+
+    var hasNote: Bool {
+        !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 

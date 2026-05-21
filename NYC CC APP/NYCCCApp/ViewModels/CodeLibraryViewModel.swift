@@ -40,6 +40,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var selectedCodeSectionID: Int64?
     @Published var statusMessage: String?
     @Published var readerTheme: ReaderTheme
+    @Published private(set) var isInitialContentLoaded: Bool = false
 
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
@@ -62,6 +63,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var versionLoadTask: Task<Void, Never>?
     private var contentLoadTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
+    @Published private(set) var bookmarkRevision: Int = 0
 
     init(
         locator: BundleDatabaseLocator = BundleDatabaseLocator(),
@@ -74,6 +76,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.readerTheme = readerThemeStore.load()
         self.userDataStore = try? UserDataStore()
         statusMessage = "Loading code library..."
+        isInitialContentLoaded = false
         reload()
     }
 
@@ -93,6 +96,7 @@ final class CodeLibraryViewModel: ObservableObject {
         versionLoadTask?.cancel()
         contentLoadTask?.cancel()
         statusMessage = "Loading code library..."
+        isInitialContentLoaded = false
 
         versionLoadTask = Task { [selectedVersionDefaultsKey] in
             let availableVersions = await Task.detached(priority: .userInitiated) {
@@ -183,7 +187,16 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func sectionGroups(for chapter: CodeChapter) -> [CodeSectionGroup] {
         if let authoredCodeStore {
-            return authoredCodeStore.sectionGroups(chapterID: chapter.id)
+            let groups = authoredCodeStore.sectionGroups(chapterID: chapter.id)
+            if !groups.isEmpty {
+                return groups
+            }
+            if let htmlGroups = htmlSectionGroups(for: chapter) {
+                sectionGroupsCache[chapter.id] = htmlGroups
+                sectionsCache[chapter.id] = htmlGroups.flatMap(\.sections)
+                return htmlGroups
+            }
+            return []
         }
         if let cached = sectionGroupsCache[chapter.id] {
             return cached
@@ -200,6 +213,160 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func sectionCount(for chapter: CodeChapter) -> Int {
         sections(for: chapter).count
+    }
+
+    func firstSectionAsync(for chapter: CodeChapter) async -> CodeSectionSummary? {
+        if let cached = firstSection(for: chapter) {
+            return cached
+        }
+
+        if let authoredCodeStore {
+            let authoredSections = authoredCodeStore.sections(chapterID: chapter.id)
+            if let firstAuthoredSection = authoredSections.first {
+                return firstAuthoredSection
+            }
+            if let htmlSection = firstHTMLSection(for: chapter) {
+                sectionsCache[chapter.id] = [htmlSection]
+                return htmlSection
+            }
+            return nil
+        }
+
+        if let cached = sectionsCache[chapter.id] {
+            return cached.first
+        }
+
+        if let cachedGroups = sectionGroupsCache[chapter.id] {
+            return cachedGroups.first?.sections.first
+        }
+
+        guard let sqliteChapterLoader else {
+            return sections(for: chapter).first
+        }
+
+        do {
+            let groups = try await sqliteChapterLoader.sectionGroups(chapterID: chapter.id)
+            sectionGroupsCache[chapter.id] = groups
+            sectionsCache[chapter.id] = groups.flatMap(\.sections)
+            return groups.first?.sections.first
+        } catch {
+            statusMessage = error.localizedDescription
+            return nil
+        }
+    }
+
+    func firstSection(for chapter: CodeChapter) -> CodeSectionSummary? {
+        if let cached = sectionsCache[chapter.id] {
+            return cached.first
+        }
+
+        if let cachedGroups = sectionGroupsCache[chapter.id] {
+            return cachedGroups.first?.sections.first
+        }
+
+        if let authoredCodeStore {
+            let groups = authoredCodeStore.sectionGroups(chapterID: chapter.id)
+            sectionGroupsCache[chapter.id] = groups
+            sectionsCache[chapter.id] = groups.flatMap(\.sections)
+            if let firstSection = sectionsCache[chapter.id]?.first {
+                return firstSection
+            }
+            if let htmlSection = firstHTMLSection(for: chapter) {
+                sectionsCache[chapter.id] = [htmlSection]
+                return htmlSection
+            }
+        }
+
+        return nil
+    }
+
+    private func htmlSectionGroups(for chapter: CodeChapter) -> [CodeSectionGroup]? {
+        guard selectedVersion?.contentKind == .authored,
+              let relativeRootPath = selectedVersion?.authoredHTMLBundlePath
+        else {
+            return nil
+        }
+
+        let htmlStore = PublishedHTMLContentStore(relativeRootPath: relativeRootPath)
+        let anchors = htmlStore.anchors(chapterNumber: chapter.chapterNumber)
+        guard !anchors.isEmpty else { return nil }
+
+        let sectionAnchors = anchors.filter { $0.level >= 2 }
+        guard !sectionAnchors.isEmpty else { return nil }
+
+        let levelTwoAnchors = sectionAnchors.filter { $0.level == 2 }
+        if levelTwoAnchors.isEmpty {
+            return [
+                CodeSectionGroup(
+                    id: "html-\(chapter.chapterNumber)",
+                    headerLine: chapter.displayLabel,
+                    headingLine: chapter.title,
+                    sections: sectionAnchors.map { anchor in
+                        CodeSectionSummary(
+                            id: Self.syntheticSectionID(for: chapter.chapterNumber, sectionNumber: anchor.sectionNumber),
+                            chapterNumber: chapter.chapterNumber,
+                            sectionNumber: anchor.sectionNumber,
+                            title: anchor.title
+                        )
+                    }
+                )
+            ]
+        }
+
+        var groups: [CodeSectionGroup] = []
+        for (index, groupAnchor) in levelTwoAnchors.enumerated() {
+            let nextGroupAnchor = index < levelTwoAnchors.count - 1 ? levelTwoAnchors[index + 1] : nil
+            let childAnchors = sectionAnchors.filter { anchor in
+                guard anchor.level > groupAnchor.level else { return false }
+                if anchor.sectionNumber.compare(groupAnchor.sectionNumber, options: [.numeric, .caseInsensitive]) != .orderedDescending {
+                    return false
+                }
+                if let nextGroupAnchor {
+                    return anchor.sectionNumber.compare(nextGroupAnchor.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+                }
+                return true
+            }
+
+            groups.append(
+                CodeSectionGroup(
+                    id: "html-\(chapter.chapterNumber)-\(groupAnchor.sectionNumber)",
+                    headerLine: groupAnchor.title,
+                    headingLine: nil,
+                    sections: childAnchors.map { anchor in
+                        CodeSectionSummary(
+                            id: Self.syntheticSectionID(for: chapter.chapterNumber, sectionNumber: anchor.sectionNumber),
+                            chapterNumber: chapter.chapterNumber,
+                            sectionNumber: anchor.sectionNumber,
+                            title: anchor.title
+                        )
+                    }
+                )
+            )
+        }
+
+        return groups.filter { !$0.sections.isEmpty }
+    }
+
+    private func firstHTMLSection(for chapter: CodeChapter) -> CodeSectionSummary? {
+        guard selectedVersion?.contentKind == .authored,
+              let relativeRootPath = selectedVersion?.authoredHTMLBundlePath
+        else {
+            return nil
+        }
+
+        let htmlStore = PublishedHTMLContentStore(relativeRootPath: relativeRootPath)
+        guard let chapterURL = htmlStore.chapterURL(chapterNumber: chapter.chapterNumber),
+              let firstAnchor = PublishedHTMLContentStore.anchors(in: chapterURL).first
+        else {
+            return nil
+        }
+
+        return CodeSectionSummary(
+            id: Self.syntheticSectionID(for: chapter.chapterNumber, sectionNumber: firstAnchor.sectionNumber),
+            chapterNumber: chapter.chapterNumber,
+            sectionNumber: firstAnchor.sectionNumber,
+            title: firstAnchor.title
+        )
     }
 
     func loadSectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
@@ -322,6 +489,17 @@ final class CodeLibraryViewModel: ObservableObject {
         )
     }
 
+    func renderHTMLTextBlock(_ html: String, fallbackText: String) -> NSAttributedString {
+        let rendered = Self.inlineHTMLTextBlock(
+            html: html,
+            fallbackText: fallbackText,
+            theme: readerTheme
+        )
+        return rendered.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? renderPlainTextBlock(fallbackText)
+            : rendered
+    }
+
     func chapterBodyNSTextAsync(for detail: ReaderSectionDetail) async -> NSAttributedString {
         let cacheKey = FormattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
         if let cached = chapterBodyNSTextCache[cacheKey] {
@@ -426,6 +604,25 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func sectionSummary(sectionNumber: String) -> CodeSectionSummary? {
+        let normalized = sectionNumber
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
+
+        guard !normalized.isEmpty else { return nil }
+
+        if let authoredCodeStore {
+            return try? authoredCodeStore.sectionSummary(sectionNumber: normalized)
+        }
+
+        do {
+            return try codeDatabase?.sectionSummary(sectionNumber: normalized)
+        } catch {
+            statusMessage = error.localizedDescription
+            return nil
+        }
+    }
+
     func loadSectionDetailsAsync(sectionIDs: [Int64]) async -> [ReaderSectionDetail] {
         guard !sectionIDs.isEmpty else { return [] }
 
@@ -494,32 +691,50 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func refreshBookmarks() {
         guard let selectedVersion, let userDataStore else {
+            bookmarkedSectionIDs = []
             bookmarks = []
+            bookmarkRevision &+= 1
             return
         }
 
         do {
             let ids = try userDataStore.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
+            let noteEntries = try userDataStore.noteEntries(codeVersion: selectedVersion.codeVersion)
             bookmarkedSectionIDs = Set(ids)
+            let savedSectionIDs = Array(Set(ids).union(noteEntries.keys)).sorted()
             if let authoredCodeStore {
-                bookmarks = authoredCodeStore.bookmarkedSections(ids: ids, codeVersion: selectedVersion.codeVersion)
+                bookmarks = authoredCodeStore.savedSections(
+                    ids: savedSectionIDs,
+                    codeVersion: selectedVersion.codeVersion,
+                    bookmarkedSectionIDs: bookmarkedSectionIDs,
+                    notesBySectionID: noteEntries
+                )
             } else {
-                bookmarks = try codeDatabase?.bookmarkedSections(ids: ids, codeVersion: selectedVersion.codeVersion) ?? []
+                bookmarks = try codeDatabase?.savedSections(
+                    ids: savedSectionIDs,
+                    codeVersion: selectedVersion.codeVersion,
+                    bookmarkedSectionIDs: bookmarkedSectionIDs,
+                    notesBySectionID: noteEntries
+                ) ?? []
             }
         } catch {
             statusMessage = error.localizedDescription
             bookmarkedSectionIDs = []
             bookmarks = []
         }
+        bookmarkRevision &+= 1
     }
 
-    func toggleBookmark(sectionID: Int64) {
-        guard let selectedVersion, let userDataStore else { return }
+    @discardableResult
+    func toggleBookmark(sectionID: Int64) -> Bool {
+        guard let selectedVersion, let userDataStore else { return false }
         do {
             try userDataStore.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
+            return bookmarkedSectionIDs.contains(sectionID)
         } catch {
             statusMessage = error.localizedDescription
+            return bookmarkedSectionIDs.contains(sectionID)
         }
     }
 
@@ -537,6 +752,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let selectedVersion, let userDataStore else { return }
         do {
             try userDataStore.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
+            refreshBookmarks()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -554,6 +770,7 @@ final class CodeLibraryViewModel: ObservableObject {
             codeDatabase = nil
             authoredCodeStore = nil
             statusMessage = "Bundle authored content or a generated SQLite database to browse code content."
+            isInitialContentLoaded = true
             return
         }
 
@@ -571,7 +788,13 @@ final class CodeLibraryViewModel: ObservableObject {
                 sqliteChapterLoader = try SQLiteChapterLoader(databaseURL: selectedVersion.fileURL)
                 chapters = try codeDatabase?.chapters() ?? []
                 refreshBookmarks()
-                statusMessage = nil
+                let chapters = self.chapters
+                contentLoadTask = Task {
+                    await self.prewarmSQLiteContent(chapters: chapters)
+                    guard !Task.isCancelled else { return }
+                    self.statusMessage = nil
+                    self.isInitialContentLoaded = true
+                }
             } catch {
                 codeSections = []
                 selectedCodeSectionID = nil
@@ -603,7 +826,14 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.chapters = snapshot.chapters
                     self.searchResults = []
                     self.refreshBookmarks()
+                    await self.prewarmAuthoredContent(
+                        version: selectedVersion,
+                        chapters: snapshot.chapters,
+                        store: snapshot.store
+                    )
+                    guard !Task.isCancelled else { return }
                     self.statusMessage = nil
+                    self.isInitialContentLoaded = true
                 } catch {
                     guard !Task.isCancelled else { return }
                     self.codeSections = []
@@ -615,6 +845,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.sqliteChapterLoader = nil
                     self.authoredCodeStore = nil
                     self.statusMessage = error.localizedDescription
+                    self.isInitialContentLoaded = true
                 }
             }
         }
@@ -633,13 +864,289 @@ final class CodeLibraryViewModel: ObservableObject {
         let resolvedCodeSectionID = availableCodeSections.contains(where: { $0.id == selectedCodeSectionID })
             ? selectedCodeSectionID
             : availableCodeSections.first?.id
-        let chapters = store.chapters(codeSectionID: resolvedCodeSectionID)
+        let authoredChapters = store.chapters(codeSectionID: resolvedCodeSectionID)
+        let chapters = authoredChapters + Self.htmlOnlyAppendixChapters(
+            version: version,
+            codeSectionID: resolvedCodeSectionID,
+            existingChapters: authoredChapters
+        )
         return AuthoredContentSnapshot(
             store: store,
             codeSections: availableCodeSections,
             resolvedCodeSectionID: resolvedCodeSectionID,
             chapters: chapters
         )
+    }
+
+    private nonisolated static func inlineHTMLTextBlock(
+        html: String,
+        fallbackText: String,
+        theme: ReaderTheme
+    ) -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = theme.lineSpacing
+        paragraphStyle.paragraphSpacing = min(theme.paragraphSpacing, 4)
+
+        let baseAttributes: [NSAttributedString.Key: Any] = [
+            .font: theme.bodyFont,
+            .foregroundColor: UIColor.label,
+            .paragraphStyle: paragraphStyle
+        ]
+        let attributed = NSMutableAttributedString(string: "", attributes: baseAttributes)
+        var styleStack: [(bold: Bool, italic: Bool)] = [(false, false)]
+        var cursor = html.startIndex
+
+        while cursor < html.endIndex {
+            guard let tagRange = html.range(of: #"<[^>]+>"#, options: .regularExpression, range: cursor..<html.endIndex) else {
+                appendHTMLText(String(html[cursor..<html.endIndex]), to: attributed, style: styleStack.last ?? (false, false), theme: theme, paragraphStyle: paragraphStyle)
+                break
+            }
+
+            appendHTMLText(String(html[cursor..<tagRange.lowerBound]), to: attributed, style: styleStack.last ?? (false, false), theme: theme, paragraphStyle: paragraphStyle)
+            let tag = String(html[tagRange])
+            let lowercasedTag = tag.lowercased()
+
+            if lowercasedTag.hasPrefix("<br") || lowercasedTag.hasPrefix("</div") || lowercasedTag.hasPrefix("</p") || lowercasedTag.hasPrefix("</li") {
+                appendNewlineIfNeeded(to: attributed, attributes: baseAttributes)
+            } else if lowercasedTag.hasPrefix("<b") || lowercasedTag.hasPrefix("<strong") {
+                let current = styleStack.last ?? (false, false)
+                styleStack.append((true, current.italic))
+            } else if lowercasedTag.hasPrefix("</b") || lowercasedTag.hasPrefix("</strong") {
+                if styleStack.count > 1 { styleStack.removeLast() }
+            } else if lowercasedTag.hasPrefix("<i") || lowercasedTag.hasPrefix("<em") {
+                let current = styleStack.last ?? (false, false)
+                styleStack.append((current.bold, true))
+            } else if lowercasedTag.hasPrefix("</i") || lowercasedTag.hasPrefix("</em") {
+                if styleStack.count > 1 { styleStack.removeLast() }
+            } else if lowercasedTag.contains("font-weight: bold") || lowercasedTag.contains("font-weight:bold") || lowercasedTag.contains("font-style: italic") || lowercasedTag.contains("font-style:italic") {
+                let current = styleStack.last ?? (false, false)
+                styleStack.append((
+                    current.bold || lowercasedTag.contains("font-weight: bold") || lowercasedTag.contains("font-weight:bold"),
+                    current.italic || lowercasedTag.contains("font-style: italic") || lowercasedTag.contains("font-style:italic")
+                ))
+            } else if lowercasedTag.hasPrefix("</span") {
+                if styleStack.count > 1 { styleStack.removeLast() }
+            }
+
+            cursor = tagRange.upperBound
+        }
+
+        trimWhitespace(in: attributed)
+        if attributed.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            attributed.append(NSAttributedString(string: fallbackText, attributes: baseAttributes))
+        }
+        return attributed
+    }
+
+    private nonisolated static func appendHTMLText(
+        _ rawText: String,
+        to attributed: NSMutableAttributedString,
+        style: (bold: Bool, italic: Bool),
+        theme: ReaderTheme,
+        paragraphStyle: NSParagraphStyle
+    ) {
+        let decoded = decodeInlineHTMLEntities(rawText)
+            .replacingOccurrences(of: #"[ \t\r\f]+"#, with: " ", options: .regularExpression)
+        guard !decoded.isEmpty else { return }
+
+        let font: UIFont
+        if style.bold && style.italic,
+           let descriptor = theme.boldFont.fontDescriptor.withSymbolicTraits([.traitBold, .traitItalic]) {
+            font = UIFont(descriptor: descriptor, size: theme.fontSize)
+        } else if style.bold {
+            font = theme.boldFont
+        } else if style.italic {
+            font = theme.italicFont
+        } else {
+            font = theme.bodyFont
+        }
+
+        attributed.append(
+            NSAttributedString(
+                string: decoded,
+                attributes: [
+                    .font: font,
+                    .foregroundColor: UIColor.label,
+                    .paragraphStyle: paragraphStyle
+                ]
+            )
+        )
+    }
+
+    private nonisolated static func appendNewlineIfNeeded(
+        to attributed: NSMutableAttributedString,
+        attributes: [NSAttributedString.Key: Any]
+    ) {
+        guard !attributed.string.hasSuffix("\n") else { return }
+        attributed.append(NSAttributedString(string: "\n", attributes: attributes))
+    }
+
+    private nonisolated static func decodeInlineHTMLEntities(_ text: String) -> String {
+        var decoded = text
+        let replacements = [
+            "&nbsp;": " ",
+            "&#160;": " ",
+            "&amp;": "&",
+            "&lt;": "<",
+            "&gt;": ">",
+            "&quot;": "\"",
+            "&#39;": "'",
+            "&#176;": "°",
+            "&#8211;": "-",
+            "&#8212;": "-",
+            "&#8216;": "'",
+            "&#8217;": "'",
+            "&#8220;": "\"",
+            "&#8221;": "\""
+        ]
+        for (entity, replacement) in replacements {
+            decoded = decoded.replacingOccurrences(of: entity, with: replacement)
+        }
+        return decoded
+    }
+
+    private nonisolated static func trimWhitespace(in attributed: NSMutableAttributedString) {
+        while attributed.length > 0,
+              let first = attributed.string.first,
+              first.isWhitespace {
+            attributed.deleteCharacters(in: NSRange(location: 0, length: 1))
+        }
+        while attributed.length > 0,
+              let last = attributed.string.last,
+              last.isWhitespace {
+            attributed.deleteCharacters(in: NSRange(location: attributed.length - 1, length: 1))
+        }
+    }
+
+    private nonisolated static func htmlOnlyAppendixChapters(
+        version: BundledCodeVersion,
+        codeSectionID: Int64?,
+        existingChapters: [CodeChapter]
+    ) -> [CodeChapter] {
+        guard let authoredHTMLBundlePath = version.authoredHTMLBundlePath else { return [] }
+
+        let existingNumbers = Set(existingChapters.map { $0.chapterNumber.uppercased() })
+        let chaptersURL = version.fileURL
+            .deletingLastPathComponent()
+            .appendingPathComponent("chapters", isDirectory: true)
+        guard let chapterURLs = try? FileManager.default.contentsOfDirectory(
+            at: chaptersURL,
+            includingPropertiesForKeys: [.isRegularFileKey],
+            options: [.skipsHiddenFiles]
+        ) else {
+            _ = authoredHTMLBundlePath
+            return []
+        }
+
+        return chapterURLs.compactMap { url -> CodeChapter? in
+            guard url.pathExtension.lowercased() == "html" else { return nil }
+            let chapterNumber = url.deletingPathExtension().lastPathComponent.uppercased()
+            guard chapterNumber.rangeOfCharacter(from: .letters) != nil,
+                  existingNumbers.contains(chapterNumber) == false
+            else {
+                return nil
+            }
+
+            return CodeChapter(
+                id: Self.syntheticChapterID(for: chapterNumber),
+                codeSectionID: codeSectionID,
+                chapterNumber: chapterNumber,
+                title: Self.htmlChapterTitle(in: url, chapterNumber: chapterNumber)
+            )
+        }
+        .sorted {
+            $0.chapterNumber.compare($1.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+        }
+    }
+
+    private nonisolated static func syntheticChapterID(for chapterNumber: String) -> Int64 {
+        let value = chapterNumber.unicodeScalars.reduce(Int64(0)) { partial, scalar in
+            partial * 31 + Int64(scalar.value)
+        }
+        return -1_000_000 - value
+    }
+
+    private nonisolated static func syntheticSectionID(for chapterNumber: String, sectionNumber: String) -> Int64 {
+        let value = "\(chapterNumber):\(sectionNumber)".unicodeScalars.reduce(Int64(0)) { partial, scalar in
+            partial * 31 + Int64(scalar.value)
+        }
+        return -2_000_000 - value
+    }
+
+    private nonisolated static func htmlChapterTitle(in url: URL, chapterNumber: String) -> String {
+        guard let html = try? String(contentsOf: url, encoding: .utf8),
+              let expression = try? NSRegularExpression(
+                pattern: #"<div\s+id="[^"]+"[^>]*class="[^"]*Subarticle[^"]*"[^>]*>.*?<h6[^>]*>(.*?)</h6>"#,
+                options: [.caseInsensitive, .dotMatchesLineSeparators]
+              )
+        else {
+            return "Appendix \(chapterNumber)"
+        }
+
+        let nsHTML = html as NSString
+        let range = NSRange(location: 0, length: nsHTML.length)
+        guard let match = expression.firstMatch(in: html, range: range),
+              match.numberOfRanges > 1
+        else {
+            return "Appendix \(chapterNumber)"
+        }
+
+        let heading = nsHTML.substring(with: match.range(at: 1))
+            .replacingOccurrences(of: #"<[^>]+>"#, with: "", options: .regularExpression)
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&#160;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: #"^#-+\s*"#, with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let appendixPrefix = "Appendix \(chapterNumber)"
+        if heading.localizedCaseInsensitiveCompare(appendixPrefix) == .orderedSame {
+            return appendixPrefix
+        }
+        if heading.lowercased().hasPrefix((appendixPrefix + ":").lowercased()) {
+            return heading
+                .dropFirst((appendixPrefix + ":").count)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return heading
+    }
+
+    private func prewarmAuthoredContent(
+        version: BundledCodeVersion,
+        chapters: [CodeChapter],
+        store: AuthoredCodeStore
+    ) async {
+        statusMessage = "Preparing chapter navigation..."
+
+        for chapter in chapters {
+            let groups = store.sectionGroups(chapterID: chapter.id)
+            sectionGroupsCache[chapter.id] = groups
+            sectionsCache[chapter.id] = groups.flatMap(\.sections)
+        }
+    }
+
+    private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
+        guard let sqliteChapterLoader else { return }
+        statusMessage = "Preparing chapter navigation..."
+
+        for chapter in chapters {
+            guard !Task.isCancelled else { return }
+            do {
+                let groups = try await sqliteChapterLoader.sectionGroups(chapterID: chapter.id)
+                sectionGroupsCache[chapter.id] = groups
+                let sections = groups.flatMap(\.sections)
+                sectionsCache[chapter.id] = sections
+                let sectionIDs = sections.map(\.id)
+                for batch in sectionIDs.chunked(into: 24) {
+                    guard !Task.isCancelled else { return }
+                    _ = await loadSectionDetailsAsync(sectionIDs: batch)
+                }
+            } catch {
+                statusMessage = error.localizedDescription
+                return
+            }
+        }
     }
 
     private func formattedNSAttributedText(for detail: ReaderSectionDetail) -> NSAttributedString {
@@ -826,6 +1333,13 @@ private actor SQLiteChapterLoader {
 }
 
 private extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        guard size > 0 else { return [self] }
+        return stride(from: 0, to: count, by: size).map { start in
+            Array(self[start..<Swift.min(start + size, count)])
+        }
+    }
+
     func asyncCompactMap<T>(
         _ transform: (Element) async -> T?
     ) async -> [T] {
