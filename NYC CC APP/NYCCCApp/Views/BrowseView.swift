@@ -170,8 +170,12 @@ struct BrowseView: View {
             .font(.system(size: 15, weight: .semibold))
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color(uiColor: .secondarySystemGroupedBackground))
+            )
     }
 
     private var browseBackdrop: some View {
@@ -434,10 +438,12 @@ private struct ChapterTile: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(nil)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(height: 110)
+        .frame(minHeight: 110)
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Chapter \(chapter.displayLabel): \(chapter.title)"))
