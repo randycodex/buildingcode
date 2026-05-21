@@ -34,6 +34,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var codeSections: [CodeSectionCategory] = []
     @Published private(set) var chapters: [CodeChapter] = []
     @Published private(set) var searchResults: [CodeSearchResult] = []
+    @Published private(set) var recentSearches: [String] = []
     @Published private(set) var bookmarks: [BookmarkedSection] = []
     @Published var selectedVersionFileName: String = ""
     @Published var selectedJurisdictionKey: String = ""
@@ -47,6 +48,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let referenceResolver = CodeReferenceResolver()
     private let userDataStore: UserDataStore?
     private let readerThemeStore: ReaderThemeStore
+    private let recentSearchesDefaultsKey = "recentSearches"
     private var codeDatabase: CodeDatabase?
     private var sqliteChapterLoader: SQLiteChapterLoader?
     private var authoredCodeStore: AuthoredCodeStore?
@@ -75,6 +77,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.readerThemeStore = readerThemeStore
         self.readerTheme = readerThemeStore.load()
         self.userDataStore = try? UserDataStore()
+        self.recentSearches = Self.loadRecentSearches()
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         reload()
@@ -689,6 +692,27 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func recordRecentSearch(_ query: String) {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        var updated = recentSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
+        updated.insert(trimmed, at: 0)
+        recentSearches = Array(updated.prefix(10))
+        UserDefaults.standard.set(recentSearches, forKey: recentSearchesDefaultsKey)
+    }
+
+    func removeRecentSearch(_ query: String) {
+        recentSearches.removeAll { $0.caseInsensitiveCompare(query) == .orderedSame }
+        UserDefaults.standard.set(recentSearches, forKey: recentSearchesDefaultsKey)
+    }
+
+    private static func loadRecentSearches() -> [String] {
+        (UserDefaults.standard.array(forKey: "recentSearches") as? [String] ?? [])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+
     func refreshBookmarks() {
         guard let selectedVersion, let userDataStore else {
             bookmarkedSectionIDs = []
@@ -931,6 +955,7 @@ final class CodeLibraryViewModel: ObservableObject {
             cursor = tagRange.upperBound
         }
 
+        normalizeInlineHTMLAttributedText(in: attributed)
         trimWhitespace(in: attributed)
         if attributed.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             attributed.append(NSAttributedString(string: fallbackText, attributes: baseAttributes))
@@ -946,7 +971,9 @@ final class CodeLibraryViewModel: ObservableObject {
         paragraphStyle: NSParagraphStyle
     ) {
         let decoded = decodeInlineHTMLEntities(rawText)
-            .replacingOccurrences(of: #"[ \t\r\f]+"#, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: #"\r\n?"#, with: "\n", options: .regularExpression)
+            .replacingOccurrences(of: #"\n+"#, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: #"[ \t\f]+"#, with: " ", options: .regularExpression)
         guard !decoded.isEmpty else { return }
 
         let font: UIFont
@@ -971,6 +998,32 @@ final class CodeLibraryViewModel: ObservableObject {
                 ]
             )
         )
+    }
+
+    private nonisolated static func normalizeInlineHTMLAttributedText(
+        in attributed: NSMutableAttributedString
+    ) {
+        let fullRange = NSRange(location: 0, length: attributed.length)
+        guard fullRange.length > 0 else { return }
+
+        let replacements: [(pattern: String, template: String)] = [
+            (#"[ \t]+\n"#, "\n"),
+            (#"\n{3,}"#, "\n\n"),
+            (#"\n([\.\,\;\:\)])"#, "$1"),
+            (#"([\(])\n"#, "$1"),
+            (#"([^\n])\n([a-z0-9])"#, "$1 $2"),
+            (#" {2,}"#, " ")
+        ]
+
+        for (pattern, template) in replacements {
+            guard let expression = try? NSRegularExpression(pattern: pattern, options: []) else { continue }
+            expression.replaceMatches(
+                in: attributed.mutableString,
+                options: [],
+                range: NSRange(location: 0, length: attributed.length),
+                withTemplate: template
+            )
+        }
     }
 
     private nonisolated static func appendNewlineIfNeeded(

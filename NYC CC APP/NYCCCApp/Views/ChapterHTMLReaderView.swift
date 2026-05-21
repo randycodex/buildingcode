@@ -135,9 +135,10 @@ struct ChapterHTMLReaderView: View {
                     Text(chapter.title)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .frame(maxWidth: 250)
                 .multilineTextAlignment(.center)
             }
         }

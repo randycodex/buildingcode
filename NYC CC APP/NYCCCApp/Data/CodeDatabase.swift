@@ -222,7 +222,7 @@ final class CodeDatabase: CodeReferenceLookup {
         let placeholders = ids.map { _ in "?" }.joined(separator: ",")
         let statement = try connection.prepare(
             """
-            SELECT sections.id, chapters.chapter_number, chapters.title, sections.section_number, sections.title
+            SELECT sections.id, chapters.chapter_number, chapters.title, sections.section_number, sections.title, sections.official_text
             FROM sections
             JOIN chapters ON chapters.id = sections.chapter_id
             WHERE sections.id IN (\(placeholders))
@@ -244,6 +244,7 @@ final class CodeDatabase: CodeReferenceLookup {
                     chapterTitle: connection.string(at: 2, in: statement),
                     sectionNumber: connection.string(at: 3, in: statement),
                     title: connection.string(at: 4, in: statement),
+                    previewText: connection.string(at: 5, in: statement).titleThroughFirstPeriod,
                     isBookmarked: bookmarkedSectionIDs.contains(connection.int64(at: 0, in: statement)),
                     noteBody: notesBySectionID[connection.int64(at: 0, in: statement)] ?? ""
                 )

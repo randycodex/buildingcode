@@ -42,14 +42,12 @@ struct ChapterReaderView: View {
     private func chapterReaderContent(proxy: ScrollViewProxy) -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 16) {
-                chapterHeader
-
                 ForEach(blocks) { block in
                     blockSection(for: block)
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.top, 16)
+            .padding(.top, 28)
             .padding(.bottom, 24)
         }
         .overlay(alignment: .top) {
@@ -81,6 +79,10 @@ struct ChapterReaderView: View {
                 detail: detail,
                 noteBody: $noteBody,
                 accentColor: accentColor,
+                isBookmarked: library.isBookmarked(sectionID: detail.id),
+                onToggleBookmark: {
+                    _ = library.toggleBookmark(sectionID: detail.id)
+                },
                 onSave: { body in
                     library.saveNote(sectionID: detail.id, body: body)
                 }
@@ -100,18 +102,6 @@ struct ChapterReaderView: View {
             pendingScrollSectionID = newValue
             scrollIfNeeded(with: proxy, animated: true)
         }
-    }
-
-    private var chapterHeader: some View {
-        VStack(spacing: 6) {
-            Text(chapter.displayLabel)
-                .font(.headline.weight(.semibold))
-            Text(chapter.title)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .multilineTextAlignment(.center)
     }
 
     @ViewBuilder
@@ -134,11 +124,11 @@ struct ChapterReaderView: View {
 
         return VStack(alignment: .leading, spacing: 10) {
             if let groupLabel = block.groupLabel {
-                CodeEyebrow(text: groupLabel, accent: accentColor)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        openNotes(for: block.detail)
-                    }
+                Text(groupLabel)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(accentColor)
+                    .textCase(.uppercase)
+                    .tracking(0.45)
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -161,20 +151,14 @@ struct ChapterReaderView: View {
                     if block.detail.kind != .textBlock {
                         Group {
                             if isBookmarked {
-                                Image(systemName: "bookmark.fill")
-                                    .font(.caption2.weight(.bold))
-                                    .foregroundStyle(accentColor)
+                            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(isBookmarked ? accentColor : .secondary)
+                                .frame(width: 20, height: 20, alignment: .center)
                             }
                         }
-                        .frame(width: 12, height: 12, alignment: .center)
                     }
                 }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    openNotes(for: block.detail)
-                }
-                .accessibilityAddTraits(.isButton)
-                .accessibilityHint("Opens notes for this section")
 
                 ChapterBlockBodyView(
                     detail: block.detail,
@@ -182,6 +166,13 @@ struct ChapterReaderView: View {
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded {
+                openNotes(for: block.detail)
+            })
+            .accessibilityAddTraits(.isButton)
+            .accessibilityHint("Opens notes for this section")
             .padding(.leading, hierarchyIndent)
 
             CodeHairline().padding(.top, 2)
@@ -190,16 +181,44 @@ struct ChapterReaderView: View {
     }
 
     private func isDuplicateSectionHeadingBlock(_ detail: ReaderSectionDetail) -> Bool {
+        let normalizedDisplayTitle = detail.displayTitle
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+        let normalizedTitle = detail.title
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+        let normalizedChapterTitle = chapter.title
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+        let normalizedChapterLabel = chapter.displayLabel
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+        let normalizedAuthoredChapterHeading = "Chapter \(chapter.chapterNumber)"
+
+        if detail.kind == .textBlock {
+            if normalizedDisplayTitle.caseInsensitiveCompare(normalizedChapterTitle) == .orderedSame {
+                return true
+            }
+            if normalizedDisplayTitle.caseInsensitiveCompare(normalizedAuthoredChapterHeading) == .orderedSame {
+                return true
+            }
+            if normalizedDisplayTitle.caseInsensitiveCompare(normalizedChapterLabel) == .orderedSame {
+                return true
+            }
+            if normalizedTitle.caseInsensitiveCompare(normalizedChapterTitle) == .orderedSame {
+                return true
+            }
+        }
+
         guard detail.kind == .textBlock else { return false }
-        let title = detail.displayTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-        return title.range(of: #"^Section\s+BC\s+[A-Z]?\d+"#, options: [.regularExpression, .caseInsensitive]) != nil
+        return normalizedDisplayTitle.range(of: #"^Section\s+BC\s+[A-Z]?\d+"#, options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     @ViewBuilder
     private func jumpBar(proxy: ScrollViewProxy) -> some View {
         HStack(spacing: 10) {
             Menu {
-                ForEach(blocks) { block in
+                ForEach(Array(blocks.reversed())) { block in
                     Button(jumpLabel(for: block.detail)) {
                         selectedJumpSectionID = block.detail.id
                     }
@@ -346,6 +365,8 @@ private struct ChapterNoteSheet: View {
     let detail: ReaderSectionDetail
     @Binding var noteBody: String
     let accentColor: Color
+    let isBookmarked: Bool
+    let onToggleBookmark: () -> Void
     let onSave: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -399,6 +420,14 @@ private struct ChapterNoteSheet: View {
             .navigationTitle("Notes")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        onToggleBookmark()
+                    } label: {
+                        Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                            .foregroundStyle(isBookmarked ? accentColor : .secondary)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") {
                         dismiss()

@@ -15,7 +15,7 @@ struct AttributedTextView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 8) {
             ForEach(textBlocks) { block in
                 switch block.kind {
                 case .flow:

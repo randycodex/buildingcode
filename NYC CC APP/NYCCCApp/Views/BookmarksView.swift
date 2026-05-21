@@ -148,6 +148,14 @@ struct BookmarksView: View {
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
 
+                if !bookmark.previewText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text(bookmark.previewText)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(3)
+                }
+
                 if bookmark.hasNote {
                     Text(bookmark.noteBody)
                         .font(.footnote)

@@ -353,6 +353,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 chapterTitle: indexed.chapter.title,
                 sectionNumber: indexed.section.sectionNumber,
                 title: indexed.section.title,
+                previewText: indexed.section.officialText.titleThroughFirstPeriod,
                 kind: indexed.section.kind,
                 isBookmarked: bookmarkedSectionIDs.contains(id),
                 noteBody: notesBySectionID[id] ?? ""

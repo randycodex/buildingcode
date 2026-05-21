@@ -19,16 +19,21 @@ struct SearchView: View {
                     TextField("", text: $query)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
+                        .onSubmit {
+                            library.recordRecentSearch(query)
+                        }
                         .padding(.horizontal, 14)
                         .padding(.vertical, 12)
                         .background(Color(uiColor: .secondarySystemGroupedBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-                    if !query.isEmpty && library.searchResults.isEmpty {
+                    if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        recentSearchSection
+                    } else if library.searchResults.isEmpty {
                         Text("No results")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                    } else if !query.isEmpty {
+                    } else {
                         LazyVStack(spacing: 0) {
                             ForEach(library.searchResults) { result in
                                 NavigationLink {
@@ -37,6 +42,11 @@ struct SearchView: View {
                                     resultRow(result)
                                 }
                                 .buttonStyle(.plain)
+                                .simultaneousGesture(
+                                    TapGesture().onEnded {
+                                        library.recordRecentSearch(query)
+                                    }
+                                )
 
                                 CodeHairline()
                             }
@@ -65,6 +75,55 @@ struct SearchView: View {
                 try? await Task.sleep(for: .milliseconds(250))
                 guard !Task.isCancelled else { return }
                 library.search(query: query)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var recentSearchSection: some View {
+        if !library.recentSearches.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Recent Searches")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                LazyVStack(spacing: 0) {
+                    ForEach(library.recentSearches, id: \.self) { recentSearch in
+                        HStack(spacing: 12) {
+                            Button {
+                                query = recentSearch
+                                library.search(query: recentSearch)
+                            } label: {
+                                HStack(spacing: 10) {
+                                    Image(systemName: "clock.arrow.circlepath")
+                                        .font(.footnote.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+
+                                    Text(recentSearch)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.primary)
+                                        .multilineTextAlignment(.leading)
+
+                                    Spacer(minLength: 0)
+                                }
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                library.removeRecentSearch(recentSearch)
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(.tertiary)
+                                    .frame(width: 18, height: 18)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.vertical, 12)
+
+                        CodeHairline()
+                    }
+                }
             }
         }
     }

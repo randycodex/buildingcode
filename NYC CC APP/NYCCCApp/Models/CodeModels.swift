@@ -295,6 +295,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let chapterTitle: String
     let sectionNumber: String
     let title: String
+    let previewText: String
     let kind: CodeSectionKind
     let isBookmarked: Bool
     let noteBody: String
@@ -306,6 +307,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         chapterTitle: String,
         sectionNumber: String,
         title: String,
+        previewText: String = "",
         kind: CodeSectionKind = .title,
         isBookmarked: Bool = true,
         noteBody: String = ""
@@ -316,6 +318,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         self.chapterTitle = chapterTitle
         self.sectionNumber = sectionNumber
         self.title = title
+        self.previewText = previewText
         self.kind = kind
         self.isBookmarked = isBookmarked
         self.noteBody = noteBody
