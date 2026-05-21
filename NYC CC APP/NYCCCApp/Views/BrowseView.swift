@@ -47,7 +47,7 @@ struct BrowseView: View {
                                                     NavigationLink {
                                                         ChapterLaunchView(chapter: chapter)
                                                     } label: {
-                                                        ChapterTile(chapter: chapter, accent: accentColor)
+                                                        ChapterTile(chapter: chapter, accent: accentColor, kind: .chapter)
                                                     }
                                                     .buttonStyle(.plain)
                                                 }
@@ -64,7 +64,7 @@ struct BrowseView: View {
                                                     NavigationLink {
                                                         ChapterLaunchView(chapter: chapter)
                                                     } label: {
-                                                        ChapterTile(chapter: chapter, accent: accentColor)
+                                                        ChapterTile(chapter: chapter, accent: accentColor, kind: .appendix)
                                                     }
                                                     .buttonStyle(.plain)
                                                 }
@@ -170,12 +170,7 @@ struct BrowseView: View {
             .font(.system(size: 15, weight: .semibold))
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color(uiColor: .secondarySystemGroupedBackground))
-            )
     }
 
     private var browseBackdrop: some View {
@@ -411,16 +406,56 @@ struct ChapterSectionsView: View {
     }
 }
 
+private enum ChapterTileKind {
+    case chapter
+    case appendix
+
+    var fill: Color {
+        switch self {
+        case .chapter:
+            return Color(uiColor: UIColor { trait in
+                trait.userInterfaceStyle == .dark
+                    ? UIColor(red: 0x1C / 255, green: 0x1D / 255, blue: 0x20 / 255, alpha: 1)
+                    : UIColor(red: 0xF4 / 255, green: 0xF5 / 255, blue: 0xF7 / 255, alpha: 1)
+            })
+        case .appendix:
+            return Color(uiColor: UIColor { trait in
+                trait.userInterfaceStyle == .dark
+                    ? UIColor(red: 0x20 / 255, green: 0x1E / 255, blue: 0x1A / 255, alpha: 1)
+                    : UIColor(red: 0xF7 / 255, green: 0xF4 / 255, blue: 0xEE / 255, alpha: 1)
+            })
+        }
+    }
+
+    var stroke: Color {
+        switch self {
+        case .chapter:
+            return Color(uiColor: UIColor { trait in
+                trait.userInterfaceStyle == .dark
+                    ? UIColor(red: 0x2E / 255, green: 0x30 / 255, blue: 0x34 / 255, alpha: 1)
+                    : UIColor(red: 0xE0 / 255, green: 0xE2 / 255, blue: 0xE6 / 255, alpha: 1)
+            })
+        case .appendix:
+            return Color(uiColor: UIColor { trait in
+                trait.userInterfaceStyle == .dark
+                    ? UIColor(red: 0x31 / 255, green: 0x2E / 255, blue: 0x27 / 255, alpha: 1)
+                    : UIColor(red: 0xE6 / 255, green: 0xE1 / 255, blue: 0xD6 / 255, alpha: 1)
+            })
+        }
+    }
+}
+
 private struct ChapterTile: View {
     let chapter: CodeChapter
     let accent: Color
+    let kind: ChapterTileKind
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(uiColor: .secondarySystemGroupedBackground))
+                .fill(kind.fill)
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color(uiColor: .separator), lineWidth: 1)
+                .stroke(kind.stroke, lineWidth: 1)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {
