@@ -13,6 +13,7 @@ struct ChapterReaderView: View {
     @State private var expandedInlineImage: UIImage?
     @State private var visibleBookmarkedSectionIDs: Set<Int64> = []
     @State private var visibleBookmarkedSectionNumbers: Set<String> = []
+    @State private var duplicateHeadingSectionIDs: Set<Int64> = []
     @State private var noteTarget: ReaderSectionDetail?
     @State private var noteBody = ""
     private let indentStep: CGFloat = 26
@@ -106,7 +107,7 @@ struct ChapterReaderView: View {
 
     @ViewBuilder
     private func blockSection(for block: CodeLibraryViewModel.ChapterReaderBlockContent) -> some View {
-        if isDuplicateSectionHeadingBlock(block.detail) {
+        if duplicateHeadingSectionIDs.contains(block.detail.id) {
             EmptyView()
         } else {
             visibleBlockSection(for: block)
@@ -305,11 +306,19 @@ struct ChapterReaderView: View {
 
             blocks = orderedBlocks(from: loadedBlocksByID)
             syncVisibleBookmarks()
+            refreshDuplicateHeadingSet()
             await Task.yield()
         }
 
         blocks = orderedBlocks(from: loadedBlocksByID)
         syncVisibleBookmarks()
+        refreshDuplicateHeadingSet()
+    }
+
+    private func refreshDuplicateHeadingSet() {
+        duplicateHeadingSectionIDs = Set(
+            blocks.compactMap { isDuplicateSectionHeadingBlock($0.detail) ? $0.detail.id : nil }
+        )
     }
 
     private func orderedBlocks(

@@ -665,11 +665,16 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func refreshBookmarks() {
         guard let selectedVersion, let userDataStore else {
+            let didChange = !bookmarkedSectionIDs.isEmpty || !bookmarks.isEmpty
             bookmarkedSectionIDs = []
             bookmarks = []
-            bookmarkRevision &+= 1
+            if didChange {
+                bookmarkRevision &+= 1
+            }
             return
         }
+
+        let previousBookmarkedIDs = bookmarkedSectionIDs
 
         do {
             let ids = try userDataStore.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
@@ -696,7 +701,10 @@ final class CodeLibraryViewModel: ObservableObject {
             bookmarkedSectionIDs = []
             bookmarks = []
         }
-        bookmarkRevision &+= 1
+
+        if bookmarkedSectionIDs != previousBookmarkedIDs {
+            bookmarkRevision &+= 1
+        }
     }
 
     @discardableResult
@@ -725,8 +733,11 @@ final class CodeLibraryViewModel: ObservableObject {
     func saveNote(sectionID: Int64, body: String) {
         guard let selectedVersion, let userDataStore else { return }
         do {
+            // Note edits do not change the bookmark set, so we skip the heavy
+            // `refreshBookmarks` pass that previously fired on every keystroke.
+            // BookmarksView re-reads notes from disk on appear, and the note
+            // editor re-reads via `noteBody(sectionID:)` when it opens.
             try userDataStore.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
-            refreshBookmarks()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -1162,8 +1173,10 @@ final class CodeLibraryViewModel: ObservableObject {
         return AttributedString(attributed.attributedSubstring(from: bodyRange))
     }
 
+    private nonisolated static let sharedFormattingEngine = FormattingEngine()
+
     private nonisolated static func formattedText(detail: ReaderSectionDetail, theme: ReaderTheme) -> AttributedString {
-        let formattingEngine = FormattingEngine()
+        let formattingEngine = sharedFormattingEngine
         if let richTextOverrideData = detail.richTextOverrideData,
            let richText = formattingEngine.renderRichTextOverride(
             richTextOverrideData,

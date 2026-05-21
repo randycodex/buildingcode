@@ -99,6 +99,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let groupsByChapterID: [Int64: [CodeSectionGroup]]
     private let sectionsByChapterID: [Int64: [CodeSectionSummary]]
     private let sectionIndex: [Int64: IndexedSection]
+    private let sectionsByChapterIDIndex: [Int64: [Section]]
     private let sectionNumberIndex: [String: CodeSectionSummary]
     private let chapterNumberIndex: [String: CodeChapter]
     private let tableBlocksByID: [String: CodeTableBlock]
@@ -163,6 +164,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         var groupsByChapterID: [Int64: [CodeSectionGroup]] = [:]
         var sectionsByChapterID: [Int64: [CodeSectionSummary]] = [:]
         var sectionIndex: [Int64: IndexedSection] = [:]
+        var sectionsByChapterIDIndex: [Int64: [Section]] = [:]
         var sectionNumberIndex: [String: CodeSectionSummary] = [:]
         var chapterNumberIndex: [String: CodeChapter] = [:]
         let tableBlocksByID = Dictionary(uniqueKeysWithValues: (decodedProject.tableBlocks ?? []).map { ($0.id, $0) })
@@ -190,8 +192,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             chapters.append(chapterModel)
             chapterNumberIndex[chapter.chapterNumber.uppercased()] = chapterModel
 
+            var chapterSectionList: [Section] = []
             let groups = chapter.groups.map { group in
                 let summaries = group.sections.map { section in
+                        chapterSectionList.append(section)
                         let summary = CodeSectionSummary(
                             id: section.id,
                             chapterNumber: chapter.chapterNumber,
@@ -225,6 +229,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
             groupsByChapterID[chapter.id] = groups
             sectionsByChapterID[chapter.id] = groups.flatMap { $0.sections }
+            sectionsByChapterIDIndex[chapter.id] = chapterSectionList
         }
 
         self.codeSectionsCache = codeSections
@@ -232,6 +237,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         self.groupsByChapterID = groupsByChapterID
         self.sectionsByChapterID = sectionsByChapterID
         self.sectionIndex = sectionIndex
+        self.sectionsByChapterIDIndex = sectionsByChapterIDIndex
         self.sectionNumberIndex = sectionNumberIndex
         self.chapterNumberIndex = chapterNumberIndex
         self.tableBlocksByID = tableBlocksByID
@@ -298,9 +304,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
         synthesizedContentLock.unlock()
 
-        let chapterSections = sectionIndex.values
-            .filter { $0.chapter.id == indexed.chapter.id }
-            .map(\.section)
+        let chapterSections = sectionsByChapterIDIndex[indexed.chapter.id] ?? []
         let chapterBlocks = Self.extractHTMLContentBlocks(
             chapterNumber: indexed.chapter.chapterNumber,
             sections: chapterSections,

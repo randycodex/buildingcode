@@ -9,8 +9,8 @@ struct ContentBlockListView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
 
     private var htmlStore: PublishedHTMLContentStore {
-        PublishedHTMLContentStore(
-            relativeRootPath: library.selectedVersion?.authoredHTMLBundlePath
+        ContentBlockHTMLStoreCache.shared.store(
+            for: library.selectedVersion?.authoredHTMLBundlePath
         )
     }
 
@@ -570,6 +570,25 @@ private enum TableHTMLRenderer {
         // Excel row heights are in points. Approx px ~= pt * 96 / 72 = pt * 1.333...
         let px = max(16, height * 1.3333333333)
         return "height: \(px)px;"
+    }
+}
+
+private final class ContentBlockHTMLStoreCache {
+    static let shared = ContentBlockHTMLStoreCache()
+
+    private let lock = NSLock()
+    private var stores: [String: PublishedHTMLContentStore] = [:]
+
+    func store(for relativeRootPath: String?) -> PublishedHTMLContentStore {
+        let key = relativeRootPath ?? ""
+        lock.lock()
+        defer { lock.unlock() }
+        if let cached = stores[key] {
+            return cached
+        }
+        let store = PublishedHTMLContentStore(relativeRootPath: relativeRootPath)
+        stores[key] = store
+        return store
     }
 }
 

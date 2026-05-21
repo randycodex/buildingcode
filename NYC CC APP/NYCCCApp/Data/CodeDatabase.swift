@@ -7,6 +7,7 @@ final class CodeDatabase: CodeReferenceLookup {
     private lazy var hasEditorSectionGroupsTable: Bool = {
         (try? tableExists(named: "editor_section_groups")) ?? false
     }()
+    private var editorSectionGroupMetadataCache: [Int64: [String: (headerLine: String, headingLine: String?)]] = [:]
 
     init(databaseURL: URL, locator: BundleDatabaseLocator) throws {
         self.connection = try SQLiteConnection(path: databaseURL.path, readOnly: true)
@@ -422,6 +423,9 @@ final class CodeDatabase: CodeReferenceLookup {
 
     private func editorSectionGroupMetadata(chapterID: Int64) throws -> [String: (headerLine: String, headingLine: String?)] {
         guard hasEditorSectionGroupsTable else { return [:] }
+        if let cached = editorSectionGroupMetadataCache[chapterID] {
+            return cached
+        }
 
         let statement = try connection.prepare(
             """
@@ -441,6 +445,7 @@ final class CodeDatabase: CodeReferenceLookup {
                 headingLine: connection.stringOrNil(at: 2, in: statement)
             )
         }
+        editorSectionGroupMetadataCache[chapterID] = groups
         return groups
     }
 
