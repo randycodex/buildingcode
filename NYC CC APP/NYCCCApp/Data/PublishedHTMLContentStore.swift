@@ -26,6 +26,9 @@ final class PublishedHTMLContentStore {
 
     private static var anchorCache: [String: [PublishedHTMLAnchor]] = [:]
     private static let anchorCacheLock = NSLock()
+    private static var inlineImagesCache: [String: Bool] = [:]
+    private static var inlineTablesCache: [String: Bool] = [:]
+    private static let inlineFeatureCacheLock = NSLock()
 
     private let rootURL: URL?
     private var chapterCache: [String: ChapterCache] = [:]
@@ -89,20 +92,50 @@ final class PublishedHTMLContentStore {
     }
 
     static func containsInlineImages(in chapterURL: URL) -> Bool {
-        guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
-            return false
+        let key = chapterURL.path
+        inlineFeatureCacheLock.lock()
+        if let cached = inlineImagesCache[key] {
+            inlineFeatureCacheLock.unlock()
+            return cached
         }
-        return html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil
+        inlineFeatureCacheLock.unlock()
+
+        let result: Bool
+        if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
+            result = html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil
+        } else {
+            result = false
+        }
+
+        inlineFeatureCacheLock.lock()
+        inlineImagesCache[key] = result
+        inlineFeatureCacheLock.unlock()
+        return result
     }
 
     static func containsInlineTables(in chapterURL: URL) -> Bool {
-        guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
-            return false
+        let key = chapterURL.path
+        inlineFeatureCacheLock.lock()
+        if let cached = inlineTablesCache[key] {
+            inlineFeatureCacheLock.unlock()
+            return cached
         }
-        return html.range(
-            of: #"<(?:table|ScrollTable)\b|class="[^"]*\bxsl-table\b"#,
-            options: [.regularExpression, .caseInsensitive]
-        ) != nil
+        inlineFeatureCacheLock.unlock()
+
+        let result: Bool
+        if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
+            result = html.range(
+                of: #"<(?:table|ScrollTable)\b|class="[^"]*\bxsl-table\b"#,
+                options: [.regularExpression, .caseInsensitive]
+            ) != nil
+        } else {
+            result = false
+        }
+
+        inlineFeatureCacheLock.lock()
+        inlineTablesCache[key] = result
+        inlineFeatureCacheLock.unlock()
+        return result
     }
 
     private func chapterCache(chapterNumber: String) -> ChapterCache? {

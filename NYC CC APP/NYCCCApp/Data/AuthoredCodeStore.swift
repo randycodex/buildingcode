@@ -90,6 +90,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let chapter: CodeChapter
         let group: CodeSectionGroup
         let section: Section
+        let searchHaystack: String
     }
 
     private let project: Project
@@ -199,6 +200,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                             kind: section.kind
                         )
                         sectionNumberIndex[section.sectionNumber.uppercased()] = summary
+                        let haystack = "\(section.sectionNumber) \(section.title) \(section.officialText)".lowercased()
                         sectionIndex[section.id] = IndexedSection(
                             chapter: chapterModel,
                             group: CodeSectionGroup(
@@ -207,7 +209,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                                 headingLine: group.headingLine,
                                 sections: []
                             ),
-                            section: section
+                            section: section,
+                            searchHaystack: haystack
                         )
                         return summary
                     }
@@ -319,8 +322,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
         return sectionIndex.values
             .compactMap { indexed in
-                let haystack = "\(indexed.section.sectionNumber) \(indexed.section.title) \(indexed.section.officialText)"
-                guard haystack.lowercased().contains(lowercasedQuery) else { return nil }
+                guard indexed.searchHaystack.contains(lowercasedQuery) else { return nil }
                 return CodeSearchResult(
                     id: indexed.section.id,
                     chapterNumber: indexed.chapter.chapterNumber,

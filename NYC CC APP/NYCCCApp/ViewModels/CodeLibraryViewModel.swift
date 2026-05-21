@@ -10,11 +10,6 @@ final class CodeLibraryViewModel: ObservableObject {
         let chapters: [CodeChapter]
     }
 
-    private struct FormattedTextCacheKey: Hashable {
-        let sectionID: Int64
-        let theme: ReaderTheme
-    }
-
     struct ChapterBlockDescriptor: Identifiable, Sendable {
         let sectionID: Int64
         let groupLabel: String?
@@ -57,10 +52,16 @@ final class CodeLibraryViewModel: ObservableObject {
     private var sectionsCache: [Int64: [CodeSectionSummary]] = [:]
     private var sectionGroupsCache: [Int64: [CodeSectionGroup]] = [:]
     private var sectionDetailCache: [Int64: ReaderSectionDetail] = [:]
-    private var formattedTextCache: [FormattedTextCacheKey: AttributedString] = [:]
-    private var chapterBodyTextCache: [FormattedTextCacheKey: AttributedString] = [:]
-    private var formattedNSTextCache: [FormattedTextCacheKey: NSAttributedString] = [:]
-    private var chapterBodyNSTextCache: [FormattedTextCacheKey: NSAttributedString] = [:]
+    private let formattedNSTextCache: NSCache<NSString, NSAttributedString> = {
+        let cache = NSCache<NSString, NSAttributedString>()
+        cache.countLimit = 96
+        return cache
+    }()
+    private let chapterBodyNSTextCache: NSCache<NSString, NSAttributedString> = {
+        let cache = NSCache<NSString, NSAttributedString>()
+        cache.countLimit = 96
+        return cache
+    }()
     private var bookmarkedSectionIDs: Set<Int64> = []
     private var versionLoadTask: Task<Void, Never>?
     private var contentLoadTask: Task<Void, Never>?
@@ -395,58 +396,9 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func formattedText(for detail: ReaderSectionDetail) -> AttributedString {
-        let cacheKey = FormattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
-        if let cached = formattedTextCache[cacheKey] {
-            return cached
-        }
-
-        let renderedText: AttributedString
-        if let richTextOverrideData = detail.richTextOverrideData,
-           let richText = formattingEngine.renderRichTextOverride(
-            richTextOverrideData,
-            theme: readerTheme
-           ) {
-            renderedText = richText
-        } else {
-            renderedText = formattingEngine.render(officialText: detail.officialText, spans: detail.textSpans, theme: readerTheme)
-        }
-        formattedTextCache[cacheKey] = renderedText
-        return renderedText
-    }
-
-    func chapterBodyText(for detail: ReaderSectionDetail) -> AttributedString {
-        let cacheKey = FormattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
-        if let cached = chapterBodyTextCache[cacheKey] {
-            return cached
-        }
-
-        let attributed = formattedNSAttributedText(for: detail)
-        let bodyRange = Self.chapterBodyRange(for: detail, in: attributed.string as NSString)
-        guard bodyRange.length > 0 else {
-            return AttributedString("")
-        }
-
-        let bodyText = attributed.attributedSubstring(from: bodyRange)
-        let renderedText = AttributedString(bodyText)
-        chapterBodyTextCache[cacheKey] = renderedText
-        return renderedText
-    }
-
-    func formattedNSText(for detail: ReaderSectionDetail) -> NSAttributedString {
-        let cacheKey = FormattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
-        if let cached = formattedNSTextCache[cacheKey] {
-            return cached
-        }
-
-        let renderedText = formattedNSAttributedText(for: detail)
-        formattedNSTextCache[cacheKey] = renderedText
-        return renderedText
-    }
-
     func chapterBodyNSText(for detail: ReaderSectionDetail) -> NSAttributedString {
-        let cacheKey = FormattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
-        if let cached = chapterBodyNSTextCache[cacheKey] {
+        let cacheKey = Self.formattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
+        if let cached = chapterBodyNSTextCache.object(forKey: cacheKey) {
             return cached
         }
 
@@ -459,7 +411,7 @@ final class CodeLibraryViewModel: ObservableObject {
             renderedText = Self.fallbackChapterBodyText(for: detail, formattedText: attributed)
         }
 
-        chapterBodyNSTextCache[cacheKey] = renderedText
+        chapterBodyNSTextCache.setObject(renderedText, forKey: cacheKey)
         return renderedText
     }
 
@@ -504,8 +456,8 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func chapterBodyNSTextAsync(for detail: ReaderSectionDetail) async -> NSAttributedString {
-        let cacheKey = FormattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
-        if let cached = chapterBodyNSTextCache[cacheKey] {
+        let cacheKey = Self.formattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
+        if let cached = chapterBodyNSTextCache.object(forKey: cacheKey) {
             return cached
         }
 
@@ -514,7 +466,7 @@ final class CodeLibraryViewModel: ObservableObject {
             Self.chapterBodyText(detail: detail, theme: theme)
         }.value
         let renderedText = NSAttributedString(renderedBody)
-        chapterBodyNSTextCache[cacheKey] = renderedText
+        chapterBodyNSTextCache.setObject(renderedText, forKey: cacheKey)
         return renderedText
     }
 
@@ -522,10 +474,8 @@ final class CodeLibraryViewModel: ObservableObject {
         let theme = theme.normalized
         guard readerTheme != theme else { return }
         readerTheme = theme
-        formattedTextCache.removeAll()
-        chapterBodyTextCache.removeAll()
-        formattedNSTextCache.removeAll()
-        chapterBodyNSTextCache.removeAll()
+        formattedNSTextCache.removeAllObjects()
+        chapterBodyNSTextCache.removeAllObjects()
         readerThemeStore.save(theme)
     }
 
@@ -1170,13 +1120,12 @@ final class CodeLibraryViewModel: ObservableObject {
         chapters: [CodeChapter],
         store: AuthoredCodeStore
     ) async {
-        statusMessage = "Preparing chapter navigation..."
-
-        for chapter in chapters {
-            let groups = store.sectionGroups(chapterID: chapter.id)
-            sectionGroupsCache[chapter.id] = groups
-            sectionsCache[chapter.id] = groups.flatMap(\.sections)
-        }
+        // Authored content lives in-memory in `AuthoredCodeStore` and is fetched
+        // directly via dictionary lookups; the viewModel-side cache is unused on
+        // this path, so there is nothing to prewarm.
+        _ = version
+        _ = chapters
+        _ = store
     }
 
     private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
@@ -1188,13 +1137,8 @@ final class CodeLibraryViewModel: ObservableObject {
             do {
                 let groups = try await sqliteChapterLoader.sectionGroups(chapterID: chapter.id)
                 sectionGroupsCache[chapter.id] = groups
-                let sections = groups.flatMap(\.sections)
-                sectionsCache[chapter.id] = sections
-                let sectionIDs = sections.map(\.id)
-                for batch in sectionIDs.chunked(into: 24) {
-                    guard !Task.isCancelled else { return }
-                    _ = await loadSectionDetailsAsync(sectionIDs: batch)
-                }
+                sectionsCache[chapter.id] = groups.flatMap(\.sections)
+                await Task.yield()
             } catch {
                 statusMessage = error.localizedDescription
                 return
@@ -1335,12 +1279,14 @@ final class CodeLibraryViewModel: ObservableObject {
         sectionsCache.removeAll()
         sectionGroupsCache.removeAll()
         sectionDetailCache.removeAll()
-        formattedTextCache.removeAll()
-        chapterBodyTextCache.removeAll()
-        formattedNSTextCache.removeAll()
-        chapterBodyNSTextCache.removeAll()
+        formattedNSTextCache.removeAllObjects()
+        chapterBodyNSTextCache.removeAllObjects()
         bookmarkedSectionIDs.removeAll()
         searchTask?.cancel()
+    }
+
+    private static func formattedTextCacheKey(sectionID: Int64, theme: ReaderTheme) -> NSString {
+        "\(sectionID)|\(theme.hashValue)" as NSString
     }
 
     private func buildJurisdictions(from versions: [BundledCodeVersion]) -> [BundledJurisdiction] {

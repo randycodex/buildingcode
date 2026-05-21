@@ -14,15 +14,22 @@ struct ChapterHTMLReaderView: View {
     @State private var hasActivatedHTMLReader = true
     @State private var isJumpPickerPresented = false
     @State private var scrollToTopTrigger = 0
+    @State private var cachedBookmarkedAnchorIDs: Set<String> = []
+    @State private var cachedBookmarkedSectionNumbers: Set<String> = []
+    @State private var cachedBookmarkRevision: Int = -1
+    @State private var cachedHTMLStoreRootPath: String?
+    @State private var cachedHTMLStore: PublishedHTMLContentStore?
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
     }
 
     private var htmlStore: PublishedHTMLContentStore {
-        PublishedHTMLContentStore(
-            relativeRootPath: library.selectedVersion?.authoredHTMLBundlePath
-        )
+        let rootPath = library.selectedVersion?.authoredHTMLBundlePath
+        if let cachedHTMLStore, cachedHTMLStoreRootPath == rootPath {
+            return cachedHTMLStore
+        }
+        return PublishedHTMLContentStore(relativeRootPath: rootPath)
     }
 
     private var chapterURL: URL? {
@@ -75,33 +82,30 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var bookmarkedAnchorIDs: Set<String> {
-        _ = library.bookmarkRevision
-        return Set(anchors.compactMap { anchor in
-            guard let summary = library.sectionSummary(sectionNumber: anchor.sectionNumber),
-                  library.isBookmarked(sectionID: summary.id)
-            else {
-                return nil
-            }
-            return anchor.anchorID
-        })
+        cachedBookmarkedAnchorIDs
     }
 
     private var bookmarkedSectionNumbers: Set<String> {
-        _ = library.bookmarkRevision
+        cachedBookmarkedSectionNumbers
+    }
+
+    private func recomputeBookmarkedSets() {
+        var anchorIDs: Set<String> = []
         var sectionNumbers = Set(library.bookmarks.map { bookmark in
             normalizedSectionNumber(bookmark.sectionNumber)
         })
 
-        let anchorSectionNumbers: [String] = anchors.compactMap { anchor -> String? in
+        for anchor in anchors {
             guard let summary = library.sectionSummary(sectionNumber: anchor.sectionNumber),
                   library.isBookmarked(sectionID: summary.id)
-            else {
-                return nil
-            }
-            return normalizedSectionNumber(summary.sectionNumber)
+            else { continue }
+            anchorIDs.insert(anchor.anchorID)
+            sectionNumbers.insert(normalizedSectionNumber(summary.sectionNumber))
         }
-        sectionNumbers.formUnion(anchorSectionNumbers)
-        return sectionNumbers
+
+        cachedBookmarkedAnchorIDs = anchorIDs
+        cachedBookmarkedSectionNumbers = sectionNumbers
+        cachedBookmarkRevision = library.bookmarkRevision
     }
 
     private var initialAnchor: PublishedHTMLAnchor? {
@@ -143,12 +147,20 @@ struct ChapterHTMLReaderView: View {
             }
         }
         .onAppear {
+            ensureHTMLStoreCached()
             library.refreshBookmarks()
             if targetAnchorID == nil {
                 let anchor = initialAnchor
                 selectedAnchor = anchor
                 targetAnchorID = anchor?.anchorID
             }
+            recomputeBookmarkedSets()
+        }
+        .onChange(of: library.bookmarkRevision) { _, _ in
+            recomputeBookmarkedSets()
+        }
+        .onChange(of: anchors) { _, _ in
+            recomputeBookmarkedSets()
         }
         .task(id: chapter.id) {
             guard hasActivatedHTMLReader else { return }
@@ -317,6 +329,14 @@ struct ChapterHTMLReaderView: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+    }
+
+    private func ensureHTMLStoreCached() {
+        let rootPath = library.selectedVersion?.authoredHTMLBundlePath
+        if cachedHTMLStore == nil || cachedHTMLStoreRootPath != rootPath {
+            cachedHTMLStore = PublishedHTMLContentStore(relativeRootPath: rootPath)
+            cachedHTMLStoreRootPath = rootPath
+        }
     }
 
     private func loadAnchors() async {

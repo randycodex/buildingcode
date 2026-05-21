@@ -86,37 +86,19 @@ struct AttributedTextView: View {
     }
 
     private static func containsTable(in text: NSAttributedString) -> Bool {
-        rtfString(for: text)?.contains(#"\trowd"#) == true
+        // iOS's RTF importer does not preserve NSTextTable, so attributed text
+        // produced from RTF/RTFD overrides never carries native table structure
+        // on this platform. The previous implementation round-tripped the entire
+        // attributed string through RTF data to look for `\trowd`, which was
+        // expensive and effectively always returned false here. Treating tables
+        // as flow content preserves observable behavior without the cost.
+        _ = text
+        return false
     }
 
     private func preferredTableWidth(for text: NSAttributedString, availableWidth: CGFloat) -> CGFloat {
-        let columnCount = max(maxTableColumnCount(in: text), 1)
-        let estimatedWidth = CGFloat(columnCount) * 120
-        return max(availableWidth, estimatedWidth)
-    }
-
-    private func maxTableColumnCount(in text: NSAttributedString) -> Int {
-        guard let rtf = Self.rtfString(for: text) else { return 0 }
-
-        let rows = rtf.components(separatedBy: #"\row"#)
-        var maximum = 0
-
-        for row in rows {
-            let columnCount = row.components(separatedBy: #"\cellx"#).count - 1
-            maximum = max(maximum, columnCount)
-        }
-
-        return maximum
-    }
-
-    private static func rtfString(for text: NSAttributedString) -> String? {
-        let range = NSRange(location: 0, length: text.length)
-        let data = try? text.data(
-            from: range,
-            documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]
-        )
-        guard let data else { return nil }
-        return String(data: data, encoding: .utf8)
+        _ = text
+        return availableWidth
     }
 }
 
