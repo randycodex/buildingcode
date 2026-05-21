@@ -410,38 +410,54 @@ private enum ChapterTileKind {
     case chapter
     case appendix
 
+    private static func dynamicColor(light: UInt32, dark: UInt32) -> Color {
+        Color(uiColor: UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor(hex: dark)
+                : UIColor(hex: light)
+        })
+    }
+
+    // Chapters use the green palette; appendices use the cool/teal palette.
+    // Light-mode fills come from each palette's light shades; dark-mode fills
+    // come from the dark shades. Numbers and titles use the remaining mid/
+    // accent shades from the same palette for high-contrast labels in both
+    // modes.
     var fill: Color {
         switch self {
-        case .chapter:
-            return Color(uiColor: UIColor { trait in
-                trait.userInterfaceStyle == .dark
-                    ? UIColor(red: 0x1C / 255, green: 0x1D / 255, blue: 0x20 / 255, alpha: 1)
-                    : UIColor(red: 0xF4 / 255, green: 0xF5 / 255, blue: 0xF7 / 255, alpha: 1)
-            })
-        case .appendix:
-            return Color(uiColor: UIColor { trait in
-                trait.userInterfaceStyle == .dark
-                    ? UIColor(red: 0x20 / 255, green: 0x1E / 255, blue: 0x1A / 255, alpha: 1)
-                    : UIColor(red: 0xF7 / 255, green: 0xF4 / 255, blue: 0xEE / 255, alpha: 1)
-            })
+        case .chapter:  return Self.dynamicColor(light: 0xCAD593, dark: 0x243010)
+        case .appendix: return Self.dynamicColor(light: 0xD8DDEF, dark: 0x7293A0)
         }
     }
 
     var stroke: Color {
         switch self {
-        case .chapter:
-            return Color(uiColor: UIColor { trait in
-                trait.userInterfaceStyle == .dark
-                    ? UIColor(red: 0x2E / 255, green: 0x30 / 255, blue: 0x34 / 255, alpha: 1)
-                    : UIColor(red: 0xE0 / 255, green: 0xE2 / 255, blue: 0xE6 / 255, alpha: 1)
-            })
-        case .appendix:
-            return Color(uiColor: UIColor { trait in
-                trait.userInterfaceStyle == .dark
-                    ? UIColor(red: 0x31 / 255, green: 0x2E / 255, blue: 0x27 / 255, alpha: 1)
-                    : UIColor(red: 0xE6 / 255, green: 0xE1 / 255, blue: 0xD6 / 255, alpha: 1)
-            })
+        case .chapter:  return Self.dynamicColor(light: 0xA1C349, dark: 0x2A3C24)
+        case .appendix: return Self.dynamicColor(light: 0xA0A4B8, dark: 0x45B69C)
         }
+    }
+
+    var numberColor: Color {
+        switch self {
+        case .chapter:  return Self.dynamicColor(light: 0x243010, dark: 0xCAD593)
+        case .appendix: return Self.dynamicColor(light: 0x7293A0, dark: 0xD8DDEF)
+        }
+    }
+
+    var titleColor: Color {
+        switch self {
+        case .chapter:  return Self.dynamicColor(light: 0x87A330, dark: 0xA1C349)
+        case .appendix: return Self.dynamicColor(light: 0x45B69C, dark: 0x21D19F)
+        }
+    }
+}
+
+private extension UIColor {
+    convenience init(hex: UInt32) {
+        let red   = CGFloat((hex >> 16) & 0xFF) / 255
+        let green = CGFloat((hex >> 8) & 0xFF) / 255
+        let blue  = CGFloat(hex & 0xFF) / 255
+        self.init(red: red, green: green, blue: blue, alpha: 1)
     }
 }
 
@@ -462,7 +478,7 @@ private struct ChapterTile: View {
                     Spacer()
                     Text("\(chapter.chapterNumber)")
                         .font(.system(size: 28, weight: .bold))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(kind.numberColor)
                         .lineLimit(1)
                 }
 
@@ -470,7 +486,7 @@ private struct ChapterTile: View {
 
                 Text(chapter.title)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(kind.titleColor)
                     .lineLimit(nil)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
