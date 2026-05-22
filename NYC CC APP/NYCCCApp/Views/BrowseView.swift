@@ -513,8 +513,6 @@ private struct ChapterTile: View {
         ZStack {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(kind.fill)
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(kind.stroke, lineWidth: 1)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {

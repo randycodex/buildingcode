@@ -18,9 +18,12 @@ struct ChapterReaderView: View {
     @State private var noteTarget: ReaderSectionDetail?
     @State private var noteBody = ""
     @State private var allowsNoteTap: Bool = false
-    @State private var blockOffsets: [Int64: CGFloat] = [:]
+    @State private var pendingFocusedSectionID: Int64?
+    @State private var focusedSectionUpdateTask: Task<Void, Never>?
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
+    private let focusedSectionUpdateDelay: Duration = .milliseconds(70)
+    private let prewarmedSectionCount = 4
     private let indentStep: CGFloat = 26
 
     private var accentColor: Color {
@@ -113,6 +116,10 @@ struct ChapterReaderView: View {
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
             syncVisibleBookmarks()
+        }
+        .onDisappear {
+            focusedSectionUpdateTask?.cancel()
+            focusedSectionUpdateTask = nil
         }
     }
 
@@ -298,6 +305,9 @@ struct ChapterReaderView: View {
         blocks = []
         blockOrder = [:]
         prewarmedBodyText = [:]
+        pendingFocusedSectionID = nil
+        focusedSectionUpdateTask?.cancel()
+        focusedSectionUpdateTask = nil
 
         let descriptors = await library.chapterBlockDescriptors(for: chapter)
         guard !descriptors.isEmpty else { return }
@@ -322,6 +332,8 @@ struct ChapterReaderView: View {
             pendingScrollSectionID = initialSectionID
             scrollIfNeeded(with: proxy, animated: false)
         }
+
+        await prewarmVisibleSectionBodies(from: descriptors)
 
         var loadedBlocksByID = Dictionary(uniqueKeysWithValues: blocks.map { ($0.id, $0) })
         let remainingDescriptors = descriptors.filter { $0.sectionID != initialSectionID }
@@ -362,19 +374,56 @@ struct ChapterReaderView: View {
     }
 
     private func updateFocusedSection(from offsets: [Int64: CGFloat]) {
-        guard !offsets.isEmpty else { return }
-        let candidates = offsets.filter { !duplicateHeadingSectionIDs.contains($0.key) }
-        let aboveOrAt = candidates.filter { $0.value <= chapterReaderScrollTopThreshold }
-        let topMost: Int64?
-        if let highestAbove = aboveOrAt.max(by: { $0.value < $1.value })?.key {
-            topMost = highestAbove
-        } else {
-            // Nothing above the threshold yet (e.g. content scrolled all the way
-            // down); fall back to the section closest below it.
-            topMost = candidates.min(by: { $0.value < $1.value })?.key
+        guard let topMost = topVisibleSectionID(from: offsets) else { return }
+        if pendingFocusedSectionID == topMost || selectedJumpSectionID == topMost {
+            return
         }
-        guard let topMost, topMost != selectedJumpSectionID else { return }
-        selectedJumpSectionID = topMost
+
+        pendingFocusedSectionID = topMost
+        focusedSectionUpdateTask?.cancel()
+        focusedSectionUpdateTask = Task {
+            try? await Task.sleep(for: focusedSectionUpdateDelay)
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                guard pendingFocusedSectionID == topMost, selectedJumpSectionID != topMost else { return }
+                selectedJumpSectionID = topMost
+            }
+        }
+    }
+
+    private func topVisibleSectionID(from offsets: [Int64: CGFloat]) -> Int64? {
+        guard !offsets.isEmpty else { return nil }
+        let candidates = offsets.filter { !duplicateHeadingSectionIDs.contains($0.key) }
+        guard !candidates.isEmpty else { return nil }
+        let aboveOrAt = candidates.filter { $0.value <= chapterReaderScrollTopThreshold }
+        if let highestAbove = aboveOrAt.max(by: { $0.value < $1.value })?.key {
+            return highestAbove
+        }
+        // Nothing above the threshold yet (e.g. content scrolled all the way
+        // down); fall back to the section closest below it.
+        return candidates.min(by: { $0.value < $1.value })?.key
+    }
+
+    private func prewarmVisibleSectionBodies(
+        from descriptors: [CodeLibraryViewModel.ChapterBlockDescriptor]
+    ) async {
+        let sectionIDs = Array(descriptors.prefix(prewarmedSectionCount).map(\.sectionID))
+        guard !sectionIDs.isEmpty else { return }
+
+        let details = await library.loadSectionDetailsAsync(sectionIDs: sectionIDs)
+        let detailsByID = Dictionary(uniqueKeysWithValues: details.map { ($0.id, $0) })
+        let orderedDetails = sectionIDs.compactMap { detailsByID[$0] }
+        guard !orderedDetails.isEmpty else { return }
+
+        var prewarmedEntries: [Int64: NSAttributedString] = [:]
+        prewarmedEntries.reserveCapacity(orderedDetails.count)
+
+        for detail in orderedDetails {
+            prewarmedEntries[detail.id] = await library.chapterBodyNSTextAsync(for: detail)
+        }
+
+        guard !prewarmedEntries.isEmpty else { return }
+        prewarmedBodyText.merge(prewarmedEntries) { _, new in new }
     }
 
     private func orderedBlocks(
