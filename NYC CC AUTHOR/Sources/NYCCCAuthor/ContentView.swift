@@ -260,6 +260,10 @@ struct ContentView: View {
                         viewModel.publishAllToIOSApp()
                     }
                     .disabled(!viewModel.hasDocuments || viewModel.isPublishing)
+                    Button(viewModel.isExportingPack ? "Exporting Pack..." : "Export Pack") {
+                        viewModel.exportInstallablePack()
+                    }
+                    .disabled(!viewModel.hasDocuments || viewModel.isExportingPack)
                 }
 
                 HStack(spacing: 6) {

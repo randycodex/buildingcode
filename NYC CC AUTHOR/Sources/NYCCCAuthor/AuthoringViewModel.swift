@@ -20,6 +20,25 @@ final class AuthoringViewModel: ObservableObject {
         let codeID: Int64
         let codeName: String
         let codeSectionID: Int64
+        let codeSectionName: String
+    }
+
+    private struct PackManifest: Codable {
+        let schemaVersion: Int
+        let packID: String
+        let displayName: String
+        let jurisdictionID: Int64
+        let jurisdictionName: String
+        let codeID: Int64
+        let codeName: String
+        let codeSectionID: Int64
+        let codeSectionName: String
+        let contentKind: String
+        let bundleFileName: String
+        let chaptersDirectoryName: String
+        let assetsDirectoryName: String
+        let chapterCount: Int
+        let generatedAt: String
     }
 
     @Published private(set) var documents: [EditorDocument] = []
@@ -36,6 +55,7 @@ final class AuthoringViewModel: ObservableObject {
     @Published var statusMessage = "Open HTML files, edit them visually, then export structured authored content."
     @Published var errorMessage: String?
     @Published private(set) var isPublishing = false
+    @Published private(set) var isExportingPack = false
 
     private let authoringStore = EditorAuthoringStore()
     private let iOSCodeContentRootURL = URL(
@@ -631,8 +651,9 @@ final class AuthoringViewModel: ObservableObject {
                     scope: scope
                 )
                 let bundleProject = Self.bundleProjectSnapshot(from: project, scope: scope)
-                try Self.writeBundleProject(bundleProject, scope: scope, to: codeContentRootURL)
-                try Self.publishHTMLBundle(from: documentSnapshots, scope: scope, to: codeContentRootURL)
+                let bundleRootURL = Self.authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
+                try Self.writeBundleProject(bundleProject, to: bundleRootURL)
+                try Self.publishHTMLBundle(from: documentSnapshots, to: bundleRootURL)
                 try Self.validatePublishedHTMLBundle(from: documentSnapshots, scope: scope, in: codeContentRootURL)
 
                 DispatchQueue.main.async {
@@ -648,6 +669,72 @@ final class AuthoringViewModel: ObservableObject {
                     self.present(error)
                 }
             }
+        }
+    }
+
+    func exportInstallablePack() {
+        guard !documents.isEmpty else { return }
+        guard documents.allSatisfy(\.isLoaded) else {
+            statusMessage = "Load every open file before exporting an installable pack."
+            return
+        }
+        guard !isExportingPack else { return }
+
+        do {
+            let scope = try Self.resolvePublishScope(
+                in: authoringProject,
+                selectedJurisdictionID: selectedJurisdictionID,
+                selectedCodeID: selectedCodeID,
+                selectedCodeSectionID: selectedCodeSectionID
+            )
+            let panel = NSSavePanel()
+            panel.canCreateDirectories = true
+            panel.nameFieldStringValue = "\(Self.packID(for: scope)).nycccpack"
+            panel.title = "Export Installable Code Pack"
+            panel.prompt = "Export Pack"
+
+            guard panel.runModal() == .OK, let outputURL = panel.url else { return }
+
+            let documentSnapshots = documents.map {
+                PublishDocumentSnapshot(filePath: $0.fileURL.path, htmlContent: $0.htmlContent)
+            }
+            let projectSnapshot = authoringProject
+            let documentCount = documents.count
+
+            isExportingPack = true
+            statusMessage = "Exporting installable pack..."
+
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                do {
+                    let project = try Self.buildProjectSnapshot(
+                        from: documentSnapshots,
+                        baseProject: projectSnapshot,
+                        scope: scope
+                    )
+                    let bundleProject = Self.bundleProjectSnapshot(from: project, scope: scope)
+                    try Self.exportPackBundle(
+                        bundleProject,
+                        documents: documentSnapshots,
+                        scope: scope,
+                        to: outputURL
+                    )
+
+                    DispatchQueue.main.async {
+                        guard let self else { return }
+                        self.persistAuthoringProject(project)
+                        self.isExportingPack = false
+                        self.statusMessage = "Exported \(documentCount) open file(s) as \(outputURL.lastPathComponent)."
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        guard let self else { return }
+                        self.isExportingPack = false
+                        self.present(error)
+                    }
+                }
+            }
+        } catch {
+            present(error)
         }
     }
 
@@ -807,16 +894,13 @@ final class AuthoringViewModel: ObservableObject {
 
     private nonisolated static func publishHTMLBundle(
         from documents: [PublishDocumentSnapshot],
-        scope: PublishScope,
-        to codeContentRootURL: URL?
+        to bundleRootURL: URL
     ) throws {
-        guard let codeContentRootURL else { return }
         let htmlDocuments = documents.filter { snapshot in
             URL(fileURLWithPath: snapshot.filePath).pathExtension.lowercased() == "html"
         }
         guard !htmlDocuments.isEmpty else { return }
 
-        let bundleRootURL = authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
         let outputURL = bundleRootURL
             .appendingPathComponent("chapters", isDirectory: true)
         let assetsURL = bundleRootURL
@@ -1023,12 +1107,9 @@ final class AuthoringViewModel: ObservableObject {
 
     private nonisolated static func writeBundleProject(
         _ project: EditorAuthoringProject,
-        scope: PublishScope,
-        to codeContentRootURL: URL?
+        to bundleRootURL: URL
     ) throws {
-        guard let codeContentRootURL else { return }
-        let outputURL = authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
-            .appendingPathComponent("bundle.json", isDirectory: false)
+        let outputURL = bundleRootURL.appendingPathComponent("bundle.json", isDirectory: false)
         let data = try JSONEncoder.prettyEditorJSON.encode(project)
         try FileManager.default.createDirectory(
             at: outputURL.deletingLastPathComponent(),
@@ -1037,15 +1118,99 @@ final class AuthoringViewModel: ObservableObject {
         try data.write(to: outputURL, options: .atomic)
     }
 
+    private nonisolated static func exportPackBundle(
+        _ project: EditorAuthoringProject,
+        documents: [PublishDocumentSnapshot],
+        scope: PublishScope,
+        to outputURL: URL
+    ) throws {
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: outputURL.path) {
+            try fileManager.removeItem(at: outputURL)
+        }
+        try fileManager.createDirectory(at: outputURL, withIntermediateDirectories: true)
+        try writeBundleProject(project, to: outputURL)
+        try publishHTMLBundle(from: documents, to: outputURL)
+        try writePackManifest(project: project, scope: scope, to: outputURL)
+        try validatePackBundle(from: documents, in: outputURL)
+    }
+
+    private nonisolated static func writePackManifest(
+        project: EditorAuthoringProject,
+        scope: PublishScope,
+        to outputURL: URL
+    ) throws {
+        let manifest = PackManifest(
+            schemaVersion: 1,
+            packID: packID(for: scope),
+            displayName: "\(scope.codeName) - \(scope.codeSectionName)",
+            jurisdictionID: scope.jurisdictionID,
+            jurisdictionName: scope.jurisdictionName,
+            codeID: scope.codeID,
+            codeName: scope.codeName,
+            codeSectionID: scope.codeSectionID,
+            codeSectionName: scope.codeSectionName,
+            contentKind: "authored-html",
+            bundleFileName: "bundle.json",
+            chaptersDirectoryName: "chapters",
+            assetsDirectoryName: "assets",
+            chapterCount: project.chapters.count,
+            generatedAt: ISO8601DateFormatter().string(from: Date())
+        )
+        let data = try JSONEncoder.prettyEditorJSON.encode(manifest)
+        try data.write(to: outputURL.appendingPathComponent("pack.json"), options: .atomic)
+    }
+
+    private nonisolated static func validatePackBundle(
+        from documents: [PublishDocumentSnapshot],
+        in outputURL: URL
+    ) throws {
+        for fileName in ["pack.json", "bundle.json"] {
+            let url = outputURL.appendingPathComponent(fileName, isDirectory: false)
+            guard FileManager.default.fileExists(atPath: url.path) else {
+                throw NSError(
+                    domain: "NYCCCAuthor",
+                    code: 1301,
+                    userInfo: [NSLocalizedDescriptionKey: "The installable pack is missing \(fileName)."]
+                )
+            }
+        }
+
+        let chaptersURL = outputURL.appendingPathComponent("chapters", isDirectory: true)
+        let expectedHTMLNames = documents
+            .map { URL(fileURLWithPath: $0.filePath) }
+            .filter { $0.pathExtension.lowercased() == "html" }
+            .map(\.lastPathComponent)
+
+        guard !expectedHTMLNames.isEmpty else {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1302,
+                userInfo: [NSLocalizedDescriptionKey: "No HTML chapters were available to export."]
+            )
+        }
+
+        let missingChapterNames = expectedHTMLNames.filter { fileName in
+            let url = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
+            return !FileManager.default.fileExists(atPath: url.path)
+        }
+        if !missingChapterNames.isEmpty {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1303,
+                userInfo: [NSLocalizedDescriptionKey: "The installable pack is missing chapter HTML files: \(missingChapterNames.joined(separator: ", "))."]
+            )
+        }
+    }
+
     private nonisolated static func bundleProjectSnapshot(
         from fullProject: EditorAuthoringProject,
         scope: PublishScope
     ) -> EditorAuthoringProject {
         let bundleCodes = fullProject.codes.filter { $0.id == scope.codeID }
-        let bundleCodeSections = fullProject.codeSections.filter { $0.codeID == scope.codeID }
-        let bundleCodeSectionIDs = Set(bundleCodeSections.map(\.id))
+        let bundleCodeSections = fullProject.codeSections.filter { $0.id == scope.codeSectionID }
         let bundleChapters = fullProject.chapters.filter {
-            $0.codeID == scope.codeID || bundleCodeSectionIDs.contains($0.codeSectionID)
+            $0.codeID == scope.codeID && $0.codeSectionID == scope.codeSectionID
         }
 
         var project = EditorAuthoringProject()
@@ -1092,7 +1257,7 @@ final class AuthoringViewModel: ObservableObject {
             ?? project.codeSections.first(where: { $0.codeID == codeID })?.id
             ?? project.codeSections.first?.id
             ?? 1
-        guard project.codeSections.contains(where: { $0.id == codeSectionID }) else {
+        guard let codeSection = project.codeSections.first(where: { $0.id == codeSectionID }) else {
             throw NSError(domain: "NYCCCAuthor", code: 1003, userInfo: [NSLocalizedDescriptionKey: "Select a valid code section before publishing."])
         }
 
@@ -1101,8 +1266,19 @@ final class AuthoringViewModel: ObservableObject {
             jurisdictionName: jurisdiction.name,
             codeID: code.id,
             codeName: code.name,
-            codeSectionID: codeSectionID
+            codeSectionID: codeSectionID,
+            codeSectionName: codeSection.name
         )
+    }
+
+    private nonisolated static func packID(for scope: PublishScope) -> String {
+        [
+            slug(scope.jurisdictionName),
+            slug(scope.codeName),
+            slug(scope.codeSectionName)
+        ]
+            .filter { !$0.isEmpty }
+            .joined(separator: ".")
     }
 
     private nonisolated static func slug(_ value: String) -> String {

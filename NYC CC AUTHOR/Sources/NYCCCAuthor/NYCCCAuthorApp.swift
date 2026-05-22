@@ -79,6 +79,11 @@ struct NYCCCAuthorApp: App {
                     viewModel.publishAllToIOSApp()
                 }
                 .disabled(!viewModel.hasDocuments || viewModel.isPublishing)
+
+                Button(viewModel.isExportingPack ? "Exporting Installable Pack..." : "Export Installable Pack") {
+                    viewModel.exportInstallablePack()
+                }
+                .disabled(!viewModel.hasDocuments || viewModel.isExportingPack)
             }
         }
     }
