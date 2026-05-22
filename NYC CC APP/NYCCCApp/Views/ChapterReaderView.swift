@@ -8,6 +8,7 @@ struct ChapterReaderView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var blocks: [CodeLibraryViewModel.ChapterReaderBlockContent] = []
     @State private var blockOrder: [Int64: Int] = [:]
+    @State private var prewarmedBodyText: [Int64: NSAttributedString] = [:]
     @State private var selectedJumpSectionID: Int64?
     @State private var pendingScrollSectionID: Int64?
     @State private var expandedInlineImage: UIImage?
@@ -173,6 +174,7 @@ struct ChapterReaderView: View {
 
                 ChapterBlockBodyView(
                     detail: block.detail,
+                    prewarmedText: prewarmedBodyText[block.detail.id],
                     onOpenImage: { expandedInlineImage = $0 }
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -295,6 +297,7 @@ struct ChapterReaderView: View {
     private func loadBlocks(with proxy: ScrollViewProxy) async {
         blocks = []
         blockOrder = [:]
+        prewarmedBodyText = [:]
 
         let descriptors = await library.chapterBlockDescriptors(for: chapter)
         guard !descriptors.isEmpty else { return }
@@ -307,7 +310,14 @@ struct ChapterReaderView: View {
 
         if let selectedDescriptor = descriptors.first(where: { $0.sectionID == initialSectionID }),
            let selectedDetail = await library.loadSectionDetailAsync(sectionID: initialSectionID) {
-            blocks = [library.chapterReaderBlock(detail: selectedDetail, groupLabel: selectedDescriptor.groupLabel)]
+            let selectedBlock = library.chapterReaderBlock(
+                detail: selectedDetail,
+                groupLabel: selectedDescriptor.groupLabel
+            )
+            let selectedBodyText = await library.chapterBodyNSTextAsync(for: selectedDetail)
+
+            prewarmedBodyText = [selectedDetail.id: selectedBodyText]
+            blocks = [selectedBlock]
             selectedJumpSectionID = initialSectionID
             pendingScrollSectionID = initialSectionID
             scrollIfNeeded(with: proxy, animated: false)
@@ -497,10 +507,22 @@ private struct ChapterNoteSheet: View {
 
 private struct ChapterBlockBodyView: View {
     let detail: ReaderSectionDetail
+    let prewarmedText: NSAttributedString?
     let onOpenImage: (UIImage) -> Void
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var bodyText: NSAttributedString?
+
+    init(
+        detail: ReaderSectionDetail,
+        prewarmedText: NSAttributedString? = nil,
+        onOpenImage: @escaping (UIImage) -> Void
+    ) {
+        self.detail = detail
+        self.prewarmedText = prewarmedText
+        self.onOpenImage = onOpenImage
+        _bodyText = State(initialValue: prewarmedText)
+    }
 
     var body: some View {
         Group {
@@ -515,10 +537,18 @@ private struct ChapterBlockBodyView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .task(id: detail.id) {
-            bodyText = await library.chapterBodyNSTextAsync(for: detail)
+        .task(id: ChapterBlockBodyTaskID(sectionID: detail.id, theme: library.readerTheme)) {
+            let renderedText = await library.chapterBodyNSTextAsync(for: detail)
+            if bodyText?.isEqual(renderedText) != true {
+                bodyText = renderedText
+            }
         }
     }
+}
+
+private struct ChapterBlockBodyTaskID: Hashable {
+    let sectionID: Int64
+    let theme: ReaderTheme
 }
 
 private struct ChapterReaderBlockOffsetPreferenceKey: PreferenceKey {
