@@ -148,6 +148,7 @@ struct ChapterHTMLReaderView: View {
         }
         .onAppear {
             ensureHTMLStoreCached()
+            library.noteChapterOpened(chapter: chapter)
             library.refreshBookmarks()
             if targetAnchorID == nil {
                 let anchor = initialAnchor

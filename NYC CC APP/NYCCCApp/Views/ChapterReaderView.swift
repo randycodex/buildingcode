@@ -102,6 +102,7 @@ struct ChapterReaderView: View {
             )
         }
         .task(id: chapter.id) {
+            library.noteChapterOpened(chapter: chapter)
             allowsNoteTap = false
             await loadBlocks(with: proxy)
             // Suppress note-open taps briefly after the chapter appears so

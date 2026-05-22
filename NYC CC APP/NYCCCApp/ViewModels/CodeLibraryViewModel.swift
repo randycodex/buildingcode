@@ -49,6 +49,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private var authoredCodeStore: AuthoredCodeStore?
     private let selectedVersionDefaultsKey = "selectedCodeVersionFileName"
     private let selectedJurisdictionDefaultsKey = "selectedJurisdictionKey"
+    private let lastOpenedChapterIDDefaultsKey = "lastOpenedChapterID"
+    private var lastChapterPreloadTask: Task<Void, Never>?
     private var sectionsCache: [Int64: [CodeSectionSummary]] = [:]
     private var sectionGroupsCache: [Int64: [CodeSectionGroup]] = [:]
     private var sectionDetailCache: [Int64: ReaderSectionDetail] = [:]
@@ -163,6 +165,33 @@ final class CodeLibraryViewModel: ObservableObject {
         selectedVersionFileName = fileName
         UserDefaults.standard.set(fileName, forKey: selectedVersionDefaultsKey)
         openSelectedContent()
+    }
+
+    // MARK: - Idle preload of last-opened chapter
+
+    func noteChapterOpened(chapter: CodeChapter) {
+        UserDefaults.standard.set(chapter.id, forKey: lastOpenedChapterIDDefaultsKey)
+        // The chapter is already being opened, so a pending idle preload is stale.
+        lastChapterPreloadTask?.cancel()
+    }
+
+    private func preloadLastOpenedChapterIfNeeded() {
+        let storedID = UserDefaults.standard.object(forKey: lastOpenedChapterIDDefaultsKey) as? Int64
+            ?? (UserDefaults.standard.object(forKey: lastOpenedChapterIDDefaultsKey) as? Int)
+                .map(Int64.init)
+        guard let chapterID = storedID else { return }
+        guard let chapter = chapters.first(where: { $0.id == chapterID }) else { return }
+
+        lastChapterPreloadTask?.cancel()
+        lastChapterPreloadTask = Task { [weak self] in
+            // Small delay so this does not compete with the first interaction.
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            guard !Task.isCancelled, let self else { return }
+            let descriptors = await self.chapterBlockDescriptors(for: chapter)
+            guard !Task.isCancelled else { return }
+            let firstIDs = Array(descriptors.prefix(8)).map(\.sectionID)
+            _ = await self.loadSectionDetailsAsync(sectionIDs: firstIDs)
+        }
     }
 
     func updateSelectedCodeSection(id: Int64?) {
@@ -773,12 +802,15 @@ final class CodeLibraryViewModel: ObservableObject {
                 sqliteChapterLoader = try SQLiteChapterLoader(databaseURL: selectedVersion.fileURL)
                 chapters = try codeDatabase?.chapters() ?? []
                 refreshBookmarks()
+                // Flip the overlay off as soon as tiles can render; prewarm
+                // continues in the background.
+                self.statusMessage = nil
+                self.isInitialContentLoaded = true
                 let chapters = self.chapters
                 contentLoadTask = Task {
                     await self.prewarmSQLiteContent(chapters: chapters)
                     guard !Task.isCancelled else { return }
-                    self.statusMessage = nil
-                    self.isInitialContentLoaded = true
+                    self.preloadLastOpenedChapterIfNeeded()
                 }
             } catch {
                 codeSections = []
@@ -811,14 +843,17 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.chapters = snapshot.chapters
                     self.searchResults = []
                     self.refreshBookmarks()
+                    // Flip the overlay off as soon as tiles can render; prewarm
+                    // and last-chapter preload continue in the background.
+                    self.statusMessage = nil
+                    self.isInitialContentLoaded = true
                     await self.prewarmAuthoredContent(
                         version: selectedVersion,
                         chapters: snapshot.chapters,
                         store: snapshot.store
                     )
                     guard !Task.isCancelled else { return }
-                    self.statusMessage = nil
-                    self.isInitialContentLoaded = true
+                    self.preloadLastOpenedChapterIfNeeded()
                 } catch {
                     guard !Task.isCancelled else { return }
                     self.codeSections = []

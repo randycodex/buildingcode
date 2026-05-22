@@ -24,6 +24,16 @@ final class BundleDatabaseLocator {
     ]
 
     func availableCodeVersions() -> [BundledCodeVersion] {
+        if let cached = Self.loadCache() {
+            return cached
+        }
+
+        let versions = scanAvailableCodeVersions()
+        Self.persistCache(versions: versions)
+        return versions
+    }
+
+    private func scanAvailableCodeVersions() -> [BundledCodeVersion] {
         var versions: [BundledCodeVersion] = []
 
         versions.append(contentsOf: discoverAuthoredVersions())
@@ -43,6 +53,89 @@ final class BundleDatabaseLocator {
                 return lhs.contentKind == .authored
             }
             return lhs.displayName.localizedStandardCompare(rhs.displayName) == .orderedAscending
+        }
+    }
+
+    // MARK: - Cache
+
+    private struct CachedScanEntry: Codable {
+        let fileName: String
+        let relativeFilePath: String
+        let codeVersion: String
+        let contentKindRaw: String
+        let authoredCodeID: Int64?
+        let jurisdictionID: Int64?
+        let jurisdictionName: String?
+        let authoredHTMLBundlePath: String?
+    }
+
+    private struct CachedScan: Codable {
+        let appVersionKey: String
+        let entries: [CachedScanEntry]
+    }
+
+    private static let cacheDefaultsKey = "BundleDatabaseLocator.cachedScan.v1"
+
+    private static var appVersionKey: String {
+        let info = Bundle.main.infoDictionary
+        let short = (info?["CFBundleShortVersionString"] as? String) ?? ""
+        let build = (info?["CFBundleVersion"] as? String) ?? ""
+        return "\(short)-\(build)"
+    }
+
+    private static func loadCache() -> [BundledCodeVersion]? {
+        guard let resourceURL = Bundle.main.resourceURL else { return nil }
+        guard let data = UserDefaults.standard.data(forKey: cacheDefaultsKey) else { return nil }
+        guard let scan = try? JSONDecoder().decode(CachedScan.self, from: data) else { return nil }
+        guard scan.appVersionKey == appVersionKey else { return nil }
+
+        var versions: [BundledCodeVersion] = []
+        versions.reserveCapacity(scan.entries.count)
+        for entry in scan.entries {
+            let url = resourceURL.appendingPathComponent(entry.relativeFilePath)
+            guard FileManager.default.fileExists(atPath: url.path) else { return nil }
+            guard let kind = BundledCodeContentKind(rawValue: entry.contentKindRaw) else { return nil }
+            versions.append(
+                BundledCodeVersion(
+                    fileName: entry.fileName,
+                    fileURL: url,
+                    codeVersion: entry.codeVersion,
+                    contentKind: kind,
+                    authoredCodeID: entry.authoredCodeID,
+                    jurisdictionID: entry.jurisdictionID,
+                    jurisdictionName: entry.jurisdictionName,
+                    authoredHTMLBundlePath: entry.authoredHTMLBundlePath
+                )
+            )
+        }
+        return versions
+    }
+
+    private static func persistCache(versions: [BundledCodeVersion]) {
+        guard let resourceURL = Bundle.main.resourceURL else { return }
+        let resourcePath = resourceURL.path
+        let entries: [CachedScanEntry] = versions.map { version in
+            let absolute = version.fileURL.path
+            let relative: String
+            if absolute.hasPrefix(resourcePath + "/") {
+                relative = String(absolute.dropFirst(resourcePath.count + 1))
+            } else {
+                relative = version.fileURL.lastPathComponent
+            }
+            return CachedScanEntry(
+                fileName: version.fileName,
+                relativeFilePath: relative,
+                codeVersion: version.codeVersion,
+                contentKindRaw: version.contentKind.rawValue,
+                authoredCodeID: version.authoredCodeID,
+                jurisdictionID: version.jurisdictionID,
+                jurisdictionName: version.jurisdictionName,
+                authoredHTMLBundlePath: version.authoredHTMLBundlePath
+            )
+        }
+        let scan = CachedScan(appVersionKey: appVersionKey, entries: entries)
+        if let data = try? JSONEncoder().encode(scan) {
+            UserDefaults.standard.set(data, forKey: cacheDefaultsKey)
         }
     }
 
