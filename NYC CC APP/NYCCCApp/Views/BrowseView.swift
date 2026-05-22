@@ -3,6 +3,7 @@ import SwiftUI
 struct BrowseView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Namespace private var chapterTileNamespace
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
@@ -21,11 +22,11 @@ struct BrowseView: View {
                     .padding(20)
                 } else {
                     VStack(alignment: .leading, spacing: 0) {
-                        libraryHeader
-                            .padding(.horizontal, 16)
-                            .padding(.top, 18)
-
                         ScrollView {
+                            libraryHeader
+                                .padding(.horizontal, 20)
+                                .padding(.top, 4)
+                                .padding(.bottom, 12)
                             if library.chapters.isEmpty {
                                 CodeEmptyStateCard(
                                     title: "No Chapters",
@@ -46,10 +47,12 @@ struct BrowseView: View {
                                                 ForEach(chapterItems) { chapter in
                                                     NavigationLink {
                                                         ChapterLaunchView(chapter: chapter)
+                                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                                     } label: {
                                                         ChapterTile(chapter: chapter, accent: accentColor, kind: .chapter)
                                                     }
                                                     .buttonStyle(.plain)
+                                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                                 }
                                             }
                                         } header: {
@@ -63,10 +66,12 @@ struct BrowseView: View {
                                                 ForEach(appendixItems) { chapter in
                                                     NavigationLink {
                                                         ChapterLaunchView(chapter: chapter)
+                                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                                     } label: {
                                                         ChapterTile(chapter: chapter, accent: accentColor, kind: .appendix)
                                                     }
                                                     .buttonStyle(.plain)
+                                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                                 }
                                             }
                                         } header: {
@@ -85,25 +90,20 @@ struct BrowseView: View {
                 }
             }
             .background(browseBackdrop.ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color(uiColor: .systemGroupedBackground), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .navigationTitle(selectedJurisdictionName)
+            .navigationBarTitleDisplayMode(.large)
         }
     }
 
     private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(selectedJurisdictionName)
-                .font(.system(size: 30, weight: .bold))
-                .foregroundStyle(.primary)
-
             Text(selectedVersionName)
                 .font(.title3.weight(.regular))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 18)
     }
 
@@ -189,11 +189,17 @@ private struct ChapterLaunchView: View {
     let chapter: CodeChapter
 
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dismiss) private var dismiss
     @State private var initialSection: CodeSectionSummary?
+    @State private var pinchScale: CGFloat = 1
+    @State private var isDismissingByPinch: Bool = false
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
     }
+
+    private let pinchDismissThreshold: CGFloat = 0.85
+    private let pinchMinimumScale: CGFloat = 0.6
 
     var body: some View {
         Group {
@@ -220,8 +226,41 @@ private struct ChapterLaunchView: View {
                 }
             }
         }
+        .scaleEffect(pinchScale, anchor: .center)
+        .animation(.interactiveSpring(response: 0.32, dampingFraction: 0.82), value: pinchScale)
+        .simultaneousGesture(pinchToCloseGesture)
         .navigationTitle(chapter.displayLabel)
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var pinchToCloseGesture: some Gesture {
+        MagnificationGesture(minimumScaleDelta: 0.02)
+            .onChanged { value in
+                guard !isDismissingByPinch else { return }
+                // Only react to inward pinches; outward pinches are reserved
+                // for image zoom inside the reader.
+                guard value < 1 else {
+                    if pinchScale != 1 { pinchScale = 1 }
+                    return
+                }
+                pinchScale = max(pinchMinimumScale, value)
+            }
+            .onEnded { value in
+                guard !isDismissingByPinch else { return }
+                if value <= pinchDismissThreshold {
+                    isDismissingByPinch = true
+                    withAnimation(.easeOut(duration: 0.18)) {
+                        pinchScale = pinchMinimumScale
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                        dismiss()
+                    }
+                } else {
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
+                        pinchScale = 1
+                    }
+                }
+            }
     }
 }
 
@@ -458,6 +497,26 @@ private extension UIColor {
         let green = CGFloat((hex >> 8) & 0xFF) / 255
         let blue  = CGFloat(hex & 0xFF) / 255
         self.init(red: red, green: green, blue: blue, alpha: 1)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func chapterZoomSource<ID: Hashable>(id: ID, in namespace: Namespace.ID) -> some View {
+        if #available(iOS 18.0, *) {
+            self.matchedTransitionSource(id: id, in: namespace)
+        } else {
+            self
+        }
+    }
+
+    @ViewBuilder
+    func chapterZoomDestination<ID: Hashable>(id: ID, in namespace: Namespace.ID) -> some View {
+        if #available(iOS 18.0, *) {
+            self.navigationTransition(.zoom(sourceID: id, in: namespace))
+        } else {
+            self
+        }
     }
 }
 

@@ -604,6 +604,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               border-top: 1px solid \(borderColor);
               padding-top: 0.8rem;
               margin-top: 0.8rem !important;
+              scroll-margin-top: 96px;
+            }
+            .nyccc-section-card {
+              scroll-margin-top: 96px;
             }
             .nyccc-section-card {
               box-sizing: border-box !important;

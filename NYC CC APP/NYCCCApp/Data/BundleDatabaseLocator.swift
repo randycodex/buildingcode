@@ -74,9 +74,21 @@ final class BundleDatabaseLocator {
         )
 
         var versions: [BundledCodeVersion] = []
+        var seenDirectories: Set<String> = []
         while let item = enumerator?.nextObject() as? URL {
-            guard item.lastPathComponent == "bundle.json" else { continue }
-            versions.append(contentsOf: readAuthoredVersions(from: item, authoredRootURL: authoredRootURL))
+            let name = item.lastPathComponent
+            guard name == "bundle.plist" || name == "bundle.json" else { continue }
+            let directoryPath = item.deletingLastPathComponent().path
+            // Prefer bundle.plist when both are present; only consume one bundle per directory.
+            if seenDirectories.contains(directoryPath) { continue }
+            let preferredURL: URL = {
+                if name == "bundle.plist" { return item }
+                let plistCandidate = item.deletingLastPathComponent().appendingPathComponent("bundle.plist")
+                if FileManager.default.fileExists(atPath: plistCandidate.path) { return plistCandidate }
+                return item
+            }()
+            seenDirectories.insert(directoryPath)
+            versions.append(contentsOf: readAuthoredVersions(from: preferredURL, authoredRootURL: authoredRootURL))
         }
         return versions
     }
@@ -111,11 +123,14 @@ final class BundleDatabaseLocator {
         from jsonURL: URL,
         authoredRootURL: URL
     ) -> [BundledCodeVersion] {
-        guard
-            let data = try? Data(contentsOf: jsonURL),
-            let project = try? JSONDecoder().decode(AuthoredBundleIndex.self, from: data)
-        else {
-            return []
+        guard let data = try? Data(contentsOf: jsonURL) else { return [] }
+        let project: AuthoredBundleIndex
+        if jsonURL.pathExtension.lowercased() == "plist" {
+            guard let decoded = try? PropertyListDecoder().decode(AuthoredBundleIndex.self, from: data) else { return [] }
+            project = decoded
+        } else {
+            guard let decoded = try? JSONDecoder().decode(AuthoredBundleIndex.self, from: data) else { return [] }
+            project = decoded
         }
 
         let resourceRootURL = authoredRootURL
@@ -133,7 +148,7 @@ final class BundleDatabaseLocator {
 
         return (project.codes ?? []).map { code in
             BundledCodeVersion(
-                fileName: relativeBundleRootPath + "/bundle.json#\(code.id)",
+                fileName: relativeBundleRootPath + "/\(jsonURL.lastPathComponent)#\(code.id)",
                 fileURL: jsonURL,
                 codeVersion: code.name,
                 contentKind: .authored,

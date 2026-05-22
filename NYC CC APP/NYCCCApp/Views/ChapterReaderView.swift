@@ -16,6 +16,10 @@ struct ChapterReaderView: View {
     @State private var duplicateHeadingSectionIDs: Set<Int64> = []
     @State private var noteTarget: ReaderSectionDetail?
     @State private var noteBody = ""
+    @State private var allowsNoteTap: Bool = false
+    @State private var blockOffsets: [Int64: CGFloat] = [:]
+    private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
+    private let chapterReaderScrollTopThreshold: CGFloat = 140
     private let indentStep: CGFloat = 26
 
     private var accentColor: Color {
@@ -50,6 +54,10 @@ struct ChapterReaderView: View {
             .padding(.horizontal, 20)
             .padding(.top, 28)
             .padding(.bottom, 24)
+        }
+        .coordinateSpace(name: chapterReaderCoordinateSpace)
+        .onPreferenceChange(ChapterReaderBlockOffsetPreferenceKey.self) { offsets in
+            updateFocusedSection(from: offsets)
         }
         .overlay(alignment: .top) {
             CodeTopContentFade()
@@ -90,18 +98,20 @@ struct ChapterReaderView: View {
             )
         }
         .task(id: chapter.id) {
+            allowsNoteTap = false
             await loadBlocks(with: proxy)
+            // Suppress note-open taps briefly after the chapter appears so
+            // touches that originated on the source tile during the zoom
+            // transition do not accidentally open the notes sheet on the
+            // first visible section.
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            allowsNoteTap = true
         }
         .onAppear {
             syncVisibleBookmarks()
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
             syncVisibleBookmarks()
-        }
-        .onChange(of: selectedJumpSectionID) { _, newValue in
-            guard let newValue else { return }
-            pendingScrollSectionID = newValue
-            scrollIfNeeded(with: proxy, animated: true)
         }
     }
 
@@ -170,6 +180,7 @@ struct ChapterReaderView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded {
+                guard allowsNoteTap else { return }
                 openNotes(for: block.detail)
             })
             .accessibilityAddTraits(.isButton)
@@ -179,6 +190,14 @@ struct ChapterReaderView: View {
             CodeHairline().padding(.top, 2)
         }
         .id(block.detail.id)
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(
+                    key: ChapterReaderBlockOffsetPreferenceKey.self,
+                    value: [block.detail.id: geo.frame(in: .named(chapterReaderCoordinateSpace)).minY]
+                )
+            }
+        )
     }
 
     private func isDuplicateSectionHeadingBlock(_ detail: ReaderSectionDetail) -> Bool {
@@ -219,9 +238,16 @@ struct ChapterReaderView: View {
     private func jumpBar(proxy: ScrollViewProxy) -> some View {
         HStack(spacing: 10) {
             Menu {
-                ForEach(Array(blocks.reversed())) { block in
-                    Button(jumpLabel(for: block.detail)) {
-                        selectedJumpSectionID = block.detail.id
+                let visibleBlocks = blocks.filter { !duplicateHeadingSectionIDs.contains($0.detail.id) }
+                ForEach(Array(visibleBlocks.reversed())) { block in
+                    Button {
+                        jumpToSection(id: block.detail.id, with: proxy)
+                    } label: {
+                        if selectedJumpSectionID == block.detail.id {
+                            Label(jumpLabel(for: block.detail), systemImage: "checkmark")
+                        } else {
+                            Text(jumpLabel(for: block.detail))
+                        }
                     }
                 }
             } label: {
@@ -247,9 +273,7 @@ struct ChapterReaderView: View {
 
             Button {
                 if let firstID = blocks.first?.detail.id {
-                    selectedJumpSectionID = firstID
-                    pendingScrollSectionID = firstID
-                    scrollIfNeeded(with: proxy, animated: true)
+                    jumpToSection(id: firstID, with: proxy)
                 }
             } label: {
                 Image(systemName: "arrow.up.to.line")
@@ -319,6 +343,28 @@ struct ChapterReaderView: View {
         duplicateHeadingSectionIDs = Set(
             blocks.compactMap { isDuplicateSectionHeadingBlock($0.detail) ? $0.detail.id : nil }
         )
+    }
+
+    private func jumpToSection(id: Int64, with proxy: ScrollViewProxy) {
+        selectedJumpSectionID = id
+        pendingScrollSectionID = id
+        scrollIfNeeded(with: proxy, animated: true)
+    }
+
+    private func updateFocusedSection(from offsets: [Int64: CGFloat]) {
+        guard !offsets.isEmpty else { return }
+        let candidates = offsets.filter { !duplicateHeadingSectionIDs.contains($0.key) }
+        let aboveOrAt = candidates.filter { $0.value <= chapterReaderScrollTopThreshold }
+        let topMost: Int64?
+        if let highestAbove = aboveOrAt.max(by: { $0.value < $1.value })?.key {
+            topMost = highestAbove
+        } else {
+            // Nothing above the threshold yet (e.g. content scrolled all the way
+            // down); fall back to the section closest below it.
+            topMost = candidates.min(by: { $0.value < $1.value })?.key
+        }
+        guard let topMost, topMost != selectedJumpSectionID else { return }
+        selectedJumpSectionID = topMost
     }
 
     private func orderedBlocks(
@@ -472,6 +518,14 @@ private struct ChapterBlockBodyView: View {
         .task(id: detail.id) {
             bodyText = await library.chapterBodyNSTextAsync(for: detail)
         }
+    }
+}
+
+private struct ChapterReaderBlockOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: [Int64: CGFloat] = [:]
+
+    static func reduce(value: inout [Int64: CGFloat], nextValue: () -> [Int64: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, new in new })
     }
 }
 

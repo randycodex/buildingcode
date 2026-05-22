@@ -11,10 +11,6 @@ struct SettingsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Settings")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(.primary)
-
                     CodeSurface(accent: accentColor, padding: 0) {
                         VStack(spacing: 0) {
                             jurisdictionPicker
@@ -65,10 +61,8 @@ struct SettingsView: View {
                 CodeTopContentFade()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color(uiColor: .systemGroupedBackground), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.large)
         }
     }
 

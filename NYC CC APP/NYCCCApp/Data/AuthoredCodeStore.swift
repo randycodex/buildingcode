@@ -110,7 +110,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     init(jsonURL: URL, codeID: Int64? = nil, jurisdictionID: Int64? = nil) throws {
         let data = try Data(contentsOf: jsonURL)
-        let decodedProject = try JSONDecoder().decode(Project.self, from: data)
+        let decodedProject: Project
+        if jsonURL.pathExtension.lowercased() == "plist" {
+            decodedProject = try PropertyListDecoder().decode(Project.self, from: data)
+        } else {
+            decodedProject = try JSONDecoder().decode(Project.self, from: data)
+        }
         let visibleCodes = (decodedProject.codes ?? []).filter { code in
             if let codeID {
                 return code.id == codeID

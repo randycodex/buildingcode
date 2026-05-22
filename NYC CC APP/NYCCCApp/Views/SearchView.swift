@@ -12,10 +12,6 @@ struct SearchView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Search")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(.primary)
-
                     TextField("", text: $query)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -61,10 +57,8 @@ struct SearchView: View {
                 CodeTopContentFade()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color(uiColor: .systemGroupedBackground), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .navigationTitle("Search")
+            .navigationBarTitleDisplayMode(.large)
             .task(id: query) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {

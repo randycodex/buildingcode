@@ -12,11 +12,6 @@ struct BookmarksView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Bookmarks / Notes")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(.primary)
-                        .padding(.bottom, 18)
-
                     if !library.bookmarks.isEmpty {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(bookmarkGroups) { group in
@@ -45,10 +40,8 @@ struct BookmarksView: View {
                 CodeTopContentFade()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color(uiColor: .systemGroupedBackground), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .navigationTitle("Bookmarks / Notes")
+            .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 library.refreshBookmarks()
             }
@@ -88,21 +81,10 @@ struct BookmarksView: View {
 
     @ViewBuilder
     private func bookmarkDestination(for bookmark: BookmarkedSection) -> some View {
-        if library.selectedVersion?.contentKind == .authored,
-           let chapter = resolvedChapter(for: bookmark) {
-            ChapterHTMLReaderView(
-                chapter: chapter,
-                initialSection: CodeSectionSummary(
-                    id: bookmark.id,
-                    chapterNumber: bookmark.chapterNumber,
-                    sectionNumber: bookmark.sectionNumber,
-                    title: bookmark.title,
-                    kind: bookmark.kind
-                )
-            )
-        } else {
-            ReaderView(sectionID: bookmark.id)
-        }
+        // Bookmarks open the single-section reader (notes screen) directly so
+        // tapping a bookmarked subsection goes straight to its notes view
+        // rather than landing inside the full chapter reader.
+        ReaderView(sectionID: bookmark.id)
     }
 
     private func resolvedChapter(for bookmark: BookmarkedSection) -> CodeChapter? {
