@@ -4,6 +4,8 @@ import UIKit
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
 
+    private let tabBarClearance: CGFloat = 88
+
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
     }
@@ -29,12 +31,20 @@ struct BookmarksView: View {
                                 }
                             }
                         }
+                    } else {
+                        CodeEmptyStateCard(
+                            title: "No Bookmarks or Notes",
+                            systemImage: "bookmark",
+                            description: "Saved sections and notes appear here for quick return.",
+                            accent: accentColor
+                        )
+                        .padding(.top, 4)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, 16)
                 .padding(.top, 18)
-                .padding(.bottom, 24)
+                .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
                 CodeTopContentFade()

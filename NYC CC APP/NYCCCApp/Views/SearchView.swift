@@ -4,6 +4,8 @@ struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var query = ""
 
+    private let tabBarClearance: CGFloat = 88
+
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
     }
@@ -12,23 +14,17 @@ struct SearchView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    TextField("", text: $query)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .onSubmit {
-                            library.recordRecentSearch(query)
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 12)
-                        .background(Color(uiColor: .secondarySystemGroupedBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    searchField
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         recentSearchSection
                     } else if library.searchResults.isEmpty {
-                        Text("No results")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                        CodeEmptyStateCard(
+                            title: "No Results",
+                            systemImage: "magnifyingglass",
+                            description: "Try a section number, chapter term, or phrase from the code text.",
+                            accent: accentColor
+                        )
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(library.searchResults) { result in
@@ -51,7 +47,7 @@ struct SearchView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 18)
-                .padding(.bottom, 24)
+                .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
                 CodeTopContentFade()
@@ -71,6 +67,44 @@ struct SearchView: View {
                 library.search(query: query)
             }
         }
+    }
+
+    private var searchField: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "magnifyingglass")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            TextField("Search sections, chapters, terms", text: $query)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.search)
+                .onSubmit {
+                    library.recordRecentSearch(query)
+                }
+
+            if !query.isEmpty {
+                Button {
+                    query = ""
+                    library.search(query: "")
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(Color(uiColor: .separator).opacity(0.55), lineWidth: 0.75)
+        )
+        .accessibilityElement(children: .contain)
     }
 
     @ViewBuilder
@@ -119,6 +153,13 @@ struct SearchView: View {
                     }
                 }
             }
+        } else {
+            CodeEmptyStateCard(
+                title: "Search the Code",
+                systemImage: "text.magnifyingglass",
+                description: "Find section numbers, chapter topics, and exact language across the selected code.",
+                accent: accentColor
+            )
         }
     }
 

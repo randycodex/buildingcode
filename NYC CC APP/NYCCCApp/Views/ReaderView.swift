@@ -10,6 +10,8 @@ struct ReaderView: View {
     @State private var noteBody = ""
     @State private var isBookmarked = false
     @State private var expandedInlineImage: UIImage?
+    @State private var noteSaveState: NoteSaveState = .idle
+    @State private var noteSaveResetTask: Task<Void, Never>?
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
@@ -96,6 +98,9 @@ struct ReaderView: View {
         .task(id: sectionID) {
             await loadContent()
         }
+        .onDisappear {
+            noteSaveResetTask?.cancel()
+        }
     }
 
     @ViewBuilder
@@ -130,9 +135,21 @@ struct ReaderView: View {
 
     private var notesEditor: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Notes")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+            HStack(alignment: .center, spacing: 8) {
+                Text("Notes")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                Spacer(minLength: 0)
+
+                if noteSaveState != .idle {
+                    Label(noteSaveState.title, systemImage: noteSaveState.systemImage)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .labelStyle(.titleAndIcon)
+                        .accessibilityLabel(noteSaveState.accessibilityLabel)
+                }
+            }
 
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $noteBody)
@@ -173,6 +190,7 @@ struct ReaderView: View {
         }
         isBookmarked = library.isBookmarked(sectionID: sectionID)
         noteBody = library.noteBody(sectionID: sectionID)
+        noteSaveState = .idle
     }
 
     private func toggleBookmark() {
@@ -181,6 +199,46 @@ struct ReaderView: View {
 
     private func saveNote() {
         library.saveNote(sectionID: sectionID, body: noteBody)
+        noteSaveState = .saved
+
+        noteSaveResetTask?.cancel()
+        noteSaveResetTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            noteSaveState = .idle
+        }
+    }
+
+    private enum NoteSaveState: Equatable {
+        case idle
+        case saved
+
+        var title: String {
+            switch self {
+            case .idle:
+                return ""
+            case .saved:
+                return "Saved"
+            }
+        }
+
+        var systemImage: String {
+            switch self {
+            case .idle:
+                return ""
+            case .saved:
+                return "checkmark.circle"
+            }
+        }
+
+        var accessibilityLabel: String {
+            switch self {
+            case .idle:
+                return ""
+            case .saved:
+                return "Note saved"
+            }
+        }
     }
 
     private struct ReferenceListSection: View {
