@@ -153,13 +153,6 @@ struct SearchView: View {
                     }
                 }
             }
-        } else {
-            CodeEmptyStateCard(
-                title: "Search the Code",
-                systemImage: "text.magnifyingglass",
-                description: "Find section numbers, chapter topics, and exact language across the selected code.",
-                accent: accentColor
-            )
         }
     }
 

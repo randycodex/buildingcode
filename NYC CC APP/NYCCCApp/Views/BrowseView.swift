@@ -40,42 +40,34 @@ struct BrowseView: View {
                                 let chapterItems = library.chapters.filter { !isAppendix($0) }
                                 let appendixItems = visibleAppendixItems(from: library.chapters)
 
-                                LazyVStack(alignment: .leading, spacing: 12, pinnedViews: [.sectionHeaders]) {
+                                LazyVStack(alignment: .leading, spacing: 12) {
                                     if !chapterItems.isEmpty {
-                                        Section {
-                                            LazyVGrid(columns: columns, spacing: 12) {
-                                                ForEach(chapterItems) { chapter in
-                                                    NavigationLink {
-                                                        ChapterLaunchView(chapter: chapter)
-                                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
-                                                    } label: {
-                                                        ChapterTile(chapter: chapter, accent: accentColor, kind: .chapter)
-                                                    }
-                                                    .buttonStyle(.plain)
-                                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
+                                        LazyVGrid(columns: columns, spacing: 12) {
+                                            ForEach(chapterItems) { chapter in
+                                                NavigationLink {
+                                                    ChapterLaunchView(chapter: chapter)
+                                                        .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+                                                } label: {
+                                                    ChapterTile(chapter: chapter, accent: accentColor, kind: .chapter)
                                                 }
+                                                .buttonStyle(.plain)
+                                                .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                             }
-                                        } header: {
-                                            browseSectionHeader("Chapters")
                                         }
                                     }
 
                                     if !appendixItems.isEmpty {
-                                        Section {
-                                            LazyVGrid(columns: columns, spacing: 12) {
-                                                ForEach(appendixItems) { chapter in
-                                                    NavigationLink {
-                                                        ChapterLaunchView(chapter: chapter)
-                                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
-                                                    } label: {
-                                                        ChapterTile(chapter: chapter, accent: accentColor, kind: .appendix)
-                                                    }
-                                                    .buttonStyle(.plain)
-                                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
+                                        LazyVGrid(columns: columns, spacing: 12) {
+                                            ForEach(appendixItems) { chapter in
+                                                NavigationLink {
+                                                    ChapterLaunchView(chapter: chapter)
+                                                        .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+                                                } label: {
+                                                    ChapterTile(chapter: chapter, accent: accentColor, kind: .appendix)
                                                 }
+                                                .buttonStyle(.plain)
+                                                .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                             }
-                                        } header: {
-                                            browseSectionHeader("Appendix")
                                         }
                                     }
                                 }
@@ -163,14 +155,6 @@ struct BrowseView: View {
             return nil
         }
         return String(leadingLetters)
-    }
-
-    private func browseSectionHeader(_ title: String) -> some View {
-        Text(title)
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
     }
 
     private var browseBackdrop: some View {
@@ -465,7 +449,7 @@ private enum ChapterTileKind {
     var fill: Color {
         switch self {
         case .chapter:  return Self.dynamicColor(light: 0xCAD593, dark: 0x243010)
-        case .appendix: return Self.dynamicColor(light: 0xD8DDEF, dark: 0x7293A0)
+        case .appendix: return Self.dynamicColor(light: 0xD8DDEF, dark: 0x332E3C)
         }
     }
 
@@ -479,14 +463,14 @@ private enum ChapterTileKind {
     var numberColor: Color {
         switch self {
         case .chapter:  return Self.dynamicColor(light: 0x243010, dark: 0xCAD593)
-        case .appendix: return Self.dynamicColor(light: 0x7293A0, dark: 0xD8DDEF)
+        case .appendix: return Self.dynamicColor(light: 0x7293A0, dark: 0xA29587)
         }
     }
 
     var titleColor: Color {
         switch self {
         case .chapter:  return Self.dynamicColor(light: 0x87A330, dark: 0xA1C349)
-        case .appendix: return Self.dynamicColor(light: 0x45B69C, dark: 0x21D19F)
+        case .appendix: return Self.dynamicColor(light: 0x45B69C, dark: 0x846C5B)
         }
     }
 }

@@ -31,14 +31,6 @@ struct BookmarksView: View {
                                 }
                             }
                         }
-                    } else {
-                        CodeEmptyStateCard(
-                            title: "No Bookmarks or Notes",
-                            systemImage: "bookmark",
-                            description: "Saved sections and notes appear here for quick return.",
-                            accent: accentColor
-                        )
-                        .padding(.top, 4)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
