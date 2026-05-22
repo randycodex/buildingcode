@@ -12,6 +12,7 @@ final class AuthoringViewModel: ObservableObject {
     private struct PublishDocumentSnapshot: Sendable {
         let filePath: String
         let htmlContent: String
+        let codeSectionName: String?
     }
 
     private struct PublishScope: Sendable {
@@ -89,6 +90,14 @@ final class AuthoringViewModel: ObservableObject {
     var hasDocuments: Bool { !documents.isEmpty }
     var hasSelection: Bool { selectedDocument != nil }
 
+    var visibleDocuments: [EditorDocument] {
+        guard let selectedCodeSectionID,
+              let section = authoringProject.codeSections.first(where: { $0.id == selectedCodeSectionID }) else {
+            return documents
+        }
+        return documents.filter { documentCodeSectionName(for: $0) == section.name }
+    }
+
     var selectedHTMLContent: String {
         selectedDocument?.htmlContent ?? ""
     }
@@ -114,7 +123,7 @@ final class AuthoringViewModel: ObservableObject {
         let panel = NSOpenPanel()
         panel.allowedContentTypes = [.html]
         panel.allowsMultipleSelection = true
-        panel.canChooseDirectories = false
+        panel.canChooseDirectories = true
         panel.treatsFilePackagesAsDirectories = false
 
         guard panel.runModal() == .OK else { return }
@@ -124,7 +133,11 @@ final class AuthoringViewModel: ObservableObject {
     func openDocuments(at urls: [URL]) {
         guard !urls.isEmpty else { return }
 
-        let standardizedURLs = urls.map(\.standardizedFileURL)
+        let standardizedURLs = Self.expandHTMLDocumentURLs(from: urls)
+        guard !standardizedURLs.isEmpty else {
+            statusMessage = "No HTML files were found."
+            return
+        }
         upsertPlaceholderDocuments(for: standardizedURLs)
         selectedDocumentID = documents.first(where: {
             $0.fileURL.standardizedFileURL == standardizedURLs.first
@@ -136,6 +149,45 @@ final class AuthoringViewModel: ObservableObject {
         statusMessage = standardizedURLs.count == 1
             ? "Opened and loaded 1 HTML file."
             : "Opened and loading \(standardizedURLs.count) HTML files."
+    }
+
+    private nonisolated static func expandHTMLDocumentURLs(from urls: [URL]) -> [URL] {
+        let fileManager = FileManager.default
+        var htmlURLs: [URL] = []
+
+        for url in urls.map(\.standardizedFileURL) {
+            var isDirectory: ObjCBool = false
+            guard fileManager.fileExists(atPath: url.path, isDirectory: &isDirectory) else { continue }
+
+            if isDirectory.boolValue {
+                let enumerator = fileManager.enumerator(
+                    at: url,
+                    includingPropertiesForKeys: [.isRegularFileKey],
+                    options: [.skipsHiddenFiles]
+                )
+                while let item = enumerator?.nextObject() as? URL {
+                    guard item.pathExtension.lowercased() == "html" || item.pathExtension.lowercased() == "htm" else {
+                        continue
+                    }
+                    htmlURLs.append(item.standardizedFileURL)
+                }
+            } else if url.pathExtension.lowercased() == "html" || url.pathExtension.lowercased() == "htm" {
+                htmlURLs.append(url)
+            }
+        }
+
+        return Array(Set(htmlURLs)).sorted {
+            $0.path.compare($1.path, options: [.numeric, .caseInsensitive]) == .orderedAscending
+        }
+    }
+
+    private nonisolated static func inferredCodeSectionName(for url: URL) -> String? {
+        let parent = url.deletingLastPathComponent()
+        let root = parent.deletingLastPathComponent()
+        guard root.lastPathComponent.caseInsensitiveCompare("2022 Construction Codes") == .orderedSame else {
+            return nil
+        }
+        return parent.lastPathComponent
     }
 
     func importTableManifest() {
@@ -356,6 +408,9 @@ final class AuthoringViewModel: ObservableObject {
         authoringProject.codeSections.append(newSection)
         selectedCodeID = codeID
         selectedCodeSectionID = newSection.id
+        selectedDocumentID = nil
+        selectedOutlineItemID = nil
+        collapsedOutlineItemIDs = []
         persistAuthoringProject()
     }
 
@@ -369,6 +424,7 @@ final class AuthoringViewModel: ObservableObject {
            authoringProject.codeSections.contains(where: { $0.id == currentSectionID && $0.codeID == id }) == false {
             selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == id })?.id
         }
+        syncSelectedDocumentToCurrentCodeSection()
     }
 
     func selectJurisdiction(_ id: Int64) {
@@ -383,21 +439,25 @@ final class AuthoringViewModel: ObservableObject {
         } else {
             selectedCodeSectionID = nil
         }
+        syncSelectedDocumentToCurrentCodeSection()
     }
 
     func selectCodeSection(_ id: Int64) {
         guard let section = authoringProject.codeSections.first(where: { $0.id == id }) else { return }
         selectedCodeSectionID = section.id
         selectedCodeID = section.codeID
+        syncSelectedDocumentToCurrentCodeSection()
     }
 
     private func upsertPlaceholderDocuments(for urls: [URL]) {
         for url in urls {
+            let codeSectionName = Self.inferredCodeSectionName(for: url) ?? selectedCodeSectionName
             if let existingIndex = documents.firstIndex(where: { $0.fileURL.standardizedFileURL == url }) {
                 let existing = documents[existingIndex]
                 documents[existingIndex] = EditorDocument(
                     id: existing.id,
                     fileURL: url,
+                    codeSectionName: existing.codeSectionName ?? codeSectionName,
                     kind: .html,
                     htmlContent: existing.htmlContent,
                     isLoaded: existing.isLoaded,
@@ -405,12 +465,13 @@ final class AuthoringViewModel: ObservableObject {
                     lastReplacementCount: existing.lastReplacementCount
                 )
             } else {
-                documents.append(EditorDocument(fileURL: url, kind: .html, htmlContent: "", isLoaded: false))
+                documents.append(EditorDocument(fileURL: url, codeSectionName: codeSectionName, kind: .html, htmlContent: "", isLoaded: false))
             }
         }
         for document in documents where urls.contains(where: { $0.standardizedFileURL == document.fileURL.standardizedFileURL }) {
             outlineByDocumentID[document.id] = outlineByDocumentID[document.id] ?? []
         }
+        syncSelectedDocumentToCurrentCodeSection()
     }
 
     private func preloadDocuments(at urls: [URL]) {
@@ -465,6 +526,7 @@ final class AuthoringViewModel: ObservableObject {
         if selectedDocumentID == documentID {
             selectedOutlineItemID = nil
         }
+        refreshAuthoringProjectFromLoadedDocumentsIfPossible()
     }
 
     private func finishLoadingDocument(id documentID: UUID, error: Error) {
@@ -625,7 +687,11 @@ final class AuthoringViewModel: ObservableObject {
         guard !isPublishing else { return }
 
         let documentSnapshots = documents.map {
-            PublishDocumentSnapshot(filePath: $0.fileURL.path, htmlContent: $0.htmlContent)
+            PublishDocumentSnapshot(
+                filePath: $0.fileURL.path,
+                htmlContent: $0.htmlContent,
+                codeSectionName: $0.codeSectionName ?? Self.inferredCodeSectionName(for: $0.fileURL)
+            )
         }
         let projectSnapshot = authoringProject
         let selectedCodeIDSnapshot = selectedCodeID
@@ -650,10 +716,10 @@ final class AuthoringViewModel: ObservableObject {
                     baseProject: projectSnapshot,
                     scope: scope
                 )
-                let bundleProject = Self.bundleProjectSnapshot(from: project, scope: scope)
+                let bundleProject = Self.bundleProjectSnapshot(from: project, scope: scope, includesAllCodeSectionsForCode: true)
                 let bundleRootURL = Self.authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
                 try Self.writeBundleProject(bundleProject, to: bundleRootURL)
-                try Self.publishHTMLBundle(from: documentSnapshots, to: bundleRootURL)
+                try Self.publishHTMLBundle(from: documentSnapshots, to: bundleRootURL, sectionedByCodeSection: true)
                 try Self.validatePublishedHTMLBundle(from: documentSnapshots, scope: scope, in: codeContentRootURL)
 
                 DispatchQueue.main.async {
@@ -696,7 +762,11 @@ final class AuthoringViewModel: ObservableObject {
             guard panel.runModal() == .OK, let outputURL = panel.url else { return }
 
             let documentSnapshots = documents.map {
-                PublishDocumentSnapshot(filePath: $0.fileURL.path, htmlContent: $0.htmlContent)
+                PublishDocumentSnapshot(
+                    filePath: $0.fileURL.path,
+                    htmlContent: $0.htmlContent,
+                    codeSectionName: $0.codeSectionName ?? Self.inferredCodeSectionName(for: $0.fileURL)
+                )
             }
             let projectSnapshot = authoringProject
             let documentCount = documents.count
@@ -764,7 +834,13 @@ final class AuthoringViewModel: ObservableObject {
             selectedCodeSectionID: selectedCodeSectionID
         )
         let project = try Self.buildProjectSnapshot(
-            from: documents.map { PublishDocumentSnapshot(filePath: $0.fileURL.path, htmlContent: $0.htmlContent) },
+            from: documents.map {
+                PublishDocumentSnapshot(
+                    filePath: $0.fileURL.path,
+                    htmlContent: $0.htmlContent,
+                    codeSectionName: $0.codeSectionName ?? Self.inferredCodeSectionName(for: $0.fileURL)
+                )
+            },
             baseProject: authoringProject,
             scope: scope
         )
@@ -802,6 +878,17 @@ final class AuthoringViewModel: ObservableObject {
             project.nextCodeSectionID = 2
         }
 
+        let routedCodeSectionNames = Set(documents.map { $0.codeSectionName ?? scope.codeSectionName })
+        var routedCodeSectionIDs: [String: Int64] = [:]
+        for codeSectionName in routedCodeSectionNames.sorted(by: { $0.localizedStandardCompare($1) == .orderedAscending }) {
+            let codeSectionID = ensureCodeSection(named: codeSectionName, codeID: scope.codeID, in: &project)
+            routedCodeSectionIDs[codeSectionName] = codeSectionID
+        }
+        let sectionIDsToReplace = Set(routedCodeSectionIDs.values)
+        project.chapters.removeAll {
+            $0.codeID == scope.codeID && sectionIDsToReplace.contains($0.codeSectionID)
+        }
+
         var nextChapterID: Int64 = (project.chapters.map(\.id).max() ?? 0) + 1
         var nextSectionID: Int64 = (
             project.chapters
@@ -812,12 +899,14 @@ final class AuthoringViewModel: ObservableObject {
         ) + 1
 
         for document in documents {
+            let codeSectionName = document.codeSectionName ?? scope.codeSectionName
+            let documentCodeSectionID = routedCodeSectionIDs[codeSectionName] ?? scope.codeSectionID
             let structuredText = HTMLAuthoringBridge.structuredText(fromHTMLContent: document.htmlContent)
             let hierarchy = try StructuredTextImporter.parseHierarchy(
                 structuredText,
                 defaults: StructuredImportHierarchyDefaults(
                     codeVersionName: scope.codeName,
-                    codeSectionName: project.codeSections.first(where: { $0.id == scope.codeSectionID })?.name ?? "BUILDING CODE"
+                    codeSectionName: codeSectionName
                 )
             )
 
@@ -875,7 +964,7 @@ final class AuthoringViewModel: ObservableObject {
                             EditorAuthoredChapter(
                                 id: chapterID,
                                 codeID: scope.codeID,
-                                codeSectionID: scope.codeSectionID,
+                                codeSectionID: documentCodeSectionID,
                                 chapterNumber: chapter.chapterNumber,
                                 title: chapter.title,
                                 rawDraftText: structuredText,
@@ -892,30 +981,65 @@ final class AuthoringViewModel: ObservableObject {
         return project
     }
 
+    private nonisolated static func ensureCodeSection(
+        named name: String,
+        codeID: Int64,
+        in project: inout EditorAuthoringProject
+    ) -> Int64 {
+        if let existing = project.codeSections.first(where: {
+            $0.codeID == codeID && $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }) {
+            return existing.id
+        }
+
+        let id = project.nextCodeSectionID
+        project.nextCodeSectionID += 1
+        project.codeSections.append(EditorAuthoredCodeSection(id: id, codeID: codeID, name: name))
+        return id
+    }
+
     private nonisolated static func publishHTMLBundle(
         from documents: [PublishDocumentSnapshot],
-        to bundleRootURL: URL
+        to bundleRootURL: URL,
+        sectionedByCodeSection: Bool = false
     ) throws {
         let htmlDocuments = documents.filter { snapshot in
             URL(fileURLWithPath: snapshot.filePath).pathExtension.lowercased() == "html"
         }
         guard !htmlDocuments.isEmpty else { return }
 
-        let outputURL = bundleRootURL
-            .appendingPathComponent("chapters", isDirectory: true)
         let assetsURL = bundleRootURL
             .appendingPathComponent("assets", isDirectory: true)
-
-        if FileManager.default.fileExists(atPath: outputURL.path) {
-            try FileManager.default.removeItem(at: outputURL)
-        }
         if FileManager.default.fileExists(atPath: assetsURL.path) {
             try FileManager.default.removeItem(at: assetsURL)
         }
-        try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
         try FileManager.default.createDirectory(at: assetsURL, withIntermediateDirectories: true)
+
+        if sectionedByCodeSection {
+            let codeSectionsURL = bundleRootURL.appendingPathComponent("code-sections", isDirectory: true)
+            if FileManager.default.fileExists(atPath: codeSectionsURL.path) {
+                try FileManager.default.removeItem(at: codeSectionsURL)
+            }
+        } else {
+            let outputURL = bundleRootURL.appendingPathComponent("chapters", isDirectory: true)
+            if FileManager.default.fileExists(atPath: outputURL.path) {
+                try FileManager.default.removeItem(at: outputURL)
+            }
+        }
+
         for snapshot in htmlDocuments {
             let sourceURL = URL(fileURLWithPath: snapshot.filePath)
+            let outputURL: URL
+            if sectionedByCodeSection {
+                let codeSectionSlug = slug(snapshot.codeSectionName ?? "code")
+                outputURL = bundleRootURL
+                    .appendingPathComponent("code-sections", isDirectory: true)
+                    .appendingPathComponent(codeSectionSlug, isDirectory: true)
+                    .appendingPathComponent("chapters", isDirectory: true)
+            } else {
+                outputURL = bundleRootURL.appendingPathComponent("chapters", isDirectory: true)
+            }
+            try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
             let destinationURL = outputURL.appendingPathComponent(sourceURL.lastPathComponent)
             let localizedHTML = try localizingRemoteAssets(
                 in: snapshot.htmlContent,
@@ -932,7 +1056,7 @@ final class AuthoringViewModel: ObservableObject {
 
     private nonisolated static func chapterAliasFileNames(in html: String, sourceFileName: String) -> [String] {
         guard let chapterAliasRegex = try? NSRegularExpression(
-            pattern: #"(?i)\bchapter\s+([A-Z]\d+)\s*:"#,
+            pattern: #"(?i)\b(?:chapter|appendix)\s+([A-Z]?\d+[A-Z]?|[A-Z])\s*:"#,
             options: []
         ) else {
             return []
@@ -964,7 +1088,6 @@ final class AuthoringViewModel: ObservableObject {
     ) throws {
         guard let codeContentRootURL else { return }
         let bundleRootURL = authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
-        let chaptersURL = bundleRootURL.appendingPathComponent("chapters", isDirectory: true)
         let bundleJSONURL = bundleRootURL.appendingPathComponent("bundle.json", isDirectory: false)
 
         guard FileManager.default.fileExists(atPath: bundleJSONURL.path) else {
@@ -990,7 +1113,12 @@ final class AuthoringViewModel: ObservableObject {
 
         var missingChapterNames: [String] = []
         var remoteAssetChapterNames: [String] = []
-        for fileName in expectedHTMLNames {
+        for snapshot in documents.filter({ URL(fileURLWithPath: $0.filePath).pathExtension.lowercased() == "html" }) {
+            let fileName = URL(fileURLWithPath: snapshot.filePath).lastPathComponent
+            let chaptersURL = bundleRootURL
+                .appendingPathComponent("code-sections", isDirectory: true)
+                .appendingPathComponent(slug(snapshot.codeSectionName ?? scope.codeSectionName), isDirectory: true)
+                .appendingPathComponent("chapters", isDirectory: true)
             let chapterURL = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
             guard FileManager.default.fileExists(atPath: chapterURL.path) else {
                 missingChapterNames.append(fileName)
@@ -1205,12 +1333,16 @@ final class AuthoringViewModel: ObservableObject {
 
     private nonisolated static func bundleProjectSnapshot(
         from fullProject: EditorAuthoringProject,
-        scope: PublishScope
+        scope: PublishScope,
+        includesAllCodeSectionsForCode: Bool = false
     ) -> EditorAuthoringProject {
         let bundleCodes = fullProject.codes.filter { $0.id == scope.codeID }
-        let bundleCodeSections = fullProject.codeSections.filter { $0.id == scope.codeSectionID }
+        let bundleCodeSections = fullProject.codeSections.filter {
+            includesAllCodeSectionsForCode ? $0.codeID == scope.codeID : $0.id == scope.codeSectionID
+        }
+        let bundleCodeSectionIDs = Set(bundleCodeSections.map(\.id))
         let bundleChapters = fullProject.chapters.filter {
-            $0.codeID == scope.codeID && $0.codeSectionID == scope.codeSectionID
+            $0.codeID == scope.codeID && bundleCodeSectionIDs.contains($0.codeSectionID)
         }
 
         var project = EditorAuthoringProject()
@@ -1421,6 +1553,18 @@ final class AuthoringViewModel: ObservableObject {
         }
     }
 
+    private func refreshAuthoringProjectFromLoadedDocumentsIfPossible() {
+        guard !documents.isEmpty else { return }
+        guard documents.allSatisfy(\.isLoaded) else { return }
+
+        do {
+            let refreshedProject = try buildProject(from: documents)
+            authoringProject = refreshedProject
+        } catch {
+            present(error)
+        }
+    }
+
     private func isUnsafeEmptyReplacement(newHTML: String, currentHTML: String, fileName: String) -> Bool {
         let newIsEmpty = newHTML.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         let currentIsEmpty = currentHTML.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -1429,6 +1573,20 @@ final class AuthoringViewModel: ObservableObject {
         errorMessage = message
         statusMessage = message
         return true
+    }
+
+    private func documentCodeSectionName(for document: EditorDocument) -> String {
+        document.codeSectionName ?? Self.inferredCodeSectionName(for: document.fileURL) ?? selectedCodeSectionName
+    }
+
+    private func syncSelectedDocumentToCurrentCodeSection() {
+        let visibleDocumentIDs = Set(visibleDocuments.map(\.id))
+        if let selectedDocumentID, visibleDocumentIDs.contains(selectedDocumentID) {
+            return
+        }
+        selectedDocumentID = visibleDocuments.first?.id
+        selectedOutlineItemID = nil
+        collapsedOutlineItemIDs = []
     }
 
     private func ensureSelectedJurisdiction() -> Int64 {

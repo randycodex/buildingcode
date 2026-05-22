@@ -9,6 +9,7 @@ struct EditorDocument: Identifiable {
 
     let id: UUID
     var fileURL: URL
+    var codeSectionName: String?
     var kind: Kind
     var attributedText: NSAttributedString
     var htmlContent: String
@@ -19,6 +20,7 @@ struct EditorDocument: Identifiable {
     init(
         id: UUID = UUID(),
         fileURL: URL,
+        codeSectionName: String? = nil,
         kind: Kind = .rich,
         attributedText: NSAttributedString = NSAttributedString(string: ""),
         htmlContent: String = "",
@@ -28,6 +30,7 @@ struct EditorDocument: Identifiable {
     ) {
         self.id = id
         self.fileURL = fileURL
+        self.codeSectionName = codeSectionName
         self.kind = kind
         self.attributedText = attributedText
         self.htmlContent = htmlContent

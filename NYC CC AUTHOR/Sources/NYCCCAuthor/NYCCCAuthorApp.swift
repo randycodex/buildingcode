@@ -14,7 +14,6 @@ struct NYCCCAuthorApp: App {
         WindowGroup("NYC CC AUTHOR") {
             ContentView(viewModel: viewModel)
                 .onAppear {
-                    viewModel.clearLastSessionRestoreList()
                     appDelegate.openDocuments = { urls in
                         Task { @MainActor in
                             viewModel.openDocuments(at: urls)
@@ -23,6 +22,8 @@ struct NYCCCAuthorApp: App {
                     let pendingOpenURLs = appDelegate.drainPendingOpenURLs()
                     if !pendingOpenURLs.isEmpty {
                         viewModel.openDocuments(at: pendingOpenURLs)
+                    } else {
+                        viewModel.restoreLastSessionIfAvailable()
                     }
                     for window in NSApp.windows {
                         AppDelegate.configure(window: window)

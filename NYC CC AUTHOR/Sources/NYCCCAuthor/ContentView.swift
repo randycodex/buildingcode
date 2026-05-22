@@ -332,14 +332,14 @@ struct ContentView: View {
                     id: "chapters",
                     title: "Chapters"
                 ) {
-                    if viewModel.documents.isEmpty {
-                        Text("Open HTML files to populate chapters.")
+                    if viewModel.visibleDocuments.isEmpty {
+                        Text("Open HTML files for this code section to populate chapters.")
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 10)
                     } else {
                         Picker("", selection: selectedDocumentMenuBinding) {
-                            ForEach(viewModel.documents) { document in
+                            ForEach(viewModel.visibleDocuments) { document in
                                 let statusSuffix = document.hasUnsavedChanges ? "Modified" : "Ready"
                                 Text("\(document.displayName) - \(statusSuffix)").tag(Optional(document.id))
                             }
