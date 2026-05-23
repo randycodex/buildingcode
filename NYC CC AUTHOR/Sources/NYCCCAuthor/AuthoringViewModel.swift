@@ -722,13 +722,18 @@ final class AuthoringViewModel: ObservableObject {
                 let bundleRootURL = Self.authoredBundleRootURL(scope: scope, codeContentRootURL: codeContentRootURL)
                 try Self.writeBundleProject(bundleProject, to: bundleRootURL)
                 try Self.publishHTMLBundle(from: documentSnapshots, to: bundleRootURL, sectionedByCodeSection: true)
+                let preparedManifest = try PreparedChapterContentBuilder.writePreparedContent(
+                    for: bundleProject,
+                    bundleRootURL: bundleRootURL
+                )
                 try Self.validatePublishedHTMLBundle(from: documentSnapshots, scope: scope, in: codeContentRootURL)
 
                 DispatchQueue.main.async {
                     guard let self else { return }
                     self.persistAuthoringProject(project)
                     self.isPublishing = false
-                    self.statusMessage = "Published \(documentCount) open file(s) to the iOS app JSON and HTML bundle."
+                    let preparedSectionCount = preparedManifest.chapters.reduce(0) { $0 + $1.preparedSectionCount }
+                    self.statusMessage = "Published \(documentCount) open file(s), including \(preparedSectionCount) prepared section file(s), to the iOS app."
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -1333,6 +1338,7 @@ final class AuthoringViewModel: ObservableObject {
         try fileManager.createDirectory(at: outputURL, withIntermediateDirectories: true)
         try writeBundleProject(project, to: outputURL)
         try publishHTMLBundle(from: documents, to: outputURL)
+        _ = try PreparedChapterContentBuilder.writePreparedContent(for: project, bundleRootURL: outputURL)
         try writePackManifest(project: project, scope: scope, to: outputURL)
         try validatePackBundle(from: documents, in: outputURL)
     }
