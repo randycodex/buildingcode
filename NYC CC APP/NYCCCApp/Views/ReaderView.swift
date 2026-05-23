@@ -12,6 +12,7 @@ struct ReaderView: View {
     @State private var expandedInlineImage: UIImage?
     @State private var noteSaveState: NoteSaveState = .idle
     @State private var noteSaveResetTask: Task<Void, Never>?
+    @FocusState private var isNotesFieldFocused: Bool
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
@@ -21,6 +22,10 @@ struct ReaderView: View {
         ScrollView {
             if let detail {
                 VStack(alignment: .leading, spacing: 16) {
+                    if !library.codeSections.isEmpty {
+                        CodeEyebrow(text: library.codeSectionName(id: detail.codeSectionID), accent: accentColor)
+                    }
+
                     if let sectionGroupLabel = detail.sectionGroupLabel, !sectionGroupLabel.isEmpty {
                         CodeEyebrow(text: sectionGroupLabel, accent: accentColor)
                     }
@@ -64,6 +69,10 @@ struct ReaderView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 80)
             }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            dismissKeyboard()
         }
         .overlay(alignment: .top) {
             CodeTopContentFade()
@@ -155,6 +164,7 @@ struct ReaderView: View {
                 TextEditor(text: $noteBody)
                     .font(.body)
                     .scrollContentBackground(.hidden)
+                    .focused($isNotesFieldFocused)
                     .frame(minHeight: 104)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
@@ -207,6 +217,11 @@ struct ReaderView: View {
             guard !Task.isCancelled else { return }
             noteSaveState = .idle
         }
+    }
+
+    private func dismissKeyboard() {
+        isNotesFieldFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 
     private enum NoteSaveState: Equatable {

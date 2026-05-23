@@ -187,6 +187,7 @@ struct CodeSectionGroup: Identifiable, Hashable, Sendable {
 
 struct CodeSearchResult: Identifiable, Hashable, Sendable {
     let id: Int64
+    let codeSectionID: Int64?
     let chapterNumber: String
     let sectionNumber: String
     let title: String
@@ -195,6 +196,7 @@ struct CodeSearchResult: Identifiable, Hashable, Sendable {
 
     init(
         id: Int64,
+        codeSectionID: Int64? = nil,
         chapterNumber: String,
         sectionNumber: String,
         title: String,
@@ -202,6 +204,7 @@ struct CodeSearchResult: Identifiable, Hashable, Sendable {
         kind: CodeSectionKind = .title
     ) {
         self.id = id
+        self.codeSectionID = codeSectionID
         self.chapterNumber = chapterNumber
         self.sectionNumber = sectionNumber
         self.title = title
@@ -233,6 +236,7 @@ struct TextSpan: Identifiable, Hashable, Sendable {
 
 struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
     let id: Int64
+    let codeSectionID: Int64?
     let chapterNumber: String
     let chapterTitle: String
     let sectionGroupLabel: String?
@@ -249,6 +253,7 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
 
     init(
         id: Int64,
+        codeSectionID: Int64? = nil,
         chapterNumber: String,
         chapterTitle: String,
         sectionGroupLabel: String? = nil,
@@ -264,6 +269,7 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
         tableBlocks: [CodeTableBlock] = []
     ) {
         self.id = id
+        self.codeSectionID = codeSectionID
         self.chapterNumber = chapterNumber
         self.chapterTitle = chapterTitle
         self.sectionGroupLabel = sectionGroupLabel
@@ -291,6 +297,7 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
 struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let id: Int64
     let codeVersion: String
+    let codeSectionID: Int64?
     let chapterNumber: String
     let chapterTitle: String
     let sectionNumber: String
@@ -303,6 +310,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     init(
         id: Int64,
         codeVersion: String,
+        codeSectionID: Int64? = nil,
         chapterNumber: String,
         chapterTitle: String,
         sectionNumber: String,
@@ -314,6 +322,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     ) {
         self.id = id
         self.codeVersion = codeVersion
+        self.codeSectionID = codeSectionID
         self.chapterNumber = chapterNumber
         self.chapterTitle = chapterTitle
         self.sectionNumber = sectionNumber

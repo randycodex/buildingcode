@@ -46,9 +46,7 @@ struct ChapterHTMLReaderView: View {
 
     private var shouldUseNativeAuthoredReader: Bool {
         guard library.selectedVersion?.contentKind == .authored else { return false }
-        guard !library.sectionGroups(for: chapter).isEmpty else { return false }
-        guard let chapterURL else { return true }
-        return !PublishedHTMLContentStore.containsInlineImages(in: chapterURL)
+        return !library.sectionGroups(for: chapter).isEmpty
     }
 
     private var currentJumpLabel: String {
@@ -137,13 +135,19 @@ struct ChapterHTMLReaderView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {
+                    if !library.codeSections.isEmpty {
+                        Text(library.codeSectionName(id: chapter.codeSectionID))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(accentColor)
+                            .lineLimit(1)
+                    }
                     Text(chapter.displayLabel + ":")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
                     Text(chapter.title)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(1)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: 250)

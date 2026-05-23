@@ -116,7 +116,7 @@ struct SettingsView: View {
                     }
                 } menu: {
                     ForEach(library.filteredVersions) { version in
-                        Button(version.displayName) {
+                        Button(CodeLibraryViewModel.displayName(forLibraryName: version.displayName)) {
                             library.updateSelectedVersion(fileName: version.fileName)
                         }
                     }
@@ -148,7 +148,7 @@ struct SettingsView: View {
                     }
 
                     ForEach(library.codeSections) { codeSection in
-                        Button(codeSection.name) {
+                        Button(CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name)) {
                             library.updateSelectedCodeSection(id: codeSection.id)
                         }
                     }
@@ -270,13 +270,14 @@ struct SettingsView: View {
     }
 
     private var selectedVersionPrimaryText: String {
-        library.selectedVersion?.codeVersion.replacingOccurrences(of: "\(selectedJurisdictionName) - ", with: "", options: .caseInsensitive) ?? "Not Selected"
+        let rawName = library.selectedVersion?.codeVersion.replacingOccurrences(of: "\(selectedJurisdictionName) - ", with: "", options: .caseInsensitive) ?? "Not Selected"
+        return CodeLibraryViewModel.displayName(forLibraryName: rawName)
     }
 
     private var selectedCodeSectionName: String {
         if let selectedCodeSectionID = library.selectedCodeSectionID,
            let selected = library.codeSections.first(where: { $0.id == selectedCodeSectionID }) {
-            return selected.name
+            return CodeLibraryViewModel.displayName(forCodeSectionName: selected.name)
         }
         return "All Sections"
     }

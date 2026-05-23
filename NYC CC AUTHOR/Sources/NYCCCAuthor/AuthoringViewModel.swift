@@ -1569,33 +1569,11 @@ final class AuthoringViewModel: ObservableObject {
             try data.write(to: url, options: .atomic)
             documents[index].hasUnsavedChanges = false
             persistOpenDocumentPaths()
-            writeSaveDebugLog(for: url, html: html, bytes: data.count)
             statusMessage = "Saved \(data.count) bytes → \(url.path)"
             return true
         } catch {
             present(error)
             return false
-        }
-    }
-
-    private func writeSaveDebugLog(for url: URL, html: String, bytes: Int) {
-        let logURL = url.deletingPathExtension().appendingPathExtension("save-debug.log")
-        let timestamp = ISO8601DateFormatter().string(from: Date())
-        let snippetLength = min(800, html.count)
-        let snippet = String(html.prefix(snippetLength))
-        let entry = """
-        ===== \(timestamp) =====
-        path:  \(url.path)
-        bytes: \(bytes)
-        first \(snippetLength) chars:
-        \(snippet)
-
-        """
-        if let existing = try? Data(contentsOf: logURL),
-           let combined = (String(data: existing, encoding: .utf8).map { $0 + entry }) {
-            try? Data(combined.utf8).write(to: logURL, options: .atomic)
-        } else {
-            try? Data(entry.utf8).write(to: logURL, options: .atomic)
         }
     }
 

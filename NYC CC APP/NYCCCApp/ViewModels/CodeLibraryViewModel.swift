@@ -49,6 +49,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var authoredCodeStore: AuthoredCodeStore?
     private let selectedVersionDefaultsKey = "selectedCodeVersionFileName"
     private let selectedJurisdictionDefaultsKey = "selectedJurisdictionKey"
+    private let selectedCodeSectionDefaultsKey = "selectedCodeSectionID"
     private let lastOpenedChapterIDDefaultsKey = "lastOpenedChapterID"
     private var lastChapterPreloadTask: Task<Void, Never>?
     private var sectionsCache: [Int64: [CodeSectionSummary]] = [:]
@@ -56,12 +57,12 @@ final class CodeLibraryViewModel: ObservableObject {
     private var sectionDetailCache: [Int64: ReaderSectionDetail] = [:]
     private let formattedNSTextCache: NSCache<NSString, NSAttributedString> = {
         let cache = NSCache<NSString, NSAttributedString>()
-        cache.countLimit = 96
+        cache.countLimit = 192
         return cache
     }()
     private let chapterBodyNSTextCache: NSCache<NSString, NSAttributedString> = {
         let cache = NSCache<NSString, NSAttributedString>()
-        cache.countLimit = 96
+        cache.countLimit = 192
         return cache
     }()
     private var bookmarkedSectionIDs: Set<Int64> = []
@@ -196,9 +197,37 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func updateSelectedCodeSection(id: Int64?) {
         selectedCodeSectionID = id
+        if let id {
+            UserDefaults.standard.set(id, forKey: selectedCodeSectionDefaultsKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: selectedCodeSectionDefaultsKey)
+        }
         guard let authoredCodeStore else { return }
         codeSections = authoredCodeStore.codeSections()
         chapters = authoredCodeStore.chapters(codeSectionID: id)
+        searchResults = []
+    }
+
+    func codeSectionName(id: Int64?) -> String {
+        guard let id,
+              let codeSection = codeSections.first(where: { $0.id == id })
+        else {
+            return "All Sections"
+        }
+        return Self.displayName(forCodeSectionName: codeSection.name)
+    }
+
+    static func displayName(forCodeSectionName name: String) -> String {
+        displayName(forLibraryName: name)
+    }
+
+    static func displayName(forLibraryName name: String) -> String {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return name }
+        if trimmed == trimmed.uppercased() {
+            return trimmed.localizedCapitalized
+        }
+        return trimmed
     }
 
     func authoredHTMLStore(for chapter: CodeChapter) -> PublishedHTMLContentStore {
@@ -666,7 +695,7 @@ final class CodeLibraryViewModel: ObservableObject {
         codeDatabase?.imageURL(fileName: fileName)
     }
 
-    func search(query: String) {
+    func search(query: String, restrictToSelectedCodeSection: Bool = true) {
         searchTask?.cancel()
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedQuery.isEmpty else {
@@ -675,9 +704,10 @@ final class CodeLibraryViewModel: ObservableObject {
         }
 
         if let authoredCodeStore {
+            let selectedCodeSectionID = restrictToSelectedCodeSection ? self.selectedCodeSectionID : nil
             searchTask = Task {
                 let results = await Task.detached(priority: .userInitiated) {
-                    authoredCodeStore.search(query: trimmedQuery)
+                    authoredCodeStore.search(query: trimmedQuery, codeSectionID: selectedCodeSectionID)
                 }.value
                 guard !Task.isCancelled else { return }
                 searchResults = results
@@ -847,6 +877,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
         case .authored:
             let selectedCodeSectionID = self.selectedCodeSectionID
+                ?? storedCodeSectionID()
             contentLoadTask = Task {
                 do {
                     let snapshot = try await Task.detached(priority: .userInitiated) {
@@ -918,6 +949,16 @@ final class CodeLibraryViewModel: ObservableObject {
             resolvedCodeSectionID: resolvedCodeSectionID,
             chapters: chapters
         )
+    }
+
+    private func storedCodeSectionID() -> Int64? {
+        if let number = UserDefaults.standard.object(forKey: selectedCodeSectionDefaultsKey) as? NSNumber {
+            return number.int64Value
+        }
+        if let value = UserDefaults.standard.object(forKey: selectedCodeSectionDefaultsKey) as? Int64 {
+            return value
+        }
+        return nil
     }
 
     private nonisolated static func inlineHTMLTextBlock(

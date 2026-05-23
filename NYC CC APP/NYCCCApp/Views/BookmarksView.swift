@@ -42,7 +42,7 @@ struct BookmarksView: View {
                 CodeTopContentFade()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("Bookmarks / Notes")
+            .navigationTitle("Saved")
             .navigationBarTitleDisplayMode(.large)
             .onAppear {
                 library.refreshBookmarks()
@@ -51,10 +51,17 @@ struct BookmarksView: View {
     }
 
     private var bookmarkGroups: [BookmarkChapterGroup] {
-        let grouped = Dictionary(grouping: library.bookmarks, by: \.chapterNumber)
-        return grouped.map { chapterNumber, items in
+        let grouped = Dictionary(grouping: library.bookmarks) { bookmark in
+            BookmarkGroupKey(
+                codeSectionID: bookmark.codeSectionID,
+                chapterNumber: bookmark.chapterNumber
+            )
+        }
+        return grouped.map { key, items in
             BookmarkChapterGroup(
-                chapterNumber: chapterNumber,
+                codeSectionID: key.codeSectionID,
+                codeSectionName: library.codeSectionName(id: key.codeSectionID),
+                chapterNumber: key.chapterNumber,
                 chapterTitle: items.first?.chapterTitle ?? "",
                 items: items.sorted {
                     $0.sectionNumber.compare($1.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
@@ -62,15 +69,25 @@ struct BookmarksView: View {
             )
         }
         .sorted {
-            $0.chapterNumber.compare($1.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+            if $0.codeSectionName != $1.codeSectionName {
+                return $0.codeSectionName.localizedStandardCompare($1.codeSectionName) == .orderedAscending
+            }
+            return $0.chapterNumber.compare($1.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
         }
     }
 
     private func chapterHeader(_ group: BookmarkChapterGroup) -> some View {
         VStack(alignment: .leading, spacing: 4) {
+            if !library.codeSections.isEmpty {
+                Text(group.codeSectionName)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(accentColor)
+                    .textCase(.uppercase)
+            }
+
             Text("Chapter \(group.chapterNumber)")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(accentColor)
+                .foregroundStyle(.secondary)
                 .textCase(.uppercase)
 
             Text(group.chapterTitle)
@@ -120,10 +137,13 @@ struct BookmarksView: View {
                         Image(systemName: "bookmark.fill")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(accentColor)
-                    } else if bookmark.hasNote {
-                        Text("Note")
+                    }
+
+                    if bookmark.hasNote {
+                        Image(systemName: "note.text")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(accentColor)
+                            .accessibilityLabel("Has note")
                     }
                 }
 
@@ -143,7 +163,7 @@ struct BookmarksView: View {
                 if bookmark.hasNote {
                     Text(bookmark.noteBody)
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(accentColor.opacity(0.88))
                         .multilineTextAlignment(.leading)
                         .padding(.top, 4)
                 }
@@ -155,12 +175,19 @@ struct BookmarksView: View {
     }
 }
 
+private struct BookmarkGroupKey: Hashable {
+    let codeSectionID: Int64?
+    let chapterNumber: String
+}
+
 private struct BookmarkChapterGroup: Identifiable {
+    let codeSectionID: Int64?
+    let codeSectionName: String
     let chapterNumber: String
     let chapterTitle: String
     let items: [BookmarkedSection]
 
-    var id: String { chapterNumber }
+    var id: String { "\(codeSectionID.map(String.init) ?? "all")-\(chapterNumber)" }
 }
 
 #if DEBUG

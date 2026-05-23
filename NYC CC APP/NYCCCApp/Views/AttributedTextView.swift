@@ -1,16 +1,29 @@
 import SwiftUI
 import UIKit
 
+extension Notification.Name {
+    static let nycccClearRichTextSelection = Notification.Name("nycccClearRichTextSelection")
+}
+
 struct AttributedTextView: View {
     let attributedText: NSAttributedString
     var onOpenImage: ((UIImage) -> Void)? = nil
+    var onContentTap: (() -> Void)? = nil
+    var onSelectionChange: ((Bool) -> Void)? = nil
     private let textBlocks: [AttributedTextBlock]
 
     @State private var availableWidth: CGFloat = 0
 
-    init(attributedText: NSAttributedString, onOpenImage: ((UIImage) -> Void)? = nil) {
+    init(
+        attributedText: NSAttributedString,
+        onOpenImage: ((UIImage) -> Void)? = nil,
+        onContentTap: (() -> Void)? = nil,
+        onSelectionChange: ((Bool) -> Void)? = nil
+    ) {
         self.attributedText = attributedText
         self.onOpenImage = onOpenImage
+        self.onContentTap = onContentTap
+        self.onSelectionChange = onSelectionChange
         self.textBlocks = Self.blocks(for: attributedText)
     }
 
@@ -23,7 +36,9 @@ struct AttributedTextView: View {
                         attributedText: block.attributedText,
                         contentWidth: max(availableWidth, 1),
                         fillImagesToWidth: true,
-                        onOpenImage: onOpenImage
+                        onOpenImage: onOpenImage,
+                        onContentTap: onContentTap,
+                        onSelectionChange: onSelectionChange
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -33,7 +48,9 @@ struct AttributedTextView: View {
                             attributedText: block.attributedText,
                             contentWidth: preferredTableWidth(for: block.attributedText, availableWidth: max(availableWidth, 1)),
                             fillImagesToWidth: false,
-                            onOpenImage: onOpenImage
+                            onOpenImage: onOpenImage,
+                            onContentTap: onContentTap,
+                            onSelectionChange: onSelectionChange
                         )
                         .frame(
                             width: preferredTableWidth(for: block.attributedText, availableWidth: max(availableWidth, 1)),
@@ -126,9 +143,15 @@ private struct AttributedTextContainer: UIViewRepresentable {
     let contentWidth: CGFloat
     let fillImagesToWidth: Bool
     var onOpenImage: ((UIImage) -> Void)?
+    var onContentTap: (() -> Void)?
+    var onSelectionChange: ((Bool) -> Void)?
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onOpenImage: onOpenImage)
+        Coordinator(
+            onOpenImage: onOpenImage,
+            onContentTap: onContentTap,
+            onSelectionChange: onSelectionChange
+        )
     }
 
     func makeUIView(context: Context) -> RichTextView {
@@ -144,13 +167,27 @@ private struct AttributedTextContainer: UIViewRepresentable {
         textView.attachmentTapHandler = { image in
             context.coordinator.onOpenImage?(image)
         }
+        textView.contentTapHandler = {
+            context.coordinator.onContentTap?()
+        }
+        textView.selectionChangeHandler = { hasSelection in
+            context.coordinator.onSelectionChange?(hasSelection)
+        }
         return textView
     }
 
     func updateUIView(_ uiView: RichTextView, context: Context) {
         context.coordinator.onOpenImage = onOpenImage
+        context.coordinator.onContentTap = onContentTap
+        context.coordinator.onSelectionChange = onSelectionChange
         uiView.attachmentTapHandler = { image in
             context.coordinator.onOpenImage?(image)
+        }
+        uiView.contentTapHandler = {
+            context.coordinator.onContentTap?()
+        }
+        uiView.selectionChangeHandler = { hasSelection in
+            context.coordinator.onSelectionChange?(hasSelection)
         }
 
         let renderedText = renderedAttributedText()
@@ -249,9 +286,21 @@ private struct AttributedTextContainer: UIViewRepresentable {
 
     final class Coordinator: NSObject, UITextViewDelegate {
         var onOpenImage: ((UIImage) -> Void)?
+        var onContentTap: (() -> Void)?
+        var onSelectionChange: ((Bool) -> Void)?
 
-        init(onOpenImage: ((UIImage) -> Void)?) {
+        init(
+            onOpenImage: ((UIImage) -> Void)?,
+            onContentTap: (() -> Void)?,
+            onSelectionChange: ((Bool) -> Void)?
+        ) {
             self.onOpenImage = onOpenImage
+            self.onContentTap = onContentTap
+            self.onSelectionChange = onSelectionChange
+        }
+
+        func textViewDidChangeSelection(_ textView: UITextView) {
+            onSelectionChange?(textView.selectedRange.length > 0)
         }
     }
 }
@@ -262,21 +311,58 @@ private final class ReaderImageAttachment: NSTextAttachment {
 
 private final class RichTextView: UITextView {
     var attachmentTapHandler: ((UIImage) -> Void)?
+    var contentTapHandler: (() -> Void)?
+    var selectionChangeHandler: ((Bool) -> Void)?
+    private var selectionObserver: NSObjectProtocol?
 
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
+        selectionObserver = NotificationCenter.default.addObserver(
+            forName: .nycccClearRichTextSelection,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self, self.selectedRange.length > 0 else { return }
+            self.selectedRange = NSRange(location: 0, length: 0)
+            self.selectionChangeHandler?(false)
+        }
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTap(_:))))
+        selectionObserver = NotificationCenter.default.addObserver(
+            forName: .nycccClearRichTextSelection,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self, self.selectedRange.length > 0 else { return }
+            self.selectedRange = NSRange(location: 0, length: 0)
+            self.selectionChangeHandler?(false)
+        }
+    }
+
+    deinit {
+        if let selectionObserver {
+            NotificationCenter.default.removeObserver(selectionObserver)
+        }
     }
 
     @objc private func handleTap(_ recognizer: UITapGestureRecognizer) {
+        if selectedRange.length > 0 {
+            selectedRange = NSRange(location: 0, length: 0)
+            selectionChangeHandler?(false)
+            return
+        }
+
         let point = recognizer.location(in: self)
-        guard let image = imageAttachment(at: point) else { return }
-        attachmentTapHandler?(image)
+        if let image = imageAttachment(at: point) {
+            attachmentTapHandler?(image)
+            return
+        }
+
+        contentTapHandler?()
     }
 
     private func imageAttachment(at point: CGPoint) -> UIImage? {

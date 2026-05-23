@@ -13,18 +13,18 @@ struct ChapterReaderView: View {
     @State private var pendingScrollSectionID: Int64?
     @State private var expandedInlineImage: UIImage?
     @State private var visibleBookmarkedSectionIDs: Set<Int64> = []
+    @State private var visibleNotedSectionIDs: Set<Int64> = []
     @State private var visibleBookmarkedSectionNumbers: Set<String> = []
     @State private var duplicateHeadingSectionIDs: Set<Int64> = []
     @State private var noteTarget: ReaderSectionDetail?
     @State private var noteBody = ""
-    @State private var allowsNoteTap: Bool = false
-    @State private var noteTapUnlockTask: Task<Void, Never>?
+    @State private var hasActiveTextSelection = false
+    @State private var isJumpPickerPresented = false
     @State private var pendingFocusedSectionID: Int64?
     @State private var focusedSectionUpdateTask: Task<Void, Never>?
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
     private let focusedSectionUpdateDelay: Duration = .milliseconds(70)
-    private let noteTapActivationDelay: Duration = .milliseconds(900)
     private let prewarmedSectionCount = 4
     private let indentStep: CGFloat = 26
 
@@ -33,8 +33,9 @@ struct ChapterReaderView: View {
     }
 
     private var currentJumpLabel: String {
-        if let selectedJumpSectionID,
-           let block = blocks.first(where: { $0.detail.id == selectedJumpSectionID }) {
+        let activeSectionID = pendingFocusedSectionID ?? selectedJumpSectionID
+        if let activeSectionID,
+           let block = blocks.first(where: { $0.detail.id == activeSectionID }) {
             return jumpLabel(for: block.detail)
         }
         if let first = blocks.first {
@@ -61,9 +62,14 @@ struct ChapterReaderView: View {
             .padding(.top, 28)
             .padding(.bottom, 24)
         }
+        .contentShape(Rectangle())
         .coordinateSpace(name: chapterReaderCoordinateSpace)
         .onPreferenceChange(ChapterReaderBlockOffsetPreferenceKey.self) { offsets in
             updateFocusedSection(from: offsets)
+        }
+        .onTapGesture {
+            guard hasActiveTextSelection else { return }
+            dismissTextSelection()
         }
         .overlay(alignment: .top) {
             CodeTopContentFade()
@@ -75,6 +81,24 @@ struct ChapterReaderView: View {
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                VStack(spacing: 2) {
+                    if !library.codeSections.isEmpty {
+                        Text(library.codeSectionName(id: chapter.codeSectionID))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(accentColor)
+                            .lineLimit(1)
+                    }
+                    Text(chapter.displayLabel)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: 260)
+                .multilineTextAlignment(.center)
+            }
+        }
         .fullScreenCover(
             isPresented: Binding(
                 get: { expandedInlineImage != nil },
@@ -96,38 +120,29 @@ struct ChapterReaderView: View {
                 accentColor: accentColor,
                 isBookmarked: library.isBookmarked(sectionID: detail.id),
                 onToggleBookmark: {
-                    _ = library.toggleBookmark(sectionID: detail.id)
+                    library.toggleBookmark(sectionID: detail.id)
                 },
                 onSave: { body in
                     library.saveNote(sectionID: detail.id, body: body)
+                    syncVisibleSavedState()
                 }
             )
+        }
+        .sheet(isPresented: $isJumpPickerPresented) {
+            jumpPickerSheet(proxy: proxy)
         }
         .task(id: chapter.id) {
             library.noteChapterOpened(chapter: chapter)
             noteTarget = nil
-            noteTapUnlockTask?.cancel()
-            allowsNoteTap = false
             await loadBlocks(with: proxy)
-            // Keep note taps disabled until the launch transition and any
-            // carried touch have fully settled.
-            noteTapUnlockTask = Task {
-                try? await Task.sleep(for: noteTapActivationDelay)
-                guard !Task.isCancelled else { return }
-                await MainActor.run {
-                    allowsNoteTap = true
-                }
-            }
         }
         .onAppear {
-            syncVisibleBookmarks()
+            syncVisibleSavedState()
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
-            syncVisibleBookmarks()
+            syncVisibleSavedState()
         }
         .onDisappear {
-            noteTapUnlockTask?.cancel()
-            noteTapUnlockTask = nil
             focusedSectionUpdateTask?.cancel()
             focusedSectionUpdateTask = nil
         }
@@ -150,6 +165,7 @@ struct ChapterReaderView: View {
             .uppercased()
         let isBookmarked = visibleBookmarkedSectionIDs.contains(block.detail.id)
             || visibleBookmarkedSectionNumbers.contains(normalizedSectionNumber)
+        let hasNote = visibleNotedSectionIDs.contains(block.detail.id)
 
         return VStack(alignment: .leading, spacing: 10) {
             if let groupLabel = block.groupLabel {
@@ -177,33 +193,23 @@ struct ChapterReaderView: View {
 
                     Spacer(minLength: 0)
 
-                    if block.detail.kind != .textBlock {
-                        Group {
-                            if isBookmarked {
-                            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(isBookmarked ? accentColor : .secondary)
-                                .frame(width: 20, height: 20, alignment: .center)
-                            }
-                        }
-                    }
+                    sectionStatusIndicators(isBookmarked: isBookmarked, hasNote: hasNote)
                 }
 
                 ChapterBlockBodyView(
                     detail: block.detail,
                     prewarmedText: prewarmedBodyText[block.detail.id],
-                    onOpenImage: { expandedInlineImage = $0 }
+                    onOpenImage: { expandedInlineImage = $0 },
+                    onContentTap: {
+                        openNotes(for: block.detail)
+                    },
+                    onSelectionChange: { hasSelection in
+                        hasActiveTextSelection = hasSelection
+                    }
                 )
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .simultaneousGesture(TapGesture().onEnded {
-                guard allowsNoteTap else { return }
-                openNotes(for: block.detail)
-            })
-            .accessibilityAddTraits(.isButton)
-            .accessibilityHint("Opens notes for this section")
             .padding(.leading, hierarchyIndent)
 
             CodeHairline().padding(.top, 2)
@@ -217,6 +223,27 @@ struct ChapterReaderView: View {
                 )
             }
         )
+    }
+
+    @ViewBuilder
+    private func sectionStatusIndicators(isBookmarked: Bool, hasNote: Bool) -> some View {
+        if isBookmarked || hasNote {
+        HStack(spacing: 8) {
+                if hasNote {
+                Image(systemName: "note.text")
+                    .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    .frame(width: 28, height: 28)
+                }
+
+                if isBookmarked {
+                Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                    .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(accentColor)
+                    .frame(width: 28, height: 28)
+                }
+            }
+        }
     }
 
     private func isDuplicateSectionHeadingBlock(_ detail: ReaderSectionDetail) -> Bool {
@@ -256,19 +283,8 @@ struct ChapterReaderView: View {
     @ViewBuilder
     private func jumpBar(proxy: ScrollViewProxy) -> some View {
         HStack(spacing: 10) {
-            Menu {
-                let visibleBlocks = blocks.filter { !duplicateHeadingSectionIDs.contains($0.detail.id) }
-                ForEach(Array(visibleBlocks.reversed())) { block in
-                    Button {
-                        jumpToSection(id: block.detail.id, with: proxy)
-                    } label: {
-                        if selectedJumpSectionID == block.detail.id {
-                            Label(jumpLabel(for: block.detail), systemImage: "checkmark")
-                        } else {
-                            Text(jumpLabel(for: block.detail))
-                        }
-                    }
-                }
+            Button {
+                isJumpPickerPresented = true
             } label: {
                 HStack(spacing: 8) {
                     Text(currentJumpLabel)
@@ -289,6 +305,7 @@ struct ChapterReaderView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
+            .disabled(visibleJumpBlocks.isEmpty)
 
             Button {
                 if let firstID = blocks.first?.detail.id {
@@ -309,6 +326,51 @@ struct ChapterReaderView: View {
         .padding(.horizontal, 16)
         .padding(.top, 6)
         .padding(.bottom, 8)
+    }
+
+    private var visibleJumpBlocks: [CodeLibraryViewModel.ChapterReaderBlockContent] {
+        blocks.filter { !duplicateHeadingSectionIDs.contains($0.detail.id) }
+    }
+
+    private func jumpPickerSheet(proxy: ScrollViewProxy) -> some View {
+        NavigationStack {
+            List {
+                ForEach(visibleJumpBlocks) { block in
+                    Button {
+                        jumpToSection(id: block.detail.id, with: proxy)
+                        isJumpPickerPresented = false
+                    } label: {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(jumpSheetLabel(for: block.detail))
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(accentColor)
+                                .lineLimit(2)
+
+                            if selectedJumpSectionID == block.detail.id {
+                                Text("Current")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 6)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .navigationTitle("Jump within chapter")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        isJumpPickerPresented = false
+                    }
+                    .foregroundStyle(accentColor)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
     private func loadBlocks(with proxy: ScrollViewProxy) async {
@@ -361,13 +423,13 @@ struct ChapterReaderView: View {
             }
 
             blocks = orderedBlocks(from: loadedBlocksByID)
-            syncVisibleBookmarks()
+            syncVisibleSavedState()
             refreshDuplicateHeadingSet()
             await Task.yield()
         }
 
         blocks = orderedBlocks(from: loadedBlocksByID)
-        syncVisibleBookmarks()
+        syncVisibleSavedState()
         refreshDuplicateHeadingSet()
     }
 
@@ -390,12 +452,13 @@ struct ChapterReaderView: View {
         }
 
         pendingFocusedSectionID = topMost
+        selectedJumpSectionID = topMost
         focusedSectionUpdateTask?.cancel()
         focusedSectionUpdateTask = Task {
             try? await Task.sleep(for: focusedSectionUpdateDelay)
             guard !Task.isCancelled else { return }
             await MainActor.run {
-                guard pendingFocusedSectionID == topMost, selectedJumpSectionID != topMost else { return }
+                guard pendingFocusedSectionID == topMost else { return }
                 selectedJumpSectionID = topMost
             }
         }
@@ -417,7 +480,14 @@ struct ChapterReaderView: View {
     private func prewarmVisibleSectionBodies(
         from descriptors: [CodeLibraryViewModel.ChapterBlockDescriptor]
     ) async {
-        let sectionIDs = Array(descriptors.prefix(prewarmedSectionCount).map(\.sectionID))
+        let focusedIndex = descriptors.firstIndex { $0.sectionID == initialSectionID } ?? descriptors.startIndex
+        let startIndex = max(descriptors.startIndex, focusedIndex - 1)
+        let sectionIDs = Array(
+            descriptors
+                .dropFirst(startIndex)
+                .prefix(prewarmedSectionCount + 2)
+                .map(\.sectionID)
+        )
         guard !sectionIDs.isEmpty else { return }
 
         let details = await library.loadSectionDetailsAsync(sectionIDs: sectionIDs)
@@ -446,9 +516,14 @@ struct ChapterReaderView: View {
         }
     }
 
-    private func syncVisibleBookmarks() {
+    private func syncVisibleSavedState() {
         visibleBookmarkedSectionIDs = Set(
             blocks.map(\.detail.id).filter { library.isBookmarked(sectionID: $0) }
+        )
+        visibleNotedSectionIDs = Set(
+            blocks.map(\.detail.id).filter {
+                !library.noteBody(sectionID: $0).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            }
         )
         visibleBookmarkedSectionNumbers = Set(
             blocks.compactMap { block in
@@ -465,9 +540,35 @@ struct ChapterReaderView: View {
         detail.kind == .textBlock ? detail.displayTitle : "\(detail.sectionNumber) \(detail.displayTitle)"
     }
 
+    private func jumpSheetLabel(for detail: ReaderSectionDetail) -> String {
+        if detail.kind == .textBlock {
+            return detail.displayTitle
+        }
+
+        let normalizedSectionNumber = detail.sectionNumber
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
+        let isSectionGroup = normalizedSectionNumber.range(of: #"^\d+0\d$"#, options: .regularExpression) != nil
+            && normalizedSectionNumber.count >= 3
+
+        if isSectionGroup {
+            return "Section BC \(normalizedSectionNumber): \(detail.displayTitle)"
+        }
+        return "\(detail.sectionNumber) \(detail.displayTitle)"
+    }
+
     private func openNotes(for detail: ReaderSectionDetail) {
+        if hasActiveTextSelection {
+            dismissTextSelection()
+            return
+        }
         noteBody = library.noteBody(sectionID: detail.id)
         noteTarget = detail
+    }
+
+    private func dismissTextSelection() {
+        NotificationCenter.default.post(name: .nycccClearRichTextSelection, object: nil)
+        hasActiveTextSelection = false
     }
 
     private func scrollIfNeeded(with proxy: ScrollViewProxy, animated: Bool) {
@@ -489,11 +590,28 @@ private struct ChapterNoteSheet: View {
     let detail: ReaderSectionDetail
     @Binding var noteBody: String
     let accentColor: Color
-    let isBookmarked: Bool
-    let onToggleBookmark: () -> Void
+    @State private var isBookmarked: Bool
+    let onToggleBookmark: () -> Bool
     let onSave: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var isNotesFieldFocused: Bool
+
+    init(
+        detail: ReaderSectionDetail,
+        noteBody: Binding<String>,
+        accentColor: Color,
+        isBookmarked: Bool,
+        onToggleBookmark: @escaping () -> Bool,
+        onSave: @escaping (String) -> Void
+    ) {
+        self.detail = detail
+        _noteBody = noteBody
+        self.accentColor = accentColor
+        _isBookmarked = State(initialValue: isBookmarked)
+        self.onToggleBookmark = onToggleBookmark
+        self.onSave = onSave
+    }
 
     var body: some View {
         NavigationStack {
@@ -513,6 +631,7 @@ private struct ChapterNoteSheet: View {
                     TextEditor(text: $noteBody)
                         .font(.body)
                         .scrollContentBackground(.hidden)
+                        .focused($isNotesFieldFocused)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
                         .frame(minHeight: 180)
@@ -540,13 +659,17 @@ private struct ChapterNoteSheet: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                dismissKeyboard()
+            }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("Notes")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        onToggleBookmark()
+                        isBookmarked = onToggleBookmark()
                     } label: {
                         Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                             .foregroundStyle(isBookmarked ? accentColor : .secondary)
@@ -562,12 +685,19 @@ private struct ChapterNoteSheet: View {
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
     }
+
+    private func dismissKeyboard() {
+        isNotesFieldFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }
 
 private struct ChapterBlockBodyView: View {
     let detail: ReaderSectionDetail
     let prewarmedText: NSAttributedString?
     let onOpenImage: (UIImage) -> Void
+    let onContentTap: (() -> Void)?
+    let onSelectionChange: ((Bool) -> Void)?
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var bodyText: NSAttributedString?
@@ -575,11 +705,15 @@ private struct ChapterBlockBodyView: View {
     init(
         detail: ReaderSectionDetail,
         prewarmedText: NSAttributedString? = nil,
-        onOpenImage: @escaping (UIImage) -> Void
+        onOpenImage: @escaping (UIImage) -> Void,
+        onContentTap: (() -> Void)? = nil,
+        onSelectionChange: ((Bool) -> Void)? = nil
     ) {
         self.detail = detail
         self.prewarmedText = prewarmedText
         self.onOpenImage = onOpenImage
+        self.onContentTap = onContentTap
+        self.onSelectionChange = onSelectionChange
         _bodyText = State(initialValue: prewarmedText)
     }
 
@@ -589,7 +723,9 @@ private struct ChapterBlockBodyView: View {
                 ContentBlockListView(
                     detail: detail,
                     fallbackText: bodyText,
-                    onOpenImage: onOpenImage
+                    onOpenImage: onOpenImage,
+                    onContentTap: onContentTap,
+                    onSelectionChange: onSelectionChange
                 )
             } else if bodyText == nil {
                 ProgressView()

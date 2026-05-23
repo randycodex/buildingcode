@@ -18,6 +18,15 @@ struct PublishedHTMLAnchor: Hashable, Sendable {
     }
 }
 
+struct PublishedHTMLFeatureSet: Hashable, Sendable {
+    let containsInlineImages: Bool
+    let containsInlineTables: Bool
+
+    var requiresHTMLReader: Bool {
+        containsInlineImages || containsInlineTables
+    }
+}
+
 final class PublishedHTMLContentStore {
     private struct ChapterCache {
         let url: URL
@@ -26,8 +35,7 @@ final class PublishedHTMLContentStore {
 
     private static var anchorCache: [String: [PublishedHTMLAnchor]] = [:]
     private static let anchorCacheLock = NSLock()
-    private static var inlineImagesCache: [String: Bool] = [:]
-    private static var inlineTablesCache: [String: Bool] = [:]
+    private static var inlineFeatureCache: [String: PublishedHTMLFeatureSet] = [:]
     private static let inlineFeatureCacheLock = NSLock()
 
     private let rootURL: URL?
@@ -100,48 +108,37 @@ final class PublishedHTMLContentStore {
     }
 
     static func containsInlineImages(in chapterURL: URL) -> Bool {
-        let key = chapterURL.path
-        inlineFeatureCacheLock.lock()
-        if let cached = inlineImagesCache[key] {
-            inlineFeatureCacheLock.unlock()
-            return cached
-        }
-        inlineFeatureCacheLock.unlock()
-
-        let result: Bool
-        if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
-            result = html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil
-        } else {
-            result = false
-        }
-
-        inlineFeatureCacheLock.lock()
-        inlineImagesCache[key] = result
-        inlineFeatureCacheLock.unlock()
-        return result
+        inlineFeatures(in: chapterURL).containsInlineImages
     }
 
     static func containsInlineTables(in chapterURL: URL) -> Bool {
+        inlineFeatures(in: chapterURL).containsInlineTables
+    }
+
+    static func inlineFeatures(in chapterURL: URL) -> PublishedHTMLFeatureSet {
         let key = chapterURL.path
         inlineFeatureCacheLock.lock()
-        if let cached = inlineTablesCache[key] {
+        if let cached = inlineFeatureCache[key] {
             inlineFeatureCacheLock.unlock()
             return cached
         }
         inlineFeatureCacheLock.unlock()
 
-        let result: Bool
+        let result: PublishedHTMLFeatureSet
         if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
-            result = html.range(
-                of: #"<(?:table|ScrollTable)\b|class="[^"]*\bxsl-table\b"#,
-                options: [.regularExpression, .caseInsensitive]
-            ) != nil
+            result = PublishedHTMLFeatureSet(
+                containsInlineImages: html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil,
+                containsInlineTables: html.range(
+                    of: #"<(?:table|ScrollTable)\b|class="[^"]*\bxsl-table\b"#,
+                    options: [.regularExpression, .caseInsensitive]
+                ) != nil
+            )
         } else {
-            result = false
+            result = PublishedHTMLFeatureSet(containsInlineImages: false, containsInlineTables: false)
         }
 
         inlineFeatureCacheLock.lock()
-        inlineTablesCache[key] = result
+        inlineFeatureCache[key] = result
         inlineFeatureCacheLock.unlock()
         return result
     }

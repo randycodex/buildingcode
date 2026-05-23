@@ -1,20 +1,30 @@
 import SwiftUI
+import UIKit
 
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var query = ""
+    @State private var searchesAllCodeSections: Bool
+    @FocusState private var isSearchFieldFocused: Bool
 
-    private let tabBarClearance: CGFloat = 88
+    private static let searchesAllCodeSectionsDefaultsKey = "SearchView.searchesAllCodeSections"
+    private let tabBarClearance: CGFloat = 152
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
+    }
+
+    init() {
+        _searchesAllCodeSections = State(
+            initialValue: UserDefaults.standard.bool(forKey: Self.searchesAllCodeSectionsDefaultsKey)
+        )
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    searchField
+                    searchScopeControl
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         recentSearchSection
@@ -49,13 +59,40 @@ struct SearchView: View {
                 .padding(.top, 18)
                 .padding(.bottom, tabBarClearance)
             }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                dismissKeyboard()
+            }
             .overlay(alignment: .top) {
                 CodeTopContentFade()
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                HStack {
+                    Spacer(minLength: 0)
+                    searchField
+                        .frame(maxWidth: 360)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 96)
+                .background(Color.clear)
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("Search")
             .navigationBarTitleDisplayMode(.large)
-            .task(id: query) {
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    isSearchFieldFocused = true
+                }
+            }
+            .onChange(of: searchesAllCodeSections) { _, newValue in
+                UserDefaults.standard.set(newValue, forKey: Self.searchesAllCodeSectionsDefaultsKey)
+            }
+            .task(id: SearchTaskID(
+                query: query,
+                searchesAllCodeSections: searchesAllCodeSections,
+                selectedCodeSectionID: library.selectedCodeSectionID
+            )) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {
                     library.search(query: "")
@@ -64,7 +101,10 @@ struct SearchView: View {
 
                 try? await Task.sleep(for: .milliseconds(250))
                 guard !Task.isCancelled else { return }
-                library.search(query: query)
+                library.search(
+                    query: query,
+                    restrictToSelectedCodeSection: !searchesAllCodeSections
+                )
             }
         }
     }
@@ -79,6 +119,7 @@ struct SearchView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
+                .focused($isSearchFieldFocused)
                 .onSubmit {
                     library.recordRecentSearch(query)
                 }
@@ -108,6 +149,18 @@ struct SearchView: View {
     }
 
     @ViewBuilder
+    private var searchScopeControl: some View {
+        if !library.codeSections.isEmpty, library.selectedCodeSectionID != nil {
+            Picker("Search Scope", selection: $searchesAllCodeSections) {
+                Text(library.codeSectionName(id: library.selectedCodeSectionID)).tag(false)
+                Text("All Sections").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .accessibilityLabel("Search scope")
+        }
+    }
+
+    @ViewBuilder
     private var recentSearchSection: some View {
         if !library.recentSearches.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
@@ -120,7 +173,10 @@ struct SearchView: View {
                         HStack(spacing: 12) {
                             Button {
                                 query = recentSearch
-                                library.search(query: recentSearch)
+                                library.search(
+                                    query: recentSearch,
+                                    restrictToSelectedCodeSection: !searchesAllCodeSections
+                                )
                             } label: {
                                 HStack(spacing: 10) {
                                     Image(systemName: "clock.arrow.circlepath")
@@ -160,6 +216,10 @@ struct SearchView: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
+                    if searchesAllCodeSections, let codeSectionID = result.codeSectionID {
+                        CodeMetaBadge(text: library.codeSectionName(id: codeSectionID), accent: accentColor)
+                    }
+
                     if result.kind == .textBlock {
                         CodeMetaBadge(text: "Text Block", accent: accentColor)
                     } else {
@@ -188,6 +248,17 @@ struct SearchView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, 12)
+    }
+
+    private struct SearchTaskID: Hashable {
+        let query: String
+        let searchesAllCodeSections: Bool
+        let selectedCodeSectionID: Int64?
+    }
+
+    private func dismissKeyboard() {
+        isSearchFieldFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 

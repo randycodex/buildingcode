@@ -93,12 +93,19 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let searchHaystack: String
     }
 
+    private struct SearchHit {
+        let rank: Int
+        let result: CodeSearchResult
+    }
+
     private let project: Project
     private let codeSectionsCache: [CodeSectionCategory]
     private let chaptersCache: [CodeChapter]
     private let groupsByChapterID: [Int64: [CodeSectionGroup]]
     private let sectionsByChapterID: [Int64: [CodeSectionSummary]]
     private let sectionIndex: [Int64: IndexedSection]
+    private let indexedSections: [IndexedSection]
+    private let indexedSectionsByCodeSectionID: [Int64: [IndexedSection]]
     private let sectionsByChapterIDIndex: [Int64: [Section]]
     private let sectionNumberIndex: [String: CodeSectionSummary]
     private let chapterNumberIndex: [String: CodeChapter]
@@ -169,6 +176,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         var groupsByChapterID: [Int64: [CodeSectionGroup]] = [:]
         var sectionsByChapterID: [Int64: [CodeSectionSummary]] = [:]
         var sectionIndex: [Int64: IndexedSection] = [:]
+        var indexedSections: [IndexedSection] = []
+        var indexedSectionsByCodeSectionID: [Int64: [IndexedSection]] = [:]
         var sectionsByChapterIDIndex: [Int64: [Section]] = [:]
         var sectionNumberIndex: [String: CodeSectionSummary] = [:]
         var chapterNumberIndex: [String: CodeChapter] = [:]
@@ -210,7 +219,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                         )
                         sectionNumberIndex[section.sectionNumber.uppercased()] = summary
                         let haystack = "\(section.sectionNumber) \(section.title) \(section.officialText)".lowercased()
-                        sectionIndex[section.id] = IndexedSection(
+                        let indexed = IndexedSection(
                             chapter: chapterModel,
                             group: CodeSectionGroup(
                                 id: group.id,
@@ -221,6 +230,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                             section: section,
                             searchHaystack: haystack
                         )
+                        sectionIndex[section.id] = indexed
+                        indexedSections.append(indexed)
+                        if let codeSectionID = chapterModel.codeSectionID {
+                            indexedSectionsByCodeSectionID[codeSectionID, default: []].append(indexed)
+                        }
                         return summary
                     }
 
@@ -242,6 +256,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         self.groupsByChapterID = groupsByChapterID
         self.sectionsByChapterID = sectionsByChapterID
         self.sectionIndex = sectionIndex
+        self.indexedSections = indexedSections
+        self.indexedSectionsByCodeSectionID = indexedSectionsByCodeSectionID
         self.sectionsByChapterIDIndex = sectionsByChapterIDIndex
         self.sectionNumberIndex = sectionNumberIndex
         self.chapterNumberIndex = chapterNumberIndex
@@ -277,6 +293,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             : indexed.section.contentBlocks
         return ReaderSectionDetail(
             id: indexed.section.id,
+            codeSectionID: indexed.chapter.codeSectionID,
             chapterNumber: indexed.chapter.chapterNumber,
             chapterTitle: indexed.chapter.title,
             sectionGroupLabel: indexed.group.displayLabel,
@@ -324,29 +341,60 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return blocks
     }
 
-    func search(query: String) -> [CodeSearchResult] {
+    func search(query: String, codeSectionID: Int64? = nil) -> [CodeSearchResult] {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let lowercasedQuery = trimmed.lowercased()
+        let queryTerms = lowercasedQuery
+            .split(whereSeparator: { $0.isWhitespace })
+            .map(String.init)
 
-        return sectionIndex.values
-            .compactMap { indexed in
-                guard indexed.searchHaystack.contains(lowercasedQuery) else { return nil }
-                return CodeSearchResult(
-                    id: indexed.section.id,
-                    chapterNumber: indexed.chapter.chapterNumber,
-                    sectionNumber: indexed.section.sectionNumber,
-                    title: indexed.section.title,
-                    snippet: Self.snippet(in: indexed.section.officialText, query: trimmed),
-                    kind: indexed.section.kind
+        let candidates: [IndexedSection]
+        if let codeSectionID {
+            candidates = indexedSectionsByCodeSectionID[codeSectionID] ?? []
+        } else {
+            candidates = indexedSections
+        }
+
+        let hits: [SearchHit] = candidates
+            .compactMap { (indexed: IndexedSection) -> SearchHit? in
+                guard queryTerms.allSatisfy({ indexed.searchHaystack.contains($0) }) else { return nil }
+                let sectionNumber = indexed.section.sectionNumber.lowercased()
+                let title = indexed.section.title.lowercased()
+                let rank: Int
+                if sectionNumber == lowercasedQuery {
+                    rank = 0
+                } else if sectionNumber.hasPrefix(lowercasedQuery) {
+                    rank = 1
+                } else if title.contains(lowercasedQuery) {
+                    rank = 2
+                } else {
+                    rank = 3
+                }
+                return SearchHit(
+                    rank: rank,
+                    result: CodeSearchResult(
+                        id: indexed.section.id,
+                        codeSectionID: indexed.chapter.codeSectionID,
+                        chapterNumber: indexed.chapter.chapterNumber,
+                        sectionNumber: indexed.section.sectionNumber,
+                        title: indexed.section.title,
+                        snippet: Self.snippet(in: indexed.section.officialText, query: trimmed),
+                        kind: indexed.section.kind
+                    )
                 )
             }
-            .sorted {
-                if $0.chapterNumber == $1.chapterNumber {
-                    return $0.sectionNumber.compare($1.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+            .sorted { lhs, rhs in
+                if lhs.rank != rhs.rank {
+                    return lhs.rank < rhs.rank
                 }
-                return $0.chapterNumber.compare($1.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+                if lhs.result.chapterNumber == rhs.result.chapterNumber {
+                    return lhs.result.sectionNumber.compare(rhs.result.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+                }
+                return lhs.result.chapterNumber.compare(rhs.result.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
             }
+
+        return hits.map(\.result)
     }
 
     func savedSections(
@@ -360,6 +408,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return BookmarkedSection(
                 id: indexed.section.id,
                 codeVersion: codeVersion,
+                codeSectionID: indexed.chapter.codeSectionID,
                 chapterNumber: indexed.chapter.chapterNumber,
                 chapterTitle: indexed.chapter.title,
                 sectionNumber: indexed.section.sectionNumber,
@@ -611,13 +660,20 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let nsText = text as NSString
         let lowercasedText = text.lowercased()
         let lowercasedQuery = query.lowercased()
-        guard let range = lowercasedText.range(of: lowercasedQuery) else {
+        let range = lowercasedText.range(of: lowercasedQuery)
+            ?? lowercasedQuery
+                .split(whereSeparator: { $0.isWhitespace })
+                .lazy
+                .compactMap { lowercasedText.range(of: String($0)) }
+                .first
+        guard let range else {
             return text.titleThroughFirstPeriod
         }
 
         let location = text.distance(from: text.startIndex, to: range.lowerBound)
         let start = max(0, location - 40)
-        let end = min(nsText.length, location + query.utf16.count + 60)
+        let matchedLength = text.distance(from: range.lowerBound, to: range.upperBound)
+        let end = min(nsText.length, location + matchedLength + 60)
         var snippet = nsText.substring(with: NSRange(location: start, length: end - start))
         if start > 0 {
             snippet = "…" + snippet

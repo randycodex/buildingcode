@@ -37,36 +37,55 @@ struct BrowseView: View {
                                 .padding(.horizontal, 16)
                             } else {
                                 let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
-                                let chapterItems = library.chapters.filter { !isAppendix($0) }
-                                let appendixItems = visibleAppendixItems(from: library.chapters)
+                                let chapterGroups = groupedChapterGroups(from: library.chapters)
 
                                 LazyVStack(alignment: .leading, spacing: 12) {
-                                    if !chapterItems.isEmpty {
-                                        LazyVGrid(columns: columns, spacing: 12) {
-                                            ForEach(chapterItems) { chapter in
-                                                NavigationLink {
-                                                    ChapterLaunchView(chapter: chapter)
-                                                        .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
-                                                } label: {
-                                                    ChapterTile(chapter: chapter, accent: accentColor, kind: .chapter)
+                                    ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
+                                        if selectedCodeSectionName == "All Sections" {
+                                            codeSectionGroupHeader(
+                                                title: group.title,
+                                                color: group.palette.chapterTitleColor
+                                            )
+                                                .padding(.top, index == 0 ? 0 : 8)
+                                        }
+
+                                        if !group.chapterItems.isEmpty {
+                                            LazyVGrid(columns: columns, spacing: 12) {
+                                                ForEach(group.chapterItems) { chapter in
+                                                    NavigationLink {
+                                                        ChapterLaunchView(chapter: chapter)
+                                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+                                                    } label: {
+                                                        ChapterTile(
+                                                            chapter: chapter,
+                                                            accent: accentColor,
+                                                            palette: tilePalette(for: chapter),
+                                                            kind: .chapter
+                                                        )
+                                                    }
+                                                    .buttonStyle(.plain)
+                                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                                 }
-                                                .buttonStyle(.plain)
-                                                .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                             }
                                         }
-                                    }
 
-                                    if !appendixItems.isEmpty {
-                                        LazyVGrid(columns: columns, spacing: 12) {
-                                            ForEach(appendixItems) { chapter in
-                                                NavigationLink {
-                                                    ChapterLaunchView(chapter: chapter)
-                                                        .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
-                                                } label: {
-                                                    ChapterTile(chapter: chapter, accent: accentColor, kind: .appendix)
+                                        if !group.appendixItems.isEmpty {
+                                            LazyVGrid(columns: columns, spacing: 12) {
+                                                ForEach(group.appendixItems) { chapter in
+                                                    NavigationLink {
+                                                        ChapterLaunchView(chapter: chapter)
+                                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+                                                    } label: {
+                                                        ChapterTile(
+                                                            chapter: chapter,
+                                                            accent: accentColor,
+                                                            palette: tilePalette(for: chapter),
+                                                            kind: .appendix
+                                                        )
+                                                    }
+                                                    .buttonStyle(.plain)
+                                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                                 }
-                                                .buttonStyle(.plain)
-                                                .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                             }
                                         }
                                     }
@@ -87,19 +106,68 @@ struct BrowseView: View {
         }
     }
 
-    private var libraryHeader: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(selectedVersionName)
-                .font(.system(size: 18, weight: .medium, design: .default))
-                .foregroundStyle(.secondary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
+    @ViewBuilder
+    private var codeSectionMenu: some View {
+        if !library.codeSections.isEmpty {
+            Menu {
+                Button {
+                    library.updateSelectedCodeSection(id: nil)
+                } label: {
+                    Label("All Sections", systemImage: library.selectedCodeSectionID == nil ? "checkmark" : "square.dashed")
+                }
 
-            Text(selectedJurisdictionName)
-                .font(.system(size: 15, weight: .regular, design: .default))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
+                ForEach(library.codeSections) { codeSection in
+                    Button {
+                        library.updateSelectedCodeSection(id: codeSection.id)
+                    } label: {
+                        Label(
+                            CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
+                            systemImage: library.selectedCodeSectionID == codeSection.id ? "checkmark" : "book.closed"
+                        )
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Text(selectedCodeSectionName)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                    Image(systemName: "chevron.down")
+                        .font(.caption.weight(.bold))
+                }
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .overlay(
+                    Capsule()
+                        .stroke(Color(uiColor: .separator), lineWidth: 1)
+                )
+                .clipShape(Capsule())
+            }
+            .accessibilityLabel("Choose code section")
+        }
+    }
+
+    private var libraryHeader: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(selectedVersionName)
+                    .font(.system(size: 18, weight: .medium, design: .default))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+
+                Text(selectedJurisdictionName)
+                    .font(.system(size: 15, weight: .regular, design: .default))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            }
+
+            HStack {
+                Spacer(minLength: 0)
+                codeSectionMenu
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
@@ -128,27 +196,15 @@ struct BrowseView: View {
     }
 
     private var selectedVersionName: String {
-        library.selectedVersion?
+        let rawName = library.selectedVersion?
             .codeVersion
             .replacingOccurrences(of: "\(selectedJurisdictionName) - ", with: "", options: .caseInsensitive)
             ?? "Select Version"
+        return CodeLibraryViewModel.displayName(forLibraryName: rawName)
     }
 
     private var selectedCodeSectionName: String {
-        if let selectedCodeSectionID = library.selectedCodeSectionID,
-           let codeSection = library.codeSections.first(where: { $0.id == selectedCodeSectionID }) {
-            return displayCodeSectionName(codeSection.name)
-        }
-        return "All Sections"
-    }
-
-    private func displayCodeSectionName(_ name: String) -> String {
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return name }
-        if trimmed == trimmed.uppercased() {
-            return trimmed.localizedCapitalized
-        }
-        return trimmed
+        library.codeSectionName(id: library.selectedCodeSectionID)
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {
@@ -190,6 +246,102 @@ struct BrowseView: View {
             .frame(height: 1)
             .frame(maxWidth: .infinity)
     }
+
+    private func codeSectionGroupHeader(title: String, color: Color) -> some View {
+        Text(title)
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(color)
+            .textCase(.uppercase)
+            .tracking(0.8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 4)
+    }
+
+    private func groupedChapterGroups(from chapters: [CodeChapter]) -> [BrowseChapterGroup] {
+        let chapterItems = chapters.filter { !isAppendix($0) }
+        let appendixItems = visibleAppendixItems(from: chapters)
+
+        guard selectedCodeSectionName == "All Sections" else {
+            return [
+                BrowseChapterGroup(
+                    id: selectedCodeSectionName,
+                    title: selectedCodeSectionName,
+                    palette: tilePalette(forCodeSectionName: selectedCodeSectionName),
+                    chapterItems: chapterItems,
+                    appendixItems: appendixItems
+                )
+            ]
+        }
+
+        let groupedChapters = Dictionary(grouping: chapterItems, by: { codeSectionTitle(for: $0) })
+        let groupedAppendices = Dictionary(grouping: appendixItems, by: { codeSectionTitle(for: $0) })
+        let orderedTitles = library.codeSections
+            .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
+            .filter { groupedChapters[$0] != nil || groupedAppendices[$0] != nil }
+
+        return orderedTitles.map { title in
+                BrowseChapterGroup(
+                    id: title,
+                    title: title,
+                    palette: tilePalette(forCodeSectionName: title),
+                    chapterItems: groupedChapters[title] ?? [],
+                    appendixItems: groupedAppendices[title] ?? []
+                )
+        }
+    }
+
+    private func codeSectionTitle(for chapter: CodeChapter) -> String {
+        library.codeSections
+            .first(where: { $0.id == chapter.codeSectionID })
+            .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
+            ?? "All Sections"
+    }
+
+    private func tilePalette(forCodeSectionName name: String) -> ChapterTilePalette {
+        let normalizedName = name
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+
+        switch normalizedName {
+        case let name where name.contains("BUILDING"):
+            return .building
+        case let name where name.contains("PLUMBING"):
+            return .plumbing
+        case let name where name.contains("FUEL GAS"):
+            return .fuelGas
+        case let name where name.contains("ELECTRICAL"):
+            return .electrical
+        case let name where name.contains("MECHANICAL"):
+            return .mechanical
+        case let name where name.contains("GENERAL ADMIN"):
+            return .administrative
+        case let name where name.contains("ENERGY"):
+            return .energy
+        case let name where name.contains("FIRE"):
+            return .fire
+        case let name where name.contains("EXISTING"):
+            return .existingBuilding
+        case let name where name.contains("RESIDENTIAL"):
+            return .residential
+        default:
+            return .building
+        }
+    }
+
+    private func tilePalette(for chapter: CodeChapter) -> ChapterTilePalette {
+        let codeSectionName = library.codeSections
+            .first(where: { $0.id == chapter.codeSectionID })?
+            .name ?? ""
+        return tilePalette(forCodeSectionName: codeSectionName)
+    }
+}
+
+private struct BrowseChapterGroup: Identifiable {
+    let id: String
+    let title: String
+    let palette: ChapterTilePalette
+    let chapterItems: [CodeChapter]
+    let appendixItems: [CodeChapter]
 }
 
 private struct ChapterLaunchView: View {
@@ -204,14 +356,7 @@ private struct ChapterLaunchView: View {
 
     private var shouldUseNativeAuthoredReader: Bool {
         guard library.selectedVersion?.contentKind == .authored else { return false }
-        guard !library.sectionGroups(for: chapter).isEmpty else { return false }
-
-        let htmlStore = library.authoredHTMLStore(for: chapter)
-        guard let chapterURL = htmlStore.chapterURL(chapterNumber: chapter.chapterNumber) else {
-            return true
-        }
-
-        return !PublishedHTMLContentStore.containsInlineImages(in: chapterURL)
+        return !library.sectionGroups(for: chapter).isEmpty
     }
 
     var body: some View {
@@ -432,6 +577,19 @@ struct ChapterSectionsView: View {
 private enum ChapterTileKind {
     case chapter
     case appendix
+}
+
+private enum ChapterTilePalette {
+    case administrative
+    case building
+    case plumbing
+    case fuelGas
+    case electrical
+    case mechanical
+    case energy
+    case fire
+    case existingBuilding
+    case residential
 
     private static func dynamicColor(light: UInt32, dark: UInt32) -> Color {
         Color(uiColor: UIColor { trait in
@@ -441,36 +599,93 @@ private enum ChapterTileKind {
         })
     }
 
-    // Chapters use the green palette; appendices use the cool/teal palette.
-    // Light-mode fills come from each palette's light shades; dark-mode fills
-    // come from the dark shades. Numbers and titles use the remaining mid/
-    // accent shades from the same palette for high-contrast labels in both
-    // modes.
-    var fill: Color {
+    var chapterFill: Color {
         switch self {
-        case .chapter:  return Self.dynamicColor(light: 0xCAD593, dark: 0x243010)
-        case .appendix: return Self.dynamicColor(light: 0xD8DDEF, dark: 0x332E3C)
+        case .administrative: return Self.dynamicColor(light: 0xE0C29A, dark: 0x35210E)
+        case .building: return Self.dynamicColor(light: 0xCFCFC9, dark: 0x242424)
+        case .plumbing: return Self.dynamicColor(light: 0xB7CEE6, dark: 0x15283A)
+        case .fuelGas: return Self.dynamicColor(light: 0xE0B1A8, dark: 0x391715)
+        case .electrical: return Self.dynamicColor(light: 0xD8C0A4, dark: 0x352215)
+        case .mechanical: return Self.dynamicColor(light: 0xBDD4B2, dark: 0x1A2E17)
+        case .energy: return Self.dynamicColor(light: 0xC7D5A1, dark: 0x263016)
+        case .fire: return Self.dynamicColor(light: 0xDDB29E, dark: 0x301816)
+        case .existingBuilding: return Self.dynamicColor(light: 0xC9C8B6, dark: 0x2B2A22)
+        case .residential: return Self.dynamicColor(light: 0xD8C1AA, dark: 0x332217)
         }
     }
 
-    var stroke: Color {
+    var appendixFill: Color {
         switch self {
-        case .chapter:  return Self.dynamicColor(light: 0xA1C349, dark: 0x2A3C24)
-        case .appendix: return Self.dynamicColor(light: 0xA0A4B8, dark: 0x45B69C)
+        case .administrative: return Self.dynamicColor(light: 0xB9CCE4, dark: 0x18283B)
+        case .building: return Self.dynamicColor(light: 0xD5C7B7, dark: 0x33261E)
+        case .plumbing: return Self.dynamicColor(light: 0xE2C29D, dark: 0x39220F)
+        case .fuelGas: return Self.dynamicColor(light: 0xB9C7A5, dark: 0x24301A)
+        case .electrical: return Self.dynamicColor(light: 0xB8C3D9, dark: 0x1C2536)
+        case .mechanical: return Self.dynamicColor(light: 0xD8B8C4, dark: 0x35202A)
+        case .energy: return Self.dynamicColor(light: 0xC3C1DB, dark: 0x26243A)
+        case .fire: return Self.dynamicColor(light: 0xBFD2B2, dark: 0x1F2F1A)
+        case .existingBuilding: return Self.dynamicColor(light: 0xC9BED9, dark: 0x2A2435)
+        case .residential: return Self.dynamicColor(light: 0xBFD0DC, dark: 0x1E2B37)
         }
     }
 
-    var numberColor: Color {
+    var chapterNumberColor: Color {
         switch self {
-        case .chapter:  return Self.dynamicColor(light: 0x243010, dark: 0xCAD593)
-        case .appendix: return Self.dynamicColor(light: 0x7293A0, dark: 0xA29587)
+        case .administrative: return Self.dynamicColor(light: 0x35210E, dark: 0xE0C29A)
+        case .building: return Self.dynamicColor(light: 0x242424, dark: 0xCFCFC9)
+        case .plumbing: return Self.dynamicColor(light: 0x15283A, dark: 0xB7CEE6)
+        case .fuelGas: return Self.dynamicColor(light: 0x391715, dark: 0xE0B1A8)
+        case .electrical: return Self.dynamicColor(light: 0x352215, dark: 0xD8C0A4)
+        case .mechanical: return Self.dynamicColor(light: 0x1A2E17, dark: 0xBDD4B2)
+        case .energy: return Self.dynamicColor(light: 0x263016, dark: 0xC7D5A1)
+        case .fire: return Self.dynamicColor(light: 0x301816, dark: 0xDDB29E)
+        case .existingBuilding: return Self.dynamicColor(light: 0x2B2A22, dark: 0xC9C8B6)
+        case .residential: return Self.dynamicColor(light: 0x332217, dark: 0xD8C1AA)
         }
     }
 
-    var titleColor: Color {
+    var chapterTitleColor: Color {
         switch self {
-        case .chapter:  return Self.dynamicColor(light: 0x87A330, dark: 0xA1C349)
-        case .appendix: return Self.dynamicColor(light: 0x45B69C, dark: 0x846C5B)
+        case .administrative: return Self.dynamicColor(light: 0xA56921, dark: 0xD9A561)
+        case .building: return Self.dynamicColor(light: 0x5E5E59, dark: 0xB7B7B2)
+        case .plumbing: return Self.dynamicColor(light: 0x3F6F9E, dark: 0x7FB0DE)
+        case .fuelGas: return Self.dynamicColor(light: 0xAC5147, dark: 0xD8847A)
+        case .electrical: return Self.dynamicColor(light: 0xA2743F, dark: 0xD2A16A)
+        case .mechanical: return Self.dynamicColor(light: 0x5B8E47, dark: 0x98C180)
+        case .energy: return Self.dynamicColor(light: 0x7E9B3A, dark: 0xB9D06D)
+        case .fire: return Self.dynamicColor(light: 0xA65A53, dark: 0xD58F86)
+        case .existingBuilding: return Self.dynamicColor(light: 0x7E7865, dark: 0xBCB69E)
+        case .residential: return Self.dynamicColor(light: 0x9B7547, dark: 0xD0A577)
+        }
+    }
+
+    var appendixNumberColor: Color {
+        switch self {
+        case .administrative: return Self.dynamicColor(light: 0x18283B, dark: 0xB9CCE4)
+        case .building: return Self.dynamicColor(light: 0x33261E, dark: 0xD5C7B7)
+        case .plumbing: return Self.dynamicColor(light: 0x39220F, dark: 0xE2C29D)
+        case .fuelGas: return Self.dynamicColor(light: 0x24301A, dark: 0xB9C7A5)
+        case .electrical: return Self.dynamicColor(light: 0x1C2536, dark: 0xB8C3D9)
+        case .mechanical: return Self.dynamicColor(light: 0x35202A, dark: 0xD8B8C4)
+        case .energy: return Self.dynamicColor(light: 0x26243A, dark: 0xC3C1DB)
+        case .fire: return Self.dynamicColor(light: 0x1F2F1A, dark: 0xBFD2B2)
+        case .existingBuilding: return Self.dynamicColor(light: 0x2A2435, dark: 0xC9BED9)
+        case .residential: return Self.dynamicColor(light: 0x1E2B37, dark: 0xBFD0DC)
+        }
+    }
+
+    var appendixTitleColor: Color {
+        switch self {
+        case .administrative: return Self.dynamicColor(light: 0x557FA8, dark: 0x87B2DC)
+        case .building: return Self.dynamicColor(light: 0x8E684B, dark: 0xC79E77)
+        case .plumbing: return Self.dynamicColor(light: 0xAE7432, dark: 0xD8A563)
+        case .fuelGas: return Self.dynamicColor(light: 0x6D8F45, dark: 0xA1C27B)
+        case .electrical: return Self.dynamicColor(light: 0x5C6F9F, dark: 0x90A8D6)
+        case .mechanical: return Self.dynamicColor(light: 0x9A5E79, dark: 0xCB8EAA)
+        case .energy: return Self.dynamicColor(light: 0x7468A8, dark: 0xA297D2)
+        case .fire: return Self.dynamicColor(light: 0x618E4D, dark: 0x96C17E)
+        case .existingBuilding: return Self.dynamicColor(light: 0x73639A, dark: 0xA695CB)
+        case .residential: return Self.dynamicColor(light: 0x567F99, dark: 0x89AEC8)
         }
     }
 }
@@ -507,19 +722,20 @@ private extension View {
 private struct ChapterTile: View {
     let chapter: CodeChapter
     let accent: Color
+    let palette: ChapterTilePalette
     let kind: ChapterTileKind
 
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(kind.fill)
+                .fill(tileFill)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {
                     Spacer()
                     Text("\(chapter.chapterNumber)")
                         .font(.system(size: 28, weight: .bold))
-                        .foregroundStyle(kind.numberColor)
+                        .foregroundStyle(tileNumberColor)
                         .lineLimit(1)
                 }
 
@@ -527,7 +743,7 @@ private struct ChapterTile: View {
 
                 Text(chapter.title)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(kind.titleColor)
+                    .foregroundStyle(tileTitleColor)
                     .lineLimit(nil)
                     .multilineTextAlignment(.leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -539,6 +755,33 @@ private struct ChapterTile: View {
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Chapter \(chapter.displayLabel): \(chapter.title)"))
+    }
+
+    private var tileFill: Color {
+        switch kind {
+        case .chapter:
+            return palette.chapterFill
+        case .appendix:
+            return palette.appendixFill
+        }
+    }
+
+    private var tileNumberColor: Color {
+        switch kind {
+        case .chapter:
+            return palette.chapterNumberColor
+        case .appendix:
+            return palette.appendixNumberColor
+        }
+    }
+
+    private var tileTitleColor: Color {
+        switch kind {
+        case .chapter:
+            return palette.chapterTitleColor
+        case .appendix:
+            return palette.appendixTitleColor
+        }
     }
 }
 

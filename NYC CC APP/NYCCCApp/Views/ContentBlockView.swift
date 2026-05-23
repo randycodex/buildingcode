@@ -5,6 +5,8 @@ struct ContentBlockListView: View {
     let detail: ReaderSectionDetail
     let fallbackText: NSAttributedString
     var onOpenImage: ((UIImage) -> Void)?
+    var onContentTap: (() -> Void)? = nil
+    var onSelectionChange: ((Bool) -> Void)? = nil
 
     @EnvironmentObject private var library: CodeLibraryViewModel
 
@@ -18,7 +20,9 @@ struct ContentBlockListView: View {
         if detail.contentBlocks.isEmpty {
             AttributedTextView(
                 attributedText: fallbackText,
-                onOpenImage: onOpenImage
+                onOpenImage: onOpenImage,
+                onContentTap: onContentTap,
+                onSelectionChange: onSelectionChange
             )
         } else {
             VStack(alignment: .leading, spacing: 7) {
@@ -30,7 +34,9 @@ struct ContentBlockListView: View {
                         } else {
                             AttributedTextView(
                                 attributedText: attributedText(for: block),
-                                onOpenImage: onOpenImage
+                                onOpenImage: onOpenImage,
+                                onContentTap: onContentTap,
+                                onSelectionChange: onSelectionChange
                             )
                         }
                     case .table:
@@ -214,8 +220,36 @@ private struct ImageBlockView: View {
             }
         }
         .task(id: imageURL) {
-            loadedImage = UIImage(contentsOfFile: imageURL.path)
+            if let cached = ImageBlockCache.shared.image(for: imageURL) {
+                loadedImage = cached
+                return
+            }
+
+            let data = await Task.detached(priority: .utility) {
+                try? Data(contentsOf: imageURL, options: [.mappedIfSafe])
+            }.value
+            guard let data, let image = UIImage(data: data) else { return }
+            ImageBlockCache.shared.setImage(image, for: imageURL)
+            loadedImage = image
         }
+    }
+}
+
+private final class ImageBlockCache {
+    static let shared = ImageBlockCache()
+
+    private let cache = NSCache<NSString, UIImage>()
+
+    private init() {
+        cache.countLimit = 64
+    }
+
+    func image(for url: URL) -> UIImage? {
+        cache.object(forKey: url.path as NSString)
+    }
+
+    func setImage(_ image: UIImage, for url: URL) {
+        cache.setObject(image, forKey: url.path as NSString)
     }
 }
 
