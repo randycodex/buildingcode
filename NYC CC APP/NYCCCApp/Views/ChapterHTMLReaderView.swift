@@ -25,11 +25,15 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var htmlStore: PublishedHTMLContentStore {
-        let rootPath = library.selectedVersion?.authoredHTMLBundlePath
+        let rootPath = htmlStoreCacheKey
         if let cachedHTMLStore, cachedHTMLStoreRootPath == rootPath {
             return cachedHTMLStore
         }
-        return PublishedHTMLContentStore(relativeRootPath: rootPath)
+        return library.authoredHTMLStore(for: chapter)
+    }
+
+    private var htmlStoreCacheKey: String {
+        "\(library.selectedVersion?.authoredHTMLBundlePath ?? ""):\(chapter.codeSectionID ?? 0)"
     }
 
     private var chapterURL: URL? {
@@ -333,9 +337,9 @@ struct ChapterHTMLReaderView: View {
     }
 
     private func ensureHTMLStoreCached() {
-        let rootPath = library.selectedVersion?.authoredHTMLBundlePath
+        let rootPath = htmlStoreCacheKey
         if cachedHTMLStore == nil || cachedHTMLStoreRootPath != rootPath {
-            cachedHTMLStore = PublishedHTMLContentStore(relativeRootPath: rootPath)
+            cachedHTMLStore = library.authoredHTMLStore(for: chapter)
             cachedHTMLStoreRootPath = rootPath
         }
     }

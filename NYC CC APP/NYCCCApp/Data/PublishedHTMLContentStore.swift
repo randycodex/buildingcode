@@ -33,13 +33,21 @@ final class PublishedHTMLContentStore {
     private let rootURL: URL?
     private var chapterCache: [String: ChapterCache] = [:]
 
-    init(resourceURL: URL? = Bundle.main.resourceURL, relativeRootPath: String?) {
+    init(resourceURL: URL? = Bundle.main.resourceURL, relativeRootPath: String?, codeSectionSlug: String? = nil) {
         if let resourceURL, let relativeRootPath, !relativeRootPath.isEmpty {
-            self.rootURL = relativeRootPath
+            let baseURL = relativeRootPath
                 .split(separator: "/")
                 .reduce(resourceURL) { partial, component in
                     partial.appendingPathComponent(String(component), isDirectory: true)
                 }
+            if let codeSectionSlug, !codeSectionSlug.isEmpty {
+                let codeSectionURL = baseURL
+                    .appendingPathComponent("code-sections", isDirectory: true)
+                    .appendingPathComponent(codeSectionSlug, isDirectory: true)
+                self.rootURL = FileManager.default.fileExists(atPath: codeSectionURL.path) ? codeSectionURL : baseURL
+            } else {
+                self.rootURL = baseURL
+            }
         } else {
             self.rootURL = resourceURL?
                 .appendingPathComponent("CodeContent", isDirectory: true)

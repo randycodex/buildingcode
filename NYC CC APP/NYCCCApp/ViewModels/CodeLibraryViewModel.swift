@@ -201,6 +201,13 @@ final class CodeLibraryViewModel: ObservableObject {
         chapters = authoredCodeStore.chapters(codeSectionID: id)
     }
 
+    func authoredHTMLStore(for chapter: CodeChapter) -> PublishedHTMLContentStore {
+        PublishedHTMLContentStore(
+            relativeRootPath: selectedVersion?.authoredHTMLBundlePath,
+            codeSectionSlug: authoredCodeSectionSlug(for: chapter)
+        )
+    }
+
     func sections(for chapter: CodeChapter) -> [CodeSectionSummary] {
         if let authoredCodeStore {
             return authoredCodeStore.sections(chapterID: chapter.id)
@@ -320,7 +327,10 @@ final class CodeLibraryViewModel: ObservableObject {
             return nil
         }
 
-        let htmlStore = PublishedHTMLContentStore(relativeRootPath: relativeRootPath)
+        let htmlStore = PublishedHTMLContentStore(
+            relativeRootPath: relativeRootPath,
+            codeSectionSlug: authoredCodeSectionSlug(for: chapter)
+        )
         let anchors = htmlStore.anchors(chapterNumber: chapter.chapterNumber)
         guard !anchors.isEmpty else { return nil }
 
@@ -387,7 +397,10 @@ final class CodeLibraryViewModel: ObservableObject {
             return nil
         }
 
-        let htmlStore = PublishedHTMLContentStore(relativeRootPath: relativeRootPath)
+        let htmlStore = PublishedHTMLContentStore(
+            relativeRootPath: relativeRootPath,
+            codeSectionSlug: authoredCodeSectionSlug(for: chapter)
+        )
         guard let chapterURL = htmlStore.chapterURL(chapterNumber: chapter.chapterNumber),
               let firstAnchor = PublishedHTMLContentStore.anchors(in: chapterURL).first
         else {
@@ -400,6 +413,15 @@ final class CodeLibraryViewModel: ObservableObject {
             sectionNumber: firstAnchor.sectionNumber,
             title: firstAnchor.title
         )
+    }
+
+    private func authoredCodeSectionSlug(for chapter: CodeChapter) -> String? {
+        guard let codeSectionID = chapter.codeSectionID,
+              let codeSection = codeSections.first(where: { $0.id == codeSectionID })
+        else {
+            return nil
+        }
+        return Self.slug(codeSection.name)
     }
 
     func loadSectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
@@ -1113,6 +1135,16 @@ final class CodeLibraryViewModel: ObservableObject {
             partial * 31 + Int64(scalar.value)
         }
         return -1_000_000 - value
+    }
+
+    private nonisolated static func slug(_ value: String) -> String {
+        let lowercased = value.lowercased()
+        let replaced = lowercased.replacingOccurrences(
+            of: #"[^a-z0-9]+"#,
+            with: "-",
+            options: .regularExpression
+        )
+        return replaced.trimmingCharacters(in: CharacterSet(charactersIn: "-"))
     }
 
     private nonisolated static func syntheticSectionID(for chapterNumber: String, sectionNumber: String) -> Int64 {

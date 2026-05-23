@@ -18,11 +18,13 @@ struct ChapterReaderView: View {
     @State private var noteTarget: ReaderSectionDetail?
     @State private var noteBody = ""
     @State private var allowsNoteTap: Bool = false
+    @State private var noteTapUnlockTask: Task<Void, Never>?
     @State private var pendingFocusedSectionID: Int64?
     @State private var focusedSectionUpdateTask: Task<Void, Never>?
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
     private let focusedSectionUpdateDelay: Duration = .milliseconds(70)
+    private let noteTapActivationDelay: Duration = .milliseconds(900)
     private let prewarmedSectionCount = 4
     private let indentStep: CGFloat = 26
 
@@ -103,14 +105,19 @@ struct ChapterReaderView: View {
         }
         .task(id: chapter.id) {
             library.noteChapterOpened(chapter: chapter)
+            noteTarget = nil
+            noteTapUnlockTask?.cancel()
             allowsNoteTap = false
             await loadBlocks(with: proxy)
-            // Suppress note-open taps briefly after the chapter appears so
-            // touches that originated on the source tile during the zoom
-            // transition do not accidentally open the notes sheet on the
-            // first visible section.
-            try? await Task.sleep(nanoseconds: 400_000_000)
-            allowsNoteTap = true
+            // Keep note taps disabled until the launch transition and any
+            // carried touch have fully settled.
+            noteTapUnlockTask = Task {
+                try? await Task.sleep(for: noteTapActivationDelay)
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    allowsNoteTap = true
+                }
+            }
         }
         .onAppear {
             syncVisibleBookmarks()
@@ -119,6 +126,8 @@ struct ChapterReaderView: View {
             syncVisibleBookmarks()
         }
         .onDisappear {
+            noteTapUnlockTask?.cancel()
+            noteTapUnlockTask = nil
             focusedSectionUpdateTask?.cancel()
             focusedSectionUpdateTask = nil
         }

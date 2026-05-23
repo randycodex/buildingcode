@@ -24,8 +24,8 @@ struct BrowseView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         ScrollView {
                             libraryHeader
-                                .padding(.horizontal, 20)
-                                .padding(.top, 4)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 18)
                                 .padding(.bottom, 12)
                             if library.chapters.isEmpty {
                                 CodeEmptyStateCard(
@@ -82,21 +82,27 @@ struct BrowseView: View {
                 }
             }
             .background(browseBackdrop.ignoresSafeArea())
-            .navigationTitle(selectedJurisdictionName)
+            .navigationTitle(selectedCodeSectionName)
             .navigationBarTitleDisplayMode(.large)
         }
     }
 
     private var libraryHeader: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             Text(selectedVersionName)
-                .font(.title3.weight(.regular))
+                .font(.system(size: 18, weight: .medium, design: .default))
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+
+            Text(selectedJurisdictionName)
+                .font(.system(size: 15, weight: .regular, design: .default))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.85)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom, 18)
+        .padding(.bottom, 16)
     }
 
     private func chapterRow(for chapter: CodeChapter) -> some View {
@@ -126,6 +132,23 @@ struct BrowseView: View {
             .codeVersion
             .replacingOccurrences(of: "\(selectedJurisdictionName) - ", with: "", options: .caseInsensitive)
             ?? "Select Version"
+    }
+
+    private var selectedCodeSectionName: String {
+        if let selectedCodeSectionID = library.selectedCodeSectionID,
+           let codeSection = library.codeSections.first(where: { $0.id == selectedCodeSectionID }) {
+            return displayCodeSectionName(codeSection.name)
+        }
+        return "All Sections"
+    }
+
+    private func displayCodeSectionName(_ name: String) -> String {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return name }
+        if trimmed == trimmed.uppercased() {
+            return trimmed.localizedCapitalized
+        }
+        return trimmed
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {
@@ -173,25 +196,35 @@ private struct ChapterLaunchView: View {
     let chapter: CodeChapter
 
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @Environment(\.dismiss) private var dismiss
     @State private var initialSection: CodeSectionSummary?
-    @State private var pinchScale: CGFloat = 1
-    @State private var isDismissingByPinch: Bool = false
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
     }
 
-    private let pinchDismissThreshold: CGFloat = 0.85
-    private let pinchMinimumScale: CGFloat = 0.6
+    private var shouldUseNativeAuthoredReader: Bool {
+        guard library.selectedVersion?.contentKind == .authored else { return false }
+        guard !library.sectionGroups(for: chapter).isEmpty else { return false }
+
+        let htmlStore = library.authoredHTMLStore(for: chapter)
+        guard let chapterURL = htmlStore.chapterURL(chapterNumber: chapter.chapterNumber) else {
+            return true
+        }
+
+        return !PublishedHTMLContentStore.containsInlineImages(in: chapterURL)
+    }
 
     var body: some View {
         Group {
             if let initialSection = initialSection ?? library.firstSection(for: chapter) {
-                ChapterHTMLReaderView(
-                    chapter: chapter,
-                    initialSection: initialSection
-                )
+                if shouldUseNativeAuthoredReader {
+                    ChapterReaderView(chapter: chapter, initialSectionID: initialSection.id)
+                } else {
+                    ChapterHTMLReaderView(
+                        chapter: chapter,
+                        initialSection: initialSection
+                    )
+                }
             } else {
                 VStack(spacing: 12) {
                     ProgressView()
@@ -210,41 +243,8 @@ private struct ChapterLaunchView: View {
                 }
             }
         }
-        .scaleEffect(pinchScale, anchor: .center)
-        .animation(.interactiveSpring(response: 0.32, dampingFraction: 0.82), value: pinchScale)
-        .simultaneousGesture(pinchToCloseGesture)
         .navigationTitle(chapter.displayLabel)
         .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private var pinchToCloseGesture: some Gesture {
-        MagnificationGesture(minimumScaleDelta: 0.02)
-            .onChanged { value in
-                guard !isDismissingByPinch else { return }
-                // Only react to inward pinches; outward pinches are reserved
-                // for image zoom inside the reader.
-                guard value < 1 else {
-                    if pinchScale != 1 { pinchScale = 1 }
-                    return
-                }
-                pinchScale = max(pinchMinimumScale, value)
-            }
-            .onEnded { value in
-                guard !isDismissingByPinch else { return }
-                if value <= pinchDismissThreshold {
-                    isDismissingByPinch = true
-                    withAnimation(.easeOut(duration: 0.18)) {
-                        pinchScale = pinchMinimumScale
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-                        dismiss()
-                    }
-                } else {
-                    withAnimation(.spring(response: 0.32, dampingFraction: 0.78)) {
-                        pinchScale = 1
-                    }
-                }
-            }
     }
 }
 

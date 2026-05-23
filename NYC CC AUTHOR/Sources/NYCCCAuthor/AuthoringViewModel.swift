@@ -1176,7 +1176,7 @@ final class AuthoringViewModel: ObservableObject {
                 replacementPath = cached
             } else {
                 let remoteURL = try normalizedRemoteURL(from: urlString)
-                let localURL = try downloadRemoteAsset(remoteURL, to: assetsDirectoryURL)
+                let localURL = try localAssetURL(for: remoteURL, in: assetsDirectoryURL)
                 replacementPath = "../assets/" + localURL.lastPathComponent
                 cache[urlString] = replacementPath
             }
@@ -1206,6 +1206,25 @@ final class AuthoringViewModel: ObservableObject {
         return url
     }
 
+    private nonisolated static func localAssetURL(
+        for remoteURL: URL,
+        in assetsDirectoryURL: URL
+    ) throws -> URL {
+        let ext = preferredAssetExtension(for: remoteURL)
+        if ext == "css" {
+            return try writeFallbackStylesheet(for: remoteURL, to: assetsDirectoryURL)
+        }
+
+        do {
+            return try downloadRemoteAsset(remoteURL, to: assetsDirectoryURL)
+        } catch {
+            if ["png", "jpg", "jpeg", "gif", "webp"].contains(ext) {
+                return try writeFallbackImage(for: remoteURL, to: assetsDirectoryURL)
+            }
+            throw error
+        }
+    }
+
     private nonisolated static func downloadRemoteAsset(
         _ remoteURL: URL,
         to assetsDirectoryURL: URL
@@ -1217,6 +1236,55 @@ final class AuthoringViewModel: ObservableObject {
         if !FileManager.default.fileExists(atPath: outputURL.path) {
             try data.write(to: outputURL, options: .atomic)
         }
+        return outputURL
+    }
+
+    private nonisolated static func writeFallbackStylesheet(
+        for remoteURL: URL,
+        to assetsDirectoryURL: URL
+    ) throws -> URL {
+        let fileName = sha1(remoteURL.absoluteString) + ".css"
+        let outputURL = assetsDirectoryURL.appendingPathComponent(fileName, isDirectory: false)
+        if FileManager.default.fileExists(atPath: outputURL.path) {
+            return outputURL
+        }
+
+        let css = """
+        html, body { margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 17px;
+            line-height: 1.45;
+            color: #111111;
+            background: #ffffff;
+        }
+        h1, h2, h3, h4, h5, h6 { line-height: 1.2; margin: 1.1em 0 0.45em; }
+        p, li, div { overflow-wrap: anywhere; }
+        img { max-width: 100%; height: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        """
+        try Data(css.utf8).write(to: outputURL, options: .atomic)
+        return outputURL
+    }
+
+    private nonisolated static func writeFallbackImage(
+        for remoteURL: URL,
+        to assetsDirectoryURL: URL
+    ) throws -> URL {
+        let outputURL = assetsDirectoryURL.appendingPathComponent(sha1(remoteURL.absoluteString) + ".png", isDirectory: false)
+        if FileManager.default.fileExists(atPath: outputURL.path) {
+            return outputURL
+        }
+
+        let pngBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9s2Fne8AAAAASUVORK5CYII="
+        guard let data = Data(base64Encoded: pngBase64) else {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1105,
+                userInfo: [NSLocalizedDescriptionKey: "Could not create fallback image asset."]
+            )
+        }
+        try data.write(to: outputURL, options: .atomic)
         return outputURL
     }
 
@@ -1240,11 +1308,15 @@ final class AuthoringViewModel: ObservableObject {
         to bundleRootURL: URL
     ) throws {
         let outputURL = bundleRootURL.appendingPathComponent("bundle.json", isDirectory: false)
+        let legacyPlistURL = bundleRootURL.appendingPathComponent("bundle.plist", isDirectory: false)
         let data = try JSONEncoder.prettyEditorJSON.encode(project)
         try FileManager.default.createDirectory(
             at: outputURL.deletingLastPathComponent(),
             withIntermediateDirectories: true
         )
+        if FileManager.default.fileExists(atPath: legacyPlistURL.path) {
+            try FileManager.default.removeItem(at: legacyPlistURL)
+        }
         try data.write(to: outputURL, options: .atomic)
     }
 

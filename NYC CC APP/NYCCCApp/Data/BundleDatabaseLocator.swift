@@ -74,7 +74,7 @@ final class BundleDatabaseLocator {
         let entries: [CachedScanEntry]
     }
 
-    private static let cacheDefaultsKey = "BundleDatabaseLocator.cachedScan.v1"
+    private static let cacheDefaultsKey = "BundleDatabaseLocator.cachedScan.v2"
 
     private static var appVersionKey: String {
         let info = Bundle.main.infoDictionary
@@ -172,12 +172,12 @@ final class BundleDatabaseLocator {
             let name = item.lastPathComponent
             guard name == "bundle.plist" || name == "bundle.json" else { continue }
             let directoryPath = item.deletingLastPathComponent().path
-            // Prefer bundle.plist when both are present; only consume one bundle per directory.
+            // Prefer bundle.json when both are present; JSON is the current authored publish format.
             if seenDirectories.contains(directoryPath) { continue }
             let preferredURL: URL = {
-                if name == "bundle.plist" { return item }
-                let plistCandidate = item.deletingLastPathComponent().appendingPathComponent("bundle.plist")
-                if FileManager.default.fileExists(atPath: plistCandidate.path) { return plistCandidate }
+                if name == "bundle.json" { return item }
+                let jsonCandidate = item.deletingLastPathComponent().appendingPathComponent("bundle.json")
+                if FileManager.default.fileExists(atPath: jsonCandidate.path) { return jsonCandidate }
                 return item
             }()
             seenDirectories.insert(directoryPath)
