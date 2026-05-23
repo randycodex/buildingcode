@@ -8,10 +8,10 @@ struct SearchView: View {
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let searchesAllCodeSectionsDefaultsKey = "SearchView.searchesAllCodeSections"
-    private let tabBarClearance: CGFloat = 206
+    private let tabBarClearance: CGFloat = 168
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor())
     }
 
     init() {
@@ -24,6 +24,11 @@ struct SearchView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    Text("Search")
+                        .font(.system(size: 32, weight: .bold, design: .default))
+                        .foregroundStyle(.primary)
+                        .padding(.bottom, 8)
+
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         recentSearchSection
                     } else if library.searchResults.isEmpty {
@@ -70,13 +75,13 @@ struct SearchView: View {
                     searchField
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 78)
-                .background(Color.clear)
+                .padding(.top, 10)
+                .padding(.bottom, 22)
+                .background(bottomSearchDock)
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("Search")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     isSearchFieldFocused = true
@@ -104,6 +109,25 @@ struct SearchView: View {
                 )
             }
         }
+    }
+
+    private var bottomSearchDock: some View {
+        ZStack(alignment: .top) {
+            Color(uiColor: .systemGroupedBackground)
+
+            LinearGradient(
+                colors: [
+                    Color(uiColor: .systemGroupedBackground).opacity(0),
+                    Color(uiColor: .systemGroupedBackground).opacity(0.92),
+                    Color(uiColor: .systemGroupedBackground)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 72)
+            .frame(maxWidth: .infinity, alignment: .top)
+        }
+        .ignoresSafeArea(edges: .bottom)
     }
 
     private var searchField: some View {

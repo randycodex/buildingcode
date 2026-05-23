@@ -7,13 +7,18 @@ struct BookmarksView: View {
     private let tabBarClearance: CGFloat = 88
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor())
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
+                    Text("Saved")
+                        .font(.system(size: 32, weight: .bold, design: .default))
+                        .foregroundStyle(.primary)
+                        .padding(.bottom, 8)
+
                     if !library.bookmarks.isEmpty {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(bookmarkGroups) { group in
@@ -42,8 +47,8 @@ struct BookmarksView: View {
                 CodeTopContentFade()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("Saved")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 library.refreshBookmarks()
             }

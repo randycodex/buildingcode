@@ -230,6 +230,30 @@ final class CodeLibraryViewModel: ObservableObject {
         return trimmed
     }
 
+    func accentColor(for codeSectionID: Int64? = nil) -> PlatformColor {
+        if readerTheme.accentPalette == .monochrome {
+            return .labelCompatible
+        }
+
+        let resolvedSectionID = codeSectionID ?? selectedCodeSectionID
+        let codeSectionName = codeSections
+            .first(where: { $0.id == resolvedSectionID })?
+            .name
+        return CodeSectionThemeProfile(codeSectionName: codeSectionName).accentColor
+    }
+
+    func accentHex(for codeSectionID: Int64? = nil, colorScheme: ColorScheme) -> String {
+        if readerTheme.accentPalette == .monochrome {
+            return colorScheme == .dark ? "#F5F5F7" : "#111111"
+        }
+
+        let resolvedSectionID = codeSectionID ?? selectedCodeSectionID
+        let codeSectionName = codeSections
+            .first(where: { $0.id == resolvedSectionID })?
+            .name
+        return CodeSectionThemeProfile(codeSectionName: codeSectionName).accentHex(for: colorScheme)
+    }
+
     func authoredHTMLStore(for chapter: CodeChapter) -> PublishedHTMLContentStore {
         PublishedHTMLContentStore(
             relativeRootPath: selectedVersion?.authoredHTMLBundlePath,

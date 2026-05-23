@@ -6,7 +6,7 @@ struct BrowseView: View {
     @Namespace private var chapterTileNamespace
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor())
     }
 
     var body: some View {
@@ -58,7 +58,6 @@ struct BrowseView: View {
                                                     } label: {
                                                         ChapterTile(
                                                             chapter: chapter,
-                                                            accent: accentColor,
                                                             palette: tilePalette(for: chapter),
                                                             kind: .chapter
                                                         )
@@ -78,7 +77,6 @@ struct BrowseView: View {
                                                     } label: {
                                                         ChapterTile(
                                                             chapter: chapter,
-                                                            accent: accentColor,
                                                             palette: tilePalette(for: chapter),
                                                             kind: .appendix
                                                         )
@@ -101,55 +99,20 @@ struct BrowseView: View {
                 }
             }
             .background(browseBackdrop.ignoresSafeArea())
-            .navigationTitle(selectedCodeSectionName)
-            .navigationBarTitleDisplayMode(.large)
-        }
-    }
-
-    @ViewBuilder
-    private var codeSectionMenu: some View {
-        if !library.codeSections.isEmpty {
-            Menu {
-                Button {
-                    library.updateSelectedCodeSection(id: nil)
-                } label: {
-                    Label("All Sections", systemImage: library.selectedCodeSectionID == nil ? "checkmark" : "square.dashed")
-                }
-
-                ForEach(library.codeSections) { codeSection in
-                    Button {
-                        library.updateSelectedCodeSection(id: codeSection.id)
-                    } label: {
-                        Label(
-                            CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                            systemImage: library.selectedCodeSectionID == codeSection.id ? "checkmark" : "book.closed"
-                        )
-                    }
-                }
-            } label: {
-                HStack(spacing: 8) {
-                    Text(selectedCodeSectionName)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(1)
-                    Image(systemName: "chevron.down")
-                        .font(.caption.weight(.bold))
-                }
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .overlay(
-                    Capsule()
-                        .stroke(Color(uiColor: .separator), lineWidth: 1)
-                )
-                .clipShape(Capsule())
-            }
-            .accessibilityLabel("Choose code section")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
     private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 14) {
+            Text(selectedCodeSectionName)
+                .font(.system(size: 32, weight: .bold, design: .default))
+                .foregroundStyle(.primary)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
             VStack(alignment: .leading, spacing: 6) {
                 Text(selectedVersionName)
                     .font(.system(size: 18, weight: .medium, design: .default))
@@ -162,11 +125,6 @@ struct BrowseView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
-            }
-
-            HStack {
-                Spacer(minLength: 0)
-                codeSectionMenu
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -298,6 +256,10 @@ struct BrowseView: View {
     }
 
     private func tilePalette(forCodeSectionName name: String) -> ChapterTilePalette {
+        if library.readerTheme.accentPalette == .monochrome {
+            return .monochrome
+        }
+
         let normalizedName = name
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .uppercased()
@@ -351,7 +313,7 @@ private struct ChapterLaunchView: View {
     @State private var initialSection: CodeSectionSummary?
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
     private var shouldUseNativeAuthoredReader: Bool {
@@ -399,7 +361,7 @@ struct ChapterSectionsView: View {
     @State private var expandedGroupIDs: Set<String> = []
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
     var body: some View {
@@ -580,6 +542,7 @@ private enum ChapterTileKind {
 }
 
 private enum ChapterTilePalette {
+    case monochrome
     case administrative
     case building
     case plumbing
@@ -601,12 +564,13 @@ private enum ChapterTilePalette {
 
     var chapterFill: Color {
         switch self {
-        case .administrative: return Self.dynamicColor(light: 0xE0C29A, dark: 0x35210E)
-        case .building: return Self.dynamicColor(light: 0xCFCFC9, dark: 0x242424)
-        case .plumbing: return Self.dynamicColor(light: 0xB7CEE6, dark: 0x15283A)
-        case .fuelGas: return Self.dynamicColor(light: 0xE0B1A8, dark: 0x391715)
+        case .monochrome: return Self.dynamicColor(light: 0x6A6A73, dark: 0x1E1E20)
+        case .administrative: return Self.dynamicColor(light: 0xE3D8FF, dark: 0x1F1533)
+        case .building: return Self.dynamicColor(light: 0xFFD8C7, dark: 0x2A170A)
+        case .plumbing: return Self.dynamicColor(light: 0xD6F6FF, dark: 0x08252D)
+        case .fuelGas: return Self.dynamicColor(light: 0xF7D7DD, dark: 0x2A0F12)
         case .electrical: return Self.dynamicColor(light: 0xD8C0A4, dark: 0x352215)
-        case .mechanical: return Self.dynamicColor(light: 0xBDD4B2, dark: 0x1A2E17)
+        case .mechanical: return Self.dynamicColor(light: 0xD9F2DE, dark: 0x102418)
         case .energy: return Self.dynamicColor(light: 0xC7D5A1, dark: 0x263016)
         case .fire: return Self.dynamicColor(light: 0xDDB29E, dark: 0x301816)
         case .existingBuilding: return Self.dynamicColor(light: 0xC9C8B6, dark: 0x2B2A22)
@@ -616,12 +580,13 @@ private enum ChapterTilePalette {
 
     var appendixFill: Color {
         switch self {
-        case .administrative: return Self.dynamicColor(light: 0xB9CCE4, dark: 0x18283B)
-        case .building: return Self.dynamicColor(light: 0xD5C7B7, dark: 0x33261E)
-        case .plumbing: return Self.dynamicColor(light: 0xE2C29D, dark: 0x39220F)
-        case .fuelGas: return Self.dynamicColor(light: 0xB9C7A5, dark: 0x24301A)
+        case .monochrome: return Self.dynamicColor(light: 0xB9B8BF, dark: 0x363636)
+        case .administrative: return Self.dynamicColor(light: 0xE7E2F1, dark: 0x241C32)
+        case .building: return Self.dynamicColor(light: 0xD9ECFF, dark: 0x0D1D2A)
+        case .plumbing: return Self.dynamicColor(light: 0xFFE4C8, dark: 0x2A1808)
+        case .fuelGas: return Self.dynamicColor(light: 0xD6F7F2, dark: 0x082A2D)
         case .electrical: return Self.dynamicColor(light: 0xB8C3D9, dark: 0x1C2536)
-        case .mechanical: return Self.dynamicColor(light: 0xD8B8C4, dark: 0x35202A)
+        case .mechanical: return Self.dynamicColor(light: 0xFFD7EA, dark: 0x2A1020)
         case .energy: return Self.dynamicColor(light: 0xC3C1DB, dark: 0x26243A)
         case .fire: return Self.dynamicColor(light: 0xBFD2B2, dark: 0x1F2F1A)
         case .existingBuilding: return Self.dynamicColor(light: 0xC9BED9, dark: 0x2A2435)
@@ -631,12 +596,13 @@ private enum ChapterTilePalette {
 
     var chapterNumberColor: Color {
         switch self {
-        case .administrative: return Self.dynamicColor(light: 0x35210E, dark: 0xE0C29A)
-        case .building: return Self.dynamicColor(light: 0x242424, dark: 0xCFCFC9)
-        case .plumbing: return Self.dynamicColor(light: 0x15283A, dark: 0xB7CEE6)
-        case .fuelGas: return Self.dynamicColor(light: 0x391715, dark: 0xE0B1A8)
+        case .monochrome: return Self.dynamicColor(light: 0xFFFFFF, dark: 0xE0E0E4)
+        case .administrative: return Self.dynamicColor(light: 0x7C3AED, dark: 0xC4A1FF)
+        case .building: return Self.dynamicColor(light: 0xC96410, dark: 0xFFB067)
+        case .plumbing: return Self.dynamicColor(light: 0x0891B2, dark: 0x67E8F9)
+        case .fuelGas: return Self.dynamicColor(light: 0xC62828, dark: 0xFF7B7B)
         case .electrical: return Self.dynamicColor(light: 0x352215, dark: 0xD8C0A4)
-        case .mechanical: return Self.dynamicColor(light: 0x1A2E17, dark: 0xBDD4B2)
+        case .mechanical: return Self.dynamicColor(light: 0x2F8F4E, dark: 0x6EDC8C)
         case .energy: return Self.dynamicColor(light: 0x263016, dark: 0xC7D5A1)
         case .fire: return Self.dynamicColor(light: 0x301816, dark: 0xDDB29E)
         case .existingBuilding: return Self.dynamicColor(light: 0x2B2A22, dark: 0xC9C8B6)
@@ -646,12 +612,13 @@ private enum ChapterTilePalette {
 
     var chapterTitleColor: Color {
         switch self {
-        case .administrative: return Self.dynamicColor(light: 0xA56921, dark: 0xD9A561)
-        case .building: return Self.dynamicColor(light: 0x5E5E59, dark: 0xB7B7B2)
-        case .plumbing: return Self.dynamicColor(light: 0x3F6F9E, dark: 0x7FB0DE)
-        case .fuelGas: return Self.dynamicColor(light: 0xAC5147, dark: 0xD8847A)
+        case .monochrome: return Self.dynamicColor(light: 0xCCCCCC, dark: 0xF5F5F7)
+        case .administrative: return Self.dynamicColor(light: 0x341A5A, dark: 0xF1E8FF)
+        case .building: return Self.dynamicColor(light: 0x5C2E0A, dark: 0xFFE9D6)
+        case .plumbing: return Self.dynamicColor(light: 0x123B46, dark: 0xE6FAFF)
+        case .fuelGas: return Self.dynamicColor(light: 0x5A1515, dark: 0xFFE3E3)
         case .electrical: return Self.dynamicColor(light: 0xA2743F, dark: 0xD2A16A)
-        case .mechanical: return Self.dynamicColor(light: 0x5B8E47, dark: 0x98C180)
+        case .mechanical: return Self.dynamicColor(light: 0x163524, dark: 0xE7F7EC)
         case .energy: return Self.dynamicColor(light: 0x7E9B3A, dark: 0xB9D06D)
         case .fire: return Self.dynamicColor(light: 0xA65A53, dark: 0xD58F86)
         case .existingBuilding: return Self.dynamicColor(light: 0x7E7865, dark: 0xBCB69E)
@@ -661,12 +628,13 @@ private enum ChapterTilePalette {
 
     var appendixNumberColor: Color {
         switch self {
-        case .administrative: return Self.dynamicColor(light: 0x18283B, dark: 0xB9CCE4)
-        case .building: return Self.dynamicColor(light: 0x33261E, dark: 0xD5C7B7)
-        case .plumbing: return Self.dynamicColor(light: 0x39220F, dark: 0xE2C29D)
-        case .fuelGas: return Self.dynamicColor(light: 0x24301A, dark: 0xB9C7A5)
+        case .monochrome: return Self.dynamicColor(light: 0x707078, dark: 0xD8D8DD)
+        case .administrative: return Self.dynamicColor(light: 0x69548E, dark: 0xD3C3F1)
+        case .building: return Self.dynamicColor(light: 0x1E6BA8, dark: 0x8FCBFF)
+        case .plumbing: return Self.dynamicColor(light: 0xC96A10, dark: 0xFFB067)
+        case .fuelGas: return Self.dynamicColor(light: 0x0E7490, dark: 0x67E8F9)
         case .electrical: return Self.dynamicColor(light: 0x1C2536, dark: 0xB8C3D9)
-        case .mechanical: return Self.dynamicColor(light: 0x35202A, dark: 0xD8B8C4)
+        case .mechanical: return Self.dynamicColor(light: 0xB83280, dark: 0xF472B6)
         case .energy: return Self.dynamicColor(light: 0x26243A, dark: 0xC3C1DB)
         case .fire: return Self.dynamicColor(light: 0x1F2F1A, dark: 0xBFD2B2)
         case .existingBuilding: return Self.dynamicColor(light: 0x2A2435, dark: 0xC9BED9)
@@ -676,12 +644,13 @@ private enum ChapterTilePalette {
 
     var appendixTitleColor: Color {
         switch self {
-        case .administrative: return Self.dynamicColor(light: 0x557FA8, dark: 0x87B2DC)
-        case .building: return Self.dynamicColor(light: 0x8E684B, dark: 0xC79E77)
-        case .plumbing: return Self.dynamicColor(light: 0xAE7432, dark: 0xD8A563)
-        case .fuelGas: return Self.dynamicColor(light: 0x6D8F45, dark: 0xA1C27B)
+        case .monochrome: return Self.dynamicColor(light: 0x3B3B40, dark: 0xF0F0F3)
+        case .administrative: return Self.dynamicColor(light: 0x34224E, dark: 0xF1E8FF)
+        case .building: return Self.dynamicColor(light: 0x123A5A, dark: 0xE5F4FF)
+        case .plumbing: return Self.dynamicColor(light: 0x5A3408, dark: 0xFFF0DC)
+        case .fuelGas: return Self.dynamicColor(light: 0x0F3F46, dark: 0xDFFBFF)
         case .electrical: return Self.dynamicColor(light: 0x5C6F9F, dark: 0x90A8D6)
-        case .mechanical: return Self.dynamicColor(light: 0x9A5E79, dark: 0xCB8EAA)
+        case .mechanical: return Self.dynamicColor(light: 0x5A183F, dark: 0xFFE5F2)
         case .energy: return Self.dynamicColor(light: 0x7468A8, dark: 0xA297D2)
         case .fire: return Self.dynamicColor(light: 0x618E4D, dark: 0x96C17E)
         case .existingBuilding: return Self.dynamicColor(light: 0x73639A, dark: 0xA695CB)
@@ -721,7 +690,6 @@ private extension View {
 
 private struct ChapterTile: View {
     let chapter: CodeChapter
-    let accent: Color
     let palette: ChapterTilePalette
     let kind: ChapterTileKind
 
@@ -975,7 +943,7 @@ private struct ChapterSectionsPreviewContainer: View {
                     title: "Loading Preview",
                     systemImage: "text.book.closed",
                     description: "The bundled code content is loading for the SwiftUI canvas.",
-                    accent: Color(uiColor: library.readerTheme.accentColor)
+                    accent: Color(uiColor: library.accentColor())
                 )
                 .padding(20)
             }

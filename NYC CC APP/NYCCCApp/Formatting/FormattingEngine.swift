@@ -147,13 +147,3 @@ final class FormattingEngine {
         return mutable
     }
 }
-
-private extension PlatformColor {
-    static var labelCompatible: PlatformColor {
-        #if canImport(UIKit)
-        return .label
-        #else
-        return .labelColor
-        #endif
-    }
-}

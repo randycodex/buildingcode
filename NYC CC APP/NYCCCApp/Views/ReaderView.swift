@@ -15,7 +15,7 @@ struct ReaderView: View {
     @FocusState private var isNotesFieldFocused: Bool
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor(for: detail?.codeSectionID))
     }
 
     var body: some View {
@@ -354,7 +354,7 @@ struct ReaderView: View {
         @State private var initialSection: CodeSectionSummary?
 
         private var accentColor: Color {
-            Color(uiColor: library.readerTheme.accentColor)
+            Color(uiColor: library.accentColor(for: chapter.codeSectionID))
         }
 
         var body: some View {

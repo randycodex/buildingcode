@@ -4,13 +4,18 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor())
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    Text("Settings")
+                        .font(.system(size: 32, weight: .bold, design: .default))
+                        .foregroundStyle(.primary)
+                        .padding(.bottom, 8)
+
                     CodeSurface(accent: accentColor, padding: 0) {
                         VStack(spacing: 0) {
                             jurisdictionPicker
@@ -61,8 +66,8 @@ struct SettingsView: View {
                 CodeTopContentFade()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
@@ -200,7 +205,7 @@ struct SettingsView: View {
     }
 
     private var accentPicker: some View {
-        Picker("Accent", selection: Binding(
+        Picker("Accent Color", selection: Binding(
             get: { library.readerTheme.accentPalette },
             set: { newValue in
                 var theme = library.readerTheme

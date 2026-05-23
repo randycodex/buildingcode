@@ -11,6 +11,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let readAccessURL: URL
     let targetAnchorID: String?
     let readerTheme: ReaderTheme
+    let accentHex: String
     let colorScheme: ColorScheme
     let bookmarkedAnchorIDs: Set<String>
     let bookmarkedSectionNumbers: Set<String>
@@ -58,6 +59,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         if context.coordinator.appliedTheme != readerTheme ||
+            context.coordinator.appliedAccentHex != accentHex ||
             context.coordinator.appliedColorScheme != colorScheme {
             context.coordinator.applyReaderScripts(to: webView)
         }
@@ -92,6 +94,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var pendingAnchorID: String?
         var lastScrolledAnchorID: String?
         var appliedTheme: ReaderTheme?
+        var appliedAccentHex: String?
         var appliedColorScheme: ColorScheme?
         var appliedBookmarkedAnchorIDs: Set<String> = []
         var appliedBookmarkedSectionNumbers: Set<String> = []
@@ -109,9 +112,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         func applyReaderScripts(to webView: WKWebView) {
             guard let parent else { return }
             appliedTheme = parent.readerTheme
+            appliedAccentHex = parent.accentHex
             appliedColorScheme = parent.colorScheme
 
-            let css = Self.readerCSS(theme: parent.readerTheme, colorScheme: parent.colorScheme)
+            let css = Self.readerCSS(
+                theme: parent.readerTheme,
+                colorScheme: parent.colorScheme,
+                accentHex: parent.accentHex
+            )
             let javascript = """
             (function() {
               document.querySelectorAll('link[rel="stylesheet"]').forEach(function(link) {
@@ -535,14 +543,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             )
         }
 
-        private static func readerCSS(theme: ReaderTheme, colorScheme: ColorScheme) -> String {
+        private static func readerCSS(theme: ReaderTheme, colorScheme: ColorScheme, accentHex: String) -> String {
             let isDark = colorScheme == .dark
             let textColor = isDark ? "#f5f5f7" : "#111111"
             let backgroundColor = isDark ? "#000000" : "#f2f2f7"
             let secondaryColor = isDark ? "#b5b5bc" : "#5d6168"
             let borderColor = isDark ? "#6f6f76" : "#c6c6cc"
             let softBorderColor = isDark ? "#4b4b50" : "#d8d8de"
-            let accentColor = theme.accentPalette == .monochrome && isDark ? "#f5f5f7" : theme.accentPalette.hexColor
             let bodyFontSize = max(theme.fontSize * 1.16, 12)
             let sectionHeadingSize = max(theme.fontSize * 1.08, 13)
             let subsectionHeadingSize = max(theme.fontSize * 1.0, 12)
@@ -714,7 +721,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               display: none !important;
             }
             .Section h6 {
-              color: \(accentColor) !important;
+              color: \(accentHex) !important;
               font-size: \(sectionHeadingSize)px !important;
               text-transform: uppercase;
               margin-top: 0 !important;
@@ -760,7 +767,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               top: 0 !important;
               width: 0.52rem !important;
               height: 0.72rem !important;
-              background: \(accentColor) !important;
+              background: \(accentHex) !important;
               clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%) !important;
               pointer-events: none !important;
             }
@@ -776,7 +783,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             span[style*="font-weight: bold"] { font-weight: 700 !important; }
             span[style*="font-style: italic"] { font-style: italic !important; }
-            a, .nyccc-link-text { color: \(accentColor) !important; text-decoration: none; }
+            a, .nyccc-link-text { color: \(accentHex) !important; text-decoration: none; }
             annotationdrawer, AnnotationDrawer, codeoptions, CodeOptions, .clearfix { display: none !important; }
             scrolltable, .xsl-table, .xsl-table--body {
               display: block;

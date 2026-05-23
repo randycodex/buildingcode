@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 #if canImport(UIKit)
 import UIKit
@@ -33,41 +34,17 @@ enum ReaderFontChoice: String, CaseIterable, Codable, Identifiable, Sendable {
 }
 
 enum ReaderAccentPalette: String, CaseIterable, Codable, Identifiable, Sendable {
+    case codeBased
     case monochrome
-    case civicBlue
-    case graphite
-    case forest
-    case brick
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
+        case .codeBased:
+            return "Code Based"
         case .monochrome:
             return "Black & White"
-        case .civicBlue:
-            return "Civic Blue"
-        case .graphite:
-            return "Graphite"
-        case .forest:
-            return "Forest"
-        case .brick:
-            return "Brick"
-        }
-    }
-
-    var hexColor: String {
-        switch self {
-        case .monochrome:
-            return "#111111"
-        case .civicBlue:
-            return "#1D4F91"
-        case .graphite:
-            return "#43464B"
-        case .forest:
-            return "#2E6B4C"
-        case .brick:
-            return "#914535"
         }
     }
 }
@@ -80,7 +57,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     var fontSize: Double = 17
     var lineSpacing: Double = 5
     var paragraphSpacing: Double = 9
-    var accentPalette: ReaderAccentPalette = .graphite
+    var accentPalette: ReaderAccentPalette = .codeBased
 
     static let `default` = ReaderTheme()
 
@@ -106,7 +83,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
         if accentPalette == .monochrome {
             return .labelCompatible
         }
-        return PlatformColor(hex: accentPalette.hexColor) ?? .systemBlueCompatible
+        return CodeSectionThemeProfile.building.accentColor
     }
 
     var highlightColor: PlatformColor {
@@ -119,6 +96,81 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
 
     var manualHighlightColor: PlatformColor {
         PlatformColor(hex: "#D4E2EF") ?? .systemBlueCompatible
+    }
+}
+
+enum CodeSectionThemeProfile: Sendable {
+    case building
+    case fuelGas
+    case administrative
+    case mechanical
+    case plumbing
+
+    init(codeSectionName: String?) {
+        let normalizedName = (codeSectionName ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+
+        switch normalizedName {
+        case let name where name.contains("FUEL GAS"):
+            self = .fuelGas
+        case let name where name.contains("GENERAL ADMIN"):
+            self = .administrative
+        case let name where name.contains("MECHANICAL"):
+            self = .mechanical
+        case let name where name.contains("PLUMBING"):
+            self = .plumbing
+        default:
+            self = .building
+        }
+    }
+
+    var lightAccentHex: String {
+        switch self {
+        case .building:
+            return "#C96410"
+        case .fuelGas:
+            return "#C62828"
+        case .administrative:
+            return "#7C3AED"
+        case .mechanical:
+            return "#2F8F4E"
+        case .plumbing:
+            return "#0891B2"
+        }
+    }
+
+    var darkAccentHex: String {
+        switch self {
+        case .building:
+            return "#FFB067"
+        case .fuelGas:
+            return "#FF7B7B"
+        case .administrative:
+            return "#C4A1FF"
+        case .mechanical:
+            return "#6EDC8C"
+        case .plumbing:
+            return "#67E8F9"
+        }
+    }
+
+    var accentColor: PlatformColor {
+        dynamicColor(light: lightAccentHex, dark: darkAccentHex)
+    }
+
+    func accentHex(for colorScheme: ColorScheme) -> String {
+        colorScheme == .dark ? darkAccentHex : lightAccentHex
+    }
+
+    private func dynamicColor(light: String, dark: String) -> PlatformColor {
+        #if canImport(UIKit)
+        return PlatformColor { trait in
+            PlatformColor(hex: trait.userInterfaceStyle == .dark ? dark : light) ?? .systemBlueCompatible
+        }
+        #else
+        return PlatformColor(hex: light) ?? .systemBlueCompatible
+        #endif
     }
 }
 
@@ -192,7 +244,7 @@ private extension PlatformFont {
     }
 }
 
-private extension PlatformColor {
+extension PlatformColor {
     static var systemBlueCompatible: PlatformColor {
         #if canImport(UIKit)
         return .systemBlue

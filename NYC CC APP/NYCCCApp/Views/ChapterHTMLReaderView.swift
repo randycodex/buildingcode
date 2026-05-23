@@ -21,7 +21,7 @@ struct ChapterHTMLReaderView: View {
     @State private var cachedHTMLStore: PublishedHTMLContentStore?
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
     private var htmlStore: PublishedHTMLContentStore {
@@ -194,7 +194,7 @@ struct ChapterHTMLReaderView: View {
             .overlay {
                 ProgressView()
                     .controlSize(.regular)
-                    .tint(Color(uiColor: library.readerTheme.accentColor))
+                    .tint(Color(uiColor: library.accentColor(for: chapter.codeSectionID)))
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 jumpBar
@@ -228,6 +228,7 @@ struct ChapterHTMLReaderView: View {
             readAccessURL: readAccessURL,
             targetAnchorID: targetAnchorID,
             readerTheme: library.readerTheme,
+            accentHex: library.accentHex(for: chapter.codeSectionID, colorScheme: colorScheme),
             colorScheme: colorScheme,
             bookmarkedAnchorIDs: bookmarkedAnchorIDs,
             bookmarkedSectionNumbers: bookmarkedSectionNumbers,

@@ -29,7 +29,7 @@ struct ChapterReaderView: View {
     private let indentStep: CGFloat = 26
 
     private var accentColor: Color {
-        Color(uiColor: library.readerTheme.accentColor)
+        Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
     private var currentJumpLabel: String {

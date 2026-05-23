@@ -16,14 +16,16 @@ struct NYCCCApp: App {
         let stacked = appearance.stackedLayoutAppearance
         stacked.normal.iconColor = UIColor.secondaryLabel
         stacked.normal.titleTextAttributes = [
-            .foregroundColor: UIColor.secondaryLabel,
+            .foregroundColor: UIColor.clear,
             .font: UIFont.preferredFont(forTextStyle: .caption2)
         ]
         stacked.selected.iconColor = UIColor.label
         stacked.selected.titleTextAttributes = [
-            .foregroundColor: UIColor.label,
+            .foregroundColor: UIColor.clear,
             .font: UIFont.preferredFont(forTextStyle: .caption2)
         ]
+        stacked.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 20)
+        stacked.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 20)
 
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
@@ -36,32 +38,32 @@ struct NYCCCApp: App {
                     BrowseView()
                         .tabItem {
                             Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                            Text("Browse")
+                            Text("")
                         }
                         .tag(AppTab.browse)
                     SearchView()
                         .tabItem {
                             Image(systemName: "sparkle.magnifyingglass")
-                            Text("Search")
+                            Text("")
                         }
                         .tag(AppTab.search)
 
                     BookmarksView()
                         .tabItem {
                             Image(systemName: selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
-                            Text("Saved")
+                            Text("")
                         }
                         .tag(AppTab.bookmarks)
 
                     SettingsView()
                         .tabItem {
                             Image(systemName: selectedTab == .settings ? "gearshape.fill" : "gearshape")
-                            Text("Settings")
+                            Text("")
                         }
                         .tag(AppTab.settings)
                 }
                 .environmentObject(library)
-                .tint(Color(uiColor: library.readerTheme.accentColor))
+                .tint(Color(uiColor: library.accentColor()))
 
                 if !library.isInitialContentLoaded {
                     loadingOverlay
@@ -80,7 +82,7 @@ struct NYCCCApp: App {
             VStack(spacing: 16) {
                 ProgressView()
                     .controlSize(.large)
-                    .tint(Color(uiColor: library.readerTheme.accentColor))
+                    .tint(Color(uiColor: library.accentColor()))
 
                 VStack(spacing: 4) {
                     Text("Loading chapters")
@@ -110,22 +112,22 @@ struct NYCCCApp: App {
         BrowseView()
             .tabItem {
                 Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                Text("Browse")
+                Text("")
             }
         SearchView()
             .tabItem {
                 Image(systemName: "sparkle.magnifyingglass")
-                Text("Search")
+                Text("")
             }
         BookmarksView()
             .tabItem {
                 Image(systemName: "bookmark")
-                Text("Saved")
+                Text("")
             }
         SettingsView()
             .tabItem {
                 Image(systemName: "gearshape")
-                Text("Settings")
+                Text("")
             }
     }
     .environmentObject(CodeLibraryViewModel())
