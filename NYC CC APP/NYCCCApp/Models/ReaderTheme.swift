@@ -54,8 +54,8 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     static let maximumFontSize: Double = 26
 
     var fontChoice: ReaderFontChoice = .sanFrancisco
-    var fontSize: Double = 17
-    var lineSpacing: Double = 5
+    var fontSize: Double = 12
+    var lineSpacing: Double = 2
     var paragraphSpacing: Double = 9
     var accentPalette: ReaderAccentPalette = .codeBased
 

@@ -5,6 +5,7 @@ struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var query = ""
     @State private var searchesAllCodeSections: Bool
+    @State private var scrollOffset: CGFloat = 0
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let searchesAllCodeSectionsDefaultsKey = "SearchView.searchesAllCodeSections"
@@ -12,6 +13,10 @@ struct SearchView: View {
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
+    }
+
+    private var collapseProgress: CGFloat {
+        min(max(-scrollOffset / 64, 0), 1)
     }
 
     init() {
@@ -23,11 +28,19 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
+                GeometryReader { proxy in
+                    Color.clear
+                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("searchScroll")).minY)
+                }
+                .frame(height: 0)
+
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Search")
                         .font(.system(size: 32, weight: .bold, design: .default))
                         .foregroundStyle(.primary)
                         .padding(.bottom, 8)
+                        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+                        .opacity(1 - (collapseProgress * 0.22))
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         recentSearchSection
@@ -67,7 +80,7 @@ struct SearchView: View {
                 dismissKeyboard()
             }
             .overlay(alignment: .top) {
-                CodeTopContentFade()
+                CodeTopContentFade(title: "Search", progress: collapseProgress)
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 10) {
@@ -109,6 +122,8 @@ struct SearchView: View {
                 )
             }
         }
+        .coordinateSpace(name: "searchScroll")
+        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
     private var bottomSearchDock: some View {
@@ -166,6 +181,10 @@ struct SearchView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .strokeBorder(Color(uiColor: .separator).opacity(0.55), lineWidth: 0.75)
         )
+        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .onTapGesture {
+            isSearchFieldFocused = true
+        }
         .accessibilityElement(children: .contain)
     }
 

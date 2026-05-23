@@ -4,9 +4,14 @@ struct BrowseView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Namespace private var chapterTileNamespace
+    @State private var scrollOffset: CGFloat = 0
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
+    }
+
+    private var collapseProgress: CGFloat {
+        min(max(-scrollOffset / 64, 0), 1)
     }
 
     var body: some View {
@@ -23,6 +28,12 @@ struct BrowseView: View {
                 } else {
                     VStack(alignment: .leading, spacing: 0) {
                         ScrollView {
+                            GeometryReader { proxy in
+                                Color.clear
+                                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("browseScroll")).minY)
+                            }
+                            .frame(height: 0)
+
                             libraryHeader
                                 .padding(.horizontal, 16)
                                 .padding(.top, 18)
@@ -93,7 +104,7 @@ struct BrowseView: View {
                             Spacer(minLength: 24)
                         }
                         .overlay(alignment: .top) {
-                            CodeTopContentFade()
+                            CodeTopContentFade(title: selectedCodeSectionName, progress: collapseProgress)
                         }
                     }
                 }
@@ -102,6 +113,8 @@ struct BrowseView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .coordinateSpace(name: "browseScroll")
+        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
     private var libraryHeader: some View {
@@ -112,6 +125,8 @@ struct BrowseView: View {
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
+                .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+                .opacity(1 - (collapseProgress * 0.22))
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(selectedVersionName)
@@ -761,9 +776,60 @@ struct CodeAppBackdrop: View {
     }
 }
 
+struct CodeScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 struct CodeTopContentFade: View {
+    let title: String?
+    let progress: CGFloat
+
+    init(title: String? = nil, progress: CGFloat = 0) {
+        self.title = title
+        self.progress = progress
+    }
+
     var body: some View {
-        EmptyView()
+        GeometryReader { proxy in
+            let topInset = proxy.safeAreaInsets.top
+
+            VStack(spacing: 0) {
+                ZStack(alignment: .bottomLeading) {
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .opacity(progress)
+
+                    LinearGradient(
+                        colors: [
+                            Color(uiColor: .systemGroupedBackground).opacity(0.97),
+                            Color(uiColor: .systemGroupedBackground).opacity(0.75 * progress),
+                            Color(uiColor: .systemGroupedBackground).opacity(0)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+
+                    if let title, !title.isEmpty {
+                        Text(title)
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 10)
+                            .opacity(progress)
+                    }
+                }
+                .frame(height: topInset + 50)
+
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, alignment: .top)
+            .allowsHitTesting(false)
+        }
     }
 }
 

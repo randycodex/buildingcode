@@ -448,7 +448,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 return lhs.result.chapterNumber.compare(rhs.result.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
             }
 
-        return hits.map(\.result)
+        return Array(hits.prefix(200).map(\.result))
     }
 
     func savedSections(

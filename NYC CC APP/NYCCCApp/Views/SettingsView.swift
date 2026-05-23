@@ -2,19 +2,32 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var scrollOffset: CGFloat = 0
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
     }
 
+    private var collapseProgress: CGFloat {
+        min(max(-scrollOffset / 64, 0), 1)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
+                GeometryReader { proxy in
+                    Color.clear
+                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("settingsScroll")).minY)
+                }
+                .frame(height: 0)
+
                 VStack(alignment: .leading, spacing: 20) {
                     Text("Settings")
                         .font(.system(size: 32, weight: .bold, design: .default))
                         .foregroundStyle(.primary)
                         .padding(.bottom, 8)
+                        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+                        .opacity(1 - (collapseProgress * 0.22))
 
                     CodeSurface(accent: accentColor, padding: 0) {
                         VStack(spacing: 0) {
@@ -63,12 +76,14 @@ struct SettingsView: View {
                 .padding(.bottom, 28)
             }
             .overlay(alignment: .top) {
-                CodeTopContentFade()
+                CodeTopContentFade(title: "Settings", progress: collapseProgress)
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .coordinateSpace(name: "settingsScroll")
+        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
     private var jurisdictionPicker: some View {

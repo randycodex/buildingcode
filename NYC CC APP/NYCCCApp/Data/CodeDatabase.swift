@@ -192,7 +192,8 @@ final class CodeDatabase: CodeReferenceLookup {
             JOIN sections ON sections.section_number = fts_paragraphs.section_number
             JOIN chapters ON chapters.id = sections.chapter_id
             WHERE fts_paragraphs MATCH ?
-            ORDER BY rank;
+            ORDER BY rank
+            LIMIT 200;
             """
         )
         defer { connection.finalize(statement) }
