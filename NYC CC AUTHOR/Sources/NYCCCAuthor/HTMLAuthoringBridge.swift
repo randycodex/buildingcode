@@ -35,7 +35,7 @@ enum HTMLAuthoringBridge {
         options: []
     )
     private static let sectionNumberRegex = try! NSRegularExpression(
-        pattern: #"^([A-Z]?\d+(?:\.\d+)+(?:\*|[A-Z])?)\b"#,
+        pattern: #"^(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.\d+)+(?:\*|[A-Z])?)\b"#,
         options: []
     )
     private static let appendixKPartRegex = try! NSRegularExpression(
@@ -256,6 +256,9 @@ enum HTMLAuthoringBridge {
         case "#--":
             return .section
         default:
+            if title.hasPrefix("§ ") {
+                return .section
+            }
             if title.uppercased().hasPrefix("SECTION BC ") {
                 return .section
             }
@@ -446,9 +449,12 @@ enum HTMLAuthoringBridge {
             withTemplate: ""
         )
 
-        return withoutTags
+        let decodedEntities = decodeNumericHTMLEntities(in: withoutTags)
+
+        return decodedEntities
             .replacingOccurrences(of: "&nbsp;", with: " ")
             .replacingOccurrences(of: "&#160;", with: " ")
+            .replacingOccurrences(of: "&sect;", with: "§")
             .replacingOccurrences(of: "&amp;", with: "&")
             .replacingOccurrences(of: "&lt;", with: "<")
             .replacingOccurrences(of: "&gt;", with: ">")
@@ -457,6 +463,34 @@ enum HTMLAuthoringBridge {
             .replacingOccurrences(of: "\u{00A0}", with: " ")
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func decodeNumericHTMLEntities(in text: String) -> String {
+        var decoded = text
+
+        if let hexRegex = try? NSRegularExpression(pattern: #"&#x([0-9A-Fa-f]+);"#) {
+            let nsText = decoded as NSString
+            let matches = hexRegex.matches(in: decoded, range: NSRange(location: 0, length: nsText.length)).reversed()
+            for match in matches {
+                let value = nsText.substring(with: match.range(at: 1))
+                guard let scalarValue = UInt32(value, radix: 16),
+                      let scalar = UnicodeScalar(scalarValue) else { continue }
+                decoded = (decoded as NSString).replacingCharacters(in: match.range, with: String(scalar))
+            }
+        }
+
+        if let decimalRegex = try? NSRegularExpression(pattern: #"&#([0-9]+);"#) {
+            let nsText = decoded as NSString
+            let matches = decimalRegex.matches(in: decoded, range: NSRange(location: 0, length: nsText.length)).reversed()
+            for match in matches {
+                let value = nsText.substring(with: match.range(at: 1))
+                guard let scalarValue = UInt32(value),
+                      let scalar = UnicodeScalar(scalarValue) else { continue }
+                decoded = (decoded as NSString).replacingCharacters(in: match.range, with: String(scalar))
+            }
+        }
+
+        return decoded
     }
 
     private static func nest(_ items: [OutlineItem]) -> [OutlineItem] {

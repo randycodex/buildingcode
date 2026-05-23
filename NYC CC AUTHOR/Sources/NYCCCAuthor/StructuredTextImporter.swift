@@ -122,7 +122,7 @@ enum StructuredTextImportError: LocalizedError {
 
 enum StructuredTextImporter {
     private static let sectionNumberRegex = try! NSRegularExpression(
-        pattern: #"^\s*[^A-Za-z0-9]*\s*([A-Z]?\d+(?:\.\d+[A-Za-z0-9.\-()*]*))(?:\s+.+)?$"#,
+        pattern: #"^\s*[^A-Za-z0-9]*\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.\d+[A-Za-z0-9.\-()*]*))(?:\s+.+)?$"#,
         options: []
     )
     private static let chapterDefinitionRegex = try! NSRegularExpression(
@@ -525,6 +525,35 @@ enum StructuredTextImporter {
                   let chapterTitle = currentChapterTitle else { return }
             let bodyLines = trimBlankLines(currentChapterBodyLines)
             let bodyText = bodyLines.map(\.rawText).joined(separator: "\n")
+            if currentGroups.isEmpty {
+                let chapterLabel = chapterNumber.rangeOfCharacter(from: .letters) == nil
+                    ? "Chapter \(chapterNumber)"
+                    : "Appendix \(chapterNumber)"
+                let titleLine = chapterTitle.localizedCaseInsensitiveContains(chapterLabel)
+                    ? chapterTitle
+                    : "\(chapterLabel): \(chapterTitle)"
+                currentGroups.append(
+                    StructuredHierarchyDocument.Group(
+                        headerLine: chapterLabel,
+                        headingLine: nil,
+                        headerAttributedText: nil,
+                        headingAttributedText: nil,
+                        bodyText: "",
+                        bodyAttributedText: nil,
+                        sections: [
+                            StructuredTextDocument.Section(
+                                sectionNumber: chapterNumber,
+                                titleLine: titleLine,
+                                bodyText: bodyText,
+                                attributedFullText: joinedAttributedLines(bodyLines),
+                                headerLine: chapterLabel,
+                                headingLine: nil,
+                                isFirstInGroup: true
+                            )
+                        ]
+                    )
+                )
+            }
 
             currentChapters.append(
                 StructuredHierarchyDocument.Chapter(

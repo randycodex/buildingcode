@@ -352,7 +352,7 @@ struct ContentView: View {
                     id: "chapter-sections",
                     title: "Chapter Sections"
                 ) {
-                    if viewModel.selectedDocumentID == nil {
+                    if viewModel.selectedDocumentID == nil || viewModel.visibleDocuments.contains(where: { $0.id == viewModel.selectedDocumentID }) == false {
                         Text("Select a chapter to see its titles.")
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 8)

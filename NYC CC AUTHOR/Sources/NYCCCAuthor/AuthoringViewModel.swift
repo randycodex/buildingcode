@@ -95,7 +95,8 @@ final class AuthoringViewModel: ObservableObject {
               let section = authoringProject.codeSections.first(where: { $0.id == selectedCodeSectionID }) else {
             return documents
         }
-        return documents.filter { documentCodeSectionName(for: $0) == section.name }
+        let selectedSectionName = normalizedCodeSectionName(section.name)
+        return documents.filter { normalizedCodeSectionName(documentCodeSectionName(for: $0)) == selectedSectionName }
     }
 
     var selectedHTMLContent: String {
@@ -142,6 +143,7 @@ final class AuthoringViewModel: ObservableObject {
         selectedDocumentID = documents.first(where: {
             $0.fileURL.standardizedFileURL == standardizedURLs.first
         })?.id
+        syncSelectedDocumentToCurrentCodeSection()
         selectedOutlineItemID = nil
         collapsedOutlineItemIDs = []
         preloadDocuments(at: standardizedURLs)
@@ -1577,6 +1579,12 @@ final class AuthoringViewModel: ObservableObject {
 
     private func documentCodeSectionName(for document: EditorDocument) -> String {
         document.codeSectionName ?? Self.inferredCodeSectionName(for: document.fileURL) ?? selectedCodeSectionName
+    }
+
+    private func normalizedCodeSectionName(_ name: String) -> String {
+        name
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 
     private func syncSelectedDocumentToCurrentCodeSection() {
