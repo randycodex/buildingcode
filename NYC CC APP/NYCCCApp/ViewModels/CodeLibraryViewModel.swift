@@ -739,11 +739,24 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
 
-        do {
-            searchResults = try codeDatabase?.search(query: trimmedQuery) ?? []
-        } catch {
-            statusMessage = error.localizedDescription
+        guard let databaseURL = selectedVersion?.fileURL else {
             searchResults = []
+            return
+        }
+
+        searchTask = Task {
+            do {
+                let results = try await Task.detached(priority: .userInitiated) {
+                    let database = try CodeDatabase(databaseURL: databaseURL, locator: BundleDatabaseLocator())
+                    return try database.search(query: trimmedQuery)
+                }.value
+                guard !Task.isCancelled else { return }
+                searchResults = results
+            } catch {
+                guard !Task.isCancelled else { return }
+                statusMessage = error.localizedDescription
+                searchResults = []
+            }
         }
     }
 

@@ -23,6 +23,12 @@ final class BundleDatabaseLocator {
         "nyc_code_sample.sqlite"
     ]
 
+    private let authoredScanExcludedDirectories: Set<String> = [
+        "assets",
+        "chapters",
+        "prepared"
+    ]
+
     func availableCodeVersions() -> [BundledCodeVersion] {
         if let cached = Self.loadCache() {
             return cached
@@ -162,7 +168,7 @@ final class BundleDatabaseLocator {
 
         let enumerator = FileManager.default.enumerator(
             at: authoredRootURL,
-            includingPropertiesForKeys: [.isRegularFileKey],
+            includingPropertiesForKeys: [.isDirectoryKey, .isRegularFileKey],
             options: [.skipsHiddenFiles]
         )
 
@@ -170,6 +176,11 @@ final class BundleDatabaseLocator {
         var seenDirectories: Set<String> = []
         while let item = enumerator?.nextObject() as? URL {
             let name = item.lastPathComponent
+            if authoredScanExcludedDirectories.contains(name),
+               (try? item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
+                enumerator?.skipDescendants()
+                continue
+            }
             guard name == "bundle.plist" || name == "bundle.json" else { continue }
             let directoryPath = item.deletingLastPathComponent().path
             // Prefer bundle.json when both are present; JSON is the current authored publish format.

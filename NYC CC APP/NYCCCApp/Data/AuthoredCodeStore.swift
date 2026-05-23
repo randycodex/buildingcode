@@ -90,6 +90,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let chapter: CodeChapter
         let group: CodeSectionGroup
         let section: Section
+    }
+
+    private struct SearchIndexEntry {
+        let indexed: IndexedSection
         let searchHaystack: String
     }
 
@@ -113,6 +117,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let sectionIndex: [Int64: IndexedSection]
     private let indexedSections: [IndexedSection]
     private let indexedSectionsByCodeSectionID: [Int64: [IndexedSection]]
+    private var indexedSearchSections: [SearchIndexEntry]?
+    private var indexedSearchSectionsByCodeSectionID: [Int64: [SearchIndexEntry]] = [:]
+    private let searchIndexLock = NSLock()
     private let codeSectionNameByID: [Int64: String]
     private let sectionsByChapterIDIndex: [Int64: [Section]]
     private let sectionNumberIndex: [String: CodeSectionSummary]
@@ -234,7 +241,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                             kind: section.kind
                         )
                         sectionNumberIndex[section.sectionNumber.uppercased()] = summary
-                        let haystack = "\(section.sectionNumber) \(section.title) \(section.officialText)".lowercased()
                         let indexed = IndexedSection(
                             chapter: chapterModel,
                             group: CodeSectionGroup(
@@ -243,8 +249,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                                 headingLine: group.headingLine,
                                 sections: []
                             ),
-                            section: section,
-                            searchHaystack: haystack
+                            section: section
                         )
                         sectionIndex[section.id] = indexed
                         indexedSections.append(indexed)
@@ -403,16 +408,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .split(whereSeparator: { $0.isWhitespace })
             .map(String.init)
 
-        let candidates: [IndexedSection]
-        if let codeSectionID {
-            candidates = indexedSectionsByCodeSectionID[codeSectionID] ?? []
-        } else {
-            candidates = indexedSections
-        }
+        let candidates = searchCandidates(codeSectionID: codeSectionID)
 
         let hits: [SearchHit] = candidates
-            .compactMap { (indexed: IndexedSection) -> SearchHit? in
-                guard queryTerms.allSatisfy({ indexed.searchHaystack.contains($0) }) else { return nil }
+            .compactMap { (entry: SearchIndexEntry) -> SearchHit? in
+                guard queryTerms.allSatisfy({ entry.searchHaystack.contains($0) }) else { return nil }
+                let indexed = entry.indexed
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
                 let rank: Int
@@ -449,6 +450,53 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
 
         return Array(hits.prefix(200).map(\.result))
+    }
+
+    private func searchCandidates(codeSectionID: Int64?) -> [SearchIndexEntry] {
+        if let codeSectionID {
+            searchIndexLock.lock()
+            if let cached = indexedSearchSectionsByCodeSectionID[codeSectionID] {
+                searchIndexLock.unlock()
+                return cached
+            }
+            searchIndexLock.unlock()
+
+            let entries = Self.buildSearchEntries(from: indexedSectionsByCodeSectionID[codeSectionID] ?? [])
+
+            searchIndexLock.lock()
+            if indexedSearchSectionsByCodeSectionID[codeSectionID] == nil {
+                indexedSearchSectionsByCodeSectionID[codeSectionID] = entries
+            }
+            let cached = indexedSearchSectionsByCodeSectionID[codeSectionID] ?? entries
+            searchIndexLock.unlock()
+            return cached
+        }
+
+        searchIndexLock.lock()
+        if let cached = indexedSearchSections {
+            searchIndexLock.unlock()
+            return cached
+        }
+        searchIndexLock.unlock()
+
+        let entries = Self.buildSearchEntries(from: indexedSections)
+
+        searchIndexLock.lock()
+        if indexedSearchSections == nil {
+            indexedSearchSections = entries
+        }
+        let cached = indexedSearchSections ?? entries
+        searchIndexLock.unlock()
+        return cached
+    }
+
+    private static func buildSearchEntries(from sections: [IndexedSection]) -> [SearchIndexEntry] {
+        sections.map { indexed in
+            SearchIndexEntry(
+                indexed: indexed,
+                searchHaystack: "\(indexed.section.sectionNumber) \(indexed.section.title) \(indexed.section.officialText)".lowercased()
+            )
+        }
     }
 
     func savedSections(

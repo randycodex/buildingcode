@@ -410,7 +410,7 @@ struct ChapterReaderView: View {
         var loadedBlocksByID = Dictionary(uniqueKeysWithValues: blocks.map { ($0.id, $0) })
         let remainingDescriptors = descriptors.filter { $0.sectionID != initialSectionID }
 
-        for batch in remainingDescriptors.chunked(into: 8) {
+        for batch in remainingDescriptors.chunked(into: 16) {
             let details = await library.loadSectionDetailsAsync(sectionIDs: batch.map(\.sectionID))
             let detailsByID = Dictionary(uniqueKeysWithValues: details.map { ($0.id, $0) })
 

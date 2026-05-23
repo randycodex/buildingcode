@@ -175,10 +175,6 @@ struct ChapterHTMLReaderView: View {
             guard hasActivatedHTMLReader else { return }
             await loadAnchors()
         }
-        .task(id: hasActivatedHTMLReader) {
-            guard hasActivatedHTMLReader else { return }
-            await loadAnchors()
-        }
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet
         }

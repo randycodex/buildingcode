@@ -34,9 +34,12 @@ final class PublishedHTMLContentStore {
     }
 
     private static var anchorCache: [String: [PublishedHTMLAnchor]] = [:]
+    private static var anchorCacheKeys: [String] = []
     private static let anchorCacheLock = NSLock()
     private static var inlineFeatureCache: [String: PublishedHTMLFeatureSet] = [:]
+    private static var inlineFeatureCacheKeys: [String] = []
     private static let inlineFeatureCacheLock = NSLock()
+    private static let metadataCacheLimit = 96
 
     private let rootURL: URL?
     private var chapterCache: [String: ChapterCache] = [:]
@@ -101,7 +104,7 @@ final class PublishedHTMLContentStore {
         let parsedAnchors = sortedAnchors(parseAnchors(in: html).values)
 
         anchorCacheLock.lock()
-        anchorCache[cacheKey] = parsedAnchors
+        storeAnchors(parsedAnchors, for: cacheKey)
         anchorCacheLock.unlock()
 
         return parsedAnchors
@@ -138,9 +141,33 @@ final class PublishedHTMLContentStore {
         }
 
         inlineFeatureCacheLock.lock()
-        inlineFeatureCache[key] = result
+        storeInlineFeatures(result, for: key)
         inlineFeatureCacheLock.unlock()
         return result
+    }
+
+    private static func storeAnchors(_ anchors: [PublishedHTMLAnchor], for key: String) {
+        anchorCache[key] = anchors
+        if let existingIndex = anchorCacheKeys.firstIndex(of: key) {
+            anchorCacheKeys.remove(at: existingIndex)
+        }
+        anchorCacheKeys.append(key)
+        while anchorCacheKeys.count > metadataCacheLimit {
+            let evictedKey = anchorCacheKeys.removeFirst()
+            anchorCache.removeValue(forKey: evictedKey)
+        }
+    }
+
+    private static func storeInlineFeatures(_ features: PublishedHTMLFeatureSet, for key: String) {
+        inlineFeatureCache[key] = features
+        if let existingIndex = inlineFeatureCacheKeys.firstIndex(of: key) {
+            inlineFeatureCacheKeys.remove(at: existingIndex)
+        }
+        inlineFeatureCacheKeys.append(key)
+        while inlineFeatureCacheKeys.count > metadataCacheLimit {
+            let evictedKey = inlineFeatureCacheKeys.removeFirst()
+            inlineFeatureCache.removeValue(forKey: evictedKey)
+        }
     }
 
     private func chapterCache(chapterNumber: String) -> ChapterCache? {

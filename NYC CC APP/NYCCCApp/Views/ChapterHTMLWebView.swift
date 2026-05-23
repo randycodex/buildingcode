@@ -362,6 +362,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               function reportVisibleAnchor() {
                 var anchorID = visibleAnchorID();
                 if (!anchorID) { return; }
+                if (window.__nycccLastVisibleAnchorID === anchorID) { return; }
+                window.__nycccLastVisibleAnchorID = anchorID;
                 try {
                   window.webkit.messageHandlers.\(Coordinator.visibleAnchorMessageName).postMessage(anchorID);
                 } catch (error) {}
@@ -407,7 +409,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
               window.removeEventListener('scroll', window.__nycccVisibleAnchorListener);
               window.__nycccVisibleAnchorListener = function() {
-                window.requestAnimationFrame(reportVisibleAnchor);
+                if (window.__nycccVisibleAnchorFramePending === true) { return; }
+                window.__nycccVisibleAnchorFramePending = true;
+                window.requestAnimationFrame(function() {
+                  window.__nycccVisibleAnchorFramePending = false;
+                  reportVisibleAnchor();
+                });
               };
               window.addEventListener('scroll', window.__nycccVisibleAnchorListener, { passive: true });
               setTimeout(reportVisibleAnchor, 0);
