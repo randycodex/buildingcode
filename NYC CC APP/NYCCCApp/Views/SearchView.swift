@@ -8,7 +8,7 @@ struct SearchView: View {
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let searchesAllCodeSectionsDefaultsKey = "SearchView.searchesAllCodeSections"
-    private let tabBarClearance: CGFloat = 152
+    private let tabBarClearance: CGFloat = 206
 
     private var accentColor: Color {
         Color(uiColor: library.readerTheme.accentColor)
@@ -24,8 +24,6 @@ struct SearchView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    searchScopeControl
-
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         recentSearchSection
                     } else if library.searchResults.isEmpty {
@@ -67,14 +65,13 @@ struct SearchView: View {
                 CodeTopContentFade()
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                HStack {
-                    Spacer(minLength: 0)
+                VStack(spacing: 10) {
+                    searchScopeControl
                     searchField
-                        .frame(maxWidth: 360)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
-                .padding(.bottom, 96)
+                .padding(.bottom, 78)
                 .background(Color.clear)
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())

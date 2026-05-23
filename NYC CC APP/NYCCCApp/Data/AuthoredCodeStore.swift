@@ -98,6 +98,13 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let result: CodeSearchResult
     }
 
+    private struct PreparedSectionContent: Decodable {
+        let schemaVersion: Int
+        let sectionID: Int64
+        let chapterNumber: String
+        let blocks: [CodeContentBlock]
+    }
+
     private let project: Project
     private let codeSectionsCache: [CodeSectionCategory]
     private let chaptersCache: [CodeChapter]
@@ -106,11 +113,16 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let sectionIndex: [Int64: IndexedSection]
     private let indexedSections: [IndexedSection]
     private let indexedSectionsByCodeSectionID: [Int64: [IndexedSection]]
+    private let codeSectionNameByID: [Int64: String]
     private let sectionsByChapterIDIndex: [Int64: [Section]]
     private let sectionNumberIndex: [String: CodeSectionSummary]
     private let chapterNumberIndex: [String: CodeChapter]
     private let tableBlocksByID: [String: CodeTableBlock]
     private let authoredHTMLChaptersURL: URL
+    private let preparedSectionsURL: URL
+    private var preparedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
+    private var missingPreparedSectionIDs: Set<Int64> = []
+    private let preparedContentLock = NSLock()
     private var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
     private var synthesizedChapterNumbers: Set<String> = []
     private let synthesizedContentLock = NSLock()
@@ -185,6 +197,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let authoredHTMLChaptersURL = jsonURL
             .deletingLastPathComponent()
             .appendingPathComponent("chapters", isDirectory: true)
+        let preparedSectionsURL = jsonURL
+            .deletingLastPathComponent()
+            .appendingPathComponent("prepared", isDirectory: true)
+            .appendingPathComponent("sections", isDirectory: true)
 
         for codeSection in visibleCodeSections.sorted(by: { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) == .orderedAscending }) {
             codeSections.append(
@@ -258,11 +274,13 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         self.sectionIndex = sectionIndex
         self.indexedSections = indexedSections
         self.indexedSectionsByCodeSectionID = indexedSectionsByCodeSectionID
+        self.codeSectionNameByID = Dictionary(uniqueKeysWithValues: codeSections.map { ($0.id, $0.name) })
         self.sectionsByChapterIDIndex = sectionsByChapterIDIndex
         self.sectionNumberIndex = sectionNumberIndex
         self.chapterNumberIndex = chapterNumberIndex
         self.tableBlocksByID = tableBlocksByID
         self.authoredHTMLChaptersURL = authoredHTMLChaptersURL
+        self.preparedSectionsURL = preparedSectionsURL
     }
 
     func chapters() -> [CodeChapter] {
@@ -288,9 +306,14 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     func sectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
         guard let indexed = sectionIndex[sectionID] else { return nil }
-        let contentBlocks = indexed.section.contentBlocks.isEmpty
-            ? synthesizedContentBlocks(for: indexed)
-            : indexed.section.contentBlocks
+        let contentBlocks: [CodeContentBlock]
+        if !indexed.section.contentBlocks.isEmpty {
+            contentBlocks = indexed.section.contentBlocks
+        } else if let preparedBlocks = preparedContentBlocks(sectionID: indexed.section.id) {
+            contentBlocks = preparedBlocks
+        } else {
+            contentBlocks = synthesizedContentBlocks(for: indexed)
+        }
         return ReaderSectionDetail(
             id: indexed.section.id,
             codeSectionID: indexed.chapter.codeSectionID,
@@ -313,6 +336,36 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         )
     }
 
+    private func preparedContentBlocks(sectionID: Int64) -> [CodeContentBlock]? {
+        preparedContentLock.lock()
+        if let cached = preparedContentBlocksBySectionID[sectionID] {
+            preparedContentLock.unlock()
+            return cached
+        }
+        if missingPreparedSectionIDs.contains(sectionID) {
+            preparedContentLock.unlock()
+            return nil
+        }
+        preparedContentLock.unlock()
+
+        let url = preparedSectionsURL.appendingPathComponent("\(sectionID).json", isDirectory: false)
+        guard let data = try? Data(contentsOf: url),
+              let prepared = try? JSONDecoder().decode(PreparedSectionContent.self, from: data),
+              prepared.schemaVersion == 1,
+              prepared.sectionID == sectionID,
+              !prepared.blocks.isEmpty else {
+            preparedContentLock.lock()
+            missingPreparedSectionIDs.insert(sectionID)
+            preparedContentLock.unlock()
+            return nil
+        }
+
+        preparedContentLock.lock()
+        preparedContentBlocksBySectionID[sectionID] = prepared.blocks
+        preparedContentLock.unlock()
+        return prepared.blocks
+    }
+
     private func synthesizedContentBlocks(for indexed: IndexedSection) -> [CodeContentBlock] {
         synthesizedContentLock.lock()
         if let cached = synthesizedContentBlocksBySectionID[indexed.section.id] {
@@ -329,6 +382,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let chapterSections = sectionsByChapterIDIndex[indexed.chapter.id] ?? []
         let chapterBlocks = Self.extractHTMLContentBlocks(
             chapterNumber: indexed.chapter.chapterNumber,
+            codeSectionName: indexed.chapter.codeSectionID.flatMap { codeSectionNameByID[$0] },
             sections: chapterSections,
             chaptersURL: authoredHTMLChaptersURL
         )
@@ -448,10 +502,17 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     private static func extractHTMLContentBlocks(
         chapterNumber: String,
+        codeSectionName: String?,
         sections: [Section],
         chaptersURL: URL
     ) -> [Int64: [CodeContentBlock]] {
-        let htmlURL = chaptersURL.appendingPathComponent("\(chapterNumber).html")
+        guard let htmlURL = chapterHTMLURL(
+            chapterNumber: chapterNumber,
+            codeSectionName: codeSectionName,
+            chaptersURL: chaptersURL
+        ) else {
+            return [:]
+        }
         guard let html = try? String(contentsOf: htmlURL, encoding: .utf8), !html.isEmpty else {
             return [:]
         }
@@ -478,6 +539,31 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
 
         return result
+    }
+
+    private static func chapterHTMLURL(
+        chapterNumber: String,
+        codeSectionName: String?,
+        chaptersURL: URL
+    ) -> URL? {
+        let fileName = "\(chapterNumber).html"
+        let flatURL = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
+        if FileManager.default.fileExists(atPath: flatURL.path) {
+            return flatURL
+        }
+
+        guard let codeSectionName else { return nil }
+        let sectionedURL = chaptersURL
+            .deletingLastPathComponent()
+            .appendingPathComponent("code-sections", isDirectory: true)
+            .appendingPathComponent(slug(codeSectionName), isDirectory: true)
+            .appendingPathComponent("chapters", isDirectory: true)
+            .appendingPathComponent(fileName, isDirectory: false)
+        if FileManager.default.fileExists(atPath: sectionedURL.path) {
+            return sectionedURL
+        }
+
+        return nil
     }
 
     private static func htmlHeadings(in html: String) -> [HTMLHeading] {
@@ -515,7 +601,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         var ordinal = 0
 
         while cursor < html.endIndex {
-            guard let tableStart = nextTableStart(in: html, from: cursor) else {
+            guard let richStart = nextRichBlockStart(in: html, from: cursor) else {
                 appendTextBlock(
                     html[cursor..<html.endIndex],
                     sectionID: sectionID,
@@ -526,32 +612,70 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
 
             appendTextBlock(
-                html[cursor..<tableStart],
+                html[cursor..<richStart],
                 sectionID: sectionID,
                 ordinal: &ordinal,
                 blocks: &blocks
             )
 
-            let tableEnd = matchingTableEnd(in: html, from: tableStart) ?? html.endIndex
-            let tableHTML = String(html[tableStart..<tableEnd]).trimmingCharacters(in: .whitespacesAndNewlines)
-            if !tableHTML.isEmpty {
-                ordinal += 1
-                blocks.append(
-                    CodeContentBlock(
-                        id: "\(sectionID)-table-\(ordinal)",
-                        kind: .table,
-                        html: tableHTML,
-                        tableID: nil,
-                        imageID: nil,
-                        caption: nil,
-                        plainText: nil
+            if isTableStart(in: html, at: richStart) {
+                let tableEnd = matchingTableEnd(in: html, from: richStart) ?? html.endIndex
+                let tableHTML = String(html[richStart..<tableEnd]).trimmingCharacters(in: .whitespacesAndNewlines)
+                if !tableHTML.isEmpty {
+                    ordinal += 1
+                    blocks.append(
+                        CodeContentBlock(
+                            id: "\(sectionID)-table-\(ordinal)",
+                            kind: .table,
+                            html: tableHTML,
+                            tableID: nil,
+                            imageID: nil,
+                            caption: nil,
+                            plainText: nil
+                        )
                     )
-                )
+                }
+                cursor = tableEnd
+            } else {
+                let imageEnd = matchingImageEnd(in: html, from: richStart) ?? html.index(after: richStart)
+                let imageHTML = String(html[richStart..<imageEnd]).trimmingCharacters(in: .whitespacesAndNewlines)
+                if let imageID = imageSourceID(in: imageHTML) {
+                    ordinal += 1
+                    blocks.append(
+                        CodeContentBlock(
+                            id: "\(sectionID)-image-\(ordinal)",
+                            kind: .image,
+                            html: imageHTML,
+                            tableID: nil,
+                            imageID: imageID,
+                            caption: nil,
+                            plainText: nil
+                        )
+                    )
+                } else {
+                    appendTextBlock(
+                        html[richStart..<imageEnd],
+                        sectionID: sectionID,
+                        ordinal: &ordinal,
+                        blocks: &blocks
+                    )
+                }
+                cursor = imageEnd
             }
-            cursor = tableEnd
         }
 
         return blocks
+    }
+
+    private static func nextRichBlockStart(in html: String, from cursor: String.Index) -> String.Index? {
+        [nextTableStart(in: html, from: cursor), nextImageStart(in: html, from: cursor)]
+            .compactMap { $0 }
+            .min()
+    }
+
+    private static func isTableStart(in html: String, at index: String.Index) -> Bool {
+        let lowercased = html[index...].lowercased()
+        return lowercased.hasPrefix("<scrolltable") || lowercased.hasPrefix("<table")
     }
 
     private static func nextTableStart(in html: String, from cursor: String.Index) -> String.Index? {
@@ -578,6 +702,41 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return range.upperBound
         }
         return nil
+    }
+
+    private static func nextImageStart(in html: String, from cursor: String.Index) -> String.Index? {
+        guard let imageRange = html.range(of: "<img", options: [.caseInsensitive], range: cursor..<html.endIndex) else {
+            return nil
+        }
+        if let spanRange = html.range(of: #"<span class="img""#, options: [.caseInsensitive], range: cursor..<imageRange.lowerBound) {
+            return spanRange.lowerBound
+        }
+        return imageRange.lowerBound
+    }
+
+    private static func matchingImageEnd(in html: String, from start: String.Index) -> String.Index? {
+        if html[start...].lowercased().hasPrefix("<span"),
+           let range = html.range(of: "</span>", options: [.caseInsensitive], range: start..<html.endIndex) {
+            return range.upperBound
+        }
+        return html.range(of: ">", range: start..<html.endIndex)?.upperBound
+    }
+
+    private static func imageSourceID(in html: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: #"(?i)\bsrc\s*=\s*"([^"]+)""#) else {
+            return nil
+        }
+        let nsHTML = html as NSString
+        guard let match = regex.firstMatch(in: html, range: NSRange(location: 0, length: nsHTML.length)),
+              match.numberOfRanges > 1 else {
+            return nil
+        }
+        let source = nsHTML.substring(with: match.range(at: 1))
+        return source
+            .split(separator: "/")
+            .last
+            .map(String.init)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func appendTextBlock(
@@ -645,6 +804,13 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: "."))
             .uppercased()
+    }
+
+    private static func slug(_ value: String) -> String {
+        value
+            .lowercased()
+            .replacingOccurrences(of: #"[^a-z0-9]+"#, with: "-", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
     }
 
     private static func sortChapters(_ lhs: Chapter, _ rhs: Chapter) -> Bool {
