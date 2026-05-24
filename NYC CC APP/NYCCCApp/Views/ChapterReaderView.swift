@@ -1,3 +1,4 @@
+import os.signpost
 import SwiftUI
 import UIKit
 
@@ -393,6 +394,10 @@ struct ChapterReaderView: View {
     }
 
     private func loadBlocks(with proxy: ScrollViewProxy) async {
+        let signpostID = OSSignpostID(log: AppSignpost.reader)
+        os_signpost(.begin, log: AppSignpost.reader, name: "loadBlocks", signpostID: signpostID, "%{public}@", chapter.chapterNumber)
+        defer { os_signpost(.end, log: AppSignpost.reader, name: "loadBlocks", signpostID: signpostID) }
+
         blocks = []
         pendingFocusedSectionID = nil
         focusedSectionUpdateTask?.cancel()

@@ -1,4 +1,5 @@
 import Foundation
+import os.signpost
 
 protocol CodeReferenceLookup {
     func chapter(chapterNumber: String) throws -> CodeChapter?
@@ -135,6 +136,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let synthesizedContentLock = NSLock()
 
     init(jsonURL: URL, codeID: Int64? = nil, jurisdictionID: Int64? = nil) throws {
+        let signpostID = OSSignpostID(log: AppSignpost.bundle)
+        os_signpost(.begin, log: AppSignpost.bundle, name: "bundleParse", signpostID: signpostID)
+        defer { os_signpost(.end, log: AppSignpost.bundle, name: "bundleParse", signpostID: signpostID) }
+
         let data = try Data(contentsOf: jsonURL)
         let decodedProject: Project
         if jsonURL.pathExtension.lowercased() == "plist" {
@@ -401,6 +406,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     }
 
     func search(query: String, codeSectionID: Int64? = nil) -> [CodeSearchResult] {
+        let signpostID = OSSignpostID(log: AppSignpost.search)
+        os_signpost(.begin, log: AppSignpost.search, name: "search", signpostID: signpostID)
+        defer { os_signpost(.end, log: AppSignpost.search, name: "search", signpostID: signpostID) }
+
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let lowercasedQuery = trimmed.lowercased()

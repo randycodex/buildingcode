@@ -1,4 +1,5 @@
 import Foundation
+import os.signpost
 import SwiftUI
 
 @MainActor
@@ -561,6 +562,10 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func chapterBodyNSTextAsync(for detail: ReaderSectionDetail) async -> NSAttributedString {
+        let signpostID = OSSignpostID(log: AppSignpost.reader)
+        os_signpost(.begin, log: AppSignpost.reader, name: "bodyText", signpostID: signpostID)
+        defer { os_signpost(.end, log: AppSignpost.reader, name: "bodyText", signpostID: signpostID) }
+
         let cacheKey = Self.formattedTextCacheKey(sectionID: detail.id, theme: readerTheme)
         if let cached = chapterBodyNSTextCache.object(forKey: cacheKey) {
             return cached

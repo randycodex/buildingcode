@@ -31,6 +31,7 @@
 		A1000000000000000000001B /* ChapterHTMLWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001B /* ChapterHTMLWebView.swift */; };
 		A1000000000000000000001C /* ChapterHTMLReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001C /* ChapterHTMLReaderView.swift */; };
 		A1000000000000000000001E /* CompareWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001E /* CompareWorkspaceView.swift */; };
+		A1000000000000000000001F /* Signposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001F /* Signposts.swift */; };
 		A10000000000000000000017 /* nyc_code_authored.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* nyc_code_authored.json */; };
 		A1000000000000000000001D /* CodeContent in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* CodeContent */; };
 /* End PBXBuildFile section */
@@ -61,6 +62,7 @@
 		A2000000000000000000001B /* ChapterHTMLWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLWebView.swift; sourceTree = "<group>"; };
 		A2000000000000000000001C /* ChapterHTMLReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLReaderView.swift; sourceTree = "<group>"; };
 		A2000000000000000000001E /* CompareWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareWorkspaceView.swift; sourceTree = "<group>"; };
+		A2000000000000000000001F /* Signposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signposts.swift; sourceTree = "<group>"; };
 		A2000000000000000000000F /* nyc_code_sample.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = nyc_code_sample.sqlite; sourceTree = "<group>"; };
 		A20000000000000000000010 /* Figures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Figures; sourceTree = "<group>"; };
 		A20000000000000000000011 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 			children = (
 				A20000000000000000000001 /* NYCCCApp.swift */,
 				A40000000000000000000004 /* Models */,
+				A4000000000000000000000A /* Diagnostics */,
 				A40000000000000000000005 /* Data */,
 				A40000000000000000000006 /* Formatting */,
 				A40000000000000000000007 /* ViewModels */,
@@ -108,6 +111,14 @@
 				A20000000000000000000000 /* NYCCCApp.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A4000000000000000000000A /* Diagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				A2000000000000000000001F /* Signposts.swift */,
+			);
+			path = Diagnostics;
 			sourceTree = "<group>";
 		};
 		A40000000000000000000004 /* Models */ = {
@@ -275,6 +286,7 @@
 				A1000000000000000000001E /* CompareWorkspaceView.swift in Sources */,
 				A10000000000000000000018 /* AttributedTextView.swift in Sources */,
 				A10000000000000000000019 /* ContentBlockView.swift in Sources */,
+				A1000000000000000000001F /* Signposts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
