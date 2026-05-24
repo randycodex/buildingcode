@@ -22,6 +22,7 @@ struct ChapterReaderView: View {
     @State private var hasActiveTextSelection = false
     @State private var isJumpPickerPresented = false
     @State private var pendingFocusedSectionID: Int64?
+    @State private var scrollPositionSectionID: Int64?
     @State private var focusedSectionUpdateTask: Task<Void, Never>?
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
@@ -62,11 +63,26 @@ struct ChapterReaderView: View {
             .padding(.horizontal, 20)
             .padding(.top, 28)
             .padding(.bottom, 8)
+            .scrollTargetLayout()
         }
+        .scrollPosition(id: $scrollPositionSectionID, anchor: .top)
         .contentShape(Rectangle())
         .coordinateSpace(name: chapterReaderCoordinateSpace)
         .onPreferenceChange(ChapterReaderBlockOffsetPreferenceKey.self) { offsets in
-            updateFocusedSection(from: offsets)
+            DispatchQueue.main.async {
+                updateFocusedSection(from: offsets)
+            }
+        }
+        .onChange(of: scrollPositionSectionID) { _, newValue in
+            guard let newValue else { return }
+            DispatchQueue.main.async {
+                if selectedJumpSectionID != newValue {
+                    selectedJumpSectionID = newValue
+                }
+                if rememberedSectionID.wrappedValue != newValue {
+                    rememberedSectionID.wrappedValue = newValue
+                }
+            }
         }
         .onTapGesture {
             guard hasActiveTextSelection else { return }
@@ -408,6 +424,7 @@ struct ChapterReaderView: View {
             prewarmedBodyText = [selectedDetail.id: selectedBodyText]
             blocks = [selectedBlock]
             selectedJumpSectionID = initialLoadSectionID
+            scrollPositionSectionID = initialLoadSectionID
             pendingScrollSectionID = initialLoadSectionID
             scrollIfNeeded(with: proxy, animated: false)
         }
@@ -448,6 +465,7 @@ struct ChapterReaderView: View {
 
     private func jumpToSection(id: Int64, with proxy: ScrollViewProxy) {
         selectedJumpSectionID = id
+        scrollPositionSectionID = id
         rememberedSectionID.wrappedValue = id
         pendingScrollSectionID = id
         scrollIfNeeded(with: proxy, animated: true)

@@ -45,11 +45,15 @@ struct BrowseView: View {
                         CodeTopContentFade(title: activeCodeSectionName, progress: collapseProgress)
                     }
                     .onChange(of: activeBrowseSide) { _, newValue in
-                        applyCodeSection(for: newValue)
+                        DispatchQueue.main.async {
+                            applyCodeSection(for: newValue)
+                        }
                     }
                     .onAppear {
                         seedBrowseSidesIfNeeded()
-                        applyCodeSection(for: activeBrowseSide)
+                        DispatchQueue.main.async {
+                            applyCodeSection(for: activeBrowseSide)
+                        }
                     }
                 }
             }
@@ -58,7 +62,11 @@ struct BrowseView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
         .coordinateSpace(name: "browseScroll")
-        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
+        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
+            DispatchQueue.main.async {
+                scrollOffset = newOffset
+            }
+        }
     }
 
     private func browsePage(for side: BrowseSide) -> some View {
@@ -156,6 +164,7 @@ struct BrowseView: View {
 
             Spacer(minLength: 44)
         }
+        .ignoresSafeArea(.container, edges: .bottom)
     }
 
     private func libraryHeader(for side: BrowseSide) -> some View {
@@ -275,10 +284,10 @@ struct BrowseView: View {
     private func updateCodeSection(_ id: Int64?, for side: BrowseSide) {
         if side == .left {
             leftCodeSectionID = id
-            UserDefaults.standard.set(id, forKey: Self.leftCodeSectionDefaultsKey)
+            UserDefaults.standard.set(id ?? -1, forKey: Self.leftCodeSectionDefaultsKey)
         } else {
             rightCodeSectionID = id
-            UserDefaults.standard.set(id, forKey: Self.rightCodeSectionDefaultsKey)
+            UserDefaults.standard.set(id ?? -1, forKey: Self.rightCodeSectionDefaultsKey)
         }
 
         if side == activeBrowseSide {
@@ -305,7 +314,8 @@ struct BrowseView: View {
 
     private func storedCodeSectionID(forKey key: String) -> Int64? {
         guard UserDefaults.standard.object(forKey: key) != nil else { return nil }
-        return Int64(UserDefaults.standard.integer(forKey: key))
+        let storedValue = UserDefaults.standard.integer(forKey: key)
+        return storedValue < 0 ? nil : Int64(storedValue)
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {
@@ -767,11 +777,15 @@ private struct ChapterSwipeLaunchView: View {
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
         .onChange(of: activeSide) { _, newValue in
-            library.updateSelectedCodeSection(id: codeSectionID(for: newValue))
+            DispatchQueue.main.async {
+                library.updateSelectedCodeSection(id: codeSectionID(for: newValue))
+            }
         }
         .onAppear {
             activeSide = initialSide
-            library.updateSelectedCodeSection(id: codeSectionID(for: initialSide))
+            DispatchQueue.main.async {
+                library.updateSelectedCodeSection(id: codeSectionID(for: initialSide))
+            }
         }
     }
 
@@ -809,9 +823,11 @@ private struct ChapterSidePage: View {
             }
         }
         .onChange(of: codeSectionID) { _, newValue in
-            UserDefaults.standard.set(newValue, forKey: side == .left ? "browseLeftCodeSectionID" : "browseRightCodeSectionID")
+            UserDefaults.standard.set(newValue ?? -1, forKey: side == .left ? "browseLeftCodeSectionID" : "browseRightCodeSectionID")
             if selectedChapter == nil {
-                library.updateSelectedCodeSection(id: newValue)
+                DispatchQueue.main.async {
+                    library.updateSelectedCodeSection(id: newValue)
+                }
             }
         }
     }
@@ -853,6 +869,7 @@ private struct ChapterSidePage: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 44)
         }
+        .ignoresSafeArea(.container, edges: .bottom)
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
