@@ -17,13 +17,6 @@ final class CodeLibraryViewModel: ObservableObject {
         var id: Int64 { sectionID }
     }
 
-    struct ChapterReaderBlockContent: Identifiable {
-        let detail: ReaderSectionDetail
-        let groupLabel: String?
-
-        var id: Int64 { detail.id }
-    }
-
     struct ChapterReaderBlockSummary: Identifiable, Hashable {
         let id: Int64
         let sectionNumber: String
@@ -535,16 +528,6 @@ final class CodeLibraryViewModel: ObservableObject {
 
         chapterBodyNSTextCache.setObject(renderedText, forKey: cacheKey)
         return renderedText
-    }
-
-    func chapterReaderBlock(
-        detail: ReaderSectionDetail,
-        groupLabel: String?
-    ) -> ChapterReaderBlockContent {
-        ChapterReaderBlockContent(
-            detail: detail,
-            groupLabel: groupLabel
-        )
     }
 
     func bodyNSText(for detail: ReaderSectionDetail) -> NSAttributedString {
