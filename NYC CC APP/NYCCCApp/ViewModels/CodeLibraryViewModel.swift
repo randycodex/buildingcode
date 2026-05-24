@@ -57,7 +57,11 @@ final class CodeLibraryViewModel: ObservableObject {
     private var lastChapterPreloadTask: Task<Void, Never>?
     private var sectionsCache: [Int64: [CodeSectionSummary]] = [:]
     private var sectionGroupsCache: [Int64: [CodeSectionGroup]] = [:]
-    private var sectionDetailCache: [Int64: ReaderSectionDetail] = [:]
+    private let sectionDetailCache: NSCache<NSNumber, CachedReaderSectionDetail> = {
+        let cache = NSCache<NSNumber, CachedReaderSectionDetail>()
+        cache.countLimit = 192
+        return cache
+    }()
     private let formattedNSTextCache: NSCache<NSString, NSAttributedString> = {
         let cache = NSCache<NSString, NSAttributedString>()
         cache.countLimit = 192
@@ -490,20 +494,20 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func loadSectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
-        if let cached = sectionDetailCache[sectionID] {
+        if let cached = cachedSectionDetail(for: sectionID) {
             return cached
         }
         if let authoredCodeStore {
             let detail = authoredCodeStore.sectionDetail(sectionID: sectionID)
             if let detail {
-                sectionDetailCache[sectionID] = detail
+                storeSectionDetailInCache(detail, sectionID: sectionID)
             }
             return detail
         }
         do {
             let detail = try codeDatabase?.sectionDetail(sectionID: sectionID)
             if let detail {
-                sectionDetailCache[sectionID] = detail
+                storeSectionDetailInCache(detail, sectionID: sectionID)
             }
             return detail
         } catch {
@@ -673,13 +677,13 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func loadSectionDetailAsync(sectionID: Int64) async -> ReaderSectionDetail? {
-        if let cached = sectionDetailCache[sectionID] {
+        if let cached = cachedSectionDetail(for: sectionID) {
             return cached
         }
         if let authoredCodeStore {
             let detail = authoredCodeStore.sectionDetail(sectionID: sectionID)
             if let detail {
-                sectionDetailCache[sectionID] = detail
+                storeSectionDetailInCache(detail, sectionID: sectionID)
             }
             return detail
         }
@@ -691,7 +695,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             let detail = try await sqliteChapterLoader.sectionDetail(sectionID: sectionID)
             if let detail {
-                sectionDetailCache[sectionID] = detail
+                storeSectionDetailInCache(detail, sectionID: sectionID)
             }
             return detail
         } catch {
@@ -732,7 +736,7 @@ final class CodeLibraryViewModel: ObservableObject {
         var missingIDs: [Int64] = []
 
         for sectionID in sectionIDs {
-            if let cached = sectionDetailCache[sectionID] {
+            if let cached = cachedSectionDetail(for: sectionID) {
                 orderedDetails[sectionID] = cached
             } else {
                 missingIDs.append(sectionID)
@@ -743,7 +747,7 @@ final class CodeLibraryViewModel: ObservableObject {
             do {
                 let loadedDetails = try await sqliteChapterLoader.sectionDetails(sectionIDs: missingIDs)
                 for detail in loadedDetails {
-                    sectionDetailCache[detail.id] = detail
+                    storeSectionDetailInCache(detail, sectionID: detail.id)
                     orderedDetails[detail.id] = detail
                 }
             } catch {
@@ -751,7 +755,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
         }
 
-        return sectionIDs.compactMap { orderedDetails[$0] ?? sectionDetailCache[$0] }
+        return sectionIDs.compactMap { orderedDetails[$0] ?? cachedSectionDetail(for: $0) }
     }
 
     func imageURL(fileName: String) -> URL? {
@@ -1490,10 +1494,18 @@ final class CodeLibraryViewModel: ObservableObject {
         return formattedText
     }
 
+    private func cachedSectionDetail(for sectionID: Int64) -> ReaderSectionDetail? {
+        sectionDetailCache.object(forKey: NSNumber(value: sectionID))?.detail
+    }
+
+    private func storeSectionDetailInCache(_ detail: ReaderSectionDetail, sectionID: Int64) {
+        sectionDetailCache.setObject(CachedReaderSectionDetail(detail), forKey: NSNumber(value: sectionID))
+    }
+
     private func clearCaches() {
         sectionsCache.removeAll()
         sectionGroupsCache.removeAll()
-        sectionDetailCache.removeAll()
+        sectionDetailCache.removeAllObjects()
         formattedNSTextCache.removeAllObjects()
         chapterBodyNSTextCache.removeAllObjects()
         bookmarkedSectionIDs.removeAll()
@@ -1543,6 +1555,14 @@ private actor SQLiteChapterLoader {
         try sectionIDs.compactMap { sectionID in
             try database.sectionDetail(sectionID: sectionID)
         }
+    }
+}
+
+private final class CachedReaderSectionDetail: NSObject {
+    let detail: ReaderSectionDetail
+
+    init(_ detail: ReaderSectionDetail) {
+        self.detail = detail
     }
 }
 
