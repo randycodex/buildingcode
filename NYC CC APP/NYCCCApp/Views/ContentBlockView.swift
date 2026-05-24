@@ -90,6 +90,10 @@ struct ContentBlockListView: View {
             return nil
         }
 
+        if let manifestURL = PublishedHTMLContentStore.resolvedImageURL(imageID: imageID, readAccessURL: readAccessURL) {
+            return manifestURL
+        }
+
         return ContentBlockImageURLCache.shared.resolvedURL(
             imageID: imageID,
             readAccessURL: readAccessURL,
@@ -237,19 +241,39 @@ private struct RawTableBlockView: View {
     }
 }
 
+private struct ImageDisplayWidthPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
 private struct ImageBlockView: View {
     let imageURL: URL
     let caption: String?
     let onOpenImage: ((UIImage) -> Void)?
 
     @State private var loadedImage: UIImage?
+    @State private var displayWidth: CGFloat?
+
+    private var inlineLoadID: String {
+        let bucket = displayWidth.map { ImageBlockCache.sizeBucket(forMaxPixelSize: $0 * UIScreen.main.scale * 2) } ?? 0
+        return "\(imageURL.path)|\(bucket)"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Group {
                 if let loadedImage {
                     Button {
-                        onOpenImage?(loadedImage)
+                        Task {
+                            if let fullImage = await ImageBlockCache.shared.loadFullImage(from: imageURL) {
+                                onOpenImage?(fullImage)
+                            } else {
+                                onOpenImage?(loadedImage)
+                            }
+                        }
                     } label: {
                         Image(uiImage: loadedImage)
                             .resizable()
@@ -268,6 +292,11 @@ private struct ImageBlockView: View {
                     .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
                 }
             }
+            .background {
+                GeometryReader { proxy in
+                    Color.clear.preference(key: ImageDisplayWidthPreferenceKey.self, value: proxy.size.width)
+                }
+            }
 
             if let caption, !caption.isEmpty {
                 Text(caption)
@@ -275,8 +304,13 @@ private struct ImageBlockView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .task(id: imageURL) {
-            if let cached = ImageBlockCache.shared.image(for: imageURL) {
+        .onPreferenceChange(ImageDisplayWidthPreferenceKey.self) { width in
+            guard width > 0 else { return }
+            displayWidth = width
+        }
+        .task(id: inlineLoadID) {
+            let bucket = displayWidth.map { ImageBlockCache.sizeBucket(forMaxPixelSize: $0 * UIScreen.main.scale * 2) }
+            if let bucket, let cached = ImageBlockCache.shared.inlineImage(for: imageURL, sizeBucket: bucket) {
                 loadedImage = cached
                 return
             }
@@ -284,8 +318,21 @@ private struct ImageBlockView: View {
             let data = await Task.detached(priority: .utility) {
                 try? Data(contentsOf: imageURL, options: [.mappedIfSafe])
             }.value
-            guard let data, let image = UIImage(data: data) else { return }
-            ImageBlockCache.shared.setImage(image, for: imageURL)
+            guard let data else { return }
+
+            let image: UIImage?
+            if let bucket {
+                image = await Task.detached(priority: .utility) {
+                    ImageBlockCache.downsampledImage(data: data, maxPixelSize: bucket)
+                }.value
+            } else {
+                image = UIImage(data: data)
+            }
+
+            guard let image else { return }
+            if let bucket {
+                ImageBlockCache.shared.setInlineImage(image, for: imageURL, sizeBucket: bucket)
+            }
             loadedImage = image
         }
     }
@@ -300,12 +347,59 @@ private final class ImageBlockCache {
         cache.countLimit = 64
     }
 
-    func image(for url: URL) -> UIImage? {
-        cache.object(forKey: url.path as NSString)
+    static func sizeBucket(forMaxPixelSize maxPixelSize: CGFloat) -> Int {
+        let bucket = Int((maxPixelSize / 256).rounded()) * 256
+        return max(256, bucket)
     }
 
-    func setImage(_ image: UIImage, for url: URL) {
-        cache.setObject(image, forKey: url.path as NSString)
+    static func downsampledImage(data: Data, maxPixelSize: Int) -> UIImage? {
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceThumbnailMaxPixelSize: max(1, maxPixelSize),
+            kCGImageSourceCreateThumbnailWithTransform: true
+        ]
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
+            return UIImage(data: data)
+        }
+        return UIImage(cgImage: cgImage)
+    }
+
+    func inlineImage(for url: URL, sizeBucket: Int) -> UIImage? {
+        cache.object(forKey: inlineCacheKey(url: url, sizeBucket: sizeBucket))
+    }
+
+    func setInlineImage(_ image: UIImage, for url: URL, sizeBucket: Int) {
+        cache.setObject(image, forKey: inlineCacheKey(url: url, sizeBucket: sizeBucket))
+    }
+
+    func fullImage(for url: URL) -> UIImage? {
+        cache.object(forKey: fullCacheKey(url: url))
+    }
+
+    func setFullImage(_ image: UIImage, for url: URL) {
+        cache.setObject(image, forKey: fullCacheKey(url: url))
+    }
+
+    func loadFullImage(from url: URL) async -> UIImage? {
+        if let cached = fullImage(for: url) {
+            return cached
+        }
+
+        let data = await Task.detached(priority: .userInitiated) {
+            try? Data(contentsOf: url, options: [.mappedIfSafe])
+        }.value
+        guard let data, let image = UIImage(data: data) else { return nil }
+        setFullImage(image, for: url)
+        return image
+    }
+
+    private func inlineCacheKey(url: URL, sizeBucket: Int) -> NSString {
+        "\(url.path)|\(sizeBucket)" as NSString
+    }
+
+    private func fullCacheKey(url: URL) -> NSString {
+        "\(url.path)|full" as NSString
     }
 }
 

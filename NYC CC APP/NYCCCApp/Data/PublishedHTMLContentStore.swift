@@ -79,6 +79,42 @@ final class PublishedHTMLContentStore {
         rootURL
     }
 
+    private struct ImageManifestFile: Decodable {
+        let schemaVersion: Int
+        let items: [String: String]
+    }
+
+    private static var imageManifestItems: [String: String]?
+    private static var imageManifestReadAccessURL: URL?
+    private static let imageManifestLock = NSLock()
+
+    static func resolvedImageURL(imageID: String, readAccessURL: URL) -> URL? {
+        let trimmed = imageID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        imageManifestLock.lock()
+        if imageManifestReadAccessURL != readAccessURL {
+            imageManifestItems = loadImageManifest(readAccessURL: readAccessURL)
+            imageManifestReadAccessURL = readAccessURL
+        }
+        let items = imageManifestItems
+        imageManifestLock.unlock()
+
+        guard let items else { return nil }
+        let baseName = (trimmed as NSString).deletingPathExtension
+        guard let relativePath = items[trimmed] ?? items[baseName] else { return nil }
+        return readAccessURL.appendingPathComponent(relativePath)
+    }
+
+    private static func loadImageManifest(readAccessURL: URL) -> [String: String]? {
+        let manifestURL = readAccessURL
+            .appendingPathComponent("prepared", isDirectory: true)
+            .appendingPathComponent("images.json", isDirectory: false)
+        guard let data = try? Data(contentsOf: manifestURL) else { return nil }
+        guard let manifest = try? JSONDecoder().decode(ImageManifestFile.self, from: data) else { return nil }
+        return manifest.items
+    }
+
     func anchor(chapterNumber: String, sectionNumber: String) -> PublishedHTMLAnchor? {
         guard let cache = chapterCache(chapterNumber: chapterNumber) else { return nil }
         return cache.anchorsBySectionNumber[Self.normalizedSectionKey(sectionNumber)]
