@@ -38,6 +38,145 @@ struct CodeTableBlock: Identifiable, Codable, Hashable, Sendable {
     let rowHeights: [Double?]?
     let cells: [CodeTableCell]
     let footnotes: [String]
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case caption
+        case sourceWorkbookPath
+        case sourceSheetName
+        case sourceRange
+        case columnCount
+        case rowCount
+        case columnWidths
+        case rowHeights
+        case cells
+        case footnotes
+        case sheet
+        case range
+        case rows
+    }
+
+    private struct LegacyRow: Decodable {
+        let cells: [LegacyCell]
+    }
+
+    private struct LegacyCell: Decodable {
+        let text: String
+        let columnSpan: Int
+        let rowSpan: Int
+        let isPlaceholder: Bool
+    }
+
+    init(
+        id: String,
+        caption: String?,
+        sourceWorkbookPath: String?,
+        sourceSheetName: String?,
+        sourceRange: String?,
+        columnCount: Int,
+        rowCount: Int,
+        columnWidths: [Double?]?,
+        rowHeights: [Double?]?,
+        cells: [CodeTableCell],
+        footnotes: [String]
+    ) {
+        self.id = id
+        self.caption = caption
+        self.sourceWorkbookPath = sourceWorkbookPath
+        self.sourceSheetName = sourceSheetName
+        self.sourceRange = sourceRange
+        self.columnCount = columnCount
+        self.rowCount = rowCount
+        self.columnWidths = columnWidths
+        self.rowHeights = rowHeights
+        self.cells = cells
+        self.footnotes = footnotes
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        caption = try container.decodeIfPresent(String.self, forKey: .caption)
+        sourceWorkbookPath = try container.decodeIfPresent(String.self, forKey: .sourceWorkbookPath)
+        sourceSheetName = try container.decodeIfPresent(String.self, forKey: .sourceSheetName)
+            ?? container.decodeIfPresent(String.self, forKey: .sheet)
+        sourceRange = try container.decodeIfPresent(String.self, forKey: .sourceRange)
+            ?? container.decodeIfPresent(String.self, forKey: .range)
+        columnWidths = try container.decodeIfPresent([Double?].self, forKey: .columnWidths)
+        rowHeights = try container.decodeIfPresent([Double?].self, forKey: .rowHeights)
+        footnotes = try container.decodeIfPresent([String].self, forKey: .footnotes) ?? []
+
+        if let decodedCells = try container.decodeIfPresent([CodeTableCell].self, forKey: .cells) {
+            cells = decodedCells
+            columnCount = try container.decodeIfPresent(Int.self, forKey: .columnCount)
+                ?? ((decodedCells.map { $0.column + max($0.columnSpan, 1) }.max()) ?? 0)
+            rowCount = try container.decodeIfPresent(Int.self, forKey: .rowCount)
+                ?? ((decodedCells.map { $0.row + max($0.rowSpan, 1) }.max()) ?? 0)
+            return
+        }
+
+        let legacyRows = try container.decodeIfPresent([LegacyRow].self, forKey: .rows) ?? []
+        rowCount = legacyRows.count
+        columnCount = legacyRows.map { row in
+            row.cells.reduce(0) { total, cell in
+                cell.isPlaceholder ? total : total + max(cell.columnSpan, 1)
+            }
+        }.max() ?? 0
+
+        var convertedCells: [CodeTableCell] = []
+        for (rowIndex, row) in legacyRows.enumerated() {
+            var columnIndex = 0
+            for legacyCell in row.cells {
+                defer { columnIndex += max(legacyCell.columnSpan, 1) }
+                guard !legacyCell.isPlaceholder else { continue }
+                convertedCells.append(
+                    CodeTableCell(
+                        row: rowIndex,
+                        column: columnIndex,
+                        rowSpan: max(legacyCell.rowSpan, 1),
+                        columnSpan: max(legacyCell.columnSpan, 1),
+                        html: Self.escapedHTML(legacyCell.text),
+                        plainText: legacyCell.text,
+                        borders: CodeTableCellBorders.visibleGrid,
+                        horizontalAlignment: nil,
+                        verticalAlignment: nil,
+                        backgroundColorHex: nil,
+                        textColorHex: nil,
+                        isBold: nil,
+                        isItalic: nil,
+                        fontSize: nil,
+                        isWrapped: nil
+                    )
+                )
+            }
+        }
+        cells = convertedCells
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encodeIfPresent(caption, forKey: .caption)
+        try container.encodeIfPresent(sourceWorkbookPath, forKey: .sourceWorkbookPath)
+        try container.encodeIfPresent(sourceSheetName, forKey: .sourceSheetName)
+        try container.encodeIfPresent(sourceRange, forKey: .sourceRange)
+        try container.encode(columnCount, forKey: .columnCount)
+        try container.encode(rowCount, forKey: .rowCount)
+        try container.encodeIfPresent(columnWidths, forKey: .columnWidths)
+        try container.encodeIfPresent(rowHeights, forKey: .rowHeights)
+        try container.encode(cells, forKey: .cells)
+        try container.encode(footnotes, forKey: .footnotes)
+    }
+
+    private static func escapedHTML(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+            .replacingOccurrences(of: "'", with: "&#39;")
+            .replacingOccurrences(of: "\n", with: "<br>")
+    }
 }
 
 struct CodeTableCell: Identifiable, Codable, Hashable, Sendable {
@@ -58,6 +197,40 @@ struct CodeTableCell: Identifiable, Codable, Hashable, Sendable {
     let isWrapped: Bool?
 
     var id: String { "\(row)-\(column)" }
+
+    init(
+        row: Int,
+        column: Int,
+        rowSpan: Int,
+        columnSpan: Int,
+        html: String,
+        plainText: String,
+        borders: CodeTableCellBorders,
+        horizontalAlignment: String?,
+        verticalAlignment: String?,
+        backgroundColorHex: String?,
+        textColorHex: String?,
+        isBold: Bool?,
+        isItalic: Bool?,
+        fontSize: Double?,
+        isWrapped: Bool?
+    ) {
+        self.row = row
+        self.column = column
+        self.rowSpan = rowSpan
+        self.columnSpan = columnSpan
+        self.html = html
+        self.plainText = plainText
+        self.borders = borders
+        self.horizontalAlignment = horizontalAlignment
+        self.verticalAlignment = verticalAlignment
+        self.backgroundColorHex = backgroundColorHex
+        self.textColorHex = textColorHex
+        self.isBold = isBold
+        self.isItalic = isItalic
+        self.fontSize = fontSize
+        self.isWrapped = isWrapped
+    }
 }
 
 struct CodeTableCellBorders: Codable, Hashable, Sendable {
@@ -76,6 +249,11 @@ struct CodeTableCellBorders: Codable, Hashable, Sendable {
         self.right = right
         self.top = top
         self.bottom = bottom
+    }
+
+    static var visibleGrid: CodeTableCellBorders {
+        let border = CodeTableBorder(isHidden: false, width: 1, colorHex: nil, style: "solid")
+        return CodeTableCellBorders(left: border, right: border, top: border, bottom: border)
     }
 }
 
@@ -177,11 +355,80 @@ struct CodeSectionGroup: Identifiable, Hashable, Sendable {
     let headingLine: String?
     let sections: [CodeSectionSummary]
 
+    func displayLabel(codeSectionName: String?) -> String {
+        CodeSectionHeaderFormatting.groupDisplayLabel(
+            headerLine: headerLine,
+            headingLine: headingLine,
+            codeSectionName: codeSectionName
+        )
+    }
+
     var displayLabel: String {
-        if let headingLine, !headingLine.isEmpty {
-            return "\(headerLine) - \(headingLine)"
+        displayLabel(codeSectionName: nil)
+    }
+}
+
+enum CodeSectionHeaderFormatting {
+    private static let knownPrefixes = ["BC", "FGC", "MC", "PC"]
+
+    private static func defaultPrefix(for codeSectionName: String?) -> String {
+        let name = (codeSectionName ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+
+        if name.contains("FUEL GAS") {
+            return "FGC"
         }
-        return headerLine
+        if name.contains("MECHANICAL") {
+            return "MC"
+        }
+        if name.contains("PLUMBING") {
+            return "PC"
+        }
+        return "BC"
+    }
+
+    /// Normalizes group headers to the correct code-book prefix (BC, FGC, MC, PC).
+    static func normalizedHeaderLine(_ headerLine: String, codeSectionName: String?) -> String {
+        let trimmed = headerLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return trimmed }
+
+        let upper = trimmed.uppercased()
+        if upper.hasPrefix("APPENDIX") {
+            return trimmed
+        }
+        guard upper.hasPrefix("SECTION ") else {
+            return trimmed
+        }
+
+        let suffix = trimmed.dropFirst("SECTION ".count).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !suffix.isEmpty else { return trimmed }
+
+        let upperSuffix = suffix.uppercased()
+        for prefix in knownPrefixes {
+            if upperSuffix.hasPrefix("\(prefix) ") {
+                let expected = defaultPrefix(for: codeSectionName)
+                if prefix == expected {
+                    return trimmed
+                }
+                let remainder = suffix.dropFirst(prefix.count + 1).trimmingCharacters(in: .whitespacesAndNewlines)
+                return "SECTION \(expected) \(remainder)"
+            }
+        }
+
+        if suffix.contains(".") {
+            return trimmed
+        }
+
+        return "SECTION \(defaultPrefix(for: codeSectionName)) \(suffix)"
+    }
+
+    static func groupDisplayLabel(headerLine: String, headingLine: String?, codeSectionName: String?) -> String {
+        let normalizedHeader = normalizedHeaderLine(headerLine, codeSectionName: codeSectionName)
+        if let headingLine, !headingLine.isEmpty {
+            return "\(normalizedHeader) - \(headingLine)"
+        }
+        return normalizedHeader
     }
 }
 

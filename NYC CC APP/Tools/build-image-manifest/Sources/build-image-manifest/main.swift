@@ -41,7 +41,7 @@ func scan(directory: URL, relativePrefix: String) {
 
         let relativePath: String
         if relativePrefix.isEmpty {
-            relativePath = fileURL.lastPathComponent
+            relativePath = fileURL.path.replacingOccurrences(of: bundleRoot.path + "/", with: "")
         } else {
             let subpath = fileURL.path.replacingOccurrences(of: directory.path + "/", with: "")
             relativePath = "\(relativePrefix)/\(subpath)"

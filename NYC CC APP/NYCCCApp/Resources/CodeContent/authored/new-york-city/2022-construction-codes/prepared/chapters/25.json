@@ -1,533 +1,531 @@
 {
-  "chapterID" : 25,
-  "chapterNumber" : "25",
-  "groups" : [
+  "chapterID": 25,
+  "chapterNumber": "25",
+  "groups": [
     {
-      "headerLine" : "SECTION 2501",
-      "headingLine" : "GENERAL",
-      "id" : "SECTION 2501",
-      "sections" : [
+      "headerLine": "SECTION BC 2501",
+      "headingLine": "GENERAL",
+      "id": "SECTION BC 2501",
+      "sections": [
         {
-          "id" : 5162,
-          "kind" : "title",
-          "sectionNumber" : "2501.1",
-          "title" : "2501.1 Scope."
+          "id": 5162,
+          "kind": "title",
+          "sectionNumber": "2501.1",
+          "title": "2501.1 Scope."
         },
         {
-          "id" : 5163,
-          "kind" : "title",
-          "sectionNumber" : "2501.2",
-          "title" : "2501.2 Performance."
+          "id": 5163,
+          "kind": "title",
+          "sectionNumber": "2501.2",
+          "title": "2501.2 Performance."
         },
         {
-          "id" : 5164,
-          "kind" : "title",
-          "sectionNumber" : "2501.3",
-          "title" : "2501.3 Other materials."
+          "id": 5164,
+          "kind": "title",
+          "sectionNumber": "2501.3",
+          "title": "2501.3 Other materials."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2502",
-      "headingLine" : "DEFINITIONS",
-      "id" : "SECTION 2502",
-      "sections" : [
+      "headerLine": "SECTION BC 2502",
+      "headingLine": "DEFINITIONS",
+      "id": "SECTION BC 2502",
+      "sections": [
         {
-          "id" : 5165,
-          "kind" : "title",
-          "sectionNumber" : "2502.1",
-          "title" : "2502.1 Definitions."
+          "id": 5165,
+          "kind": "title",
+          "sectionNumber": "2502.1",
+          "title": "2502.1 Definitions."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2503",
-      "headingLine" : "RESERVED",
-      "id" : "SECTION 2503",
-      "sections" : [
-
-      ]
+      "headerLine": "SECTION BC 2503",
+      "headingLine": "RESERVED",
+      "id": "SECTION BC 2503",
+      "sections": []
     },
     {
-      "headerLine" : "SECTION 2504",
-      "headingLine" : "VERTICAL AND HORIZONTAL ASSEMBLIES",
-      "id" : "SECTION 2504",
-      "sections" : [
+      "headerLine": "SECTION BC 2504",
+      "headingLine": "VERTICAL AND HORIZONTAL ASSEMBLIES",
+      "id": "SECTION BC 2504",
+      "sections": [
         {
-          "id" : 5166,
-          "kind" : "title",
-          "sectionNumber" : "2504.1",
-          "title" : "2504.1 Scope."
+          "id": 5166,
+          "kind": "title",
+          "sectionNumber": "2504.1",
+          "title": "2504.1 Scope."
         },
         {
-          "id" : 5167,
-          "kind" : "title",
-          "sectionNumber" : "2504.1.1",
-          "title" : "2504.1.1 Wood framing."
+          "id": 5167,
+          "kind": "title",
+          "sectionNumber": "2504.1.1",
+          "title": "2504.1.1 Wood framing."
         },
         {
-          "id" : 5168,
-          "kind" : "title",
-          "sectionNumber" : "2504.1.2",
-          "title" : "2504.1.2 Studless partitions."
+          "id": 5168,
+          "kind": "title",
+          "sectionNumber": "2504.1.2",
+          "title": "2504.1.2 Studless partitions."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2505",
-      "headingLine" : "SHEAR WALL CONSTRUCTION",
-      "id" : "SECTION 2505",
-      "sections" : [
+      "headerLine": "SECTION BC 2505",
+      "headingLine": "SHEAR WALL CONSTRUCTION",
+      "id": "SECTION BC 2505",
+      "sections": [
         {
-          "id" : 5169,
-          "kind" : "title",
-          "sectionNumber" : "2505.1",
-          "title" : "2505.1 Resistance to shear (wood framing)."
+          "id": 5169,
+          "kind": "title",
+          "sectionNumber": "2505.1",
+          "title": "2505.1 Resistance to shear (wood framing)."
         },
         {
-          "id" : 5170,
-          "kind" : "title",
-          "sectionNumber" : "2505.2",
-          "title" : "2505.2 Resistance to shear (steel framing)."
+          "id": 5170,
+          "kind": "title",
+          "sectionNumber": "2505.2",
+          "title": "2505.2 Resistance to shear (steel framing)."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2506",
-      "headingLine" : "GYPSUM BOARD AND GYPSUM PANEL PRODUCT MATERIALS",
-      "id" : "SECTION 2506",
-      "sections" : [
+      "headerLine": "SECTION BC 2506",
+      "headingLine": "GYPSUM BOARD AND GYPSUM PANEL PRODUCT MATERIALS",
+      "id": "SECTION BC 2506",
+      "sections": [
         {
-          "id" : 5171,
-          "kind" : "title",
-          "sectionNumber" : "2506.1",
-          "title" : "2506.1 General."
+          "id": 5171,
+          "kind": "title",
+          "sectionNumber": "2506.1",
+          "title": "2506.1 General."
         },
         {
-          "id" : 5172,
-          "kind" : "title",
-          "sectionNumber" : "2506.2",
-          "title" : "2506.2 Standards."
+          "id": 5172,
+          "kind": "title",
+          "sectionNumber": "2506.2",
+          "title": "2506.2 Standards."
         },
         {
-          "id" : 5173,
-          "kind" : "title",
-          "sectionNumber" : "2506.2.1",
-          "title" : "2506.2.1 Other materials."
+          "id": 5173,
+          "kind": "title",
+          "sectionNumber": "2506.2.1",
+          "title": "2506.2.1 Other materials."
         },
         {
-          "id" : 5174,
-          "kind" : "title",
-          "sectionNumber" : "2506.3",
-          "title" : "2506.3 Mold resistance."
+          "id": 5174,
+          "kind": "title",
+          "sectionNumber": "2506.3",
+          "title": "2506.3 Mold resistance."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2507",
-      "headingLine" : "LATHING AND PLASTERING",
-      "id" : "SECTION 2507",
-      "sections" : [
+      "headerLine": "SECTION BC 2507",
+      "headingLine": "LATHING AND PLASTERING",
+      "id": "SECTION BC 2507",
+      "sections": [
         {
-          "id" : 5175,
-          "kind" : "title",
-          "sectionNumber" : "2507.1",
-          "title" : "2507.1 General."
+          "id": 5175,
+          "kind": "title",
+          "sectionNumber": "2507.1",
+          "title": "2507.1 General."
         },
         {
-          "id" : 5176,
-          "kind" : "title",
-          "sectionNumber" : "2507.2",
-          "title" : "2507.2 Standards."
+          "id": 5176,
+          "kind": "title",
+          "sectionNumber": "2507.2",
+          "title": "2507.2 Standards."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2508",
-      "headingLine" : "GYPSUM CONSTRUCTION",
-      "id" : "SECTION 2508",
-      "sections" : [
+      "headerLine": "SECTION BC 2508",
+      "headingLine": "GYPSUM CONSTRUCTION",
+      "id": "SECTION BC 2508",
+      "sections": [
         {
-          "id" : 5177,
-          "kind" : "title",
-          "sectionNumber" : "2508.1",
-          "title" : "2508.1 General."
+          "id": 5177,
+          "kind": "title",
+          "sectionNumber": "2508.1",
+          "title": "2508.1 General."
         },
         {
-          "id" : 5178,
-          "kind" : "title",
-          "sectionNumber" : "2508.2",
-          "title" : "2508.2 Limitations."
+          "id": 5178,
+          "kind": "title",
+          "sectionNumber": "2508.2",
+          "title": "2508.2 Limitations."
         },
         {
-          "id" : 5179,
-          "kind" : "title",
-          "sectionNumber" : "2508.2.1",
-          "title" : "2508.2.1 Weather protection."
+          "id": 5179,
+          "kind": "title",
+          "sectionNumber": "2508.2.1",
+          "title": "2508.2.1 Weather protection."
         },
         {
-          "id" : 5180,
-          "kind" : "title",
-          "sectionNumber" : "2508.3",
-          "title" : "2508.3 Single-ply application."
+          "id": 5180,
+          "kind": "title",
+          "sectionNumber": "2508.3",
+          "title": "2508.3 Single-ply application."
         },
         {
-          "id" : 5181,
-          "kind" : "title",
-          "sectionNumber" : "2508.3.1",
-          "title" : "2508.3.1 Floating angles."
+          "id": 5181,
+          "kind": "title",
+          "sectionNumber": "2508.3.1",
+          "title": "2508.3.1 Floating angles."
         },
         {
-          "id" : 5182,
-          "kind" : "title",
-          "sectionNumber" : "2508.4",
-          "title" : "2508.4 Joint treatment."
+          "id": 5182,
+          "kind": "title",
+          "sectionNumber": "2508.4",
+          "title": "2508.4 Joint treatment."
         },
         {
-          "id" : 5183,
-          "kind" : "title",
-          "sectionNumber" : "2508.5",
-          "title" : "2508.5 Horizontal gypsum board or gypsum panel product diaphragm ceilings."
+          "id": 5183,
+          "kind": "title",
+          "sectionNumber": "2508.5",
+          "title": "2508.5 Horizontal gypsum board or gypsum panel product diaphragm ceilings."
         },
         {
-          "id" : 5184,
-          "kind" : "title",
-          "sectionNumber" : "2508.5.1",
-          "title" : "2508.5.1 Diaphragm proportions."
+          "id": 5184,
+          "kind": "title",
+          "sectionNumber": "2508.5.1",
+          "title": "2508.5.1 Diaphragm proportions."
         },
         {
-          "id" : 5185,
-          "kind" : "title",
-          "sectionNumber" : "2508.5.2",
-          "title" : "2508.5.2 Installation."
+          "id": 5185,
+          "kind": "title",
+          "sectionNumber": "2508.5.2",
+          "title": "2508.5.2 Installation."
         },
         {
-          "id" : 5186,
-          "kind" : "title",
-          "sectionNumber" : "2508.5.3",
-          "title" : "2508.5.3 Blocking of perimeter edges."
+          "id": 5186,
+          "kind": "title",
+          "sectionNumber": "2508.5.3",
+          "title": "2508.5.3 Blocking of perimeter edges."
         },
         {
-          "id" : 5187,
-          "kind" : "title",
-          "sectionNumber" : "2508.5.4",
-          "title" : "2508.5.4 Fasteners."
+          "id": 5187,
+          "kind": "title",
+          "sectionNumber": "2508.5.4",
+          "title": "2508.5.4 Fasteners."
         },
         {
-          "id" : 5188,
-          "kind" : "title",
-          "sectionNumber" : "2508.5.5",
-          "title" : "2508.5.5 Lateral force restrictions."
+          "id": 5188,
+          "kind": "title",
+          "sectionNumber": "2508.5.5",
+          "title": "2508.5.5 Lateral force restrictions."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2509",
-      "headingLine" : "SHOWERS AND WATER CLOSETS",
-      "id" : "SECTION 2509",
-      "sections" : [
+      "headerLine": "SECTION BC 2509",
+      "headingLine": "SHOWERS AND WATER CLOSETS",
+      "id": "SECTION BC 2509",
+      "sections": [
         {
-          "id" : 5189,
-          "kind" : "title",
-          "sectionNumber" : "2509.1",
-          "title" : "2509.1 Wet areas."
+          "id": 5189,
+          "kind": "title",
+          "sectionNumber": "2509.1",
+          "title": "2509.1 Wet areas."
         },
         {
-          "id" : 5190,
-          "kind" : "title",
-          "sectionNumber" : "2509.2",
-          "title" : "2509.2 Base for tile."
+          "id": 5190,
+          "kind": "title",
+          "sectionNumber": "2509.2",
+          "title": "2509.2 Base for tile."
         },
         {
-          "id" : 5191,
-          "kind" : "title",
-          "sectionNumber" : "2509.3",
-          "title" : "2509.3 Limitations."
+          "id": 5191,
+          "kind": "title",
+          "sectionNumber": "2509.3",
+          "title": "2509.3 Limitations."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2510",
-      "headingLine" : "LATHING AND FURRING FOR CEMENT PLASTER (STUCCO)",
-      "id" : "SECTION 2510",
-      "sections" : [
+      "headerLine": "SECTION BC 2510",
+      "headingLine": "LATHING AND FURRING FOR CEMENT PLASTER (STUCCO)",
+      "id": "SECTION BC 2510",
+      "sections": [
         {
-          "id" : 5192,
-          "kind" : "title",
-          "sectionNumber" : "2510.1",
-          "title" : "2510.1 General."
+          "id": 5192,
+          "kind": "title",
+          "sectionNumber": "2510.1",
+          "title": "2510.1 General."
         },
         {
-          "id" : 5193,
-          "kind" : "title",
-          "sectionNumber" : "2510.2",
-          "title" : "2510.2 Weather protection."
+          "id": 5193,
+          "kind": "title",
+          "sectionNumber": "2510.2",
+          "title": "2510.2 Weather protection."
         },
         {
-          "id" : 5194,
-          "kind" : "title",
-          "sectionNumber" : "2510.3",
-          "title" : "2510.3 Installation."
+          "id": 5194,
+          "kind": "title",
+          "sectionNumber": "2510.3",
+          "title": "2510.3 Installation."
         },
         {
-          "id" : 5195,
-          "kind" : "title",
-          "sectionNumber" : "2510.4",
-          "title" : "2510.4 Corrosion resistance."
+          "id": 5195,
+          "kind": "title",
+          "sectionNumber": "2510.4",
+          "title": "2510.4 Corrosion resistance."
         },
         {
-          "id" : 5196,
-          "kind" : "title",
-          "sectionNumber" : "2510.5",
-          "title" : "2510.5 Backing."
+          "id": 5196,
+          "kind": "title",
+          "sectionNumber": "2510.5",
+          "title": "2510.5 Backing."
         },
         {
-          "id" : 5197,
-          "kind" : "title",
-          "sectionNumber" : "2510.5.1",
-          "title" : "2510.5.1 Support of lath."
+          "id": 5197,
+          "kind": "title",
+          "sectionNumber": "2510.5.1",
+          "title": "2510.5.1 Support of lath."
         },
         {
-          "id" : 5198,
-          "kind" : "title",
-          "sectionNumber" : "2510.5.2",
-          "title" : "2510.5.2 Use of gypsum backing board."
+          "id": 5198,
+          "kind": "title",
+          "sectionNumber": "2510.5.2",
+          "title": "2510.5.2 Use of gypsum backing board."
         },
         {
-          "id" : 5199,
-          "kind" : "title",
-          "sectionNumber" : "2510.5.2.1",
-          "title" : "2510.5.2.1 Use of gypsum board as a backing board."
+          "id": 5199,
+          "kind": "title",
+          "sectionNumber": "2510.5.2.1",
+          "title": "2510.5.2.1 Use of gypsum board as a backing board."
         },
         {
-          "id" : 5200,
-          "kind" : "title",
-          "sectionNumber" : "2510.5.2.2",
-          "title" : "2510.5.2.2 Gypsum sheathing backing."
+          "id": 5200,
+          "kind": "title",
+          "sectionNumber": "2510.5.2.2",
+          "title": "2510.5.2.2 Gypsum sheathing backing."
         },
         {
-          "id" : 5201,
-          "kind" : "title",
-          "sectionNumber" : "2510.5.3",
-          "title" : "2510.5.3 Backing not required."
+          "id": 5201,
+          "kind": "title",
+          "sectionNumber": "2510.5.3",
+          "title": "2510.5.3 Backing not required."
         },
         {
-          "id" : 5202,
-          "kind" : "title",
-          "sectionNumber" : "2510.6",
-          "title" : "2510.6 Weather-resistive barriers."
+          "id": 5202,
+          "kind": "title",
+          "sectionNumber": "2510.6",
+          "title": "2510.6 Weather-resistive barriers."
         },
         {
-          "id" : 5203,
-          "kind" : "title",
-          "sectionNumber" : "2510.7",
-          "title" : "2510.7 Preparation of masonry and concrete."
+          "id": 5203,
+          "kind": "title",
+          "sectionNumber": "2510.7",
+          "title": "2510.7 Preparation of masonry and concrete."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2511",
-      "headingLine" : "INTERIOR PLASTER",
-      "id" : "SECTION 2511",
-      "sections" : [
+      "headerLine": "SECTION BC 2511",
+      "headingLine": "INTERIOR PLASTER",
+      "id": "SECTION BC 2511",
+      "sections": [
         {
-          "id" : 5204,
-          "kind" : "title",
-          "sectionNumber" : "2511.1",
-          "title" : "2511.1 General."
+          "id": 5204,
+          "kind": "title",
+          "sectionNumber": "2511.1",
+          "title": "2511.1 General."
         },
         {
-          "id" : 5205,
-          "kind" : "title",
-          "sectionNumber" : "2511.1.1",
-          "title" : "2511.1.1 Installation."
+          "id": 5205,
+          "kind": "title",
+          "sectionNumber": "2511.1.1",
+          "title": "2511.1.1 Installation."
         },
         {
-          "id" : 5206,
-          "kind" : "title",
-          "sectionNumber" : "2511.2",
-          "title" : "2511.2 Limitations."
+          "id": 5206,
+          "kind": "title",
+          "sectionNumber": "2511.2",
+          "title": "2511.2 Limitations."
         },
         {
-          "id" : 5207,
-          "kind" : "title",
-          "sectionNumber" : "2511.3",
-          "title" : "2511.3 Grounds."
+          "id": 5207,
+          "kind": "title",
+          "sectionNumber": "2511.3",
+          "title": "2511.3 Grounds."
         },
         {
-          "id" : 5208,
-          "kind" : "title",
-          "sectionNumber" : "2511.4",
-          "title" : "2511.4 Interior masonry or concrete."
+          "id": 5208,
+          "kind": "title",
+          "sectionNumber": "2511.4",
+          "title": "2511.4 Interior masonry or concrete."
         },
         {
-          "id" : 5209,
-          "kind" : "title",
-          "sectionNumber" : "2511.5",
-          "title" : "2511.5 Wet areas."
+          "id": 5209,
+          "kind": "title",
+          "sectionNumber": "2511.5",
+          "title": "2511.5 Wet areas."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2512",
-      "headingLine" : "EXTERIOR PLASTER",
-      "id" : "SECTION 2512",
-      "sections" : [
+      "headerLine": "SECTION BC 2512",
+      "headingLine": "EXTERIOR PLASTER",
+      "id": "SECTION BC 2512",
+      "sections": [
         {
-          "id" : 5210,
-          "kind" : "title",
-          "sectionNumber" : "2512.1",
-          "title" : "2512.1 General."
+          "id": 5210,
+          "kind": "title",
+          "sectionNumber": "2512.1",
+          "title": "2512.1 General."
         },
         {
-          "id" : 5211,
-          "kind" : "title",
-          "sectionNumber" : "2512.1.1",
-          "title" : "2512.1.1 On-grade floor slab."
+          "id": 5211,
+          "kind": "title",
+          "sectionNumber": "2512.1.1",
+          "title": "2512.1.1 On-grade floor slab."
         },
         {
-          "id" : 5212,
-          "kind" : "title",
-          "sectionNumber" : "2512.1.2",
-          "title" : "2512.1.2 Weep screeds."
+          "id": 5212,
+          "kind": "title",
+          "sectionNumber": "2512.1.2",
+          "title": "2512.1.2 Weep screeds."
         },
         {
-          "id" : 5213,
-          "kind" : "title",
-          "sectionNumber" : "2512.2",
-          "title" : "2512.2 Plasticity agents."
+          "id": 5213,
+          "kind": "title",
+          "sectionNumber": "2512.2",
+          "title": "2512.2 Plasticity agents."
         },
         {
-          "id" : 5214,
-          "kind" : "title",
-          "sectionNumber" : "2512.3",
-          "title" : "2512.3 Limitations."
+          "id": 5214,
+          "kind": "title",
+          "sectionNumber": "2512.3",
+          "title": "2512.3 Limitations."
         },
         {
-          "id" : 5215,
-          "kind" : "title",
-          "sectionNumber" : "2512.4",
-          "title" : "2512.4 Cement plaster."
+          "id": 5215,
+          "kind": "title",
+          "sectionNumber": "2512.4",
+          "title": "2512.4 Cement plaster."
         },
         {
-          "id" : 5216,
-          "kind" : "title",
-          "sectionNumber" : "2512.5",
-          "title" : "2512.5 Second-coat application."
+          "id": 5216,
+          "kind": "title",
+          "sectionNumber": "2512.5",
+          "title": "2512.5 Second-coat application."
         },
         {
-          "id" : 5217,
-          "kind" : "title",
-          "sectionNumber" : "2512.6",
-          "title" : "2512.6 Curing and interval."
+          "id": 5217,
+          "kind": "title",
+          "sectionNumber": "2512.6",
+          "title": "2512.6 Curing and interval."
         },
         {
-          "id" : 5218,
-          "kind" : "title",
-          "sectionNumber" : "2512.7",
-          "title" : "2512.7 Application to solid backings."
+          "id": 5218,
+          "kind": "title",
+          "sectionNumber": "2512.7",
+          "title": "2512.7 Application to solid backings."
         },
         {
-          "id" : 5219,
-          "kind" : "title",
-          "sectionNumber" : "2512.8",
-          "title" : "2512.8 Alternate method of application."
+          "id": 5219,
+          "kind": "title",
+          "sectionNumber": "2512.8",
+          "title": "2512.8 Alternate method of application."
         },
         {
-          "id" : 5220,
-          "kind" : "title",
-          "sectionNumber" : "2512.8.1",
-          "title" : "2512.8.1 Admixtures."
+          "id": 5220,
+          "kind": "title",
+          "sectionNumber": "2512.8.1",
+          "title": "2512.8.1 Admixtures."
         },
         {
-          "id" : 5221,
-          "kind" : "title",
-          "sectionNumber" : "2512.8.2",
-          "title" : "2512.8.2 Curing."
+          "id": 5221,
+          "kind": "title",
+          "sectionNumber": "2512.8.2",
+          "title": "2512.8.2 Curing."
         },
         {
-          "id" : 5222,
-          "kind" : "title",
-          "sectionNumber" : "2512.9",
-          "title" : "2512.9 Finish coats."
+          "id": 5222,
+          "kind": "title",
+          "sectionNumber": "2512.9",
+          "title": "2512.9 Finish coats."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2513",
-      "headingLine" : "EXPOSED AGGREGATE PLASTER",
-      "id" : "SECTION 2513",
-      "sections" : [
+      "headerLine": "SECTION BC 2513",
+      "headingLine": "EXPOSED AGGREGATE PLASTER",
+      "id": "SECTION BC 2513",
+      "sections": [
         {
-          "id" : 5223,
-          "kind" : "title",
-          "sectionNumber" : "2513.1",
-          "title" : "2513.1 General."
+          "id": 5223,
+          "kind": "title",
+          "sectionNumber": "2513.1",
+          "title": "2513.1 General."
         },
         {
-          "id" : 5224,
-          "kind" : "title",
-          "sectionNumber" : "2513.2",
-          "title" : "2513.2 Aggregate."
+          "id": 5224,
+          "kind": "title",
+          "sectionNumber": "2513.2",
+          "title": "2513.2 Aggregate."
         },
         {
-          "id" : 5225,
-          "kind" : "title",
-          "sectionNumber" : "2513.3",
-          "title" : "2513.3 Bedding coat proportions."
+          "id": 5225,
+          "kind": "title",
+          "sectionNumber": "2513.3",
+          "title": "2513.3 Bedding coat proportions."
         },
         {
-          "id" : 5226,
-          "kind" : "title",
-          "sectionNumber" : "2513.4",
-          "title" : "2513.4 Application."
+          "id": 5226,
+          "kind": "title",
+          "sectionNumber": "2513.4",
+          "title": "2513.4 Application."
         },
         {
-          "id" : 5227,
-          "kind" : "title",
-          "sectionNumber" : "2513.5",
-          "title" : "2513.5 Bases."
+          "id": 5227,
+          "kind": "title",
+          "sectionNumber": "2513.5",
+          "title": "2513.5 Bases."
         },
         {
-          "id" : 5228,
-          "kind" : "title",
-          "sectionNumber" : "2513.6",
-          "title" : "2513.6 Preparation of masonry and concrete."
+          "id": 5228,
+          "kind": "title",
+          "sectionNumber": "2513.6",
+          "title": "2513.6 Preparation of masonry and concrete."
         },
         {
-          "id" : 5229,
-          "kind" : "title",
-          "sectionNumber" : "2513.7",
-          "title" : "2513.7 Curing of base coats."
+          "id": 5229,
+          "kind": "title",
+          "sectionNumber": "2513.7",
+          "title": "2513.7 Curing of base coats."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 2514",
-      "headingLine" : "REINFORCED GYPSUM CONCRETE",
-      "id" : "SECTION 2514",
-      "sections" : [
+      "headerLine": "SECTION BC 2514",
+      "headingLine": "REINFORCED GYPSUM CONCRETE",
+      "id": "SECTION BC 2514",
+      "sections": [
         {
-          "id" : 5230,
-          "kind" : "title",
-          "sectionNumber" : "2514.1",
-          "title" : "2514.1 General."
+          "id": 5230,
+          "kind": "title",
+          "sectionNumber": "2514.1",
+          "title": "2514.1 General."
         },
         {
-          "id" : 5231,
-          "kind" : "title",
-          "sectionNumber" : "2514.2",
-          "title" : "2514.2 Minimum thickness."
+          "id": 5231,
+          "kind": "title",
+          "sectionNumber": "2514.2",
+          "title": "2514.2 Minimum thickness."
         },
         {
-          "id" : 5232,
-          "kind" : "title",
-          "sectionNumber" : "2514.3",
-          "title" : "2514.3 Limitations of use."
+          "id": 5232,
+          "kind": "title",
+          "sectionNumber": "2514.3",
+          "title": "2514.3 Limitations of use."
         }
       ]
     }
   ],
-  "rawDraftText" : "#- Chapter 25: Gypsum Board, Gypsum Panel Products and Plaster\n\n#-- Section BC 2501: General\n\n#--- 2501.1 Scope.\n\nProvisions of this chapter shall govern the materials, design, construction and quality of gypsum board, gypsum panel products, lath, gypsum plaster, cement plaster, cement board and reinforced gypsum concrete.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/013.\n\n#--- 2501.2 Performance.\n\nLathing, plastering, gypsum board and gypsum panel product construction shall be done in the manner and with the materials specified in this chapter and the referenced standards listed in Chapter 35. When fire protection is required, such construction shall also comply with the provisions of Chapter 7.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 2501.3 Other materials.\n\nOther approved wall or ceiling coverings shall be permitted to be installed in accordance with the recommendations of the manufacturer and the approval of the commissioner.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#-- Section BC 2502: Definitions\n\n#--- 2502.1 Definitions.\n\nThe following terms are defined in Chapter 2:\n\nCEMENT BOARD.\n\nCEMENT PLASTER.\n\nEXTERIOR SURFACES.\n\nGYPSUM BOARD.\n\nGYPSUM PANEL PRODUCTS.\n\nGYPSUM PLASTER.\n\nGYPSUM VENEER PLASTER.\n\nINTERIOR SURFACES.\n\nWEATHER-EXPOSED SURFACES.\n\nWIRE BACKING.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/013.\n\n#-- Section BC 2503: Reserved\n\n#-- Section BC 2504: Vertical and Horizontal Assemblies\n\n#--- 2504.1 Scope.\n\nThe following requirements shall be met where construction involves gypsum board, gypsum panel products or lath and plaster in vertical and horizontal assemblies.\n\n#---- 2504.1.1 Wood framing.\n\nWood supports for lath, gypsum board or gypsum panel products, as well as wood stripping or furring, shall be not less than 2 inches (51 mm) nominal thickness in the least dimension.\n\nException: The minimum nominal dimension of wood furring strips installed over solid backing shall be not less than 1 inch by 2 inches (25 mm by 51 mm).\n\n#---- 2504.1.2 Studless partitions.\n\nThe minimum thickness of vertically erected studless solid plaster partitions of 3\/8-inch (9.5 mm) and 3\/4-inch (19.1 mm) rib metal lath, 1\/2-inch-thick (12.7 mm) gypsum lath, gypsum board or gypsum panel product shall be 2 inches (51 mm).\n\n#-- Section BC 2505: Shear Wall Construction\n\n#--- 2505.1 Resistance to shear (wood framing).\n\nWood-frame shear walls sheathed with gypsum board, gypsum panel products or lath and plaster shall be designed and constructed in accordance with Section 2306.3 and are permitted to resist wind and seismic loads. Walls resisting seismic loads shall be subject to the limitations in Section 12.2.1 of ASCE 7.\n\n#--- 2505.2 Resistance to shear (steel framing).\n\nCold-formed steel-frame shear walls sheathed with gypsum board or gypsum panel products and constructed in accordance with the materials and provisions of Section 2211.1.1 are permitted to resist wind and seismic loads. Walls resisting seismic loads shall be subject to the limitations in Section 12.2.1 of ASCE 7.\n\n#-- Section BC 2506: Gypsum Board and Gypsum Panel Product Materials\n\n#--- 2506.1 General.\n\nGypsum board, gypsum panel products and accessories shall be identified by the manufacturer's designation to indicate compliance with the appropriate standards referenced in this section and stored to protect such materials from the weather.\n\n#--- 2506.2 Standards.\n\nGypsum board and gypsum panel products shall conform to the appropriate standards listed in Table 2506.2 and Chapter 35 and, where required for fire protection, shall conform to the provisions of Chapter 7.\n\nTable 2506.2 Gypsum Board and Gypsum Panel Products Materials and Accessories\n\n#---- 2506.2.1 Other materials.\n\nMetal suspension systems for acoustical and lay-in panel ceilings shall conform with Section 808.1.\n\n#--- 2506.3 Mold resistance.\n\nGypsum board or cement board, used in an assembly for the following areas, shall have a mold resistance rating of 10 in accordance with ASTM D 3273:\n\n1. Interior faces of exterior walls of basements, cellars, and other below grade rooms.\n\n2. Walls and ceilings of spaces containing condensers, water tanks, water pumps, and pressure reduction valves.\n\n3. Walls and ceilings of laundry rooms.\n\n4. Portions of walls within 2 feet (610 mm) of kitchen sinks to a height of 4 feet (1219 mm) above the floor.\n\n5. Portions of walls within 2 feet (610 mm) of kitchen stoves to a height of 4 feet (1219 mm) above the floor.\n\n6. Walls of bathrooms that are not solely water closet compartments, other than walls specifically required to be cement board.\n\n7. Walls and ceilings in service sink closets.\n\n8. Portions of walls within 2 feet (610 mm) of mop sinks or service sinks to a height of 4 feet (1219 mm) above the floor.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/013.\n\n#-- Section BC 2507: Lathing and Plastering\n\n#--- 2507.1 General.\n\nLathing and plastering materials and accessories shall be marked by the manufacturer's designation to indicate compliance with the appropriate standards referenced in this section and stored in such a manner to protect them from the weather.\n\n#--- 2507.2 Standards.\n\nLathing and plastering materials shall conform to the standards listed in Table 2507.2 and Chapter 35 and, where required for fire protection, shall also conform to the provisions of Chapter 7.\n\nTable 2507.2 Lath, Plastering Materials and Accessories\n\n#-- Section BC 2508: Gypsum Construction\n\n#--- 2508.1 General.\n\nGypsum board, gypsum panel products and gypsum plaster construction shall be of the materials listed in Tables 2506.2 and 2507.2. These materials shall be assembled and installed in compliance with the appropriate standards listed in Tables 2508.1 and 2511.1.1, and Chapter 35.\n\nTable 2508.1 Installation of Gypsum Construction\n\n#--- 2508.2 Limitations.\n\nGypsum wallboard or gypsum plaster shall not be used in any exterior surface where such gypsum construction will be exposed directly to the weather. Gypsum wallboard shall not be used where there will be direct exposure to water or continuous high humidity conditions beyond the published recommendations of the manufacturer. Gypsum sheathing shall be installed on exterior surfaces in accordance with ASTM C 1280.\n\n#---- 2508.2.1 Weather protection.\n\nGypsum wallboard, gypsum lath or gypsum plaster shall not be installed until weather protection for the installation is provided.\n\n#--- 2508.3 Single-ply application.\n\nEdges and ends of gypsum board and gypsum panel products shall occur on the framing members, except those edges and ends that are perpendicular to the framing members. Edges and ends of gypsum board and gypsum panel products shall be in moderate contact except in concealed spaces where fire-resistance-rated construction, shear resistance or diaphragm action is not required.\n\n#---- 2508.3.1 Floating angles.\n\nFasteners at the top and bottom plates of vertical assemblies, or the edges and ends of horizontal assemblies perpendicular to supports, and at the wall line are permitted to be omitted except on shear resisting elements or fire-resistance-rated assemblies. Fasteners shall be applied in such a manner as not to fracture the face paper with the fastener head.\n\n#--- 2508.4 Joint treatment.\n\nGypsum board and gypsum panel product fire-resistance-rated assemblies shall have joints and fasteners treated.\n\nException: Joint and fastener treatment need not be provided where any of the following conditions occur:\n\n1. Where the gypsum board or the gypsum panel product is to receive a decorative finish such as wood paneling, battens, acoustical finishes or any similar application that would be equivalent to joint treatment.\n\n2. On single-layer systems where joints occur over wood framing members.\n\n3. Square edge or tongue-and-groove edge gypsum board (V-edge), gypsum panel products, gypsum backing board or gypsum sheathing.\n\n4. On multilayer systems where the joints of adjacent layers are offset.\n\n5. Assemblies tested without joint treatment.\n\n#--- 2508.5 Horizontal gypsum board or gypsum panel product diaphragm ceilings.\n\nGypsum board or gypsum panel products shall be permitted to be used on wood joists to create a horizontal diaphragm ceiling in accordance with Table 2508.5.\n\nTable 2508.5 Shear Capacity for Horizontal Wood-Frame Gypsum Board Diaphragm Ceiling Assemblies\n\nFor SI: 1 inch = 25.4 mm, 1 pound per foot = 14.59 N\/m.\n\na. Values are not cumulative with other horizontal diaphragm values and are for short-term wind or seismic loading. Values shall be reduced 25 percent for normal loading.\n\nb. Values shall be reduced 50 percent in Seismic Design Categories D, E and F.\n\nc. 1 1\/4-inch, No. 6 Type S or W screws are permitted to be substituted for the listed nails.\n\n#---- 2508.5.1 Diaphragm proportions.\n\nThe maximum allowable diaphragm proportions shall be 1 1\/2:1 between shear resisting elements. Rotation or cantilever conditions shall not be permitted.\n\n#---- 2508.5.2 Installation.\n\nGypsum board or gypsum panel products used in a horizontal diaphragm ceiling shall be installed perpendicular to ceiling framing members. End joints of adjacent courses of gypsum board shall not occur on the same joist.\n\n#---- 2508.5.3 Blocking of perimeter edges.\n\nPerimeter edges shall be blocked using a wood member not less than 2-inch by 6-inch (51 mm by 152 mm) nominal dimension. Blocking material shall be installed flat over the top plate of the wall to provide a nailing surface not less than 2 inches (51 mm) in width for the attachment of the gypsum board or gypsum panel product.\n\n#---- 2508.5.4 Fasteners.\n\nFasteners used for the attachment of gypsum board or gypsum panel products to a horizontal diaphragm ceiling shall be as defined in Table 2508.5. Fasteners shall be spaced not more than 7 inches (178 mm) on center at all supports, including perimeter blocking, and not more than 3\/8 inch (9.5 mm) from the edges and ends of the gypsum board or gypsum panel products.\n\n#---- 2508.5.5 Lateral force restrictions.\n\nGypsum board or gypsum panel products shall not be used in diaphragm ceilings to resist lateral forces imposed by masonry or concrete construction.\n\n#-- Section BC 2509: Showers and Water Closets\n\n#--- 2509.1 Wet areas.\n\nShowers and public toilet walls shall conform to Section 1210.2.\n\n#--- 2509.2 Base for tile.\n\nMaterials used as a base for wall tile in tub and shower areas and wall and ceiling panels in shower areas shall be of materials listed in Table 2509.2 and installed in accordance with the manufacturer's recommendations. Water-resistant gypsum backing board shall be used as a base for tile in water closet compartment walls when installed in accordance with GA-216 or ASTM C 840 and the manufacturer's recommendations. Regular gypsum wallboard is permitted under tile or wall panels in other wall and ceiling areas when installed in accordance with GA-216 or ASTM C 840.\n\nTable 2509.2 Backerboard Materials\n\n#--- 2509.3 Limitations.\n\nWater-resistant gypsum backing board shall not be used in the following locations:\n\n1. Over a vapor retarder in shower or bathtub compartments.\n\n2. Where there will be direct exposure to water or in areas subject to continuous high humidity.\n\n#-- Section BC 2510: Lathing and Furring for Cement Plaster (Stucco)\n\n#--- 2510.1 General.\n\nExterior and interior cement plaster and lathing shall be done with the appropriate materials listed in Table 2507.2 and Chapter 35.\n\n#--- 2510.2 Weather protection.\n\nMaterials shall be stored in such a manner as to protect them from the weather.\n\n#--- 2510.3 Installation.\n\nInstallation of these materials shall be in compliance with ASTM C 926 and ASTM C 1063.\n\n#--- 2510.4 Corrosion resistance.\n\nMetal lath and lath attachments shall be of corrosion-resistant material.\n\n#--- 2510.5 Backing.\n\nBacking or a lath shall provide sufficient rigidity to permit plaster applications.\n\n#---- 2510.5.1 Support of lath.\n\nWhere lath on vertical surfaces extends between rafters or other similar projecting members, solid backing shall be installed to provide support for lath and attachments.\n\n#---- 2510.5.2 Use of gypsum backing board.\n\nGypsum backing for cement plaster shall be in accordance with Section 2510.5.2.1 or 2510.5.2.2.\n\n#----- 2510.5.2.1 Use of gypsum board as a backing board.\n\nGypsum lath or gypsum wallboard shall not be used as a backing for cement plaster.\n\nException: Gypsum lath or gypsum wallboard is permitted, with a weather-resistive barrier, as a backing for self-furred metal lath or self-furred wire fabric lath and cement plaster where either of the following conditions occur:\n\n1. On horizontal supports of ceilings or roof soffits.\n\n2. On interior walls.\n\n#----- 2510.5.2.2 Gypsum sheathing backing.\n\nGypsum sheathing is permitted as a backing for metal or wire fabric lath and cement plaster on walls. A weather-resistive barrier shall be provided in accordance with Section 2510.6.\n\n#---- 2510.5.3 Backing not required.\n\nWire backing is not required under expanded metal lath or paperbacked wire fabric lath.\n\n#--- 2510.6 Weather-resistive barriers.\n\nWater-resistive barriers shall be installed as required in Section 1404.2 and, where applied over wood-based sheathing, shall include a water-resistive barrier with a performance at least equivalent to two layers of water-resistive barrier complying with ASTM E 2556, Type I. The individual layers shall be installed independently such that each layer provides a separate continuous plane and any flashing (installed in accordance with Section 1405.4), has a means for draining water that enters the assembly to the exterior.\n\nException: Where the water-resistive barrier that is applied over wood-based sheathing has a water resistance equal to or greater than that of a water-resistive barrier complying with ASTM E 2556, Type II and is separated from the stucco by an intervening, substantially nonwater-absorbing layer or drainage space.\n\n#--- 2510.7 Preparation of masonry and concrete.\n\nSurfaces shall be clean, free from efflorescence, sufficiently damp and rough for proper bond. If the surface is insufficiently rough, approved bonding agents or a portland cement dash bond coat mixed in proportions of not more than two parts volume of sand to one part volume of portland cement or plastic cement shall be applied. The dash bond coat shall be left undisturbed and shall be moist cured not less than 24 hours.\n\n#-- Section BC 2511: Interior Plaster\n\n#--- 2511.1 General.\n\nPlastering gypsum plaster or cement plaster shall not be less than three coats where applied over metal lath or wire fabric lath and not less than two coats where applied over other bases permitted by this chapter.\n\nException: Gypsum veneer plaster and cement plaster specifically designed and approved for one-coat applications.\n\n#---- 2511.1.1 Installation.\n\nInstallation of lathing and plaster materials shall conform to Table 2511.1.1 and Section 2507.\n\nTable 2511.1.1 Installation of Plaster Construction\n\n#--- 2511.2 Limitations.\n\nPlaster shall not be applied directly to fiber insulation board. Cement plaster shall not be applied directly to gypsum lath or gypsum plaster except as specified in Sections 2510.5.1 and 2510.5.2.\n\n#--- 2511.3 Grounds.\n\nWhere installed, grounds shall ensure the minimum thickness of plaster as set forth in ASTM C 842 and ASTM C 926. Plaster thickness shall be measured from the face of lath and other bases.\n\n#--- 2511.4 Interior masonry or concrete.\n\nCondition of surfaces shall be as specified in Section 2510.7. Approved specially prepared gypsum plaster designed for application to concrete surfaces or approved acoustical plaster is permitted. The total thickness of base coat plaster applied to concrete ceilings shall be as set forth in ASTM C 842 or ASTM C 926. Should ceiling surfaces require more than the maximum thickness permitted in ASTM C 842 or ASTM C 926, metal lath or wire fabric lath shall be installed on such surfaces before plastering.\n\n#--- 2511.5 Wet areas.\n\nShowers and public toilet walls shall conform to Sections 1210.2 and 1210.3. When wood frame walls and partitions are covered on the interior with cement plaster or tile of similar material and are subject to water splash, the framing shall be protected with an approved moisture barrier.\n\n#-- Section BC 2512: Exterior Plaster\n\n#--- 2512.1 General.\n\nPlastering with cement plaster shall be not less than three coats when applied over metal lath or wire fabric lath or gypsum board backing as specified in Section 2510.5 and shall be not less than two coats when applied over masonry or concrete. If the plaster surface is to be completely covered by veneer or other facing material, or is completely concealed by another wall, plaster application need be only two coats, provided the total thickness is as set forth in ASTM C 926.\n\n#---- 2512.1.1 On-grade floor slab.\n\nOn wood frame or steel stud construction with an on-grade concrete floor slab system, exterior plaster shall be applied in such a manner as to cover, but not to extend below, the lath and paper. The application of lath, paper and flashing or drip screeds shall comply with ASTM C 1063.\n\n#---- 2512.1.2 Weep screeds.\n\nA minimum 0.019-inch (0.48 mm) (No. 26 galvanized sheet gage), corrosion-resistant weep screed with a minimum vertical attachment flange of 3 1\/2 inches (89 mm) shall be provided at or below the foundation plate line on exterior stud walls in accordance with ASTM C 926. The weep screed shall be placed a minimum of 4 inches (102 mm) above the earth or 2 inches (51 mm) above paved areas and be of a type that will allow trapped water to drain to the exterior of the building. The water-resistive barrier shall lap the attachment flange. The exterior lath shall cover and terminate on the attachment flange of the weep screed.\n\n#--- 2512.2 Plasticity agents.\n\nOnly approved plasticity agents and approved amounts thereof shall be added to portland cement or blended cements. When plastic cement or masonry cement is used, no additional lime or plasticizers shall be added. Hydrated lime or the equivalent amount of lime putty used as a plasticizer is permitted to be added to cement plaster or cement and lime plaster in an amount not to exceed that set forth in ASTM C 926.\n\n#--- 2512.3 Limitations.\n\nGypsum plaster shall not be used on exterior surfaces.\n\n#--- 2512.4 Cement plaster.\n\nPlaster coats shall be protected from freezing for a period of not less than 24 hours after set has occurred. Plaster shall be applied when the ambient temperature is higher than 40°F (4°C), unless provisions are made to keep cement plaster work above 40°F (4°C) during application and 48 hours thereafter.\n\n#--- 2512.5 Second-coat application.\n\nThe second coat shall be brought out to proper thickness, rodded and floated sufficiently rough to provide adequate bond for the finish coat. The second coat shall have no variation greater than 1\/4 inch (6.4 mm) in any direction under a 5-foot (1524 mm) straight edge.\n\n#--- 2512.6 Curing and interval.\n\nFirst and second coats of cement plaster shall be applied and moist cured as set forth in ASTM C 926 and Table 2512.6.\n\nTable 2512.6 Cement Plasters\n\na. The first two coats shall be as required for the first coats of exterior plaster, except that the moist-curing time period between the first and second coats shall not be less than 24 hours. Moist curing shall not be required where job and weather conditions are favorable to the retention of moisture in the cement plaster for the required time period.\n\nb. Twenty-four-hour minimum interval between coats of interior cement plaster. For alternate method of application, see Section 2512.8.\n\nc. Finish coat plaster is permitted to be applied to interior cement base coats after a 48-hour period.\n\n#--- 2512.7 Application to solid backings.\n\nWhere applied over gypsum backing as specified in Section 2510.5 or directly to unit masonry surfaces, the second coat is permitted to be applied as soon as the first coat has attained sufficient hardness.\n\n#--- 2512.8 Alternate method of application.\n\nThe second coat is permitted to be applied as soon as the first coat has attained sufficiently rigidity to receive the second coat.\n\n#---- 2512.8.1 Admixtures.\n\nWhen using this method of application, calcium aluminate cement up to 15 percent of the weight of the portland cement is permitted to be added to the mix.\n\n#---- 2512.8.2 Curing.\n\nCuring of the first coat is permitted to be omitted and the second coat shall be cured as set forth in ASTM C 926 and Table 2512.6.\n\n#--- 2512.9 Finish coats.\n\nCement plaster finish coats shall be applied over base coats that have been in place for the time periods set forth in ASTM C 926. The third or finish coat shall be applied with sufficient material and pressure to bond and to cover the brown coat and shall be of sufficient thickness to conceal the brown coat.\n\n#-- Section BC 2513: Exposed Aggregate Plaster\n\n#--- 2513.1 General.\n\nExposed natural or integrally colored aggregate is permitted to be partially embedded in a natural or colored bedding coat of cement plaster or gypsum plaster, subject to the provisions of this section.\n\n#--- 2513.2 Aggregate.\n\nThe aggregate shall be applied manually or mechanically and shall consist of marble chips, pebbles or similar durable, moderately hard (three or more on the Mohs hardness scale), nonreactive materials.\n\n#--- 2513.3 Bedding coat proportions.\n\nThe bedding coat for interior or exterior surfaces shall be composed of one part portland cement and one part Type S lime; or one part blended cement and one part Type S lime; or masonry cement; or plastic cement and a maximum of three parts of graded white or natural sand by volume. The bedding coat for interior surfaces shall be composed of 100 pounds (45.4 kg) of neat gypsum plaster and a maximum of 200 pounds (90.8 kg) of graded white sand. A factory-prepared bedding coat for interior or exterior use is permitted. The bedding coat for exterior surfaces shall have a minimum compressive strength of 1,000 pounds per square inch (psi) (6895 kPa)\n\n#--- 2513.4 Application.\n\nThe bedding coat is permitted to be applied directly over the first (scratch) coat of plaster, provided the ultimate overall thickness is a minimum of 7\/8 inch (22 mm), including lath. Over concrete or masonry surfaces, the overall thickness shall be a minimum of 1\/2 inch (12.7 mm).\n\n#--- 2513.5 Bases.\n\nExposed aggregate plaster is permitted to be applied over concrete, masonry, cement plaster base coats or gypsum plaster base coats installed in accordance with Section 2511 or 2512.\n\n#--- 2513.6 Preparation of masonry and concrete.\n\nMasonry and concrete surfaces shall be prepared in accordance with the provisions of Section 2510.7.\n\n#--- 2513.7 Curing of base coats.\n\nCement plaster base coats shall be cured in accordance with ASTM C 926. Cement plaster bedding coats shall retain sufficient moisture for hydration (hardening) for 24 hours minimum or, where necessary, shall be kept damp for 24 hours by light water spraying.\n\n#-- Section BC 2514: Reinforced Gypsum Concrete\n\n#--- 2514.1 General.\n\nReinforced gypsum concrete shall comply with the requirements of ASTM C 317 and ASTM C 956.\n\n#--- 2514.2 Minimum thickness.\n\nThe minimum thickness of reinforced gypsum concrete shall be 2 inches (51 mm) except the minimum required thickness shall be reduced to 1 1\/2 inches (38 mm), provided the following conditions are satisfied:\n\n1. The overall thickness, including the formboard, is not less than 2 inches (51 mm).\n\n2. The clear span of the gypsum concrete between supports does not exceed 33 inches (838 mm).\n\n3. Diaphragm action is not required.\n\n4. The design live load does not exceed 40 pounds per square foot (psf) (1915 Pa).\n\n#--- 2514.3 Limitations of use.\n\nReinforced gypsum concrete shall not be used where exposed directly to the weather or where subject to frequent or continuous wetting. Precast units shall be protected by coverings or coatings from the weather and from contact with moisture during shipment and during storage at the work site.",
-  "schemaVersion" : 1
+  "rawDraftText": "#- Chapter 25: Gypsum Board, Gypsum Panel Products and Plaster\n\n#-- Section BC 2501: General\n\n#--- 2501.1 Scope.\n\nProvisions of this chapter shall govern the materials, design, construction and quality of gypsum board, gypsum panel products, lath, gypsum plaster, cement plaster, cement board and reinforced gypsum concrete.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/013.\n\n#--- 2501.2 Performance.\n\nLathing, plastering, gypsum board and gypsum panel product construction shall be done in the manner and with the materials specified in this chapter and the referenced standards listed in Chapter 35. When fire protection is required, such construction shall also comply with the provisions of Chapter 7.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 2501.3 Other materials.\n\nOther approved wall or ceiling coverings shall be permitted to be installed in accordance with the recommendations of the manufacturer and the approval of the commissioner.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#-- Section BC 2502: Definitions\n\n#--- 2502.1 Definitions.\n\nThe following terms are defined in Chapter 2:\n\nCEMENT BOARD.\n\nCEMENT PLASTER.\n\nEXTERIOR SURFACES.\n\nGYPSUM BOARD.\n\nGYPSUM PANEL PRODUCTS.\n\nGYPSUM PLASTER.\n\nGYPSUM VENEER PLASTER.\n\nINTERIOR SURFACES.\n\nWEATHER-EXPOSED SURFACES.\n\nWIRE BACKING.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/013.\n\n#-- Section BC 2503: Reserved\n\n#-- Section BC 2504: Vertical and Horizontal Assemblies\n\n#--- 2504.1 Scope.\n\nThe following requirements shall be met where construction involves gypsum board, gypsum panel products or lath and plaster in vertical and horizontal assemblies.\n\n#---- 2504.1.1 Wood framing.\n\nWood supports for lath, gypsum board or gypsum panel products, as well as wood stripping or furring, shall be not less than 2 inches (51 mm) nominal thickness in the least dimension.\n\nException: The minimum nominal dimension of wood furring strips installed over solid backing shall be not less than 1 inch by 2 inches (25 mm by 51 mm).\n\n#---- 2504.1.2 Studless partitions.\n\nThe minimum thickness of vertically erected studless solid plaster partitions of 3/8-inch (9.5 mm) and 3/4-inch (19.1 mm) rib metal lath, 1/2-inch-thick (12.7 mm) gypsum lath, gypsum board or gypsum panel product shall be 2 inches (51 mm).\n\n#-- Section BC 2505: Shear Wall Construction\n\n#--- 2505.1 Resistance to shear (wood framing).\n\nWood-frame shear walls sheathed with gypsum board, gypsum panel products or lath and plaster shall be designed and constructed in accordance with Section 2306.3 and are permitted to resist wind and seismic loads. Walls resisting seismic loads shall be subject to the limitations in Section 12.2.1 of ASCE 7.\n\n#--- 2505.2 Resistance to shear (steel framing).\n\nCold-formed steel-frame shear walls sheathed with gypsum board or gypsum panel products and constructed in accordance with the materials and provisions of Section 2211.1.1 are permitted to resist wind and seismic loads. Walls resisting seismic loads shall be subject to the limitations in Section 12.2.1 of ASCE 7.\n\n#-- Section BC 2506: Gypsum Board and Gypsum Panel Product Materials\n\n#--- 2506.1 General.\n\nGypsum board, gypsum panel products and accessories shall be identified by the manufacturer's designation to indicate compliance with the appropriate standards referenced in this section and stored to protect such materials from the weather.\n\n#--- 2506.2 Standards.\n\nGypsum board and gypsum panel products shall conform to the appropriate standards listed in Table 2506.2 and Chapter 35 and, where required for fire protection, shall conform to the provisions of Chapter 7.\n\nTable 2506.2 Gypsum Board and Gypsum Panel Products Materials and Accessories\n\n#---- 2506.2.1 Other materials.\n\nMetal suspension systems for acoustical and lay-in panel ceilings shall conform with Section 808.1.\n\n#--- 2506.3 Mold resistance.\n\nGypsum board or cement board, used in an assembly for the following areas, shall have a mold resistance rating of 10 in accordance with ASTM D 3273:\n\n1. Interior faces of exterior walls of basements, cellars, and other below grade rooms.\n\n2. Walls and ceilings of spaces containing condensers, water tanks, water pumps, and pressure reduction valves.\n\n3. Walls and ceilings of laundry rooms.\n\n4. Portions of walls within 2 feet (610 mm) of kitchen sinks to a height of 4 feet (1219 mm) above the floor.\n\n5. Portions of walls within 2 feet (610 mm) of kitchen stoves to a height of 4 feet (1219 mm) above the floor.\n\n6. Walls of bathrooms that are not solely water closet compartments, other than walls specifically required to be cement board.\n\n7. Walls and ceilings in service sink closets.\n\n8. Portions of walls within 2 feet (610 mm) of mop sinks or service sinks to a height of 4 feet (1219 mm) above the floor.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/013.\n\n#-- Section BC 2507: Lathing and Plastering\n\n#--- 2507.1 General.\n\nLathing and plastering materials and accessories shall be marked by the manufacturer's designation to indicate compliance with the appropriate standards referenced in this section and stored in such a manner to protect them from the weather.\n\n#--- 2507.2 Standards.\n\nLathing and plastering materials shall conform to the standards listed in Table 2507.2 and Chapter 35 and, where required for fire protection, shall also conform to the provisions of Chapter 7.\n\nTable 2507.2 Lath, Plastering Materials and Accessories\n\n#-- Section BC 2508: Gypsum Construction\n\n#--- 2508.1 General.\n\nGypsum board, gypsum panel products and gypsum plaster construction shall be of the materials listed in Tables 2506.2 and 2507.2. These materials shall be assembled and installed in compliance with the appropriate standards listed in Tables 2508.1 and 2511.1.1, and Chapter 35.\n\nTable 2508.1 Installation of Gypsum Construction\n\n#--- 2508.2 Limitations.\n\nGypsum wallboard or gypsum plaster shall not be used in any exterior surface where such gypsum construction will be exposed directly to the weather. Gypsum wallboard shall not be used where there will be direct exposure to water or continuous high humidity conditions beyond the published recommendations of the manufacturer. Gypsum sheathing shall be installed on exterior surfaces in accordance with ASTM C 1280.\n\n#---- 2508.2.1 Weather protection.\n\nGypsum wallboard, gypsum lath or gypsum plaster shall not be installed until weather protection for the installation is provided.\n\n#--- 2508.3 Single-ply application.\n\nEdges and ends of gypsum board and gypsum panel products shall occur on the framing members, except those edges and ends that are perpendicular to the framing members. Edges and ends of gypsum board and gypsum panel products shall be in moderate contact except in concealed spaces where fire-resistance-rated construction, shear resistance or diaphragm action is not required.\n\n#---- 2508.3.1 Floating angles.\n\nFasteners at the top and bottom plates of vertical assemblies, or the edges and ends of horizontal assemblies perpendicular to supports, and at the wall line are permitted to be omitted except on shear resisting elements or fire-resistance-rated assemblies. Fasteners shall be applied in such a manner as not to fracture the face paper with the fastener head.\n\n#--- 2508.4 Joint treatment.\n\nGypsum board and gypsum panel product fire-resistance-rated assemblies shall have joints and fasteners treated.\n\nException: Joint and fastener treatment need not be provided where any of the following conditions occur:\n\n1. Where the gypsum board or the gypsum panel product is to receive a decorative finish such as wood paneling, battens, acoustical finishes or any similar application that would be equivalent to joint treatment.\n\n2. On single-layer systems where joints occur over wood framing members.\n\n3. Square edge or tongue-and-groove edge gypsum board (V-edge), gypsum panel products, gypsum backing board or gypsum sheathing.\n\n4. On multilayer systems where the joints of adjacent layers are offset.\n\n5. Assemblies tested without joint treatment.\n\n#--- 2508.5 Horizontal gypsum board or gypsum panel product diaphragm ceilings.\n\nGypsum board or gypsum panel products shall be permitted to be used on wood joists to create a horizontal diaphragm ceiling in accordance with Table 2508.5.\n\nTable 2508.5 Shear Capacity for Horizontal Wood-Frame Gypsum Board Diaphragm Ceiling Assemblies\n\nFor SI: 1 inch = 25.4 mm, 1 pound per foot = 14.59 N/m.\n\na. Values are not cumulative with other horizontal diaphragm values and are for short-term wind or seismic loading. Values shall be reduced 25 percent for normal loading.\n\nb. Values shall be reduced 50 percent in Seismic Design Categories D, E and F.\n\nc. 1 1/4-inch, No. 6 Type S or W screws are permitted to be substituted for the listed nails.\n\n#---- 2508.5.1 Diaphragm proportions.\n\nThe maximum allowable diaphragm proportions shall be 1 1/2:1 between shear resisting elements. Rotation or cantilever conditions shall not be permitted.\n\n#---- 2508.5.2 Installation.\n\nGypsum board or gypsum panel products used in a horizontal diaphragm ceiling shall be installed perpendicular to ceiling framing members. End joints of adjacent courses of gypsum board shall not occur on the same joist.\n\n#---- 2508.5.3 Blocking of perimeter edges.\n\nPerimeter edges shall be blocked using a wood member not less than 2-inch by 6-inch (51 mm by 152 mm) nominal dimension. Blocking material shall be installed flat over the top plate of the wall to provide a nailing surface not less than 2 inches (51 mm) in width for the attachment of the gypsum board or gypsum panel product.\n\n#---- 2508.5.4 Fasteners.\n\nFasteners used for the attachment of gypsum board or gypsum panel products to a horizontal diaphragm ceiling shall be as defined in Table 2508.5. Fasteners shall be spaced not more than 7 inches (178 mm) on center at all supports, including perimeter blocking, and not more than 3/8 inch (9.5 mm) from the edges and ends of the gypsum board or gypsum panel products.\n\n#---- 2508.5.5 Lateral force restrictions.\n\nGypsum board or gypsum panel products shall not be used in diaphragm ceilings to resist lateral forces imposed by masonry or concrete construction.\n\n#-- Section BC 2509: Showers and Water Closets\n\n#--- 2509.1 Wet areas.\n\nShowers and public toilet walls shall conform to Section 1210.2.\n\n#--- 2509.2 Base for tile.\n\nMaterials used as a base for wall tile in tub and shower areas and wall and ceiling panels in shower areas shall be of materials listed in Table 2509.2 and installed in accordance with the manufacturer's recommendations. Water-resistant gypsum backing board shall be used as a base for tile in water closet compartment walls when installed in accordance with GA-216 or ASTM C 840 and the manufacturer's recommendations. Regular gypsum wallboard is permitted under tile or wall panels in other wall and ceiling areas when installed in accordance with GA-216 or ASTM C 840.\n\nTable 2509.2 Backerboard Materials\n\n#--- 2509.3 Limitations.\n\nWater-resistant gypsum backing board shall not be used in the following locations:\n\n1. Over a vapor retarder in shower or bathtub compartments.\n\n2. Where there will be direct exposure to water or in areas subject to continuous high humidity.\n\n#-- Section BC 2510: Lathing and Furring for Cement Plaster (Stucco)\n\n#--- 2510.1 General.\n\nExterior and interior cement plaster and lathing shall be done with the appropriate materials listed in Table 2507.2 and Chapter 35.\n\n#--- 2510.2 Weather protection.\n\nMaterials shall be stored in such a manner as to protect them from the weather.\n\n#--- 2510.3 Installation.\n\nInstallation of these materials shall be in compliance with ASTM C 926 and ASTM C 1063.\n\n#--- 2510.4 Corrosion resistance.\n\nMetal lath and lath attachments shall be of corrosion-resistant material.\n\n#--- 2510.5 Backing.\n\nBacking or a lath shall provide sufficient rigidity to permit plaster applications.\n\n#---- 2510.5.1 Support of lath.\n\nWhere lath on vertical surfaces extends between rafters or other similar projecting members, solid backing shall be installed to provide support for lath and attachments.\n\n#---- 2510.5.2 Use of gypsum backing board.\n\nGypsum backing for cement plaster shall be in accordance with Section 2510.5.2.1 or 2510.5.2.2.\n\n#----- 2510.5.2.1 Use of gypsum board as a backing board.\n\nGypsum lath or gypsum wallboard shall not be used as a backing for cement plaster.\n\nException: Gypsum lath or gypsum wallboard is permitted, with a weather-resistive barrier, as a backing for self-furred metal lath or self-furred wire fabric lath and cement plaster where either of the following conditions occur:\n\n1. On horizontal supports of ceilings or roof soffits.\n\n2. On interior walls.\n\n#----- 2510.5.2.2 Gypsum sheathing backing.\n\nGypsum sheathing is permitted as a backing for metal or wire fabric lath and cement plaster on walls. A weather-resistive barrier shall be provided in accordance with Section 2510.6.\n\n#---- 2510.5.3 Backing not required.\n\nWire backing is not required under expanded metal lath or paperbacked wire fabric lath.\n\n#--- 2510.6 Weather-resistive barriers.\n\nWater-resistive barriers shall be installed as required in Section 1404.2 and, where applied over wood-based sheathing, shall include a water-resistive barrier with a performance at least equivalent to two layers of water-resistive barrier complying with ASTM E 2556, Type I. The individual layers shall be installed independently such that each layer provides a separate continuous plane and any flashing (installed in accordance with Section 1405.4), has a means for draining water that enters the assembly to the exterior.\n\nException: Where the water-resistive barrier that is applied over wood-based sheathing has a water resistance equal to or greater than that of a water-resistive barrier complying with ASTM E 2556, Type II and is separated from the stucco by an intervening, substantially nonwater-absorbing layer or drainage space.\n\n#--- 2510.7 Preparation of masonry and concrete.\n\nSurfaces shall be clean, free from efflorescence, sufficiently damp and rough for proper bond. If the surface is insufficiently rough, approved bonding agents or a portland cement dash bond coat mixed in proportions of not more than two parts volume of sand to one part volume of portland cement or plastic cement shall be applied. The dash bond coat shall be left undisturbed and shall be moist cured not less than 24 hours.\n\n#-- Section BC 2511: Interior Plaster\n\n#--- 2511.1 General.\n\nPlastering gypsum plaster or cement plaster shall not be less than three coats where applied over metal lath or wire fabric lath and not less than two coats where applied over other bases permitted by this chapter.\n\nException: Gypsum veneer plaster and cement plaster specifically designed and approved for one-coat applications.\n\n#---- 2511.1.1 Installation.\n\nInstallation of lathing and plaster materials shall conform to Table 2511.1.1 and Section 2507.\n\nTable 2511.1.1 Installation of Plaster Construction\n\n#--- 2511.2 Limitations.\n\nPlaster shall not be applied directly to fiber insulation board. Cement plaster shall not be applied directly to gypsum lath or gypsum plaster except as specified in Sections 2510.5.1 and 2510.5.2.\n\n#--- 2511.3 Grounds.\n\nWhere installed, grounds shall ensure the minimum thickness of plaster as set forth in ASTM C 842 and ASTM C 926. Plaster thickness shall be measured from the face of lath and other bases.\n\n#--- 2511.4 Interior masonry or concrete.\n\nCondition of surfaces shall be as specified in Section 2510.7. Approved specially prepared gypsum plaster designed for application to concrete surfaces or approved acoustical plaster is permitted. The total thickness of base coat plaster applied to concrete ceilings shall be as set forth in ASTM C 842 or ASTM C 926. Should ceiling surfaces require more than the maximum thickness permitted in ASTM C 842 or ASTM C 926, metal lath or wire fabric lath shall be installed on such surfaces before plastering.\n\n#--- 2511.5 Wet areas.\n\nShowers and public toilet walls shall conform to Sections 1210.2 and 1210.3. When wood frame walls and partitions are covered on the interior with cement plaster or tile of similar material and are subject to water splash, the framing shall be protected with an approved moisture barrier.\n\n#-- Section BC 2512: Exterior Plaster\n\n#--- 2512.1 General.\n\nPlastering with cement plaster shall be not less than three coats when applied over metal lath or wire fabric lath or gypsum board backing as specified in Section 2510.5 and shall be not less than two coats when applied over masonry or concrete. If the plaster surface is to be completely covered by veneer or other facing material, or is completely concealed by another wall, plaster application need be only two coats, provided the total thickness is as set forth in ASTM C 926.\n\n#---- 2512.1.1 On-grade floor slab.\n\nOn wood frame or steel stud construction with an on-grade concrete floor slab system, exterior plaster shall be applied in such a manner as to cover, but not to extend below, the lath and paper. The application of lath, paper and flashing or drip screeds shall comply with ASTM C 1063.\n\n#---- 2512.1.2 Weep screeds.\n\nA minimum 0.019-inch (0.48 mm) (No. 26 galvanized sheet gage), corrosion-resistant weep screed with a minimum vertical attachment flange of 3 1/2 inches (89 mm) shall be provided at or below the foundation plate line on exterior stud walls in accordance with ASTM C 926. The weep screed shall be placed a minimum of 4 inches (102 mm) above the earth or 2 inches (51 mm) above paved areas and be of a type that will allow trapped water to drain to the exterior of the building. The water-resistive barrier shall lap the attachment flange. The exterior lath shall cover and terminate on the attachment flange of the weep screed.\n\n#--- 2512.2 Plasticity agents.\n\nOnly approved plasticity agents and approved amounts thereof shall be added to portland cement or blended cements. When plastic cement or masonry cement is used, no additional lime or plasticizers shall be added. Hydrated lime or the equivalent amount of lime putty used as a plasticizer is permitted to be added to cement plaster or cement and lime plaster in an amount not to exceed that set forth in ASTM C 926.\n\n#--- 2512.3 Limitations.\n\nGypsum plaster shall not be used on exterior surfaces.\n\n#--- 2512.4 Cement plaster.\n\nPlaster coats shall be protected from freezing for a period of not less than 24 hours after set has occurred. Plaster shall be applied when the ambient temperature is higher than 40°F (4°C), unless provisions are made to keep cement plaster work above 40°F (4°C) during application and 48 hours thereafter.\n\n#--- 2512.5 Second-coat application.\n\nThe second coat shall be brought out to proper thickness, rodded and floated sufficiently rough to provide adequate bond for the finish coat. The second coat shall have no variation greater than 1/4 inch (6.4 mm) in any direction under a 5-foot (1524 mm) straight edge.\n\n#--- 2512.6 Curing and interval.\n\nFirst and second coats of cement plaster shall be applied and moist cured as set forth in ASTM C 926 and Table 2512.6.\n\nTable 2512.6 Cement Plasters\n\na. The first two coats shall be as required for the first coats of exterior plaster, except that the moist-curing time period between the first and second coats shall not be less than 24 hours. Moist curing shall not be required where job and weather conditions are favorable to the retention of moisture in the cement plaster for the required time period.\n\nb. Twenty-four-hour minimum interval between coats of interior cement plaster. For alternate method of application, see Section 2512.8.\n\nc. Finish coat plaster is permitted to be applied to interior cement base coats after a 48-hour period.\n\n#--- 2512.7 Application to solid backings.\n\nWhere applied over gypsum backing as specified in Section 2510.5 or directly to unit masonry surfaces, the second coat is permitted to be applied as soon as the first coat has attained sufficient hardness.\n\n#--- 2512.8 Alternate method of application.\n\nThe second coat is permitted to be applied as soon as the first coat has attained sufficiently rigidity to receive the second coat.\n\n#---- 2512.8.1 Admixtures.\n\nWhen using this method of application, calcium aluminate cement up to 15 percent of the weight of the portland cement is permitted to be added to the mix.\n\n#---- 2512.8.2 Curing.\n\nCuring of the first coat is permitted to be omitted and the second coat shall be cured as set forth in ASTM C 926 and Table 2512.6.\n\n#--- 2512.9 Finish coats.\n\nCement plaster finish coats shall be applied over base coats that have been in place for the time periods set forth in ASTM C 926. The third or finish coat shall be applied with sufficient material and pressure to bond and to cover the brown coat and shall be of sufficient thickness to conceal the brown coat.\n\n#-- Section BC 2513: Exposed Aggregate Plaster\n\n#--- 2513.1 General.\n\nExposed natural or integrally colored aggregate is permitted to be partially embedded in a natural or colored bedding coat of cement plaster or gypsum plaster, subject to the provisions of this section.\n\n#--- 2513.2 Aggregate.\n\nThe aggregate shall be applied manually or mechanically and shall consist of marble chips, pebbles or similar durable, moderately hard (three or more on the Mohs hardness scale), nonreactive materials.\n\n#--- 2513.3 Bedding coat proportions.\n\nThe bedding coat for interior or exterior surfaces shall be composed of one part portland cement and one part Type S lime; or one part blended cement and one part Type S lime; or masonry cement; or plastic cement and a maximum of three parts of graded white or natural sand by volume. The bedding coat for interior surfaces shall be composed of 100 pounds (45.4 kg) of neat gypsum plaster and a maximum of 200 pounds (90.8 kg) of graded white sand. A factory-prepared bedding coat for interior or exterior use is permitted. The bedding coat for exterior surfaces shall have a minimum compressive strength of 1,000 pounds per square inch (psi) (6895 kPa)\n\n#--- 2513.4 Application.\n\nThe bedding coat is permitted to be applied directly over the first (scratch) coat of plaster, provided the ultimate overall thickness is a minimum of 7/8 inch (22 mm), including lath. Over concrete or masonry surfaces, the overall thickness shall be a minimum of 1/2 inch (12.7 mm).\n\n#--- 2513.5 Bases.\n\nExposed aggregate plaster is permitted to be applied over concrete, masonry, cement plaster base coats or gypsum plaster base coats installed in accordance with Section 2511 or 2512.\n\n#--- 2513.6 Preparation of masonry and concrete.\n\nMasonry and concrete surfaces shall be prepared in accordance with the provisions of Section 2510.7.\n\n#--- 2513.7 Curing of base coats.\n\nCement plaster base coats shall be cured in accordance with ASTM C 926. Cement plaster bedding coats shall retain sufficient moisture for hydration (hardening) for 24 hours minimum or, where necessary, shall be kept damp for 24 hours by light water spraying.\n\n#-- Section BC 2514: Reinforced Gypsum Concrete\n\n#--- 2514.1 General.\n\nReinforced gypsum concrete shall comply with the requirements of ASTM C 317 and ASTM C 956.\n\n#--- 2514.2 Minimum thickness.\n\nThe minimum thickness of reinforced gypsum concrete shall be 2 inches (51 mm) except the minimum required thickness shall be reduced to 1 1/2 inches (38 mm), provided the following conditions are satisfied:\n\n1. The overall thickness, including the formboard, is not less than 2 inches (51 mm).\n\n2. The clear span of the gypsum concrete between supports does not exceed 33 inches (838 mm).\n\n3. Diaphragm action is not required.\n\n4. The design live load does not exceed 40 pounds per square foot (psf) (1915 Pa).\n\n#--- 2514.3 Limitations of use.\n\nReinforced gypsum concrete shall not be used where exposed directly to the weather or where subject to frequent or continuous wetting. Precast units shall be protected by coverings or coatings from the weather and from contact with moisture during shipment and during storage at the work site.",
+  "schemaVersion": 1
 }

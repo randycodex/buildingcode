@@ -47,6 +47,8 @@ struct SettingsView: View {
                             versionPicker
                             Divider()
                             codeSectionPicker
+                            Divider()
+                            comparisonModeToggle
                         }
                     }
 
@@ -223,6 +225,25 @@ struct SettingsView: View {
                 .padding(.vertical, 14)
             }
         }
+    }
+
+    private var comparisonModeToggle: some View {
+        Toggle(isOn: Binding(
+            get: { library.comparisonModeEnabled },
+            set: { library.updateComparisonMode(enabled: $0) }
+        )) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Comparison Mode")
+                    .font(.title3)
+                    .foregroundStyle(.primary)
+
+                Text("Adds a second browser tab for side-by-side code review.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
     }
 
     private var themePreviewCard: some View {

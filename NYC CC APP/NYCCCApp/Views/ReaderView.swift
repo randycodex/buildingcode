@@ -79,7 +79,7 @@ struct ReaderView: View {
             dismissKeyboard()
         }
         .overlay(alignment: .top) {
-            CodeTopContentFade()
+            CodeTopContentFade(alwaysVisible: true)
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle(navigationTitle)

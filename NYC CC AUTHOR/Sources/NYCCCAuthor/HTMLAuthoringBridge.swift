@@ -31,7 +31,7 @@ enum HTMLAuthoringBridge {
         options: []
     )
     private static let sectionGroupDefinitionRegex = try! NSRegularExpression(
-        pattern: #"(?i)^section\s+((?:bc\s+)?[A-Z]?\d+(?:\.\d+)*[A-Z]?)\s*[:\-]?\s*(.+)?$"#,
+        pattern: #"(?i)^section\s+(?:(BC|FGC|MC|PC)\s+)?([A-Z0-9.\-()]+)\s*[:\-]?\s*(.+)?$"#,
         options: []
     )
     private static let sectionNumberRegex = try! NSRegularExpression(
@@ -378,24 +378,32 @@ enum HTMLAuthoringBridge {
     private static func parseSectionGroupDefinition(from line: String) -> (number: String, title: String?)? {
         let range = NSRange(location: 0, length: line.utf16.count)
         guard let match = sectionGroupDefinitionRegex.firstMatch(in: line, range: range),
-              let numberRange = Range(match.range(at: 1), in: line) else {
+              let idRange = Range(match.range(at: 2), in: line) else {
             return nil
         }
 
-        let number = String(line[numberRange])
-            .replacingOccurrences(of: #"(?i)^bc\s+"#, with: "", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !number.isEmpty else { return nil }
+        let explicitPrefix: String?
+        if match.range(at: 1).location != NSNotFound, let prefixRange = Range(match.range(at: 1), in: line) {
+            explicitPrefix = String(line[prefixRange])
+        } else {
+            explicitPrefix = nil
+        }
+
+        var sectionID = String(line[idRange]).trimmingCharacters(in: .whitespacesAndNewlines)
+        if let explicitPrefix, !explicitPrefix.isEmpty {
+            sectionID = "\(explicitPrefix) \(sectionID)"
+        }
+        guard !sectionID.isEmpty else { return nil }
 
         let title: String?
-        if let titleRange = Range(match.range(at: 2), in: line) {
+        if match.range(at: 3).location != NSNotFound, let titleRange = Range(match.range(at: 3), in: line) {
             let value = String(line[titleRange]).trimmingCharacters(in: .whitespacesAndNewlines)
             title = value.isEmpty ? nil : value
         } else {
             title = nil
         }
 
-        return (number, title)
+        return (sectionID, title)
     }
 
     private static func parseSectionNumber(from line: String, appendixQMode: Bool = false) -> String? {

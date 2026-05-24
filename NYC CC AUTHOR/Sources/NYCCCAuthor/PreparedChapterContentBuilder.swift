@@ -224,7 +224,20 @@ enum PreparedChapterContentBuilder {
             if isTableStart(in: html, at: richStart) {
                 let tableEnd = matchingTableEnd(in: html, from: richStart) ?? html.endIndex
                 let tableHTML = String(html[richStart..<tableEnd]).trimmingCharacters(in: .whitespacesAndNewlines)
-                if !tableHTML.isEmpty {
+                if let tableID = tableReferenceID(in: tableHTML) {
+                    ordinal += 1
+                    blocks.append(
+                        PreparedContentBlock(
+                            id: "\(sectionID)-table-\(ordinal)",
+                            kind: .table,
+                            html: nil,
+                            tableID: tableID,
+                            imageID: nil,
+                            caption: nil,
+                            plainText: nil
+                        )
+                    )
+                } else if !tableHTML.isEmpty {
                     ordinal += 1
                     blocks.append(
                         PreparedContentBlock(
@@ -272,19 +285,32 @@ enum PreparedChapterContentBuilder {
 
     private static func isTableStart(in html: String, at index: String.Index) -> Bool {
         let lowercased = html[index...].lowercased()
-        return lowercased.hasPrefix("<scrolltable") || lowercased.hasPrefix("<table")
+        return lowercased.hasPrefix("<scrolltable") ||
+            lowercased.hasPrefix("<table") ||
+            lowercased.hasPrefix("<figure")
     }
 
     private static func nextTableStart(in html: String, from cursor: String.Index) -> String.Index? {
         let scrollTable = html.range(of: "<ScrollTable", options: [.caseInsensitive], range: cursor..<html.endIndex)?.lowerBound
         let table = html.range(of: "<table", options: [.caseInsensitive], range: cursor..<html.endIndex)?.lowerBound
-        return [scrollTable, table].compactMap { $0 }.min()
+        let tableReference = html.range(
+            of: #"<figure\b[^>]*\bdata-table-ref\s*="#,
+            options: [.regularExpression, .caseInsensitive],
+            range: cursor..<html.endIndex
+        )?.lowerBound
+        return [scrollTable, table, tableReference].compactMap { $0 }.min()
     }
 
     private static func matchingTableEnd(in html: String, from start: String.Index) -> String.Index? {
         if html[start...].lowercased().hasPrefix("<scrolltable"),
            let range = html.range(of: "</ScrollTable>", options: [.caseInsensitive], range: start..<html.endIndex) {
             return range.upperBound
+        }
+        if html[start...].lowercased().hasPrefix("<figure") {
+            if let range = html.range(of: "</figure>", options: [.caseInsensitive], range: start..<html.endIndex) {
+                return range.upperBound
+            }
+            return html.range(of: ">", range: start..<html.endIndex)?.upperBound
         }
         return html.range(of: "</table>", options: [.caseInsensitive], range: start..<html.endIndex)?.upperBound
     }
@@ -321,6 +347,19 @@ enum PreparedChapterContentBuilder {
             .split(separator: "/")
             .last
             .map(String.init)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func tableReferenceID(in html: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: #"(?i)\bdata-table-ref\s*=\s*"([^"]+)""#) else {
+            return nil
+        }
+        let nsHTML = html as NSString
+        guard let match = regex.firstMatch(in: html, range: NSRange(location: 0, length: nsHTML.length)),
+              match.numberOfRanges > 1 else {
+            return nil
+        }
+        return nsHTML.substring(with: match.range(at: 1))
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 

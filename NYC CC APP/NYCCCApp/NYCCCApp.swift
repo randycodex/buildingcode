@@ -35,12 +35,25 @@ struct NYCCCApp: App {
         WindowGroup {
             ZStack {
                 TabView(selection: $selectedTab) {
-                    BrowseView()
+                    BrowseView(browserContext: .primary)
                         .tabItem {
                             Image(systemName: "text.line.first.and.arrowtriangle.forward")
                             Text("")
                         }
                         .tag(AppTab.browse)
+
+                    if library.comparisonModeEnabled {
+                        DeferredBrowseTabView(
+                            browserContext: .secondary,
+                            isActive: selectedTab == .browseSecondary
+                        )
+                            .tabItem {
+                                Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                                Text("")
+                            }
+                            .tag(AppTab.browseSecondary)
+                    }
+
                     SearchView()
                         .tabItem {
                             Image(systemName: "sparkle.magnifyingglass")
@@ -64,6 +77,37 @@ struct NYCCCApp: App {
                 }
                 .environmentObject(library)
                 .tint(Color(uiColor: library.accentColor()))
+                .onChange(of: library.comparisonModeEnabled) { _, isEnabled in
+                    if !isEnabled, selectedTab == .browseSecondary {
+                        selectedTab = .browse
+                    }
+                }
+                .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
+                    guard let requestedContext else { return }
+                    selectedTab = requestedContext == .primary ? .browse : .browseSecondary
+                    library.browserTabSwitchRequest = nil
+                }
+                .onChange(of: selectedTab) { _, newTab in
+                    switch newTab {
+                    case .browse:
+                        library.syncSelectedCodeSection(from: .primary)
+                    case .browseSecondary:
+                        library.syncSelectedCodeSection(from: .secondary)
+                    default:
+                        break
+                    }
+                }
+                .onAppear {
+                    switch selectedTab {
+                    case .browse:
+                        library.syncSelectedCodeSection(from: .primary)
+                    case .browseSecondary:
+                        library.syncSelectedCodeSection(from: .secondary)
+                    default:
+                        break
+                    }
+                }
+                .id(library.comparisonModeEnabled)
 
                 if !library.isInitialContentLoaded {
                     loadingOverlay
@@ -100,9 +144,38 @@ struct NYCCCApp: App {
 
     private enum AppTab: Hashable {
         case browse
+        case browseSecondary
         case search
         case bookmarks
         case settings
+    }
+}
+
+private struct DeferredBrowseTabView: View {
+    let browserContext: BrowserContextID
+    let isActive: Bool
+
+    @State private var hasActivated = false
+
+    var body: some View {
+        Group {
+            if hasActivated || isActive {
+                BrowseView(browserContext: browserContext)
+            } else {
+                Color.clear
+                    .accessibilityHidden(true)
+            }
+        }
+        .onAppear {
+            if isActive {
+                hasActivated = true
+            }
+        }
+        .onChange(of: isActive) { _, newValue in
+            if newValue {
+                hasActivated = true
+            }
+        }
     }
 }
 

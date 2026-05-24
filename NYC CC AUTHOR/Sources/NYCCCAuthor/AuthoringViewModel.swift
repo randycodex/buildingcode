@@ -67,9 +67,7 @@ final class AuthoringViewModel: ObservableObject {
     init() {
         authoringProject = (try? authoringStore.load()) ?? EditorAuthoringProject()
         Self.ensureDefaultJurisdiction(in: &authoringProject)
-        authoringProject.tableManifest = nil
-        authoringProject.lastTableManifestPath = nil
-        tableManifest = nil
+        tableManifest = authoringProject.tableManifest
         selectedJurisdictionID = authoringProject.jurisdictions.first?.id
         selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == selectedJurisdictionID })?.id ?? authoringProject.codes.first?.id
         selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == selectedCodeID })?.id

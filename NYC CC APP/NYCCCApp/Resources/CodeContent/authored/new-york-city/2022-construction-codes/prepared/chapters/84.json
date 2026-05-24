@@ -1,735 +1,735 @@
 {
-  "chapterID" : 84,
-  "chapterNumber" : "3",
-  "groups" : [
+  "chapterID": 84,
+  "chapterNumber": "3",
+  "groups": [
     {
-      "headerLine" : "SECTION BC 301",
-      "headingLine" : "General",
-      "id" : "SECTION BC 301",
-      "sections" : [
+      "headerLine": "SECTION MC 301",
+      "headingLine": "General",
+      "id": "SECTION MC 301",
+      "sections": [
         {
-          "id" : 10281,
-          "kind" : "title",
-          "sectionNumber" : "301.1",
-          "title" : "301.1 Scope."
+          "id": 10281,
+          "kind": "title",
+          "sectionNumber": "301.1",
+          "title": "301.1 Scope."
         },
         {
-          "id" : 10282,
-          "kind" : "title",
-          "sectionNumber" : "301.2",
-          "title" : "301.2 Energy utilization."
+          "id": 10282,
+          "kind": "title",
+          "sectionNumber": "301.2",
+          "title": "301.2 Energy utilization."
         },
         {
-          "id" : 10283,
-          "kind" : "title",
-          "sectionNumber" : "301.3",
-          "title" : "301.3 Identification."
+          "id": 10283,
+          "kind": "title",
+          "sectionNumber": "301.3",
+          "title": "301.3 Identification."
         },
         {
-          "id" : 10284,
-          "kind" : "title",
-          "sectionNumber" : "301.4",
-          "title" : "301.4 Plastic pipe, fittings and components."
+          "id": 10284,
+          "kind": "title",
+          "sectionNumber": "301.4",
+          "title": "301.4 Plastic pipe, fittings and components."
         },
         {
-          "id" : 10285,
-          "kind" : "title",
-          "sectionNumber" : "301.5",
-          "title" : "301.5 Third-party testing and certification."
+          "id": 10285,
+          "kind": "title",
+          "sectionNumber": "301.5",
+          "title": "301.5 Third-party testing and certification."
         },
         {
-          "id" : 10286,
-          "kind" : "title",
-          "sectionNumber" : "301.6",
-          "title" : "301.6 Fuel gas appliances and equipment."
+          "id": 10286,
+          "kind": "title",
+          "sectionNumber": "301.6",
+          "title": "301.6 Fuel gas appliances and equipment."
         },
         {
-          "id" : 10287,
-          "kind" : "title",
-          "sectionNumber" : "301.7",
-          "title" : "301.7 Listed and labeled."
+          "id": 10287,
+          "kind": "title",
+          "sectionNumber": "301.7",
+          "title": "301.7 Listed and labeled."
         },
         {
-          "id" : 10288,
-          "kind" : "title",
-          "sectionNumber" : "301.8",
-          "title" : "301.8 Testing of materials."
+          "id": 10288,
+          "kind": "title",
+          "sectionNumber": "301.8",
+          "title": "301.8 Testing of materials."
         },
         {
-          "id" : 10289,
-          "kind" : "title",
-          "sectionNumber" : "301.9",
-          "title" : "301.9 Label information."
+          "id": 10289,
+          "kind": "title",
+          "sectionNumber": "301.9",
+          "title": "301.9 Label information."
         },
         {
-          "id" : 10290,
-          "kind" : "title",
-          "sectionNumber" : "301.10",
-          "title" : "301.10 Electrical."
+          "id": 10290,
+          "kind": "title",
+          "sectionNumber": "301.10",
+          "title": "301.10 Electrical."
         },
         {
-          "id" : 10291,
-          "kind" : "title",
-          "sectionNumber" : "301.11",
-          "title" : "301.11 Plumbing connections."
+          "id": 10291,
+          "kind": "title",
+          "sectionNumber": "301.11",
+          "title": "301.11 Plumbing connections."
         },
         {
-          "id" : 10292,
-          "kind" : "title",
-          "sectionNumber" : "301.12",
-          "title" : "301.12 Fuel types."
+          "id": 10292,
+          "kind": "title",
+          "sectionNumber": "301.12",
+          "title": "301.12 Fuel types."
         },
         {
-          "id" : 10293,
-          "kind" : "title",
-          "sectionNumber" : "301.13",
-          "title" : "301.13 Reserved."
+          "id": 10293,
+          "kind": "title",
+          "sectionNumber": "301.13",
+          "title": "301.13 Reserved."
         },
         {
-          "id" : 10294,
-          "kind" : "title",
-          "sectionNumber" : "301.14",
-          "title" : "301.14 Repair."
+          "id": 10294,
+          "kind": "title",
+          "sectionNumber": "301.14",
+          "title": "301.14 Repair."
         },
         {
-          "id" : 10295,
-          "kind" : "title",
-          "sectionNumber" : "301.15",
-          "title" : "301.15 Wind resistance."
+          "id": 10295,
+          "kind": "title",
+          "sectionNumber": "301.15",
+          "title": "301.15 Wind resistance."
         },
         {
-          "id" : 10296,
-          "kind" : "title",
-          "sectionNumber" : "301.16",
-          "title" : "301.16 Flood hazard."
+          "id": 10296,
+          "kind": "title",
+          "sectionNumber": "301.16",
+          "title": "301.16 Flood hazard."
         },
         {
-          "id" : 10297,
-          "kind" : "title",
-          "sectionNumber" : "301.16.1",
-          "title" : "301.16.1 High-velocity wave action."
+          "id": 10297,
+          "kind": "title",
+          "sectionNumber": "301.16.1",
+          "title": "301.16.1 High-velocity wave action."
         },
         {
-          "id" : 10298,
-          "kind" : "title",
-          "sectionNumber" : "301.17",
-          "title" : "301.17 Rodentproofing."
+          "id": 10298,
+          "kind": "title",
+          "sectionNumber": "301.17",
+          "title": "301.17 Rodentproofing."
         },
         {
-          "id" : 10299,
-          "kind" : "title",
-          "sectionNumber" : "301.18",
-          "title" : "301.18 Seismic resistance."
+          "id": 10299,
+          "kind": "title",
+          "sectionNumber": "301.18",
+          "title": "301.18 Seismic resistance."
         },
         {
-          "id" : 10300,
-          "kind" : "title",
-          "sectionNumber" : "302.1",
-          "title" : "302.1 Structural safety."
+          "id": 10300,
+          "kind": "title",
+          "sectionNumber": "302.1",
+          "title": "302.1 Structural safety."
         },
         {
-          "id" : 10301,
-          "kind" : "title",
-          "sectionNumber" : "302.1.1",
-          "title" : "302.1.1 Loading."
+          "id": 10301,
+          "kind": "title",
+          "sectionNumber": "302.1.1",
+          "title": "302.1.1 Loading."
         },
         {
-          "id" : 10302,
-          "kind" : "title",
-          "sectionNumber" : "302.2",
-          "title" : "302.2 Penetrations of floor\/ceiling assemblies and fire-resistance-rated assemblies."
+          "id": 10302,
+          "kind": "title",
+          "sectionNumber": "302.2",
+          "title": "302.2 Penetrations of floor/ceiling assemblies and fire-resistance-rated assemblies."
         },
         {
-          "id" : 10303,
-          "kind" : "title",
-          "sectionNumber" : "302.3",
-          "title" : "302.3 Cutting, notching and boring in wood framing."
+          "id": 10303,
+          "kind": "title",
+          "sectionNumber": "302.3",
+          "title": "302.3 Cutting, notching and boring in wood framing."
         },
         {
-          "id" : 10304,
-          "kind" : "title",
-          "sectionNumber" : "302.3.1",
-          "title" : "302.3.1 Solid non-engineered joist notches and holes."
+          "id": 10304,
+          "kind": "title",
+          "sectionNumber": "302.3.1",
+          "title": "302.3.1 Solid non-engineered joist notches and holes."
         },
         {
-          "id" : 10305,
-          "kind" : "title",
-          "sectionNumber" : "302.3.2",
-          "title" : "302.3.2 Stud cutting and notching."
+          "id": 10305,
+          "kind": "title",
+          "sectionNumber": "302.3.2",
+          "title": "302.3.2 Stud cutting and notching."
         },
         {
-          "id" : 10306,
-          "kind" : "title",
-          "sectionNumber" : "302.3.3",
-          "title" : "302.3.3 Bored holes in studs."
+          "id": 10306,
+          "kind": "title",
+          "sectionNumber": "302.3.3",
+          "title": "302.3.3 Bored holes in studs."
         },
         {
-          "id" : 10307,
-          "kind" : "title",
-          "sectionNumber" : "302.3.4",
-          "title" : "302.3.4 Engineered wood products."
+          "id": 10307,
+          "kind": "title",
+          "sectionNumber": "302.3.4",
+          "title": "302.3.4 Engineered wood products."
         },
         {
-          "id" : 10308,
-          "kind" : "title",
-          "sectionNumber" : "302.3.5",
-          "title" : "302.3.5 Drilling and notching of top plate."
+          "id": 10308,
+          "kind": "title",
+          "sectionNumber": "302.3.5",
+          "title": "302.3.5 Drilling and notching of top plate."
         },
         {
-          "id" : 10309,
-          "kind" : "title",
-          "sectionNumber" : "302.4",
-          "title" : "302.4 Trusses."
+          "id": 10309,
+          "kind": "title",
+          "sectionNumber": "302.4",
+          "title": "302.4 Trusses."
         },
         {
-          "id" : 10310,
-          "kind" : "title",
-          "sectionNumber" : "302.5",
-          "title" : "302.5 Cutting, notching and boring in steel framing."
+          "id": 10310,
+          "kind": "title",
+          "sectionNumber": "302.5",
+          "title": "302.5 Cutting, notching and boring in steel framing."
         },
         {
-          "id" : 10311,
-          "kind" : "title",
-          "sectionNumber" : "302.5.1",
-          "title" : "302.5.1 Structural steel framing."
+          "id": 10311,
+          "kind": "title",
+          "sectionNumber": "302.5.1",
+          "title": "302.5.1 Structural steel framing."
         },
         {
-          "id" : 10312,
-          "kind" : "title",
-          "sectionNumber" : "302.5.2",
-          "title" : "302.5.2 Cold-formed steel framing."
+          "id": 10312,
+          "kind": "title",
+          "sectionNumber": "302.5.2",
+          "title": "302.5.2 Cold-formed steel framing."
         },
         {
-          "id" : 10313,
-          "kind" : "title",
-          "sectionNumber" : "302.5.3",
-          "title" : "302.5.3 Nonstructural cold-formed steel wall framing."
+          "id": 10313,
+          "kind": "title",
+          "sectionNumber": "302.5.3",
+          "title": "302.5.3 Nonstructural cold-formed steel wall framing."
         },
         {
-          "id" : 10314,
-          "kind" : "title",
-          "sectionNumber" : "302.5.4",
-          "title" : "302.5.4 Steel floor and roof decking."
+          "id": 10314,
+          "kind": "title",
+          "sectionNumber": "302.5.4",
+          "title": "302.5.4 Steel floor and roof decking."
         },
         {
-          "id" : 10315,
-          "kind" : "title",
-          "sectionNumber" : "302.6",
-          "title" : "302.6 Cutting, notching and coring into concrete."
+          "id": 10315,
+          "kind": "title",
+          "sectionNumber": "302.6",
+          "title": "302.6 Cutting, notching and coring into concrete."
         },
         {
-          "id" : 10316,
-          "kind" : "title",
-          "sectionNumber" : "302.7",
-          "title" : "302.7 Protection of footings."
+          "id": 10316,
+          "kind": "title",
+          "sectionNumber": "302.7",
+          "title": "302.7 Protection of footings."
         },
         {
-          "id" : 10317,
-          "kind" : "title",
-          "sectionNumber" : "302.8",
-          "title" : "302.8 Piping materials exposed within plenums."
+          "id": 10317,
+          "kind": "title",
+          "sectionNumber": "302.8",
+          "title": "302.8 Piping materials exposed within plenums."
         },
         {
-          "id" : 10318,
-          "kind" : "title",
-          "sectionNumber" : "303.1",
-          "title" : "303.1 General."
+          "id": 10318,
+          "kind": "title",
+          "sectionNumber": "303.1",
+          "title": "303.1 General."
         },
         {
-          "id" : 10319,
-          "kind" : "title",
-          "sectionNumber" : "303.2",
-          "title" : "303.2 Hazardous locations."
+          "id": 10319,
+          "kind": "title",
+          "sectionNumber": "303.2",
+          "title": "303.2 Hazardous locations."
         },
         {
-          "id" : 10320,
-          "kind" : "title",
-          "sectionNumber" : "303.3",
-          "title" : "303.3 Prohibited locations."
+          "id": 10320,
+          "kind": "title",
+          "sectionNumber": "303.3",
+          "title": "303.3 Prohibited locations."
         },
         {
-          "id" : 10321,
-          "kind" : "title",
-          "sectionNumber" : "303.4",
-          "title" : "303.4 Protection from physical damage."
+          "id": 10321,
+          "kind": "title",
+          "sectionNumber": "303.4",
+          "title": "303.4 Protection from physical damage."
         },
         {
-          "id" : 10322,
-          "kind" : "title",
-          "sectionNumber" : "303.5",
-          "title" : "303.5 Indoor locations."
+          "id": 10322,
+          "kind": "title",
+          "sectionNumber": "303.5",
+          "title": "303.5 Indoor locations."
         },
         {
-          "id" : 10323,
-          "kind" : "title",
-          "sectionNumber" : "303.6",
-          "title" : "303.6 Outdoor locations."
+          "id": 10323,
+          "kind": "title",
+          "sectionNumber": "303.6",
+          "title": "303.6 Outdoor locations."
         },
         {
-          "id" : 10324,
-          "kind" : "title",
-          "sectionNumber" : "303.7",
-          "title" : "303.7 Pit locations."
+          "id": 10324,
+          "kind": "title",
+          "sectionNumber": "303.7",
+          "title": "303.7 Pit locations."
         },
         {
-          "id" : 10325,
-          "kind" : "title",
-          "sectionNumber" : "303.8",
-          "title" : "303.8 Elevator shafts."
+          "id": 10325,
+          "kind": "title",
+          "sectionNumber": "303.8",
+          "title": "303.8 Elevator shafts."
         },
         {
-          "id" : 10326,
-          "kind" : "title",
-          "sectionNumber" : "304.1",
-          "title" : "304.1 General."
+          "id": 10326,
+          "kind": "title",
+          "sectionNumber": "304.1",
+          "title": "304.1 General."
         },
         {
-          "id" : 10327,
-          "kind" : "title",
-          "sectionNumber" : "304.2",
-          "title" : "304.2 Conflicts."
+          "id": 10327,
+          "kind": "title",
+          "sectionNumber": "304.2",
+          "title": "304.2 Conflicts."
         },
         {
-          "id" : 10328,
-          "kind" : "title",
-          "sectionNumber" : "304.3",
-          "title" : "304.3 Elevation of ignition source."
+          "id": 10328,
+          "kind": "title",
+          "sectionNumber": "304.3",
+          "title": "304.3 Elevation of ignition source."
         },
         {
-          "id" : 10329,
-          "kind" : "title",
-          "sectionNumber" : "304.3.1",
-          "title" : "304.3.1 Parking garages."
+          "id": 10329,
+          "kind": "title",
+          "sectionNumber": "304.3.1",
+          "title": "304.3.1 Parking garages."
         },
         {
-          "id" : 10330,
-          "kind" : "title",
-          "sectionNumber" : "304.4",
-          "title" : "304.4 Prohibited equipment and appliance location."
+          "id": 10330,
+          "kind": "title",
+          "sectionNumber": "304.4",
+          "title": "304.4 Prohibited equipment and appliance location."
         },
         {
-          "id" : 10331,
-          "kind" : "title",
-          "sectionNumber" : "304.5",
-          "title" : "304.5 Hydrogen generating and refueling operations."
+          "id": 10331,
+          "kind": "title",
+          "sectionNumber": "304.5",
+          "title": "304.5 Hydrogen generating and refueling operations."
         },
         {
-          "id" : 10332,
-          "kind" : "title",
-          "sectionNumber" : "304.6",
-          "title" : "304.6 Public garages."
+          "id": 10332,
+          "kind": "title",
+          "sectionNumber": "304.6",
+          "title": "304.6 Public garages."
         },
         {
-          "id" : 10333,
-          "kind" : "title",
-          "sectionNumber" : "304.7",
-          "title" : "304.7 Private garages."
+          "id": 10333,
+          "kind": "title",
+          "sectionNumber": "304.7",
+          "title": "304.7 Private garages."
         },
         {
-          "id" : 10334,
-          "kind" : "title",
-          "sectionNumber" : "304.8",
-          "title" : "304.8 Construction and protection."
+          "id": 10334,
+          "kind": "title",
+          "sectionNumber": "304.8",
+          "title": "304.8 Construction and protection."
         },
         {
-          "id" : 10335,
-          "kind" : "title",
-          "sectionNumber" : "304.9",
-          "title" : "304.9 Clearances to combustible construction."
+          "id": 10335,
+          "kind": "title",
+          "sectionNumber": "304.9",
+          "title": "304.9 Clearances to combustible construction."
         },
         {
-          "id" : 10336,
-          "kind" : "title",
-          "sectionNumber" : "304.10",
-          "title" : "304.10 Clearances from grade."
+          "id": 10336,
+          "kind": "title",
+          "sectionNumber": "304.10",
+          "title": "304.10 Clearances from grade."
         },
         {
-          "id" : 10337,
-          "kind" : "title",
-          "sectionNumber" : "304.11",
-          "title" : "304.11 Guards."
+          "id": 10337,
+          "kind": "title",
+          "sectionNumber": "304.11",
+          "title": "304.11 Guards."
         },
         {
-          "id" : 10338,
-          "kind" : "title",
-          "sectionNumber" : "304.12",
-          "title" : "304.12 Area served."
+          "id": 10338,
+          "kind": "title",
+          "sectionNumber": "304.12",
+          "title": "304.12 Area served."
         },
         {
-          "id" : 10339,
-          "kind" : "title",
-          "sectionNumber" : "304.13",
-          "title" : "304.13 Rooftop access and obstructions."
+          "id": 10339,
+          "kind": "title",
+          "sectionNumber": "304.13",
+          "title": "304.13 Rooftop access and obstructions."
         },
         {
-          "id" : 10340,
-          "kind" : "title",
-          "sectionNumber" : "305.1",
-          "title" : "305.1 General."
+          "id": 10340,
+          "kind": "title",
+          "sectionNumber": "305.1",
+          "title": "305.1 General."
         },
         {
-          "id" : 10341,
-          "kind" : "title",
-          "sectionNumber" : "305.2",
-          "title" : "305.2 Materials."
+          "id": 10341,
+          "kind": "title",
+          "sectionNumber": "305.2",
+          "title": "305.2 Materials."
         },
         {
-          "id" : 10342,
-          "kind" : "title",
-          "sectionNumber" : "305.3",
-          "title" : "305.3 Structural attachment."
+          "id": 10342,
+          "kind": "title",
+          "sectionNumber": "305.3",
+          "title": "305.3 Structural attachment."
         },
         {
-          "id" : 10343,
-          "kind" : "title",
-          "sectionNumber" : "305.4",
-          "title" : "305.4 Interval of support."
+          "id": 10343,
+          "kind": "title",
+          "sectionNumber": "305.4",
+          "title": "305.4 Interval of support."
         },
         {
-          "id" : 10344,
-          "kind" : "title",
-          "sectionNumber" : "305.5",
-          "title" : "305.5 Protection against physical damage."
+          "id": 10344,
+          "kind": "title",
+          "sectionNumber": "305.5",
+          "title": "305.5 Protection against physical damage."
         },
         {
-          "id" : 10345,
-          "kind" : "title",
-          "sectionNumber" : "306.1",
-          "title" : "306.1 Access."
+          "id": 10345,
+          "kind": "title",
+          "sectionNumber": "306.1",
+          "title": "306.1 Access."
         },
         {
-          "id" : 10346,
-          "kind" : "title",
-          "sectionNumber" : "306.1.1",
-          "title" : "306.1.1 Central furnaces."
+          "id": 10346,
+          "kind": "title",
+          "sectionNumber": "306.1.1",
+          "title": "306.1.1 Central furnaces."
         },
         {
-          "id" : 10347,
-          "kind" : "title",
-          "sectionNumber" : "306.2",
-          "title" : "306.2 Appliances in rooms."
+          "id": 10347,
+          "kind": "title",
+          "sectionNumber": "306.2",
+          "title": "306.2 Appliances in rooms."
         },
         {
-          "id" : 10348,
-          "kind" : "title",
-          "sectionNumber" : "306.3",
-          "title" : "306.3 Appliances in attics."
+          "id": 10348,
+          "kind": "title",
+          "sectionNumber": "306.3",
+          "title": "306.3 Appliances in attics."
         },
         {
-          "id" : 10349,
-          "kind" : "title",
-          "sectionNumber" : "306.3.1",
-          "title" : "306.3.1 Electrical requirements."
+          "id": 10349,
+          "kind": "title",
+          "sectionNumber": "306.3.1",
+          "title": "306.3.1 Electrical requirements."
         },
         {
-          "id" : 10350,
-          "kind" : "title",
-          "sectionNumber" : "306.4",
-          "title" : "306.4 Appliances under floors."
+          "id": 10350,
+          "kind": "title",
+          "sectionNumber": "306.4",
+          "title": "306.4 Appliances under floors."
         },
         {
-          "id" : 10351,
-          "kind" : "title",
-          "sectionNumber" : "306.4.1",
-          "title" : "306.4.1 Electrical requirements."
+          "id": 10351,
+          "kind": "title",
+          "sectionNumber": "306.4.1",
+          "title": "306.4.1 Electrical requirements."
         },
         {
-          "id" : 10352,
-          "kind" : "title",
-          "sectionNumber" : "306.5",
-          "title" : "306.5 Equipment and appliances on roofs or elevated structures."
+          "id": 10352,
+          "kind": "title",
+          "sectionNumber": "306.5",
+          "title": "306.5 Equipment and appliances on roofs or elevated structures."
         },
         {
-          "id" : 10353,
-          "kind" : "title",
-          "sectionNumber" : "306.5.1",
-          "title" : "306.5.1 Sloped roofs."
+          "id": 10353,
+          "kind": "title",
+          "sectionNumber": "306.5.1",
+          "title": "306.5.1 Sloped roofs."
         },
         {
-          "id" : 10354,
-          "kind" : "title",
-          "sectionNumber" : "306.5.2",
-          "title" : "306.5.2 Electrical requirements."
+          "id": 10354,
+          "kind": "title",
+          "sectionNumber": "306.5.2",
+          "title": "306.5.2 Electrical requirements."
         },
         {
-          "id" : 10355,
-          "kind" : "title",
-          "sectionNumber" : "307.1",
-          "title" : "307.1 Fuel-burning appliances."
+          "id": 10355,
+          "kind": "title",
+          "sectionNumber": "307.1",
+          "title": "307.1 Fuel-burning appliances."
         },
         {
-          "id" : 10356,
-          "kind" : "title",
-          "sectionNumber" : "307.1.1",
-          "title" : "307.1.1 Condensate disposal."
+          "id": 10356,
+          "kind": "title",
+          "sectionNumber": "307.1.1",
+          "title": "307.1.1 Condensate disposal."
         },
         {
-          "id" : 10357,
-          "kind" : "title",
-          "sectionNumber" : "307.2",
-          "title" : "307.2 Evaporators and cooling coils."
+          "id": 10357,
+          "kind": "title",
+          "sectionNumber": "307.2",
+          "title": "307.2 Evaporators and cooling coils."
         },
         {
-          "id" : 10358,
-          "kind" : "title",
-          "sectionNumber" : "307.2.1",
-          "title" : "307.2.1 Condensate disposal."
+          "id": 10358,
+          "kind": "title",
+          "sectionNumber": "307.2.1",
+          "title": "307.2.1 Condensate disposal."
         },
         {
-          "id" : 10359,
-          "kind" : "title",
-          "sectionNumber" : "307.2.2",
-          "title" : "307.2.2 Drain pipe materials and sizes."
+          "id": 10359,
+          "kind": "title",
+          "sectionNumber": "307.2.2",
+          "title": "307.2.2 Drain pipe materials and sizes."
         },
         {
-          "id" : 10360,
-          "kind" : "title",
-          "sectionNumber" : "307.2.3",
-          "title" : "307.2.3 Auxiliary and secondary drain systems."
+          "id": 10360,
+          "kind": "title",
+          "sectionNumber": "307.2.3",
+          "title": "307.2.3 Auxiliary and secondary drain systems."
         },
         {
-          "id" : 10361,
-          "kind" : "title",
-          "sectionNumber" : "307.2.3.1",
-          "title" : "307.2.3.1 Water-level monitoring devices."
+          "id": 10361,
+          "kind": "title",
+          "sectionNumber": "307.2.3.1",
+          "title": "307.2.3.1 Water-level monitoring devices."
         },
         {
-          "id" : 10362,
-          "kind" : "title",
-          "sectionNumber" : "307.2.3.2",
-          "title" : "307.2.3.2 Appliance, equipment or insulation in pans."
+          "id": 10362,
+          "kind": "title",
+          "sectionNumber": "307.2.3.2",
+          "title": "307.2.3.2 Appliance, equipment or insulation in pans."
         },
         {
-          "id" : 10363,
-          "kind" : "title",
-          "sectionNumber" : "307.2.4",
-          "title" : "307.2.4 Traps."
+          "id": 10363,
+          "kind": "title",
+          "sectionNumber": "307.2.4",
+          "title": "307.2.4 Traps."
         },
         {
-          "id" : 10364,
-          "kind" : "title",
-          "sectionNumber" : "307.2.5",
-          "title" : "307.2.5 Drain line maintenance."
+          "id": 10364,
+          "kind": "title",
+          "sectionNumber": "307.2.5",
+          "title": "307.2.5 Drain line maintenance."
         },
         {
-          "id" : 10365,
-          "kind" : "title",
-          "sectionNumber" : "307.2.6",
-          "title" : "307.2.6 Condensate discharge."
+          "id": 10365,
+          "kind": "title",
+          "sectionNumber": "307.2.6",
+          "title": "307.2.6 Condensate discharge."
         },
         {
-          "id" : 10366,
-          "kind" : "title",
-          "sectionNumber" : "307.3",
-          "title" : "307.3 Exceptions."
+          "id": 10366,
+          "kind": "title",
+          "sectionNumber": "307.3",
+          "title": "307.3 Exceptions."
         },
         {
-          "id" : 10367,
-          "kind" : "title",
-          "sectionNumber" : "308.1",
-          "title" : "308.1 Scope."
+          "id": 10367,
+          "kind": "title",
+          "sectionNumber": "308.1",
+          "title": "308.1 Scope."
         },
         {
-          "id" : 10368,
-          "kind" : "title",
-          "sectionNumber" : "308.2",
-          "title" : "308.2 Listed appliances and equipment."
+          "id": 10368,
+          "kind": "title",
+          "sectionNumber": "308.2",
+          "title": "308.2 Listed appliances and equipment."
         },
         {
-          "id" : 10369,
-          "kind" : "title",
-          "sectionNumber" : "308.3",
-          "title" : "308.3 Protective assembly construction and installation."
+          "id": 10369,
+          "kind": "title",
+          "sectionNumber": "308.3",
+          "title": "308.3 Protective assembly construction and installation."
         },
         {
-          "id" : 10370,
-          "kind" : "title",
-          "sectionNumber" : "308.4",
-          "title" : "308.4 Allowable reduction."
+          "id": 10370,
+          "kind": "title",
+          "sectionNumber": "308.4",
+          "title": "308.4 Allowable reduction."
         },
         {
-          "id" : 10371,
-          "kind" : "title",
-          "sectionNumber" : "308.4.1",
-          "title" : "308.4.1 Labeled assemblies."
+          "id": 10371,
+          "kind": "title",
+          "sectionNumber": "308.4.1",
+          "title": "308.4.1 Labeled assemblies."
         },
         {
-          "id" : 10372,
-          "kind" : "title",
-          "sectionNumber" : "308.4.2",
-          "title" : "308.4.2 Reduction table."
+          "id": 10372,
+          "kind": "title",
+          "sectionNumber": "308.4.2",
+          "title": "308.4.2 Reduction table."
         },
         {
-          "id" : 10373,
-          "kind" : "title",
-          "sectionNumber" : "308.4.2.1",
-          "title" : "308.4.2.1 Solid fuel-burning appliances."
+          "id": 10373,
+          "kind": "title",
+          "sectionNumber": "308.4.2.1",
+          "title": "308.4.2.1 Solid fuel-burning appliances."
         },
         {
-          "id" : 10374,
-          "kind" : "title",
-          "sectionNumber" : "308.4.2.2",
-          "title" : "308.4.2.2 Masonry chimneys."
+          "id": 10374,
+          "kind": "title",
+          "sectionNumber": "308.4.2.2",
+          "title": "308.4.2.2 Masonry chimneys."
         },
         {
-          "id" : 10375,
-          "kind" : "title",
-          "sectionNumber" : "308.4.2.3",
-          "title" : "308.4.2.3 Chimney connector pass-throughs."
+          "id": 10375,
+          "kind": "title",
+          "sectionNumber": "308.4.2.3",
+          "title": "308.4.2.3 Chimney connector pass-throughs."
         },
         {
-          "id" : 10376,
-          "kind" : "title",
-          "sectionNumber" : "308.4.2.4",
-          "title" : "308.4.2.4 Masonry fireplaces."
+          "id": 10376,
+          "kind": "title",
+          "sectionNumber": "308.4.2.4",
+          "title": "308.4.2.4 Masonry fireplaces."
         },
         {
-          "id" : 10377,
-          "kind" : "title",
-          "sectionNumber" : "308.4.2.5",
-          "title" : "308.4.2.5 Kitchen exhaust ducts."
+          "id": 10377,
+          "kind": "title",
+          "sectionNumber": "308.4.2.5",
+          "title": "308.4.2.5 Kitchen exhaust ducts."
         },
         {
-          "id" : 10378,
-          "kind" : "title",
-          "sectionNumber" : "309.1",
-          "title" : "309.1 Space-heating systems."
+          "id": 10378,
+          "kind": "title",
+          "sectionNumber": "309.1",
+          "title": "309.1 Space-heating systems."
         },
         {
-          "id" : 10379,
-          "kind" : "title",
-          "sectionNumber" : "310.1",
-          "title" : "310.1 Required."
+          "id": 10379,
+          "kind": "title",
+          "sectionNumber": "310.1",
+          "title": "310.1 Required."
         },
         {
-          "id" : 10380,
-          "kind" : "title",
-          "sectionNumber" : "311.1",
-          "title" : "311.1 Required."
+          "id": 10380,
+          "kind": "title",
+          "sectionNumber": "311.1",
+          "title": "311.1 Required."
         },
         {
-          "id" : 10381,
-          "kind" : "title",
-          "sectionNumber" : "312.1",
-          "title" : "312.1 Load calculations."
+          "id": 10381,
+          "kind": "title",
+          "sectionNumber": "312.1",
+          "title": "312.1 Load calculations."
         },
         {
-          "id" : 10382,
-          "kind" : "title",
-          "sectionNumber" : "313.1",
-          "title" : "313.1 General."
+          "id": 10382,
+          "kind": "title",
+          "sectionNumber": "313.1",
+          "title": "313.1 General."
         },
         {
-          "id" : 10383,
-          "kind" : "title",
-          "sectionNumber" : "313.2",
-          "title" : "313.2 Noise from exterior mechanical equipment."
+          "id": 10383,
+          "kind": "title",
+          "sectionNumber": "313.2",
+          "title": "313.2 Noise from exterior mechanical equipment."
         },
         {
-          "id" : 10384,
-          "kind" : "title",
-          "sectionNumber" : "313.2.1",
-          "title" : "313.2.1 Design and installation."
+          "id": 10384,
+          "kind": "title",
+          "sectionNumber": "313.2.1",
+          "title": "313.2.1 Design and installation."
         },
         {
-          "id" : 10385,
-          "kind" : "title",
-          "sectionNumber" : "313.2.2",
-          "title" : "313.2.2 Operation."
+          "id": 10385,
+          "kind": "title",
+          "sectionNumber": "313.2.2",
+          "title": "313.2.2 Operation."
         },
         {
-          "id" : 10386,
-          "kind" : "title",
-          "sectionNumber" : "313.3",
-          "title" : "313.3 Minimum structure-borne noise and vibration isolation requirements."
+          "id": 10386,
+          "kind": "title",
+          "sectionNumber": "313.3",
+          "title": "313.3 Minimum structure-borne noise and vibration isolation requirements."
         },
         {
-          "id" : 10387,
-          "kind" : "title",
-          "sectionNumber" : "313.3.1",
-          "title" : "313.3.1 Boiler rooms."
+          "id": 10387,
+          "kind": "title",
+          "sectionNumber": "313.3.1",
+          "title": "313.3.1 Boiler rooms."
         },
         {
-          "id" : 10388,
-          "kind" : "title",
-          "sectionNumber" : "313.3.1.1",
-          "title" : "313.3.1.1 Boilers."
+          "id": 10388,
+          "kind": "title",
+          "sectionNumber": "313.3.1.1",
+          "title": "313.3.1.1 Boilers."
         },
         {
-          "id" : 10389,
-          "kind" : "title",
-          "sectionNumber" : "313.3.1.2",
-          "title" : "313.3.1.2 Boiler breeching and piping."
+          "id": 10389,
+          "kind": "title",
+          "sectionNumber": "313.3.1.2",
+          "title": "313.3.1.2 Boiler breeching and piping."
         },
         {
-          "id" : 10390,
-          "kind" : "title",
-          "sectionNumber" : "313.3.2",
-          "title" : "313.3.2 Refuse charging chutes."
+          "id": 10390,
+          "kind": "title",
+          "sectionNumber": "313.3.2",
+          "title": "313.3.2 Refuse charging chutes."
         },
         {
-          "id" : 10391,
-          "kind" : "title",
-          "sectionNumber" : "313.3.2.1",
-          "title" : "313.3.2.1 Metal chutes."
+          "id": 10391,
+          "kind": "title",
+          "sectionNumber": "313.3.2.1",
+          "title": "313.3.2.1 Metal chutes."
         },
         {
-          "id" : 10392,
-          "kind" : "title",
-          "sectionNumber" : "313.3.2.2",
-          "title" : "313.3.2.2 Masonry chutes."
+          "id": 10392,
+          "kind": "title",
+          "sectionNumber": "313.3.2.2",
+          "title": "313.3.2.2 Masonry chutes."
         },
         {
-          "id" : 10393,
-          "kind" : "title",
-          "sectionNumber" : "313.3.3",
-          "title" : "313.3.3 Piping."
+          "id": 10393,
+          "kind": "title",
+          "sectionNumber": "313.3.3",
+          "title": "313.3.3 Piping."
         },
         {
-          "id" : 10394,
-          "kind" : "title",
-          "sectionNumber" : "313.3.4",
-          "title" : "313.3.4 Fans."
+          "id": 10394,
+          "kind": "title",
+          "sectionNumber": "313.3.4",
+          "title": "313.3.4 Fans."
         },
         {
-          "id" : 10395,
-          "kind" : "title",
-          "sectionNumber" : "313.3.5",
-          "title" : "313.3.5 Pumps."
+          "id": 10395,
+          "kind": "title",
+          "sectionNumber": "313.3.5",
+          "title": "313.3.5 Pumps."
         },
         {
-          "id" : 10396,
-          "kind" : "title",
-          "sectionNumber" : "313.3.6",
-          "title" : "313.3.6 Compressors."
+          "id": 10396,
+          "kind": "title",
+          "sectionNumber": "313.3.6",
+          "title": "313.3.6 Compressors."
         },
         {
-          "id" : 10397,
-          "kind" : "title",
-          "sectionNumber" : "313.3.7",
-          "title" : "313.3.7 Cooling towers and fluid coolers."
+          "id": 10397,
+          "kind": "title",
+          "sectionNumber": "313.3.7",
+          "title": "313.3.7 Cooling towers and fluid coolers."
         },
         {
-          "id" : 10398,
-          "kind" : "title",
-          "sectionNumber" : "313.3.8",
-          "title" : "313.3.8 Evaporative condensers."
+          "id": 10398,
+          "kind": "title",
+          "sectionNumber": "313.3.8",
+          "title": "313.3.8 Evaporative condensers."
         },
         {
-          "id" : 10399,
-          "kind" : "title",
-          "sectionNumber" : "313.3.9",
-          "title" : "313.3.9 Duct connections to fans."
+          "id": 10399,
+          "kind": "title",
+          "sectionNumber": "313.3.9",
+          "title": "313.3.9 Duct connections to fans."
         },
         {
-          "id" : 10400,
-          "kind" : "title",
-          "sectionNumber" : "313.3.10",
-          "title" : "313.3.10 Ceiling suspended packaged HVAC units with compressors."
+          "id": 10400,
+          "kind": "title",
+          "sectionNumber": "313.3.10",
+          "title": "313.3.10 Ceiling suspended packaged HVAC units with compressors."
         }
       ]
     }
   ],
-  "rawDraftText" : "#- Chapter 3: General Regulations\n\nSection MC 301: General\n\n#--- 301.1 Scope.\n\nThis chapter shall govern the approval and installation of all equipment and appliances that comprise parts of the building mechanical systems regulated by this code in accordance with Section 101.2.\n\n#--- 301.2 Energy utilization.\n\nHeating, ventilating, air-conditioning, and refrigeration systems of all structures shall be designed and installed for efficient utilization of energy in accordance with the New York City Energy Conservation Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085.\n\n#--- 301.3 Identification.\n\nAll pipe and tubing and each pipe fitting utilized in a mechanical system shall bear the identification of the manufacturer.\n\n#--- 301.4 Plastic pipe, fittings and components.\n\nPlastic pipe, fittings and components shall be third-party certified.\n\n#--- 301.5 Third-party testing and certification.\n\nPiping, tubing and fittings shall comply with the applicable referenced standards, specifications and performance criteria of this code and shall be identified in accordance with Section 301.3. Piping, tubing and fittings shall either be tested by an approved third-party testing agency or certified by an approved third-party certification agency.\n\n#--- 301.6 Fuel gas appliances and equipment.\n\nThe approval and installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be in accordance with the New York City Fuel Gas Code.\n\n#--- 301.7 Listed and labeled.\n\nAppliances regulated by this code shall be listed and labeled for the application in which they are installed.\n\nException: Listing and labeling of equipment and appliances used for refrigeration shall be in accordance with Section 1101.2.\n\n#--- 301.8 Testing of materials.\n\nRefer to Section 28-113 of the Administrative Code.\n\n#--- 301.9 Label information.\n\nA permanent factory-applied name-plate(s) shall be affixed to appliances on which shall appear in legible lettering, the manufacturer's name or trademark, the model number, serial number and the seal or mark of the approved agency. A label shall also include the following:\n\n1. Electrical equipment and appliances: Electrical rating in volts, amperes and motor phase; identification of individual electrical components in volts, amperes or watts, motor phase; Btu\/h (W) output; and required clearances.\n\n2. Absorption units: Hourly rating in Btu\/h (W); minimum hourly rating for units having step or automatic modulating controls; type of fuel; type of refrigerant; cooling capacity in Btu\/h (W); and required clearances.\n\n3. Fuel-burning units: Hourly rating in Btu\/h (W); type of fuel approved for use with the appliance; and required clearances.\n\n4. Electric rating in volts, amperes and phase; Btu\/h (W) output rating; individual marking for each electrical component in amperes or watts, volts and phase; and required clearances from combustibles.\n\n#--- 301.10 Electrical.\n\nElectrical wiring, controls and connections to equipment and appliances regulated by this code shall be in accordance with the New York City Electrical Code.\n\n#--- 301.11 Plumbing connections.\n\nPotable water supply and building drainage system connections to equipment and appliances regulated by this code shall be in accordance with the New York City Plumbing Code.\n\n#--- 301.12 Fuel types.\n\nFuel-fired appliances shall be designed for use with the type of fuel to which they will be connected and the altitude at which they are installed. Appliances that comprise parts of the building mechanical system shall not be converted for the usage of a different fuel, except where approved and converted in accordance with the manufacturer's instructions. The fuel input rate shall not be increased or decreased beyond the limit rating for the altitude at which the appliance is installed.\n\n#--- 301.13 Reserved.\n\n#--- 301.14 Repair.\n\nDefective material or parts shall be replaced or repaired in such a manner so as to preserve the original approval or listing.\n\n#--- 301.15 Wind resistance.\n\nMechanical equipment, appliances and supports that are exposed to wind shall be designed and installed to resist the wind pressures determined in accordance with the New York City Building Code.\n\n#--- 301.16 Flood hazard.\n\nFor structures located in flood hazard areas, mechanical systems, equipment and appliances shall comply with the additional requirements of Appendix G of the New York City Building Code.\n\n#---- 301.16.1 High-velocity wave action.\n\nFor buildings in coastal high-hazard areas and coastal A-zones as established in Section G102 of the New York City Building Code, mechanical systems and equipment shall not be mounted on or penetrate through breakaway walls.\n\n#--- 301.17 Rodentproofing.\n\nBuildings or structures and the walls enclosing habitable or occupiable rooms and spaces in which persons live, sleep or work, or in which feed, food or foodstuffs are stored, prepared, processed, served or sold, shall be constructed to protect against the entrance of rodents in accordance with Appendix F of the New York City Building Code.\n\n#--- 301.18 Seismic resistance.\n\nWhere earthquake loads are applicable in accordance with the New York City Building Code, mechanical system supports shall be designed and installed for the seismic forces in accordance with the New York City Building Code.\n\nSection MC 302: Structural Safety\n\n#--- 302.1 Structural safety.\n\nThe building or structure shall not be weakened by the installation of mechanical systems. Where floors, walls, ceilings or any other portion of the building or structure are required to be altered or replaced in the process of installing or repairing any system, the building or structure shall be left in a safe structural condition in accordance with the New York City Building Code.\n\n#---- 302.1.1 Loading.\n\nAlterations resulting in the addition of loads to any member, such as HVAC equipment and water heaters, shall not be permitted without verification that the members are capable of supporting such additional loading.\n\n#--- 302.2 Penetrations of floor\/ceiling assemblies and fire-resistance-rated assemblies.\n\nPenetrations of floor\/ceiling assemblies and assemblies required to have a fire-resistance rating shall be protected in accordance with Chapter 7 of the New York City Building Code and Chapter 6 of this code.\n\n#--- 302.3 Cutting, notching and boring in wood framing.\n\nThe cutting, notching and boring of wood framing members shall comply with Sections 302.3.1 through 302.3.5.\n\n#---- 302.3.1 Solid non-engineered joist notches and holes.\n\nNotches on the ends of the solid, non-engineered joists shall not exceed one-fourth the joist depth. Notches in the top or bottom of joists shall not exceed one-sixth the depth, shall not be longer than one-third the depth and shall not be located in the middle third of the span. Holes bored in joists shall not be within 2 inches (50.8 mm) of the top or bottom of the joist, and the diameter of any such hole shall not exceed one-third the depth of the joist. Holes bored in the middle third of the span shall be located at the center of the joist depth. Clear distance between holes and notches shall be a minimum of 2 inches (50.8 mm). See Figure 2308.5.8 of the New York City Building Code.\n\n#---- 302.3.2 Stud cutting and notching.\n\nIn exterior walls and bearing partitions, wood studs are permitted to be cut or notched to a depth not exceeding 25 percent of the width of the stud. Cutting or notching of studs to a depth not greater than 40 percent of the width of the stud is permitted in nonbearing partitions supporting no loads other than the weight of the partition. See Figure 2308.5.8 of the New York City Building Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#---- 302.3.3 Bored holes in studs.\n\nBored holes not greater than 40 percent of the stud width are permitted to be bored in any wood stud. Bored holes not greater than 60 percent of the stud width are permitted in nonbearing partitions or in any wall where each bored stud is doubled, provided not more than two such successive doubled studs are so bored. In no case shall the edge of the bored hole be nearer than 5\/8 inch (15.9 mm) to the edge of the stud. Bored holes shall not be located at the same section of stud as a cut or notch. See Figure 2308.5.8 of the New York City Building Code.\n\n#---- 302.3.4 Engineered wood products.\n\nCuts, notches and holes bored in trusses, structural composite lumber, structural glue-laminated members or I-joists are prohibited except where permitted by the manufacturer's recommendations or where the effects of such alterations are specifically considered in the design of the member by a registered design professional.\n\n#---- 302.3.5 Drilling and notching of top plate.\n\nWhen piping or ductwork is placed in or partly in an exterior wall or interior load-bearing wall, necessitating cutting, drilling or notching of the top plate by more than 50 percent of its width, a galvanized metal tie not less than 0.054 inch thick (1.37 mm) (16 ga) and 1 1\/2 inches (38.1 mm) wide shall be fastened across and to the plate at each side of the opening with not less than eight 10d (0.148 inch diameter) nails having a minimum length of 1 1\/2 inches (38.1 mm) at each side or equivalent. The metal tie must extend a minimum of 6 inches (152.4 mm) past the opening. See Figure 2308.5.8 of the New York City Building Code.\n\nException: When the entire side of the wall with the notch or cut is covered by wood structural panel sheathing additional fastening is not required.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 302.4 Trusses.\n\nTruss members of any material and components shall not be cut, drilled, notched, spliced or otherwise altered in any way without written concurrence and approval of a registered design professional.\n\n#--- 302.5 Cutting, notching and boring in steel framing.\n\nThe cutting, notching and boring of steel framing members shall comply with Sections 302.5.1 through 302.5.4.\n\n#---- 302.5.1 Structural steel framing.\n\nThe cutting, notching and boring of holes in structural steel framing members shall be as prescribed by the registered design professional.\n\n#---- 302.5.2 Cold-formed steel framing.\n\nFlanges and lips of load-bearing cold-formed steel framing members shall not be cut or notched. Holes in webs of load-bearing cold-formed steel framing members shall be permitted along the centerline of the web of the framing member and shall not exceed the dimensional limitations, penetration spacing or minimum hole edge distance as prescribed by the registered design professional.\n\n#---- 302.5.3 Nonstructural cold-formed steel wall framing.\n\nFlanges and lips of nonstructural cold-formed steel wall studs shall be permitted along the centerline of the web of the framing member, shall not exceed 1 1\/2 inches (38.1 mm) in width or 4 inches (101.6 mm) in length, and the holes shall not be spaced less than 24 inches (609.6 mm) center to center from another hole or less than 10 inches (254 mm) from the bearing end.\n\n#---- 302.5.4 Steel floor and roof decking.\n\nCutting, notching and boring holes in steel floor and roof decking shall be as prescribed by the registered design professional.\n\n#--- 302.6 Cutting, notching and coring into concrete.\n\nThe cutting, notching or coring of concrete must comply with provisions of Chapter 19 of the New York City Building Code and is not permitted without prior approval of the registered design professional.\n\n#--- 302.7 Protection of footings.\n\nTrenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall. The upper boundary of the bearing plane is a line that extends downward, at an angle of 34 degrees (1:1.5 slope) from horizontal, from the outside bottom edge of the footing or wall.\n\n#--- 302.8 Piping materials exposed within plenums.\n\nPiping materials exposed within plenums shall comply with this code.\n\nSection MC 303: Equipment and Appliance Location\n\n#--- 303.1 General.\n\nEquipment and appliances shall be located as required by this section, specific requirements elsewhere in this code and the conditions of the equipment and appliance listing.\n\n#--- 303.2 Hazardous locations.\n\nAppliances shall not be located in a hazardous location unless listed and approved for the specific installation.\n\n#--- 303.3 Prohibited locations.\n\nAppliances shall not be located in sleeping rooms, bathrooms, toilet rooms, storage closets or surgical rooms, or in a space that opens only into such rooms or spaces, except where the installation complies with one of the following exceptions:\n\nExceptions: This section shall not apply to the following appliances:\n\n1. In rooms other than those used for sleeping purposes, direct-vent appliances that obtain all combustion air directly from the outdoors and are installed in accordance with the conditions of the listing and manufacturer's instructions.\n\n2. In rooms other than those used for sleeping purposes, vented room heaters, wall furnaces, vented decorative appliances, vented gas fireplaces, vented gas fireplace heaters and decorative appliances for installation in vented solid fuel-burning fireplaces that are installed in rooms that meet the required volume criteria of Section 702.\n\n3. In rooms other than those used for sleeping purposes, appliances installed in a dedicated enclosure in which all combustion air is taken directly from the outdoors, in accordance with Section 703. Access to such enclosure shall be through a solid door, weather-stripped in accordance with the exterior door air leakage requirements of the New York City Energy Conservation Code and equipped with an approved self-closing device.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085.\n\n#--- 303.4 Protection from physical damage.\n\nAppliances shall not be installed in a location where subject to physical damage, including vehicular impact, unless protected by approved barriers meeting the requirements of the New York City Fire Code.\n\n#--- 303.5 Indoor locations.\n\nFurnaces and boilers installed in closets and alcoves shall be listed for such installation.\n\n#--- 303.6 Outdoor locations.\n\nAppliances installed in other than indoor locations shall be listed and labeled for outdoor installation.\n\n#--- 303.7 Pit locations.\n\nAppliances installed in pits or excavations shall not come in direct contact with the surrounding soil. The sides of the pit or excavation shall be held back not less than 12 inches (304.8 mm) from the appliance. Where the depth exceeds 12 inches (304.8 mm) below adjoining grade, the walls of the pit or excavation shall be lined with concrete or masonry. Such concrete or masonry shall extend not less than 4 inches (101.6 mm) above adjoining grade and shall have sufficient lateral load-bearing capacity to resist collapse. The appliance shall be protected from flooding.\n\n#--- 303.8 Elevator shafts.\n\nMechanical systems shall not be located in an elevator shaft.\n\nSection MC 304: Installation\n\n#--- 304.1 General.\n\nEquipment and appliances shall be installed as required by the terms of their approval, in accordance with the conditions of the listing, the manufacturer's instructions and this code. Manufacturer's instructions shall be available on the job site at the time of inspection.\n\n#--- 304.2 Conflicts.\n\nWhere conflicts between this code and the conditions of listing or the manufacturer's instructions occur, the provisions of this code shall apply.\n\nException: Where a code provision is less restrictive than the conditions of the listing of the equipment or appliance or the manufacturer's installation instructions, the conditions of the listing and the manufacturer's installation instructions shall apply.\n\n#--- 304.3 Elevation of ignition source.\n\nEquipment and appliances having an ignition source and located in hazardous locations and public garages, private garages, repair garages, automotive motor fuel-dispensing facilities and parking garages shall be elevated such that the source of ignition is not less than 18 inches (457.2 mm) above the floor surface on which the equipment or appliance rests. For the purpose of this section, rooms or spaces that are not part of the living space of a dwelling unit and that communicate directly with a private garage through openings shall be considered to be part of the private garage.\n\nException: Elevation of the ignition source is not required for appliances that are listed as flammable vapor ignition resistant.\n\n#---- 304.3.1 Parking garages.\n\nConnection of a parking garage with any room in which there is a fuel-fired appliance shall be by means of a vestibule providing a two-doorway separation, except that a single door is permitted where the sources of ignition in the appliance are elevated in accordance with Section 304.3.\n\nException: This section shall not apply to appliance installations complying with Section 304.6.\n\n#--- 304.4 Prohibited equipment and appliance location.\n\nEquipment and appliances having an ignition source shall not be installed in Group H occupancies or control areas where open use, handling or dispensing of combustible, flammable or explosive materials occurs.\n\n#--- 304.5 Hydrogen generating and refueling operations.\n\nHydrogen generating and refueling operations shall be prohibited except as permitted by the Commissioner of the Fire Department.\n\n#--- 304.6 Public garages.\n\nAppliances located in public garages, motor fueling-dispensing facilities, repair garages or other areas frequented by motor vehicles, shall be installed not less than 8 feet (2438.4 mm) above the floor. Where motor vehicles are capable of passing under an appliance, the appliance shall be installed at the clearances required by the appliance manufacturer and not less than 1 foot (304.8 mm) higher than the tallest vehicle garage door opening.\n\nException: The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with NFPA 30A and Section 304.3 of this code.\n\n#--- 304.7 Private garages.\n\nAppliances located in private garages and carports shall be installed with a minimum clearance of 6 feet (1828.8 mm) above the floor.\n\nException: The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with Section 304.3.\n\n#--- 304.8 Construction and protection.\n\nBoiler rooms and furnace rooms shall be protected as required by the New York City Building Code.\n\n#--- 304.9 Clearances to combustible construction.\n\nHeat-producing equipment and appliances shall be installed to maintain the required clearances to combustible construction as specified in the listing and manufacturer's instructions. Such clearances shall be reduced only in accordance with Section 308. Clearances to combustibles shall include such considerations as door swing, drawer pull, overhead projections or shelving and window swing, shutters, coverings and drapes. Devices such as doorstops or limits, closers, drapery ties or guards shall not be used to provide the required clearances.\n\n#--- 304.10 Clearances from grade.\n\nEquipment and appliances installed at grade level shall be supported on a level concrete slab or other approved material extending not less than 3 inches (76.2 mm) above adjoining grade or shall be suspended not less than 6 inches (152.4 mm) above adjoining grade. Such support shall be in accordance with the manufacturer's instructions.\n\n#--- 304.11 Guards.\n\nGuards shall be provided where appliances, equipment, fans or other components that require service and roof hatch openings are located within 10 feet (3048 mm) of a roof edge or open side of a walking surface and such edge or open side is located more than 30 inches (762 mm) above the floor, roof or grade below. The guard shall extend not less than 30 inches (762 mm) beyond each end of such appliances, equipment, fans, components and roof hatch openings and the top of the guard shall be located not less than 42 inches (1066.8 mm) above the elevated surface adjacent to the guard. The guard shall be constructed so as to prevent the passage of a 21-inch-diameter (533.4 mm) sphere and shall comply with the loading requirements for guards specified in the New York City Building Code.\n\n#--- 304.12 Area served.\n\nAppliances serving different areas of a building other than where they are installed shall be permanently marked in an approved manner that uniquely identifies the appliance and the area it serves.\n\n#--- 304.13 Rooftop access and obstructions.\n\nEquipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the New York City Fire Code regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.\n\nSection MC 305: Piping Support\n\n#--- 305.1 General.\n\nMechanical system piping shall be supported in accordance with this section.\n\n#--- 305.2 Materials.\n\nPipe hangers and supports shall have sufficient strength to withstand all anticipated static and specified dynamic loading conditions associated with the intended use. Pipe hangers and supports that are in direct contact with piping shall be of materials that are compatible with the piping and that will not promote galvanic action.\n\n#--- 305.3 Structural attachment.\n\nHangers and anchors shall be attached to the building structure. Post-installed anchors shall be subject to special inspection in accordance with Section 1705.37 of the New York City Building Code.\n\n#--- 305.4 Interval of support.\n\nPiping shall be supported at distances not exceeding the spacing specified in Table 305.4, or in accordance with ANSI\/MSS SP-58.\n\nTable 305.4 Piping Support Spacing a, b, c\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na. See Section 301.18.\n\nb. The maximum horizontal spacing of cast-iron pipe hangers shall be increased to 10 feet where 10 foot lengths of pipe are installed.\n\nc. Mid-story guide.\n\n#--- 305.5 Protection against physical damage.\n\nIn concealed locations where piping, other than cast-iron or steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38.1 mm) from the nearest edge of the member, the pipe shall be protected by shield plates. Protective steel shield plates having a minimum thickness of 0.0575 inch (1.463 mm) (No. 16 gage) shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (50.8 mm) above sole plates and below top plates.\n\nSection MC 306: Access and Service Space\n\n#--- 306.1 Access.\n\nAppliances, control devices, heat exchangers and HVAC system components that require maintenance shall be accessible for inspection, service, repair and replacement without disabling the function of a fire-resistance-rated assembly or removing permanent construction, other appliances, venting systems or any other piping or ducts not connected to the appliance being inspected, serviced, repaired or replaced. A level working space not less than 30 inches deep and 30 inches wide (762 mm by 762 mm) shall be provided in front of the control side to service an appliance. Clearance shall also be provided as required by the New York City Electrical Code.\n\n#---- 306.1.1 Central furnaces.\n\nCentral furnaces within compartments or alcoves shall have a minimum working space clearance of 3 inches (76.2 mm) along the sides, back and top with a total width of the enclosing space being not less than 12 inches (304.8 mm) wider than the furnace. Furnaces having a firebox open to the atmosphere shall have not less than 6 inches (152.4 mm) working space along the front combustion chamber side. Combustion air openings at the rear or side of the compartment shall comply with the requirements of Chapter 7.\n\nException: This section shall not apply to replacement appliances installed in existing compartments and alcoves where the working space clearances are in accordance with the equipment or appliance manufacturer's instructions.\n\n#--- 306.2 Appliances in rooms.\n\nRooms containing appliances shall be provided with a door and an unobstructed passageway measuring not less than 36 inches (914.4 mm) wide and 80 inches (2032 mm) high.\n\nException: Within a dwelling unit, appliances installed in a compartment, alcove, basement or similar space shall be accessed by an opening or door and an unobstructed passageway measuring not less than 24 inches (609.6 mm) wide and large enough to allow removal of the largest appliance in the space, provided that a level service space of not less than 30 inches (762 mm) deep and the height of the appliance, but not less than 30 inches (762 mm), is present at the front or service side of the appliance with the door open.\n\n#--- 306.3 Appliances in attics.\n\nAttics containing appliances shall be provided with an opening and unobstructed passageway large enough to allow removal of the largest appliance. The passageway shall be not less than 30 inches (762 mm) high and 22 inches (558.8 mm) wide and not more than 20 feet (6096 mm) in length measured along the centerline of the passageway from the opening to the appliance. The passageway shall have continuous solid flooring not less than 24 inches (609.6 mm) wide. A level service space not less than 30 inches (762 mm) deep and 30 inches (762 mm) wide shall be present at the front or service side of the appliance. The clear access opening dimensions shall be not less than 20 inches by 30 inches (508 mm by 762 mm), and large enough to allow removal of the largest appliance.\n\nExceptions:\n\n1. The passageway and level service space are not required where the appliance is capable of being serviced and removed through the required opening.\n\n2. Where the passageway is unobstructed and not less than 6 feet (1828.8 mm) high and 24 inches (609.6 mm) wide for its entire length, the passageway shall be not greater than 50 feet (15 250 mm) in length.\n\n#---- 306.3.1 Electrical requirements.\n\nA luminaire controlled by a switch located at the required passageway opening and a receptacle outlet shall be provided at or near the appliance location in accordance with the New York City Electrical Code.\n\n#--- 306.4 Appliances under floors.\n\nUnder-floor spaces containing appliances shall be provided with an access opening and unobstructed passageway large enough to remove the largest appliance. The passageway shall be not less than 30 inches (762 mm) high and 22 inches (558.8 mm) wide, nor more than 20 feet (6096 mm) in length measured along the centerline of the passageway from the opening to the appliance. A level service space not less than 30 inches (762 mm) deep and 30 inches (762 mm) wide shall be present at the front or service side of the appliance. If the depth of the passageway or the service space exceeds 12 inches (304.8 mm) below the adjoining grade, the walls of the passageway shall be lined with concrete or masonry. Such concrete or masonry shall extend not less than 4 inches (101.6 mm) above the adjoining grade and shall have sufficient lateral-bearing capacity to resist collapse. The clear access opening dimensions shall be not less than 22 inches by 30 inches (558.8 mm by 762 mm), and large enough to allow removal of the largest appliance.\n\nExceptions:\n\n1. The passageway is not required where the level service space is present when the access is open and the appliance is capable of being serviced and removed through the required opening.\n\n2. Where the passageway is unobstructed and not less than 6 feet (1828.8 mm) high and 22 inches (558.8 mm) wide for its entire length, the passageway shall not be limited in length.\n\n#---- 306.4.1 Electrical requirements.\n\nA luminaire controlled by a switch located at the required passageway opening and a receptacle outlet shall be provided at or near the appliance location in accordance with the New York City Electrical Code.\n\n#--- 306.5 Equipment and appliances on roofs or elevated structures.\n\nWhere equipment or appliances requiring access are located on an elevated structure or the roof of a building such that personnel will have to climb higher than 16 feet (4876.8 mm) above grade, roof or floor level to access such equipment or appliances, an interior or exterior means of access shall be provided. Such access shall not require climbing over obstructions greater than 30 inches (762 mm) in height or walking on roofs having a slope greater than 4 units vertical in 12 units horizontal (33-percent slope). Such access to the roof or elevated structure and access from the roof or elevated structure to equipment requiring maintenance shall not require the use of portable ladders. Where access involves climbing over parapet walls, the height shall be measured to the top of the parapet wall.\n\nPermanent ladders installed to provide the required access shall comply with the following minimum design criteria:\n\n1. The side railing shall extend above the parapet or roof edge not less than 30 inches (762 mm).\n\n2. Ladders shall have rung spacing not to exceed 12 inches (304.8 mm) on center. The uppermost rung shall be not more than 24 inches (609.6 mm) below the upper edge of the roof hatch, roof or parapet, or equipment access platform, as applicable.\n\n3. Ladders shall have a toe spacing not less than 7 inches (177.8 mm) deep.\n\n4. There shall be not less than 18 inches (457.2 mm) between rails.\n\n5. Rungs shall have a diameter not less than 0.75-inch (19 mm) and be capable of withstanding a 300-pound (136.1 kg) load.\n\n6. Where a cage, well or ladder safety device is prohibited, ladders over 20 feet (6096 mm) in height shall be provided with landing platforms for each 30 feet (9144 mm) of height. Where a cage, well or ladder safety device is not provided, ladders over 20 feet (6096 mm) in height shall be provided with landing platforms for each 20 feet (6096 mm) of height. Landings shall be capable of withstanding 100 pounds (488.2 kg\/m 2 ) per square foot. A guard rail and toeboard shall be provided on all open sides of the landing.\n\n7. Climbing clearance. The distance from the centerline of the rungs to the nearest permanent object on the climbing side of the ladder shall be not less than 30 inches (762 mm) measured perpendicular to the rungs. This distance shall be maintained from the point of ladder access to the bottom of the roof hatch. A minimum clear width of 15 inches (381 mm) shall be provided on both sides of the ladder measured from the midpoint of and parallel with the rungs except where cages or wells are installed.\n\n8. Landing required. The ladder shall be provided with a clear and unobstructed bottom landing area having a minimum dimension of 30 inches by 30 inches (762 mm by 762 mm) centered in front of the ladder.\n\n9. Ladders shall be protected against corrosion by approved means.\n\n10. Service personnel shall have access to ladders at all times.\n\n11. Where ladder extensions are installed, the side rails of through or side-step ladder extensions shall extend 3 1\/2 feet (1066.8 mm) above the parapets and landings. For through ladder extensions, the rungs shall be omitted from the extensions and shall have not less than 18 inches (457.2 mm) nor more than 24 inches (609.6 mm) of clearance between rails. For side-step or offset fixed ladder sections, at landings, the side rails and rungs shall be carried to the next regular rung beyond or above the 3 1\/2 feet (1066.8 mm) minimum.\n\nCatwalks installed to provide the required access shall be not less than 24 inches (609.6 mm) wide and shall have railings as required for service platforms.\n\nException: This section shall not apply to Group R-3 occupancies.\n\n#---- 306.5.1 Sloped roofs.\n\nWhere appliances, equipment, fans or other components that require service are installed on a roof having a slope of three units vertical in 12 units horizontal (25-percent slope) or greater and having an edge more than 30 inches (762 mm) above grade at such edge, a level platform shall be provided on each side of the appliance or equipment to which access is required for service, repair or maintenance. The platform shall be not less than 30 inches (762 mm) in any dimension and shall be provided with guards. The guards shall extend not less than 42 inches (1066.8 mm) above the platform, shall be constructed so as to prevent the passage of a 21-inch (533.4 mm) diameter sphere and shall comply with the loading requirements for guards specified in the New York City Building Code. Access shall not require walking on roofs having a slope greater than four units vertical in 12 units horizontal (33-percent slope). Where access involves obstructions greater than 30 inches (762 mm) in height, such obstructions shall be provided with ladders installed in accordance with Section 306.5 or stairways installed in accordance with the requirements specified in the New York City Building Code in the path of travel to and from appliances, fans or equipment requiring service.\n\n#---- 306.5.2 Electrical requirements.\n\nA receptacle outlet shall be provided at or near the equipment location in accordance with the New York City Electrical Code.\n\nSection MC 307: Condensate Disposal\n\n#--- 307.1 Fuel-burning appliances.\n\nLiquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture or disposal area in accordance with the manufacturer's instructions. Condensate piping shall be of approved corrosion-resistant material in accordance with Section 803 of the New York City Plumbing Code and shall not be smaller than the drain connection on the appliance. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope). Piping shall be configured to permit clearing of blockages and performance of maintenance without requiring the drain line to be cut.\n\n#---- 307.1.1 Condensate disposal.\n\nCondensate from all fuel-burning appliances and associated flues shall be neutralized to a pH of at least 6 and no more than 8 prior to disposal to a sanitary system.\n\n#--- 307.2 Evaporators and cooling coils.\n\nCondensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 307.2.1 through 307.2.6.\n\nException: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.\n\n#---- 307.2.1 Condensate disposal.\n\nCondensate from all cooling coils and evaporators shall be conveyed from the drain pan outlet to an approved place of disposal. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope). Condensate shall not discharge into a street, alley or other areas so as to cause a nuisance.\n\n#---- 307.2.2 Drain pipe materials and sizes.\n\nComponents of the condensate disposal system shall be cast iron, galvanized steel, copper, cross-linked polyethylene, polyethylene, ABS, CPVC, or PVC pipe or tubing. Polypropylene tubing may be used in lengths that do not exceed 12 inches (304.8 mm) for an individual drain application. Components shall be selected for the pressure and temperature rating of the installation. Joints and connections shall be made in accordance with the applicable provisions of Chapter 7 of the New York City Plumbing Code relative to the material type. Condensate waste and drain line size shall be not less than 3\/4-inch (19.1 mm) internal diameter and shall not decrease in size from the drain pan connection to the place of condensate disposal. Where the drain pipes from more than one unit are manifolded together for condensate drainage, the pipe or tubing shall be sized in accordance with Table 307.2.2.\n\nTable 307.2.2 Condensate Drain Sizing\n\nFor SI: 1 inch = 25.4 mm, 1 ton = 3.517 kW.\n\n#---- 307.2.3 Auxiliary and secondary drain systems.\n\nIn addition to the requirements of Section 307.2.1, where damage to any building components could occur as a result of overflow from the equipment primary condensate removal system, one of the following auxiliary protection methods shall be provided for each cooling coil or fuel-fired appliance that produces condensate:\n\n1. An auxiliary drain pan with a separate drain shall be provided under the coils on which condensation will occur. The auxiliary pan drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The pan shall have a depth of not less than 1 1\/2 inches (38.1 mm), shall be not less than 3 inches (76.2 mm) larger than the unit, or the coil dimensions in width and length and shall be constructed of corrosion-resistant material. Metallic pans shall have a thickness of not less than 0.0236 inch (0.6010 mm) (No. 24 gage) for galvanized sheet metal pans, 0.0179 inch (0.4546 mm) (No. 26 gage) for stainless steel pans, or 0.0320 inch (0.8128 mm) (No. 20 gage) for aluminum pans. Nonmetallic pans shall have a thickness of not less than 0.0625 inch (1.6 mm).\n\n2. A separate overflow drain line shall be connected to the drain pan provided with the equipment. Such overflow drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The overflow drain line shall connect to the drain pan at a higher level than the primary drain connection.\n\n3. An auxiliary drain pan without a separate drain line shall be provided under the coils on which condensate will occur. Such pan shall be equipped with a listed water-level detection device that will shut off the equipment served prior to overflow of the pan. The auxiliary drain pan shall be constructed in accordance with Item 1 of this section.\n\n4. A listed water-level detection device shall be provided that will shut off the equipment served in the event that the primary drain is blocked. The device shall be installed in the primary drain line, the overflow drain line, or in the equipment-supplied drain pan, located at a point higher than the primary drain line connection and below the overflow rim of such pan.\n\nExceptions:\n\n1. An auxiliary drain protection method shall not be required for fuel-fired appliances that automatically shut down operation in the event of a stoppage in the condensate drainage system.\n\n2. An auxiliary drain protection method shall not be required where a suitably sized and located floor drain is provided.\n\n#----- 307.2.3.1 Water-level monitoring devices.\n\nOn down-flow units and all other coils that do not have a secondary drain or provisions to install a secondary or auxiliary drain pan, a water-level monitoring device shall be installed inside the primary drain pan. This device shall shut off the equipment served in the event that the primary drain becomes restricted. Devices installed in the drain line shall not be permitted.\n\n#----- 307.2.3.2 Appliance, equipment or insulation in pans.\n\nWhere an appliance, equipment or insulation is subject to water damage when auxiliary drain pans fill, that portion of the appliance, equipment or insulation shall be installed above the rim of the pans. Supports located inside of the pans to support the appliance or equipment or insulation shall be water resistant and approved.\n\n#---- 307.2.4 Traps.\n\nCondensate drains shall be trapped as required by the equipment or appliance manufacturer.\n\n#---- 307.2.5 Drain line maintenance.\n\nCondensate drain lines shall be configured to permit the clearing of blockages and performance of maintenance without requiring the drain line to be cut.\n\n#---- 307.2.6 Condensate discharge.\n\nWhere multiple evaporators and\/or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.\n\n#--- 307.3 Exceptions.\n\nThis section applies to permanently installed equipment. Window units and through-the-wall air-conditioning units are exempt from the requirements of this section.\n\nSection MC 308: Clearance Reduction\n\n#--- 308.1 Scope.\n\nThis section shall govern the reduction in required clearances to gypsum board, combustible materials and combustible assemblies for chimneys, vents, kitchen exhaust equipment, mechanical appliances, and mechanical devices and equipment.\n\n#--- 308.2 Listed appliances and equipment.\n\nThe reduction of the required clearances to combustibles for listed and labeled appliances and equipment shall be in accordance with the requirements of this section, except that such clearances shall not be reduced where reduction is specifically prohibited by the terms of the appliance or equipment listing.\n\n#--- 308.3 Protective assembly construction and installation.\n\nReduced clearance protective assemblies, including structural and support elements, shall be constructed of noncombustible materials. Spacers utilized to maintain an airspace between the protective assembly and the protected material or assembly shall be noncombustible. Where a space between the protective assembly and protected combustible material or assembly is specified, the same space shall be provided around the edges of the protective assembly and the spacers shall be placed so as to allow air circulation by convection in such space. Protective assemblies shall not be placed less than 1 inch (25.4 mm) from the mechanical appliances, devices or equipment, regardless of the allowable reduced clearance.\n\n#--- 308.4 Allowable reduction.\n\nThe reduction of required clearances to combustible assemblies or combustible materials shall be based on the utilization of a reduced clearance protective assembly in accordance with Section 308.4.1 or 308.4.2.\n\n#---- 308.4.1 Labeled assemblies.\n\nThe allowable clearance reduction shall be based on a reduced clearance protective assembly that has been tested and bears the label of an approved agency.\n\n#---- 308.4.2 Reduction table.\n\nThe allowable clearance reduction shall be based on one of the methods specified in Table 308.4.2. Where required clearances are not listed in Table 308.4.2, the reduced clearances shall be determined by linear interpolation between the distances listed in the table. Reduced clearances shall not be derived by extrapolation below the range of the table.\n\nTable 308.4.2 Clearance Reduction Methods b\n\nFor SI: 1 inch = 25.4 mm, °C = ((°F)-32)\/1.8, 1 pound per cubic foot = 16.02 kg\/m 3 , 1.0 Btu ∙ in\/(ft 2 ∙ h ∙ °F) = 0.144 W\/m 2 ∙ K.\n\na. Mineral wool and glass fiber batts (blanket or board) shall have a minimum density of 8 pounds per cubic foot and a minimum melting point of 1,500°F. Insulation material utilized as part of a clearance reduction system shall have a thermal conductivity of 1.0 Btu ∙ in.\/(ft 2 ∙ h ∙ °F) or less. Insulation board shall be formed of noncombustible material.\n\nb. For limitations on clearance reduction for solid fuel-burning appliances, masonry chimneys, connector pass-throughs, masonry fireplaces and kitchen ducts, see Sections 308.4.2.1 through 308.4.2.5.\n\n#----- 308.4.2.1 Solid fuel-burning appliances.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearance required for solid fuel-burning appliances that are labeled for installation with clearances of 12 inches (304.8 mm) or less. Where appliances are labeled for installation with clearances of greater than 12 inches (304.8 mm), the clearance reduction methods of Table 308.4.2 shall not reduce the clearance to less than 12 inches (304.8 mm).\n\n#----- 308.4.2.2 Masonry chimneys.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearances required for masonry chimneys as specified in the New York City Building Code and Chapter 8 of this code.\n\n#----- 308.4.2.3 Chimney connector pass-throughs.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearances required for chimney connector pass-throughs as specified in Section 803.10.4.\n\n#----- 308.4.2.4 Masonry fireplaces.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearances required for masonry fireplaces as specified in the New York City Building Code and Chapter 8 of this code.\n\n#----- 308.4.2.5 Kitchen exhaust ducts.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the minimum clearances required by Section 506.3.11 for kitchen exhaust ducts enclosed in a shaft.\n\nSection MC 309: Temperature Control\n\n#--- 309.1 Space-heating systems.\n\nInterior spaces intended for human occupancy shall be provided with active or passive space-heating systems capable of maintaining an indoor temperature of not less than 68°F (20°C) at a point 3 feet (914.4 mm) above floor on the design heating day. The installation of portable space heaters shall not be used to achieve compliance with this section. Refer to Section 1204 of the New York City Building Code.\n\nException: Interior spaces where the primary purpose is not associated with human comfort.\n\nSection MC 310: Explosion Control\n\n#--- 310.1 Required.\n\nStructures occupied for purposes involving explosion hazards shall be provided with explosion control in compliance with rules of the Commissioner of the Fire Department. Explosion control systems shall be designed and installed in accordance with the New York City Fire Code.\n\nSection MC 311: Smoke and Heat Vents\n\n#--- 311.1 Required.\n\nApproved smoke and heat vents shall be installed in the roofs of one-story buildings where required by the New York City Fire Code. Smoke and heat vents shall be designed and installed in accordance with the New York City Fire Code.\n\nSection MC 312: Heating and Cooling Load Calculations\n\n#--- 312.1 Load calculations.\n\nHeating and cooling system design loads for the purpose of sizing systems, appliances and equipment shall be determined in accordance with the procedures described in the ASHRAE ACCA Standard 183. Alternatively, design loads shall be determined by an approved equivalent computation procedure, using the design parameters specified in the New York City Energy Conservation Code. Heating and cooling system design loads for the purpose of sizing systems, appliances and equipment shall also comply with the requirements of Section 1204 of the New York City Building Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085.\n\nSection MC 313: Noise Control and Vibration Isolation Requirements\n\n#--- 313.1 General.\n\nInterior and exterior mechanical equipment and systems shall comply with the provisions of this section.\n\n#--- 313.2 Noise from exterior mechanical equipment.\n\nMechanical equipment located outside of the building in a yard or court or on a roof, or located inside a building but open to the exterior of the building, shall comply with the requirements of Sections 313.2.1 and 313.2.2.\n\n#---- 313.2.1 Design and installation.\n\nThe applicant shall select and design any such exterior mechanical equipment in order to achieve compliance with the applicable requirements of Sections 24-218, 24-227, 24-228 and 24-232 of the Administrative Code, also known as the New York City Noise Control Code, in accordance with generally acceptable engineering practices.\n\n#---- 313.2.2 Operation.\n\nThe operation of such exterior mechanical equipment shall comply with any applicable requirements of Sections 24-218, 24-227, 24-228 and 24-232 of the New York City Noise Control Code, as enforced by the Department of Environmental Protection.\n\n#--- 313.3 Minimum structure-borne noise and vibration isolation requirements.\n\nAll isolators shall comply with the requirements of Sections 313.3.1 through 313.3.10. Where vibration isolation of equipment and appliances is employed, supplemental restraint shall be used to accomplish the support and restraint.\n\nException: When specified by the registered design professional, the requirements of Sections 313.3.1 through 313.3.10 may be modified provided that the equipment, appliances, and supports shall be designed and installed so that continuous or intermittent vibration transmitted to structural slabs shall not exceed the following values between 8 Hz and 80 Hz on the structural slab in the affected occupancy space:\n\n1. Group E, I or R occupancies: 5,600 microinches (142.4 µm) per second.\n\n2. All other occupancies: 16,000 microinches (406.4 µm) per second.\n\nFor the purposes of this exception, transmitted vibration shall be in accordance with the following parameters:\n\n1. The peak third-octave band RMS velocity measurements.\n\n2. The method shall be in accordance with ANSI\/ASA S2.71.\n\n#---- 313.3.1 Boiler rooms.\n\nBoilers, boiler breeching, and boiler piping shall be isolated in accordance with the applicable requirements of Sections 313.3.1.1 and 313.3.1.2.\n\n#----- 313.3.1.1 Boilers.\n\nAll boilers supported on floors directly above a story having dwelling units shall be supported on resilient isolators having a minimum static deflection of 1 inch (25.4 mm). The isolators shall be installed directly under the structural frame of the boiler.\n\n#----- 313.3.1.2 Boiler breeching and piping.\n\nWhen boilers are equipped with mechanical draft fans, the boiler breeching and piping that are supported from or on slabs, floors or walls that are contiguous to the dwelling unit shall be supported for a distance of 50 pipe diameters on or from resilient isolators. Each isolator shall have a minimum static deflection of 1 inch (25.4 mm).\n\n#---- 313.3.2 Refuse charging chutes.\n\nMetal chutes, chute supports, and chute bracing shall be installed in accordance with Section 313.3.2.1. Masonry chutes must comply with Section 313.3.2.2.\n\n#----- 313.3.2.1 Metal chutes.\n\nMetal chutes, metal chute supports, and\/or metal chute bracing shall be free of direct contact with the shaft enclosure and the openings provided in the floor construction. Metal chutes shall be resiliently supported at each structural support location. Isolators shall provide a minimum static deflection of 0.30 inches (7.62 mm). All chutes shall be plumb.\n\n#----- 313.3.2.2 Masonry chutes.\n\nThe interior chute wall shall be plumb and without obstructions for the full height of the shaft and shall have a smooth interior finish.\n\n#---- 313.3.3 Piping.\n\nEquipment piping shall be installed as follows:\n\n1. Metal piping connected to power driven equipment shall be resiliently supported from or on the building structure for a distance of 50 pipe diameters from the power driven equipment. The resilient isolators shall have a minimum static deflection of 1 inch (25.4 mm) for all piping with a 4 inch (101.6 mm) or larger in actual outside diameter and 1\/2 inch (12.7 mm) for piping with less than 4 inches (101.6 mm) in actual outside diameter. Piping connected to fluid pressure-reducing valves shall be resiliently isolated for a distance of 50 pipe diameters from pressure-reducing valves and isolators shall provide a minimum static deflection of 1\/2 inch (12.7 mm).\n\n2. Equipment such as heat exchangers, absorption refrigeration machines, or similar equipment, that is located on any floor or roof other than a floor on grade, and that is not power driven but is connected by metal piping to power driven equipment, shall be resiliently supported from or on the building structure, for a distance of 50 pipe diameters from the power driven equipment. The resilient supports shall be vibration isolators having a minimum static deflection of 1 inch (25.4 mm) and shall incorporate approved resilient pads having a minimum thickness of 1\/4 inch (6.4 mm).\n\n#---- 313.3.4 Fans.\n\nAll fan equipment with motors in excess of 1\/2 horsepower (0.37 kW), located on any roof or floor other than a floor on grade shall be mounted on or from vibration isolators. Fan equipment with motor drives separated from the fan equipment shall be supported on an isolated integral rigid structural base supporting both the fan and motor. Fan equipment with motor drives supported from the fan equipment shall be mounted directly on vibration isolators. Each isolator shall have provision for leveling. Isolators shall incorporate resilient pads having a minimum thickness of 1\/4 inch (6.4 mm). The vibration isolators shall provide a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum deflection of 2 inches (50.8 mm). Fans and compressors assembled in unitary containers may meet this requirement with isolators internal to the container providing the isolators meet the above minimum isolator efficiencies.\n\n#---- 313.3.5 Pumps.\n\nAll pumps of 3 horsepower (2.24 kW) or more located on any floor other than a floor on grade shall be supported on vibration isolators having a minimum isolation efficiency of 90 percent at the lowest disturbing frequency. Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm).\n\n#---- 313.3.6 Compressors.\n\nCompressors and drives located on a floor other than a floor on grade shall be mounted on vibration isolators having a minimum isolation efficiency of 90 percent at the lowest disturbing frequency. Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm).\n\n#---- 313.3.7 Cooling towers and fluid coolers.\n\nAll moving parts of cooling towers located on a roof or floor other than a floor on grade shall be installed on vibration isolators providing a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum static deflection of 4 inches (101.6 mm). Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm). Vibration cutoff switches shall be provided.\n\n#---- 313.3.8 Evaporative condensers.\n\nEvaporative and air-cooled condensers located on a roof or floor other than a floor on grade shall be mounted on vibration isolators providing a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum static deflection of 4 inches (101.6 mm). Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm). Vibration cutoff switches shall be provided on evaporative condensers.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#---- 313.3.9 Duct connections to fans.\n\nFlexible connections shall be installed between fan equipment and connecting ductwork.\n\n#---- 313.3.10 Ceiling suspended packaged HVAC units with compressors.\n\nEquipment such as heat pumps, air-conditioning units, or similar equipment, that is suspended from a structure shall be resiliently supported from or on the building structure. Vibration isolators shall have a minimum isolation efficiency of 90 percent at the lowest disturbing frequency.",
-  "schemaVersion" : 1
+  "rawDraftText": "#- Chapter 3: General Regulations\n\nSection MC 301: General\n\n#--- 301.1 Scope.\n\nThis chapter shall govern the approval and installation of all equipment and appliances that comprise parts of the building mechanical systems regulated by this code in accordance with Section 101.2.\n\n#--- 301.2 Energy utilization.\n\nHeating, ventilating, air-conditioning, and refrigeration systems of all structures shall be designed and installed for efficient utilization of energy in accordance with the New York City Energy Conservation Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/085.\n\n#--- 301.3 Identification.\n\nAll pipe and tubing and each pipe fitting utilized in a mechanical system shall bear the identification of the manufacturer.\n\n#--- 301.4 Plastic pipe, fittings and components.\n\nPlastic pipe, fittings and components shall be third-party certified.\n\n#--- 301.5 Third-party testing and certification.\n\nPiping, tubing and fittings shall comply with the applicable referenced standards, specifications and performance criteria of this code and shall be identified in accordance with Section 301.3. Piping, tubing and fittings shall either be tested by an approved third-party testing agency or certified by an approved third-party certification agency.\n\n#--- 301.6 Fuel gas appliances and equipment.\n\nThe approval and installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be in accordance with the New York City Fuel Gas Code.\n\n#--- 301.7 Listed and labeled.\n\nAppliances regulated by this code shall be listed and labeled for the application in which they are installed.\n\nException: Listing and labeling of equipment and appliances used for refrigeration shall be in accordance with Section 1101.2.\n\n#--- 301.8 Testing of materials.\n\nRefer to Section 28-113 of the Administrative Code.\n\n#--- 301.9 Label information.\n\nA permanent factory-applied name-plate(s) shall be affixed to appliances on which shall appear in legible lettering, the manufacturer's name or trademark, the model number, serial number and the seal or mark of the approved agency. A label shall also include the following:\n\n1. Electrical equipment and appliances: Electrical rating in volts, amperes and motor phase; identification of individual electrical components in volts, amperes or watts, motor phase; Btu/h (W) output; and required clearances.\n\n2. Absorption units: Hourly rating in Btu/h (W); minimum hourly rating for units having step or automatic modulating controls; type of fuel; type of refrigerant; cooling capacity in Btu/h (W); and required clearances.\n\n3. Fuel-burning units: Hourly rating in Btu/h (W); type of fuel approved for use with the appliance; and required clearances.\n\n4. Electric rating in volts, amperes and phase; Btu/h (W) output rating; individual marking for each electrical component in amperes or watts, volts and phase; and required clearances from combustibles.\n\n#--- 301.10 Electrical.\n\nElectrical wiring, controls and connections to equipment and appliances regulated by this code shall be in accordance with the New York City Electrical Code.\n\n#--- 301.11 Plumbing connections.\n\nPotable water supply and building drainage system connections to equipment and appliances regulated by this code shall be in accordance with the New York City Plumbing Code.\n\n#--- 301.12 Fuel types.\n\nFuel-fired appliances shall be designed for use with the type of fuel to which they will be connected and the altitude at which they are installed. Appliances that comprise parts of the building mechanical system shall not be converted for the usage of a different fuel, except where approved and converted in accordance with the manufacturer's instructions. The fuel input rate shall not be increased or decreased beyond the limit rating for the altitude at which the appliance is installed.\n\n#--- 301.13 Reserved.\n\n#--- 301.14 Repair.\n\nDefective material or parts shall be replaced or repaired in such a manner so as to preserve the original approval or listing.\n\n#--- 301.15 Wind resistance.\n\nMechanical equipment, appliances and supports that are exposed to wind shall be designed and installed to resist the wind pressures determined in accordance with the New York City Building Code.\n\n#--- 301.16 Flood hazard.\n\nFor structures located in flood hazard areas, mechanical systems, equipment and appliances shall comply with the additional requirements of Appendix G of the New York City Building Code.\n\n#---- 301.16.1 High-velocity wave action.\n\nFor buildings in coastal high-hazard areas and coastal A-zones as established in Section G102 of the New York City Building Code, mechanical systems and equipment shall not be mounted on or penetrate through breakaway walls.\n\n#--- 301.17 Rodentproofing.\n\nBuildings or structures and the walls enclosing habitable or occupiable rooms and spaces in which persons live, sleep or work, or in which feed, food or foodstuffs are stored, prepared, processed, served or sold, shall be constructed to protect against the entrance of rodents in accordance with Appendix F of the New York City Building Code.\n\n#--- 301.18 Seismic resistance.\n\nWhere earthquake loads are applicable in accordance with the New York City Building Code, mechanical system supports shall be designed and installed for the seismic forces in accordance with the New York City Building Code.\n\nSection MC 302: Structural Safety\n\n#--- 302.1 Structural safety.\n\nThe building or structure shall not be weakened by the installation of mechanical systems. Where floors, walls, ceilings or any other portion of the building or structure are required to be altered or replaced in the process of installing or repairing any system, the building or structure shall be left in a safe structural condition in accordance with the New York City Building Code.\n\n#---- 302.1.1 Loading.\n\nAlterations resulting in the addition of loads to any member, such as HVAC equipment and water heaters, shall not be permitted without verification that the members are capable of supporting such additional loading.\n\n#--- 302.2 Penetrations of floor/ceiling assemblies and fire-resistance-rated assemblies.\n\nPenetrations of floor/ceiling assemblies and assemblies required to have a fire-resistance rating shall be protected in accordance with Chapter 7 of the New York City Building Code and Chapter 6 of this code.\n\n#--- 302.3 Cutting, notching and boring in wood framing.\n\nThe cutting, notching and boring of wood framing members shall comply with Sections 302.3.1 through 302.3.5.\n\n#---- 302.3.1 Solid non-engineered joist notches and holes.\n\nNotches on the ends of the solid, non-engineered joists shall not exceed one-fourth the joist depth. Notches in the top or bottom of joists shall not exceed one-sixth the depth, shall not be longer than one-third the depth and shall not be located in the middle third of the span. Holes bored in joists shall not be within 2 inches (50.8 mm) of the top or bottom of the joist, and the diameter of any such hole shall not exceed one-third the depth of the joist. Holes bored in the middle third of the span shall be located at the center of the joist depth. Clear distance between holes and notches shall be a minimum of 2 inches (50.8 mm). See Figure 2308.5.8 of the New York City Building Code.\n\n#---- 302.3.2 Stud cutting and notching.\n\nIn exterior walls and bearing partitions, wood studs are permitted to be cut or notched to a depth not exceeding 25 percent of the width of the stud. Cutting or notching of studs to a depth not greater than 40 percent of the width of the stud is permitted in nonbearing partitions supporting no loads other than the weight of the partition. See Figure 2308.5.8 of the New York City Building Code.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 302.3.3 Bored holes in studs.\n\nBored holes not greater than 40 percent of the stud width are permitted to be bored in any wood stud. Bored holes not greater than 60 percent of the stud width are permitted in nonbearing partitions or in any wall where each bored stud is doubled, provided not more than two such successive doubled studs are so bored. In no case shall the edge of the bored hole be nearer than 5/8 inch (15.9 mm) to the edge of the stud. Bored holes shall not be located at the same section of stud as a cut or notch. See Figure 2308.5.8 of the New York City Building Code.\n\n#---- 302.3.4 Engineered wood products.\n\nCuts, notches and holes bored in trusses, structural composite lumber, structural glue-laminated members or I-joists are prohibited except where permitted by the manufacturer's recommendations or where the effects of such alterations are specifically considered in the design of the member by a registered design professional.\n\n#---- 302.3.5 Drilling and notching of top plate.\n\nWhen piping or ductwork is placed in or partly in an exterior wall or interior load-bearing wall, necessitating cutting, drilling or notching of the top plate by more than 50 percent of its width, a galvanized metal tie not less than 0.054 inch thick (1.37 mm) (16 ga) and 1 1/2 inches (38.1 mm) wide shall be fastened across and to the plate at each side of the opening with not less than eight 10d (0.148 inch diameter) nails having a minimum length of 1 1/2 inches (38.1 mm) at each side or equivalent. The metal tie must extend a minimum of 6 inches (152.4 mm) past the opening. See Figure 2308.5.8 of the New York City Building Code.\n\nException: When the entire side of the wall with the notch or cut is covered by wood structural panel sheathing additional fastening is not required.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 302.4 Trusses.\n\nTruss members of any material and components shall not be cut, drilled, notched, spliced or otherwise altered in any way without written concurrence and approval of a registered design professional.\n\n#--- 302.5 Cutting, notching and boring in steel framing.\n\nThe cutting, notching and boring of steel framing members shall comply with Sections 302.5.1 through 302.5.4.\n\n#---- 302.5.1 Structural steel framing.\n\nThe cutting, notching and boring of holes in structural steel framing members shall be as prescribed by the registered design professional.\n\n#---- 302.5.2 Cold-formed steel framing.\n\nFlanges and lips of load-bearing cold-formed steel framing members shall not be cut or notched. Holes in webs of load-bearing cold-formed steel framing members shall be permitted along the centerline of the web of the framing member and shall not exceed the dimensional limitations, penetration spacing or minimum hole edge distance as prescribed by the registered design professional.\n\n#---- 302.5.3 Nonstructural cold-formed steel wall framing.\n\nFlanges and lips of nonstructural cold-formed steel wall studs shall be permitted along the centerline of the web of the framing member, shall not exceed 1 1/2 inches (38.1 mm) in width or 4 inches (101.6 mm) in length, and the holes shall not be spaced less than 24 inches (609.6 mm) center to center from another hole or less than 10 inches (254 mm) from the bearing end.\n\n#---- 302.5.4 Steel floor and roof decking.\n\nCutting, notching and boring holes in steel floor and roof decking shall be as prescribed by the registered design professional.\n\n#--- 302.6 Cutting, notching and coring into concrete.\n\nThe cutting, notching or coring of concrete must comply with provisions of Chapter 19 of the New York City Building Code and is not permitted without prior approval of the registered design professional.\n\n#--- 302.7 Protection of footings.\n\nTrenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall. The upper boundary of the bearing plane is a line that extends downward, at an angle of 34 degrees (1:1.5 slope) from horizontal, from the outside bottom edge of the footing or wall.\n\n#--- 302.8 Piping materials exposed within plenums.\n\nPiping materials exposed within plenums shall comply with this code.\n\nSection MC 303: Equipment and Appliance Location\n\n#--- 303.1 General.\n\nEquipment and appliances shall be located as required by this section, specific requirements elsewhere in this code and the conditions of the equipment and appliance listing.\n\n#--- 303.2 Hazardous locations.\n\nAppliances shall not be located in a hazardous location unless listed and approved for the specific installation.\n\n#--- 303.3 Prohibited locations.\n\nAppliances shall not be located in sleeping rooms, bathrooms, toilet rooms, storage closets or surgical rooms, or in a space that opens only into such rooms or spaces, except where the installation complies with one of the following exceptions:\n\nExceptions: This section shall not apply to the following appliances:\n\n1. In rooms other than those used for sleeping purposes, direct-vent appliances that obtain all combustion air directly from the outdoors and are installed in accordance with the conditions of the listing and manufacturer's instructions.\n\n2. In rooms other than those used for sleeping purposes, vented room heaters, wall furnaces, vented decorative appliances, vented gas fireplaces, vented gas fireplace heaters and decorative appliances for installation in vented solid fuel-burning fireplaces that are installed in rooms that meet the required volume criteria of Section 702.\n\n3. In rooms other than those used for sleeping purposes, appliances installed in a dedicated enclosure in which all combustion air is taken directly from the outdoors, in accordance with Section 703. Access to such enclosure shall be through a solid door, weather-stripped in accordance with the exterior door air leakage requirements of the New York City Energy Conservation Code and equipped with an approved self-closing device.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/085.\n\n#--- 303.4 Protection from physical damage.\n\nAppliances shall not be installed in a location where subject to physical damage, including vehicular impact, unless protected by approved barriers meeting the requirements of the New York City Fire Code.\n\n#--- 303.5 Indoor locations.\n\nFurnaces and boilers installed in closets and alcoves shall be listed for such installation.\n\n#--- 303.6 Outdoor locations.\n\nAppliances installed in other than indoor locations shall be listed and labeled for outdoor installation.\n\n#--- 303.7 Pit locations.\n\nAppliances installed in pits or excavations shall not come in direct contact with the surrounding soil. The sides of the pit or excavation shall be held back not less than 12 inches (304.8 mm) from the appliance. Where the depth exceeds 12 inches (304.8 mm) below adjoining grade, the walls of the pit or excavation shall be lined with concrete or masonry. Such concrete or masonry shall extend not less than 4 inches (101.6 mm) above adjoining grade and shall have sufficient lateral load-bearing capacity to resist collapse. The appliance shall be protected from flooding.\n\n#--- 303.8 Elevator shafts.\n\nMechanical systems shall not be located in an elevator shaft.\n\nSection MC 304: Installation\n\n#--- 304.1 General.\n\nEquipment and appliances shall be installed as required by the terms of their approval, in accordance with the conditions of the listing, the manufacturer's instructions and this code. Manufacturer's instructions shall be available on the job site at the time of inspection.\n\n#--- 304.2 Conflicts.\n\nWhere conflicts between this code and the conditions of listing or the manufacturer's instructions occur, the provisions of this code shall apply.\n\nException: Where a code provision is less restrictive than the conditions of the listing of the equipment or appliance or the manufacturer's installation instructions, the conditions of the listing and the manufacturer's installation instructions shall apply.\n\n#--- 304.3 Elevation of ignition source.\n\nEquipment and appliances having an ignition source and located in hazardous locations and public garages, private garages, repair garages, automotive motor fuel-dispensing facilities and parking garages shall be elevated such that the source of ignition is not less than 18 inches (457.2 mm) above the floor surface on which the equipment or appliance rests. For the purpose of this section, rooms or spaces that are not part of the living space of a dwelling unit and that communicate directly with a private garage through openings shall be considered to be part of the private garage.\n\nException: Elevation of the ignition source is not required for appliances that are listed as flammable vapor ignition resistant.\n\n#---- 304.3.1 Parking garages.\n\nConnection of a parking garage with any room in which there is a fuel-fired appliance shall be by means of a vestibule providing a two-doorway separation, except that a single door is permitted where the sources of ignition in the appliance are elevated in accordance with Section 304.3.\n\nException: This section shall not apply to appliance installations complying with Section 304.6.\n\n#--- 304.4 Prohibited equipment and appliance location.\n\nEquipment and appliances having an ignition source shall not be installed in Group H occupancies or control areas where open use, handling or dispensing of combustible, flammable or explosive materials occurs.\n\n#--- 304.5 Hydrogen generating and refueling operations.\n\nHydrogen generating and refueling operations shall be prohibited except as permitted by the Commissioner of the Fire Department.\n\n#--- 304.6 Public garages.\n\nAppliances located in public garages, motor fueling-dispensing facilities, repair garages or other areas frequented by motor vehicles, shall be installed not less than 8 feet (2438.4 mm) above the floor. Where motor vehicles are capable of passing under an appliance, the appliance shall be installed at the clearances required by the appliance manufacturer and not less than 1 foot (304.8 mm) higher than the tallest vehicle garage door opening.\n\nException: The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with NFPA 30A and Section 304.3 of this code.\n\n#--- 304.7 Private garages.\n\nAppliances located in private garages and carports shall be installed with a minimum clearance of 6 feet (1828.8 mm) above the floor.\n\nException: The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with Section 304.3.\n\n#--- 304.8 Construction and protection.\n\nBoiler rooms and furnace rooms shall be protected as required by the New York City Building Code.\n\n#--- 304.9 Clearances to combustible construction.\n\nHeat-producing equipment and appliances shall be installed to maintain the required clearances to combustible construction as specified in the listing and manufacturer's instructions. Such clearances shall be reduced only in accordance with Section 308. Clearances to combustibles shall include such considerations as door swing, drawer pull, overhead projections or shelving and window swing, shutters, coverings and drapes. Devices such as doorstops or limits, closers, drapery ties or guards shall not be used to provide the required clearances.\n\n#--- 304.10 Clearances from grade.\n\nEquipment and appliances installed at grade level shall be supported on a level concrete slab or other approved material extending not less than 3 inches (76.2 mm) above adjoining grade or shall be suspended not less than 6 inches (152.4 mm) above adjoining grade. Such support shall be in accordance with the manufacturer's instructions.\n\n#--- 304.11 Guards.\n\nGuards shall be provided where appliances, equipment, fans or other components that require service and roof hatch openings are located within 10 feet (3048 mm) of a roof edge or open side of a walking surface and such edge or open side is located more than 30 inches (762 mm) above the floor, roof or grade below. The guard shall extend not less than 30 inches (762 mm) beyond each end of such appliances, equipment, fans, components and roof hatch openings and the top of the guard shall be located not less than 42 inches (1066.8 mm) above the elevated surface adjacent to the guard. The guard shall be constructed so as to prevent the passage of a 21-inch-diameter (533.4 mm) sphere and shall comply with the loading requirements for guards specified in the New York City Building Code.\n\n#--- 304.12 Area served.\n\nAppliances serving different areas of a building other than where they are installed shall be permanently marked in an approved manner that uniquely identifies the appliance and the area it serves.\n\n#--- 304.13 Rooftop access and obstructions.\n\nEquipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the New York City Fire Code regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.\n\nSection MC 305: Piping Support\n\n#--- 305.1 General.\n\nMechanical system piping shall be supported in accordance with this section.\n\n#--- 305.2 Materials.\n\nPipe hangers and supports shall have sufficient strength to withstand all anticipated static and specified dynamic loading conditions associated with the intended use. Pipe hangers and supports that are in direct contact with piping shall be of materials that are compatible with the piping and that will not promote galvanic action.\n\n#--- 305.3 Structural attachment.\n\nHangers and anchors shall be attached to the building structure. Post-installed anchors shall be subject to special inspection in accordance with Section 1705.37 of the New York City Building Code.\n\n#--- 305.4 Interval of support.\n\nPiping shall be supported at distances not exceeding the spacing specified in Table 305.4, or in accordance with ANSI/MSS SP-58.\n\nTable 305.4 Piping Support Spacing a, b, c\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na. See Section 301.18.\n\nb. The maximum horizontal spacing of cast-iron pipe hangers shall be increased to 10 feet where 10 foot lengths of pipe are installed.\n\nc. Mid-story guide.\n\n#--- 305.5 Protection against physical damage.\n\nIn concealed locations where piping, other than cast-iron or steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1/2 inches (38.1 mm) from the nearest edge of the member, the pipe shall be protected by shield plates. Protective steel shield plates having a minimum thickness of 0.0575 inch (1.463 mm) (No. 16 gage) shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (50.8 mm) above sole plates and below top plates.\n\nSection MC 306: Access and Service Space\n\n#--- 306.1 Access.\n\nAppliances, control devices, heat exchangers and HVAC system components that require maintenance shall be accessible for inspection, service, repair and replacement without disabling the function of a fire-resistance-rated assembly or removing permanent construction, other appliances, venting systems or any other piping or ducts not connected to the appliance being inspected, serviced, repaired or replaced. A level working space not less than 30 inches deep and 30 inches wide (762 mm by 762 mm) shall be provided in front of the control side to service an appliance. Clearance shall also be provided as required by the New York City Electrical Code.\n\n#---- 306.1.1 Central furnaces.\n\nCentral furnaces within compartments or alcoves shall have a minimum working space clearance of 3 inches (76.2 mm) along the sides, back and top with a total width of the enclosing space being not less than 12 inches (304.8 mm) wider than the furnace. Furnaces having a firebox open to the atmosphere shall have not less than 6 inches (152.4 mm) working space along the front combustion chamber side. Combustion air openings at the rear or side of the compartment shall comply with the requirements of Chapter 7.\n\nException: This section shall not apply to replacement appliances installed in existing compartments and alcoves where the working space clearances are in accordance with the equipment or appliance manufacturer's instructions.\n\n#--- 306.2 Appliances in rooms.\n\nRooms containing appliances shall be provided with a door and an unobstructed passageway measuring not less than 36 inches (914.4 mm) wide and 80 inches (2032 mm) high.\n\nException: Within a dwelling unit, appliances installed in a compartment, alcove, basement or similar space shall be accessed by an opening or door and an unobstructed passageway measuring not less than 24 inches (609.6 mm) wide and large enough to allow removal of the largest appliance in the space, provided that a level service space of not less than 30 inches (762 mm) deep and the height of the appliance, but not less than 30 inches (762 mm), is present at the front or service side of the appliance with the door open.\n\n#--- 306.3 Appliances in attics.\n\nAttics containing appliances shall be provided with an opening and unobstructed passageway large enough to allow removal of the largest appliance. The passageway shall be not less than 30 inches (762 mm) high and 22 inches (558.8 mm) wide and not more than 20 feet (6096 mm) in length measured along the centerline of the passageway from the opening to the appliance. The passageway shall have continuous solid flooring not less than 24 inches (609.6 mm) wide. A level service space not less than 30 inches (762 mm) deep and 30 inches (762 mm) wide shall be present at the front or service side of the appliance. The clear access opening dimensions shall be not less than 20 inches by 30 inches (508 mm by 762 mm), and large enough to allow removal of the largest appliance.\n\nExceptions:\n\n1. The passageway and level service space are not required where the appliance is capable of being serviced and removed through the required opening.\n\n2. Where the passageway is unobstructed and not less than 6 feet (1828.8 mm) high and 24 inches (609.6 mm) wide for its entire length, the passageway shall be not greater than 50 feet (15 250 mm) in length.\n\n#---- 306.3.1 Electrical requirements.\n\nA luminaire controlled by a switch located at the required passageway opening and a receptacle outlet shall be provided at or near the appliance location in accordance with the New York City Electrical Code.\n\n#--- 306.4 Appliances under floors.\n\nUnder-floor spaces containing appliances shall be provided with an access opening and unobstructed passageway large enough to remove the largest appliance. The passageway shall be not less than 30 inches (762 mm) high and 22 inches (558.8 mm) wide, nor more than 20 feet (6096 mm) in length measured along the centerline of the passageway from the opening to the appliance. A level service space not less than 30 inches (762 mm) deep and 30 inches (762 mm) wide shall be present at the front or service side of the appliance. If the depth of the passageway or the service space exceeds 12 inches (304.8 mm) below the adjoining grade, the walls of the passageway shall be lined with concrete or masonry. Such concrete or masonry shall extend not less than 4 inches (101.6 mm) above the adjoining grade and shall have sufficient lateral-bearing capacity to resist collapse. The clear access opening dimensions shall be not less than 22 inches by 30 inches (558.8 mm by 762 mm), and large enough to allow removal of the largest appliance.\n\nExceptions:\n\n1. The passageway is not required where the level service space is present when the access is open and the appliance is capable of being serviced and removed through the required opening.\n\n2. Where the passageway is unobstructed and not less than 6 feet (1828.8 mm) high and 22 inches (558.8 mm) wide for its entire length, the passageway shall not be limited in length.\n\n#---- 306.4.1 Electrical requirements.\n\nA luminaire controlled by a switch located at the required passageway opening and a receptacle outlet shall be provided at or near the appliance location in accordance with the New York City Electrical Code.\n\n#--- 306.5 Equipment and appliances on roofs or elevated structures.\n\nWhere equipment or appliances requiring access are located on an elevated structure or the roof of a building such that personnel will have to climb higher than 16 feet (4876.8 mm) above grade, roof or floor level to access such equipment or appliances, an interior or exterior means of access shall be provided. Such access shall not require climbing over obstructions greater than 30 inches (762 mm) in height or walking on roofs having a slope greater than 4 units vertical in 12 units horizontal (33-percent slope). Such access to the roof or elevated structure and access from the roof or elevated structure to equipment requiring maintenance shall not require the use of portable ladders. Where access involves climbing over parapet walls, the height shall be measured to the top of the parapet wall.\n\nPermanent ladders installed to provide the required access shall comply with the following minimum design criteria:\n\n1. The side railing shall extend above the parapet or roof edge not less than 30 inches (762 mm).\n\n2. Ladders shall have rung spacing not to exceed 12 inches (304.8 mm) on center. The uppermost rung shall be not more than 24 inches (609.6 mm) below the upper edge of the roof hatch, roof or parapet, or equipment access platform, as applicable.\n\n3. Ladders shall have a toe spacing not less than 7 inches (177.8 mm) deep.\n\n4. There shall be not less than 18 inches (457.2 mm) between rails.\n\n5. Rungs shall have a diameter not less than 0.75-inch (19 mm) and be capable of withstanding a 300-pound (136.1 kg) load.\n\n6. Where a cage, well or ladder safety device is prohibited, ladders over 20 feet (6096 mm) in height shall be provided with landing platforms for each 30 feet (9144 mm) of height. Where a cage, well or ladder safety device is not provided, ladders over 20 feet (6096 mm) in height shall be provided with landing platforms for each 20 feet (6096 mm) of height. Landings shall be capable of withstanding 100 pounds (488.2 kg/m 2 ) per square foot. A guard rail and toeboard shall be provided on all open sides of the landing.\n\n7. Climbing clearance. The distance from the centerline of the rungs to the nearest permanent object on the climbing side of the ladder shall be not less than 30 inches (762 mm) measured perpendicular to the rungs. This distance shall be maintained from the point of ladder access to the bottom of the roof hatch. A minimum clear width of 15 inches (381 mm) shall be provided on both sides of the ladder measured from the midpoint of and parallel with the rungs except where cages or wells are installed.\n\n8. Landing required. The ladder shall be provided with a clear and unobstructed bottom landing area having a minimum dimension of 30 inches by 30 inches (762 mm by 762 mm) centered in front of the ladder.\n\n9. Ladders shall be protected against corrosion by approved means.\n\n10. Service personnel shall have access to ladders at all times.\n\n11. Where ladder extensions are installed, the side rails of through or side-step ladder extensions shall extend 3 1/2 feet (1066.8 mm) above the parapets and landings. For through ladder extensions, the rungs shall be omitted from the extensions and shall have not less than 18 inches (457.2 mm) nor more than 24 inches (609.6 mm) of clearance between rails. For side-step or offset fixed ladder sections, at landings, the side rails and rungs shall be carried to the next regular rung beyond or above the 3 1/2 feet (1066.8 mm) minimum.\n\nCatwalks installed to provide the required access shall be not less than 24 inches (609.6 mm) wide and shall have railings as required for service platforms.\n\nException: This section shall not apply to Group R-3 occupancies.\n\n#---- 306.5.1 Sloped roofs.\n\nWhere appliances, equipment, fans or other components that require service are installed on a roof having a slope of three units vertical in 12 units horizontal (25-percent slope) or greater and having an edge more than 30 inches (762 mm) above grade at such edge, a level platform shall be provided on each side of the appliance or equipment to which access is required for service, repair or maintenance. The platform shall be not less than 30 inches (762 mm) in any dimension and shall be provided with guards. The guards shall extend not less than 42 inches (1066.8 mm) above the platform, shall be constructed so as to prevent the passage of a 21-inch (533.4 mm) diameter sphere and shall comply with the loading requirements for guards specified in the New York City Building Code. Access shall not require walking on roofs having a slope greater than four units vertical in 12 units horizontal (33-percent slope). Where access involves obstructions greater than 30 inches (762 mm) in height, such obstructions shall be provided with ladders installed in accordance with Section 306.5 or stairways installed in accordance with the requirements specified in the New York City Building Code in the path of travel to and from appliances, fans or equipment requiring service.\n\n#---- 306.5.2 Electrical requirements.\n\nA receptacle outlet shall be provided at or near the equipment location in accordance with the New York City Electrical Code.\n\nSection MC 307: Condensate Disposal\n\n#--- 307.1 Fuel-burning appliances.\n\nLiquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture or disposal area in accordance with the manufacturer's instructions. Condensate piping shall be of approved corrosion-resistant material in accordance with Section 803 of the New York City Plumbing Code and shall not be smaller than the drain connection on the appliance. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope). Piping shall be configured to permit clearing of blockages and performance of maintenance without requiring the drain line to be cut.\n\n#---- 307.1.1 Condensate disposal.\n\nCondensate from all fuel-burning appliances and associated flues shall be neutralized to a pH of at least 6 and no more than 8 prior to disposal to a sanitary system.\n\n#--- 307.2 Evaporators and cooling coils.\n\nCondensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 307.2.1 through 307.2.6.\n\nException: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.\n\n#---- 307.2.1 Condensate disposal.\n\nCondensate from all cooling coils and evaporators shall be conveyed from the drain pan outlet to an approved place of disposal. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope). Condensate shall not discharge into a street, alley or other areas so as to cause a nuisance.\n\n#---- 307.2.2 Drain pipe materials and sizes.\n\nComponents of the condensate disposal system shall be cast iron, galvanized steel, copper, cross-linked polyethylene, polyethylene, ABS, CPVC, or PVC pipe or tubing. Polypropylene tubing may be used in lengths that do not exceed 12 inches (304.8 mm) for an individual drain application. Components shall be selected for the pressure and temperature rating of the installation. Joints and connections shall be made in accordance with the applicable provisions of Chapter 7 of the New York City Plumbing Code relative to the material type. Condensate waste and drain line size shall be not less than 3/4-inch (19.1 mm) internal diameter and shall not decrease in size from the drain pan connection to the place of condensate disposal. Where the drain pipes from more than one unit are manifolded together for condensate drainage, the pipe or tubing shall be sized in accordance with Table 307.2.2.\n\nTable 307.2.2 Condensate Drain Sizing\n\nFor SI: 1 inch = 25.4 mm, 1 ton = 3.517 kW.\n\n#---- 307.2.3 Auxiliary and secondary drain systems.\n\nIn addition to the requirements of Section 307.2.1, where damage to any building components could occur as a result of overflow from the equipment primary condensate removal system, one of the following auxiliary protection methods shall be provided for each cooling coil or fuel-fired appliance that produces condensate:\n\n1. An auxiliary drain pan with a separate drain shall be provided under the coils on which condensation will occur. The auxiliary pan drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The pan shall have a depth of not less than 1 1/2 inches (38.1 mm), shall be not less than 3 inches (76.2 mm) larger than the unit, or the coil dimensions in width and length and shall be constructed of corrosion-resistant material. Metallic pans shall have a thickness of not less than 0.0236 inch (0.6010 mm) (No. 24 gage) for galvanized sheet metal pans, 0.0179 inch (0.4546 mm) (No. 26 gage) for stainless steel pans, or 0.0320 inch (0.8128 mm) (No. 20 gage) for aluminum pans. Nonmetallic pans shall have a thickness of not less than 0.0625 inch (1.6 mm).\n\n2. A separate overflow drain line shall be connected to the drain pan provided with the equipment. Such overflow drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The overflow drain line shall connect to the drain pan at a higher level than the primary drain connection.\n\n3. An auxiliary drain pan without a separate drain line shall be provided under the coils on which condensate will occur. Such pan shall be equipped with a listed water-level detection device that will shut off the equipment served prior to overflow of the pan. The auxiliary drain pan shall be constructed in accordance with Item 1 of this section.\n\n4. A listed water-level detection device shall be provided that will shut off the equipment served in the event that the primary drain is blocked. The device shall be installed in the primary drain line, the overflow drain line, or in the equipment-supplied drain pan, located at a point higher than the primary drain line connection and below the overflow rim of such pan.\n\nExceptions:\n\n1. An auxiliary drain protection method shall not be required for fuel-fired appliances that automatically shut down operation in the event of a stoppage in the condensate drainage system.\n\n2. An auxiliary drain protection method shall not be required where a suitably sized and located floor drain is provided.\n\n#----- 307.2.3.1 Water-level monitoring devices.\n\nOn down-flow units and all other coils that do not have a secondary drain or provisions to install a secondary or auxiliary drain pan, a water-level monitoring device shall be installed inside the primary drain pan. This device shall shut off the equipment served in the event that the primary drain becomes restricted. Devices installed in the drain line shall not be permitted.\n\n#----- 307.2.3.2 Appliance, equipment or insulation in pans.\n\nWhere an appliance, equipment or insulation is subject to water damage when auxiliary drain pans fill, that portion of the appliance, equipment or insulation shall be installed above the rim of the pans. Supports located inside of the pans to support the appliance or equipment or insulation shall be water resistant and approved.\n\n#---- 307.2.4 Traps.\n\nCondensate drains shall be trapped as required by the equipment or appliance manufacturer.\n\n#---- 307.2.5 Drain line maintenance.\n\nCondensate drain lines shall be configured to permit the clearing of blockages and performance of maintenance without requiring the drain line to be cut.\n\n#---- 307.2.6 Condensate discharge.\n\nWhere multiple evaporators and/or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.\n\n#--- 307.3 Exceptions.\n\nThis section applies to permanently installed equipment. Window units and through-the-wall air-conditioning units are exempt from the requirements of this section.\n\nSection MC 308: Clearance Reduction\n\n#--- 308.1 Scope.\n\nThis section shall govern the reduction in required clearances to gypsum board, combustible materials and combustible assemblies for chimneys, vents, kitchen exhaust equipment, mechanical appliances, and mechanical devices and equipment.\n\n#--- 308.2 Listed appliances and equipment.\n\nThe reduction of the required clearances to combustibles for listed and labeled appliances and equipment shall be in accordance with the requirements of this section, except that such clearances shall not be reduced where reduction is specifically prohibited by the terms of the appliance or equipment listing.\n\n#--- 308.3 Protective assembly construction and installation.\n\nReduced clearance protective assemblies, including structural and support elements, shall be constructed of noncombustible materials. Spacers utilized to maintain an airspace between the protective assembly and the protected material or assembly shall be noncombustible. Where a space between the protective assembly and protected combustible material or assembly is specified, the same space shall be provided around the edges of the protective assembly and the spacers shall be placed so as to allow air circulation by convection in such space. Protective assemblies shall not be placed less than 1 inch (25.4 mm) from the mechanical appliances, devices or equipment, regardless of the allowable reduced clearance.\n\n#--- 308.4 Allowable reduction.\n\nThe reduction of required clearances to combustible assemblies or combustible materials shall be based on the utilization of a reduced clearance protective assembly in accordance with Section 308.4.1 or 308.4.2.\n\n#---- 308.4.1 Labeled assemblies.\n\nThe allowable clearance reduction shall be based on a reduced clearance protective assembly that has been tested and bears the label of an approved agency.\n\n#---- 308.4.2 Reduction table.\n\nThe allowable clearance reduction shall be based on one of the methods specified in Table 308.4.2. Where required clearances are not listed in Table 308.4.2, the reduced clearances shall be determined by linear interpolation between the distances listed in the table. Reduced clearances shall not be derived by extrapolation below the range of the table.\n\nTable 308.4.2 Clearance Reduction Methods b\n\nFor SI: 1 inch = 25.4 mm, °C = ((°F)-32)/1.8, 1 pound per cubic foot = 16.02 kg/m 3 , 1.0 Btu ∙ in/(ft 2 ∙ h ∙ °F) = 0.144 W/m 2 ∙ K.\n\na. Mineral wool and glass fiber batts (blanket or board) shall have a minimum density of 8 pounds per cubic foot and a minimum melting point of 1,500°F. Insulation material utilized as part of a clearance reduction system shall have a thermal conductivity of 1.0 Btu ∙ in./(ft 2 ∙ h ∙ °F) or less. Insulation board shall be formed of noncombustible material.\n\nb. For limitations on clearance reduction for solid fuel-burning appliances, masonry chimneys, connector pass-throughs, masonry fireplaces and kitchen ducts, see Sections 308.4.2.1 through 308.4.2.5.\n\n#----- 308.4.2.1 Solid fuel-burning appliances.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearance required for solid fuel-burning appliances that are labeled for installation with clearances of 12 inches (304.8 mm) or less. Where appliances are labeled for installation with clearances of greater than 12 inches (304.8 mm), the clearance reduction methods of Table 308.4.2 shall not reduce the clearance to less than 12 inches (304.8 mm).\n\n#----- 308.4.2.2 Masonry chimneys.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearances required for masonry chimneys as specified in the New York City Building Code and Chapter 8 of this code.\n\n#----- 308.4.2.3 Chimney connector pass-throughs.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearances required for chimney connector pass-throughs as specified in Section 803.10.4.\n\n#----- 308.4.2.4 Masonry fireplaces.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the clearances required for masonry fireplaces as specified in the New York City Building Code and Chapter 8 of this code.\n\n#----- 308.4.2.5 Kitchen exhaust ducts.\n\nThe clearance reduction methods specified in Table 308.4.2 shall not be utilized to reduce the minimum clearances required by Section 506.3.11 for kitchen exhaust ducts enclosed in a shaft.\n\nSection MC 309: Temperature Control\n\n#--- 309.1 Space-heating systems.\n\nInterior spaces intended for human occupancy shall be provided with active or passive space-heating systems capable of maintaining an indoor temperature of not less than 68°F (20°C) at a point 3 feet (914.4 mm) above floor on the design heating day. The installation of portable space heaters shall not be used to achieve compliance with this section. Refer to Section 1204 of the New York City Building Code.\n\nException: Interior spaces where the primary purpose is not associated with human comfort.\n\nSection MC 310: Explosion Control\n\n#--- 310.1 Required.\n\nStructures occupied for purposes involving explosion hazards shall be provided with explosion control in compliance with rules of the Commissioner of the Fire Department. Explosion control systems shall be designed and installed in accordance with the New York City Fire Code.\n\nSection MC 311: Smoke and Heat Vents\n\n#--- 311.1 Required.\n\nApproved smoke and heat vents shall be installed in the roofs of one-story buildings where required by the New York City Fire Code. Smoke and heat vents shall be designed and installed in accordance with the New York City Fire Code.\n\nSection MC 312: Heating and Cooling Load Calculations\n\n#--- 312.1 Load calculations.\n\nHeating and cooling system design loads for the purpose of sizing systems, appliances and equipment shall be determined in accordance with the procedures described in the ASHRAE ACCA Standard 183. Alternatively, design loads shall be determined by an approved equivalent computation procedure, using the design parameters specified in the New York City Energy Conservation Code. Heating and cooling system design loads for the purpose of sizing systems, appliances and equipment shall also comply with the requirements of Section 1204 of the New York City Building Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/085.\n\nSection MC 313: Noise Control and Vibration Isolation Requirements\n\n#--- 313.1 General.\n\nInterior and exterior mechanical equipment and systems shall comply with the provisions of this section.\n\n#--- 313.2 Noise from exterior mechanical equipment.\n\nMechanical equipment located outside of the building in a yard or court or on a roof, or located inside a building but open to the exterior of the building, shall comply with the requirements of Sections 313.2.1 and 313.2.2.\n\n#---- 313.2.1 Design and installation.\n\nThe applicant shall select and design any such exterior mechanical equipment in order to achieve compliance with the applicable requirements of Sections 24-218, 24-227, 24-228 and 24-232 of the Administrative Code, also known as the New York City Noise Control Code, in accordance with generally acceptable engineering practices.\n\n#---- 313.2.2 Operation.\n\nThe operation of such exterior mechanical equipment shall comply with any applicable requirements of Sections 24-218, 24-227, 24-228 and 24-232 of the New York City Noise Control Code, as enforced by the Department of Environmental Protection.\n\n#--- 313.3 Minimum structure-borne noise and vibration isolation requirements.\n\nAll isolators shall comply with the requirements of Sections 313.3.1 through 313.3.10. Where vibration isolation of equipment and appliances is employed, supplemental restraint shall be used to accomplish the support and restraint.\n\nException: When specified by the registered design professional, the requirements of Sections 313.3.1 through 313.3.10 may be modified provided that the equipment, appliances, and supports shall be designed and installed so that continuous or intermittent vibration transmitted to structural slabs shall not exceed the following values between 8 Hz and 80 Hz on the structural slab in the affected occupancy space:\n\n1. Group E, I or R occupancies: 5,600 microinches (142.4 µm) per second.\n\n2. All other occupancies: 16,000 microinches (406.4 µm) per second.\n\nFor the purposes of this exception, transmitted vibration shall be in accordance with the following parameters:\n\n1. The peak third-octave band RMS velocity measurements.\n\n2. The method shall be in accordance with ANSI/ASA S2.71.\n\n#---- 313.3.1 Boiler rooms.\n\nBoilers, boiler breeching, and boiler piping shall be isolated in accordance with the applicable requirements of Sections 313.3.1.1 and 313.3.1.2.\n\n#----- 313.3.1.1 Boilers.\n\nAll boilers supported on floors directly above a story having dwelling units shall be supported on resilient isolators having a minimum static deflection of 1 inch (25.4 mm). The isolators shall be installed directly under the structural frame of the boiler.\n\n#----- 313.3.1.2 Boiler breeching and piping.\n\nWhen boilers are equipped with mechanical draft fans, the boiler breeching and piping that are supported from or on slabs, floors or walls that are contiguous to the dwelling unit shall be supported for a distance of 50 pipe diameters on or from resilient isolators. Each isolator shall have a minimum static deflection of 1 inch (25.4 mm).\n\n#---- 313.3.2 Refuse charging chutes.\n\nMetal chutes, chute supports, and chute bracing shall be installed in accordance with Section 313.3.2.1. Masonry chutes must comply with Section 313.3.2.2.\n\n#----- 313.3.2.1 Metal chutes.\n\nMetal chutes, metal chute supports, and/or metal chute bracing shall be free of direct contact with the shaft enclosure and the openings provided in the floor construction. Metal chutes shall be resiliently supported at each structural support location. Isolators shall provide a minimum static deflection of 0.30 inches (7.62 mm). All chutes shall be plumb.\n\n#----- 313.3.2.2 Masonry chutes.\n\nThe interior chute wall shall be plumb and without obstructions for the full height of the shaft and shall have a smooth interior finish.\n\n#---- 313.3.3 Piping.\n\nEquipment piping shall be installed as follows:\n\n1. Metal piping connected to power driven equipment shall be resiliently supported from or on the building structure for a distance of 50 pipe diameters from the power driven equipment. The resilient isolators shall have a minimum static deflection of 1 inch (25.4 mm) for all piping with a 4 inch (101.6 mm) or larger in actual outside diameter and 1/2 inch (12.7 mm) for piping with less than 4 inches (101.6 mm) in actual outside diameter. Piping connected to fluid pressure-reducing valves shall be resiliently isolated for a distance of 50 pipe diameters from pressure-reducing valves and isolators shall provide a minimum static deflection of 1/2 inch (12.7 mm).\n\n2. Equipment such as heat exchangers, absorption refrigeration machines, or similar equipment, that is located on any floor or roof other than a floor on grade, and that is not power driven but is connected by metal piping to power driven equipment, shall be resiliently supported from or on the building structure, for a distance of 50 pipe diameters from the power driven equipment. The resilient supports shall be vibration isolators having a minimum static deflection of 1 inch (25.4 mm) and shall incorporate approved resilient pads having a minimum thickness of 1/4 inch (6.4 mm).\n\n#---- 313.3.4 Fans.\n\nAll fan equipment with motors in excess of 1/2 horsepower (0.37 kW), located on any roof or floor other than a floor on grade shall be mounted on or from vibration isolators. Fan equipment with motor drives separated from the fan equipment shall be supported on an isolated integral rigid structural base supporting both the fan and motor. Fan equipment with motor drives supported from the fan equipment shall be mounted directly on vibration isolators. Each isolator shall have provision for leveling. Isolators shall incorporate resilient pads having a minimum thickness of 1/4 inch (6.4 mm). The vibration isolators shall provide a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum deflection of 2 inches (50.8 mm). Fans and compressors assembled in unitary containers may meet this requirement with isolators internal to the container providing the isolators meet the above minimum isolator efficiencies.\n\n#---- 313.3.5 Pumps.\n\nAll pumps of 3 horsepower (2.24 kW) or more located on any floor other than a floor on grade shall be supported on vibration isolators having a minimum isolation efficiency of 90 percent at the lowest disturbing frequency. Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1/4 inch (6.4 mm).\n\n#---- 313.3.6 Compressors.\n\nCompressors and drives located on a floor other than a floor on grade shall be mounted on vibration isolators having a minimum isolation efficiency of 90 percent at the lowest disturbing frequency. Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1/4 inch (6.4 mm).\n\n#---- 313.3.7 Cooling towers and fluid coolers.\n\nAll moving parts of cooling towers located on a roof or floor other than a floor on grade shall be installed on vibration isolators providing a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum static deflection of 4 inches (101.6 mm). Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1/4 inch (6.4 mm). Vibration cutoff switches shall be provided.\n\n#---- 313.3.8 Evaporative condensers.\n\nEvaporative and air-cooled condensers located on a roof or floor other than a floor on grade shall be mounted on vibration isolators providing a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum static deflection of 4 inches (101.6 mm). Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1/4 inch (6.4 mm). Vibration cutoff switches shall be provided on evaporative condensers.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 313.3.9 Duct connections to fans.\n\nFlexible connections shall be installed between fan equipment and connecting ductwork.\n\n#---- 313.3.10 Ceiling suspended packaged HVAC units with compressors.\n\nEquipment such as heat pumps, air-conditioning units, or similar equipment, that is suspended from a structure shall be resiliently supported from or on the building structure. Vibration isolators shall have a minimum isolation efficiency of 90 percent at the lowest disturbing frequency.",
+  "schemaVersion": 1
 }

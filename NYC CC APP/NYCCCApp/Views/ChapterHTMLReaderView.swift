@@ -78,10 +78,11 @@ struct ChapterHTMLReaderView: View {
             }
         }
 
+        let codeSectionName = library.codeSectionName(id: chapter.codeSectionID)
         return library.sectionGroups(for: chapter).map { group in
             ChapterHTMLJumpTarget(
                 sectionNumber: sectionNumber(from: group.headerLine),
-                title: group.displayLabel,
+                title: group.displayLabel(codeSectionName: codeSectionName),
                 anchorID: nil,
                 level: 2
             )
@@ -257,6 +258,9 @@ struct ChapterHTMLReaderView: View {
                 openedSection = sectionSummary(for: target)
             }
         )
+        .overlay(alignment: .top) {
+            CodeTopContentFade(alwaysVisible: true)
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar
                 .background(pageBackgroundColor)

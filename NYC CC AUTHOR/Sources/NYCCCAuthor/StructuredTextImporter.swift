@@ -130,18 +130,18 @@ enum StructuredTextImporter {
         options: [.caseInsensitive]
     )
     private static let sectionGroupDefinitionRegex = try! NSRegularExpression(
-        pattern: #"^SECTION\s+((?:BC\s+)?[A-Z0-9.\-()]+)(?:(?:\s*[:\-–—]\s*|\s+)(.+))?$"#,
-        options: [.caseInsensitive]
+        pattern: #"^(?i)section\s+(?:(BC|FGC|MC|PC)\s+)?([A-Z0-9.\-()]+)(?:\s*[:\-–—]\s*(.*))?$"#,
+        options: []
     )
     private static let ignorableParsingCharacters = CharacterSet(charactersIn: "\u{FEFF}\u{200B}\u{200C}\u{200D}\u{2060}")
     private static let inferredGroupHeading = "General"
 
-    static func parse(_ rawText: String) throws -> StructuredTextDocument {
-        try parseSections(from: parsedLines(from: rawText))
+    static func parse(_ rawText: String, codeSectionName: String? = nil) throws -> StructuredTextDocument {
+        try parseSections(from: parsedLines(from: rawText), codeSectionName: codeSectionName)
     }
 
-    static func parse(_ attributedText: NSAttributedString) throws -> StructuredTextDocument {
-        try parseSections(from: parsedLines(from: attributedText))
+    static func parse(_ attributedText: NSAttributedString, codeSectionName: String? = nil) throws -> StructuredTextDocument {
+        try parseSections(from: parsedLines(from: attributedText), codeSectionName: codeSectionName)
     }
 
     static func parseHierarchy(
@@ -241,7 +241,7 @@ enum StructuredTextImporter {
         }
     }
 
-    private static func parseSections(from lines: [ParsedLine]) throws -> StructuredTextDocument {
+    private static func parseSections(from lines: [ParsedLine], codeSectionName: String? = nil) throws -> StructuredTextDocument {
         var groups: [StructuredTextDocument.Group] = []
         var currentHeaderLine: String?
         var currentHeaderAttributedText: NSAttributedString?
@@ -373,7 +373,7 @@ enum StructuredTextImporter {
                 currentHeadingAttributedText = line.attributedContent(afterMarkerPrefixLength: 4)
             } else if let customGroupLine = customMarkerContent(in: line.trimmedText, marker: "#2") ??
                       customMarkerContent(in: line.trimmedText, marker: "#--"),
-                      let naturalGroup = parseSectionGroupDefinition(from: customGroupLine) {
+                      let naturalGroup = parseSectionGroupDefinition(from: customGroupLine, codeSectionName: codeSectionName) {
                 try finishCurrentGroup()
                 currentHeaderLine = naturalGroup.headerLine
                 currentHeaderAttributedText = metadataAttributedText(
@@ -389,7 +389,7 @@ enum StructuredTextImporter {
                 try finishCurrentGroup()
                 currentHeaderLine = String(line.trimmedText.dropFirst(3)).trimmingCharacters(in: .whitespacesAndNewlines)
                 currentHeaderAttributedText = line.attributedContent(afterMarkerPrefixLength: 3)
-            } else if let naturalGroup = parseSectionGroupDefinition(from: line.trimmedText) {
+            } else if let naturalGroup = parseSectionGroupDefinition(from: line.trimmedText, codeSectionName: codeSectionName) {
                 try finishCurrentGroup()
                 currentHeaderLine = naturalGroup.headerLine
                 currentHeaderAttributedText = metadataAttributedText(
@@ -647,7 +647,10 @@ enum StructuredTextImporter {
                 currentChapterNumber = chapter.number
                 currentChapterTitle = chapter.title
             } else if let customGroupLine,
-                      let naturalGroup = parseSectionGroupDefinition(from: customGroupLine) {
+                      let naturalGroup = parseSectionGroupDefinition(
+                from: customGroupLine,
+                codeSectionName: currentCodeSectionName
+            ) {
                 guard currentChapterNumber != nil else {
                     throw StructuredTextImportError.groupOutsideChapter(line.trimmedText)
                 }
@@ -674,7 +677,10 @@ enum StructuredTextImporter {
                     guard let currentChapterNumber else {
                         throw StructuredTextImportError.headingOutsideGroup(line.trimmedText)
                     }
-                    currentGroupHeaderLine = "SECTION BC \(currentChapterNumber)"
+                    currentGroupHeaderLine = inferredGroupHeader(
+                        from: currentChapterNumber ?? "",
+                        codeSectionName: currentCodeSectionName
+                    )
                     currentGroupHeadingLine = inferredGroupHeading
                 }
                 try finishCurrentSection()
@@ -691,7 +697,10 @@ enum StructuredTextImporter {
                     throw StructuredTextImportError.invalidTitleLine(titleLine)
                 }
                 if currentGroupHeaderLine == nil {
-                    currentGroupHeaderLine = inferredGroupHeader(from: sectionNumber)
+                    currentGroupHeaderLine = inferredGroupHeader(
+                        from: sectionNumber,
+                        codeSectionName: currentCodeSectionName
+                    )
                     currentGroupHeadingLine = inferredGroupHeading
                 }
                 currentTitleLine = titleLine
@@ -794,10 +803,14 @@ enum StructuredTextImporter {
         return sectionNumber
     }
 
-    private static func inferredGroupHeader(from sectionNumber: String) -> String {
+    private static func inferredGroupHeader(from sectionNumber: String, codeSectionName: String?) -> String {
         let trimmed = sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines)
         let majorComponent = trimmed.split(separator: ".").first.map(String.init) ?? trimmed
-        return "SECTION BC \(majorComponent)"
+        return CodeSectionGroupHeaderFormatting.formattedSectionHeader(
+            explicitPrefix: nil,
+            sectionID: majorComponent,
+            codeSectionName: codeSectionName
+        )
     }
 
     private static func requiresAppendixQPrefixedTitle(currentGroupHeaderLine: String?) -> Bool {
@@ -878,31 +891,41 @@ enum StructuredTextImporter {
         return (number, title)
     }
 
-    private static func parseSectionGroupDefinition(from line: String) -> (headerLine: String, headingLine: String?)? {
+    private static func parseSectionGroupDefinition(
+        from line: String,
+        codeSectionName: String? = nil
+    ) -> (headerLine: String, headingLine: String?)? {
         let range = NSRange(location: 0, length: line.utf16.count)
         guard let match = sectionGroupDefinitionRegex.firstMatch(in: line, range: range),
-              let numberRange = Range(match.range(at: 1), in: line) else {
+              let idRange = Range(match.range(at: 2), in: line) else {
             return nil
         }
 
-        let groupID = String(line[numberRange])
-            .replacingOccurrences(of: #"(?i)^bc\s+"#, with: "", options: .regularExpression)
+        let explicitPrefix: String?
+        if match.range(at: 1).location != NSNotFound, let prefixRange = Range(match.range(at: 1), in: line) {
+            explicitPrefix = String(line[prefixRange])
+        } else {
+            explicitPrefix = nil
+        }
+
+        let sectionID = String(line[idRange])
             .trimmingCharacters(in: .whitespacesAndNewlines)
-            .uppercased()
-        guard !groupID.isEmpty else { return nil }
+        guard !sectionID.isEmpty else { return nil }
 
         let headingLine: String?
-        if let trailingRange = Range(match.range(at: 2), in: line) {
+        if match.range(at: 3).location != NSNotFound, let trailingRange = Range(match.range(at: 3), in: line) {
             let trailing = String(line[trailingRange]).trimmingCharacters(in: .whitespacesAndNewlines)
             headingLine = trailing.isEmpty ? nil : trailing.uppercased()
         } else {
             headingLine = nil
         }
 
-        let headerPrefix = groupID.first?.isLetter == true && groupID.uppercased().hasPrefix("BC") == false && !groupID.contains(".")
-            ? "SECTION BC "
-            : "SECTION "
-        return (headerLine: "\(headerPrefix)\(groupID)", headingLine: headingLine)
+        let headerLine = CodeSectionGroupHeaderFormatting.formattedSectionHeader(
+            explicitPrefix: explicitPrefix,
+            sectionID: sectionID,
+            codeSectionName: codeSectionName
+        )
+        return (headerLine: headerLine, headingLine: headingLine)
     }
 
     private static func trimBlankLines(_ lines: [ParsedLine]) -> [ParsedLine] {

@@ -2,13 +2,15 @@ import SwiftUI
 import UIKit
 
 struct BrowseView: View {
+    var browserContext: BrowserContextID = .primary
+
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Namespace private var chapterTileNamespace
     @State private var scrollOffset: CGFloat = 0
     @State private var browseCodeSectionID: Int64?
     @State private var hasSeededBrowseSection = false
-    private static let codeSectionDefaultsKey = "browseLeftCodeSectionID"
+    @State private var rememberedSectionIDs: [Int64: Int64] = [:]
     private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
@@ -36,9 +38,6 @@ struct BrowseView: View {
                     browseContent
                         .onAppear {
                             seedBrowseSectionIfNeeded()
-                            DispatchQueue.main.async {
-                                library.updateSelectedCodeSection(id: browseCodeSectionID)
-                            }
                         }
                 }
             }
@@ -100,7 +99,10 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.chapterItems) { chapter in
                                         NavigationLink {
-                                            ChapterLaunchView(chapter: chapter)
+                                            ChapterLaunchView(
+                                                chapter: chapter,
+                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id)
+                                            )
                                                 .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
@@ -119,7 +121,10 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         NavigationLink {
-                                            ChapterLaunchView(chapter: chapter)
+                                            ChapterLaunchView(
+                                                chapter: chapter,
+                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id)
+                                            )
                                                 .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
@@ -142,6 +147,9 @@ struct BrowseView: View {
         }
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
+        .overlay(alignment: .top) {
+            CodeTopContentFade(title: selectedCodeSectionName, progress: collapseProgress)
+        }
         .background(
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
                 .ignoresSafeArea()
@@ -150,40 +158,45 @@ struct BrowseView: View {
 
     private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Menu {
-                Button {
-                    updateCodeSection(nil)
-                } label: {
-                    codeSectionPickerLabel("All Sections", isSelected: browseCodeSectionID == nil)
-                }
-
-                ForEach(library.codeSections) { codeSection in
-                    Button {
-                        updateCodeSection(codeSection.id)
-                    } label: {
-                        codeSectionPickerLabel(
-                            CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                            isSelected: browseCodeSectionID == codeSection.id
-                        )
-                    }
-                }
-            } label: {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(selectedCodeSectionName)
-                        .font(.system(size: 32, weight: .bold, design: .default))
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(Color(uiColor: library.accentColor(for: browseCodeSectionID)))
-                }
-                .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
-                .opacity(1 - (collapseProgress * 0.22))
+            if library.comparisonModeEnabled {
+                CodeEyebrow(text: browserContext.displayName, accent: accentColor)
             }
-            .buttonStyle(.plain)
+
+            if library.comparisonModeEnabled {
+                Menu {
+                    ForEach(BrowserContextID.allCases) { context in
+                        Button {
+                            library.requestBrowserTabSwitch(to: context)
+                        } label: {
+                            codeSectionPickerLabel(context.displayName, isSelected: context == browserContext)
+                        }
+                    }
+
+                    Divider()
+
+                    Button {
+                        updateCodeSection(nil)
+                    } label: {
+                        codeSectionPickerLabel("All Sections", isSelected: browseCodeSectionID == nil)
+                    }
+
+                    ForEach(library.codeSections) { codeSection in
+                        Button {
+                            updateCodeSection(codeSection.id)
+                        } label: {
+                            codeSectionPickerLabel(
+                                CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
+                                isSelected: browseCodeSectionID == codeSection.id
+                            )
+                        }
+                    }
+                } label: {
+                    headerTitle(showPicker: true)
+                }
+                .buttonStyle(.plain)
+            } else {
+                headerTitle(showPicker: false)
+            }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(selectedVersionName)
@@ -201,6 +214,26 @@ struct BrowseView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
+    }
+
+    private func headerTitle(showPicker: Bool) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(selectedCodeSectionName)
+                .font(.system(size: 32, weight: .bold, design: .default))
+                .foregroundStyle(.primary)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if showPicker {
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(Color(uiColor: library.accentColor(for: browseCodeSectionID)))
+                    .padding(.top, 9)
+            }
+        }
+        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+        .opacity(1 - (collapseProgress * 0.22))
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
@@ -252,23 +285,46 @@ struct BrowseView: View {
 
     private func updateCodeSection(_ id: Int64?) {
         browseCodeSectionID = id
-        UserDefaults.standard.set(id ?? -1, forKey: Self.codeSectionDefaultsKey)
+        BrowserContextID.persistCodeSectionID(id, for: browserContext)
         library.updateSelectedCodeSection(id: id)
+    }
+
+    private func rememberedSectionBinding(for chapterID: Int64) -> Binding<Int64?> {
+        Binding(
+            get: { rememberedSectionIDs[chapterID] },
+            set: { newValue in
+                if let newValue {
+                    rememberedSectionIDs[chapterID] = newValue
+                } else {
+                    rememberedSectionIDs.removeValue(forKey: chapterID)
+                }
+            }
+        )
     }
 
     private func seedBrowseSectionIfNeeded() {
         guard !hasSeededBrowseSection else { return }
         hasSeededBrowseSection = true
 
-        browseCodeSectionID = storedCodeSectionID(forKey: Self.codeSectionDefaultsKey)
-            ?? library.selectedCodeSectionID
-            ?? library.codeSections.first?.id
-    }
+        let stored = BrowserContextID.storedCodeSectionID(for: browserContext)
 
-    private func storedCodeSectionID(forKey key: String) -> Int64? {
-        guard UserDefaults.standard.object(forKey: key) != nil else { return nil }
-        let storedValue = UserDefaults.standard.integer(forKey: key)
-        return storedValue < 0 ? nil : Int64(storedValue)
+        switch browserContext {
+        case .primary:
+            browseCodeSectionID = stored
+                ?? library.selectedCodeSectionID
+                ?? library.codeSections.first?.id
+        case .secondary:
+            let primarySectionID = BrowserContextID.storedCodeSectionID(for: .primary)
+                ?? library.selectedCodeSectionID
+                ?? library.codeSections.first?.id
+            browseCodeSectionID = stored
+                ?? library.codeSections.first(where: { $0.id != primarySectionID })?.id
+                ?? primarySectionID
+        }
+
+        if stored == nil {
+            BrowserContextID.persistCodeSectionID(browseCodeSectionID, for: browserContext)
+        }
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {
@@ -573,7 +629,7 @@ struct ChapterSectionsView: View {
                 toggleGroup(group.id)
             } label: {
                 HStack(alignment: .center, spacing: 12) {
-                    Text(group.displayLabel.uppercased())
+                    Text(group.displayLabel(codeSectionName: library.codeSectionName(id: chapter.codeSectionID)).uppercased())
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(accentColor)
                         .tracking(0.9)
@@ -896,38 +952,49 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
 struct CodeTopContentFade: View {
     let title: String?
     let progress: CGFloat
+    let alwaysVisible: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
-    init(title: String? = nil, progress: CGFloat = 0) {
+    init(title: String? = nil, progress: CGFloat = 0, alwaysVisible: Bool = true) {
         self.title = title
         self.progress = progress
+        self.alwaysVisible = alwaysVisible
     }
 
     var body: some View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
-            let collapsedOpacity = min(max((progress - 0.08) / 0.22, 0), 1)
+            let collapsedOpacity = alwaysVisible
+                ? 1
+                : min(max((progress - 0.08) / 0.22, 0), 1)
 
             VStack(spacing: 0) {
-                ZStack(alignment: .bottomLeading) {
+                ZStack {
                     Rectangle()
                         .fill(.ultraThinMaterial)
 
-                    if let title, !title.isEmpty {
-                        Text(title)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.primary)
-                            .lineLimit(1)
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 10)
-                    }
+                    Rectangle()
+                        .fill(colorScheme == .dark ? Color.black.opacity(0.86) : Color.clear)
                 }
-                .frame(height: topInset + 50)
+                    .mask(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .black, location: 0),
+                                .init(color: .black.opacity(0.82), location: 0.48),
+                                .init(color: .black.opacity(0), location: 1)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(height: topInset)
 
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .top)
             .opacity(collapsedOpacity)
             .allowsHitTesting(false)
+            .ignoresSafeArea(.container, edges: .top)
         }
     }
 }
