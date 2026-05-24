@@ -134,14 +134,54 @@ private struct MissingTableBlockView: View {
     }
 }
 
+private func isSimpleTable(_ table: CodeTableBlock) -> Bool {
+    guard table.columnCount <= 6 else { return false }
+    for cell in table.cells {
+        if cell.rowSpan > 1 || cell.columnSpan > 1 { return false }
+        if cell.backgroundColorHex != nil || cell.textColorHex != nil { return false }
+        if cell.fontSize != nil { return false }
+        if hasCustomTableBorders(cell.borders) { return false }
+        if cell.html != cell.plainText, cell.html.contains("<") { return false }
+    }
+    return true
+}
+
+private func hasCustomTableBorders(_ borders: CodeTableCellBorders) -> Bool {
+    [borders.left, borders.right, borders.top, borders.bottom].contains { border in
+        !border.isHidden || border.width != nil || border.colorHex != nil || border.style != nil
+    }
+}
+
+private struct SimpleTableBlockView: View {
+    let table: CodeTableBlock
+
+    var body: some View {
+        let cellsByPosition = Dictionary(uniqueKeysWithValues: table.cells.map { ("\($0.row)-\($0.column)", $0) })
+        Grid(horizontalSpacing: 0, verticalSpacing: 0) {
+            ForEach(0..<table.rowCount, id: \.self) { row in
+                GridRow {
+                    ForEach(0..<table.columnCount, id: \.self) { column in
+                        let cell = cellsByPosition["\(row)-\(column)"]
+                        Text(cell?.plainText ?? "")
+                            .font(.body)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .overlay(alignment: .bottom) {
+                                Color(uiColor: .separator).frame(height: 0.5)
+                            }
+                            .overlay(alignment: .trailing) {
+                                Color(uiColor: .separator).frame(width: 0.5)
+                            }
+                    }
+                }
+            }
+        }
+    }
+}
+
 private struct TableBlockView: View {
     let table: CodeTableBlock
-    private let html: String
-
-    init(table: CodeTableBlock) {
-        self.table = table
-        self.html = TableHTMLRenderer.html(for: table)
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -151,8 +191,14 @@ private struct TableBlockView: View {
                     .foregroundStyle(.primary)
             }
 
-            TableHTMLView(html: html, tableID: table.id)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Group {
+                if isSimpleTable(table) {
+                    SimpleTableBlockView(table: table)
+                } else {
+                    TableHTMLView(html: TableHTMLRenderer.html(for: table), tableID: table.id)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             ForEach(Array(table.footnotes.enumerated()), id: \.offset) { _, footnote in
                 Text(footnote)
