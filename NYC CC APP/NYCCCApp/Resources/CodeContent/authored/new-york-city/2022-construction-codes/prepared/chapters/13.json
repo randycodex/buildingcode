@@ -1,0 +1,27 @@
+{
+  "chapterID" : 13,
+  "chapterNumber" : "13",
+  "groups" : [
+    {
+      "headerLine" : "SECTION 1301",
+      "headingLine" : "GENERAL",
+      "id" : "SECTION 1301",
+      "sections" : [
+        {
+          "id" : 3054,
+          "kind" : "title",
+          "sectionNumber" : "1301.1",
+          "title" : "1301.1 Scope."
+        },
+        {
+          "id" : 3055,
+          "kind" : "title",
+          "sectionNumber" : "1301.1.1",
+          "title" : "1301.1.1 Criteria."
+        }
+      ]
+    }
+  ],
+  "rawDraftText" : "#- Chapter 13: Energy Efficiency\n\n#-- Section BC 1301: General\n\n#--- 1301.1 Scope.\n\nThis chapter governs the design and construction of buildings for energy efficiency.\n\n#---- 1301.1.1 Criteria.\n\nBuildings shall be designed and constructed in accordance with the New York City Energy Conservation Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085.",
+  "schemaVersion" : 1
+}

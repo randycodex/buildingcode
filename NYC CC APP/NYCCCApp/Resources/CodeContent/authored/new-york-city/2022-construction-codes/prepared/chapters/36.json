@@ -1,0 +1,20 @@
+{
+  "chapterID" : 36,
+  "chapterNumber" : "A",
+  "groups" : [
+    {
+      "headerLine" : "Appendix A",
+      "id" : "Appendix A",
+      "sections" : [
+        {
+          "id" : 6864,
+          "kind" : "title",
+          "sectionNumber" : "A",
+          "title" : "Appendix A: Reserved"
+        }
+      ]
+    }
+  ],
+  "rawDraftText" : "#- Appendix A: Reserved",
+  "schemaVersion" : 1
+}

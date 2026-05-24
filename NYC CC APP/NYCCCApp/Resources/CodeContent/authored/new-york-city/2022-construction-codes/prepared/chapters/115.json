@@ -1,0 +1,51 @@
+{
+  "chapterID" : 115,
+  "chapterNumber" : "12",
+  "groups" : [
+    {
+      "headerLine" : "SECTION BC 1201",
+      "headingLine" : "General",
+      "id" : "SECTION BC 1201",
+      "sections" : [
+        {
+          "id" : 12737,
+          "kind" : "title",
+          "sectionNumber" : "1201.1",
+          "title" : "1201.1 Scope."
+        },
+        {
+          "id" : 12738,
+          "kind" : "title",
+          "sectionNumber" : "1201.2",
+          "title" : "1201.2 Storage, handling, and use."
+        },
+        {
+          "id" : 12739,
+          "kind" : "title",
+          "sectionNumber" : "1202.1",
+          "title" : "1202.1 Nonflammable medical and nonmedical gases."
+        },
+        {
+          "id" : 12740,
+          "kind" : "title",
+          "sectionNumber" : "1203.1",
+          "title" : "1203.1 Design and installation."
+        },
+        {
+          "id" : 12741,
+          "kind" : "title",
+          "sectionNumber" : "1204.1",
+          "title" : "1204.1 Design and installation."
+        },
+        {
+          "id" : 12742,
+          "kind" : "title",
+          "sectionNumber" : "1204.2",
+          "title" : "1204.2 Storage, handling, and use."
+        }
+      ]
+    }
+  ],
+  "rawDraftText" : "#- Chapter 12: Special Piping and Storage Systems\n\nSection PC 1201: General\n\n#--- 1201.1 Scope.\n\nThe provisions of this chapter shall govern the design and installation of piping and storage systems for nonflammable medical and nonmedical gas systems.\n\n#--- 1201.2 Storage, handling, and use.\n\nThe storage, handling, and use of medical and nonmedical gases shall be in accordance with the New York City Fire Code.\n\nSection PC 1202: Medical and Nonmedical Gases\n\n#--- 1202.1 Nonflammable medical and nonmedical gases.\n\nNonflammable medical and nonmedical gas systems shall be designed and installed in accordance with NFPA 99.\n\nExceptions:\n\n1. This section shall not apply to portable systems or cylinder storage.\n\n2. Vacuum system exhaust terminations shall comply with the New York City Mechanical Code.\n\nSection PC 1203: Nonmedical Oxygen Systems\n\n#--- 1203.1 Design and installation.\n\nNonmedical oxygen systems shall be designed and installed in accordance with NFPA 55 and NFPA 51.\n\nSection PC 1204: Other Cryogenic Systems\n\n#--- 1204.1 Design and installation.\n\nDesign and installation of cryogenic systems shall be in accordance with Sections 1202 and 1203.\n\n#--- 1204.2 Storage, handling, and use.\n\nStorage, handling, and use of cryogenic gases and fluids shall be in accordance with the New York City Fire Code.",
+  "schemaVersion" : 1
+}

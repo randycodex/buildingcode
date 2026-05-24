@@ -1,0 +1,20 @@
+{
+  "chapterID" : 80,
+  "chapterNumber" : "B",
+  "groups" : [
+    {
+      "headerLine" : "Appendix B",
+      "id" : "Appendix B",
+      "sections" : [
+        {
+          "id" : 10209,
+          "kind" : "title",
+          "sectionNumber" : "B",
+          "title" : "Appendix B: Reserved"
+        }
+      ]
+    }
+  ],
+  "rawDraftText" : "#- Appendix A: Chimney Connector Pass-Throughs\n\nFigure A-1 Chimney Connector Systems\n\nFor SI: 1 inch = 25.4 mm.\n\n#- Appendix B: Reserved\n\n#- Appendix C: Fuel Oil Storage Tank Venting Options\n\nSection MC C101: General\n\n#--- C101.1 Scope.\n\nThe figures in this appendix shall supplement the provisions for venting of tanks in Section 1305 and are intended for illustrative purposes. Where there is a conflict between the figures in this appendix and the provisions in Section 1305, the provisions of Section 1305 shall govern.\n\nFigure C101.1(1) Primary Tank: UL 80, ASME BPVC, or NYC Alternate Tank Day Tank: UL 80, ASME BPVC, or NYC Alternate Tank\n\nFigure C101.1(2) Primary Tank: UL 142 or Dual Label Tank Day Tank: UL 142 or Dual Label Tank\n\nFigure C101.1(3) Primary Tank: UL 80, ASME BPVC, or NYC Alternate Tank Day Tank: UL 142 or Dual Label Tank",
+  "schemaVersion" : 1
+}

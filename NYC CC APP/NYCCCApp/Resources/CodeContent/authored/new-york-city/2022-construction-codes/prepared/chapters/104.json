@@ -1,0 +1,483 @@
+{
+  "chapterID" : 104,
+  "chapterNumber" : "1",
+  "groups" : [
+    {
+      "headerLine" : "SECTION BC 101",
+      "headingLine" : "General",
+      "id" : "SECTION BC 101",
+      "sections" : [
+        {
+          "id" : 11729,
+          "kind" : "title",
+          "sectionNumber" : "101.1",
+          "title" : "101.1 Title."
+        },
+        {
+          "id" : 11730,
+          "kind" : "title",
+          "sectionNumber" : "101.2",
+          "title" : "101.2 Scope."
+        },
+        {
+          "id" : 11731,
+          "kind" : "title",
+          "sectionNumber" : "101.3",
+          "title" : "101.3 Intent."
+        },
+        {
+          "id" : 11732,
+          "kind" : "title",
+          "sectionNumber" : "101.4",
+          "title" : "101.4 Severability."
+        },
+        {
+          "id" : 11733,
+          "kind" : "title",
+          "sectionNumber" : "102.1",
+          "title" : "102.1 General."
+        },
+        {
+          "id" : 11734,
+          "kind" : "title",
+          "sectionNumber" : "102.2",
+          "title" : "102.2 Existing installations."
+        },
+        {
+          "id" : 11735,
+          "kind" : "title",
+          "sectionNumber" : "102.2.1",
+          "title" : "102.2.1 Existing buildings."
+        },
+        {
+          "id" : 11736,
+          "kind" : "title",
+          "sectionNumber" : "102.2.2",
+          "title" : "102.2.2 References to the New York City Building Code."
+        },
+        {
+          "id" : 11737,
+          "kind" : "title",
+          "sectionNumber" : "102.3",
+          "title" : "102.3 Maintenance."
+        },
+        {
+          "id" : 11738,
+          "kind" : "title",
+          "sectionNumber" : "102.3.1",
+          "title" : "102.3.1 Owner responsibility."
+        },
+        {
+          "id" : 11739,
+          "kind" : "title",
+          "sectionNumber" : "102.4",
+          "title" : "102.4 Additions, alterations or repairs."
+        },
+        {
+          "id" : 11740,
+          "kind" : "title",
+          "sectionNumber" : "102.4.1",
+          "title" : "102.4.1 Minor additions, alterations, renovations and repairs."
+        },
+        {
+          "id" : 11741,
+          "kind" : "title",
+          "sectionNumber" : "102.4.2",
+          "title" : "102.4.2 Special provisions for prior code buildings."
+        },
+        {
+          "id" : 11742,
+          "kind" : "title",
+          "sectionNumber" : "102.4.2.1",
+          "title" : "102.4.2.1 Number of plumbing fixtures."
+        },
+        {
+          "id" : 11743,
+          "kind" : "title",
+          "sectionNumber" : "102.4.2.2",
+          "title" : "102.4.2.2 Seismic supports."
+        },
+        {
+          "id" : 11744,
+          "kind" : "title",
+          "sectionNumber" : "102.4.2.3",
+          "title" : "102.4.2.3 Wind resistance."
+        },
+        {
+          "id" : 11745,
+          "kind" : "title",
+          "sectionNumber" : "102.5",
+          "title" : "102.5 Change in occupancy."
+        },
+        {
+          "id" : 11746,
+          "kind" : "title",
+          "sectionNumber" : "102.6",
+          "title" : "102.6 Reserved."
+        },
+        {
+          "id" : 11747,
+          "kind" : "title",
+          "sectionNumber" : "102.7",
+          "title" : "102.7 Reserved."
+        },
+        {
+          "id" : 11748,
+          "kind" : "title",
+          "sectionNumber" : "102.8",
+          "title" : "102.8 Referenced standards."
+        },
+        {
+          "id" : 11749,
+          "kind" : "title",
+          "sectionNumber" : "102.8.1",
+          "title" : "102.8.1 Editions of referenced standards."
+        },
+        {
+          "id" : 11750,
+          "kind" : "title",
+          "sectionNumber" : "102.9",
+          "title" : "102.9 Requirements not covered by code."
+        },
+        {
+          "id" : 11751,
+          "kind" : "title",
+          "sectionNumber" : "102.10",
+          "title" : "102.10 Application of references."
+        },
+        {
+          "id" : 11752,
+          "kind" : "title",
+          "sectionNumber" : "103.1",
+          "title" : "103.1 Enforcement agency."
+        },
+        {
+          "id" : 11753,
+          "kind" : "title",
+          "sectionNumber" : "104.1",
+          "title" : "104.1 General."
+        },
+        {
+          "id" : 11754,
+          "kind" : "title",
+          "sectionNumber" : "104.2",
+          "title" : "104.2 Remedies for non-functioning storm water disposal systems."
+        },
+        {
+          "id" : 11755,
+          "kind" : "title",
+          "sectionNumber" : "105.1",
+          "title" : "105.1 Approvals."
+        },
+        {
+          "id" : 11756,
+          "kind" : "title",
+          "sectionNumber" : "106.1",
+          "title" : "106.1 General."
+        },
+        {
+          "id" : 11757,
+          "kind" : "title",
+          "sectionNumber" : "106.2",
+          "title" : "106.2 Required."
+        },
+        {
+          "id" : 11758,
+          "kind" : "title",
+          "sectionNumber" : "106.3",
+          "title" : "106.3 Work exempt from permit."
+        },
+        {
+          "id" : 11759,
+          "kind" : "title",
+          "sectionNumber" : "106.4",
+          "title" : "106.4 Validity of permit."
+        },
+        {
+          "id" : 11760,
+          "kind" : "title",
+          "sectionNumber" : "106.5",
+          "title" : "106.5 Mandatory sewer and catch basin work required by Section 24-526 of the Administrative Code."
+        },
+        {
+          "id" : 11761,
+          "kind" : "title",
+          "sectionNumber" : "106.6",
+          "title" : "106.6 Other permits."
+        },
+        {
+          "id" : 11762,
+          "kind" : "title",
+          "sectionNumber" : "106.7",
+          "title" : "106.7 Permits with respect to limited alteration applications."
+        },
+        {
+          "id" : 11763,
+          "kind" : "title",
+          "sectionNumber" : "107.1",
+          "title" : "107.1 General."
+        },
+        {
+          "id" : 11764,
+          "kind" : "title",
+          "sectionNumber" : "107.2",
+          "title" : "107.2 Required documents."
+        },
+        {
+          "id" : 11765,
+          "kind" : "title",
+          "sectionNumber" : "107.2.1",
+          "title" : "107.2.1 Composite plans."
+        },
+        {
+          "id" : 11766,
+          "kind" : "title",
+          "sectionNumber" : "107.3",
+          "title" : "107.3 Lot diagram."
+        },
+        {
+          "id" : 11767,
+          "kind" : "title",
+          "sectionNumber" : "107.4",
+          "title" : "107.4 Building classification statement."
+        },
+        {
+          "id" : 11768,
+          "kind" : "title",
+          "sectionNumber" : "107.5",
+          "title" : "107.5 Plumbing plans."
+        },
+        {
+          "id" : 11769,
+          "kind" : "title",
+          "sectionNumber" : "5.1.",
+          "title" : "5.1. The relative elevation of the lowest fixture referred to the city datum provided in Section 28-104.7.6 of the Administrative Code and the approximate inside top of the public sewers;"
+        },
+        {
+          "id" : 11770,
+          "kind" : "title",
+          "sectionNumber" : "5.2.",
+          "title" : "5.2. The number, size, and location of all proposed sewer connections and relative location and size of all water mains, leaders, and risers; and"
+        },
+        {
+          "id" : 11771,
+          "kind" : "title",
+          "sectionNumber" : "5.3.",
+          "title" : "5.3. A statement from the Department of Environmental Protection, giving the minimum water pressure in the main serving the building."
+        },
+        {
+          "id" : 11772,
+          "kind" : "title",
+          "sectionNumber" : "107.6",
+          "title" : "107.6 Discharge of sewage and discharge and\/or management of stormwater runoff."
+        },
+        {
+          "id" : 11773,
+          "kind" : "title",
+          "sectionNumber" : "107.6.1",
+          "title" : "107.6.1 Sewage."
+        },
+        {
+          "id" : 11774,
+          "kind" : "title",
+          "sectionNumber" : "107.6.1.1",
+          "title" : "107.6.1.1 Connection feasible and available."
+        },
+        {
+          "id" : 11775,
+          "kind" : "title",
+          "sectionNumber" : "107.6.1.2",
+          "title" : "107.6.1.2 Connection not feasible or not available."
+        },
+        {
+          "id" : 11776,
+          "kind" : "title",
+          "sectionNumber" : "107.6.2",
+          "title" : "107.6.2 Stormwater."
+        },
+        {
+          "id" : 11777,
+          "kind" : "title",
+          "sectionNumber" : "1.1.",
+          "title" : "1.1. This exception shall not apply if the horizontal building enlargement and increase in impervious surface related to the current application for construction document approval and any other enlargement or increase in impervious surface made on the same tax lot after July 1, 2008 together exceed 200 square feet (19 m 2 )."
+        },
+        {
+          "id" : 11778,
+          "kind" : "title",
+          "sectionNumber" : "2.1.",
+          "title" : "2.1. This exception shall not apply where on-site disposal cannot be designed to conform to the provisions of the applicable laws and rules including but not limited to minimum required distances from lot lines or structures or subsoil conditions as determined by the department."
+        },
+        {
+          "id" : 11779,
+          "kind" : "title",
+          "sectionNumber" : "2.2.",
+          "title" : "2.2. This exception shall not apply if the horizontal building enlargement and increase in impervious surface related to the current application for construction document approval and all other enlargements or increases in impervious surface made on the same tax lot after July 1, 2008 together exceed 1,000 square feet (93 m 2 )."
+        },
+        {
+          "id" : 11780,
+          "kind" : "title",
+          "sectionNumber" : "107.6.2.1",
+          "title" : "107.6.2.1 Connection feasible and available."
+        },
+        {
+          "id" : 11781,
+          "kind" : "title",
+          "sectionNumber" : "107.6.2.2",
+          "title" : "107.6.2.2 Connection not feasible or not available."
+        },
+        {
+          "id" : 11782,
+          "kind" : "title",
+          "sectionNumber" : "107.6.3",
+          "title" : "107.6.3 Post-construction stormwater management facilities."
+        },
+        {
+          "id" : 11783,
+          "kind" : "title",
+          "sectionNumber" : "107.7",
+          "title" : "107.7 Private sewers."
+        },
+        {
+          "id" : 11784,
+          "kind" : "title",
+          "sectionNumber" : "107.8",
+          "title" : "107.8 Private sewage treatment plant."
+        },
+        {
+          "id" : 11785,
+          "kind" : "title",
+          "sectionNumber" : "107.9",
+          "title" : "107.9 Private stormwater or sewage disposal system."
+        },
+        {
+          "id" : 11786,
+          "kind" : "title",
+          "sectionNumber" : "107.10",
+          "title" : "107.10 Energy efficiency."
+        },
+        {
+          "id" : 11787,
+          "kind" : "title",
+          "sectionNumber" : "107.11",
+          "title" : "107.11 Retention of construction and submittal documents."
+        },
+        {
+          "id" : 11788,
+          "kind" : "title",
+          "sectionNumber" : "108.1",
+          "title" : "108.1 General."
+        },
+        {
+          "id" : 11789,
+          "kind" : "title",
+          "sectionNumber" : "108.2",
+          "title" : "108.2 Required inspections and testing."
+        },
+        {
+          "id" : 11790,
+          "kind" : "title",
+          "sectionNumber" : "1.2.",
+          "title" : "1.2. Rough-in inspection and\/or testing shall be made after the roof, framing, fireblocking, firestopping, draftstopping and bracing is in place and all sanitary, storm and water distribution piping is roughed-in, and prior to the installation of wall or ceiling membranes."
+        },
+        {
+          "id" : 11791,
+          "kind" : "title",
+          "sectionNumber" : "1.3.",
+          "title" : "1.3. Inspections required by the New York City Energy Conservation Code shall be made in accordance with rules of the department, as applicable."
+        },
+        {
+          "id" : 11792,
+          "kind" : "title",
+          "sectionNumber" : "108.2.1",
+          "title" : "108.2.1 Approved agencies."
+        },
+        {
+          "id" : 11793,
+          "kind" : "title",
+          "sectionNumber" : "108.2.2",
+          "title" : "108.2.2 Inspection of prefabricated construction assemblies."
+        },
+        {
+          "id" : 11794,
+          "kind" : "title",
+          "sectionNumber" : "108.2.2.1",
+          "title" : "108.2.2.1 Test and inspection records."
+        },
+        {
+          "id" : 11795,
+          "kind" : "title",
+          "sectionNumber" : "108.2.3",
+          "title" : "108.2.3 Exposure of work."
+        },
+        {
+          "id" : 11796,
+          "kind" : "title",
+          "sectionNumber" : "108.3",
+          "title" : "108.3 Special inspections of alternative engineered design systems."
+        },
+        {
+          "id" : 11797,
+          "kind" : "title",
+          "sectionNumber" : "108.3.1",
+          "title" : "108.3.1 Periodic inspection."
+        },
+        {
+          "id" : 11798,
+          "kind" : "title",
+          "sectionNumber" : "108.3.2",
+          "title" : "108.3.2 Written report."
+        },
+        {
+          "id" : 11799,
+          "kind" : "title",
+          "sectionNumber" : "108.4",
+          "title" : "108.4 Testing."
+        },
+        {
+          "id" : 11800,
+          "kind" : "title",
+          "sectionNumber" : "108.4.1",
+          "title" : "108.4.1 New, altered, extended or repaired systems."
+        },
+        {
+          "id" : 11801,
+          "kind" : "title",
+          "sectionNumber" : "108.4.2",
+          "title" : "108.4.2 Apparatus, material and labor for tests."
+        },
+        {
+          "id" : 11802,
+          "kind" : "title",
+          "sectionNumber" : "108.4.3",
+          "title" : "108.4.3 Reinspection and testing."
+        },
+        {
+          "id" : 11803,
+          "kind" : "title",
+          "sectionNumber" : "108.5",
+          "title" : "108.5 Sign-off of completed work."
+        },
+        {
+          "id" : 11804,
+          "kind" : "title",
+          "sectionNumber" : "108.6",
+          "title" : "108.6 Temporary connection."
+        },
+        {
+          "id" : 11805,
+          "kind" : "title",
+          "sectionNumber" : "108.7",
+          "title" : "108.7 Connection of service utilities."
+        },
+        {
+          "id" : 11806,
+          "kind" : "title",
+          "sectionNumber" : "109.1",
+          "title" : "109.1 General."
+        }
+      ]
+    }
+  ],
+  "rawDraftText" : "#- Chapter 1: Administration\n\nSection PC 101: General\n\n#--- 101.1 Title.\n\nThis code shall be known and may be cited as the \"New York City Plumbing Code,\" \"NYCPC\" or \"PC\". All section numbers in this code shall be deemed to be preceded by the designation \"PC\".\n\n#--- 101.2 Scope.\n\nThe provisions of this code shall apply to the erection, installation, alteration, repair, relocation, replacement, addition to, use or maintenance of plumbing systems. This code shall also regulate nonflammable medical and nonmedical gas, nonmedical oxygen systems, and sanitary and condensate vacuum collection systems. The installation of fuel gas distribution piping and equipment, fuel gas-fired water heaters, and water heater venting systems shall be regulated by the New York City Fuel Gas Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 101.3 Intent.\n\nThe purpose of this code is to provide minimum standards to safeguard life or limb, health, property, public welfare and the environment by regulating and controlling the design, construction, installation, quality of materials, location, operation and maintenance or use of plumbing systems.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2010\/049.\n\n#--- 101.4 Severability.\n\nIf a section, subsection, sentence, clause or phrase of this code is, for any reason, held to be unconstitutional, such decision shall not affect the validity of the remaining portions of this code.\n\nSection PC 102: Applicability\n\n#--- 102.1 General.\n\nWhere there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.\n\n#--- 102.2 Existing installations.\n\nExcept as otherwise specifically provided, plumbing systems lawfully in existence on July 1, 2008 or on the effective date of a subsequent amendment of this code shall be permitted to have their use and maintenance continued if the use, maintenance or repair is in accordance with the original design and no hazard to life, health or property is created by such plumbing system.\n\n#---- 102.2.1 Existing buildings.\n\nAdditions, alterations, renovations or repairs related to building or structural issues shall be governed by Chapter 1 of Title 28 of the Administrative Code, the New York City Building Code and the 1968 Building Code, as applicable.\n\n#---- 102.2.2 References to the New York City Building Code.\n\nFor existing buildings, a reference to a section of the New York City Building Code in this code shall also be deemed to refer to the equivalent provision of the 1968 Building Code, as applicable in accordance with Chapter 1 of Title 28 of the Administrative Code.\n\n#--- 102.3 Maintenance.\n\nInstallations, both existing and new, and parts thereof shall be maintained in proper operating condition in accordance with the original design and in a safe and sanitary condition. Devices or safeguards that are required by this code shall be maintained in compliance with the applicable provisions under which they were installed.\n\n#---- 102.3.1 Owner responsibility.\n\nThe owner or the owner's designated agent shall be responsible for maintenance of plumbing systems. To determine compliance with this provision, the commissioner shall have the authority to require any plumbing system to be inspected.\n\n#--- 102.4 Additions, alterations or repairs.\n\nAdditions, alterations, renovations or repairs to installations shall conform to that required for new installations without requiring the existing installation to comply with all of the requirements of this code. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded.\n\n#---- 102.4.1 Minor additions, alterations, renovations and repairs.\n\nMinor additions, alterations, renovations and repairs to existing installations shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved.\n\n#---- 102.4.2 Special provisions for prior code buildings.\n\nIn addition to the requirements of Sections 102.4 and 102.4.1, the provisions of Sections 102.4.2.1 through 102.4.2.3 shall apply to prior code buildings.\n\n#----- 102.4.2.1 Number of plumbing fixtures.\n\nFor prior code buildings, the number of required plumbing fixtures shall be permitted to be calculated based on the 1968 Building Code utilizing the occupant load figures for the 1968 Building Code, or shall be permitted to be calculated based on the New York City Plumbing Code utilizing the occupant load figures from the New York City Plumbing Code.\n\n#----- 102.4.2.2 Seismic supports.\n\nFor prior code buildings, the determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with Chapter 16 of the New York City Building Code or the 1968 Building Code and Reference Standard RS 9-6 of such code.\n\n#----- 102.4.2.3 Wind resistance.\n\nFor prior code buildings, equipment, appliances and supports that are exposed to wind shall be designed and installed to resist the wind pressures determined in accordance with Chapter 16 of the New York City Building Code.\n\n#--- 102.5 Change in occupancy.\n\nRefer to Chapter 1 of Title 28 of the Administrative Code.\n\n#--- 102.6 Reserved.\n\n#--- 102.7 Reserved.\n\n#--- 102.8 Referenced standards.\n\nThe standards referenced in this code shall be those that are listed in Chapter 15 and such standards shall be considered as part of the requirements of this code to the prescribed extent of each such reference. Where differences occur between the provisions of this code and the referenced standards, the provisions of this code shall apply. Refer to Article 103 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to referenced standards.\n\n#---- 102.8.1 Editions of referenced standards.\n\nReferences to standards in this code shall be to the editions of those standards provided for in Chapter 15, or as otherwise provided by rule.\n\n#--- 102.9 Requirements not covered by code.\n\nRequirements necessary for the strength, stability or proper operation of an existing or proposed plumbing system, or for the public safety, health and general welfare, not specifically covered by this code, shall be determined by the commissioner.\n\n#--- 102.10 Application of references.\n\nReference to chapter or section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code.\n\nSection PC 103: Department of Buildings\n\n#--- 103.1 Enforcement agency.\n\nRefer to the New York City Charter and Chapter 1 of Title 28 of the Administrative Code.\n\nSection PC 104: Duties and Powers of the Commissioner of Buildings\n\n#--- 104.1 General.\n\nThe commissioner shall have the authority to render interpretations of this code, adopt rules, and establish policies and procedures in order to clarify and implement its provisions. Such interpretations, policies, procedures, and rules shall be in compliance with the intent and purpose of this code. See the New York City Charter and Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to the authority of the Commissioner of Buildings.\n\n#--- 104.2 Remedies for non-functioning storm water disposal systems.\n\nIf the commissioner determines that a system of storm water disposal which has been previously approved under the provisions of this code or of previous codes is no longer providing adequate drainage of storm water from a lot or development, the commissioner shall order repair of such system as required by section 28-301.1 of the Administrative Code; or if, in the judgment of the commissioner, repair of such system is not sufficient to ensure adequate drainage of storm water from such lot or development, the commissioner shall order that one of the methods of storm water disposal set forth in Chapter 11 shall be used to provide such drainage. The commissioner may apply to the Board of Standards and Appeals for modification of the certificate of occupancy of any building constructed on such lot or development to require the use of such method.\n\nSection PC 105: Approvals\n\n#--- 105.1 Approvals.\n\nRefer to Chapter 1 of Title 28 of the Administrative Code.\n\nSection PC 106: Permits\n\n#--- 106.1 General.\n\nPermits shall comply with this section, with Article 105 of Chapter 1 of Title 28 of the Administrative Code, and with requirements found elsewhere in this code.\n\n#--- 106.2 Required.\n\nAny owner or authorized agent who intends to construct, add to, alter, repair, move, demolish, or change the occupancy of a building or structure, or to erect, install, add to, alter, repair, remove, convert or replace any gas, mechanical or plumbing system, the installation of which is regulated by this code, or to cause any such work to be done, shall first make application for construction document approval in accordance with Chapter 1 of Title 28 of the Administrative Code and this chapter and obtain the required permit.\n\n#--- 106.3 Work exempt from permit.\n\nExemptions from permit requirements of this code as authorized in Chapter 1 of Title 28 of the Administrative Code and the rules of the department shall not be deemed to grant authorization for any work to be done in any manner in violation of the provisions of this code or any other laws or rules.\n\n#--- 106.4 Validity of permit.\n\nThe issuance or granting of a permit shall not be construed to be a permit for, or an approval of, any violation of any of the provisions of this code or of any other law. Permits presuming to give authority to violate or cancel the provisions of this code or other law shall not be valid. The issuance of a permit based on construction documents and other data shall not prevent the commissioner from requiring the correction of errors in the construction documents and other data. The commissioner is also authorized to prevent occupancy or use of a structure where in violation of this code or of any other law.\n\n#--- 106.5 Mandatory sewer and catch basin work required by Section 24-526 of the Administrative Code.\n\nAn applicant for a permit who is required pursuant to Section 24-526 of the Administrative Code to construct or repair defects in sewers or catch basins that lie outside the property shall submit certification from the Department of Environmental Protection in accordance with Section 105.9 of the New York City Building Code.\n\n#--- 106.6 Other permits.\n\nIn addition to any permits required by the provisions of this code, the following permits shall also be required:\n\n1. Permits for all water supplies and backflow devices for all buildings shall be obtained from the Department of Environmental Protection, and the installation of the water service system from the street main up to and including the meter outlet control valve shall be subject to inspection and approval by such department. All backflow devices shall be acceptable to the New York State Department of Health.\n\n2. Permits for the installation of the building sewer shall be obtained from the Department of Environmental Protection.\n\n3. Permits for sidewalk and street openings shall be obtained from the Department of Transportation.\n\n4. Where groundwater discharge permits are required by the rules of the Department of Environmental Protection for the discharge of groundwater, such permits shall be obtained from the Department of Environmental Protection in accordance with such rules.\n\n5. Permits for the installation of temporary connections at the street for water and sewer shall be obtained from the Department of Environmental Protection.\n\n#--- 106.7 Permits with respect to limited alteration applications.\n\nFor permits with respect to limited alteration applications refer to Sections 28-101.5 and 28-104.6, Exception 1 of the Administrative Code.\n\nSection PC 107: Construction Documents\n\n#--- 107.1 General.\n\nConstruction documents shall comply with Article 104 of Chapter 1 of Title 28 of the Administrative Code and other applicable provisions of this code and its referenced standards. Such construction documents shall be coordinated with architectural, structural and means of egress plans.\n\n#--- 107.2 Required documents.\n\nThe applicant shall submit all of the documents specified in Sections 107.3 through 107.10 as appropriate to the nature and extent of the work proposed. Construction documents shall indicate the plumbing work to be performed, so drawn as to conform to the architectural and structural aspects of the building and to show in detail compliance with this code.\n\n#---- 107.2.1 Composite plans.\n\nComposite plans showing compliance of architectural, structural, and mechanical parts of a building may be submitted provided that a clear understanding of each part is not impaired.\n\n#--- 107.3 Lot diagram.\n\nThe lot diagram shall be provided where applicable to the work proposed, including but not limited to street connection locations and increases of impervious surfaces.\n\n#--- 107.4 Building classification statement.\n\nWhere applicable to the proposed work, the statement shall identify:\n\n1. The occupancy group or groups that apply to parts of the building in accordance with Section 302 of the New York City Building Code;\n\n2. The occupancy group of the main use or dominant occupancy of the building;\n\n3. The construction type of the building in accordance with Section 602 of the New York City Building Code;\n\n4. The structure category in accordance with Table 1604.5 of the New York City Building Code;\n\n5. The height of the building as defined in Section 202 of the New York City Building Code;\n\n6. The applicable measurements to the highest and lowest level of Fire Department access;\n\n7. Whether the building is inside or outside of the fire districts; and\n\n8. Whether the building is inside or outside a flood hazard area as such term is defined in Chapter 2 of the New York City Building Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 107.5 Plumbing plans.\n\nConstruction documents for plumbing work shall contain plans which include the following data and information. Such plans shall not be required in connection with applications for limited plumbing alterations.\n\n1. Riser diagrams showing the story heights, all plumbing fixtures with diagrammatic arrangement of their connections to soil, waste, and vent piping, all soil, waste, and vent stacks from the point of connection with the building drain to their termination above the roof, all leader and storm water piping from the point of connection with the building drain to the roof drain, and all risers.\n\n2. Diagrammatic floor plans showing the location, layout, and spacing of all plumbing fixtures, the summation of plumbing loads, the size, location, and material for all building sewers and drains, and the soil, waste, vent, water, and gas distribution piping.\n\n3. Floor plans showing typical layouts; and stack details shown on one drawing, provided that such details are clearly identified as to location and stack number.\n\n4. Plans clearly indicating all appurtenant equipment, including, but not limited to, pumps, ejectors, water tanks, and piping.\n\n5. In the case of plans for new plumbing systems, and alterations of existing plumbing systems, plans indicating:\n\n#--- 5.1. The relative elevation of the lowest fixture referred to the city datum provided in Section 28-104.7.6 of the Administrative Code and the approximate inside top of the public sewers;\n\n#--- 5.2. The number, size, and location of all proposed sewer connections and relative location and size of all water mains, leaders, and risers; and\n\n#--- 5.3. A statement from the Department of Environmental Protection, giving the minimum water pressure in the main serving the building.\n\n6. Seismic protection and restraint details for piping and equipment as required by Chapter 16 of the New York City Building Code.\n\n7. Details showing structural supports for water tanks where required.\n\n8. In flood hazard areas, construction documents shall comply with Appendix G of the New York City Building Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 107.6 Discharge of sewage and discharge and\/or management of stormwater runoff.\n\nApplications for construction document approval shall comply with Sections 107.6.1, 107.6.2 and 107.6.3.\n\n(Am. L.L. 2017\/097, 5\/30\/2017, eff. 6\/1\/2019)\n\n#---- 107.6.1 Sewage.\n\nApplications for construction document approval shall include submittal documents relating to the availability and feasibility of a public sanitary or public combined sewer and\/or other approved discharge for sewage in accordance with Sections 107.6.1.1 and 107.6.1.2 for the following types of applications:\n\n1. New buildings that include any fixtures that produce sewage;\n\n2. Alterations that require an increase in size to an existing sanitary or combined sewer connection; and\/or\n\n3. Alterations requiring a new connection to a sanitary or combined sewer.\n\n#----- 107.6.1.1 Connection feasible and available.\n\nWhere a public sanitary or combined sewer availability is certified by the Department of Environmental Protection or certified by an applicant in accordance with rules of such department and connection thereto feasible, the applicant shall submit:\n\n1. Department of Environmental Protection certification of availability and feasibility. A sewer certification issued by the Department of Environmental Protection that a public sanitary or combined sewer is available and connection thereto is feasible. Applications for such certification shall be made to the Department of Environmental Protection on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department) and shall be reviewed and approved by such department in accordance with the rules of such department. Such certification may be conditioned by such department on part or all of the sewage to be disposed of with an on-site disposal system or with the use of an alternative disposal system; or\n\n2. Applicant certification of availability and feasibility. A certification submitted by the applicant to the Department of Environmental Protection in accordance with the rules of such department that a public sanitary or combined sewer is available and connection thereto is feasible, in such cases where the availability and feasibility of connection to a public sanitary or combined sewer are allowed to be certified by the applicant pursuant to such rules. Such certification shall be on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department).\n\n#----- 107.6.1.2 Connection not feasible or not available.\n\nWhere a public sanitary or combined sewer is not available, or where connection thereto is not feasible, the applicant shall submit:\n\n1. Department of Environmental Protection or applicant certification of unavailability or non-feasibility.\n\n(i) A certification issued by the Department of Environmental Protection that a public sanitary or combined sewer is not available or that connection to an available sewer is not feasible. Such certification shall be on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department) or\n\n(ii) A certification submitted by the applicant to the Department of Environmental Protection that a public sanitary or combined sewer is not available or that connection thereto is not feasible, in such cases where the availability and feasibility of connection to a public sanitary or combined sewer are allowed to be certified by the applicant pursuant to the rules of such department. Such certification shall be on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department); and\n\n2. On-site disposal. A proposal for the design and construction of a system for the on-site disposal of sewage conforming to the provisions of this code and other applicable laws and rules including but not limited to minimum required distances from lot lines or structures and subsoil conditions. Construction documents for such system shall be subject to the approval of the department.\n\n#---- 107.6.2 Stormwater.\n\nApplications for construction document approval shall include submittal documents relating to the availability and feasibility of a public combined or storm sewer or other approved method for stormwater discharge in accordance with Sections 107.6.2.1 and 107.6.2.2 for the following types of applications:\n\n1. New buildings;\n\n2. Alterations of buildings proposing horizontal building enlargement; and\/or\n\n3. Alterations that increase impervious surfaces on the tax lot.\n\nExceptions:\n\n1. Applications for construction document approval for the alteration of an existing one- or two-family dwelling need not include such submittal documents, where the footprint of a proposed horizontal building enlargement and any proposed increase in impervious surfaces combined is less than or equal to 200 square feet (19 m2). Construction documents shall include the amount of proposed increase in impervious area.\n\n#--- 1.1. This exception shall not apply if the horizontal building enlargement and increase in impervious surface related to the current application for construction document approval and any other enlargement or increase in impervious surface made on the same tax lot after July 1, 2008 together exceed 200 square feet (19 m 2 ).\n\n2. Applications for construction document approval for the alteration of a building need not include such submittal documents, where the increase in area of the footprint resulting from a proposed horizontal building enlargement and any proposed increase in impervious surfaces on a lot combined is less than or equal to 1,000 square feet (93 m2), and on-site disposal of stormwater conforming to the provisions of the applicable laws and rules as determined by the department is proposed for such enlargement and\/or increase in impervious surface. Construction documents shall include the amount of proposed increase in impervious area.\n\n#--- 2.1. This exception shall not apply where on-site disposal cannot be designed to conform to the provisions of the applicable laws and rules including but not limited to minimum required distances from lot lines or structures or subsoil conditions as determined by the department.\n\n#--- 2.2. This exception shall not apply if the horizontal building enlargement and increase in impervious surface related to the current application for construction document approval and all other enlargements or increases in impervious surface made on the same tax lot after July 1, 2008 together exceed 1,000 square feet (93 m 2 ).\n\n#----- 107.6.2.1 Connection feasible and available.\n\nWhere a public combined or storm sewer availability is certified by the Department of Environmental Protection or certified by an applicant in accordance with rules of such department and connection thereto is feasible, applicants shall submit:\n\n1. Department of Environmental Protection certification of availability and feasibility. A sewer certification issued by the Department of Environmental Protection that a public storm or combined sewer is available and connection thereto is feasible. Applications for such certification shall be made to the Department of Environmental Protection on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department) and shall be reviewed and approved by such department in accordance with the rules of such department. Such certification may be conditioned by such department on part or all of the stormwater runoff to be disposed of through an on-site detention or retention system, or by use of alternative disposal methods including but not limited to ditches, swales or watercourses; or\n\n2. Applicant certification of availability and feasibility. A certification submitted by the applicant to the Department of Environmental Protection in accordance with the rules of such department that a public storm or combined sewer is available and connection thereto is feasible, in such cases where the availability and feasibility of connection to a public storm or combined sewer are allowed to be certified by the applicant pursuant to such rules. Such certification shall be on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department).\n\n#----- 107.6.2.2 Connection not feasible or not available.\n\nWhere a public combined or storm sewer is not available, or where connection thereto is not feasible, applicants shall submit:\n\n1. Department of Environmental Protection or applicant certification of unavailability or non-feasibility.\n\n(i) Certification issued by the Department of Environmental Protection that a public storm or combined sewer is not available or that connection thereto is not feasible. Such certification shall be on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department); or\n\n(ii) Certification submitted by the applicant to the Department of Environmental Protection that a public storm or combined sewer is not available or that connection thereto is not feasible, in such cases where the availability and feasibility of connection to a public storm or combined sewer are allowed to be certified by the applicant pursuant to rules of such department. Certification shall be on forms specified by such department (Department of Environmental Protection \"house\/site connection proposal application\" or other form as specified in the rules of such department); and\n\n2. On-site disposal. A proposal for the design and construction of a system for the on-site disposal of stormwater conforming to the provisions of this code and other applicable laws and rules including but not limited to minimum required distances from lot lines or structures and subsoil conditions. Construction documents for such system shall be subject to the approval of the department.\n\n#---- 107.6.3 Post-construction stormwater management facilities.\n\nA post-construction stormwater management facility that is constructed as a part of a covered development project shall comply with the rules of the Department of Environmental Protection and with this code.\n\n(L.L. 2017\/097, 5\/30\/2017, eff. 6\/1\/2019; Am. L.L. 2020\/091, 9\/27\/2020, eff. 3\/26\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/091.\n\n#--- 107.7 Private sewers.\n\nIf private sewers are to be constructed pursuant to subdivision b of Section 1403 of the New York City Charter, a copy of the sewer plan shall be submitted.\n\n#--- 107.8 Private sewage treatment plant.\n\nIf a private sewage treatment plant is to be constructed, a copy of plans approved by the Department of Health and Mental Hygiene and the Department of Environmental Protection shall be submitted.\n\n#--- 107.9 Private stormwater or sewage disposal system.\n\nIf a private stormwater or sewage disposal system is to be installed, a site and subsoil evaluation indicating that the site and subsoil conditions comply with the applicable laws and rules shall be submitted in accordance with the provisions of Section 1705.27 of the New York City Building Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 107.10 Energy efficiency.\n\nConstruction documents shall include compliance documentation as required by the New York City Energy Conservation Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085.\n\n#--- 107.11 Retention of construction and submittal documents.\n\nRefer to Section 28-104.12 of the Administrative Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\nSection PC 108: Inspections and Testing\n\n#--- 108.1 General.\n\nExcept as otherwise specified, inspections required by this code or by the department during the progress of work, may be performed on behalf of the owner by approved agencies or, if applicable, by special inspectors. However, in the interest of public safety, the commissioner may direct that any of such inspections be performed by the department. All inspections shall be performed at the sole cost and expense of the owner. Refer to Article 116 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to inspections.\n\n#--- 108.2 Required inspections and testing.\n\nIn addition to any inspections otherwise required by this code or applicable rules, the holder of the permit shall be responsible for the scheduling of the following required inspections:\n\n1. Progress inspections:\n\n#--- 1.1. Underground inspection and\/or testing of installed piping, valves, fittings, support structures, anti-corrosion equipment and associated underground components shall be made before backfill is put in place. When excavated soil contains rocks, broken concrete, frozen chunks and other rubble that would damage or break the piping or cause corrosive action, clean backfill shall be on the job site ready for use in backfilling.\n\n#--- 1.2. Rough-in inspection and\/or testing shall be made after the roof, framing, fireblocking, firestopping, draftstopping and bracing is in place and all sanitary, storm and water distribution piping is roughed-in, and prior to the installation of wall or ceiling membranes.\n\nException: When new water, waste and vent piping is installed or replaced and all of the piping is to be permanently exposed there shall be no requirement for a rough-in inspection.\n\n#--- 1.3. Inspections required by the New York City Energy Conservation Code shall be made in accordance with rules of the department, as applicable.\n\n2. Special inspections. Special inspections shall be performed in accordance with this code and Chapter 17 of the New York City Building Code, and, where applicable, Section 107.3.\n\n3. Final inspection shall be made after the building is complete, all plumbing fixtures are in place and properly connected, and the structure is ready for occupancy. Refer to Article 116 of Chapter 1 of Title 28 of the Administrative Code for additional requirements.\n\n#---- 108.2.1 Approved agencies.\n\nRefer to Articles 114 and 115 of Chapter 1 of Title 28 of the Administrative Code.\n\n#---- 108.2.2 Inspection of prefabricated construction assemblies.\n\nPrior to the approval of a prefabricated construction assembly having concealed work and the issuance of a permit, the department shall require the submittal of an evaluation report by an approved agency on each prefabricated construction assembly, indicating the complete details of the installation, including a description of the system and its components, the basis upon which the system is being evaluated, test results and similar information and other data as necessary for the commissioner to determine conformance to this code.\n\n#----- 108.2.2.1 Test and inspection records.\n\nRequired test and inspection records shall be available to the commissioner at all times during the fabrication of the installation and the erection of the building; or such records as the commissioner designates shall be filed.\n\n#---- 108.2.3 Exposure of work.\n\nThe work shall remain accessible and exposed for inspection purposes. Neither the commissioner nor the city shall be liable for expense entailed in the removal or replacement of any material required to allow inspection.\n\n#--- 108.3 Special inspections of alternative engineered design systems.\n\nSpecial inspections of alternative engineered design plumbing systems shall be conducted in accordance with Sections 108.3.1 and 108.3.2.\n\n#---- 108.3.1 Periodic inspection.\n\nThe special inspector shall periodically inspect and observe the work being performed to determine that the installation is in accordance with the approved construction documents for the alternative engineered design. All discrepancies shall be brought to the immediate attention of the plumbing contractor for correction. Records shall be kept of all inspections.\n\n#---- 108.3.2 Written report.\n\nThe special inspector shall submit a final report in writing to the commissioner upon completion of the installation, certifying that the alternative engineered design installation conforms to the approved construction documents.\n\n#--- 108.4 Testing.\n\nPlumbing work and systems shall be tested as required in Section 312 and in accordance with Sections 108.4.1 through 108.4.3. Tests shall be made by the permit holder and witnessed by the department.\n\n#---- 108.4.1 New, altered, extended or repaired systems.\n\nNew plumbing systems and parts of existing systems that have been altered, extended or repaired shall be tested as prescribed herein to disclose leaks and defects, except that testing is not required in the following cases:\n\n1. In any case that does not include addition to, replacement, alteration or relocation of any water supply, drainage or vent piping.\n\n2. In any case where plumbing equipment is set up temporarily for exhibition purposes.\n\n3, For ordinary plumbing work, the department may accept written certification from a licensed master plumber that the job was performed in compliance with the requirements of this code and rules of the department.\n\n4. Minor alterations and ordinary repairs.\n\n5. In accordance with the exceptions in Section 312.1.\n\n#---- 108.4.2 Apparatus, material and labor for tests.\n\nAll apparatus, material and labor required for testing a plumbing system or part thereof shall be furnished by the permit holder.\n\n#---- 108.4.3 Reinspection and testing.\n\nWhere any work or installation does not pass any initial test or inspection, the necessary corrections shall be made to comply with this code. The work or installation shall then be resubmitted to the commissioner for inspection and testing.\n\n#--- 108.5 Sign-off of completed work.\n\nRefer to Article 116 of Chapter 1 of Title 28 of the Administrative Code.\n\n#--- 108.6 Temporary connection.\n\nThe commissioner shall have the authority to authorize the temporary connection of the building or system to the utility source for the purpose of testing plumbing systems or for use under a temporary Certificate of Occupancy. Additional permits may be required in accordance with Section 106.6.\n\n#--- 108.7 Connection of service utilities.\n\nRefer to Title 28 of the Administrative Code.\n\nSection PC 109: Violations\n\n#--- 109.1 General.\n\nRefer to Chapters 2 and 3 of Title 28 of the Administrative Code.",
+  "schemaVersion" : 1
+}

@@ -1,0 +1,963 @@
+{
+  "chapterID" : 107,
+  "chapterNumber" : "4",
+  "groups" : [
+    {
+      "headerLine" : "SECTION BC 401",
+      "headingLine" : "General",
+      "id" : "SECTION BC 401",
+      "sections" : [
+        {
+          "id" : 11902,
+          "kind" : "title",
+          "sectionNumber" : "401.1",
+          "title" : "401.1 Scope."
+        },
+        {
+          "id" : 11903,
+          "kind" : "title",
+          "sectionNumber" : "401.2",
+          "title" : "401.2 Prohibited fixtures and connections."
+        },
+        {
+          "id" : 11904,
+          "kind" : "title",
+          "sectionNumber" : "401.3",
+          "title" : "401.3 Water conservation."
+        },
+        {
+          "id" : 11905,
+          "kind" : "title",
+          "sectionNumber" : "402.1",
+          "title" : "402.1 Quality of fixtures."
+        },
+        {
+          "id" : 11906,
+          "kind" : "title",
+          "sectionNumber" : "402.2",
+          "title" : "402.2 Materials for specialty fixtures."
+        },
+        {
+          "id" : 11907,
+          "kind" : "title",
+          "sectionNumber" : "402.3",
+          "title" : "402.3 Sheet copper."
+        },
+        {
+          "id" : 11908,
+          "kind" : "title",
+          "sectionNumber" : "402.4",
+          "title" : "402.4 Sheet lead."
+        },
+        {
+          "id" : 11909,
+          "kind" : "title",
+          "sectionNumber" : "403.1",
+          "title" : "403.1 Minimum number of fixtures."
+        },
+        {
+          "id" : 11910,
+          "kind" : "title",
+          "sectionNumber" : "403.1.1",
+          "title" : "403.1.1 Fixture calculations."
+        },
+        {
+          "id" : 11911,
+          "kind" : "title",
+          "sectionNumber" : "403.1.2",
+          "title" : "403.1.2 Family or assisted-use toilet and bath fixtures."
+        },
+        {
+          "id" : 11912,
+          "kind" : "title",
+          "sectionNumber" : "403.1.3",
+          "title" : "403.1.3 Single-occupant toilet fixtures."
+        },
+        {
+          "id" : 11913,
+          "kind" : "title",
+          "sectionNumber" : "403.2",
+          "title" : "403.2 Separate facilities."
+        },
+        {
+          "id" : 11914,
+          "kind" : "title",
+          "sectionNumber" : "403.2.1",
+          "title" : "403.2.1 Family or assisted-use toilet facilities serving as separate facilities."
+        },
+        {
+          "id" : 11915,
+          "kind" : "title",
+          "sectionNumber" : "403.2.2",
+          "title" : "403.2.2 Single-occupant toilet rooms."
+        },
+        {
+          "id" : 11916,
+          "kind" : "title",
+          "sectionNumber" : "403.3",
+          "title" : "403.3 Required employee and public toilet facilities."
+        },
+        {
+          "id" : 11917,
+          "kind" : "title",
+          "sectionNumber" : "403.3.1",
+          "title" : "403.3.1 Access."
+        },
+        {
+          "id" : 11918,
+          "kind" : "title",
+          "sectionNumber" : "403.3.2",
+          "title" : "403.3.2 Prohibited toilet room location."
+        },
+        {
+          "id" : 11919,
+          "kind" : "title",
+          "sectionNumber" : "403.3.3",
+          "title" : "403.3.3 Location of toilet facilities in occupancies other than malls."
+        },
+        {
+          "id" : 11920,
+          "kind" : "title",
+          "sectionNumber" : "403.3.4",
+          "title" : "403.3.4 Location of toilet facilities in malls."
+        },
+        {
+          "id" : 11921,
+          "kind" : "title",
+          "sectionNumber" : "403.3.5",
+          "title" : "403.3.5 Pay facilities."
+        },
+        {
+          "id" : 11922,
+          "kind" : "title",
+          "sectionNumber" : "403.3.6",
+          "title" : "403.3.6 Door locking."
+        },
+        {
+          "id" : 11923,
+          "kind" : "title",
+          "sectionNumber" : "403.4",
+          "title" : "403.4 Signage."
+        },
+        {
+          "id" : 11924,
+          "kind" : "title",
+          "sectionNumber" : "403.4.1",
+          "title" : "403.4.1 Directional signage."
+        },
+        {
+          "id" : 11925,
+          "kind" : "title",
+          "sectionNumber" : "403.5",
+          "title" : "403.5 Drinking fountain location."
+        },
+        {
+          "id" : 11926,
+          "kind" : "title",
+          "sectionNumber" : "404.1",
+          "title" : "404.1 Where required."
+        },
+        {
+          "id" : 11927,
+          "kind" : "title",
+          "sectionNumber" : "404.2",
+          "title" : "404.2 Accessible fixture requirements."
+        },
+        {
+          "id" : 11928,
+          "kind" : "title",
+          "sectionNumber" : "404.3",
+          "title" : "404.3 Exposed pipes and surfaces."
+        },
+        {
+          "id" : 11929,
+          "kind" : "title",
+          "sectionNumber" : "405.1",
+          "title" : "405.1 Water supply protection."
+        },
+        {
+          "id" : 11930,
+          "kind" : "title",
+          "sectionNumber" : "405.2",
+          "title" : "405.2 Access for cleaning."
+        },
+        {
+          "id" : 11931,
+          "kind" : "title",
+          "sectionNumber" : "405.3",
+          "title" : "405.3 Setting."
+        },
+        {
+          "id" : 11932,
+          "kind" : "title",
+          "sectionNumber" : "405.3.1",
+          "title" : "405.3.1 Water closets, urinals, lavatories and bidets."
+        },
+        {
+          "id" : 11933,
+          "kind" : "title",
+          "sectionNumber" : "405.3.2",
+          "title" : "405.3.2 Public lavatories."
+        },
+        {
+          "id" : 11934,
+          "kind" : "title",
+          "sectionNumber" : "405.3.3",
+          "title" : "405.3.3 Location of fixtures and piping."
+        },
+        {
+          "id" : 11935,
+          "kind" : "title",
+          "sectionNumber" : "405.3.4",
+          "title" : "405.3.4 Water closet compartment."
+        },
+        {
+          "id" : 11936,
+          "kind" : "title",
+          "sectionNumber" : "405.3.5",
+          "title" : "405.3.5 Urinal partitions."
+        },
+        {
+          "id" : 11937,
+          "kind" : "title",
+          "sectionNumber" : "405.4",
+          "title" : "405.4 Floor and wall drainage connections."
+        },
+        {
+          "id" : 11938,
+          "kind" : "title",
+          "sectionNumber" : "405.4.1",
+          "title" : "405.4.1 Floor flanges."
+        },
+        {
+          "id" : 11939,
+          "kind" : "title",
+          "sectionNumber" : "405.4.2",
+          "title" : "405.4.2 Securing floor outlet fixtures."
+        },
+        {
+          "id" : 11940,
+          "kind" : "title",
+          "sectionNumber" : "405.4.3",
+          "title" : "405.4.3 Securing wall-hung water closet bowls."
+        },
+        {
+          "id" : 11941,
+          "kind" : "title",
+          "sectionNumber" : "405.5",
+          "title" : "405.5 Water-tight joints."
+        },
+        {
+          "id" : 11942,
+          "kind" : "title",
+          "sectionNumber" : "405.6",
+          "title" : "405.6 Plumbing in mental health centers."
+        },
+        {
+          "id" : 11943,
+          "kind" : "title",
+          "sectionNumber" : "405.7",
+          "title" : "405.7 Design of overflows."
+        },
+        {
+          "id" : 11944,
+          "kind" : "title",
+          "sectionNumber" : "405.7.1",
+          "title" : "405.7.1 Connection of overflows."
+        },
+        {
+          "id" : 11945,
+          "kind" : "title",
+          "sectionNumber" : "405.8",
+          "title" : "405.8 Slip joint connections."
+        },
+        {
+          "id" : 11946,
+          "kind" : "title",
+          "sectionNumber" : "405.9",
+          "title" : "405.9 Design and installation of plumbing fixtures."
+        },
+        {
+          "id" : 11947,
+          "kind" : "title",
+          "sectionNumber" : "406.1",
+          "title" : "406.1 Water connection."
+        },
+        {
+          "id" : 11948,
+          "kind" : "title",
+          "sectionNumber" : "406.2",
+          "title" : "406.2 Waste connection."
+        },
+        {
+          "id" : 11949,
+          "kind" : "title",
+          "sectionNumber" : "407.1",
+          "title" : "407.1 Approval."
+        },
+        {
+          "id" : 11950,
+          "kind" : "title",
+          "sectionNumber" : "407.2",
+          "title" : "407.2 Bathtub waste outlets and overflows."
+        },
+        {
+          "id" : 11951,
+          "kind" : "title",
+          "sectionNumber" : "407.3",
+          "title" : "407.3 Glazing."
+        },
+        {
+          "id" : 11952,
+          "kind" : "title",
+          "sectionNumber" : "407.4",
+          "title" : "407.4 Bathtub enclosure."
+        },
+        {
+          "id" : 11953,
+          "kind" : "title",
+          "sectionNumber" : "408.1",
+          "title" : "408.1 Approval."
+        },
+        {
+          "id" : 11954,
+          "kind" : "title",
+          "sectionNumber" : "408.2",
+          "title" : "408.2 Water connection."
+        },
+        {
+          "id" : 11955,
+          "kind" : "title",
+          "sectionNumber" : "408.3",
+          "title" : "408.3 Bidet water temperature."
+        },
+        {
+          "id" : 11956,
+          "kind" : "title",
+          "sectionNumber" : "409.1",
+          "title" : "409.1 Approval."
+        },
+        {
+          "id" : 11957,
+          "kind" : "title",
+          "sectionNumber" : "409.2",
+          "title" : "409.2 Water connection."
+        },
+        {
+          "id" : 11958,
+          "kind" : "title",
+          "sectionNumber" : "409.3",
+          "title" : "409.3 Waste connection."
+        },
+        {
+          "id" : 11959,
+          "kind" : "title",
+          "sectionNumber" : "410.1",
+          "title" : "410.1 Approval."
+        },
+        {
+          "id" : 11960,
+          "kind" : "title",
+          "sectionNumber" : "410.2",
+          "title" : "410.2 Small occupancies."
+        },
+        {
+          "id" : 11961,
+          "kind" : "title",
+          "sectionNumber" : "410.3",
+          "title" : "410.3 Required drinking fountains."
+        },
+        {
+          "id" : 11962,
+          "kind" : "title",
+          "sectionNumber" : "410.4",
+          "title" : "410.4 Prohibited location."
+        },
+        {
+          "id" : 11963,
+          "kind" : "title",
+          "sectionNumber" : "411.1",
+          "title" : "411.1 Approval."
+        },
+        {
+          "id" : 11964,
+          "kind" : "title",
+          "sectionNumber" : "411.2",
+          "title" : "411.2 Waste connection."
+        },
+        {
+          "id" : 11965,
+          "kind" : "title",
+          "sectionNumber" : "412.1",
+          "title" : "412.1 Approval."
+        },
+        {
+          "id" : 11966,
+          "kind" : "title",
+          "sectionNumber" : "412.2",
+          "title" : "412.2 Floor drains."
+        },
+        {
+          "id" : 11967,
+          "kind" : "title",
+          "sectionNumber" : "412.3",
+          "title" : "412.3 Size of floor drains."
+        },
+        {
+          "id" : 11968,
+          "kind" : "title",
+          "sectionNumber" : "412.4",
+          "title" : "412.4 Public laundries and central washing facilities."
+        },
+        {
+          "id" : 11969,
+          "kind" : "title",
+          "sectionNumber" : "413.1",
+          "title" : "413.1 Approval."
+        },
+        {
+          "id" : 11970,
+          "kind" : "title",
+          "sectionNumber" : "413.2",
+          "title" : "413.2 Domestic food waste disposer waste outlets."
+        },
+        {
+          "id" : 11971,
+          "kind" : "title",
+          "sectionNumber" : "413.3",
+          "title" : "413.3 Commercial food waste disposer units."
+        },
+        {
+          "id" : 11972,
+          "kind" : "title",
+          "sectionNumber" : "413.4",
+          "title" : "413.4 Water supply required."
+        },
+        {
+          "id" : 11973,
+          "kind" : "title",
+          "sectionNumber" : "414.1",
+          "title" : "414.1 Water connection."
+        },
+        {
+          "id" : 11974,
+          "kind" : "title",
+          "sectionNumber" : "414.2",
+          "title" : "414.2 Waste connection."
+        },
+        {
+          "id" : 11975,
+          "kind" : "title",
+          "sectionNumber" : "415.1",
+          "title" : "415.1 Approval."
+        },
+        {
+          "id" : 11976,
+          "kind" : "title",
+          "sectionNumber" : "415.2",
+          "title" : "415.2 Waste outlet."
+        },
+        {
+          "id" : 11977,
+          "kind" : "title",
+          "sectionNumber" : "416.1",
+          "title" : "416.1 Approval."
+        },
+        {
+          "id" : 11978,
+          "kind" : "title",
+          "sectionNumber" : "416.2",
+          "title" : "416.2 Cultured marble lavatories."
+        },
+        {
+          "id" : 11979,
+          "kind" : "title",
+          "sectionNumber" : "416.3",
+          "title" : "416.3 Lavatory waste outlets."
+        },
+        {
+          "id" : 11980,
+          "kind" : "title",
+          "sectionNumber" : "416.4",
+          "title" : "416.4 Moveable lavatory systems."
+        },
+        {
+          "id" : 11981,
+          "kind" : "title",
+          "sectionNumber" : "416.5",
+          "title" : "416.5 Tempered water for public hand-washing facilities."
+        },
+        {
+          "id" : 11982,
+          "kind" : "title",
+          "sectionNumber" : "417.1",
+          "title" : "417.1 Approval."
+        },
+        {
+          "id" : 11983,
+          "kind" : "title",
+          "sectionNumber" : "417.2",
+          "title" : "417.2 Water supply riser."
+        },
+        {
+          "id" : 11984,
+          "kind" : "title",
+          "sectionNumber" : "417.3",
+          "title" : "417.3 Shower waste outlet."
+        },
+        {
+          "id" : 11985,
+          "kind" : "title",
+          "sectionNumber" : "417.4",
+          "title" : "417.4 Shower compartments."
+        },
+        {
+          "id" : 11986,
+          "kind" : "title",
+          "sectionNumber" : "417.4.1",
+          "title" : "417.4.1 Floor and wall area."
+        },
+        {
+          "id" : 11987,
+          "kind" : "title",
+          "sectionNumber" : "417.4.2",
+          "title" : "417.4.2 Access."
+        },
+        {
+          "id" : 11988,
+          "kind" : "title",
+          "sectionNumber" : "417.5",
+          "title" : "417.5 Shower floors or receptors."
+        },
+        {
+          "id" : 11989,
+          "kind" : "title",
+          "sectionNumber" : "417.5.1",
+          "title" : "417.5.1 Support."
+        },
+        {
+          "id" : 11990,
+          "kind" : "title",
+          "sectionNumber" : "417.5.2",
+          "title" : "417.5.2 Shower lining."
+        },
+        {
+          "id" : 11991,
+          "kind" : "title",
+          "sectionNumber" : "417.5.2.1",
+          "title" : "417.5.2.1 PVC sheets."
+        },
+        {
+          "id" : 11992,
+          "kind" : "title",
+          "sectionNumber" : "417.5.2.2",
+          "title" : "417.5.2.2 Chlorinated polyethylene (CPE) sheets."
+        },
+        {
+          "id" : 11993,
+          "kind" : "title",
+          "sectionNumber" : "417.5.2.3",
+          "title" : "417.5.2.3 Sheet lead."
+        },
+        {
+          "id" : 11994,
+          "kind" : "title",
+          "sectionNumber" : "417.5.2.4",
+          "title" : "417.5.2.4 Sheet copper."
+        },
+        {
+          "id" : 11995,
+          "kind" : "title",
+          "sectionNumber" : "417.5.2.5",
+          "title" : "417.5.2.5 Sheet-applied, load-bearing, bonded, waterproof membranes."
+        },
+        {
+          "id" : 11996,
+          "kind" : "title",
+          "sectionNumber" : "417.5.2.6",
+          "title" : "417.5.2.6 Liquid-type, trowel-applied, load-bearing, bonded waterproof materials."
+        },
+        {
+          "id" : 11997,
+          "kind" : "title",
+          "sectionNumber" : "417.6",
+          "title" : "417.6 Glazing."
+        },
+        {
+          "id" : 11998,
+          "kind" : "title",
+          "sectionNumber" : "418.1",
+          "title" : "418.1 Approval."
+        },
+        {
+          "id" : 11999,
+          "kind" : "title",
+          "sectionNumber" : "418.2",
+          "title" : "418.2 Sink waste outlets."
+        },
+        {
+          "id" : 12000,
+          "kind" : "title",
+          "sectionNumber" : "418.3",
+          "title" : "418.3 Moveable sink systems."
+        },
+        {
+          "id" : 12001,
+          "kind" : "title",
+          "sectionNumber" : "419.1",
+          "title" : "419.1 Approval."
+        },
+        {
+          "id" : 12002,
+          "kind" : "title",
+          "sectionNumber" : "419.2",
+          "title" : "419.2 Substitution for water closets."
+        },
+        {
+          "id" : 12003,
+          "kind" : "title",
+          "sectionNumber" : "419.3",
+          "title" : "419.3 Surrounding material."
+        },
+        {
+          "id" : 12004,
+          "kind" : "title",
+          "sectionNumber" : "419.4",
+          "title" : "419.4 Waterless urinals."
+        },
+        {
+          "id" : 12005,
+          "kind" : "title",
+          "sectionNumber" : "420.1",
+          "title" : "420.1 Approval."
+        },
+        {
+          "id" : 12006,
+          "kind" : "title",
+          "sectionNumber" : "420.2",
+          "title" : "420.2 Water closets for public or employee toilet facilities."
+        },
+        {
+          "id" : 12007,
+          "kind" : "title",
+          "sectionNumber" : "420.3",
+          "title" : "420.3 Water closet seats."
+        },
+        {
+          "id" : 12008,
+          "kind" : "title",
+          "sectionNumber" : "420.4",
+          "title" : "420.4 Water closet connections."
+        },
+        {
+          "id" : 12009,
+          "kind" : "title",
+          "sectionNumber" : "420.5",
+          "title" : "420.5 Water closets for children's use."
+        },
+        {
+          "id" : 12010,
+          "kind" : "title",
+          "sectionNumber" : "421.1",
+          "title" : "421.1 Approval."
+        },
+        {
+          "id" : 12011,
+          "kind" : "title",
+          "sectionNumber" : "421.2",
+          "title" : "421.2 Installation."
+        },
+        {
+          "id" : 12012,
+          "kind" : "title",
+          "sectionNumber" : "421.3",
+          "title" : "421.3 Drain."
+        },
+        {
+          "id" : 12013,
+          "kind" : "title",
+          "sectionNumber" : "421.4",
+          "title" : "421.4 Suction fittings."
+        },
+        {
+          "id" : 12014,
+          "kind" : "title",
+          "sectionNumber" : "421.5",
+          "title" : "421.5 Access to pump."
+        },
+        {
+          "id" : 12015,
+          "kind" : "title",
+          "sectionNumber" : "421.6",
+          "title" : "421.6 Whirlpool enclosure."
+        },
+        {
+          "id" : 12016,
+          "kind" : "title",
+          "sectionNumber" : "422.1",
+          "title" : "422.1 Scope."
+        },
+        {
+          "id" : 12017,
+          "kind" : "title",
+          "sectionNumber" : "422.2",
+          "title" : "422.2 Approval."
+        },
+        {
+          "id" : 12018,
+          "kind" : "title",
+          "sectionNumber" : "422.3",
+          "title" : "422.3 Protection."
+        },
+        {
+          "id" : 12019,
+          "kind" : "title",
+          "sectionNumber" : "422.4",
+          "title" : "422.4 Materials."
+        },
+        {
+          "id" : 12020,
+          "kind" : "title",
+          "sectionNumber" : "422.5",
+          "title" : "422.5 Access."
+        },
+        {
+          "id" : 12021,
+          "kind" : "title",
+          "sectionNumber" : "422.6",
+          "title" : "422.6 Clinical sink."
+        },
+        {
+          "id" : 12022,
+          "kind" : "title",
+          "sectionNumber" : "422.7",
+          "title" : "422.7 Prohibited usage of clinical sinks and service sinks."
+        },
+        {
+          "id" : 12023,
+          "kind" : "title",
+          "sectionNumber" : "422.8",
+          "title" : "422.8 Ice prohibited in soiled utility room."
+        },
+        {
+          "id" : 12024,
+          "kind" : "title",
+          "sectionNumber" : "422.9",
+          "title" : "422.9 Sterilizer equipment requirements."
+        },
+        {
+          "id" : 12025,
+          "kind" : "title",
+          "sectionNumber" : "422.9.1",
+          "title" : "422.9.1 Sterilizer piping."
+        },
+        {
+          "id" : 12026,
+          "kind" : "title",
+          "sectionNumber" : "422.9.2",
+          "title" : "422.9.2 Steam supply."
+        },
+        {
+          "id" : 12027,
+          "kind" : "title",
+          "sectionNumber" : "422.9.3",
+          "title" : "422.9.3 Steam condensate return."
+        },
+        {
+          "id" : 12028,
+          "kind" : "title",
+          "sectionNumber" : "422.9.4",
+          "title" : "422.9.4 Condensers."
+        },
+        {
+          "id" : 12029,
+          "kind" : "title",
+          "sectionNumber" : "422.10",
+          "title" : "422.10 Special elevations."
+        },
+        {
+          "id" : 12030,
+          "kind" : "title",
+          "sectionNumber" : "423.1",
+          "title" : "423.1 Water connections."
+        },
+        {
+          "id" : 12031,
+          "kind" : "title",
+          "sectionNumber" : "423.2",
+          "title" : "423.2 Approval."
+        },
+        {
+          "id" : 12032,
+          "kind" : "title",
+          "sectionNumber" : "423.3",
+          "title" : "423.3 Footbaths, pedicure baths and head shampoo sinks."
+        },
+        {
+          "id" : 12033,
+          "kind" : "title",
+          "sectionNumber" : "424.1",
+          "title" : "424.1 Approval."
+        },
+        {
+          "id" : 12034,
+          "kind" : "title",
+          "sectionNumber" : "424.1.1",
+          "title" : "424.1.1 Faucets and supply fittings."
+        },
+        {
+          "id" : 12035,
+          "kind" : "title",
+          "sectionNumber" : "424.1.2",
+          "title" : "424.1.2 Waste fittings."
+        },
+        {
+          "id" : 12036,
+          "kind" : "title",
+          "sectionNumber" : "424.1.3",
+          "title" : "424.1.3 Lavatory operation without external electrical power."
+        },
+        {
+          "id" : 12037,
+          "kind" : "title",
+          "sectionNumber" : "424.2",
+          "title" : "424.2 Hand showers."
+        },
+        {
+          "id" : 12038,
+          "kind" : "title",
+          "sectionNumber" : "424.3",
+          "title" : "424.3 Individual shower valves."
+        },
+        {
+          "id" : 12039,
+          "kind" : "title",
+          "sectionNumber" : "424.4",
+          "title" : "424.4 Multiple (gang) showers."
+        },
+        {
+          "id" : 12040,
+          "kind" : "title",
+          "sectionNumber" : "424.5",
+          "title" : "424.5 Bathtub and whirlpool bathtub valves."
+        },
+        {
+          "id" : 12041,
+          "kind" : "title",
+          "sectionNumber" : "424.6",
+          "title" : "424.6 Hose-connected outlets."
+        },
+        {
+          "id" : 12042,
+          "kind" : "title",
+          "sectionNumber" : "424.7",
+          "title" : "424.7 Temperature-actuated, flow reduction valves for individual fixture fittings."
+        },
+        {
+          "id" : 12043,
+          "kind" : "title",
+          "sectionNumber" : "424.8",
+          "title" : "424.8 Transfer valves."
+        },
+        {
+          "id" : 12044,
+          "kind" : "title",
+          "sectionNumber" : "424.9",
+          "title" : "424.9 Water closet personal hygiene devices."
+        },
+        {
+          "id" : 12045,
+          "kind" : "title",
+          "sectionNumber" : "425.1",
+          "title" : "425.1 Flushing devices required."
+        },
+        {
+          "id" : 12046,
+          "kind" : "title",
+          "sectionNumber" : "425.1.1",
+          "title" : "425.1.1 Separate for each fixture."
+        },
+        {
+          "id" : 12047,
+          "kind" : "title",
+          "sectionNumber" : "425.1.2",
+          "title" : "425.1.2 Water closet flushing without external electrical power."
+        },
+        {
+          "id" : 12048,
+          "kind" : "title",
+          "sectionNumber" : "425.2",
+          "title" : "425.2 Flushometer valves and tanks."
+        },
+        {
+          "id" : 12049,
+          "kind" : "title",
+          "sectionNumber" : "425.3",
+          "title" : "425.3 Flush tanks."
+        },
+        {
+          "id" : 12050,
+          "kind" : "title",
+          "sectionNumber" : "425.3.1",
+          "title" : "425.3.1 Fill valves."
+        },
+        {
+          "id" : 12051,
+          "kind" : "title",
+          "sectionNumber" : "425.3.2",
+          "title" : "425.3.2 Overflows in flush tanks."
+        },
+        {
+          "id" : 12052,
+          "kind" : "title",
+          "sectionNumber" : "425.3.3",
+          "title" : "425.3.3 Sheet copper."
+        },
+        {
+          "id" : 12053,
+          "kind" : "title",
+          "sectionNumber" : "425.3.4",
+          "title" : "425.3.4 Access required."
+        },
+        {
+          "id" : 12054,
+          "kind" : "title",
+          "sectionNumber" : "425.4",
+          "title" : "425.4 Flush pipes and fittings."
+        },
+        {
+          "id" : 12055,
+          "kind" : "title",
+          "sectionNumber" : "426.1",
+          "title" : "426.1 Approval."
+        },
+        {
+          "id" : 12056,
+          "kind" : "title",
+          "sectionNumber" : "427.1",
+          "title" : "427.1 Approval."
+        },
+        {
+          "id" : 12057,
+          "kind" : "title",
+          "sectionNumber" : "428.1",
+          "title" : "428.1 Prohibited potable water uses."
+        },
+        {
+          "id" : 12058,
+          "kind" : "title",
+          "sectionNumber" : "428.1.1",
+          "title" : "428.1.1 Potable water prohibited for once through cooling."
+        },
+        {
+          "id" : 12059,
+          "kind" : "title",
+          "sectionNumber" : "429.1",
+          "title" : "429.1 Water supply."
+        }
+      ]
+    }
+  ],
+  "rawDraftText" : "#- Chapter 4: Fixtures, Faucets and Fixture Fittings\n\nSection PC 401: General\n\n#--- 401.1 Scope.\n\nThis chapter shall govern the materials, design and installation of plumbing fixtures, faucets and fixture fittings in accordance with the type of occupancy, and shall provide for the minimum number of fixtures for various types of occupancies.\n\n#--- 401.2 Prohibited fixtures and connections.\n\nWater closets having a concealed trap seal or an unventilated space or having walls that are not thoroughly washed at each discharge in accordance with ASME A112.19.2\/CSA B45.1 shall be prohibited. Any water closet that permits siphonage of the contents of the bowl back into the tank shall be prohibited. Trough urinals shall be prohibited.\n\n#--- 401.3 Water conservation.\n\nThe maximum water flow rates and flush volume for plumbing fixtures and fixture fittings shall comply with Section 604.\n\nSection PC 402: Fixture Materials\n\n#--- 402.1 Quality of fixtures.\n\nPlumbing fixtures shall be constructed of approved materials, with smooth, impervious surfaces, free from defects and concealed fouling surfaces, and shall conform to standards cited in this code. All porcelain enameled surfaces on plumbing fixtures shall be acid resistant.\n\n#--- 402.2 Materials for specialty fixtures.\n\nMaterials for specialty fixtures not otherwise covered in this code shall be of stainless steel, soapstone, chemical stoneware or plastic, or shall be lined with lead, copper-base alloy, nickel-copper alloy, corrosion-resistant steel or other material especially suited to the application for which the fixture is intended.\n\n#--- 402.3 Sheet copper.\n\nSheet copper for general applications shall conform to ASTM B 152 and shall not weigh less than 12 ounces per square foot (3.7 kg\/m 2 ).\n\n#--- 402.4 Sheet lead.\n\nSheet lead for pans shall not weigh less than 4 pounds per square foot (19.5 kg\/m2) and shall be coated with an asphalt paint or other approved coating.\n\nSection PC 403: Minimum Plumbing Facilities\n\n#--- 403.1 Minimum number of fixtures.\n\nPlumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code.\n\nTable 403.1 Minimum Number of Required Plumbing Fixtures a (See Sections 403.1.1 and 403.2)\n\na. The fixtures shown are based on one fixture being the minimum required for the number of persons indicated. Any fraction of the number of persons requires an additional fixture. The number of occupants shall be determined by the New York City Building Code.\n\nb. Toilet facilities for employees shall be separate from facilities for incarcerated individuals or care recipients.\n\nc. A single-occupant toilet room with one water closet and one lavatory serving not more than two adjacent patient sleeping units shall be permitted where such room is provided with direct access from each patient sleeping unit and with provisions for privacy.\n\nd. The occupant load for seasonal outdoor seating and entertainment areas shall be included when determining the minimum number of facilities required.\n\ne. The minimum number of required drinking foundations shall comply with Table 403.1 and Chapter 11 of the New York City Building Code.\n\nf. For the purposes of this table only, \"Bar\" shall mean a business establishment or a portion of a nonprofit entity devoted primarily to the selling and serving of alcoholic beverages for consumption by the public, guests, patrons, or members on the premises and in which the serving of food is only incidental.\n\ng. The total number of occupants for a single establishment comprising of a restaurant with an accessory bar shall be considered as a restaurant for the purposes of determining the minimum number of plumbing fixtures.\n\nh. As per the New York City Building Code.\n\ni. The requirements for the number of water closets for a total occupancy of 150 persons or fewer shall not apply to bars except that, subject to the requirements of Section 403.2.1, there shall be at least one water closet for men and at least one water closet for women or at least two single-occupant toilet rooms.\n\nj. The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies.\n\nk. In addition to the requirements of Table 403.1, residential occupancies I-1, R-1, R-2, and R-3 shall provide fixtures in compliance with the requirements of Section 614 for emergency drinking water access.\n\nl. [Reserved.]\n\nm. For business and mercantile occupancies with an occupant load of 15 or fewer, service sinks shall not be required.\n\nn. Libraries that are not classified as accessory to Group E per Section 304.1 of the New York City Building Code shall comply with fixture counts for Group B occupancies.\n\n(Am. L.L. 2016\/079, 6\/28\/2016, eff. 10\/26\/2016; Am. 2021 N.Y. Laws Ch. 322, 8\/2\/2021, eff. 8\/2\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/051.\n\n#---- 403.1.1 Fixture calculations.\n\nTo determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor.\n\nException: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex.\n\n#---- 403.1.2 Family or assisted-use toilet and bath fixtures.\n\nFixtures located within family or assisted-use toilet and bathing rooms required by Section 1109.2.1 of the New York City Building Code are permitted to be included in the number of required fixtures for either the male or female occupants in assembly and mercantile occupancies.\n\n#---- 403.1.3 Single-occupant toilet fixtures.\n\nFixtures located within single-occupant toilet rooms are permitted to be included in the number of fixtures required by Section 403, or where applicable the 1968 Building Code, for either the male or the female occupants. Fixtures located within toilet rooms subject to the exception of Section 403.2.1 are permitted to be included in the number of fixtures required by Section 403, or where applicable the 1968 Building Code, only for that sex.\n\n(L.L. 2016\/079, 6\/28\/2016, eff. 10\/26\/2016)\n\n#--- 403.2 Separate facilities.\n\nWhere plumbing fixtures are required, separate facilities shall be provided for each sex.\n\nExceptions:\n\n1. Separate facilities shall not be required for dwelling units and sleeping units.\n\n2. In structures or tenant spaces where combined employee and public toilet facilities are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of employees, customers, patrons and visitors is 30 or fewer.\n\n3. In structures or tenant spaces where required toilet facilities for only employee use are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of employees is 30 or fewer.\n\n4. In structures or tenant spaces where required toilet facilities for only public use are provided in accordance with Section 403.3, separate facilities shall not be required where the total number of customers, patrons and visitors is 30 or fewer.\n\n#---- 403.2.1 Family or assisted-use toilet facilities serving as separate facilities.\n\nWhere a building or tenant space requires a separate toilet facility for each sex and each toilet facility is required to have only one water closet, two-family* or assisted-use toilet facilities shall be permitted to serve as the required separate facilities. Family or assisted-use toilet facilities shall not be required to be identified for exclusive use by either sex as required by Section 403.4.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n* Editor's note: As set forth in L.L. 2023\/077; intended reference is likelty \"two family or assisted-use toilet facilities....\"\n\n#---- 403.2.2 Single-occupant toilet rooms.\n\nAll single-occupant toilet rooms shall be made available for use by persons of any sex. Existing toilet rooms shall comply with this section. Nothing in this section shall be construed to affect or alter the number of toilet rooms in a building otherwise required pursuant to this code or where applicable the 1968 Building Code.\n\nException: Where egress from a single-occupant toilet room is through a room permissibly restricted by sex.\n\n(L.L. 2016\/079, 6\/28\/2016, eff. 10\/26\/2016)\n\n#--- 403.3 Required employee and public toilet facilities.\n\nEmployees shall be provided with toilet facilities in all occupancies. The number of plumbing fixtures located within the required employee toilet facilities shall be provided in accordance with Section 403 for all employees. Customers, patrons and visitors shall be provided with public toilet facilities in structures and tenant spaces intended for public utilization. The number of plumbing fixtures located within the required public toilet facilities shall be provided in accordance with Section 403 for all customers, patrons and visitors. Employee and public toilet facilities may be separate or combined. Where combined facilities are provided, the number of plumbing fixtures shall be in accordance with Section 403 for all users.\n\nException: Public utilization of toilet facilities shall not be required for:\n\n1. Food service establishments, as defined in Section 81.03 of the New York City Health Code, with a seating capacity of less than 20, provided such establishments are less than 10,000 square feet (929 m 2 ).\n\n2. Establishments less than 10,000 square feet (929 m 2 ) classified as Occupancy Group B or M pursuant to Sections 304.1 and 309.1 of the New York City Building Code, respectively, provided however that this exception shall not apply to a building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as a Group B occupancy in accordance with Section 303.1.2 of the New York City Building Code.\n\n#---- 403.3.1 Access.\n\nThe route to the public toilet facilities required by Section 403.3 shall not pass through kitchens, storage rooms or closets. Access to the required facilities shall be from within the building or from the exterior of the building. Routes shall comply with the accessibility requirements of the New York City Building Code. The public shall have access to the required toilet facilities at all times that the building is occupied.\n\n#---- 403.3.2 Prohibited toilet room location.\n\nToilet rooms shall not open directly into a room used for the preparation of food for service to the public.\n\n#---- 403.3.3 Location of toilet facilities in occupancies other than malls.\n\nIn occupancies other than covered and open mall buildings, the required public and employee toilet facilities shall be located not more than one story above or below the space required to be provided with toilet facilities, and the path of travel to such facilities shall not exceed a distance of 500 feet (152 m).\n\nException: The location and maximum distances of travel to required employee facilities in factory and industrial occupancies are permitted to exceed that required by this section, provided that the location and maximum distance of travel are approved.\n\n#---- 403.3.4 Location of toilet facilities in malls.\n\nIn covered and open mall buildings, the required public and employee toilet facilities shall be located not more than one story above or below the space required to be provided with toilet facilities, and the path of travel to such facilities shall not exceed a distance of 300 feet (91 m). In mall buildings, the required facilities shall be based on total square footage within a covered mall building or within the perimeter line of an open mall building, and facilities shall be installed in each individual store or in a central toilet area located in accordance with this section. The maximum distance of travel to central toilet facilities in mall buildings shall be measured from the main entrance of any store or tenant space. In mall buildings, where employees' toilet facilities are not provided in the individual store, the maximum distance of travel shall be measured from the employees' work area of the store or tenant space.\n\n#---- 403.3.5 Pay facilities.\n\nWhere pay facilities are installed, such facilities shall be in excess of the required minimum facilities. Required facilities shall be free of charge.\n\n#---- 403.3.6 Door locking.\n\nWhere a toilet room is provided for the use of multiple occupants, the egress door for the room shall not be lockable from the inside of the room. This section does not apply to family or assisted-use toilet rooms.\n\n#--- 403.4 Signage.\n\nRequired public facilities shall be designated by a legible sign for each sex or, for a single- occupant toilet room, for all sexes. Signs shall be readily visible and located near the entrance to each toilet facility. Existing single-occupant toilet rooms shall comply with this requirement.\n\n#---- 403.4.1 Directional signage.\n\nDirectional signage indicating the route to the required public toilet facilities shall be posted in accordance with Section 1110 of the New York City Building Code. Such signage shall be located in a lobby, corridor, aisle or similar space, such that the sign can be readily seen from the main entrance to the building or tenant space.\n\n#--- 403.5 Drinking fountain location.\n\nDrinking fountains shall not be required to be located in individual tenant spaces provided that public drinking fountains are located on each story within a distance of travel of 500 feet (152 m) of the most remote location in the tenant space on such story. Where the tenant space is in a covered or open mall, such distance shall not exceed 300 feet (91 m). Drinking fountains shall be located on an accessible route.\n\nSection PC 404: Accessible Plumbing Facilities\n\n#--- 404.1 Where required.\n\nAccessible plumbing facilities and fixtures shall be provided in accordance with the New York city building code.\n\n#--- 404.2 Accessible fixture requirements.\n\nAccessible plumbing fixtures shall be installed with the clearances, heights, spacings and arrangements in accordance with ICC A117.1.\n\n#--- 404.3 Exposed pipes and surfaces.\n\nWater supply and drain pipes under accessible lavatories and sinks shall be covered or otherwise configured to protect against contact. Pipe coverings shall comply with ASME A112.18.9.\n\nSection PC 405: Installation of Fixtures\n\n#--- 405.1 Water supply protection.\n\nThe supply lines and fittings for every plumbing fixture shall be installed so as to prevent backflow.\n\n#--- 405.2 Access for cleaning.\n\nPlumbing fixtures shall be installed so as to afford easy access for cleaning both the fixture and the area around the fixture.\n\n#--- 405.3 Setting.\n\nFixtures shall be set level and in proper alignment with reference to adjacent walls.\n\n#---- 405.3.1 Water closets, urinals, lavatories and bidets.\n\nA water closet, urinal, lavatory or bidet shall not be set closer than 15 inches (381 mm) from its center to any side wall, partition, vanity or other obstruction, or closer than 30 inches (762 mm) center to center between adjacent fixtures. There shall be not less than a 21-inch (533 mm) clearance in front of the water closet, urinal, lavatory or bidet to any wall, fixture or door. Water closet compartments shall be not less than 30 inches (762 mm) in width and not less than 60 inches (1524 mm) in depth for floor-mounted water closets and not less than 30 inches (762 mm) in width and 56 inches (1422 mm) in depth for wall-hung water closets.\n\n#---- 405.3.2 Public lavatories.\n\nIn employee and public toilet rooms, the required lavatory shall be located in the same room as the required water closet.\n\n#---- 405.3.3 Location of fixtures and piping.\n\nPiping, fixtures or equipment shall not be located in such a manner as to interfere with the normal operation of windows, doors or other means of egress openings.\n\n#---- 405.3.4 Water closet compartment.\n\nEach water closet utilized by the public or employees shall occupy a separate compartment with walls or partitions and a door enclosing the fixtures to ensure privacy.\n\nExceptions:\n\n1. Water closet compartments shall not be required in a single-occupant toilet room with a lockable door.\n\n2. Toilet rooms located in child day care facilities and containing two or more water closets shall be permitted to have one water closet without an enclosing compartment.\n\n3. Toilet areas located within Group I-3 housing areas.\n\n#---- 405.3.5 Urinal partitions.\n\nEach urinal utilized by the public or employees shall occupy a separate area with walls or partitions to provide privacy. The walls or partitions shall begin at a height not greater than 12 inches (305 mm) from and extend not less than 60 inches (1524 mm) above the finished floor surface. The walls or partitions shall extend from the wall surface at each side of the urinal not less than 18 inches (457 mm) or to a point not less than 6 inches (152 mm) beyond the outermost front lip of the urinal measured from the finished backwall surface, whichever is greater.\n\n1. Urinal partitions shall not be required in a single occupant or family\/assisted-use toilet room with a lockable door.\n\n2. Toilet rooms located in child day care facilities and containing two or more urinals shall be permitted to have one urinal without partitions.\n\n#--- 405.4 Floor and wall drainage connections.\n\nConnections between the drain and floor outlet plumbing fixtures shall be made with a floor flange or a waste connector and sealing gasket. The waste connector and sealing gasket joint shall comply with the joint tightness test of ASME A112.4.3 and shall be installed in accordance with the manufacturer's instructions. The flange shall be attached to the drain and anchored to the structure. Connections between the drain and wall-hung water closets shall be made with an approved extension nipple or horn adaptor. The water closet shall be bolted to the carrier with corrosion- resistant bolts or screws. Joints shall be sealed with an approved elastomeric gasket, flange-to-fixture connection complying with ASME A112.4.3 or an approved setting compound.\n\n#---- 405.4.1 Floor flanges.\n\nFloor flanges for water closets or similar fixtures shall be not less than 0.125 inch (3.2 mm) thick for brass, 0.25 inch (6.4 mm) thick for plastic and 0.25 inch (6.4 mm) thick and not less than a 2-inch (51 mm) caulking depth for cast-iron or galvanized malleable iron.\n\nFloor flanges of hard lead shall weigh not less than 1 pound, 9 ounces (0.7 kg) and shall be composed of lead alloy with not less than 7.75-percent antimony by weight. Closet screws and bolts shall be of brass. Flanges shall be secured to the building structure with corrosion-resistant screws or bolts.\n\n#---- 405.4.2 Securing floor outlet fixtures.\n\nFloor outlet fixtures shall be secured to the floor or floor flanges by screws or bolts of corrosion-resistant material.\n\n#---- 405.4.3 Securing wall-hung water closet bowls.\n\nWall-hung water closet bowls shall be supported by a concealed metal carrier that is attached to the building structure so that strain is not transmitted to the closet connector or any other part of the plumbing system. The carrier shall conform to ASME A112.6.1M or ASME A112.6.2.\n\n#--- 405.5 Water-tight joints.\n\nJoints formed where fixtures come in contact with walls or floors shall be sealed.\n\n#--- 405.6 Plumbing in mental health centers.\n\nIn mental health centers, pipes or traps shall not be exposed, and fixtures shall be bolted through walls.\n\n#--- 405.7 Design of overflows.\n\nWhere any fixture is provided with an overflow, the waste shall be designed and installed so that standing water in the fixture will not rise in the overflow when the stopper is closed, and no water will remain in the overflow when the fixture is empty.\n\nException: Existing overflows for bath tubs utilizing standing wastes.\n\n#---- 405.7.1 Connection of overflows.\n\nThe overflow from any fixture shall discharge into the drainage system on the inlet or fixture side of the trap.\n\nException: The overflow from a flush tank serving a water closet or urinal shall discharge into the fixture served.\n\n#--- 405.8 Slip joint connections.\n\nSlip joints shall be made with an approved elastomeric gasket and shall only be installed on the trap outlet, trap inlet and within the trap seal. Fixtures with concealed slip-joint connections shall be provided with an access panel or utility space not less than 12 inches (305 mm) in its smallest dimension or other approved arrangement so as to provide access to the slip joint connections for inspection and repair.\n\n#--- 405.9 Design and installation of plumbing fixtures.\n\nIntegral fixture fitting mounting surfaces on manufactured plumbing fixtures or plumbing fixtures constructed on site shall meet the design requirements of ASME A112.19.2\/CSA B45.1 or ASME A112.19.3\/CSA B45.4.\n\nSection PC 406: Automatic Clothes Washers\n\n#--- 406.1 Water connection.\n\nThe water supply to an automatic clothes washer shall be protected against backflow by an air gap that is integral with the machine or a backflow preventer shall be installed in accordance with Section 608. Air gaps shall comply with ASME A112.1.2 or A112.1.3.\n\n#--- 406.2 Waste connection.\n\nThe waste from an automatic clothes washer shall discharge through an air break into a standpipe in accordance with Section 802 or into a laundry sink. The trap and fixture drain for an automatic clothes washer standpipe shall be not less than 2 inches (51 mm) in diameter. The fixture drain for the standpipe serving an automatic clothes washer shall connect to a 3-inch (76 mm) or larger diameter fixture branch, building drain, or stack. Automatic clothes washers that discharge by gravity shall be permitted to drain to a waste receptor or an approved trench drain.\n\nSection PC 407: Bathtubs\n\n#--- 407.1 Approval.\n\nBathtubs shall conform to ASME A112.19.1\/ CSA B45.2, ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4, or CSA B45.5\/IAPMO Z124.\n\n#--- 407.2 Bathtub waste outlets and overflows.\n\nBathtubs shall be equipped with a waste outlet and an overflow outlet. The outlets shall be connected to waste tubing or piping not less than 1 1\/2 inches (38 mm) in diameter. The waste outlet shall be equipped with a water-tight stopper.\n\n#--- 407.3 Glazing.\n\nWindows and doors within a bathtub enclosure shall conform to the safety glazing requirements of the New York City Building Code.\n\n#--- 407.4 Bathtub enclosure.\n\nDoors in a bathtub enclosure shall conform to ASME A112.19.15.\n\nSection PC 408: Bidets\n\n#--- 408.1 Approval.\n\nBidets shall conform to ASME A112.19.2\/CSA B45.1.\n\n#--- 408.2 Water connection.\n\nThe water supply to a bidet shall be protected against backflow by an air gap or backflow preventer in accordance with Section 608.13.\n\n#--- 408.3 Bidet water temperature.\n\nThe discharge water temperature from a bidet fitting shall be limited to a maximum temperature of 110°F (43°C) by a water temperature limiting device conforming to ASSE 1070 or CSA B125.3.\n\nSection PC 409: Dishwashing Machines\n\n#--- 409.1 Approval.\n\nCommercial dishwashing machines shall conform to ASSE 1004 and NSF 3. Commercial dishwashing machines with integral gas-fired heating must be tested and evaluated in accordance with UL 921.\n\n#--- 409.2 Water connection.\n\nThe water supply to a dishwashing machine shall be protected against backflow by an air gap that is integral with the machine or a backflow preventer shall be installed in accordance with Section 608. Air gaps shall comply with ASME A112.1.2 or A112.1.3.\n\n#--- 409.3 Waste connection.\n\nThe waste connection of a dishwashing machine shall comply with Section 802.\n\nSection PC 410: Drinking Fountains\n\n#--- 410.1 Approval.\n\nDrinking fountains shall conform to ASME A112.19.1\/CSA B45.2 or ASME A112.19.2\/CSA B45.1 and water coolers shall conform to AHRI 1010. Drinking fountains and water coolers shall conform to NSF 61, Section 9 and ICC A117.1. Drinking fountains required by Table 403.1 shall be equipped with both a bubbler faucet for drinking and a separate faucet designed for filling a container at least 10 inches (254 mm) in height. Drinking fountains and water coolers shall comply with the lead requirements of Section 605.\n\n#--- 410.2 Small occupancies.\n\nDrinking fountains shall not be required for an occupant load of 15 or fewer.\n\n#--- 410.3 Required drinking fountains.\n\nWhere water is served in restaurants, drinking fountains shall not be required. In other occupancies, where drinking fountains are required, up to 50 percent of required drinking fountains conforming to Section 410.1 may be substituted by dedicated plumbing fixtures with faucets designed for filling a container at least 10 inches (254 mm) in height, provided any such dedicated plumbing fixture is adjacent to or readily visible from the location of a drinking fountain conforming to Section 410.1. Bottled water dispensers shall not be substituted for required drinking fountains.\n\n#--- 410.4 Prohibited location.\n\nDrinking fountains and plumbing fixtures with faucets permitted to be substituted for required drinking fountains shall not be installed in public restrooms.\n\nSection PC 411: Emergency Showers and Eyewash Stations\n\n#--- 411.1 Approval.\n\nEmergency showers and eyewash stations shall conform to ISEA Z358.1.\n\n#--- 411.2 Waste connection.\n\nWaste connections shall not be required for emergency showers and eyewash stations.\n\nSection PC 412: Floor and Trench Drains\n\n#--- 412.1 Approval.\n\nFloor drains shall conform to ASME A112.3.1, ASME A112.6.3 or CSA B79. Trench drains shall comply with ASME A112.6.3.\n\n#--- 412.2 Floor drains.\n\nFloor drains shall have removable strainers. The floor drain shall be constructed so that the drain is capable of being cleaned. Access shall be provided to the drain inlet. Ready access shall be provided to floor drains.\n\nException: Floor drains serving refrigerated display cases shall be provided with access.\n\n#--- 412.3 Size of floor drains.\n\nFloor drains shall have a drain outlet not less than 3 inches (76 mm) in diameter.\n\n#--- 412.4 Public laundries and central washing facilities.\n\nIn public coin-operated laundries and in the central washing facilities of multiple-family dwellings, the rooms containing automatic clothes washers shall be provided with floor drains located to readily drain the entire floor area. Such drains shall have an outlet of not less than 3 inches (76 mm) in diameter and be provided with lint strainers.\n\nSection PC 413: Food Waste Disposer Units\n\n#--- 413.1 Approval.\n\nDomestic food waste disposers shall conform to ASSE 1008 and shall be listed and labeled in accordance with UL 430. Food waste disposers shall not increase the drainage fixture unit load on the sanitary drainage system. Food waste disposers shall be permitted only within dwelling units.\n\n#--- 413.2 Domestic food waste disposer waste outlets.\n\nThe outlets of domestic food waste disposers shall be connected to a drain of not less than 2 inches (51 mm) in diameter.\n\n#--- 413.3 Commercial food waste disposer units.\n\nCommercial food waste disposers shall be prohibited unless approved for use by the Department of Environmental Protection.\n\n#--- 413.4 Water supply required.\n\nFood waste disposers shall be provided with a supply of cold water.\n\nSection PC 414: Garbage Can Washers\n\n#--- 414.1 Water connection.\n\nThe water supply to a garbage can washer shall be protected against backflow by an air gap or a backflow preventer in accordance with Section 608.13.1, 608.13.2, 608.13.3, 608.13.5, 608.13.6 or 608.13.8.\n\n#--- 414.2 Waste connection.\n\nGarbage can washers shall be trapped separately. The receptacle receiving the waste from the washer shall have a removable basket or strainer to prevent the discharge of large particles into the drainage system.\n\nSection PC 415: Laundry Trays\n\n#--- 415.1 Approval.\n\nLaundry trays shall conform to ASME A112.19.1\/CSA B45.2, ASME A112.19.2\/CSA B45.1, ASME A119.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124.\n\n#--- 415.2 Waste outlet.\n\nEach compartment of a laundry tray shall be provided with a waste outlet not less than 1 1\/2 inches (38 mm) in diameter and a strainer or crossbar to restrict the clear opening of the waste outlet.\n\nSection PC 416: Lavatories\n\n#--- 416.1 Approval.\n\nLavatories shall conform to ASME A112.19.1\/CSA B45.2, ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124. Group wash-up equipment shall conform to the requirements of Section 402. Every 20 inches (508 mm) of rim space shall be considered as one lavatory.\n\n#--- 416.2 Cultured marble lavatories.\n\nCultured marble vanity tops with an integral lavatory shall conform to CSA B45.5\/IAPMO Z124.\n\n#--- 416.3 Lavatory waste outlets.\n\nLavatories shall have waste outlets not less than 1 1\/4 inches (32 mm) in diameter. A strainer, pop-up stopper, crossbar or other device shall be provided to restrict the clear opening of the waste outlet. Where a stopper is utilized, a built-in overflow shall be provided.\n\n#--- 416.4 Moveable lavatory systems.\n\nMoveable lavatory systems shall comply with ASME A112.19.12.\n\n#--- 416.5 Tempered water for public hand-washing facilities.\n\nTempered water shall be delivered from lavatories and group wash fixtures located in public toilet facilities provided for customers, patrons and visitors. Tempered water shall be delivered through an approved water-temperature limiting device that conforms to ASSE 1070.\n\nException: Where point of use heaters are installed, outlet water temperature shall be regulated to provide tempered water.\n\nSection PC 417: Showers\n\n#--- 417.1 Approval.\n\nPrefabricated showers and shower compartments shall conform to ASME A112.19.2\/CSA B45.1 or CSA B45.5\/IAPMO Z124. Shower valves for individual showers shall conform to the requirements of Section 424.3.\n\n#--- 417.2 Water supply riser.\n\nWater supply risers from the shower valve to the shower head outlet, whether exposed or concealed, shall be attached to the structure. The attachment to the structure shall be made by the use of support devices designed for use with the specific piping material or by fittings anchored with screws.\n\n#--- 417.3 Shower waste outlet.\n\nWaste outlets serving showers shall be not less than 2 inches (51 mm) in diameter and, for other than waste outlets in bathtubs, shall have removable strainers not less than 3 inches (76 mm) in diameter with strainer openings not less than 1\/4 inch (6.4 mm) in least dimension. Where each shower space is not provided with an individual waste outlet, the waste outlet shall be located and the floor pitched so that waste from one shower does not flow over the floor area serving another shower. Waste outlets shall be fastened to the waste pipe in an approved manner.\n\n#--- 417.4 Shower compartments.\n\nShower compartments shall be not less than 900 square inches (0.58 m2) in interior cross-sectional area. Shower compartments shall be not less than 30 inches (762 mm) in least dimension as measured from the finished interior dimension of the compartment, exclusive of fixture valves, showerheads, soap dishes and safety grab bars or rails. Except as required in Section 404, the minimum required area and dimension shall be measured from the finished interior dimension at a height equal to the top of the threshold and at a point tangent to its centerline and shall be continued to a height not less than 70 inches (1778 mm) above the shower drain outlet.\n\n#---- 417.4.1 Floor and wall area.\n\nBathtub floors, shower floors, wall areas above built-in tubs that have installed shower heads and walls in shower compartments shall be constructed of smooth, corrosion- resistant and nonabsorbent waterproof materials. Wall materials shall extend to a height of not less than 6 feet (1829 mm) above the room floor level, and not less than 70 inches (1778 mm) above the drain of the tub or shower. Such walls shall form a water-tight joint with each other and with either the tub or shower floor.\n\n#---- 417.4.2 Access.\n\nThe shower compartment access and egress opening shall have a clear and unobstructed finished width of not less than 22 inches (559 mm). Shower compartments required to be designed in conformance to accessibility provisions shall comply with Section 404.1.\n\n#--- 417.5 Shower floors or receptors.\n\nFloor surfaces shall be constructed of impervious, noncorrosive, nonabsorbent and waterproof materials.\n\n#---- 417.5.1 Support.\n\nFloors or receptors under shower compartments shall be laid on, and supported by, a smooth and structurally sound base.\n\n#---- 417.5.2 Shower lining.\n\nFloors under shower compartments, except where prefabricated receptors have been provided, shall be lined and made water tight utilizing material complying with Sections 417.5.2.1 through 417.5.2.6. Such liners shall turn up on all sides not less than 2 inches (51 mm) above the finished threshold level. Liners shall be recessed and fastened to an approved backing so as not to occupy the space required for wall covering, and shall not be nailed or perforated at any point less than 1 inch (25 mm) above the finished threshold. Liners shall be pitched one-fourth unit vertical in 12 units horizontal (2 percent slope) and shall be sloped toward the fixture drains and be securely fastened to the waste outlet at the seepage entrance, making a water-tight joint between the liner and the outlet. The completed liner shall be tested in accordance with Section 312.9.\n\nExceptions:\n\n1. Floor surfaces under shower heads provided for rinsing laid directly on the ground are not required to comply with this section.\n\n2. Where a sheet-applied, load-bearing, bonded, waterproof membrane is installed as the shower lining, the membrane shall not be required to be recessed.\n\n#----- 417.5.2.1 PVC sheets.\n\nPlasticized polyvinyl chloride (PVC) sheets shall meet the requirements of ASTM D 4551. Sheets shall be joined by solvent welding in accordance with the manufacturer's installation instructions.\n\n#----- 417.5.2.2 Chlorinated polyethylene (CPE) sheets.\n\nNonplasticized chlorinated polyethylene sheet shall meet the requirements of ASTM D 4068. The liner shall be joined in accordance with the manufacturer's installation instructions.\n\n#----- 417.5.2.3 Sheet lead.\n\nSheet lead shall weigh not less than 4 pounds per square foot (19.5 kg\/m2) and shall be coated with an asphalt paint or other approved coating. The lead sheet shall be insulated from conducting substances other than the connecting drain by 15-pound (6.80 kg) asphalt felt or an equivalent. Sheet lead shall be joined by burning or soldering.\n\n#----- 417.5.2.4 Sheet copper.\n\nSheet copper shall conform to ASTM B 152 and shall weigh not less than 12 ounces per square foot (3.7 kg\/m2). The copper sheet shall be insulated from conducting substances other than the connecting drain by 15-pound (6.80 kg) asphalt felt or an equivalent. Sheet copper shall be joined by brazing or soldering.\n\n#----- 417.5.2.5 Sheet-applied, load-bearing, bonded, waterproof membranes.\n\nSheet-applied, load-bearing, bonded, waterproof membranes shall meet requirements of ANSI A118.10 and shall be applied in accordance with the manufacturer's installation instructions.\n\n#----- 417.5.2.6 Liquid-type, trowel-applied, load-bearing, bonded waterproof materials.\n\nLiquid-type, trowel-applied, load-bearing, bonded waterproof materials shall meet the requirements of ANSI A118.10 and shall be applied in accordance with the manufacturer's instructions.\n\n#--- 417.6 Glazing.\n\nWindows and doors within a shower enclosure shall conform to the safety glazing requirements of the New York City Building Code.\n\nSection PC 418: Sinks\n\n#--- 418.1 Approval.\n\nSinks shall conform to ASME A112.19.1\/CSA B45.2, ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124.\n\n#--- 418.2 Sink waste outlets.\n\nSinks shall be provided with waste outlets having a diameter not less than 1 1\/2 inches (38 mm). A strainer or crossbar shall be provided to restrict the clear opening of the waste outlet.\n\n#--- 418.3 Moveable sink systems.\n\nMoveable sink systems shall comply with ASME A112.19.12.\n\nSection PC 419: Urinals\n\n#--- 419.1 Approval.\n\nUrinals shall conform to ASME A112.19.2\/CSA B45.1, ASME A112.19.19 or CSA B45.5\/IAPMO Z124. Urinals shall conform to the water consumption requirements of Section 604.4. Water-supplied urinals shall conform to the hydraulic performance requirements of ASME A112.19.2\/CSA B45.1 or CSA B45.5\/IAPMO Z124.\n\n#--- 419.2 Substitution for water closets.\n\nIn each bathroom or toilet room, urinals shall not be substituted for more than 50 percent of the required water closets.\n\n#--- 419.3 Surrounding material.\n\nWall and floor space to a point 2 feet (610 mm) in front of a urinal lip and 4 feet (1219 mm) above the floor and at least 2 feet (610 mm) to each side of the urinal shall be waterproofed with a smooth, readily cleanable, nonabsorbent material.\n\n#--- 419.4 Waterless urinals.\n\nApproved waterless urinals may be utilized only as part of an approved building water conservation plan prepared in accordance with the rules of the department.\n\nSection PC 420: Water Closets\n\n#--- 420.1 Approval.\n\nWater closets shall conform to the water consumption requirements of Section 604.4 and shall conform to ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124. Water closets shall conform to the hydraulic performance requirements of ASME A112.19.2\/CSAB45.1. Water closet tanks shall conform to ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124. Electro-hydraulic water closets shall comply with ASME A112.19.2\/CSA B45.1. Water closets equipped with a dual flushing device shall comply with ASME A112.19.14.\n\n#--- 420.2 Water closets for public or employee toilet facilities.\n\nWater closet bowls for public or employee toilet facilities shall be of the elongated type.\n\n#--- 420.3 Water closet seats.\n\nWater closets shall be equipped with seats of smooth, nonabsorbent material. All seats of water closets provided for public or employee toilet facilities shall be of the hinged open-front type. Integral water closet seats shall be of the same material as the fixture. Water closet seats shall be sized for the water closet bowl type.\n\n#--- 420.4 Water closet connections.\n\nA 4-inch by 3-inch (102 mm by 76 mm) closet bend shall be acceptable. Where a 3-inch (76 mm) bend is utilized on water closets, a 4-inch by 3-inch (102 mm by 76 mm) flange shall be installed to receive the fixture horn.\n\n#--- 420.5 Water closets for children's use.\n\nIn nurseries, schools, and similar places where plumbing fixtures are provided for the use of children under six years of age, such water closets shall be of a size and height suitable for the children's use.\n\nSection PC 421: Whirlpool Bathtubs\n\n#--- 421.1 Approval.\n\nWhirlpool bathtubs shall comply with ASME A112.19.7\/CSA B45.10 and shall be listed and labeled in accordance with UL 1795.\n\n#--- 421.2 Installation.\n\nWhirlpool bathtubs shall be installed and tested in accordance with the manufacturer's instructions. The pump shall be located above the weir of the fixture trap.\n\n#--- 421.3 Drain.\n\nThe pump drain and circulation piping shall be sloped to drain the water in the volute and the circulation piping when the whirlpool bathtub is empty.\n\n#--- 421.4 Suction fittings.\n\nSuction fittings for whirlpool bathtubs shall comply with ASME A112.19.7\/CSA B45.10.\n\n#--- 421.5 Access to pump.\n\nAccess shall be provided to circulation pumps in accordance with the fixture or pump manufacturer's installation instructions. Where the manufacturer's instructions do not specify the location and minimum size of field-fabricated access openings, an opening not less than 12 inches by 12 inches (305 mm by 305 mm) shall be installed to provide access to the circulation pump. Where pumps are located more than 2 feet (609 mm) from the access opening, an opening not less than 18 inches by 18 inches (457 mm by 457 mm) shall be installed. A door or panel shall be permitted to close the opening. In all cases, the access opening shall be unobstructed and of the size necessary to permit the removal and replacement of the circulation pump.\n\n#--- 421.6 Whirlpool enclosure.\n\nDoors within a whirlpool enclosure shall conform to ASME A112.19.15.\n\nSection PC 422: Health Care Fixtures and Equipment\n\n#--- 422.1 Scope.\n\nThis section shall govern those aspects of health care plumbing systems that differ from plumbing systems in other structures. Health care plumbing systems shall conform to the requirements of this section in addition to the other requirements of this code. The provisions of this section shall apply to the special devices and equipment installed and maintained in the following occupancies: hospitals, nursing homes, homes for the aged, orphanages, infirmaries, first aid stations, psychiatric facilities, clinics, professional offices of dentists and doctors, mortuaries, educational facilities, surgery, dentistry, research and testing laboratories, establishments manufacturing pharmaceutical drugs and medicines, animal care facilities, and other structures with similar apparatus and equipment classified as plumbing.\n\n#--- 422.2 Approval.\n\nAll special plumbing fixtures, equipment, devices, assemblies and apparatus shall be of an approved type.\n\n#--- 422.3 Protection.\n\nAll devices, appurtenances, appliances and apparatus intended to serve some special function, such as sterilization, distillation, processing, cooling, or storage of ice or foods, and that connect to either the water supply or drainage system, shall be provided with protection against backflow, flooding, fouling, contamination of the water supply system and stoppage of the drain.\n\n#--- 422.4 Materials.\n\nFixtures designed for therapy, special cleansing or disposal of waste materials, combinations of such purposes, or any other special purpose, shall be of smooth, impervious, corrosion-resistant materials and, where subjected to temperatures in excess of 180°F (82°C), shall be capable of withstanding, without damage, higher temperatures.\n\n#--- 422.5 Access.\n\nAccess shall be provided to concealed piping in connection with special fixtures where such piping contains steam traps, valves, relief valves, check valves, vacuum breakers or other similar items that require periodic inspection, servicing, maintenance or repair. Access shall be provided to concealed piping that requires periodic inspection, maintenance or repair.\n\n#--- 422.6 Clinical sink.\n\nA clinical sink shall have an integral trap in which the upper portion of a visible trap seal provides a water surface. The fixture shall be designed so as to permit complete removal of the contents by siphonic or blowout action and to reseal the trap. A flushing rim shall provide water to cleanse the interior surface. The fixture shall have the flushing and cleansing characteristics of a water closet.\n\n#--- 422.7 Prohibited usage of clinical sinks and service sinks.\n\nA clinical sink serving a soiled utility room shall not be considered as a substitute for, or be utilized as, a service sink. A service sink shall not be utilized for the disposal of urine, fecal matter or other human waste.\n\n#--- 422.8 Ice prohibited in soiled utility room.\n\nMachines for manufacturing ice, or any device for the handling or storage of ice, shall not be located in a soiled utility room.\n\n#--- 422.9 Sterilizer equipment requirements.\n\nThe approval and installation of all sterilizers shall conform to the requirements of the New York city mechanical code.\n\n#---- 422.9.1 Sterilizer piping.\n\nAccess for the purposes of inspection and maintenance shall be provided to all sterilizer piping and devices necessary for the operation of sterilizers.\n\n#---- 422.9.2 Steam supply.\n\nSteam supplies to sterilizers, including those connected by pipes from overhead mains or branches, shall be drained to prevent any moisture from reaching the sterilizer. The condensate drainage from the steam supply shall be discharged by gravity.\n\n#---- 422.9.3 Steam condensate return.\n\nSteam condensate returns from sterilizers shall be a gravity return system.\n\n#---- 422.9.4 Condensers.\n\nPressure sterilizers shall be equipped with a means of condensing and cooling the exhaust steam vapors. Nonpressure sterilizers shall be equipped with a device that will automatically control the vapor, confining the vapors within the vessel.\n\n#--- 422.10 Special elevations.\n\nControl valves, vacuum outlets and devices protruding from a wall of an operating, emergency, recovery, examining or delivery room, or in a corridor or other location where patients are transported on a wheeled stretcher, shall be located at an elevation that prevents bumping the patient or stretcher against the device.\n\nSection PC 423: Specialty Plumbing Fixtures\n\n#--- 423.1 Water connections.\n\nBaptisteries, ornamental and lily pools, aquariums, ornamental fountain basins, swimming pools, and similar constructions, where provided with water supplies, shall be protected against backflow in accordance with Section 608.\n\n#--- 423.2 Approval.\n\nSpecialties requiring water and waste connections shall be submitted for approval.\n\n#--- 423.3 Footbaths, pedicure baths and head shampoo sinks.\n\nThe water supplied to specialty plumbing fixtures, such as pedicure chairs having an integral foot bathtub, footbaths, and head shampoo sinks, shall be limited to a maximum temperature of 120°F (49°C) by a water temperature limiting device that conforms to ASSE 1070 or CSA B125.3.\n\nSection PC 424: Faucets and Other Fixture Fittings\n\n#--- 424.1 Approval.\n\nFaucets and fixture fittings shall conform to ASME A112.18.1\/CSA B125.1. Faucets and fixture fittings that supply drinking water for human ingestion shall conform to the requirements of NSF 61, section 9. Flexible water connectors exposed to continuous pressure shall conform to the requirements of Section 605.6.\n\n#---- 424.1.1 Faucets and supply fittings.\n\nFaucets and supply fittings shall conform to the water consumption requirements of Section 604.4.\n\n#---- 424.1.2 Waste fittings.\n\nWaste fittings shall conform to ASME A112.18.2\/CSA B125.2, ASTM F 409 or to one of the standards listed in Tables 702.1 and 702.4 for aboveground drainage and vent pipe and fittings.\n\n#---- 424.1.3 Lavatory operation without external electrical power.\n\nWhere automatic lavatory faucets connected to an external supply of electrical power are provided in a bathroom or toilet room, at least one lavatory faucet in such bathroom or toilet room shall be capable of normal operation in the absence of an external supply of electrical power for a period of at least two weeks, either through manual operation or built-in battery back-up. Where such automatic lavatory faucets are located in a bathroom or toilet room with a required accessible lavatory, such operational lavatory faucet shall be at such required accessible lavatory.\n\nException: Section 424.1.3 shall not apply to more than one bathroom or toilet room in a dwelling unit.\n\n#--- 424.2 Hand showers.\n\nHand-held showers shall conform to ASME A112.18.1\/CSA B125.1. Hand-held showers shall provide backflow protection in accordance with ASME A112.18.1\/CSA B125.1 or shall be protected against backflow by a device complying with ASME A112.18.3.\n\n#--- 424.3 Individual shower valves.\n\nIndividual shower and tub-shower combination valves shall be balanced-pressure, thermostatic or combination balanced-pressure\/thermostatic valves that conform to the requirements of ASSE 1016\/ASME A112.1016\/CSA B125.16 or ASME A112.18.1\/CSA B125.1 and shall be installed at the point of use. Shower and tub-shower combination valves required by this section shall be equipped with a means to limit the maximum setting of the valve to 120°F (49°C), which shall be field adjusted in accordance with the manufacturer's instructions. In-line thermostatic valves shall not be utilized for compliance with this section.\n\n#--- 424.4 Multiple (gang) showers.\n\nMultiple (gang) showers supplied with a single-tempered water supply pipe shall have the water supply for such showers controlled by an approved automatic temperature control mixing valve that conforms to ASSE 1069 or CSA B125.3, or each shower head shall be individually controlled by a balanced-pressure, thermostatic or combination balanced-pressure\/thermostatic valve that conforms to ASSE 1016\/ASME A112.1016\/CSA B125.16 or ASME A112.18.1\/CSA B125.1 and is installed at the point of use. Such valves shall be equipped with a means to limit the maximum setting of the valve to 120°F (49°C), which shall be field adjusted in accordance with the manufacturers' instructions.\n\n#--- 424.5 Bathtub and whirlpool bathtub valves.\n\nThe hot water supplied to bathtubs and whirlpool bathtubs, including bathtubs equipped with hand-held showers, shall be limited to a maximum temperature of 120°F (49°C) by a water-temperature limiting device that conforms to ASSE 1070 or CSA B125.3, except where such protection is otherwise provided by a combination tub\/shower valve in accordance with Section 424.3.\n\n#--- 424.6 Hose-connected outlets.\n\nFaucets and fixture fittings with hose-connected outlets shall conform to ASME A112.18.3 or ASME A112.18.1\/CSA B125.1.\n\n#--- 424.7 Temperature-actuated, flow reduction valves for individual fixture fittings.\n\nTemperature-actuated, flow reduction devices, where installed for individual fixture fittings, shall conform to ASSE 1062. Such valves shall not be used alone as a substitute for the balanced-pressure, thermostatic or combination shower valves required in Section 424.3.\n\n#--- 424.8 Transfer valves.\n\nDeck-mounted bath\/shower transfer valves containing an integral atmospheric vacuum breaker shall conform to the requirements of ASME A112.18.1\/CSA B125.1.\n\n#--- 424.9 Water closet personal hygiene devices.\n\nPersonal hygiene devices integral to water closets or water closet seats shall conform to the requirements of ASME A112.4.2.\n\nSection PC 425: Flushing Devices for Water Closets and Urinals\n\n#--- 425.1 Flushing devices required.\n\nEach water closet, urinal, clinical sink and any plumbing fixture that depends on trap siphonage to discharge the fixture contents to the drainage system shall be provided with a flushometer valve, flushometer tank or a flush tank designed and installed to supply water in quantity and rate of flow to flush the contents of the fixture, cleanse the fixture and refill the fixture trap.\n\n#---- 425.1.1 Separate for each fixture.\n\nA flushing device shall not serve more than one fixture.\n\n#---- 425.1.2 Water closet flushing without external electrical power.\n\nWhere automatic flushing devices connected to an external supply of electrical power are provided for water closets in a bathroom or toilet room, the flushing device of at least one water closet in such bathroom or toilet room shall be capable of normal operation in the absence of an external supply of electrical power for a period of at least two weeks, either through manual operation or built-in battery back-up. Where such automatic flushing devices are located in a bathroom or toilet room with a required accessible water closet, such operational flushing device shall be at such required accessible water closet.\n\nException: Section 425.1.2 shall not apply to more than one bathroom or toilet room in a dwelling unit.\n\n#--- 425.2 Flushometer valves and tanks.\n\nFlushometer valves and tanks shall comply with ASSE 1037 or CSA B125.3. Vacuum breakers on flushometer valves shall conform to the performance requirements of ASSE 1001 or CSA B64.1.1. Access shall be provided to vacuum breakers. Flushometer valves shall be of the water conservation type and shall not be used where the water pressure is lower than the minimum required for normal operation. When operated, the valve shall automatically complete the cycle of operation, opening fully and closing positively under the water supply pressure. Each flushometer valve shall be provided with a means for regulating the flow through the valve. The trap seal to the fixture shall be automatically refilled after each flushing cycle.\n\n#--- 425.3 Flush tanks.\n\nFlush tanks equipped for manual flushing shall be controlled by a device designed to refill the tank after each discharge and to shut off completely the water flow to the tank when the tank is filled to operational capacity. The trap seal to the fixture shall be automatically refilled after each flushing. The water supply to flush tanks equipped for automatic flushing shall be controlled with a timing device or sensor control devices.\n\n#---- 425.3.1 Fill valves.\n\nFlush tanks shall be equipped with an antisiphon fill valve conforming to ASSE 1002 or CSA B125.3. The fill valve backflow preventer shall be located not less than 1 inch (25 mm) above the full opening of the overflow pipe.\n\n#---- 425.3.2 Overflows in flush tanks.\n\nFlush tanks shall be provided with overflows discharging to the water closet or urinal connected thereto and shall be sized to prevent flooding the tank at the maximum rate at which the tanks are supplied with water according to the manufacturer's design conditions. The opening of the overflow pipe shall be located above the flood level rim of the water closet or urinal or above a secondary overflow in the flush tank.\n\n#---- 425.3.3 Sheet copper.\n\nSheet copper utilized for flush tank linings shall conform to ASTM B 152 and shall not weigh less than 10 ounces per square foot (0.03 kg\/m 2 ).\n\n#---- 425.3.4 Access required.\n\nAll parts in a flush tank shall be accessible for repair and replacement.\n\n#--- 425.4 Flush pipes and fittings.\n\nFlush pipes and fittings shall be of nonferrous material and shall conform to ASME A112.19.5\/CSA B45.15.\n\nSection PC 426: Manual Food and Beverage Dispensing Equipment\n\n#--- 426.1 Approval.\n\nManual food and beverage dispensing equipment shall conform to the requirements of NSF 18.\n\nSection PC 427: Floor Sinks\n\n#--- 427.1 Approval.\n\nSanitary floor sinks shall conform to the requirements of ASME A112.6.7.\n\nSection PC 428: Prohibited Water Uses\n\n#--- 428.1 Prohibited potable water uses.\n\nPotable water shall not be permitted for those uses prohibited by this section.\n\n#---- 428.1.1 Potable water prohibited for once through cooling.\n\nPotable water shall not be used for once-through cooling. Equipment such as ice making machines, walk-in coolers, refrigerated walk-in boxes, or air conditioning equipment shall be provided with air cooled condensers or recirculating condenser water systems.\n\nExceptions:\n\n1. Once-through water-cooled ice making machines producing less than 500 pounds (227 kg) of ice per day at Standard Rating Conditions as specified in AHRI 810.\n\n2. Once-through water-cooled ice making machines, walk-in coolers, refrigerated walk-in boxes or air conditioning equipment supplied with potable water through piping systems installed prior to January 1, 2011 and any subsequent replacements that use the same or lesser amount of potable water and are installed in accordance with RCNY Title 15 Chapter 20 Section 20-06.\n\n3. Use of once-through cooling may be permitted for temporary emergency conditions where approved by the commissioner.\n\nSection PC 429: Rooftop Gardens and Landscaping\n\n#--- 429.1 Water supply.\n\nWhere a connection to an approved water supply is required by Section 318.5 of the New York City Fire Code for rooftop gardens or landscaping exceeding 250 square feet (23 m 2 ), an approved fixture shall be provided for connection to such water supply in accordance with this code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2013\/148.",
+  "schemaVersion" : 1
+}

@@ -1,0 +1,65 @@
+{
+  "chapterID" : 20,
+  "chapterNumber" : "20",
+  "groups" : [
+    {
+      "headerLine" : "SECTION 2001",
+      "headingLine" : "GENERAL",
+      "id" : "SECTION 2001",
+      "sections" : [
+        {
+          "id" : 4558,
+          "kind" : "title",
+          "sectionNumber" : "2001.1",
+          "title" : "2001.1 Scope."
+        }
+      ]
+    },
+    {
+      "headerLine" : "SECTION 2002",
+      "headingLine" : "MATERIALS",
+      "id" : "SECTION 2002",
+      "sections" : [
+        {
+          "id" : 4559,
+          "kind" : "title",
+          "sectionNumber" : "2002.1",
+          "title" : "2002.1 General."
+        }
+      ]
+    },
+    {
+      "headerLine" : "SECTION 2003",
+      "headingLine" : "ADDITIONAL REQUIREMENTS",
+      "id" : "SECTION 2003",
+      "sections" : [
+        {
+          "id" : 4560,
+          "kind" : "title",
+          "sectionNumber" : "2003.1",
+          "title" : "2003.1 Identification."
+        },
+        {
+          "id" : 4561,
+          "kind" : "title",
+          "sectionNumber" : "2003.2",
+          "title" : "2003.2 Quality control."
+        },
+        {
+          "id" : 4562,
+          "kind" : "title",
+          "sectionNumber" : "2003.2.1",
+          "title" : "2003.2.1 Reference."
+        },
+        {
+          "id" : 4563,
+          "kind" : "title",
+          "sectionNumber" : "2003.2.2",
+          "title" : "2003.2.2 Welding operations."
+        }
+      ]
+    }
+  ],
+  "rawDraftText" : "#- Chapter 20: Aluminum\n\n#-- Section BC 2001: General\n\n#--- 2001.1 Scope.\n\nThis chapter shall govern the quality, design, fabrication and erection of aluminum.\n\n#-- Section BC 2002: Materials\n\n#--- 2002.1 General.\n\nAluminum used for structural purposes in buildings and structures shall comply with AA ASM 35 and AA ADM unless otherwise restricted by this code. The nominal loads shall be the minimum design loads required by Chapter 16 of this code.\n\n#-- Section BC 2003: Additional Requirements\n\n#--- 2003.1 Identification.\n\nAluminum for structural elements shall at all times in the fabricator's plant, be marked, segregated, or otherwise handled so that the separate alloys and tempers are positively identified, and after completion of fabrication shall be marked to identify the alloy and temper. Such markings shall be affixed to completed members and assemblies or to boxed or bundled shipments of multiple units prior to shipment from the fabricator's plant.\n\n#--- 2003.2 Quality control.\n\nIn addition to the requirements of Section 2002, the quality control of aluminum used for structural purposes shall comply with Sections 2003.2.1 and 2003.2.2.\n\n#---- 2003.2.1 Reference.\n\nWelding operations shall be subjected to the special inspections as required by Chapter 17 of this code.\n\n#---- 2003.2.2 Welding operations.\n\nWelding operations performed on aluminum used for structural purposes shall comply with the following:\n\n1. The provisions of AWS D1.2.\n\n2. Welding work shall be performed only by persons who have obtained a license from the commissioner. Where manual welding work on structural members is not performed in the City of New York, welds shall be made by welders certified by the American Welding Society in accordance with AWS D1.2.",
+  "schemaVersion" : 1
+}
