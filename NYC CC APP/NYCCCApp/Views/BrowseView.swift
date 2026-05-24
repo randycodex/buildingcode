@@ -1215,23 +1215,11 @@ struct CodeTopContentFade: View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
             let collapsedOpacity = min(max((progress - 0.08) / 0.22, 0), 1)
-            let background = Color(uiColor: .systemGroupedBackground)
 
             VStack(spacing: 0) {
                 ZStack(alignment: .bottomLeading) {
                     Rectangle()
                         .fill(.ultraThinMaterial)
-                        .opacity(max(progress, collapsedOpacity * 0.35))
-
-                    LinearGradient(
-                        colors: [
-                            background.opacity(0.97),
-                            background.opacity(max(0.55, 0.75 * progress)),
-                            background.opacity(0)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
 
                     if let title, !title.isEmpty {
                         Text(title)
@@ -1263,21 +1251,13 @@ struct CodeBottomContentFade: View {
     var body: some View {
         GeometryReader { proxy in
             let bottomInset = proxy.safeAreaInsets.bottom
-            let background = Color(uiColor: .systemGroupedBackground)
 
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
 
-                LinearGradient(
-                    colors: [
-                        background.opacity(0),
-                        background.opacity(0.72),
-                        background.opacity(0.97)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: bottomInset + extraHeight * 0.55)
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .frame(height: bottomInset + extraHeight * 0.55)
             }
             .frame(maxWidth: .infinity, alignment: .bottom)
             .allowsHitTesting(false)

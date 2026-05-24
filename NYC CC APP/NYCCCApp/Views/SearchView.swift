@@ -145,22 +145,9 @@ struct SearchView: View {
     }
 
     private var bottomSearchDock: some View {
-        ZStack(alignment: .top) {
-            Color(uiColor: .systemGroupedBackground)
-
-            LinearGradient(
-                colors: [
-                    Color(uiColor: .systemGroupedBackground).opacity(0),
-                    Color(uiColor: .systemGroupedBackground).opacity(0.92),
-                    Color(uiColor: .systemGroupedBackground)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: 72)
-            .frame(maxWidth: .infinity, alignment: .top)
-        }
-        .ignoresSafeArea(edges: .bottom)
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .ignoresSafeArea(edges: .bottom)
     }
 
     private var searchField: some View {
