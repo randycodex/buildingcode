@@ -120,6 +120,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let indexedSectionsByCodeSectionID: [Int64: [IndexedSection]]
     private var indexedSearchSections: [SearchIndexEntry]?
     private var indexedSearchSectionsByCodeSectionID: [Int64: [SearchIndexEntry]] = [:]
+    private var invertedIndex: [String: Set<Int64>]?
+    private var invertedIndexByCodeSection: [Int64: [String: Set<Int64>]] = [:]
     private let searchIndexLock = NSLock()
     private let codeSectionNameByID: [Int64: String]
     private let sectionsByChapterIDIndex: [Int64: [Section]]
@@ -413,15 +415,29 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
         let lowercasedQuery = trimmed.lowercased()
-        let queryTerms = lowercasedQuery
-            .split(whereSeparator: { $0.isWhitespace })
-            .map(String.init)
+        let queryTokens = Self.tokenize(trimmed)
+        guard !queryTokens.isEmpty else { return [] }
 
-        let candidates = searchCandidates(codeSectionID: codeSectionID)
+        let index = invertedIndex(for: codeSectionID)
+        var candidateIDs = index[queryTokens[0]] ?? []
+        for token in queryTokens.dropFirst() {
+            candidateIDs.formIntersection(index[token] ?? [])
+            if candidateIDs.isEmpty { break }
+        }
 
-        let hits: [SearchHit] = candidates
-            .compactMap { (entry: SearchIndexEntry) -> SearchHit? in
-                guard queryTerms.allSatisfy({ entry.searchHaystack.contains($0) }) else { return nil }
+        if trimmed.range(of: #"^[A-Za-z]?\d"#, options: .regularExpression) != nil {
+            for (token, sectionIDs) in index where token.hasPrefix(lowercasedQuery) {
+                candidateIDs.formUnion(sectionIDs)
+            }
+        }
+
+        let entriesByID = Dictionary(uniqueKeysWithValues: searchCandidates(codeSectionID: codeSectionID).map {
+            ($0.indexed.section.id, $0)
+        })
+
+        let hits: [SearchHit] = candidateIDs
+            .compactMap { sectionID -> SearchHit? in
+                guard let entry = entriesByID[sectionID] else { return nil }
                 let indexed = entry.indexed
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
@@ -506,6 +522,85 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 searchHaystack: "\(indexed.section.sectionNumber) \(indexed.section.title) \(indexed.section.officialText)".lowercased()
             )
         }
+    }
+
+    private func invertedIndex(for codeSectionID: Int64?) -> [String: Set<Int64>] {
+        if let codeSectionID {
+            searchIndexLock.lock()
+            if let cached = invertedIndexByCodeSection[codeSectionID] {
+                searchIndexLock.unlock()
+                return cached
+            }
+            searchIndexLock.unlock()
+
+            let sections = indexedSectionsByCodeSectionID[codeSectionID] ?? []
+            let entries = Self.buildSearchEntries(from: sections)
+            let index = Self.buildInvertedIndex(from: entries)
+
+            searchIndexLock.lock()
+            invertedIndexByCodeSection[codeSectionID] = index
+            if indexedSearchSectionsByCodeSectionID[codeSectionID] == nil {
+                indexedSearchSectionsByCodeSectionID[codeSectionID] = entries
+            }
+            searchIndexLock.unlock()
+            return index
+        }
+
+        searchIndexLock.lock()
+        if let cached = invertedIndex {
+            searchIndexLock.unlock()
+            return cached
+        }
+        searchIndexLock.unlock()
+
+        let entries = Self.buildSearchEntries(from: indexedSections)
+        let index = Self.buildInvertedIndex(from: entries)
+
+        searchIndexLock.lock()
+        invertedIndex = index
+        if indexedSearchSections == nil {
+            indexedSearchSections = entries
+        }
+        searchIndexLock.unlock()
+        return index
+    }
+
+    private static func tokenize(_ text: String) -> [String] {
+        var tokens: [String] = []
+        var current = ""
+
+        func flush() {
+            guard current.count >= 2 else {
+                current = ""
+                return
+            }
+            tokens.append(current)
+            current = ""
+        }
+
+        for character in text.lowercased() {
+            if character.isWhitespace {
+                flush()
+            } else if character.isLetter || character.isNumber || character == "." || character == "-" {
+                current.append(character)
+            } else {
+                flush()
+            }
+        }
+        flush()
+        return tokens
+    }
+
+    private static func buildInvertedIndex(from entries: [SearchIndexEntry]) -> [String: Set<Int64>] {
+        var index: [String: Set<Int64>] = [:]
+        for entry in entries {
+            let sectionID = entry.indexed.section.id
+            let tokens = tokenize(entry.searchHaystack)
+            for token in tokens {
+                index[token, default: []].insert(sectionID)
+            }
+        }
+        return index
     }
 
     func savedSections(
