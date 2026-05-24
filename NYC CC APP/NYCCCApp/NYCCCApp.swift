@@ -8,10 +8,10 @@ struct NYCCCApp: App {
 
     init() {
         let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-        appearance.backgroundEffect = nil
-        appearance.backgroundColor = UIColor.systemBackground
-        appearance.shadowColor = UIColor.separator
+        appearance.configureWithTransparentBackground()
+        appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
+        appearance.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.22)
+        appearance.shadowColor = UIColor.separator.withAlphaComponent(0.35)
 
         let stacked = appearance.stackedLayoutAppearance
         stacked.normal.iconColor = UIColor.secondaryLabel

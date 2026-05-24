@@ -99,6 +99,15 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func chapters(for codeSectionID: Int64?) -> [CodeChapter] {
+        if let authoredCodeStore {
+            return authoredCodeStore.chapters(codeSectionID: codeSectionID)
+        }
+
+        guard let codeSectionID else { return chapters }
+        return chapters.filter { $0.codeSectionID == codeSectionID }
+    }
+
     func reload() {
         versionLoadTask?.cancel()
         contentLoadTask?.cancel()

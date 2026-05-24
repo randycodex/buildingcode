@@ -54,17 +54,35 @@ struct SearchView: View {
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(library.searchResults) { result in
-                                NavigationLink {
-                                    ReaderView(sectionID: result.id)
-                                } label: {
-                                    resultRow(result)
-                                }
-                                .buttonStyle(.plain)
-                                .simultaneousGesture(
-                                    TapGesture().onEnded {
-                                        library.recordRecentSearch(query)
+                                HStack(alignment: .top, spacing: 10) {
+                                    NavigationLink {
+                                        ReaderView(sectionID: result.id)
+                                    } label: {
+                                        resultRow(result)
                                     }
-                                )
+                                    .buttonStyle(.plain)
+                                    .simultaneousGesture(
+                                        TapGesture().onEnded {
+                                            library.recordRecentSearch(query)
+                                        }
+                                    )
+
+                                    NavigationLink {
+                                        CompareWorkspaceView(referenceTarget: compareTarget(for: result))
+                                    } label: {
+                                        Image(systemName: "square.split.2x1")
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundStyle(Color(uiColor: library.accentColor(for: result.codeSectionID)))
+                                            .frame(width: 36, height: 36)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .simultaneousGesture(
+                                        TapGesture().onEnded {
+                                            library.recordRecentSearch(query)
+                                        }
+                                    )
+                                    .accessibilityLabel("Open result in compare")
+                                }
 
                                 CodeHairline()
                             }
@@ -290,6 +308,14 @@ struct SearchView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, 12)
+    }
+
+    private func compareTarget(for result: CodeSearchResult) -> CompareLaunchTarget {
+        CompareLaunchTarget(
+            codeSectionID: result.codeSectionID,
+            chapterNumber: result.chapterNumber,
+            sectionID: result.id
+        )
     }
 
     private struct SearchTaskID: Hashable {
