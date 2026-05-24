@@ -775,6 +775,11 @@ final class CodeLibraryViewModel: ObservableObject {
         UserDefaults.standard.set(recentSearches, forKey: recentSearchesDefaultsKey)
     }
 
+    func clearRecentSearches() {
+        recentSearches = []
+        UserDefaults.standard.removeObject(forKey: recentSearchesDefaultsKey)
+    }
+
     private static func loadRecentSearches() -> [String] {
         (UserDefaults.standard.array(forKey: "recentSearches") as? [String] ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -793,6 +798,7 @@ final class CodeLibraryViewModel: ObservableObject {
         }
 
         let previousBookmarkedIDs = bookmarkedSectionIDs
+        let previousBookmarks = bookmarks
 
         do {
             let ids = try userDataStore.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
@@ -820,7 +826,7 @@ final class CodeLibraryViewModel: ObservableObject {
             bookmarks = []
         }
 
-        if bookmarkedSectionIDs != previousBookmarkedIDs {
+        if bookmarkedSectionIDs != previousBookmarkedIDs || bookmarks != previousBookmarks {
             bookmarkRevision &+= 1
         }
     }
@@ -856,6 +862,26 @@ final class CodeLibraryViewModel: ObservableObject {
             // BookmarksView re-reads notes from disk on appear, and the note
             // editor re-reads via `noteBody(sectionID:)` when it opens.
             try userDataStore.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func clearAllBookmarks() {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.clearBookmarks(codeVersion: selectedVersion.codeVersion)
+            refreshBookmarks()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func clearAllNotes() {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.clearNotes(codeVersion: selectedVersion.codeVersion)
+            refreshBookmarks()
         } catch {
             statusMessage = error.localizedDescription
         }

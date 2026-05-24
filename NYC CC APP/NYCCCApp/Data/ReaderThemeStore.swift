@@ -22,7 +22,11 @@ final class ReaderThemeStore {
             save(theme)
             defaults.set(true, forKey: defaultTextMetricsMigrationKey)
         }
-        return theme
+        let normalized = theme.normalized
+        if normalized != theme {
+            save(normalized)
+        }
+        return normalized
     }
 
     func save(_ theme: ReaderTheme) {

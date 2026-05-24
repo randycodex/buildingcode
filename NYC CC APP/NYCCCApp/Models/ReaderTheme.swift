@@ -11,16 +11,32 @@ typealias PlatformFont = NSFont
 typealias PlatformColor = NSColor
 #endif
 
-enum ReaderFontChoice: String, CaseIterable, Codable, Identifiable, Sendable {
+enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
+    case sfPro
+    case sfCompact
+    case sfMono
+    case newYork
     case sanFrancisco
     case serif
     case rounded
     case monospaced
 
+    static var allCases: [ReaderFontChoice] {
+        [.sfPro, .sfCompact, .sfMono, .newYork]
+    }
+
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
+        case .sfPro:
+            return "SF Pro"
+        case .sfCompact:
+            return "SF Compact"
+        case .sfMono:
+            return "SF Mono"
+        case .newYork:
+            return "New York"
         case .sanFrancisco:
             return "San Francisco"
         case .serif:
@@ -29,6 +45,19 @@ enum ReaderFontChoice: String, CaseIterable, Codable, Identifiable, Sendable {
             return "Rounded"
         case .monospaced:
             return "Monospaced"
+        }
+    }
+
+    var normalizedChoice: ReaderFontChoice {
+        switch self {
+        case .sfPro, .sfCompact, .sfMono, .newYork:
+            return self
+        case .sanFrancisco, .rounded:
+            return .sfPro
+        case .serif:
+            return .newYork
+        case .monospaced:
+            return .sfMono
         }
     }
 }
@@ -53,7 +82,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     static let minimumFontSize: Double = 10
     static let maximumFontSize: Double = 26
 
-    var fontChoice: ReaderFontChoice = .sanFrancisco
+    var fontChoice: ReaderFontChoice = .sfPro
     var fontSize: Double = 12
     var lineSpacing: Double = 2
     var paragraphSpacing: Double = 9
@@ -63,6 +92,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
 
     var normalized: ReaderTheme {
         var theme = self
+        theme.fontChoice = theme.fontChoice.normalizedChoice
         theme.fontSize = min(max(theme.fontSize, Self.minimumFontSize), Self.maximumFontSize)
         return theme
     }
@@ -77,6 +107,18 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
 
     var italicFont: PlatformFont {
         fontChoice.italicFont(size: fontSize)
+    }
+
+    func swiftUIFont(size: Double? = nil, emphasized: Bool = false) -> Font {
+        let resolvedSize = size ?? fontSize
+        let platformFont = emphasized
+            ? fontChoice.boldFont(size: resolvedSize)
+            : fontChoice.bodyFont(size: resolvedSize)
+        #if canImport(UIKit)
+        return Font(platformFont)
+        #else
+        return Font(platformFont)
+        #endif
     }
 
     var accentColor: PlatformColor {
@@ -177,6 +219,37 @@ enum CodeSectionThemeProfile: Sendable {
 private extension ReaderFontChoice {
     func bodyFont(size: Double) -> PlatformFont {
         switch self {
+        case .sfPro:
+            #if canImport(UIKit)
+            return UIFont(name: "SFProText-Regular", size: size)
+                ?? UIFont(name: ".SFUIText-Regular", size: size)
+                ?? .systemFont(ofSize: size)
+            #else
+            return .systemFont(ofSize: size)
+            #endif
+        case .sfCompact:
+            #if canImport(UIKit)
+            return UIFont(name: "SFCompactText-Regular", size: size)
+                ?? UIFont(name: ".SFCompactText-Regular", size: size)
+                ?? .systemFont(ofSize: size)
+            #else
+            return .systemFont(ofSize: size)
+            #endif
+        case .sfMono:
+            #if canImport(UIKit)
+            return UIFont(name: "SFMono-Regular", size: size)
+                ?? .monospacedSystemFont(ofSize: size, weight: .regular)
+            #else
+            return .monospacedSystemFont(ofSize: size, weight: .regular)
+            #endif
+        case .newYork:
+            #if canImport(UIKit)
+            return UIFont(name: "NewYorkMedium-Regular", size: size)
+                ?? UIFont(name: "NewYork-Regular", size: size)
+                ?? UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body), size: size)
+            #else
+            return NSFont(name: "New York", size: size) ?? .systemFont(ofSize: size)
+            #endif
         case .sanFrancisco:
             #if canImport(UIKit)
             return UIFont(name: "SFProText-Regular", size: size) ?? .systemFont(ofSize: size)
@@ -202,6 +275,37 @@ private extension ReaderFontChoice {
 
     func boldFont(size: Double) -> PlatformFont {
         switch self {
+        case .sfPro:
+            #if canImport(UIKit)
+            return UIFont(name: "SFProText-Semibold", size: size)
+                ?? UIFont(name: ".SFUIText-Semibold", size: size)
+                ?? .systemFont(ofSize: size, weight: .semibold)
+            #else
+            return .boldSystemFont(ofSize: size)
+            #endif
+        case .sfCompact:
+            #if canImport(UIKit)
+            return UIFont(name: "SFCompactText-Semibold", size: size)
+                ?? UIFont(name: ".SFCompactText-Semibold", size: size)
+                ?? .systemFont(ofSize: size, weight: .semibold)
+            #else
+            return .boldSystemFont(ofSize: size)
+            #endif
+        case .sfMono:
+            #if canImport(UIKit)
+            return UIFont(name: "SFMono-Semibold", size: size)
+                ?? .monospacedSystemFont(ofSize: size, weight: .semibold)
+            #else
+            return .monospacedSystemFont(ofSize: size, weight: .semibold)
+            #endif
+        case .newYork:
+            #if canImport(UIKit)
+            return UIFont(name: "NewYorkMedium-Semibold", size: size)
+                ?? UIFont(name: "NewYork-Semibold", size: size)
+                ?? UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline), size: size)
+            #else
+            return NSFont(name: "New York Bold", size: size) ?? .boldSystemFont(ofSize: size)
+            #endif
         case .sanFrancisco:
             #if canImport(UIKit)
             return UIFont(name: "SFProText-Semibold", size: size) ?? .systemFont(ofSize: size, weight: .semibold)

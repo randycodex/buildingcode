@@ -11,6 +11,10 @@ struct BookmarksView: View {
         Color(uiColor: library.accentColor())
     }
 
+    private func bookmarkAccentColor(for codeSectionID: Int64?) -> Color {
+        Color(uiColor: library.accentColor(for: codeSectionID))
+    }
+
     private var collapseProgress: CGFloat {
         min(max(-scrollOffset / 64, 0), 1)
     }
@@ -101,7 +105,7 @@ struct BookmarksView: View {
             if !library.codeSections.isEmpty {
                 Text(group.codeSectionName)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(accentColor)
+                    .foregroundStyle(bookmarkAccentColor(for: group.codeSectionID))
                     .textCase(.uppercase)
             }
 
@@ -142,11 +146,13 @@ struct BookmarksView: View {
     }
 
     private func bookmarkRow(_ bookmark: BookmarkedSection) -> some View {
-        HStack(alignment: .top, spacing: 12) {
+        let bookmarkAccent = bookmarkAccentColor(for: bookmark.codeSectionID)
+
+        return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     if bookmark.kind == .textBlock {
-                        CodeMetaBadge(text: "Text Block", accent: accentColor)
+                        CodeMetaBadge(text: "Text Block", accent: bookmarkAccent)
                     } else {
                         Text(bookmark.sectionNumber)
                             .font(.subheadline.weight(.semibold))
@@ -156,25 +162,25 @@ struct BookmarksView: View {
                     if bookmark.isBookmarked {
                         Image(systemName: "bookmark.fill")
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(accentColor)
+                            .foregroundStyle(bookmarkAccent)
                     }
 
                     if bookmark.hasNote {
                         Image(systemName: "note.text")
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(accentColor)
+                            .foregroundStyle(bookmarkAccent)
                             .accessibilityLabel("Has note")
                     }
                 }
 
                 Text(bookmark.displayTitle)
-                    .font(.subheadline.weight(.semibold))
+                    .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
 
                 if !bookmark.previewText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     Text(bookmark.previewText)
-                        .font(.footnote)
+                        .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(3)
@@ -182,8 +188,8 @@ struct BookmarksView: View {
 
                 if bookmark.hasNote {
                     Text(bookmark.noteBody)
-                        .font(.footnote)
-                        .foregroundStyle(accentColor.opacity(0.88))
+                        .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
+                        .foregroundStyle(bookmarkAccent.opacity(0.88))
                         .multilineTextAlignment(.leading)
                         .padding(.top, 4)
                 }

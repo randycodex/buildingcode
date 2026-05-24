@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
+    @State private var pendingClearAction: ClearSettingsAction?
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -59,6 +60,10 @@ struct SettingsView: View {
                         lineSpacingSlider
                     }
 
+                    CodeSurface(accent: accentColor, padding: 16) {
+                        savedDataTools
+                    }
+
                     Text("NYC Code (Unofficial) is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -84,6 +89,31 @@ struct SettingsView: View {
         }
         .coordinateSpace(name: "settingsScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
+        .confirmationDialog(
+            pendingClearAction?.confirmationTitle ?? "",
+            isPresented: Binding(
+                get: { pendingClearAction != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        pendingClearAction = nil
+                    }
+                }
+            ),
+            titleVisibility: .visible
+        ) {
+            if let pendingClearAction {
+                Button(pendingClearAction.buttonTitle, role: .destructive) {
+                    performClearAction(pendingClearAction)
+                }
+            }
+            Button("Cancel", role: .cancel) {
+                pendingClearAction = nil
+            }
+        } message: {
+            if let pendingClearAction {
+                Text(pendingClearAction.message)
+            }
+        }
     }
 
     private var jurisdictionPicker: some View {
@@ -188,11 +218,11 @@ struct SettingsView: View {
                 .foregroundStyle(accentColor)
 
             Text("101.2 Scope.")
-                .font(.system(size: previewFontSize + 2, weight: .semibold, design: previewDesign))
+                .font(library.readerTheme.swiftUIFont(size: previewFontSize + 2, emphasized: true))
                 .foregroundStyle(.primary)
 
             Text("The provisions of this code shall apply to the construction, alteration, movement, addition, replacement, repair, equipment, use and occupancy of every building or structure.")
-                .font(.system(size: previewFontSize, weight: .regular, design: previewDesign))
+                .font(library.readerTheme.swiftUIFont(size: previewFontSize))
                 .foregroundStyle(.primary)
                 .lineSpacing(library.readerTheme.lineSpacing)
 
@@ -272,17 +302,40 @@ struct SettingsView: View {
         }
     }
 
-    private var previewFontSize: CGFloat {
-        CGFloat(library.readerTheme.fontSize)
+    private var savedDataTools: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            CodeEyebrow(text: "Saved Data", accent: accentColor)
+
+            Text("The app only persists your recent searches, reader settings, and the `user_data.sqlite` file used for bookmarks and notes.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            settingsDangerButton(
+                title: "Clear Recent Searches",
+                systemImage: "magnifyingglass.circle",
+                action: .clearSearches
+            )
+
+            CodeHairline()
+
+            settingsDangerButton(
+                title: "Clear All Bookmarks",
+                systemImage: "bookmark.slash",
+                action: .clearBookmarks
+            )
+
+            CodeHairline()
+
+            settingsDangerButton(
+                title: "Clear All Notes",
+                systemImage: "note.text",
+                action: .clearNotes
+            )
+        }
     }
 
-    private var previewDesign: Font.Design {
-        switch library.readerTheme.fontChoice {
-        case .sanFrancisco: return .default
-        case .serif: return .serif
-        case .rounded: return .rounded
-        case .monospaced: return .monospaced
-        }
+    private var previewFontSize: CGFloat {
+        CGFloat(library.readerTheme.fontSize)
     }
 
     private var selectedJurisdictionName: String {
@@ -325,6 +378,82 @@ struct SettingsView: View {
             }
         }
         .buttonStyle(.plain)
+    }
+
+    private func settingsDangerButton(
+        title: String,
+        systemImage: String,
+        action: ClearSettingsAction
+    ) -> some View {
+        Button {
+            pendingClearAction = action
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.red)
+
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+
+                Spacer(minLength: 0)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func performClearAction(_ action: ClearSettingsAction) {
+        switch action {
+        case .clearSearches:
+            library.clearRecentSearches()
+        case .clearBookmarks:
+            library.clearAllBookmarks()
+        case .clearNotes:
+            library.clearAllNotes()
+        }
+        pendingClearAction = nil
+    }
+}
+
+private enum ClearSettingsAction: Identifiable {
+    case clearSearches
+    case clearBookmarks
+    case clearNotes
+
+    var id: String { buttonTitle }
+
+    var buttonTitle: String {
+        switch self {
+        case .clearSearches:
+            return "Clear Recent Searches"
+        case .clearBookmarks:
+            return "Clear All Bookmarks"
+        case .clearNotes:
+            return "Clear All Notes"
+        }
+    }
+
+    var confirmationTitle: String {
+        switch self {
+        case .clearSearches:
+            return "Clear recent searches?"
+        case .clearBookmarks:
+            return "Clear all bookmarks?"
+        case .clearNotes:
+            return "Clear all notes?"
+        }
+    }
+
+    var message: String {
+        switch self {
+        case .clearSearches:
+            return "This removes the recent-search list for this device."
+        case .clearBookmarks:
+            return "This removes every bookmark saved for the current code version."
+        case .clearNotes:
+            return "This removes every note saved for the current code version."
+        }
     }
 }
 

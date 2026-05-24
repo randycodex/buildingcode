@@ -253,19 +253,21 @@ struct SearchView: View {
     }
 
     private func resultRow(_ result: CodeSearchResult) -> some View {
-        HStack(alignment: .top, spacing: 12) {
+        let resultAccent = Color(uiColor: library.accentColor(for: result.codeSectionID))
+
+        return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     if searchesAllCodeSections, let codeSectionID = result.codeSectionID {
-                        CodeMetaBadge(text: library.codeSectionName(id: codeSectionID), accent: accentColor)
+                        CodeMetaBadge(text: library.codeSectionName(id: codeSectionID), accent: resultAccent)
                     }
 
                     if result.kind == .textBlock {
-                        CodeMetaBadge(text: "Text Block", accent: accentColor)
+                        CodeMetaBadge(text: "Text Block", accent: resultAccent)
                     } else {
                         Text(result.sectionNumber)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(resultAccent)
                     }
 
                     Text("Chapter \(result.chapterNumber)")

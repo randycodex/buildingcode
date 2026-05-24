@@ -162,7 +162,7 @@ struct ReaderView: View {
 
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $noteBody)
-                    .font(.body)
+                    .font(library.readerTheme.swiftUIFont())
                     .scrollContentBackground(.hidden)
                     .focused($isNotesFieldFocused)
                     .frame(minHeight: 104)
@@ -180,7 +180,7 @@ struct ReaderView: View {
 
                 if noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     Text("Add a note")
-                        .font(.body)
+                        .font(library.readerTheme.swiftUIFont())
                         .foregroundStyle(.tertiary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 16)

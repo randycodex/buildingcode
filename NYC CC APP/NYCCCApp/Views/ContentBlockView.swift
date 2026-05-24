@@ -90,18 +90,31 @@ struct ContentBlockListView: View {
             return nil
         }
 
-        let directURL = readAccessURL.appendingPathComponent(imageID)
-        if FileManager.default.fileExists(atPath: directURL.path) {
-            return directURL
-        }
-
-        let assetURL = readAccessURL.appendingPathComponent("assets", isDirectory: true)
-            .appendingPathComponent(imageID)
-        if FileManager.default.fileExists(atPath: assetURL.path) {
-            return assetURL
+        let candidates = resolvedImageCandidates(for: imageID, relativeTo: readAccessURL)
+        for candidate in candidates {
+            if FileManager.default.fileExists(atPath: candidate.path) {
+                return candidate
+            }
         }
 
         return nil
+    }
+
+    private func resolvedImageCandidates(for imageID: String, relativeTo readAccessURL: URL) -> [URL] {
+        let directURL = readAccessURL.appendingPathComponent(imageID)
+        let assetDirectoryURL = readAccessURL.appendingPathComponent("assets", isDirectory: true)
+        let assetURL = assetDirectoryURL.appendingPathComponent(imageID)
+
+        let baseName = URL(fileURLWithPath: imageID).deletingPathExtension().lastPathComponent
+        let fallbackExtensions = ["png", "jpg", "jpeg", "gif", "webp"]
+        let fallbackURLs = fallbackExtensions.flatMap { ext in
+            [
+                readAccessURL.appendingPathComponent("\(baseName).\(ext)"),
+                assetDirectoryURL.appendingPathComponent("\(baseName).\(ext)")
+            ]
+        }
+
+        return [directURL, assetURL] + fallbackURLs
     }
 }
 

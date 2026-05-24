@@ -173,4 +173,34 @@ final class UserDataStore {
             """
         )
     }
+
+    func clearBookmarks(codeVersion: String) throws {
+        let statement = try connection.prepare(
+            """
+            DELETE FROM bookmarks
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        _ = try connection.step(statement)
+        try vacuumIfNeeded()
+    }
+
+    func clearNotes(codeVersion: String) throws {
+        let statement = try connection.prepare(
+            """
+            DELETE FROM notes
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        _ = try connection.step(statement)
+        try vacuumIfNeeded()
+    }
+
+    private func vacuumIfNeeded() throws {
+        try connection.execute("VACUUM;")
+    }
 }

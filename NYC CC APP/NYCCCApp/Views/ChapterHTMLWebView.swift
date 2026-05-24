@@ -54,7 +54,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         if context.coordinator.loadedURL != chapterURL {
             context.coordinator.loadedURL = chapterURL
             context.coordinator.pendingAnchorID = targetAnchorID
-            webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
+            if let resolvedHTML = context.coordinator.resolvedHTML(for: chapterURL, readAccessURL: readAccessURL) {
+                webView.loadHTMLString(resolvedHTML, baseURL: chapterURL.deletingLastPathComponent())
+            } else {
+                webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
+            }
             return
         }
 
@@ -101,6 +105,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
+
+        func resolvedHTML(for chapterURL: URL, readAccessURL: URL) -> String? {
+            guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
+                return nil
+            }
+            return rewriteImageSources(in: html, chapterURL: chapterURL, readAccessURL: readAccessURL)
+        }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             applyReaderScripts(to: webView)
@@ -550,6 +561,101 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             )
         }
 
+        private func rewriteImageSources(in html: String, chapterURL: URL, readAccessURL: URL) -> String {
+            guard let regex = try? NSRegularExpression(pattern: #"(?i)(<img\b[^>]*\bsrc\s*=\s*")([^"]+)(")"#) else {
+                return html
+            }
+
+            let nsHTML = html as NSString
+            let matches = regex.matches(in: html, range: NSRange(location: 0, length: nsHTML.length))
+            guard !matches.isEmpty else { return html }
+
+            let chapterBaseURL = chapterURL.deletingLastPathComponent()
+            let assetsDirectoryURL = resolvedAssetsDirectoryURL(chapterURL: chapterURL, readAccessURL: readAccessURL)
+            var rewrittenHTML = html
+
+            for match in matches.reversed() {
+                guard match.numberOfRanges == 4 else { continue }
+                let originalSource = nsHTML.substring(with: match.range(at: 2))
+                guard let replacementSource = resolvedImageSource(
+                    originalSource,
+                    chapterBaseURL: chapterBaseURL,
+                    assetsDirectoryURL: assetsDirectoryURL
+                ),
+                replacementSource != originalSource else {
+                    continue
+                }
+
+                if let sourceRange = Range(match.range(at: 2), in: rewrittenHTML) {
+                    rewrittenHTML.replaceSubrange(sourceRange, with: replacementSource)
+                }
+            }
+
+            return rewrittenHTML
+        }
+
+        private func resolvedImageSource(
+            _ source: String,
+            chapterBaseURL: URL,
+            assetsDirectoryURL: URL?
+        ) -> String? {
+            guard !source.isEmpty else { return nil }
+
+            let fileManager = FileManager.default
+            let sourceURL = URL(fileURLWithPath: source)
+            let fileName = sourceURL.lastPathComponent
+            guard !fileName.isEmpty else { return nil }
+
+            let chapterFileURL = chapterBaseURL.appendingPathComponent(fileName)
+            if fileManager.fileExists(atPath: chapterFileURL.path) {
+                return chapterFileURL.absoluteString
+            }
+
+            if let assetsDirectoryURL {
+                let assetFileURL = assetsDirectoryURL.appendingPathComponent(fileName)
+                if fileManager.fileExists(atPath: assetFileURL.path) {
+                    return assetFileURL.absoluteString
+                }
+            }
+
+            let baseName = sourceURL.deletingPathExtension().lastPathComponent
+            for ext in ["png", "jpg", "jpeg", "gif", "webp"] {
+                let candidateName = "\(baseName).\(ext)"
+                if let assetsDirectoryURL {
+                    let assetCandidateURL = assetsDirectoryURL.appendingPathComponent(candidateName)
+                    if fileManager.fileExists(atPath: assetCandidateURL.path) {
+                        return assetCandidateURL.absoluteString
+                    }
+                }
+                let chapterCandidateURL = chapterBaseURL.appendingPathComponent(candidateName)
+                if fileManager.fileExists(atPath: chapterCandidateURL.path) {
+                    return chapterCandidateURL.absoluteString
+                }
+            }
+
+            return nil
+        }
+
+        private func resolvedAssetsDirectoryURL(chapterURL: URL, readAccessURL: URL) -> URL? {
+            let fileManager = FileManager.default
+
+            let directAssetsURL = readAccessURL.appendingPathComponent("assets", isDirectory: true)
+            if fileManager.fileExists(atPath: directAssetsURL.path) {
+                return directAssetsURL
+            }
+
+            var searchURL = chapterURL.deletingLastPathComponent()
+            for _ in 0..<5 {
+                let candidate = searchURL.appendingPathComponent("assets", isDirectory: true)
+                if fileManager.fileExists(atPath: candidate.path) {
+                    return candidate
+                }
+                searchURL.deleteLastPathComponent()
+            }
+
+            return nil
+        }
+
         private static func readerCSS(theme: ReaderTheme, colorScheme: ColorScheme, accentHex: String) -> String {
             let isDark = colorScheme == .dark
             let textColor = isDark ? "#f5f5f7" : "#111111"
@@ -565,6 +671,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let paragraphSpacing = max(theme.paragraphSpacing / 20, 0.42)
             let fontFamily: String
             switch theme.fontChoice {
+            case .sfPro:
+                fontFamily = #""SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif"#
+            case .sfCompact:
+                fontFamily = #""SF Compact Text", "SF Compact Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif"#
+            case .sfMono:
+                fontFamily = #""SF Mono", ui-monospace, Menlo, Monaco, monospace"#
+            case .newYork:
+                fontFamily = #""New York", "NewYork", ui-serif, Georgia, "Times New Roman", serif"#
             case .sanFrancisco:
                 fontFamily = #""SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif"#
             case .serif:
