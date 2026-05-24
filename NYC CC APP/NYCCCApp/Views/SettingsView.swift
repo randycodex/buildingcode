@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
+    private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -93,11 +94,15 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 18)
-                .padding(.bottom, 28)
+                .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Settings", progress: collapseProgress)
             }
+            .overlay(alignment: .bottom) {
+                CodeBottomContentFade(extraHeight: tabBarClearance)
+            }
+            .modifier(CodeScrollClipDisabledModifier())
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)

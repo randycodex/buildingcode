@@ -12,7 +12,7 @@ struct BrowseView: View {
     @State private var hasSeededBrowseSides = false
     private static let leftCodeSectionDefaultsKey = "browseLeftCodeSectionID"
     private static let rightCodeSectionDefaultsKey = "browseRightCodeSectionID"
-    private let tabBarClearance: CGFloat = 88
+    private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: activeCodeSectionID))
@@ -42,6 +42,12 @@ struct BrowseView: View {
                             .tag(BrowseSide.right)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
+                    .overlay(alignment: .top) {
+                        CodeTopContentFade(title: activeCodeSectionName, progress: collapseProgress)
+                    }
+                    .overlay(alignment: .bottom) {
+                        CodeBottomContentFade(extraHeight: tabBarClearance)
+                    }
                     .onChange(of: activeBrowseSide) { _, newValue in
                         DispatchQueue.main.async {
                             applyCodeSection(for: newValue)
@@ -167,9 +173,7 @@ struct BrowseView: View {
             .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(.bottom, tabBarClearance)
         }
-        .overlay(alignment: .top) {
-            CodeTopContentFade(title: codeSectionName(for: side), progress: collapseProgress)
-        }
+        .modifier(CodeScrollClipDisabledModifier())
         .scrollIndicators(.hidden)
     }
 
@@ -1211,12 +1215,23 @@ struct CodeTopContentFade: View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
             let collapsedOpacity = min(max((progress - 0.08) / 0.22, 0), 1)
+            let background = Color(uiColor: .systemGroupedBackground)
 
             VStack(spacing: 0) {
                 ZStack(alignment: .bottomLeading) {
                     Rectangle()
                         .fill(.ultraThinMaterial)
-                        .opacity(0.35 * collapsedOpacity)
+                        .opacity(max(progress, collapsedOpacity * 0.35))
+
+                    LinearGradient(
+                        colors: [
+                            background.opacity(0.97),
+                            background.opacity(max(0.55, 0.75 * progress)),
+                            background.opacity(0)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
 
                     if let title, !title.isEmpty {
                         Text(title)
@@ -1224,16 +1239,58 @@ struct CodeTopContentFade: View {
                             .foregroundStyle(.primary)
                             .lineLimit(1)
                             .padding(.horizontal, 16)
-                            .padding(.bottom, 12)
+                            .padding(.bottom, 10)
                             .opacity(collapsedOpacity)
                     }
                 }
-                .frame(height: topInset + 58)
+                .frame(height: topInset + 50)
 
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .top)
             .allowsHitTesting(false)
+        }
+    }
+}
+
+struct CodeBottomContentFade: View {
+    let extraHeight: CGFloat
+
+    init(extraHeight: CGFloat = 88) {
+        self.extraHeight = extraHeight
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            let bottomInset = proxy.safeAreaInsets.bottom
+            let background = Color(uiColor: .systemGroupedBackground)
+
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+
+                LinearGradient(
+                    colors: [
+                        background.opacity(0),
+                        background.opacity(0.72),
+                        background.opacity(0.97)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: bottomInset + extraHeight * 0.55)
+            }
+            .frame(maxWidth: .infinity, alignment: .bottom)
+            .allowsHitTesting(false)
+        }
+    }
+}
+
+struct CodeScrollClipDisabledModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 17.4, *) {
+            content.scrollClipDisabled(true)
+        } else {
+            content
         }
     }
 }

@@ -5,7 +5,7 @@ struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
 
-    private let tabBarClearance: CGFloat = 88
+    private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -76,6 +76,10 @@ struct BookmarksView: View {
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Saved", progress: collapseProgress)
             }
+            .overlay(alignment: .bottom) {
+                CodeBottomContentFade(extraHeight: tabBarClearance)
+            }
+            .modifier(CodeScrollClipDisabledModifier())
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
