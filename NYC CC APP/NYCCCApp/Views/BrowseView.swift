@@ -573,7 +573,7 @@ struct ChapterSectionsView: View {
                 toggleGroup(group.id)
             } label: {
                 HStack(alignment: .center, spacing: 12) {
-                    Text(group.displayLabel.uppercased())
+                    Text(group.displayLabel(codeSectionName: library.codeSectionName(id: chapter.codeSectionID)).uppercased())
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(accentColor)
                         .tracking(0.9)

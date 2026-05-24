@@ -1,525 +1,525 @@
 {
-  "chapterID" : 112,
-  "chapterNumber" : "9",
-  "groups" : [
+  "chapterID": 112,
+  "chapterNumber": "9",
+  "groups": [
     {
-      "headerLine" : "SECTION BC 901",
-      "headingLine" : "General",
-      "id" : "SECTION BC 901",
-      "sections" : [
+      "headerLine": "SECTION PC 901",
+      "headingLine": "General",
+      "id": "SECTION PC 901",
+      "sections": [
         {
-          "id" : 12519,
-          "kind" : "title",
-          "sectionNumber" : "901.1",
-          "title" : "901.1 Scope."
+          "id": 12519,
+          "kind": "title",
+          "sectionNumber": "901.1",
+          "title": "901.1 Scope."
         },
         {
-          "id" : 12520,
-          "kind" : "title",
-          "sectionNumber" : "901.1.1",
-          "title" : "901.1.1 Methane and radon venting."
+          "id": 12520,
+          "kind": "title",
+          "sectionNumber": "901.1.1",
+          "title": "901.1.1 Methane and radon venting."
         },
         {
-          "id" : 12521,
-          "kind" : "title",
-          "sectionNumber" : "901.2",
-          "title" : "901.2 Trap seal protection."
+          "id": 12521,
+          "kind": "title",
+          "sectionNumber": "901.2",
+          "title": "901.2 Trap seal protection."
         },
         {
-          "id" : 12522,
-          "kind" : "title",
-          "sectionNumber" : "901.2.1",
-          "title" : "901.2.1 Venting required."
+          "id": 12522,
+          "kind": "title",
+          "sectionNumber": "901.2.1",
+          "title": "901.2.1 Venting required."
         },
         {
-          "id" : 12523,
-          "kind" : "title",
-          "sectionNumber" : "901.3",
-          "title" : "901.3 Chemical waste vent systems."
+          "id": 12523,
+          "kind": "title",
+          "sectionNumber": "901.3",
+          "title": "901.3 Chemical waste vent systems."
         },
         {
-          "id" : 12524,
-          "kind" : "title",
-          "sectionNumber" : "901.4",
-          "title" : "901.4 Use limitations."
+          "id": 12524,
+          "kind": "title",
+          "sectionNumber": "901.4",
+          "title": "901.4 Use limitations."
         },
         {
-          "id" : 12525,
-          "kind" : "title",
-          "sectionNumber" : "901.5",
-          "title" : "901.5 Tests."
+          "id": 12525,
+          "kind": "title",
+          "sectionNumber": "901.5",
+          "title": "901.5 Tests."
         },
         {
-          "id" : 12526,
-          "kind" : "title",
-          "sectionNumber" : "901.6",
-          "title" : "901.6 Engineered systems."
+          "id": 12526,
+          "kind": "title",
+          "sectionNumber": "901.6",
+          "title": "901.6 Engineered systems."
         },
         {
-          "id" : 12527,
-          "kind" : "title",
-          "sectionNumber" : "902.1",
-          "title" : "902.1 Vents."
+          "id": 12527,
+          "kind": "title",
+          "sectionNumber": "902.1",
+          "title": "902.1 Vents."
         },
         {
-          "id" : 12528,
-          "kind" : "title",
-          "sectionNumber" : "902.2",
-          "title" : "902.2 Sheet copper."
+          "id": 12528,
+          "kind": "title",
+          "sectionNumber": "902.2",
+          "title": "902.2 Sheet copper."
         },
         {
-          "id" : 12529,
-          "kind" : "title",
-          "sectionNumber" : "902.3",
-          "title" : "902.3 Sheet lead."
+          "id": 12529,
+          "kind": "title",
+          "sectionNumber": "902.3",
+          "title": "902.3 Sheet lead."
         },
         {
-          "id" : 12530,
-          "kind" : "title",
-          "sectionNumber" : "903.1",
-          "title" : "903.1 Roof extension."
+          "id": 12530,
+          "kind": "title",
+          "sectionNumber": "903.1",
+          "title": "903.1 Roof extension."
         },
         {
-          "id" : 12531,
-          "kind" : "title",
-          "sectionNumber" : "903.2",
-          "title" : "903.2 Frost closure."
+          "id": 12531,
+          "kind": "title",
+          "sectionNumber": "903.2",
+          "title": "903.2 Frost closure."
         },
         {
-          "id" : 12532,
-          "kind" : "title",
-          "sectionNumber" : "903.3",
-          "title" : "903.3 Flashings."
+          "id": 12532,
+          "kind": "title",
+          "sectionNumber": "903.3",
+          "title": "903.3 Flashings."
         },
         {
-          "id" : 12533,
-          "kind" : "title",
-          "sectionNumber" : "903.4",
-          "title" : "903.4 Prohibited use."
+          "id": 12533,
+          "kind": "title",
+          "sectionNumber": "903.4",
+          "title": "903.4 Prohibited use."
         },
         {
-          "id" : 12534,
-          "kind" : "title",
-          "sectionNumber" : "903.5",
-          "title" : "903.5 Location of vent terminal."
+          "id": 12534,
+          "kind": "title",
+          "sectionNumber": "903.5",
+          "title": "903.5 Location of vent terminal."
         },
         {
-          "id" : 12535,
-          "kind" : "title",
-          "sectionNumber" : "903.5.1",
-          "title" : "903.5.1 New vent terminals."
+          "id": 12535,
+          "kind": "title",
+          "sectionNumber": "903.5.1",
+          "title": "903.5.1 New vent terminals."
         },
         {
-          "id" : 12536,
-          "kind" : "title",
-          "sectionNumber" : "903.5.2",
-          "title" : "903.5.2 New openings."
+          "id": 12536,
+          "kind": "title",
+          "sectionNumber": "903.5.2",
+          "title": "903.5.2 New openings."
         },
         {
-          "id" : 12537,
-          "kind" : "title",
-          "sectionNumber" : "903.6",
-          "title" : "903.6 Reserved."
+          "id": 12537,
+          "kind": "title",
+          "sectionNumber": "903.6",
+          "title": "903.6 Reserved."
         },
         {
-          "id" : 12538,
-          "kind" : "title",
-          "sectionNumber" : "903.7",
-          "title" : "903.7 Reserved."
+          "id": 12538,
+          "kind": "title",
+          "sectionNumber": "903.7",
+          "title": "903.7 Reserved."
         },
         {
-          "id" : 12539,
-          "kind" : "title",
-          "sectionNumber" : "904.1",
-          "title" : "904.1 Required vent extension."
+          "id": 12539,
+          "kind": "title",
+          "sectionNumber": "904.1",
+          "title": "904.1 Required vent extension."
         },
         {
-          "id" : 12540,
-          "kind" : "title",
-          "sectionNumber" : "904.1.1",
-          "title" : "904.1.1 Installation."
+          "id": 12540,
+          "kind": "title",
+          "sectionNumber": "904.1.1",
+          "title": "904.1.1 Installation."
         },
         {
-          "id" : 12541,
-          "kind" : "title",
-          "sectionNumber" : "904.1.2",
-          "title" : "904.1.2 Size."
+          "id": 12541,
+          "kind": "title",
+          "sectionNumber": "904.1.2",
+          "title": "904.1.2 Size."
         },
         {
-          "id" : 12542,
-          "kind" : "title",
-          "sectionNumber" : "904.2",
-          "title" : "904.2 Vent stack required."
+          "id": 12542,
+          "kind": "title",
+          "sectionNumber": "904.2",
+          "title": "904.2 Vent stack required."
         },
         {
-          "id" : 12543,
-          "kind" : "title",
-          "sectionNumber" : "904.3",
-          "title" : "904.3 Vent termination."
+          "id": 12543,
+          "kind": "title",
+          "sectionNumber": "904.3",
+          "title": "904.3 Vent termination."
         },
         {
-          "id" : 12544,
-          "kind" : "title",
-          "sectionNumber" : "904.4",
-          "title" : "904.4 Vent connection at base."
+          "id": 12544,
+          "kind": "title",
+          "sectionNumber": "904.4",
+          "title": "904.4 Vent connection at base."
         },
         {
-          "id" : 12545,
-          "kind" : "title",
-          "sectionNumber" : "904.5",
-          "title" : "904.5 Vent headers."
+          "id": 12545,
+          "kind": "title",
+          "sectionNumber": "904.5",
+          "title": "904.5 Vent headers."
         },
         {
-          "id" : 12546,
-          "kind" : "title",
-          "sectionNumber" : "904.6",
-          "title" : "904.6 Sub-stack connections."
+          "id": 12546,
+          "kind": "title",
+          "sectionNumber": "904.6",
+          "title": "904.6 Sub-stack connections."
         },
         {
-          "id" : 12547,
-          "kind" : "title",
-          "sectionNumber" : "905.1",
-          "title" : "905.1 Connection."
+          "id": 12547,
+          "kind": "title",
+          "sectionNumber": "905.1",
+          "title": "905.1 Connection."
         },
         {
-          "id" : 12548,
-          "kind" : "title",
-          "sectionNumber" : "905.2",
-          "title" : "905.2 Grade."
+          "id": 12548,
+          "kind": "title",
+          "sectionNumber": "905.2",
+          "title": "905.2 Grade."
         },
         {
-          "id" : 12549,
-          "kind" : "title",
-          "sectionNumber" : "905.3",
-          "title" : "905.3 Vent connection to drainage system."
+          "id": 12549,
+          "kind": "title",
+          "sectionNumber": "905.3",
+          "title": "905.3 Vent connection to drainage system."
         },
         {
-          "id" : 12550,
-          "kind" : "title",
-          "sectionNumber" : "905.4",
-          "title" : "905.4 Reserved."
+          "id": 12550,
+          "kind": "title",
+          "sectionNumber": "905.4",
+          "title": "905.4 Reserved."
         },
         {
-          "id" : 12551,
-          "kind" : "title",
-          "sectionNumber" : "905.5",
-          "title" : "905.5 Height above fixtures."
+          "id": 12551,
+          "kind": "title",
+          "sectionNumber": "905.5",
+          "title": "905.5 Height above fixtures."
         },
         {
-          "id" : 12552,
-          "kind" : "title",
-          "sectionNumber" : "905.6",
-          "title" : "905.6 Vent for future fixtures."
+          "id": 12552,
+          "kind": "title",
+          "sectionNumber": "905.6",
+          "title": "905.6 Vent for future fixtures."
         },
         {
-          "id" : 12553,
-          "kind" : "title",
-          "sectionNumber" : "906.1",
-          "title" : "906.1 Size of stack vents and vent stacks."
+          "id": 12553,
+          "kind": "title",
+          "sectionNumber": "906.1",
+          "title": "906.1 Size of stack vents and vent stacks."
         },
         {
-          "id" : 12554,
-          "kind" : "title",
-          "sectionNumber" : "906.2",
-          "title" : "906.2 Vents other than stack vents or vent stacks."
+          "id": 12554,
+          "kind": "title",
+          "sectionNumber": "906.2",
+          "title": "906.2 Vents other than stack vents or vent stacks."
         },
         {
-          "id" : 12555,
-          "kind" : "title",
-          "sectionNumber" : "906.3",
-          "title" : "906.3 Developed length."
+          "id": 12555,
+          "kind": "title",
+          "sectionNumber": "906.3",
+          "title": "906.3 Developed length."
         },
         {
-          "id" : 12556,
-          "kind" : "title",
-          "sectionNumber" : "906.4",
-          "title" : "906.4 Multiple branch vents."
+          "id": 12556,
+          "kind": "title",
+          "sectionNumber": "906.4",
+          "title": "906.4 Multiple branch vents."
         },
         {
-          "id" : 12557,
-          "kind" : "title",
-          "sectionNumber" : "906.5",
-          "title" : "906.5 Ejector vents."
+          "id": 12557,
+          "kind": "title",
+          "sectionNumber": "906.5",
+          "title": "906.5 Ejector vents."
         },
         {
-          "id" : 12558,
-          "kind" : "title",
-          "sectionNumber" : "906.5.1",
-          "title" : "906.5.1 Sewage pumps and sewage ejectors other than pneumatic."
+          "id": 12558,
+          "kind": "title",
+          "sectionNumber": "906.5.1",
+          "title": "906.5.1 Sewage pumps and sewage ejectors other than pneumatic."
         },
         {
-          "id" : 12559,
-          "kind" : "title",
-          "sectionNumber" : "906.5.2",
-          "title" : "906.5.2 Pneumatic sewage ejectors."
+          "id": 12559,
+          "kind": "title",
+          "sectionNumber": "906.5.2",
+          "title": "906.5.2 Pneumatic sewage ejectors."
         },
         {
-          "id" : 12560,
-          "kind" : "title",
-          "sectionNumber" : "907.1",
-          "title" : "907.1 Vent for horizontal offset of drainage stack."
+          "id": 12560,
+          "kind": "title",
+          "sectionNumber": "907.1",
+          "title": "907.1 Vent for horizontal offset of drainage stack."
         },
         {
-          "id" : 12561,
-          "kind" : "title",
-          "sectionNumber" : "907.2",
-          "title" : "907.2 Upper section."
+          "id": 12561,
+          "kind": "title",
+          "sectionNumber": "907.2",
+          "title": "907.2 Upper section."
         },
         {
-          "id" : 12562,
-          "kind" : "title",
-          "sectionNumber" : "907.3",
-          "title" : "907.3 Lower section."
+          "id": 12562,
+          "kind": "title",
+          "sectionNumber": "907.3",
+          "title": "907.3 Lower section."
         },
         {
-          "id" : 12563,
-          "kind" : "title",
-          "sectionNumber" : "908.1",
-          "title" : "908.1 Where required."
+          "id": 12563,
+          "kind": "title",
+          "sectionNumber": "908.1",
+          "title": "908.1 Where required."
         },
         {
-          "id" : 12564,
-          "kind" : "title",
-          "sectionNumber" : "908.2",
-          "title" : "908.2 Size and connection."
+          "id": 12564,
+          "kind": "title",
+          "sectionNumber": "908.2",
+          "title": "908.2 Size and connection."
         },
         {
-          "id" : 12565,
-          "kind" : "title",
-          "sectionNumber" : "909.1",
-          "title" : "909.1 Distance of trap from vent."
+          "id": 12565,
+          "kind": "title",
+          "sectionNumber": "909.1",
+          "title": "909.1 Distance of trap from vent."
         },
         {
-          "id" : 12566,
-          "kind" : "title",
-          "sectionNumber" : "909.2",
-          "title" : "909.2 Venting of fixture drains."
+          "id": 12566,
+          "kind": "title",
+          "sectionNumber": "909.2",
+          "title": "909.2 Venting of fixture drains."
         },
         {
-          "id" : 12567,
-          "kind" : "title",
-          "sectionNumber" : "909.3",
-          "title" : "909.3 Crown vent."
+          "id": 12567,
+          "kind": "title",
+          "sectionNumber": "909.3",
+          "title": "909.3 Crown vent."
         },
         {
-          "id" : 12568,
-          "kind" : "title",
-          "sectionNumber" : "910.1",
-          "title" : "910.1 Individual vent permitted."
+          "id": 12568,
+          "kind": "title",
+          "sectionNumber": "910.1",
+          "title": "910.1 Individual vent permitted."
         },
         {
-          "id" : 12569,
-          "kind" : "title",
-          "sectionNumber" : "910.2",
-          "title" : "910.2 Floor drain vents."
+          "id": 12569,
+          "kind": "title",
+          "sectionNumber": "910.2",
+          "title": "910.2 Floor drain vents."
         },
         {
-          "id" : 12570,
-          "kind" : "title",
-          "sectionNumber" : "911.1",
-          "title" : "911.1 Individual vent as common vent."
+          "id": 12570,
+          "kind": "title",
+          "sectionNumber": "911.1",
+          "title": "911.1 Individual vent as common vent."
         },
         {
-          "id" : 12571,
-          "kind" : "title",
-          "sectionNumber" : "911.2",
-          "title" : "911.2 Connection at the same level."
+          "id": 12571,
+          "kind": "title",
+          "sectionNumber": "911.2",
+          "title": "911.2 Connection at the same level."
         },
         {
-          "id" : 12572,
-          "kind" : "title",
-          "sectionNumber" : "911.3",
-          "title" : "911.3 Connection at different levels."
+          "id": 12572,
+          "kind": "title",
+          "sectionNumber": "911.3",
+          "title": "911.3 Connection at different levels."
         },
         {
-          "id" : 12573,
-          "kind" : "title",
-          "sectionNumber" : "912.1",
-          "title" : "912.1 Horizontal wet vent permitted."
+          "id": 12573,
+          "kind": "title",
+          "sectionNumber": "912.1",
+          "title": "912.1 Horizontal wet vent permitted."
         },
         {
-          "id" : 12574,
-          "kind" : "title",
-          "sectionNumber" : "912.1.1",
-          "title" : "912.1.1 Vertical wet vent permitted."
+          "id": 12574,
+          "kind": "title",
+          "sectionNumber": "912.1.1",
+          "title": "912.1.1 Vertical wet vent permitted."
         },
         {
-          "id" : 12575,
-          "kind" : "title",
-          "sectionNumber" : "912.2",
-          "title" : "912.2 Dry-vent connection."
+          "id": 12575,
+          "kind": "title",
+          "sectionNumber": "912.2",
+          "title": "912.2 Dry-vent connection."
         },
         {
-          "id" : 12576,
-          "kind" : "title",
-          "sectionNumber" : "912.2.1",
-          "title" : "912.2.1 Horizontal wet vent."
+          "id": 12576,
+          "kind": "title",
+          "sectionNumber": "912.2.1",
+          "title": "912.2.1 Horizontal wet vent."
         },
         {
-          "id" : 12577,
-          "kind" : "title",
-          "sectionNumber" : "912.2.2",
-          "title" : "912.2.2 Vertical wet vent."
+          "id": 12577,
+          "kind": "title",
+          "sectionNumber": "912.2.2",
+          "title": "912.2.2 Vertical wet vent."
         },
         {
-          "id" : 12578,
-          "kind" : "title",
-          "sectionNumber" : "912.3",
-          "title" : "912.3 Size."
+          "id": 12578,
+          "kind": "title",
+          "sectionNumber": "912.3",
+          "title": "912.3 Size."
         },
         {
-          "id" : 12579,
-          "kind" : "title",
-          "sectionNumber" : "914.1",
-          "title" : "914.1 Circuit vent permitted."
+          "id": 12579,
+          "kind": "title",
+          "sectionNumber": "914.1",
+          "title": "914.1 Circuit vent permitted."
         },
         {
-          "id" : 12580,
-          "kind" : "title",
-          "sectionNumber" : "914.1.1",
-          "title" : "914.1.1 Multiple circuit-vented branches."
+          "id": 12580,
+          "kind": "title",
+          "sectionNumber": "914.1.1",
+          "title": "914.1.1 Multiple circuit-vented branches."
         },
         {
-          "id" : 12581,
-          "kind" : "title",
-          "sectionNumber" : "914.2",
-          "title" : "914.2 Vent connection."
+          "id": 12581,
+          "kind": "title",
+          "sectionNumber": "914.2",
+          "title": "914.2 Vent connection."
         },
         {
-          "id" : 12582,
-          "kind" : "title",
-          "sectionNumber" : "914.3",
-          "title" : "914.3 Slope and size of horizontal branch."
+          "id": 12582,
+          "kind": "title",
+          "sectionNumber": "914.3",
+          "title": "914.3 Slope and size of horizontal branch."
         },
         {
-          "id" : 12583,
-          "kind" : "title",
-          "sectionNumber" : "914.3.1",
-          "title" : "914.3.1 Size of multiple circuit vent."
+          "id": 12583,
+          "kind": "title",
+          "sectionNumber": "914.3.1",
+          "title": "914.3.1 Size of multiple circuit vent."
         },
         {
-          "id" : 12584,
-          "kind" : "title",
-          "sectionNumber" : "914.4",
-          "title" : "914.4 Relief vent."
+          "id": 12584,
+          "kind": "title",
+          "sectionNumber": "914.4",
+          "title": "914.4 Relief vent."
         },
         {
-          "id" : 12585,
-          "kind" : "title",
-          "sectionNumber" : "914.4.1",
-          "title" : "914.4.1 Connection and installation."
+          "id": 12585,
+          "kind": "title",
+          "sectionNumber": "914.4.1",
+          "title": "914.4.1 Connection and installation."
         },
         {
-          "id" : 12586,
-          "kind" : "title",
-          "sectionNumber" : "914.4.2",
-          "title" : "914.4.2 Fixture drain or branch."
+          "id": 12586,
+          "kind": "title",
+          "sectionNumber": "914.4.2",
+          "title": "914.4.2 Fixture drain or branch."
         },
         {
-          "id" : 12587,
-          "kind" : "title",
-          "sectionNumber" : "914.5",
-          "title" : "914.5 Additional fixtures."
+          "id": 12587,
+          "kind": "title",
+          "sectionNumber": "914.5",
+          "title": "914.5 Additional fixtures."
         },
         {
-          "id" : 12588,
-          "kind" : "title",
-          "sectionNumber" : "915.1",
-          "title" : "915.1 Types of fixtures."
+          "id": 12588,
+          "kind": "title",
+          "sectionNumber": "915.1",
+          "title": "915.1 Types of fixtures."
         },
         {
-          "id" : 12589,
-          "kind" : "title",
-          "sectionNumber" : "915.2",
-          "title" : "915.2 Installation."
+          "id": 12589,
+          "kind": "title",
+          "sectionNumber": "915.2",
+          "title": "915.2 Installation."
         },
         {
-          "id" : 12590,
-          "kind" : "title",
-          "sectionNumber" : "915.2.1",
-          "title" : "915.2.1 Slope."
+          "id": 12590,
+          "kind": "title",
+          "sectionNumber": "915.2.1",
+          "title": "915.2.1 Slope."
         },
         {
-          "id" : 12591,
-          "kind" : "title",
-          "sectionNumber" : "915.2.2",
-          "title" : "915.2.2 Size and length."
+          "id": 12591,
+          "kind": "title",
+          "sectionNumber": "915.2.2",
+          "title": "915.2.2 Size and length."
         },
         {
-          "id" : 12592,
-          "kind" : "title",
-          "sectionNumber" : "915.2.3",
-          "title" : "915.2.3 Connection."
+          "id": 12592,
+          "kind": "title",
+          "sectionNumber": "915.2.3",
+          "title": "915.2.3 Connection."
         },
         {
-          "id" : 12593,
-          "kind" : "title",
-          "sectionNumber" : "915.2.4",
-          "title" : "915.2.4 Vent size."
+          "id": 12593,
+          "kind": "title",
+          "sectionNumber": "915.2.4",
+          "title": "915.2.4 Vent size."
         },
         {
-          "id" : 12594,
-          "kind" : "title",
-          "sectionNumber" : "915.2.5",
-          "title" : "915.2.5 Fixture branch or drain."
+          "id": 12594,
+          "kind": "title",
+          "sectionNumber": "915.2.5",
+          "title": "915.2.5 Fixture branch or drain."
         },
         {
-          "id" : 12595,
-          "kind" : "title",
-          "sectionNumber" : "916.1",
-          "title" : "916.1 Limitation."
+          "id": 12595,
+          "kind": "title",
+          "sectionNumber": "916.1",
+          "title": "916.1 Limitation."
         },
         {
-          "id" : 12596,
-          "kind" : "title",
-          "sectionNumber" : "916.2",
-          "title" : "916.2 Vent connection."
+          "id": 12596,
+          "kind": "title",
+          "sectionNumber": "916.2",
+          "title": "916.2 Vent connection."
         },
         {
-          "id" : 12597,
-          "kind" : "title",
-          "sectionNumber" : "916.3",
-          "title" : "916.3 Vent installation below the fixture flood level rim."
+          "id": 12597,
+          "kind": "title",
+          "sectionNumber": "916.3",
+          "title": "916.3 Vent installation below the fixture flood level rim."
         },
         {
-          "id" : 12598,
-          "kind" : "title",
-          "sectionNumber" : "919.1",
-          "title" : "919.1 General"
+          "id": 12598,
+          "kind": "title",
+          "sectionNumber": "919.1",
+          "title": "919.1 General"
         },
         {
-          "id" : 12599,
-          "kind" : "title",
-          "sectionNumber" : "919.2",
-          "title" : "919.2 Individual branch fixture and individual fixture header vents."
+          "id": 12599,
+          "kind": "title",
+          "sectionNumber": "919.2",
+          "title": "919.2 Individual branch fixture and individual fixture header vents."
         },
         {
-          "id" : 12600,
-          "kind" : "title",
-          "sectionNumber" : "919.3",
-          "title" : "919.3 A Licensed Professional Engineer shall certify design."
+          "id": 12600,
+          "kind": "title",
+          "sectionNumber": "919.3",
+          "title": "919.3 A Licensed Professional Engineer shall certify design."
         },
         {
-          "id" : 12601,
-          "kind" : "title",
-          "sectionNumber" : "920.1",
-          "title" : "920.1 Design of vent system."
+          "id": 12601,
+          "kind": "title",
+          "sectionNumber": "920.1",
+          "title": "920.1 Design of vent system."
         },
         {
-          "id" : 12602,
-          "kind" : "title",
-          "sectionNumber" : "920.2",
-          "title" : "920.2 System capacity."
+          "id": 12602,
+          "kind": "title",
+          "sectionNumber": "920.2",
+          "title": "920.2 System capacity."
         },
         {
-          "id" : 12603,
-          "kind" : "title",
-          "sectionNumber" : "920.3",
-          "title" : "920.3 Design shall be certified by a Licensed Professional Engineer."
+          "id": 12603,
+          "kind": "title",
+          "sectionNumber": "920.3",
+          "title": "920.3 Design shall be certified by a Licensed Professional Engineer."
         }
       ]
     }
   ],
-  "rawDraftText" : "#- Chapter 9: Vents\n\nSection PC 901: General\n\n#--- 901.1 Scope.\n\nThe provisions of this chapter shall govern the materials, design, construction and installation of vent systems except for vent systems for methane and radon which shall be governed by this section.\n\n#---- 901.1.1 Methane and radon venting.\n\nThe design and materials used in the installation of the methane and radon vent systems shall be approved by the commissioner and shall comply with all applicable rules of the Fire Department.\n\n#--- 901.2 Trap seal protection.\n\nThe plumbing system shall be provided with a system of vent piping that will permit the admission or emission of air so that the seal of any fixture trap shall not be subjected to a pressure differential of more than 1 inch of water column (249 Pa).\n\n#---- 901.2.1 Venting required.\n\nTraps and trapped fixtures shall be vented in accordance with one of the venting methods specified in this chapter.\n\n#--- 901.3 Chemical waste vent systems.\n\nThe vent system for a chemical waste system shall be independent of the sanitary vent system and shall terminate separately through the roof to the outdoors.\n\n#--- 901.4 Use limitations.\n\nThe plumbing vent system shall not be utilized for purposes other than the venting of the plumbing system.\n\n#--- 901.5 Tests.\n\nThe vent system shall be tested in accordance with Section 312.\n\n#--- 901.6 Engineered systems.\n\nEngineered venting systems shall conform to the provisions of Section 919.\n\nSection PC 902: Materials\n\n#--- 902.1 Vents.\n\nThe materials and methods utilized for the construction and installation of venting systems shall comply with the applicable provisions of Section 702.\n\n#--- 902.2 Sheet copper.\n\nSheet copper for vent pipe flashings shall conform to ASTM B 152 and shall weigh not less than 8 ounces per square foot (2.5 kg\/m 2 ).\n\n#--- 902.3 Sheet lead.\n\nSheet lead for vent pipe flashings shall weigh not less than 3 pounds per square foot (15 kg\/m 2 ) for field-constructed flashings and not less than 2 1\/2 pounds per square foot (12 kg\/m 2 ) for prefabricated flashings.\n\nSection PC 903: Vent Terminals\n\n#--- 903.1 Roof extension.\n\nOpen vent pipes that extend through a roof shall be terminated not less than 24 inches (610 mm) above the roof. Where a roof is to be used for assembly or as a promenade, observation deck, sun bathing deck or similar purposes, open vent pipes shall terminate not less than 7 feet (2134 mm) above the roof. Approved vandal-resistant vent caps may be used.\n\n#--- 903.2 Frost closure.\n\nVent extensions through a roof or wall shall be not less than 4 inches (102 mm) in diameter. Any increase in the size of the vent shall be made not less than 1 foot (305 mm) inside the thermal envelope of the building.\n\n#--- 903.3 Flashings.\n\nThe juncture of each vent pipe with the roof line shall be made water tight by an approved flashing.\n\n#--- 903.4 Prohibited use.\n\nA vent terminal shall not be used for any purpose other than a vent terminal.\n\n#--- 903.5 Location of vent terminal.\n\nLocations of vent terminals shall comply with Sections 903.5.1 and 903.5.2.\n\n#---- 903.5.1 New vent terminals.\n\nAn open vent terminal from a drainage system of the new or altered building shall not be located directly beneath any door, operable window, or other air intake opening of the building or of an adjacent building, and any such vent terminal shall not be within 10 feet (3048 mm) horizontally of such an opening unless it is at least 3 feet (914 mm) above the top of such opening. When the consent of the owner of an adjoining taller building is obtained, the owner of the new or altered building shall be permitted to carry the new vent stack, with adequate support, to a level above the higher existing roof.\n\n#---- 903.5.2 New openings.\n\nA door, operable window, or other air intake opening of the new or altered building shall not be located within 10 feet (3048 mm) horizontally from an open vent terminal from a drainage system of an existing adjacent building unless the existing terminal is at least 3 feet (914 mm) above such opening. Whenever necessary, the owner of the new building shall at his or her own expense, and with approval of the adjoining owner, offset the vent stack of the adjacent existing building to a distance of 10 feet (3048 mm) or more from such openings, or shall extend such vent stack to a height of at least 3 feet (924 mm) above the topmost opening.\n\n#--- 903.6 Reserved.\n\n#--- 903.7 Reserved.\n\nSection PC 904: Outdoor Vent Extensions\n\n#--- 904.1 Required vent extension.\n\nThe vent system serving each building drain shall have not less than one vent pipe that extends to the outdoors.\n\n#---- 904.1.1 Installation.\n\nThe required vent shall be a dry vent that connects to the building drain or an extension of a drain that connects to the building drain. Such vent shall not be an island fixture vent as allowed by Section 916.\n\n#---- 904.1.2 Size.\n\nThe required vent shall be sized in accordance with Section 906.2 based on the required size of the building drain.\n\n#--- 904.2 Vent stack required.\n\nA vent stack shall be required for every drainage stack that has three branch intervals or more.\n\n#--- 904.3 Vent termination.\n\nVent stacks or stack vents shall terminate outdoors above the roof or to the stack vent portion of the soil or waste stack, at least 6 inches (152 mm) above the flood level of the highest fixture connection discharging into the soil or waste stack.\n\n#--- 904.4 Vent connection at base.\n\nVent stacks shall connect to the base of the drainage stack. The vent stack shall connect at or below the lowest horizontal branch. Where the vent stack connects to the building drain, the connection shall be located downstream of the drainage stack and within a distance of 10 times the diameter of the drainage stack.\n\n#--- 904.5 Vent headers.\n\nStack vents and vent stacks connected into a common vent header at the top of the stacks and extending to the open air above the roof at one point shall be sized in accordance with the requirements of Section 906.1, but shall not be smaller than the smallest stack vent. The number of fixture units shall be the sum of all fixture units on all stacks connected thereto, and the developed length shall be the longest vent length from the intersection at the base of the most distant stack to the vent terminal in the open air, as a direct extension of one stack.\n\n#--- 904.6 Sub-stack connections.\n\nWhere it is desired to terminate stacks at a point below the roof terminus of the main vent stack, the sub-stack may connect to the main vent stack provided the portion of the main vent stack above the connection is sized for the total fixture unit load connected thereto, and for the maximum developed length of the stack or sub-stack.\n\nSection PC 905: Vent Connections and Grades\n\n#--- 905.1 Connection.\n\nIndividual, branch and circuit vents shall connect to a vent stack, stack vent, or extend to the open air above the roof.\n\n#--- 905.2 Grade.\n\nVent and branch vent pipes shall be so graded and connected as to drain back to the drainage pipe by gravity.\n\n#--- 905.3 Vent connection to drainage system.\n\nEvery dry vent connecting to a horizontal drain shall connect above the centerline of the horizontal drain pipe.\n\n#--- 905.4 Reserved.\n\n#--- 905.5 Height above fixtures.\n\nA connection between a vent pipe and a vent stack or stack vent shall be made at not less than 6 inches (152 mm) above the flood level rim of the highest fixture served by the vent. Horizontal vent pipes forming branch vents, relief vents or loop vents shall be located not less than 6 inches (152 mm) above the flood level rim of the highest fixture served.\n\n#--- 905.6 Vent for future fixtures.\n\nWhere the drainage piping has been roughed-in for future fixtures, a rough-in connection for a vent shall be installed. The vent size shall be not less than one-half the diameter of the rough-in drain to be served. The vent rough-in shall connect to the vent system, or shall be vented by other means as provided for in this chapter. The connection shall be identified to indicate that it is a vent.\n\nSection PC 906: Vent Pipe Sizing\n\n#--- 906.1 Size of stack vents and vent stacks.\n\nThe minimum required diameter of stack vents and vent stacks shall be determined from the developed length and the total of drainage fixture units connected thereto in accordance with Table 906.1, but in no case shall the diameter be less than one-half the diameter of the drain served or less than 1 1\/4 inches (32 mm).\n\nTable 906.1 Size and Developed Length of Stack Vents and Vent Stacks\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na. The developed length shall be measured from the vent connection to the open air.\n\n#--- 906.2 Vents other than stack vents or vent stacks.\n\nThe diameter of individual vents, branch vents, circuit vents and relief vents shall be at least one-half the required diameter of the drain served. The required size of the drain shall be determined in accordance with Table 710.1(2). Vent pipes shall not be less than 1 1\/4 inches (32 mm) in diameter. Vents shall be sized in accordance with Table 906.1 utilizing the drainage fixture units and the corresponding developed length. Relief vents for soil and waste stacks in buildings having more than 10 branch intervals shall be sized in accordance with Section 908.2.\n\n#--- 906.3 Developed length.\n\nThe developed length of individual, branch, circuit and relief vents shall be measured from the farthest point of vent connection to the drainage system to the point of connection to the vent stack, stack vent or termination outside of the building.\n\n#--- 906.4 Multiple branch vents.\n\nWhere multiple branch vents are connected to a common branch vent, the common branch vent shall be sized in accordance with this section based on the size of the common horizontal drainage branch that is or would be required to serve the total drainage fixture unit load being vented.\n\n#--- 906.5 Ejector vents.\n\nEjector vent sizes shall be determined in accordance with Sections 906.5.1 and 906.5.2.\n\n#---- 906.5.1 Sewage pumps and sewage ejectors other than pneumatic.\n\nDrainage piping below sewer level shall be vented in the same manner as that of a gravity system. Building sump vent sizes for sumps with sewage pumps or sewage ejectors, other than pneumatic, shall be determined in accordance with Table 906.5.1. Where a building sump vent connects to a sanitary vent system, the sanitary branch vent shall be at least 3 inches (76 mm) in diameter.\n\nTable 906.5.1 Size and Length of Sump Vents\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 gallon per minute = 3.785 L\/m.\n\na. Developed length plus an appropriate allowance for entrance losses and friction due to fittings, changes in direction and diameter. Suggested allowances shall be obtained from NBS Monograph 31 or other approved sources. An allowance of 50 percent of the developed length shall be assumed if a more precise value is not available.\n\nb. Actual values greater than 500 feet.\n\nc. Less than 10 feet.\n\n#---- 906.5.2 Pneumatic sewage ejectors.\n\nThe air pressure relief pipe from a pneumatic sewage ejector shall be connected to an independent vent stack terminating as required for vent extensions through the roof. The relief pipe shall be sized to relieve air pressure inside the ejector to atmospheric pressure, but shall be not less than 1 1\/2 inches (38 mm) in size.\n\nSection PC 907: Vents for Stack Offsets\n\n#--- 907.1 Vent for horizontal offset of drainage stack.\n\nHorizontal offsets of drainage stacks shall be vented where five or more branch intervals are located above the offset. The offset shall be vented by venting the upper section of the drainage stack and the lower section of the drainage stack.\n\n#--- 907.2 Upper section.\n\nThe upper section of the drainage stack shall be vented as a separate stack with a vent stack connection installed in accordance with Section 904.4. The offset shall be considered the base of the stack.\n\n#--- 907.3 Lower section.\n\nThe lower section of the drainage stack shall be vented by a yoke vent connecting between the offset and the next lower horizontal branch. The yoke vent connection shall be permitted to be a vertical extension of the drainage stack. The size of the yoke vent and connection shall be a minimum of the size required for the vent stack of the drainage stack.\n\nSection PC 908: Relief Vents – Stacks of More than 10 Branch Intervals\n\n#--- 908.1 Where required.\n\nSoil and waste stacks in buildings having more than 10 branch intervals shall be provided with a relief vent at each tenth interval installed, beginning with the top floor.\n\n#--- 908.2 Size and connection.\n\nThe size of the relief vent shall be equal to the size of the vent stack to which it connects. The lower end of each relief vent shall connect to the soil or waste stack through a wye below the horizontal branch serving the floor, and the upper end shall connect to the vent stack through a tee or inverted wye not less than 3 feet (914 mm) above the floor.\n\nSection PC 909: Fixture Vents\n\n#--- 909.1 Distance of trap from vent.\n\nEach fixture trap shall have a protecting vent located so that the slope and the developed length in the fixture drain from the trap weir to the vent fitting are within the requirements set forth in Table 909.1.\n\nException: The developed length of the fixture drain from the trap weir to the vent fitting for self- siphoning fixtures, such as water closets, shall not be limited.\n\nTable 909.1 Maximum Distance of Fixture Trap from Vent\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 inch per foot = 83.3 mm\/m.\n\n#--- 909.2 Venting of fixture drains.\n\nThe vent for a fixture drain, except where serving a fixture with integral traps, such as water closets, shall connect above the weir of the fixture trap being vented.\n\n#--- 909.3 Crown vent.\n\nA vent shall not be installed within two pipe diameters of the trap weir.\n\nSection PC 910: Individual Vent\n\n#--- 910.1 Individual vent permitted.\n\nEach trap and trapped fixture is permitted to be provided with an individual vent. The individual vent shall connect to the fixture drain of the trap or trapped fixture being vented in accordance with Section 909.1, but at a distance not to exceed 16 feet (4876 mm).\n\n#--- 910.2 Floor drain vents.\n\nNo vents will be required for piping serving floor drains when the floor drain is located not more than 15 feet (4572 mm) from the vented line to which it connects.\n\nSection PC 911: Common Vent\n\n#--- 911.1 Individual vent as common vent.\n\nAn individual vent is permitted to vent two traps or trapped fixtures as a common vent. The traps or trapped fixtures being common vented shall be located on the same floor level.\n\n#--- 911.2 Connection at the same level.\n\nWhere the fixture drains being common vented connect at the same level, the vent connection shall be at the interconnection of the fixture drains.\n\nException: Where wet vents are permitted by this code, the wet vent connection may be located downstream of the interconnection.\n\n#--- 911.3 Connection at different levels.\n\nWhere the fixture drains connect at different levels, the vent shall connect as a vertical extension of the vertical drain. The vertical drain pipe connecting the two fixture drains shall be considered the vent for the lower fixture drain, and shall be sized in accordance with Table 911.3. The upper fixture shall not be a water closet.\n\nTable 911.3 Common Vent Sizes\n\nFor SI: 1 inch = 25.4 mm.\n\nSection PC 912: Wet Venting\n\n#--- 912.1 Horizontal wet vent permitted.\n\nAny combination of fixtures within one bathroom group located in the same room is permitted to be vented by a horizontal wet vent. The wet vent shall be considered the vent for the fixtures and shall extend from the connection of the dry vent along the direction of the flow in the drain pipe to the most downstream fixture drain connection to the horizontal branch drain. Each wet-vented fixture drain shall connect independently to the horizontal wet vent. Only the fixtures within the bathroom groups shall connect to the wet-vented horizontal branch drain. Any additional fixtures shall discharge downstream of the horizontal wet vent.\n\n#---- 912.1.1 Vertical wet vent permitted.\n\nAny combination of fixtures within one bathroom group is permitted to be vented by a vertical wet vent. The vertical wet vent shall be considered the vent for the fixtures and shall extend from the connection of the dry vent down to the lowest fixture drain connection. Each wet-vented fixture shall connect independently to the vertical wet vent. Fixture drains shall connect above or at the same elevation as the water closet fixture drain. The dry-vent connection to the vertical wet vent shall be an individual or common vent serving one or two fixtures.\n\n#--- 912.2 Dry-vent connection.\n\nThe required dry-vent connection for wet-vented systems shall comply with Sections 912.2.1 and 912.2.2.\n\n#---- 912.2.1 Horizontal wet vent.\n\nThe dry-vent connection for a horizontal wet-vent system shall be an individual vent or a common vent for any bathroom group fixture, except an emergency floor drain. Where the dry-vent connects to a water closet fixture drain, the drain shall connect horizontally to the horizontal wet-vent system. Not more than one wet-vented fixture drain shall discharge upstream of the dry-vented fixture drain connection.\n\n#---- 912.2.2 Vertical wet vent.\n\nThe dry-vent connection for a vertical wet-vent system shall be an individual vent or common vent for the most upstream fixture drain.\n\n#--- 912.3 Size.\n\nThe dry vent serving the wet vent shall be sized based on the largest required diameter of pipe within the wet-vent system served by the dry vent. The wet vent shall be of a size not less than that specified in Table 912.3, based on the fixture unit discharge to the wet vent.\n\nTable 912.3 Wet Vent Size\n\nFor SI: 1 inch = 25.4 mm.\n\nSection PC 913: Reserved\n\nSection PC 914: Circuit Venting\n\n#--- 914.1 Circuit vent permitted.\n\nA maximum of eight fixtures connected to a horizontal branch drain shall be permitted to be circuit vented. Each fixture drain shall connect horizontally to the horizontal branch being circuit vented. The horizontal branch drain shall be classified as a vent from the most downstream fixture drain connection to the most upstream fixture drain connection to the horizontal branch.\n\n#---- 914.1.1 Multiple circuit-vented branches.\n\nCircuit-vented horizontal branch drains are permitted to be connected together. Each group of a maximum of eight fixtures shall be considered a separate circuit vent and shall conform to the requirements of this section.\n\n#--- 914.2 Vent connection.\n\nThe circuit vent connection shall be located between the two most upstream fixture drains. The vent shall connect to the horizontal branch and shall be installed in accordance with Section 905. The circuit vent pipe shall not receive the discharge of any soil or waste.\n\n#--- 914.3 Slope and size of horizontal branch.\n\nThe slope of the vent section of the horizontal branch drain shall be not greater than one unit vertical in 12 units horizontal ( 8.3-percent slope). The entire length of the vent section of the horizontal branch drain shall be sized for the total drainage discharge to the branch.\n\n#---- 914.3.1 Size of multiple circuit vent.\n\nEach separate circuit-vented horizontal branch that is interconnected shall be sized independently in accordance with Section 914.3. The downstream circuit-vented horizontal branch shall be sized for the total discharge into the branch, including the upstream branches and the fixtures within the branch.\n\n#--- 914.4 Relief vent.\n\nA relief vent shall be provided for circuit-vented horizontal branches receiving the discharge of four or more water closets and connecting to a drainage stack that receives the discharge of soil or waste from upper horizontal branches.\n\n#---- 914.4.1 Connection and installation.\n\nThe relief vent shall connect to the horizontal branch drain between the stack and the most downstream fixture drain of the circuit vent. The relief vent shall be installed in accordance with Section 905.\n\n#---- 914.4.2 Fixture drain or branch.\n\nThe relief vent is permitted to be a fixture drain or fixture branch for fixtures located within the same branch interval as the circuit-vented horizontal branch. The maximum discharge to a relief vent shall be four fixture units.\n\n#--- 914.5 Additional fixtures.\n\nFixtures, other than the circuit-vented fixtures, are permitted to discharge to the horizontal branch drain. Such fixtures shall be located on the same floor as the circuit-vented fixtures and shall be either individually or common vented.\n\nSection PC 915: Combination Waste and Vent System\n\n#--- 915.1 Types of fixtures.\n\nA combination waste and vent system shall not serve fixtures other than floor drains, lavatories and drinking fountains. Combination waste and vent systems shall not receive the discharge from a food waste disposer or clinical sink.\n\n#--- 915.2 Installation.\n\nThe combination waste and vent system shall be a horizontal piping system. The only vertical pipe of a combination waste and vent system shall be the connection between the fixture drain and the horizontal combination waste and vent pipe. The vertical distance shall not exceed 8 feet (2438 mm).\n\n#---- 915.2.1 Slope.\n\nThe slope at a horizontal combination waste and vent pipe shall not exceed one-half unit vertical in 12 units horizontal (4-percent slope) and shall not be less than indicated in Table 704.1.\n\n#---- 915.2.2 Size and length.\n\nThe size of a combination waste and vent pipe shall be not less than that indicated in Table 915.2.2. The horizontal length of a combination waste and vent system shall be unlimited.\n\nTable 915.2.2 Size of Combination Waste and Vent Pipe\n\nFor SI: 1 inch = 25.4 mm.\n\n#---- 915.2.3 Connection.\n\nThe combination waste and vent system shall be provided with a dry vent connected at any point within the system or the system shall connect to a horizontal drain that serves vented fixtures located on the same floor. Combination waste and vent systems connecting to building drains receiving only the discharge from one or more stacks shall be provided with a dry vent. The vent connection to the combination waste and vent pipe shall extend vertically to a point not less than 6 inches (152 mm) above the flood level rim of the highest fixture being vented before offsetting horizontally.\n\n#---- 915.2.4 Vent size.\n\nThe vent shall be sized for the total drainage fixture unit load in accordance with Section 906.2.\n\n#---- 915.2.5 Fixture branch or drain.\n\nThe fixture branch or fixture drain shall connect to the combination waste and vent within a distance specified in Table 909.1. The combination waste and vent pipe shall be considered the vent for the fixture.\n\nSection PC 916: Island Fixture Venting\n\n#--- 916.1 Limitation.\n\nIsland fixture venting shall not be permitted for fixtures other than sinks and lavatories. Residential kitchen sinks with a dishwasher waste connection, a food waste disposer, or both, in combination with the kitchen sink waste, shall be permitted to be vented in accordance with this section.\n\n#--- 916.2 Vent connection.\n\nThe island fixture vent shall connect to the fixture drain as required for an individual or common vent. The vent shall rise vertically to above the drainage outlet of the fixture being vented before offsetting horizontally or vertically downward. The vent or branch vent for multiple island fixture vents shall extend to a point not less than 6 inches (152 mm) above the highest island fixture being vented before connecting to the outside vent terminal.\n\n#--- 916.3 Vent installation below the fixture flood level rim.\n\nThe vent located below the flood level rim of the fixture being vented shall be installed as required for drainage piping in accordance with Chapter 7, except for sizing. The vent shall be sized in accordance with Section 906.2. The lowest point of the island fixture vent shall connect full size to the drainage system. The connection shall be to a vertical drain pipe or to the top half of a horizontal drain pipe. Cleanouts shall be provided in the island fixture vent to permit rodding of all vent piping located below the flood level rim of the fixtures. Rodding in both directions shall be permitted through a cleanout.\n\nSection PC 917: Reserved\n\nSection PC 918: Reserved\n\nSection PC 919: Engineered Vent Systems\n\n#--- 919.1 General\n\nEngineered vent systems shall comply with this section and Section 28-113.2.2 of the Administrative Code.\n\n#--- 919.2 Individual branch fixture and individual fixture header vents.\n\nThe maximum developed length of individual fixture vents to vent branches and vent headers shall be determined in accordance with Table 919.2 for the minimum pipe diameters at the indicated vent airflow rates.\n\nThe individual vent airflow rate shall be determined in accordance with the following:\n\nQh,b = Nn,bQv (Equation 9-1)\n\nFor SI: Qh,b = Nn,bQv(0.4719 L\/s)\n\nwhere:\n\nNn,b = Number of fixtures per header (or vent branch) ÷ total number of fixtures connected to vent stack.\n\nQh,b = Vent branch or vent header airflow rate (cfm).\n\nQv = Total vent stack airflow rate (cfm).\n\nQv(gpm) = 27.8rs2\/3 (1 - rs)D8\/3\n\nQv(cfm) = 0.134Qv (gpm)\n\nwhere:\n\nD = Drainage stack diameter (inches).\n\nQw = Design discharge load (gpm).\n\nrs = Waste water flow area to total area.\n\n= Qw \/ 27.8D8\/3\n\nIndividual vent airflow rates are obtained by equally distributing Qh,b into one-half the total number of fixtures on the branch or header for more than two fixtures; for an odd number of total fixtures, decrease by one; for one fixture, apply the full value of Qh,b.\n\nIndividual vent developed length shall be increased by 20 percent of the distance from the vent stack to the fixture vent connection on the vent branch or header.\n\nTable 919.2 Minimum Diameter and Maximum Length of Individual Branch Fixture Vents and Individual Fixture Header Vents for Smooth Pipes\n\nFor SI: 1 inch = 25.4 mm, 1 cubic foot per minute = 0.4719 L\/s, 1 foot = 304.8 mm\n\n#--- 919.3 A Licensed Professional Engineer shall certify design.\n\nAn engineer shall also inspect and certify the system upon completion of the system.\n\nSection PC 920: Computerized Vent Design\n\n#--- 920.1 Design of vent system.\n\nThe sizing, design and layout of the vent system shall be permitted to be determined by computer program design methods which shall be approved by the commissioner to insure compliance with the minimum standards of this code.\n\n#--- 920.2 System capacity.\n\nThe vent system shall be based on the air capacity requirements of the drainage system under a peak load condition.\n\n#--- 920.3 Design shall be certified by a Licensed Professional Engineer.\n\nAn engineer shall also inspect and certify the system upon completion of the system.",
-  "schemaVersion" : 1
+  "rawDraftText": "#- Chapter 9: Vents\n\nSection PC 901: General\n\n#--- 901.1 Scope.\n\nThe provisions of this chapter shall govern the materials, design, construction and installation of vent systems except for vent systems for methane and radon which shall be governed by this section.\n\n#---- 901.1.1 Methane and radon venting.\n\nThe design and materials used in the installation of the methane and radon vent systems shall be approved by the commissioner and shall comply with all applicable rules of the Fire Department.\n\n#--- 901.2 Trap seal protection.\n\nThe plumbing system shall be provided with a system of vent piping that will permit the admission or emission of air so that the seal of any fixture trap shall not be subjected to a pressure differential of more than 1 inch of water column (249 Pa).\n\n#---- 901.2.1 Venting required.\n\nTraps and trapped fixtures shall be vented in accordance with one of the venting methods specified in this chapter.\n\n#--- 901.3 Chemical waste vent systems.\n\nThe vent system for a chemical waste system shall be independent of the sanitary vent system and shall terminate separately through the roof to the outdoors.\n\n#--- 901.4 Use limitations.\n\nThe plumbing vent system shall not be utilized for purposes other than the venting of the plumbing system.\n\n#--- 901.5 Tests.\n\nThe vent system shall be tested in accordance with Section 312.\n\n#--- 901.6 Engineered systems.\n\nEngineered venting systems shall conform to the provisions of Section 919.\n\nSection PC 902: Materials\n\n#--- 902.1 Vents.\n\nThe materials and methods utilized for the construction and installation of venting systems shall comply with the applicable provisions of Section 702.\n\n#--- 902.2 Sheet copper.\n\nSheet copper for vent pipe flashings shall conform to ASTM B 152 and shall weigh not less than 8 ounces per square foot (2.5 kg/m 2 ).\n\n#--- 902.3 Sheet lead.\n\nSheet lead for vent pipe flashings shall weigh not less than 3 pounds per square foot (15 kg/m 2 ) for field-constructed flashings and not less than 2 1/2 pounds per square foot (12 kg/m 2 ) for prefabricated flashings.\n\nSection PC 903: Vent Terminals\n\n#--- 903.1 Roof extension.\n\nOpen vent pipes that extend through a roof shall be terminated not less than 24 inches (610 mm) above the roof. Where a roof is to be used for assembly or as a promenade, observation deck, sun bathing deck or similar purposes, open vent pipes shall terminate not less than 7 feet (2134 mm) above the roof. Approved vandal-resistant vent caps may be used.\n\n#--- 903.2 Frost closure.\n\nVent extensions through a roof or wall shall be not less than 4 inches (102 mm) in diameter. Any increase in the size of the vent shall be made not less than 1 foot (305 mm) inside the thermal envelope of the building.\n\n#--- 903.3 Flashings.\n\nThe juncture of each vent pipe with the roof line shall be made water tight by an approved flashing.\n\n#--- 903.4 Prohibited use.\n\nA vent terminal shall not be used for any purpose other than a vent terminal.\n\n#--- 903.5 Location of vent terminal.\n\nLocations of vent terminals shall comply with Sections 903.5.1 and 903.5.2.\n\n#---- 903.5.1 New vent terminals.\n\nAn open vent terminal from a drainage system of the new or altered building shall not be located directly beneath any door, operable window, or other air intake opening of the building or of an adjacent building, and any such vent terminal shall not be within 10 feet (3048 mm) horizontally of such an opening unless it is at least 3 feet (914 mm) above the top of such opening. When the consent of the owner of an adjoining taller building is obtained, the owner of the new or altered building shall be permitted to carry the new vent stack, with adequate support, to a level above the higher existing roof.\n\n#---- 903.5.2 New openings.\n\nA door, operable window, or other air intake opening of the new or altered building shall not be located within 10 feet (3048 mm) horizontally from an open vent terminal from a drainage system of an existing adjacent building unless the existing terminal is at least 3 feet (914 mm) above such opening. Whenever necessary, the owner of the new building shall at his or her own expense, and with approval of the adjoining owner, offset the vent stack of the adjacent existing building to a distance of 10 feet (3048 mm) or more from such openings, or shall extend such vent stack to a height of at least 3 feet (924 mm) above the topmost opening.\n\n#--- 903.6 Reserved.\n\n#--- 903.7 Reserved.\n\nSection PC 904: Outdoor Vent Extensions\n\n#--- 904.1 Required vent extension.\n\nThe vent system serving each building drain shall have not less than one vent pipe that extends to the outdoors.\n\n#---- 904.1.1 Installation.\n\nThe required vent shall be a dry vent that connects to the building drain or an extension of a drain that connects to the building drain. Such vent shall not be an island fixture vent as allowed by Section 916.\n\n#---- 904.1.2 Size.\n\nThe required vent shall be sized in accordance with Section 906.2 based on the required size of the building drain.\n\n#--- 904.2 Vent stack required.\n\nA vent stack shall be required for every drainage stack that has three branch intervals or more.\n\n#--- 904.3 Vent termination.\n\nVent stacks or stack vents shall terminate outdoors above the roof or to the stack vent portion of the soil or waste stack, at least 6 inches (152 mm) above the flood level of the highest fixture connection discharging into the soil or waste stack.\n\n#--- 904.4 Vent connection at base.\n\nVent stacks shall connect to the base of the drainage stack. The vent stack shall connect at or below the lowest horizontal branch. Where the vent stack connects to the building drain, the connection shall be located downstream of the drainage stack and within a distance of 10 times the diameter of the drainage stack.\n\n#--- 904.5 Vent headers.\n\nStack vents and vent stacks connected into a common vent header at the top of the stacks and extending to the open air above the roof at one point shall be sized in accordance with the requirements of Section 906.1, but shall not be smaller than the smallest stack vent. The number of fixture units shall be the sum of all fixture units on all stacks connected thereto, and the developed length shall be the longest vent length from the intersection at the base of the most distant stack to the vent terminal in the open air, as a direct extension of one stack.\n\n#--- 904.6 Sub-stack connections.\n\nWhere it is desired to terminate stacks at a point below the roof terminus of the main vent stack, the sub-stack may connect to the main vent stack provided the portion of the main vent stack above the connection is sized for the total fixture unit load connected thereto, and for the maximum developed length of the stack or sub-stack.\n\nSection PC 905: Vent Connections and Grades\n\n#--- 905.1 Connection.\n\nIndividual, branch and circuit vents shall connect to a vent stack, stack vent, or extend to the open air above the roof.\n\n#--- 905.2 Grade.\n\nVent and branch vent pipes shall be so graded and connected as to drain back to the drainage pipe by gravity.\n\n#--- 905.3 Vent connection to drainage system.\n\nEvery dry vent connecting to a horizontal drain shall connect above the centerline of the horizontal drain pipe.\n\n#--- 905.4 Reserved.\n\n#--- 905.5 Height above fixtures.\n\nA connection between a vent pipe and a vent stack or stack vent shall be made at not less than 6 inches (152 mm) above the flood level rim of the highest fixture served by the vent. Horizontal vent pipes forming branch vents, relief vents or loop vents shall be located not less than 6 inches (152 mm) above the flood level rim of the highest fixture served.\n\n#--- 905.6 Vent for future fixtures.\n\nWhere the drainage piping has been roughed-in for future fixtures, a rough-in connection for a vent shall be installed. The vent size shall be not less than one-half the diameter of the rough-in drain to be served. The vent rough-in shall connect to the vent system, or shall be vented by other means as provided for in this chapter. The connection shall be identified to indicate that it is a vent.\n\nSection PC 906: Vent Pipe Sizing\n\n#--- 906.1 Size of stack vents and vent stacks.\n\nThe minimum required diameter of stack vents and vent stacks shall be determined from the developed length and the total of drainage fixture units connected thereto in accordance with Table 906.1, but in no case shall the diameter be less than one-half the diameter of the drain served or less than 1 1/4 inches (32 mm).\n\nTable 906.1 Size and Developed Length of Stack Vents and Vent Stacks\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na. The developed length shall be measured from the vent connection to the open air.\n\n#--- 906.2 Vents other than stack vents or vent stacks.\n\nThe diameter of individual vents, branch vents, circuit vents and relief vents shall be at least one-half the required diameter of the drain served. The required size of the drain shall be determined in accordance with Table 710.1(2). Vent pipes shall not be less than 1 1/4 inches (32 mm) in diameter. Vents shall be sized in accordance with Table 906.1 utilizing the drainage fixture units and the corresponding developed length. Relief vents for soil and waste stacks in buildings having more than 10 branch intervals shall be sized in accordance with Section 908.2.\n\n#--- 906.3 Developed length.\n\nThe developed length of individual, branch, circuit and relief vents shall be measured from the farthest point of vent connection to the drainage system to the point of connection to the vent stack, stack vent or termination outside of the building.\n\n#--- 906.4 Multiple branch vents.\n\nWhere multiple branch vents are connected to a common branch vent, the common branch vent shall be sized in accordance with this section based on the size of the common horizontal drainage branch that is or would be required to serve the total drainage fixture unit load being vented.\n\n#--- 906.5 Ejector vents.\n\nEjector vent sizes shall be determined in accordance with Sections 906.5.1 and 906.5.2.\n\n#---- 906.5.1 Sewage pumps and sewage ejectors other than pneumatic.\n\nDrainage piping below sewer level shall be vented in the same manner as that of a gravity system. Building sump vent sizes for sumps with sewage pumps or sewage ejectors, other than pneumatic, shall be determined in accordance with Table 906.5.1. Where a building sump vent connects to a sanitary vent system, the sanitary branch vent shall be at least 3 inches (76 mm) in diameter.\n\nTable 906.5.1 Size and Length of Sump Vents\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 gallon per minute = 3.785 L/m.\n\na. Developed length plus an appropriate allowance for entrance losses and friction due to fittings, changes in direction and diameter. Suggested allowances shall be obtained from NBS Monograph 31 or other approved sources. An allowance of 50 percent of the developed length shall be assumed if a more precise value is not available.\n\nb. Actual values greater than 500 feet.\n\nc. Less than 10 feet.\n\n#---- 906.5.2 Pneumatic sewage ejectors.\n\nThe air pressure relief pipe from a pneumatic sewage ejector shall be connected to an independent vent stack terminating as required for vent extensions through the roof. The relief pipe shall be sized to relieve air pressure inside the ejector to atmospheric pressure, but shall be not less than 1 1/2 inches (38 mm) in size.\n\nSection PC 907: Vents for Stack Offsets\n\n#--- 907.1 Vent for horizontal offset of drainage stack.\n\nHorizontal offsets of drainage stacks shall be vented where five or more branch intervals are located above the offset. The offset shall be vented by venting the upper section of the drainage stack and the lower section of the drainage stack.\n\n#--- 907.2 Upper section.\n\nThe upper section of the drainage stack shall be vented as a separate stack with a vent stack connection installed in accordance with Section 904.4. The offset shall be considered the base of the stack.\n\n#--- 907.3 Lower section.\n\nThe lower section of the drainage stack shall be vented by a yoke vent connecting between the offset and the next lower horizontal branch. The yoke vent connection shall be permitted to be a vertical extension of the drainage stack. The size of the yoke vent and connection shall be a minimum of the size required for the vent stack of the drainage stack.\n\nSection PC 908: Relief Vents – Stacks of More than 10 Branch Intervals\n\n#--- 908.1 Where required.\n\nSoil and waste stacks in buildings having more than 10 branch intervals shall be provided with a relief vent at each tenth interval installed, beginning with the top floor.\n\n#--- 908.2 Size and connection.\n\nThe size of the relief vent shall be equal to the size of the vent stack to which it connects. The lower end of each relief vent shall connect to the soil or waste stack through a wye below the horizontal branch serving the floor, and the upper end shall connect to the vent stack through a tee or inverted wye not less than 3 feet (914 mm) above the floor.\n\nSection PC 909: Fixture Vents\n\n#--- 909.1 Distance of trap from vent.\n\nEach fixture trap shall have a protecting vent located so that the slope and the developed length in the fixture drain from the trap weir to the vent fitting are within the requirements set forth in Table 909.1.\n\nException: The developed length of the fixture drain from the trap weir to the vent fitting for self- siphoning fixtures, such as water closets, shall not be limited.\n\nTable 909.1 Maximum Distance of Fixture Trap from Vent\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 inch per foot = 83.3 mm/m.\n\n#--- 909.2 Venting of fixture drains.\n\nThe vent for a fixture drain, except where serving a fixture with integral traps, such as water closets, shall connect above the weir of the fixture trap being vented.\n\n#--- 909.3 Crown vent.\n\nA vent shall not be installed within two pipe diameters of the trap weir.\n\nSection PC 910: Individual Vent\n\n#--- 910.1 Individual vent permitted.\n\nEach trap and trapped fixture is permitted to be provided with an individual vent. The individual vent shall connect to the fixture drain of the trap or trapped fixture being vented in accordance with Section 909.1, but at a distance not to exceed 16 feet (4876 mm).\n\n#--- 910.2 Floor drain vents.\n\nNo vents will be required for piping serving floor drains when the floor drain is located not more than 15 feet (4572 mm) from the vented line to which it connects.\n\nSection PC 911: Common Vent\n\n#--- 911.1 Individual vent as common vent.\n\nAn individual vent is permitted to vent two traps or trapped fixtures as a common vent. The traps or trapped fixtures being common vented shall be located on the same floor level.\n\n#--- 911.2 Connection at the same level.\n\nWhere the fixture drains being common vented connect at the same level, the vent connection shall be at the interconnection of the fixture drains.\n\nException: Where wet vents are permitted by this code, the wet vent connection may be located downstream of the interconnection.\n\n#--- 911.3 Connection at different levels.\n\nWhere the fixture drains connect at different levels, the vent shall connect as a vertical extension of the vertical drain. The vertical drain pipe connecting the two fixture drains shall be considered the vent for the lower fixture drain, and shall be sized in accordance with Table 911.3. The upper fixture shall not be a water closet.\n\nTable 911.3 Common Vent Sizes\n\nFor SI: 1 inch = 25.4 mm.\n\nSection PC 912: Wet Venting\n\n#--- 912.1 Horizontal wet vent permitted.\n\nAny combination of fixtures within one bathroom group located in the same room is permitted to be vented by a horizontal wet vent. The wet vent shall be considered the vent for the fixtures and shall extend from the connection of the dry vent along the direction of the flow in the drain pipe to the most downstream fixture drain connection to the horizontal branch drain. Each wet-vented fixture drain shall connect independently to the horizontal wet vent. Only the fixtures within the bathroom groups shall connect to the wet-vented horizontal branch drain. Any additional fixtures shall discharge downstream of the horizontal wet vent.\n\n#---- 912.1.1 Vertical wet vent permitted.\n\nAny combination of fixtures within one bathroom group is permitted to be vented by a vertical wet vent. The vertical wet vent shall be considered the vent for the fixtures and shall extend from the connection of the dry vent down to the lowest fixture drain connection. Each wet-vented fixture shall connect independently to the vertical wet vent. Fixture drains shall connect above or at the same elevation as the water closet fixture drain. The dry-vent connection to the vertical wet vent shall be an individual or common vent serving one or two fixtures.\n\n#--- 912.2 Dry-vent connection.\n\nThe required dry-vent connection for wet-vented systems shall comply with Sections 912.2.1 and 912.2.2.\n\n#---- 912.2.1 Horizontal wet vent.\n\nThe dry-vent connection for a horizontal wet-vent system shall be an individual vent or a common vent for any bathroom group fixture, except an emergency floor drain. Where the dry-vent connects to a water closet fixture drain, the drain shall connect horizontally to the horizontal wet-vent system. Not more than one wet-vented fixture drain shall discharge upstream of the dry-vented fixture drain connection.\n\n#---- 912.2.2 Vertical wet vent.\n\nThe dry-vent connection for a vertical wet-vent system shall be an individual vent or common vent for the most upstream fixture drain.\n\n#--- 912.3 Size.\n\nThe dry vent serving the wet vent shall be sized based on the largest required diameter of pipe within the wet-vent system served by the dry vent. The wet vent shall be of a size not less than that specified in Table 912.3, based on the fixture unit discharge to the wet vent.\n\nTable 912.3 Wet Vent Size\n\nFor SI: 1 inch = 25.4 mm.\n\nSection PC 913: Reserved\n\nSection PC 914: Circuit Venting\n\n#--- 914.1 Circuit vent permitted.\n\nA maximum of eight fixtures connected to a horizontal branch drain shall be permitted to be circuit vented. Each fixture drain shall connect horizontally to the horizontal branch being circuit vented. The horizontal branch drain shall be classified as a vent from the most downstream fixture drain connection to the most upstream fixture drain connection to the horizontal branch.\n\n#---- 914.1.1 Multiple circuit-vented branches.\n\nCircuit-vented horizontal branch drains are permitted to be connected together. Each group of a maximum of eight fixtures shall be considered a separate circuit vent and shall conform to the requirements of this section.\n\n#--- 914.2 Vent connection.\n\nThe circuit vent connection shall be located between the two most upstream fixture drains. The vent shall connect to the horizontal branch and shall be installed in accordance with Section 905. The circuit vent pipe shall not receive the discharge of any soil or waste.\n\n#--- 914.3 Slope and size of horizontal branch.\n\nThe slope of the vent section of the horizontal branch drain shall be not greater than one unit vertical in 12 units horizontal ( 8.3-percent slope). The entire length of the vent section of the horizontal branch drain shall be sized for the total drainage discharge to the branch.\n\n#---- 914.3.1 Size of multiple circuit vent.\n\nEach separate circuit-vented horizontal branch that is interconnected shall be sized independently in accordance with Section 914.3. The downstream circuit-vented horizontal branch shall be sized for the total discharge into the branch, including the upstream branches and the fixtures within the branch.\n\n#--- 914.4 Relief vent.\n\nA relief vent shall be provided for circuit-vented horizontal branches receiving the discharge of four or more water closets and connecting to a drainage stack that receives the discharge of soil or waste from upper horizontal branches.\n\n#---- 914.4.1 Connection and installation.\n\nThe relief vent shall connect to the horizontal branch drain between the stack and the most downstream fixture drain of the circuit vent. The relief vent shall be installed in accordance with Section 905.\n\n#---- 914.4.2 Fixture drain or branch.\n\nThe relief vent is permitted to be a fixture drain or fixture branch for fixtures located within the same branch interval as the circuit-vented horizontal branch. The maximum discharge to a relief vent shall be four fixture units.\n\n#--- 914.5 Additional fixtures.\n\nFixtures, other than the circuit-vented fixtures, are permitted to discharge to the horizontal branch drain. Such fixtures shall be located on the same floor as the circuit-vented fixtures and shall be either individually or common vented.\n\nSection PC 915: Combination Waste and Vent System\n\n#--- 915.1 Types of fixtures.\n\nA combination waste and vent system shall not serve fixtures other than floor drains, lavatories and drinking fountains. Combination waste and vent systems shall not receive the discharge from a food waste disposer or clinical sink.\n\n#--- 915.2 Installation.\n\nThe combination waste and vent system shall be a horizontal piping system. The only vertical pipe of a combination waste and vent system shall be the connection between the fixture drain and the horizontal combination waste and vent pipe. The vertical distance shall not exceed 8 feet (2438 mm).\n\n#---- 915.2.1 Slope.\n\nThe slope at a horizontal combination waste and vent pipe shall not exceed one-half unit vertical in 12 units horizontal (4-percent slope) and shall not be less than indicated in Table 704.1.\n\n#---- 915.2.2 Size and length.\n\nThe size of a combination waste and vent pipe shall be not less than that indicated in Table 915.2.2. The horizontal length of a combination waste and vent system shall be unlimited.\n\nTable 915.2.2 Size of Combination Waste and Vent Pipe\n\nFor SI: 1 inch = 25.4 mm.\n\n#---- 915.2.3 Connection.\n\nThe combination waste and vent system shall be provided with a dry vent connected at any point within the system or the system shall connect to a horizontal drain that serves vented fixtures located on the same floor. Combination waste and vent systems connecting to building drains receiving only the discharge from one or more stacks shall be provided with a dry vent. The vent connection to the combination waste and vent pipe shall extend vertically to a point not less than 6 inches (152 mm) above the flood level rim of the highest fixture being vented before offsetting horizontally.\n\n#---- 915.2.4 Vent size.\n\nThe vent shall be sized for the total drainage fixture unit load in accordance with Section 906.2.\n\n#---- 915.2.5 Fixture branch or drain.\n\nThe fixture branch or fixture drain shall connect to the combination waste and vent within a distance specified in Table 909.1. The combination waste and vent pipe shall be considered the vent for the fixture.\n\nSection PC 916: Island Fixture Venting\n\n#--- 916.1 Limitation.\n\nIsland fixture venting shall not be permitted for fixtures other than sinks and lavatories. Residential kitchen sinks with a dishwasher waste connection, a food waste disposer, or both, in combination with the kitchen sink waste, shall be permitted to be vented in accordance with this section.\n\n#--- 916.2 Vent connection.\n\nThe island fixture vent shall connect to the fixture drain as required for an individual or common vent. The vent shall rise vertically to above the drainage outlet of the fixture being vented before offsetting horizontally or vertically downward. The vent or branch vent for multiple island fixture vents shall extend to a point not less than 6 inches (152 mm) above the highest island fixture being vented before connecting to the outside vent terminal.\n\n#--- 916.3 Vent installation below the fixture flood level rim.\n\nThe vent located below the flood level rim of the fixture being vented shall be installed as required for drainage piping in accordance with Chapter 7, except for sizing. The vent shall be sized in accordance with Section 906.2. The lowest point of the island fixture vent shall connect full size to the drainage system. The connection shall be to a vertical drain pipe or to the top half of a horizontal drain pipe. Cleanouts shall be provided in the island fixture vent to permit rodding of all vent piping located below the flood level rim of the fixtures. Rodding in both directions shall be permitted through a cleanout.\n\nSection PC 917: Reserved\n\nSection PC 918: Reserved\n\nSection PC 919: Engineered Vent Systems\n\n#--- 919.1 General\n\nEngineered vent systems shall comply with this section and Section 28-113.2.2 of the Administrative Code.\n\n#--- 919.2 Individual branch fixture and individual fixture header vents.\n\nThe maximum developed length of individual fixture vents to vent branches and vent headers shall be determined in accordance with Table 919.2 for the minimum pipe diameters at the indicated vent airflow rates.\n\nThe individual vent airflow rate shall be determined in accordance with the following:\n\nQh,b = Nn,bQv (Equation 9-1)\n\nFor SI: Qh,b = Nn,bQv(0.4719 L/s)\n\nwhere:\n\nNn,b = Number of fixtures per header (or vent branch) ÷ total number of fixtures connected to vent stack.\n\nQh,b = Vent branch or vent header airflow rate (cfm).\n\nQv = Total vent stack airflow rate (cfm).\n\nQv(gpm) = 27.8rs2/3 (1 - rs)D8/3\n\nQv(cfm) = 0.134Qv (gpm)\n\nwhere:\n\nD = Drainage stack diameter (inches).\n\nQw = Design discharge load (gpm).\n\nrs = Waste water flow area to total area.\n\n= Qw / 27.8D8/3\n\nIndividual vent airflow rates are obtained by equally distributing Qh,b into one-half the total number of fixtures on the branch or header for more than two fixtures; for an odd number of total fixtures, decrease by one; for one fixture, apply the full value of Qh,b.\n\nIndividual vent developed length shall be increased by 20 percent of the distance from the vent stack to the fixture vent connection on the vent branch or header.\n\nTable 919.2 Minimum Diameter and Maximum Length of Individual Branch Fixture Vents and Individual Fixture Header Vents for Smooth Pipes\n\nFor SI: 1 inch = 25.4 mm, 1 cubic foot per minute = 0.4719 L/s, 1 foot = 304.8 mm\n\n#--- 919.3 A Licensed Professional Engineer shall certify design.\n\nAn engineer shall also inspect and certify the system upon completion of the system.\n\nSection PC 920: Computerized Vent Design\n\n#--- 920.1 Design of vent system.\n\nThe sizing, design and layout of the vent system shall be permitted to be determined by computer program design methods which shall be approved by the commissioner to insure compliance with the minimum standards of this code.\n\n#--- 920.2 System capacity.\n\nThe vent system shall be based on the air capacity requirements of the drainage system under a peak load condition.\n\n#--- 920.3 Design shall be certified by a Licensed Professional Engineer.\n\nAn engineer shall also inspect and certify the system upon completion of the system.",
+  "schemaVersion": 1
 }

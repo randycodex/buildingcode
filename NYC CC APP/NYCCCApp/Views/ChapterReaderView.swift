@@ -28,6 +28,7 @@ struct ChapterReaderView: View {
     private let chapterReaderScrollTopThreshold: CGFloat = 140
     private let focusedSectionUpdateDelay: Duration = .milliseconds(70)
     private let prewarmedSectionCount = 4
+    private let backgroundPrefetchSectionLimit = 12
     private let indentStep: CGFloat = 26
 
     private var accentColor: Color {
@@ -437,17 +438,20 @@ struct ChapterReaderView: View {
             // Walk outward from the visible anchor so sections you're likely
             // to reach next get warmed first.
             var offset = 1
-            while !Task.isCancelled {
+            var prefetchedCount = 0
+            while !Task.isCancelled, prefetchedCount < backgroundPrefetchSectionLimit {
                 let forwardIndex = anchorIndex + offset
                 let backwardIndex = anchorIndex - offset
                 var didTouch = false
                 for candidate in [forwardIndex, backwardIndex] {
                     guard candidate >= summaries.startIndex, candidate < summaries.endIndex else { continue }
+                    guard prefetchedCount < backgroundPrefetchSectionLimit else { return }
                     didTouch = true
                     let id = summaries[candidate].id
                     if let detail = await library.loadSectionDetailAsync(sectionID: id) {
                         _ = await library.chapterBodyNSTextAsync(for: detail)
                     }
+                    prefetchedCount += 1
                     if Task.isCancelled { return }
                     await Task.yield()
                 }
@@ -713,7 +717,17 @@ private struct ChapterBlockBodyView: View {
 
     var body: some View {
         Group {
-            if let detail, let bodyText, !bodyText.string.isEmpty {
+            if let detail, !detail.contentBlocks.isEmpty {
+                ContentBlockListView(
+                    detail: detail,
+                    fallbackText: bodyText ?? NSAttributedString(string: ""),
+                    onOpenImage: onOpenImage,
+                    onContentTap: {
+                        onOpenNotes?(detail)
+                    },
+                    onSelectionChange: onSelectionChange
+                )
+            } else if let detail, let bodyText, !bodyText.string.isEmpty {
                 ContentBlockListView(
                     detail: detail,
                     fallbackText: bodyText,

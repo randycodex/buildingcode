@@ -1,1051 +1,1051 @@
 {
-  "chapterID" : 14,
-  "chapterNumber" : "14",
-  "groups" : [
+  "chapterID": 14,
+  "chapterNumber": "14",
+  "groups": [
     {
-      "headerLine" : "SECTION 1401",
-      "headingLine" : "GENERAL",
-      "id" : "SECTION 1401",
-      "sections" : [
+      "headerLine": "SECTION BC 1401",
+      "headingLine": "GENERAL",
+      "id": "SECTION BC 1401",
+      "sections": [
         {
-          "id" : 3056,
-          "kind" : "title",
-          "sectionNumber" : "1401.1",
-          "title" : "1401.1 Scope."
+          "id": 3056,
+          "kind": "title",
+          "sectionNumber": "1401.1",
+          "title": "1401.1 Scope."
         },
         {
-          "id" : 3057,
-          "kind" : "title",
-          "sectionNumber" : "1401.2",
-          "title" : "1401.2 Construction documents."
+          "id": 3057,
+          "kind": "title",
+          "sectionNumber": "1401.2",
+          "title": "1401.2 Construction documents."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1402",
-      "headingLine" : "DEFINITIONS",
-      "id" : "SECTION 1402",
-      "sections" : [
+      "headerLine": "SECTION BC 1402",
+      "headingLine": "DEFINITIONS",
+      "id": "SECTION BC 1402",
+      "sections": [
         {
-          "id" : 3058,
-          "kind" : "title",
-          "sectionNumber" : "1402.1",
-          "title" : "1402.1 Definitions."
+          "id": 3058,
+          "kind": "title",
+          "sectionNumber": "1402.1",
+          "title": "1402.1 Definitions."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1403",
-      "headingLine" : "PERFORMANCE REQUIREMENTS",
-      "id" : "SECTION 1403",
-      "sections" : [
+      "headerLine": "SECTION BC 1403",
+      "headingLine": "PERFORMANCE REQUIREMENTS",
+      "id": "SECTION BC 1403",
+      "sections": [
         {
-          "id" : 3059,
-          "kind" : "title",
-          "sectionNumber" : "1403.1",
-          "title" : "1403.1 General."
+          "id": 3059,
+          "kind": "title",
+          "sectionNumber": "1403.1",
+          "title": "1403.1 General."
         },
         {
-          "id" : 3060,
-          "kind" : "title",
-          "sectionNumber" : "1403.2",
-          "title" : "1403.2 Weather protection."
+          "id": 3060,
+          "kind": "title",
+          "sectionNumber": "1403.2",
+          "title": "1403.2 Weather protection."
         },
         {
-          "id" : 3061,
-          "kind" : "title",
-          "sectionNumber" : "2.1.",
-          "title" : "2.1. Exterior wall envelope test assemblies shall include at least one opening, one control joint, and where required one wall\/eave interface and one wall sill. Tested openings and penetrations shall be representative of the intended end-use configuration."
+          "id": 3061,
+          "kind": "title",
+          "sectionNumber": "2.1.",
+          "title": "2.1. Exterior wall envelope test assemblies shall include at least one opening, one control joint, and where required one wall/eave interface and one wall sill. Tested openings and penetrations shall be representative of the intended end-use configuration."
         },
         {
-          "id" : 3062,
-          "kind" : "title",
-          "sectionNumber" : "2.2.",
-          "title" : "2.2. Exterior wall envelope test assemblies shall be at least 4 feet by 8 feet (1220 mm by 2438.4 mm) in size."
+          "id": 3062,
+          "kind": "title",
+          "sectionNumber": "2.2.",
+          "title": "2.2. Exterior wall envelope test assemblies shall be at least 4 feet by 8 feet (1220 mm by 2438.4 mm) in size."
         },
         {
-          "id" : 3063,
-          "kind" : "title",
-          "sectionNumber" : "2.3.",
-          "title" : "2.3. Exterior wall envelope assemblies shall be tested at a minimum differential pressure of 6.24 pounds per square foot (psf) (0.297 kN\/m 2 ) for a duration of 2 hours. The exterior wall envelope assemblies shall also be tested at a minimum differential pressure not less than 20 percent of the positive design wind load as calculated per Chapter 16, or 15 pounds per square foot (psf) (0.718 kN\/m 2 for a duration of 15 minutes."
+          "id": 3063,
+          "kind": "title",
+          "sectionNumber": "2.3.",
+          "title": "2.3. Exterior wall envelope assemblies shall be tested at a minimum differential pressure of 6.24 pounds per square foot (psf) (0.297 kN/m 2 ) for a duration of 2 hours. The exterior wall envelope assemblies shall also be tested at a minimum differential pressure not less than 20 percent of the positive design wind load as calculated per Chapter 16, or 15 pounds per square foot (psf) (0.718 kN/m 2 for a duration of 15 minutes."
         },
         {
-          "id" : 3064,
-          "kind" : "title",
-          "sectionNumber" : "2.4.",
-          "title" : "2.4. The exterior wall envelope design shall be considered to resist wind-driven rain where the results of testing indicate that water did not penetrate the test assembly including control joints in the exterior wall envelope, joints at the perimeter of openings or intersections of terminations with dissimilar materials."
+          "id": 3064,
+          "kind": "title",
+          "sectionNumber": "2.4.",
+          "title": "2.4. The exterior wall envelope design shall be considered to resist wind-driven rain where the results of testing indicate that water did not penetrate the test assembly including control joints in the exterior wall envelope, joints at the perimeter of openings or intersections of terminations with dissimilar materials."
         },
         {
-          "id" : 3065,
-          "kind" : "title",
-          "sectionNumber" : "1403.3",
-          "title" : "1403.3 Structural."
+          "id": 3065,
+          "kind": "title",
+          "sectionNumber": "1403.3",
+          "title": "1403.3 Structural."
         },
         {
-          "id" : 3066,
-          "kind" : "title",
-          "sectionNumber" : "1403.4",
-          "title" : "1403.4 Fire resistance."
+          "id": 3066,
+          "kind": "title",
+          "sectionNumber": "1403.4",
+          "title": "1403.4 Fire resistance."
         },
         {
-          "id" : 3067,
-          "kind" : "title",
-          "sectionNumber" : "1403.5",
-          "title" : "1403.5 Vertical and lateral flame propagation."
+          "id": 3067,
+          "kind": "title",
+          "sectionNumber": "1403.5",
+          "title": "1403.5 Vertical and lateral flame propagation."
         },
         {
-          "id" : 3068,
-          "kind" : "title",
-          "sectionNumber" : "1403.5.1",
-          "title" : "1403.5.1 Exterior walls with water-resistive barriers."
+          "id": 3068,
+          "kind": "title",
+          "sectionNumber": "1403.5.1",
+          "title": "1403.5.1 Exterior walls with water-resistive barriers."
         },
         {
-          "id" : 3069,
-          "kind" : "title",
-          "sectionNumber" : "1403.6",
-          "title" : "1403.6 Flood resistance."
+          "id": 3069,
+          "kind": "title",
+          "sectionNumber": "1403.6",
+          "title": "1403.6 Flood resistance."
         },
         {
-          "id" : 3070,
-          "kind" : "title",
-          "sectionNumber" : "1403.7",
-          "title" : "1403.7 Thermal and condensation resistance."
+          "id": 3070,
+          "kind": "title",
+          "sectionNumber": "1403.7",
+          "title": "1403.7 Thermal and condensation resistance."
         },
         {
-          "id" : 3071,
-          "kind" : "title",
-          "sectionNumber" : "1403.8",
-          "title" : "1403.8 Bird friendly materials."
+          "id": 3071,
+          "kind": "title",
+          "sectionNumber": "1403.8",
+          "title": "1403.8 Bird friendly materials."
         },
         {
-          "id" : 3072,
-          "kind" : "title",
-          "sectionNumber" : "1403.8.1",
-          "title" : "1403.8.1 Exterior wall envelope."
+          "id": 3072,
+          "kind": "title",
+          "sectionNumber": "1403.8.1",
+          "title": "1403.8.1 Exterior wall envelope."
         },
         {
-          "id" : 3073,
-          "kind" : "title",
-          "sectionNumber" : "1403.8.2",
-          "title" : "1403.8.2 Bird hazard installations."
+          "id": 3073,
+          "kind": "title",
+          "sectionNumber": "1403.8.2",
+          "title": "1403.8.2 Bird hazard installations."
         },
         {
-          "id" : 3074,
-          "kind" : "title",
-          "sectionNumber" : "1403.8.3",
-          "title" : "1403.8.3 Fly-through conditions."
+          "id": 3074,
+          "kind": "title",
+          "sectionNumber": "1403.8.3",
+          "title": "1403.8.3 Fly-through conditions."
         },
         {
-          "id" : 3075,
-          "kind" : "title",
-          "sectionNumber" : "1403.8.4",
-          "title" : "1403.8.4 Adjacency to green roofs."
+          "id": 3075,
+          "kind": "title",
+          "sectionNumber": "1403.8.4",
+          "title": "1403.8.4 Adjacency to green roofs."
         },
         {
-          "id" : 3076,
-          "kind" : "title",
-          "sectionNumber" : "1403.9",
-          "title" : "1403.9 Air barrier."
+          "id": 3076,
+          "kind": "title",
+          "sectionNumber": "1403.9",
+          "title": "1403.9 Air barrier."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1404",
-      "headingLine" : "MATERIALS",
-      "id" : "SECTION 1404",
-      "sections" : [
+      "headerLine": "SECTION BC 1404",
+      "headingLine": "MATERIALS",
+      "id": "SECTION BC 1404",
+      "sections": [
         {
-          "id" : 3077,
-          "kind" : "title",
-          "sectionNumber" : "1404.1",
-          "title" : "1404.1 General."
+          "id": 3077,
+          "kind": "title",
+          "sectionNumber": "1404.1",
+          "title": "1404.1 General."
         },
         {
-          "id" : 3078,
-          "kind" : "title",
-          "sectionNumber" : "1404.2",
-          "title" : "1404.2 Water-resistive barrier."
+          "id": 3078,
+          "kind": "title",
+          "sectionNumber": "1404.2",
+          "title": "1404.2 Water-resistive barrier."
         },
         {
-          "id" : 3079,
-          "kind" : "title",
-          "sectionNumber" : "1404.3",
-          "title" : "1404.3 Wood."
+          "id": 3079,
+          "kind": "title",
+          "sectionNumber": "1404.3",
+          "title": "1404.3 Wood."
         },
         {
-          "id" : 3080,
-          "kind" : "title",
-          "sectionNumber" : "1404.3.1",
-          "title" : "1404.3.1 Basic hardboard."
+          "id": 3080,
+          "kind": "title",
+          "sectionNumber": "1404.3.1",
+          "title": "1404.3.1 Basic hardboard."
         },
         {
-          "id" : 3081,
-          "kind" : "title",
-          "sectionNumber" : "1404.3.2",
-          "title" : "1404.3.2 Hardboard siding."
+          "id": 3081,
+          "kind": "title",
+          "sectionNumber": "1404.3.2",
+          "title": "1404.3.2 Hardboard siding."
         },
         {
-          "id" : 3082,
-          "kind" : "title",
-          "sectionNumber" : "1404.4",
-          "title" : "1404.4 Masonry."
+          "id": 3082,
+          "kind": "title",
+          "sectionNumber": "1404.4",
+          "title": "1404.4 Masonry."
         },
         {
-          "id" : 3083,
-          "kind" : "title",
-          "sectionNumber" : "1404.5",
-          "title" : "1404.5 Metal."
+          "id": 3083,
+          "kind": "title",
+          "sectionNumber": "1404.5",
+          "title": "1404.5 Metal."
         },
         {
-          "id" : 3084,
-          "kind" : "title",
-          "sectionNumber" : "1404.5.1",
-          "title" : "1404.5.1 Aluminum siding."
+          "id": 3084,
+          "kind": "title",
+          "sectionNumber": "1404.5.1",
+          "title": "1404.5.1 Aluminum siding."
         },
         {
-          "id" : 3085,
-          "kind" : "title",
-          "sectionNumber" : "1404.5.2",
-          "title" : "1404.5.2 Cold-rolled copper."
+          "id": 3085,
+          "kind": "title",
+          "sectionNumber": "1404.5.2",
+          "title": "1404.5.2 Cold-rolled copper."
         },
         {
-          "id" : 3086,
-          "kind" : "title",
-          "sectionNumber" : "1404.5.3",
-          "title" : "1404.5.3 Lead-coated copper."
+          "id": 3086,
+          "kind": "title",
+          "sectionNumber": "1404.5.3",
+          "title": "1404.5.3 Lead-coated copper."
         },
         {
-          "id" : 3087,
-          "kind" : "title",
-          "sectionNumber" : "1404.6",
-          "title" : "1404.6 Concrete."
+          "id": 3087,
+          "kind": "title",
+          "sectionNumber": "1404.6",
+          "title": "1404.6 Concrete."
         },
         {
-          "id" : 3088,
-          "kind" : "title",
-          "sectionNumber" : "1404.7",
-          "title" : "1404.7 Glass-unit masonry."
+          "id": 3088,
+          "kind": "title",
+          "sectionNumber": "1404.7",
+          "title": "1404.7 Glass-unit masonry."
         },
         {
-          "id" : 3089,
-          "kind" : "title",
-          "sectionNumber" : "1404.8",
-          "title" : "1404.8 Plastics."
+          "id": 3089,
+          "kind": "title",
+          "sectionNumber": "1404.8",
+          "title": "1404.8 Plastics."
         },
         {
-          "id" : 3090,
-          "kind" : "title",
-          "sectionNumber" : "1404.9",
-          "title" : "1404.9 Vinyl siding."
+          "id": 3090,
+          "kind": "title",
+          "sectionNumber": "1404.9",
+          "title": "1404.9 Vinyl siding."
         },
         {
-          "id" : 3091,
-          "kind" : "title",
-          "sectionNumber" : "1404.10",
-          "title" : "1404.10 Fiber-cement siding."
+          "id": 3091,
+          "kind": "title",
+          "sectionNumber": "1404.10",
+          "title": "1404.10 Fiber-cement siding."
         },
         {
-          "id" : 3092,
-          "kind" : "title",
-          "sectionNumber" : "1404.11",
-          "title" : "1404.11 Exterior insulation finish system (EIFS)."
+          "id": 3092,
+          "kind": "title",
+          "sectionNumber": "1404.11",
+          "title": "1404.11 Exterior insulation finish system (EIFS)."
         },
         {
-          "id" : 3093,
-          "kind" : "title",
-          "sectionNumber" : "1404.12",
-          "title" : "1404.12 Polypropylene siding."
+          "id": 3093,
+          "kind": "title",
+          "sectionNumber": "1404.12",
+          "title": "1404.12 Polypropylene siding."
         },
         {
-          "id" : 3094,
-          "kind" : "title",
-          "sectionNumber" : "1404.12.1",
-          "title" : "1404.12.1 Flame spread index."
+          "id": 3094,
+          "kind": "title",
+          "sectionNumber": "1404.12.1",
+          "title": "1404.12.1 Flame spread index."
         },
         {
-          "id" : 3095,
-          "kind" : "title",
-          "sectionNumber" : "1404.12.2",
-          "title" : "1404.12.2 Distance between adjacent buildings."
+          "id": 3095,
+          "kind": "title",
+          "sectionNumber": "1404.12.2",
+          "title": "1404.12.2 Distance between adjacent buildings."
         },
         {
-          "id" : 3096,
-          "kind" : "title",
-          "sectionNumber" : "1404.13",
-          "title" : "1404.13 Foam plastic insulation."
+          "id": 3096,
+          "kind": "title",
+          "sectionNumber": "1404.13",
+          "title": "1404.13 Foam plastic insulation."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1405",
-      "headingLine" : "INSTALLATION OF WALL COVERINGS",
-      "id" : "SECTION 1405",
-      "sections" : [
+      "headerLine": "SECTION BC 1405",
+      "headingLine": "INSTALLATION OF WALL COVERINGS",
+      "id": "SECTION BC 1405",
+      "sections": [
         {
-          "id" : 3097,
-          "kind" : "title",
-          "sectionNumber" : "1405.1",
-          "title" : "1405.1 General."
+          "id": 3097,
+          "kind": "title",
+          "sectionNumber": "1405.1",
+          "title": "1405.1 General."
         },
         {
-          "id" : 3098,
-          "kind" : "title",
-          "sectionNumber" : "1405.2",
-          "title" : "1405.2 Weather protection."
+          "id": 3098,
+          "kind": "title",
+          "sectionNumber": "1405.2",
+          "title": "1405.2 Weather protection."
         },
         {
-          "id" : 3099,
-          "kind" : "title",
-          "sectionNumber" : "1405.3",
-          "title" : "1405.3 Vapor retarders."
+          "id": 3099,
+          "kind": "title",
+          "sectionNumber": "1405.3",
+          "title": "1405.3 Vapor retarders."
         },
         {
-          "id" : 3100,
-          "kind" : "title",
-          "sectionNumber" : "1405.3.1",
-          "title" : "1405.3.1 Reserved."
+          "id": 3100,
+          "kind": "title",
+          "sectionNumber": "1405.3.1",
+          "title": "1405.3.1 Reserved."
         },
         {
-          "id" : 3101,
-          "kind" : "title",
-          "sectionNumber" : "1405.3.2",
-          "title" : "1405.3.2 Reserved."
+          "id": 3101,
+          "kind": "title",
+          "sectionNumber": "1405.3.2",
+          "title": "1405.3.2 Reserved."
         },
         {
-          "id" : 3102,
-          "kind" : "title",
-          "sectionNumber" : "1405.3.3",
-          "title" : "1405.3.3 Material vapor retarder class."
+          "id": 3102,
+          "kind": "title",
+          "sectionNumber": "1405.3.3",
+          "title": "1405.3.3 Material vapor retarder class."
         },
         {
-          "id" : 3103,
-          "kind" : "title",
-          "sectionNumber" : "1405.3.4",
-          "title" : "1405.3.4 Minimum clear airspaces and vented openings for vented cladding."
+          "id": 3103,
+          "kind": "title",
+          "sectionNumber": "1405.3.4",
+          "title": "1405.3.4 Minimum clear airspaces and vented openings for vented cladding."
         },
         {
-          "id" : 3104,
-          "kind" : "title",
-          "sectionNumber" : "1405.4",
-          "title" : "1405.4 Flashing."
+          "id": 3104,
+          "kind": "title",
+          "sectionNumber": "1405.4",
+          "title": "1405.4 Flashing."
         },
         {
-          "id" : 3105,
-          "kind" : "title",
-          "sectionNumber" : "1405.4.1",
-          "title" : "1405.4.1 Exterior wall pockets."
+          "id": 3105,
+          "kind": "title",
+          "sectionNumber": "1405.4.1",
+          "title": "1405.4.1 Exterior wall pockets."
         },
         {
-          "id" : 3106,
-          "kind" : "title",
-          "sectionNumber" : "1405.4.2",
-          "title" : "1405.4.2 Masonry."
+          "id": 3106,
+          "kind": "title",
+          "sectionNumber": "1405.4.2",
+          "title": "1405.4.2 Masonry."
         },
         {
-          "id" : 3107,
-          "kind" : "title",
-          "sectionNumber" : "1405.5",
-          "title" : "1405.5 Wood veneers."
+          "id": 3107,
+          "kind": "title",
+          "sectionNumber": "1405.5",
+          "title": "1405.5 Wood veneers."
         },
         {
-          "id" : 3108,
-          "kind" : "title",
-          "sectionNumber" : "1405.6",
-          "title" : "1405.6 Anchored masonry veneer."
+          "id": 3108,
+          "kind": "title",
+          "sectionNumber": "1405.6",
+          "title": "1405.6 Anchored masonry veneer."
         },
         {
-          "id" : 3109,
-          "kind" : "title",
-          "sectionNumber" : "1405.6.1",
-          "title" : "1405.6.1 Tolerances."
+          "id": 3109,
+          "kind": "title",
+          "sectionNumber": "1405.6.1",
+          "title": "1405.6.1 Tolerances."
         },
         {
-          "id" : 3110,
-          "kind" : "title",
-          "sectionNumber" : "1405.6.2",
-          "title" : "1405.6.2 Seismic requirements."
+          "id": 3110,
+          "kind": "title",
+          "sectionNumber": "1405.6.2",
+          "title": "1405.6.2 Seismic requirements."
         },
         {
-          "id" : 3111,
-          "kind" : "title",
-          "sectionNumber" : "1405.7",
-          "title" : "1405.7 Stone veneer."
+          "id": 3111,
+          "kind": "title",
+          "sectionNumber": "1405.7",
+          "title": "1405.7 Stone veneer."
         },
         {
-          "id" : 3112,
-          "kind" : "title",
-          "sectionNumber" : "1405.8",
-          "title" : "1405.8 Slab-type veneer."
+          "id": 3112,
+          "kind": "title",
+          "sectionNumber": "1405.8",
+          "title": "1405.8 Slab-type veneer."
         },
         {
-          "id" : 3113,
-          "kind" : "title",
-          "sectionNumber" : "1405.9",
-          "title" : "1405.9 Terra cotta."
+          "id": 3113,
+          "kind": "title",
+          "sectionNumber": "1405.9",
+          "title": "1405.9 Terra cotta."
         },
         {
-          "id" : 3114,
-          "kind" : "title",
-          "sectionNumber" : "1405.10",
-          "title" : "1405.10 Adhered masonry veneer."
+          "id": 3114,
+          "kind": "title",
+          "sectionNumber": "1405.10",
+          "title": "1405.10 Adhered masonry veneer."
         },
         {
-          "id" : 3115,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1",
-          "title" : "1405.10.1 Exterior adhered masonry veneer."
+          "id": 3115,
+          "kind": "title",
+          "sectionNumber": "1405.10.1",
+          "title": "1405.10.1 Exterior adhered masonry veneer."
         },
         {
-          "id" : 3116,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.1",
-          "title" : "1405.10.1.1 Water-resistive barriers."
+          "id": 3116,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.1",
+          "title": "1405.10.1.1 Water-resistive barriers."
         },
         {
-          "id" : 3117,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.2",
-          "title" : "1405.10.1.2 Flashing."
+          "id": 3117,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.2",
+          "title": "1405.10.1.2 Flashing."
         },
         {
-          "id" : 3118,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.2.1",
-          "title" : "1405.10.1.2.1 Flashing at foundation."
+          "id": 3118,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.2.1",
+          "title": "1405.10.1.2.1 Flashing at foundation."
         },
         {
-          "id" : 3119,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.3",
-          "title" : "1405.10.1.3 Clearances."
+          "id": 3119,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.3",
+          "title": "1405.10.1.3 Clearances."
         },
         {
-          "id" : 3120,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.4",
-          "title" : "1405.10.1.4 Adhered masonry veneer installed with lath and mortar."
+          "id": 3120,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.4",
+          "title": "1405.10.1.4 Adhered masonry veneer installed with lath and mortar."
         },
         {
-          "id" : 3121,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.4.1",
-          "title" : "1405.10.1.4.1 Lathing."
+          "id": 3121,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.4.1",
+          "title": "1405.10.1.4.1 Lathing."
         },
         {
-          "id" : 3122,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.4.2",
-          "title" : "1405.10.1.4.2 Scratch coat."
+          "id": 3122,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.4.2",
+          "title": "1405.10.1.4.2 Scratch coat."
         },
         {
-          "id" : 3123,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.4.3",
-          "title" : "1405.10.1.4.3 Adhering veneer."
+          "id": 3123,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.4.3",
+          "title": "1405.10.1.4.3 Adhering veneer."
         },
         {
-          "id" : 3124,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.5",
-          "title" : "1405.10.1.5 Adhered masonry veneer applied directly to masonry and concrete."
+          "id": 3124,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.5",
+          "title": "1405.10.1.5 Adhered masonry veneer applied directly to masonry and concrete."
         },
         {
-          "id" : 3125,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.6",
-          "title" : "1405.10.1.6 Cold weather construction."
+          "id": 3125,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.6",
+          "title": "1405.10.1.6 Cold weather construction."
         },
         {
-          "id" : 3126,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.1.7",
-          "title" : "1405.10.1.7 Hot weather construction."
+          "id": 3126,
+          "kind": "title",
+          "sectionNumber": "1405.10.1.7",
+          "title": "1405.10.1.7 Hot weather construction."
         },
         {
-          "id" : 3127,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.2",
-          "title" : "1405.10.2 Exterior adhered masonry veneers – porcelain tile."
+          "id": 3127,
+          "kind": "title",
+          "sectionNumber": "1405.10.2",
+          "title": "1405.10.2 Exterior adhered masonry veneers – porcelain tile."
         },
         {
-          "id" : 3128,
-          "kind" : "title",
-          "sectionNumber" : "1405.10.3",
-          "title" : "1405.10.3 Interior adhered masonry veneers."
+          "id": 3128,
+          "kind": "title",
+          "sectionNumber": "1405.10.3",
+          "title": "1405.10.3 Interior adhered masonry veneers."
         },
         {
-          "id" : 3129,
-          "kind" : "title",
-          "sectionNumber" : "1405.11",
-          "title" : "1405.11 Metal veneers."
+          "id": 3129,
+          "kind": "title",
+          "sectionNumber": "1405.11",
+          "title": "1405.11 Metal veneers."
         },
         {
-          "id" : 3130,
-          "kind" : "title",
-          "sectionNumber" : "1405.11.1",
-          "title" : "1405.11.1 Attachment."
+          "id": 3130,
+          "kind": "title",
+          "sectionNumber": "1405.11.1",
+          "title": "1405.11.1 Attachment."
         },
         {
-          "id" : 3131,
-          "kind" : "title",
-          "sectionNumber" : "1405.11.2",
-          "title" : "1405.11.2 Weather protection."
+          "id": 3131,
+          "kind": "title",
+          "sectionNumber": "1405.11.2",
+          "title": "1405.11.2 Weather protection."
         },
         {
-          "id" : 3132,
-          "kind" : "title",
-          "sectionNumber" : "1405.11.3",
-          "title" : "1405.11.3 Backup."
+          "id": 3132,
+          "kind": "title",
+          "sectionNumber": "1405.11.3",
+          "title": "1405.11.3 Backup."
         },
         {
-          "id" : 3133,
-          "kind" : "title",
-          "sectionNumber" : "1405.11.4",
-          "title" : "1405.11.4 Grounding."
+          "id": 3133,
+          "kind": "title",
+          "sectionNumber": "1405.11.4",
+          "title": "1405.11.4 Grounding."
         },
         {
-          "id" : 3134,
-          "kind" : "title",
-          "sectionNumber" : "1405.12",
-          "title" : "1405.12 Thin exterior structural glass veneer."
+          "id": 3134,
+          "kind": "title",
+          "sectionNumber": "1405.12",
+          "title": "1405.12 Thin exterior structural glass veneer."
         },
         {
-          "id" : 3135,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.1",
-          "title" : "1405.12.1 Length and height."
+          "id": 3135,
+          "kind": "title",
+          "sectionNumber": "1405.12.1",
+          "title": "1405.12.1 Length and height."
         },
         {
-          "id" : 3136,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.2",
-          "title" : "1405.12.2 Thickness."
+          "id": 3136,
+          "kind": "title",
+          "sectionNumber": "1405.12.2",
+          "title": "1405.12.2 Thickness."
         },
         {
-          "id" : 3137,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.3",
-          "title" : "1405.12.3 Application."
+          "id": 3137,
+          "kind": "title",
+          "sectionNumber": "1405.12.3",
+          "title": "1405.12.3 Application."
         },
         {
-          "id" : 3138,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.4",
-          "title" : "1405.12.4 Installation at sidewalk level."
+          "id": 3138,
+          "kind": "title",
+          "sectionNumber": "1405.12.4",
+          "title": "1405.12.4 Installation at sidewalk level."
         },
         {
-          "id" : 3139,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.4.1",
-          "title" : "1405.12.4.1 Installation above sidewalk level."
+          "id": 3139,
+          "kind": "title",
+          "sectionNumber": "1405.12.4.1",
+          "title": "1405.12.4.1 Installation above sidewalk level."
         },
         {
-          "id" : 3140,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.5",
-          "title" : "1405.12.5 Joints."
+          "id": 3140,
+          "kind": "title",
+          "sectionNumber": "1405.12.5",
+          "title": "1405.12.5 Joints."
         },
         {
-          "id" : 3141,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.6",
-          "title" : "1405.12.6 Mechanical fastenings."
+          "id": 3141,
+          "kind": "title",
+          "sectionNumber": "1405.12.6",
+          "title": "1405.12.6 Mechanical fastenings."
         },
         {
-          "id" : 3142,
-          "kind" : "title",
-          "sectionNumber" : "1405.12.7",
-          "title" : "1405.12.7 Flashing."
+          "id": 3142,
+          "kind": "title",
+          "sectionNumber": "1405.12.7",
+          "title": "1405.12.7 Flashing."
         },
         {
-          "id" : 3143,
-          "kind" : "title",
-          "sectionNumber" : "1405.13",
-          "title" : "1405.13 Exterior windows and doors."
+          "id": 3143,
+          "kind": "title",
+          "sectionNumber": "1405.13",
+          "title": "1405.13 Exterior windows and doors."
         },
         {
-          "id" : 3144,
-          "kind" : "title",
-          "sectionNumber" : "1405.13.1",
-          "title" : "1405.13.1 Installation."
+          "id": 3144,
+          "kind": "title",
+          "sectionNumber": "1405.13.1",
+          "title": "1405.13.1 Installation."
         },
         {
-          "id" : 3145,
-          "kind" : "title",
-          "sectionNumber" : "1405.13.2",
-          "title" : "1405.13.2 Windows in Group R-2 and R-3 occupancies."
+          "id": 3145,
+          "kind": "title",
+          "sectionNumber": "1405.13.2",
+          "title": "1405.13.2 Windows in Group R-2 and R-3 occupancies."
         },
         {
-          "id" : 3146,
-          "kind" : "title",
-          "sectionNumber" : "1405.13.3",
-          "title" : "1405.13.3 Windows in R-2 Occupancy."
+          "id": 3146,
+          "kind": "title",
+          "sectionNumber": "1405.13.3",
+          "title": "1405.13.3 Windows in R-2 Occupancy."
         },
         {
-          "id" : 3147,
-          "kind" : "title",
-          "sectionNumber" : "1405.14",
-          "title" : "1405.14 Vinyl siding."
+          "id": 3147,
+          "kind": "title",
+          "sectionNumber": "1405.14",
+          "title": "1405.14 Vinyl siding."
         },
         {
-          "id" : 3148,
-          "kind" : "title",
-          "sectionNumber" : "1405.14.1",
-          "title" : "1405.14.1 Application."
+          "id": 3148,
+          "kind": "title",
+          "sectionNumber": "1405.14.1",
+          "title": "1405.14.1 Application."
         },
         {
-          "id" : 3149,
-          "kind" : "title",
-          "sectionNumber" : "1405.15",
-          "title" : "1405.15 Cement plaster."
+          "id": 3149,
+          "kind": "title",
+          "sectionNumber": "1405.15",
+          "title": "1405.15 Cement plaster."
         },
         {
-          "id" : 3150,
-          "kind" : "title",
-          "sectionNumber" : "1405.16",
-          "title" : "1405.16 Fiber-cement siding."
+          "id": 3150,
+          "kind": "title",
+          "sectionNumber": "1405.16",
+          "title": "1405.16 Fiber-cement siding."
         },
         {
-          "id" : 3151,
-          "kind" : "title",
-          "sectionNumber" : "1405.16.1",
-          "title" : "1405.16.1 Panel siding."
+          "id": 3151,
+          "kind": "title",
+          "sectionNumber": "1405.16.1",
+          "title": "1405.16.1 Panel siding."
         },
         {
-          "id" : 3152,
-          "kind" : "title",
-          "sectionNumber" : "1405.16.2",
-          "title" : "1405.16.2 Lap siding."
+          "id": 3152,
+          "kind": "title",
+          "sectionNumber": "1405.16.2",
+          "title": "1405.16.2 Lap siding."
         },
         {
-          "id" : 3153,
-          "kind" : "title",
-          "sectionNumber" : "1405.17",
-          "title" : "1405.17 Fastening."
+          "id": 3153,
+          "kind": "title",
+          "sectionNumber": "1405.17",
+          "title": "1405.17 Fastening."
         },
         {
-          "id" : 3154,
-          "kind" : "title",
-          "sectionNumber" : "1405.18",
-          "title" : "1405.18 Polypropylene siding."
+          "id": 3154,
+          "kind": "title",
+          "sectionNumber": "1405.18",
+          "title": "1405.18 Polypropylene siding."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1406",
-      "headingLine" : "COMBUSTIBLE MATERIALS ON THE EXTERIOR SIDE OF EXTERIOR WALLS",
-      "id" : "SECTION 1406",
-      "sections" : [
+      "headerLine": "SECTION BC 1406",
+      "headingLine": "COMBUSTIBLE MATERIALS ON THE EXTERIOR SIDE OF EXTERIOR WALLS",
+      "id": "SECTION BC 1406",
+      "sections": [
         {
-          "id" : 3155,
-          "kind" : "title",
-          "sectionNumber" : "1406.1",
-          "title" : "1406.1 General."
+          "id": 3155,
+          "kind": "title",
+          "sectionNumber": "1406.1",
+          "title": "1406.1 General."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1406",
-      "headingLine" : "SHALL APPLY TO EXTERIOR WALL COVERINGS, EXTERIOR BALCONIES AND SIMILAR PROJECTIONS, BAY AND ORIEL WINDOWS, DECKS, PORCHES, PORTICOS, ENTRANCEWAYS, AND STORM ENCLOSURES CONSTRUCTED OF COMBUSTIBLE MATERIALS. COMBUSTIBLE WATER-RESISTIVE BARRIERS COMPLYING WITH SECTION 1403.5.1 SHALL BE PERMITTED IN EXTERIOR WALL COVERINGS. FIREBLOCKING SHALL BE INSTALLED IN ACCORDANCE WITH SECTION 1406.2.3. EXISTING BUILDING RETROFITS UTILIZING COMBUSTIBLE EXTERIOR WALL COVERINGS SHALL ALSO COMPLY WITH SECTION 1406.5. COMBUSTIBLE EXTERIOR WALL COVERINGS SHALL BE SUBJECT TO THE SPECIAL INSPECTION REQUIREMENTS OF SECTION 1705.16.",
-      "id" : "SECTION 1406",
-      "sections" : [
+      "headerLine": "SECTION 1406",
+      "headingLine": "SHALL APPLY TO EXTERIOR WALL COVERINGS, EXTERIOR BALCONIES AND SIMILAR PROJECTIONS, BAY AND ORIEL WINDOWS, DECKS, PORCHES, PORTICOS, ENTRANCEWAYS, AND STORM ENCLOSURES CONSTRUCTED OF COMBUSTIBLE MATERIALS. COMBUSTIBLE WATER-RESISTIVE BARRIERS COMPLYING WITH SECTION 1403.5.1 SHALL BE PERMITTED IN EXTERIOR WALL COVERINGS. FIREBLOCKING SHALL BE INSTALLED IN ACCORDANCE WITH SECTION 1406.2.3. EXISTING BUILDING RETROFITS UTILIZING COMBUSTIBLE EXTERIOR WALL COVERINGS SHALL ALSO COMPLY WITH SECTION 1406.5. COMBUSTIBLE EXTERIOR WALL COVERINGS SHALL BE SUBJECT TO THE SPECIAL INSPECTION REQUIREMENTS OF SECTION 1705.16.",
+      "id": "SECTION 1406",
+      "sections": [
         {
-          "id" : 3156,
-          "kind" : "title",
-          "sectionNumber" : "1406.2",
-          "title" : "1406.2 Combustible exterior wall coverings."
+          "id": 3156,
+          "kind": "title",
+          "sectionNumber": "1406.2",
+          "title": "1406.2 Combustible exterior wall coverings."
         },
         {
-          "id" : 3157,
-          "kind" : "title",
-          "sectionNumber" : "1406.2.1",
-          "title" : "1406.2.1 Type I, II, III and IV construction."
+          "id": 3157,
+          "kind": "title",
+          "sectionNumber": "1406.2.1",
+          "title": "1406.2.1 Type I, II, III and IV construction."
         },
         {
-          "id" : 3158,
-          "kind" : "title",
-          "sectionNumber" : "1406.2.1.1",
-          "title" : "1406.2.1.1 Ignition resistance."
+          "id": 3158,
+          "kind": "title",
+          "sectionNumber": "1406.2.1.1",
+          "title": "1406.2.1.1 Ignition resistance."
         },
         {
-          "id" : 3159,
-          "kind" : "title",
-          "sectionNumber" : "1406.2.1.1.1",
-          "title" : "1406.2.1.1.1 Fire separation 5 feet or less."
+          "id": 3159,
+          "kind": "title",
+          "sectionNumber": "1406.2.1.1.1",
+          "title": "1406.2.1.1.1 Fire separation 5 feet or less."
         },
         {
-          "id" : 3160,
-          "kind" : "title",
-          "sectionNumber" : "1406.2.1.1.2",
-          "title" : "1406.2.1.1.2 Fire separation greater than 5 feet."
+          "id": 3160,
+          "kind": "title",
+          "sectionNumber": "1406.2.1.1.2",
+          "title": "1406.2.1.1.2 Fire separation greater than 5 feet."
         },
         {
-          "id" : 3161,
-          "kind" : "title",
-          "sectionNumber" : "1406.2.2",
-          "title" : "1406.2.2 Location."
+          "id": 3161,
+          "kind": "title",
+          "sectionNumber": "1406.2.2",
+          "title": "1406.2.2 Location."
         },
         {
-          "id" : 3162,
-          "kind" : "title",
-          "sectionNumber" : "1406.2.3",
-          "title" : "1406.2.3 Fireblocking."
+          "id": 3162,
+          "kind": "title",
+          "sectionNumber": "1406.2.3",
+          "title": "1406.2.3 Fireblocking."
         },
         {
-          "id" : 3163,
-          "kind" : "title",
-          "sectionNumber" : "1406.3",
-          "title" : "1406.3 Exterior balconies and similar projections."
+          "id": 3163,
+          "kind": "title",
+          "sectionNumber": "1406.3",
+          "title": "1406.3 Exterior balconies and similar projections."
         },
         {
-          "id" : 3164,
-          "kind" : "title",
-          "sectionNumber" : "1406.4",
-          "title" : "1406.4 Bay and oriel windows, decks, porches, porticos, entranceways, and storm enclosures."
+          "id": 3164,
+          "kind": "title",
+          "sectionNumber": "1406.4",
+          "title": "1406.4 Bay and oriel windows, decks, porches, porticos, entranceways, and storm enclosures."
         },
         {
-          "id" : 3165,
-          "kind" : "title",
-          "sectionNumber" : "1406.4.1",
-          "title" : "1406.4.1 Appendages on Type I and II construction."
+          "id": 3165,
+          "kind": "title",
+          "sectionNumber": "1406.4.1",
+          "title": "1406.4.1 Appendages on Type I and II construction."
         },
         {
-          "id" : 3166,
-          "kind" : "title",
-          "sectionNumber" : "1406.4.2",
-          "title" : "1406.4.2 Appendages on Type III, IV and VA construction."
+          "id": 3166,
+          "kind": "title",
+          "sectionNumber": "1406.4.2",
+          "title": "1406.4.2 Appendages on Type III, IV and VA construction."
         },
         {
-          "id" : 3167,
-          "kind" : "title",
-          "sectionNumber" : "1406.4.3",
-          "title" : "1406.4.3 Appendages on Type VB construction."
+          "id": 3167,
+          "kind": "title",
+          "sectionNumber": "1406.4.3",
+          "title": "1406.4.3 Appendages on Type VB construction."
         },
         {
-          "id" : 3168,
-          "kind" : "title",
-          "sectionNumber" : "1406.5",
-          "title" : "1406.5 Retrofit of existing buildings."
+          "id": 3168,
+          "kind": "title",
+          "sectionNumber": "1406.5",
+          "title": "1406.5 Retrofit of existing buildings."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1407",
-      "headingLine" : "METAL COMPOSITE MATERIALS (MCM)",
-      "id" : "SECTION 1407",
-      "sections" : [
+      "headerLine": "SECTION BC 1407",
+      "headingLine": "METAL COMPOSITE MATERIALS (MCM)",
+      "id": "SECTION BC 1407",
+      "sections": [
         {
-          "id" : 3169,
-          "kind" : "title",
-          "sectionNumber" : "1407.1",
-          "title" : "1407.1 General."
+          "id": 3169,
+          "kind": "title",
+          "sectionNumber": "1407.1",
+          "title": "1407.1 General."
         },
         {
-          "id" : 3170,
-          "kind" : "title",
-          "sectionNumber" : "1407.1.1",
-          "title" : "1407.1.1 Plastic core."
+          "id": 3170,
+          "kind": "title",
+          "sectionNumber": "1407.1.1",
+          "title": "1407.1.1 Plastic core."
         },
         {
-          "id" : 3171,
-          "kind" : "title",
-          "sectionNumber" : "1407.1.2",
-          "title" : "1407.1.2 Prohibited locations."
+          "id": 3171,
+          "kind": "title",
+          "sectionNumber": "1407.1.2",
+          "title": "1407.1.2 Prohibited locations."
         },
         {
-          "id" : 3172,
-          "kind" : "title",
-          "sectionNumber" : "1407.2",
-          "title" : "1407.2 Exterior wall finish."
+          "id": 3172,
+          "kind": "title",
+          "sectionNumber": "1407.2",
+          "title": "1407.2 Exterior wall finish."
         },
         {
-          "id" : 3173,
-          "kind" : "title",
-          "sectionNumber" : "1407.3",
-          "title" : "1407.3 Architectural trim and embellishments."
+          "id": 3173,
+          "kind": "title",
+          "sectionNumber": "1407.3",
+          "title": "1407.3 Architectural trim and embellishments."
         },
         {
-          "id" : 3174,
-          "kind" : "title",
-          "sectionNumber" : "1407.4",
-          "title" : "1407.4 Structural design."
+          "id": 3174,
+          "kind": "title",
+          "sectionNumber": "1407.4",
+          "title": "1407.4 Structural design."
         },
         {
-          "id" : 3175,
-          "kind" : "title",
-          "sectionNumber" : "1407.5",
-          "title" : "1407.5 Approval."
+          "id": 3175,
+          "kind": "title",
+          "sectionNumber": "1407.5",
+          "title": "1407.5 Approval."
         },
         {
-          "id" : 3176,
-          "kind" : "title",
-          "sectionNumber" : "1407.6",
-          "title" : "1407.6 Weather resistance."
+          "id": 3176,
+          "kind": "title",
+          "sectionNumber": "1407.6",
+          "title": "1407.6 Weather resistance."
         },
         {
-          "id" : 3177,
-          "kind" : "title",
-          "sectionNumber" : "1407.7",
-          "title" : "1407.7 Durability."
+          "id": 3177,
+          "kind": "title",
+          "sectionNumber": "1407.7",
+          "title": "1407.7 Durability."
         },
         {
-          "id" : 3178,
-          "kind" : "title",
-          "sectionNumber" : "1407.8",
-          "title" : "1407.8 Fire-resistance rating."
+          "id": 3178,
+          "kind": "title",
+          "sectionNumber": "1407.8",
+          "title": "1407.8 Fire-resistance rating."
         },
         {
-          "id" : 3179,
-          "kind" : "title",
-          "sectionNumber" : "1407.9",
-          "title" : "1407.9 Surface-burning characteristics."
+          "id": 3179,
+          "kind": "title",
+          "sectionNumber": "1407.9",
+          "title": "1407.9 Surface-burning characteristics."
         },
         {
-          "id" : 3180,
-          "kind" : "title",
-          "sectionNumber" : "1407.10",
-          "title" : "1407.10 Thermal barriers."
+          "id": 3180,
+          "kind": "title",
+          "sectionNumber": "1407.10",
+          "title": "1407.10 Thermal barriers."
         },
         {
-          "id" : 3181,
-          "kind" : "title",
-          "sectionNumber" : "1407.11",
-          "title" : "1407.11 Full-scale tests."
+          "id": 3181,
+          "kind": "title",
+          "sectionNumber": "1407.11",
+          "title": "1407.11 Full-scale tests."
         },
         {
-          "id" : 3182,
-          "kind" : "title",
-          "sectionNumber" : "1407.12",
-          "title" : "1407.12 Reserved."
+          "id": 3182,
+          "kind": "title",
+          "sectionNumber": "1407.12",
+          "title": "1407.12 Reserved."
         },
         {
-          "id" : 3183,
-          "kind" : "title",
-          "sectionNumber" : "1407.13",
-          "title" : "1407.13 Foam plastic insulation."
+          "id": 3183,
+          "kind": "title",
+          "sectionNumber": "1407.13",
+          "title": "1407.13 Foam plastic insulation."
         },
         {
-          "id" : 3184,
-          "kind" : "title",
-          "sectionNumber" : "1407.14",
-          "title" : "1407.14 Labeling."
+          "id": 3184,
+          "kind": "title",
+          "sectionNumber": "1407.14",
+          "title": "1407.14 Labeling."
         },
         {
-          "id" : 3185,
-          "kind" : "title",
-          "sectionNumber" : "1407.15",
-          "title" : "1407.15 Special inspection."
+          "id": 3185,
+          "kind": "title",
+          "sectionNumber": "1407.15",
+          "title": "1407.15 Special inspection."
         },
         {
-          "id" : 3186,
-          "kind" : "title",
-          "sectionNumber" : "1407.16",
-          "title" : "1407.16 Fireblocking."
+          "id": 3186,
+          "kind": "title",
+          "sectionNumber": "1407.16",
+          "title": "1407.16 Fireblocking."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1408",
-      "headingLine" : "EXTERIOR INSULATION AND FINISH SYSTEMS (EIFS)",
-      "id" : "SECTION 1408",
-      "sections" : [
+      "headerLine": "SECTION BC 1408",
+      "headingLine": "EXTERIOR INSULATION AND FINISH SYSTEMS (EIFS)",
+      "id": "SECTION BC 1408",
+      "sections": [
         {
-          "id" : 3187,
-          "kind" : "title",
-          "sectionNumber" : "1408.1",
-          "title" : "1408.1 General."
+          "id": 3187,
+          "kind": "title",
+          "sectionNumber": "1408.1",
+          "title": "1408.1 General."
         },
         {
-          "id" : 3188,
-          "kind" : "title",
-          "sectionNumber" : "1408.1.1",
-          "title" : "1408.1.1 Prohibited locations."
+          "id": 3188,
+          "kind": "title",
+          "sectionNumber": "1408.1.1",
+          "title": "1408.1.1 Prohibited locations."
         },
         {
-          "id" : 3189,
-          "kind" : "title",
-          "sectionNumber" : "1408.2",
-          "title" : "1408.2 Performance characteristics."
+          "id": 3189,
+          "kind": "title",
+          "sectionNumber": "1408.2",
+          "title": "1408.2 Performance characteristics."
         },
         {
-          "id" : 3190,
-          "kind" : "title",
-          "sectionNumber" : "1408.3",
-          "title" : "1408.3 Structural design."
+          "id": 3190,
+          "kind": "title",
+          "sectionNumber": "1408.3",
+          "title": "1408.3 Structural design."
         },
         {
-          "id" : 3191,
-          "kind" : "title",
-          "sectionNumber" : "1408.4",
-          "title" : "1408.4 Weather resistance."
+          "id": 3191,
+          "kind": "title",
+          "sectionNumber": "1408.4",
+          "title": "1408.4 Weather resistance."
         },
         {
-          "id" : 3192,
-          "kind" : "title",
-          "sectionNumber" : "1408.4.1",
-          "title" : "1408.4.1 EIFS with drainage."
+          "id": 3192,
+          "kind": "title",
+          "sectionNumber": "1408.4.1",
+          "title": "1408.4.1 EIFS with drainage."
         },
         {
-          "id" : 3193,
-          "kind" : "title",
-          "sectionNumber" : "1408.4.1.1",
-          "title" : "1408.4.1.1 Water-resistive barrier."
+          "id": 3193,
+          "kind": "title",
+          "sectionNumber": "1408.4.1.1",
+          "title": "1408.4.1.1 Water-resistive barrier."
         },
         {
-          "id" : 3194,
-          "kind" : "title",
-          "sectionNumber" : "1408.5",
-          "title" : "1408.5 Installation."
+          "id": 3194,
+          "kind": "title",
+          "sectionNumber": "1408.5",
+          "title": "1408.5 Installation."
         },
         {
-          "id" : 3195,
-          "kind" : "title",
-          "sectionNumber" : "1408.6",
-          "title" : "1408.6 Special inspections."
+          "id": 3195,
+          "kind": "title",
+          "sectionNumber": "1408.6",
+          "title": "1408.6 Special inspections."
         },
         {
-          "id" : 3196,
-          "kind" : "title",
-          "sectionNumber" : "1408.7",
-          "title" : "1408.7 Fireblocking."
+          "id": 3196,
+          "kind": "title",
+          "sectionNumber": "1408.7",
+          "title": "1408.7 Fireblocking."
         },
         {
-          "id" : 3197,
-          "kind" : "title",
-          "sectionNumber" : "1408.8",
-          "title" : "1408.8 Foam plastic insulation."
+          "id": 3197,
+          "kind": "title",
+          "sectionNumber": "1408.8",
+          "title": "1408.8 Foam plastic insulation."
         },
         {
-          "id" : 3198,
-          "kind" : "title",
-          "sectionNumber" : "1408.9",
-          "title" : "1408.9 Thermal barrier."
+          "id": 3198,
+          "kind": "title",
+          "sectionNumber": "1408.9",
+          "title": "1408.9 Thermal barrier."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1409",
-      "headingLine" : "HIGH-PRESSURE DECORATIVE EXTERIOR-GRADE COMPACT LAMINATES (HPL)",
-      "id" : "SECTION 1409",
-      "sections" : [
+      "headerLine": "SECTION BC 1409",
+      "headingLine": "HIGH-PRESSURE DECORATIVE EXTERIOR-GRADE COMPACT LAMINATES (HPL)",
+      "id": "SECTION BC 1409",
+      "sections": [
         {
-          "id" : 3199,
-          "kind" : "title",
-          "sectionNumber" : "1409.1",
-          "title" : "1409.1 General."
+          "id": 3199,
+          "kind": "title",
+          "sectionNumber": "1409.1",
+          "title": "1409.1 General."
         },
         {
-          "id" : 3200,
-          "kind" : "title",
-          "sectionNumber" : "1409.1.1",
-          "title" : "1409.1.1 Prohibited locations."
+          "id": 3200,
+          "kind": "title",
+          "sectionNumber": "1409.1.1",
+          "title": "1409.1.1 Prohibited locations."
         },
         {
-          "id" : 3201,
-          "kind" : "title",
-          "sectionNumber" : "1409.2",
-          "title" : "1409.2 Exterior wall finish."
+          "id": 3201,
+          "kind": "title",
+          "sectionNumber": "1409.2",
+          "title": "1409.2 Exterior wall finish."
         },
         {
-          "id" : 3202,
-          "kind" : "title",
-          "sectionNumber" : "1409.3",
-          "title" : "1409.3 Architectural trim and embellishments."
+          "id": 3202,
+          "kind": "title",
+          "sectionNumber": "1409.3",
+          "title": "1409.3 Architectural trim and embellishments."
         },
         {
-          "id" : 3203,
-          "kind" : "title",
-          "sectionNumber" : "1409.4",
-          "title" : "1409.4 Structural design."
+          "id": 3203,
+          "kind": "title",
+          "sectionNumber": "1409.4",
+          "title": "1409.4 Structural design."
         },
         {
-          "id" : 3204,
-          "kind" : "title",
-          "sectionNumber" : "1409.5",
-          "title" : "1409.5 Approval."
+          "id": 3204,
+          "kind": "title",
+          "sectionNumber": "1409.5",
+          "title": "1409.5 Approval."
         },
         {
-          "id" : 3205,
-          "kind" : "title",
-          "sectionNumber" : "1409.6",
-          "title" : "1409.6 Weather resistance."
+          "id": 3205,
+          "kind": "title",
+          "sectionNumber": "1409.6",
+          "title": "1409.6 Weather resistance."
         },
         {
-          "id" : 3206,
-          "kind" : "title",
-          "sectionNumber" : "1409.7",
-          "title" : "1409.7 Durability."
+          "id": 3206,
+          "kind": "title",
+          "sectionNumber": "1409.7",
+          "title": "1409.7 Durability."
         },
         {
-          "id" : 3207,
-          "kind" : "title",
-          "sectionNumber" : "1409.8",
-          "title" : "1409.8 Fire-resistance rating."
+          "id": 3207,
+          "kind": "title",
+          "sectionNumber": "1409.8",
+          "title": "1409.8 Fire-resistance rating."
         },
         {
-          "id" : 3208,
-          "kind" : "title",
-          "sectionNumber" : "1409.9",
-          "title" : "1409.9 Surface-burning characteristics."
+          "id": 3208,
+          "kind": "title",
+          "sectionNumber": "1409.9",
+          "title": "1409.9 Surface-burning characteristics."
         },
         {
-          "id" : 3209,
-          "kind" : "title",
-          "sectionNumber" : "1409.10",
-          "title" : "1409.10 Thermal barriers."
+          "id": 3209,
+          "kind": "title",
+          "sectionNumber": "1409.10",
+          "title": "1409.10 Thermal barriers."
         },
         {
-          "id" : 3210,
-          "kind" : "title",
-          "sectionNumber" : "1409.11",
-          "title" : "1409.11 Full-scale tests."
+          "id": 3210,
+          "kind": "title",
+          "sectionNumber": "1409.11",
+          "title": "1409.11 Full-scale tests."
         },
         {
-          "id" : 3211,
-          "kind" : "title",
-          "sectionNumber" : "1409.12",
-          "title" : "1409.12 Reserved."
+          "id": 3211,
+          "kind": "title",
+          "sectionNumber": "1409.12",
+          "title": "1409.12 Reserved."
         },
         {
-          "id" : 3212,
-          "kind" : "title",
-          "sectionNumber" : "1409.13",
-          "title" : "1409.13 Foam plastic insulation."
+          "id": 3212,
+          "kind": "title",
+          "sectionNumber": "1409.13",
+          "title": "1409.13 Foam plastic insulation."
         },
         {
-          "id" : 3213,
-          "kind" : "title",
-          "sectionNumber" : "1409.14",
-          "title" : "1409.14 Labeling."
+          "id": 3213,
+          "kind": "title",
+          "sectionNumber": "1409.14",
+          "title": "1409.14 Labeling."
         },
         {
-          "id" : 3214,
-          "kind" : "title",
-          "sectionNumber" : "1409.15",
-          "title" : "1409.15 Special inspection."
+          "id": 3214,
+          "kind": "title",
+          "sectionNumber": "1409.15",
+          "title": "1409.15 Special inspection."
         },
         {
-          "id" : 3215,
-          "kind" : "title",
-          "sectionNumber" : "1409.16",
-          "title" : "1409.16 Fireblocking."
+          "id": 3215,
+          "kind": "title",
+          "sectionNumber": "1409.16",
+          "title": "1409.16 Fireblocking."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 1410",
-      "headingLine" : "PLASTIC COMPOSITE DECKING",
-      "id" : "SECTION 1410",
-      "sections" : [
+      "headerLine": "SECTION BC 1410",
+      "headingLine": "PLASTIC COMPOSITE DECKING",
+      "id": "SECTION BC 1410",
+      "sections": [
         {
-          "id" : 3216,
-          "kind" : "title",
-          "sectionNumber" : "1410.1",
-          "title" : "1410.1 Plastic composite decking."
+          "id": 3216,
+          "kind": "title",
+          "sectionNumber": "1410.1",
+          "title": "1410.1 Plastic composite decking."
         }
       ]
     }
   ],
-  "rawDraftText" : "#- Chapter 14: Exterior Walls\n\n#-- Section BC 1401: General\n\n#--- 1401.1 Scope.\n\nThe provisions of this chapter shall establish the minimum requirements for exterior: walls; wall coverings; wall openings; windows and doors; architectural trim; balconies; projections; and other appendages.\n\n#--- 1401.2 Construction documents.\n\nConstruction documents for exterior wall coverings required to be tested in accordance with NFPA 285 pursuant to this code shall include the following data and information:\n\n1. Design documentation of the NFPA 285 tested assembly from the manufacturer shall be included in the construction documents. This shall include section and elevation drawings that identify materials and components of the tested assembly, including panel sizes and joint locations. All components used in the tested assembly shall be clearly identified. Material thicknesses, relative locations of components and offsets shall be fully dimensioned.\n\n2. Information shall be provided for verification in accordance with Sections 1705.16 and 1705.20 special inspections.\n\n3. A certification by the applicant that \"Any deviation which occurs during the course of installation will be evaluated and approved by the applicant of record or registered design professional. No deviation shall be approved that would result in an assembly that would otherwise fail to pass the acceptance criteria of NFPA 285.\"\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#-- Section BC 1402: Definitions\n\n#--- 1402.1 Definitions.\n\nThe following terms are defined in Chapter 2:\n\nADHERED MASONRY VENEER.\n\nANCHORED MASONRY VENEER.\n\nBACKING.\n\nBIRD FRIENDLY MATERIAL.\n\nBIRD HAZARD INSTALLATIONS.\n\nCURTAIN WALL.\n\nEXTERIOR INSULATION AND FINISH SYSTEMS (EIFS).\n\nEXTERIOR INSULATION AND FINISH SYSTEMS (EIFS) WITH DRAINAGE.\n\nEXTERIOR WALL.\n\nEXTERIOR WALL COVERING.\n\nEXTERIOR WALL ENVELOPE.\n\nFENESTRATION.\n\nFIBER-CEMENT SIDING.\n\nFLY-THROUGH CONDITIONS.\n\nHIGH-PRESSURE DECORATIVE EXTERIOR-GRADE COMPACT LAMINATE (HPL).\n\nMETAL COMPOSITE MATERIAL (MCM).\n\nMETAL COMPOSITE MATERIAL (MCM) SYSTEM.\n\nPOLYPROPYLENE SIDING.\n\nPORCELAIN TILE.\n\nVENEER.\n\nVINYL SIDING.\n\nWATER-RESISTIVE BARRIER.\n\n(Am. L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015.\n\n#-- Section BC 1403: Performance Requirements\n\n#--- 1403.1 General.\n\nThe provisions of this section shall apply to exterior walls, exterior wall coverings and components thereof.\n\n#--- 1403.2 Weather protection.\n\nExterior walls shall provide the building with a weather-resistant exterior wall envelope. The exterior wall envelope shall include flashing, as described in Section 1405.4. The exterior wall envelope shall be designed and constructed in such a manner as to prevent the accumulation of water within the wall assembly by providing a water-resistive barrier behind the exterior veneer, as described in Section 1404.2, and a means for draining water that enters the assembly to the exterior. Protection against condensation shall be provided as required.\n\nExceptions:\n\n1. A weather-resistant exterior wall envelope shall not be required over concrete and masonry walls designed to resist water penetration and detrimental effects from freeze\/thaw cycling and in accordance with Chapters 19 and 21 of this code, as applicable.\n\n2. Compliance with the requirements for a means of drainage, and the requirements of Sections 1404.2 and 1405.4 of this code, shall not be required for an exterior wall envelope that has been demonstrated through testing to resist wind-driven rain, including joints, penetrations and intersections with dissimilar materials, in accordance with ASTM E 331 under the following conditions:\n\n#--- 2.1. Exterior wall envelope test assemblies shall include at least one opening, one control joint, and where required one wall\/eave interface and one wall sill. Tested openings and penetrations shall be representative of the intended end-use configuration.\n\n#--- 2.2. Exterior wall envelope test assemblies shall be at least 4 feet by 8 feet (1220 mm by 2438.4 mm) in size.\n\n#--- 2.3. Exterior wall envelope assemblies shall be tested at a minimum differential pressure of 6.24 pounds per square foot (psf) (0.297 kN\/m 2 ) for a duration of 2 hours. The exterior wall envelope assemblies shall also be tested at a minimum differential pressure not less than 20 percent of the positive design wind load as calculated per Chapter 16, or 15 pounds per square foot (psf) (0.718 kN\/m 2 for a duration of 15 minutes.\n\n#--- 2.4. The exterior wall envelope design shall be considered to resist wind-driven rain where the results of testing indicate that water did not penetrate the test assembly including control joints in the exterior wall envelope, joints at the perimeter of openings or intersections of terminations with dissimilar materials.\n\n3. Exterior insulation and finish systems (EIFS) complying with Section 1408.4.1.\n\n#--- 1403.3 Structural.\n\nExterior wall envelope, and the associated openings, shall be designed and constructed to resist safely the superimposed loads required by Chapter 16.\n\n#--- 1403.4 Fire resistance.\n\nExterior wall envelope shall be fire-resistance rated as required by other sections of this code with opening protection as required by Chapter 7.\n\n#--- 1403.5 Vertical and lateral flame propagation.\n\nExterior walls that contain foam plastic insulation including exterior insulation and finish systems (EIFS), metal composite material (MCM) systems, high-pressure decorative exterior-grade compact laminates (HPL), and fiber-reinforced polymer (FRP) shall be tested in accordance with and comply with the acceptance criteria of NFPA 285. Foam plastic insulation assemblies and FRP shall be tested in accordance with Section 2603.5.5. MCM systems shall be tested in accordance with Section 1407.11. HPL systems shall be tested in accordance with Section 1409.11. Approved NFPA 285 tested assembly design documentation shall be included on the submitted construction documents complying with Section 1401.2. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department. Combustible exterior wall coverings shall comply with Section 1406 of this code.\n\nException: Fiber-reinforced polymer (FRP) where permitted by Section 2613.5 not to be tested.\n\n#---- 1403.5.1 Exterior walls with water-resistive barriers.\n\nExterior walls on buildings of Type I, II, III, or IV construction that are greater than 40 feet (12 192 mm) in height above grade plane and contain a combustible water-resistive barrier shall be tested in accordance with and comply with the acceptance criteria of NFPA 285. For the purposes of this section, fenestration products and flashing of fenestration products and water-resistive barrier flashing and accessories at other locations, including through wall flashings and attachment accessories, shall not be considered part of the water-resistive barrier.\n\nExceptions:\n\n1. Walls in which the water-resistive barrier is the only combustible component and the exterior wall has a wall covering of brick, concrete, stone, terra cotta, stucco or steel with minimum thicknesses in accordance with Table 1405.2 of this code.\n\n2. Walls in which the water-resistive barrier is the only combustible component and the water-resistive barrier has a peak heat release rate of less than 150 kW\/m2 (203.9 hp\/m 2 ), a total heat release of less than 20 MJ\/m2 (18 956 BTU\/m 2 ) and an effective heat of combustion of less than 18 MJ\/kg (17 060 BTU\/lb) as determined in accordance with ASTM E 1354 and has a flame spread index of 25 or less and a smoke-developed index of 450 or less as determined in accordance with ASTM E 84 or UL 723. The ASTM E 1354 test shall be conducted on specimens at the thickness intended for use, in the horizontal orientation and at an incident radiant heat flux of 50 kW\/m 2 .\n\n#--- 1403.6 Flood resistance.\n\nFor buildings in flood hazard areas, the exterior wall envelope extending below the design flood elevation shall be resistant to water damage and shall comply with Appendix G.\n\n#--- 1403.7 Thermal and condensation resistance.\n\nThe exterior wall envelope shall be designed and constructed for thermal and condensation resistance as necessary to meet the requirements of the New York City Energy Conservation Code.\n\n#--- 1403.8 Bird friendly materials.\n\nBird friendly materials shall be required in accordance with Sections 1403.8.1 through 1403.8.4.\n\n(L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015.\n\n#---- 1403.8.1 Exterior wall envelope.\n\nThe exterior wall envelope, and any associated openings, shall be constructed with bird friendly materials up to 75 feet (22 860 mm) above grade. Materials other than bird friendly materials shall not exceed an aggregate of 10 square feet (0.93 m 2 ) within any 10 feet (3048 mm) by 10 feet (3048 mm) square area of exterior wall below 75 feet (22 860 mm) above grade.\n\nExceptions:\n\n1. Where ground floor transparency is required by the New York City Zoning Resolution, transparent bird friendly material with a UV-reflective pattern and a maximum threat factor of 27 shall be provided.\n\n2. In areas of special flood hazard and shaded X-Zones where flood resistant glazing is proposed and ground floor transparency is required by the New York City Zoning Resolution, transparent bird friendly material with a UV-reflective pattern and a maximum threat factor of 36 shall be provided.\n\n(L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015.\n\n#---- 1403.8.2 Bird hazard installations.\n\nBird hazard installations shall be constructed of bird friendly materials regardless of their height above grade.\n\n(L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015.\n\n#---- 1403.8.3 Fly-through conditions.\n\nFly-through conditions located 75 feet (22 860 mm) or less above grade shall be constructed with bird friendly materials.\n\n(L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015.\n\n#---- 1403.8.4 Adjacency to green roofs.\n\nThe exterior wall envelope, and any associated openings, installed adjacent to a green roof system on the same building shall be constructed with bird friendly materials up to 12 feet (3657.6 mm) above the walking surface.\n\n(L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015.\n\n#--- 1403.9 Air barrier.\n\nThe exterior wall envelope shall be designed and constructed with an air barrier as necessary to meet the requirements of the New York City Energy Conservation Code and this code.\n\n#-- Section BC 1404: Materials\n\n#--- 1404.1 General.\n\nMaterials used for the construction of exterior walls shall comply with the provisions of this section. Materials not prescribed herein shall be permitted, provided that any such alternative has been approved.\n\n#--- 1404.2 Water-resistive barrier.\n\nNot fewer than one layer of No. 15 asphalt felt complying with ASTM D 226 for Type 1 felt or other approved materials shall be attached to the studs or sheathing, with flashing as described in Section 1405.4 of this code, in such a manner as to provide a continuous water-resistive barrier behind the exterior wall veneer. Combustible water-resistive barriers shall comply with special inspection requirements of Chapter 17 of this code.\n\n#--- 1404.3 Wood.\n\nExterior walls of wood construction shall be designed and constructed in accordance with Chapter 23.\n\n#---- 1404.3.1 Basic hardboard.\n\nBasic hardboard shall conform to the requirements of ANSI A135.4.\n\n#---- 1404.3.2 Hardboard siding.\n\nHardboard siding shall conform to the requirements of ANSI A135.6 and, where used structurally, shall be so identified by the label of an approved agency.\n\n#--- 1404.4 Masonry.\n\nExterior walls of masonry construction shall be designed and constructed in accordance with this chapter and Chapter 21. Masonry units, mortar and metal accessories used in anchored and adhered veneer shall meet the physical requirements of Chapter 21. The backing of anchored and adhered veneer shall be of concrete, masonry, steel framing or wood framing. Continuous insulation meeting the applicable requirements of this code shall be permitted between the backing and the masonry veneer.\n\n#--- 1404.5 Metal.\n\nExterior walls constructed of cold-formed steel, structural steel or aluminum shall be designed in accordance with Chapters 20 and 22, as applicable.\n\n#---- 1404.5.1 Aluminum siding.\n\nAluminum siding shall conform to the requirements of AAMA 1402.\n\n#---- 1404.5.2 Cold-rolled copper.\n\nCopper shall conform to the requirements of ASTM B 370.\n\n#---- 1404.5.3 Lead-coated copper.\n\nLead-coated copper shall conform to the requirements of ASTM B 101.\n\n#--- 1404.6 Concrete.\n\nExterior walls of concrete construction shall be designed and constructed in accordance with Chapter 19.\n\n#--- 1404.7 Glass-unit masonry.\n\nExterior walls of glass-unit masonry shall be designed and constructed in accordance with Chapter 21.\n\n#--- 1404.8 Plastics.\n\nPlastic panel, apron or spandrel walls as defined in this code shall not be limited in thickness, provided that such plastics and their assemblies conform to the requirements of Chapter 26 and other applicable requirements of this chapter, and are constructed of approved weather-resistant materials of adequate strength to resist the wind loads for cladding specified in Chapter 16.\n\n#--- 1404.9 Vinyl siding.\n\nVinyl siding shall be certified and labeled as conforming to the requirements of ASTM D 3679 by an approved agency.\n\n#--- 1404.10 Fiber-cement siding.\n\nFiber-cement siding shall conform to the requirements of ASTM C 1186, Type A or ISO 8336, Category A, and shall be so identified on labeling listing an approved agency.\n\n#--- 1404.11 Exterior insulation finish system (EIFS).\n\nEIFS shall be designed and constructed in accordance with Section 1408.\n\n#--- 1404.12 Polypropylene siding.\n\nPolypropylene siding shall be certified and labeled as conforming to the requirements of ASTM D 7254 and those of Section 1404.12.1 or 1404.12.2 of this code by an approved agency. Polypropylene siding shall be installed in accordance with manufacturer's instructions and the requirements of Section 1405.18 of this code. Polypropylene siding shall be secured to the building so as to provide weather protection for the exterior walls of the building.\n\n#---- 1404.12.1 Flame spread index.\n\nThe certification of the flame spread index shall be accompanied by a test report stating that all portions of the test specimen ahead of the flame front remained in position during the test in accordance with ASTM E 84 or UL 723.\n\n#---- 1404.12.2 Distance between adjacent buildings.\n\nThe distance between a building with polypropylene siding and the adjacent building shall be not less than 10 feet (3048 mm).\n\n#--- 1404.13 Foam plastic insulation.\n\nFoam plastic insulation used in exterior wall covering assemblies shall comply with Chapter 26 and be fireblocked in accordance with Section 718.2.6.1.\n\n#-- Section BC 1405: Installation of Wall Coverings\n\n#--- 1405.1 General.\n\nExterior wall coverings shall be designed and constructed in accordance with the applicable provisions of this section. Installations not prescribed herein shall be permitted, provided that such alternative has been approved. Installations shall be in accordance with approved construction documents where a permit is required. Installations of exterior wall coverings shall comply with the special inspection requirements of Chapter 17.\n\n#--- 1405.2 Weather protection.\n\nThe exterior wall envelope shall provide weather protection for the building. The materials of the minimum nominal thickness specified in Table 1405.2 shall be acceptable as approved weather coverings.\n\nException: Weather coverings not meeting the minimum nominal thicknesses specified in Table 1405.2 shall be permitted provided such alternative has been approved.\n\nTable 1405.2 Minimum Thickness of Weather Coverings\n\nFor SI: 1 inch = 25.4 mm, 1 ounce = 28.35 g, 1 square foot = 0.093 m 2 .\n\na. Wood siding of thicknesses less than 0.5 inch shall be placed over sheathing that conforms to Section 2304.6.\n\nb. Exclusive of texture.\n\nc. As measured at the bottom of decorative grooves.\n\nd. 16 ounces per square foot for cold-rolled copper and lead-coated copper, 12 ounces per square foot for copper shingles, high-yield copper and lead-coated high-yield copper.\n\n* Veneer units in this group shall be of an approved type and not be greater than 2 inches in thickness.\n\n#--- 1405.3 Vapor retarders.\n\nVapor retarders as described in Section 1405.3.3 shall be provided based on an approved design using accepted engineering practice for hygrothermal analysis.\n\n#---- 1405.3.1 Reserved.\n\n#---- 1405.3.2 Reserved.\n\n#---- 1405.3.3 Material vapor retarder class.\n\nThe vapor retarder class shall be based on the manufacturer's certified testing or a tested assembly. The following shall be deemed to meet the class specified:\n\nClass I: Sheet polyethylene, non-perforated aluminum foil with a perm rating of less than or equal to 0.1.\n\nClass II: Kraft-faced fiberglass batts or paint with a perm rating greater than 0.1 and less than or equal to 1.0.\n\nClass III: Latex or enamel paint with a perm rating of greater than 1.0 and less than or equal to 10.0.\n\n#---- 1405.3.4 Minimum clear airspaces and vented openings for vented cladding.\n\nFor the purposes of this section, vented cladding shall include the following minimum clear airspaces:\n\n1. Vinyl lap or horizontal aluminum siding applied over a weather-resistive barrier as specified in this chapter.\n\n2. Brick veneer with a clear airspace as specified in this code.\n\n3. Other approved vented claddings.\n\n#--- 1405.4 Flashing.\n\nFlashing shall be installed in such a manner so as to prevent moisture from entering the wall or to redirect moisture to the exterior. Flashing shall be installed where required at the perimeters of exterior door and window assemblies, penetrations and terminations of exterior wall assemblies, exterior wall intersections with roofs, chimneys, porches, decks, balconies and similar projections and at built-in gutters and similar locations where moisture could enter the wall. Flashing with projecting flanges shall be installed on both sides and the ends of copings, under sills and continuously above projecting trim.\n\n#---- 1405.4.1 Exterior wall pockets.\n\nIn exterior walls of buildings or structures, wall pockets or crevices in which moisture can accumulate shall be avoided or protected with caps or drips, or other approved means shall be provided to prevent water damage.\n\n#---- 1405.4.2 Masonry.\n\nFlashing and weep holes in anchored veneer shall be located in the first course of masonry above finished ground level above the foundation wall or slab, and other points of support, including structural floors, shelf angles and lintels where anchored veneers are designed in accordance with Section 1405.6.\n\n#--- 1405.5 Wood veneers.\n\nWood veneers on exterior walls of buildings of Type I, II, III and IV construction shall be not less than 1-inch (25.4 mm) nominal thickness, 0.438-inch (11.1 mm) exterior hardboard siding or 0.375-inch (9.5 mm) exterior-type wood structural panels or particleboard and shall conform to the following:\n\n1. The veneer shall not exceed 40 feet (12190 mm) in height above grade. Where fire-retardant-treated wood is used, the height shall not exceed 60 feet (18290 mm) in height above grade.\n\n2. The veneer is attached to or furred from a noncombustible backing that is fire-resistance rated as required by other provisions of this code.\n\n3. Where open or spaced wood veneers (without concealed spaces) are used, they shall not project more than 24 inches (609.6 mm) from the building wall.\n\n#--- 1405.6 Anchored masonry veneer.\n\nAnchored masonry veneer shall comply with the provisions of Sections 1405.6, 1405.7, 1405.8 and 1405.9 and Sections 12.1 and 12.2 of TMS 402, as modified by Chapter 21 of this code.\n\n#---- 1405.6.1 Tolerances.\n\nAnchored masonry veneers in accordance with Chapter 14 are not required to meet the tolerances in Article 3.3 F1 of TMS 602.\n\n#---- 1405.6.2 Seismic requirements.\n\nAnchored masonry veneer located in Seismic Design Category C or D shall conform to the requirements of Section 12.2.2.10 of TMS 402, as modified by Chapter 21 of this code\n\n#--- 1405.7 Stone veneer.\n\nAnchored stone veneer units not exceeding 10 inches (254 mm) in thickness shall be anchored directly to masonry, concrete or to stud construction by one of the following methods:\n\n1. With concrete or masonry backing, anchor ties shall be not less than 0.1055-inch (2.68 mm) corrosion-resistant wire, or approved equal, formed beyond the base of the backing. The legs of the loops shall be not less than 6 inches (152.4 mm) in length bent at right angles and laid in the mortar joint, and spaced so that the eyes or loops are 12 inches (304.8 mm) maximum on center in both directions. There shall be provided not less than a 0.1055-inch (2.68 mm) corrosion-resistant wire tie, or approved equal, threaded through the exposed loops for every 2 square feet (0.2 m 2 ) of stone veneer. This tie shall be a loop having legs not less than 15 inches (381 mm) in length, so bent that the tie will lie in the stone veneer mortar joint. The last 2 inches (50.8 mm) of each wire leg shall have a right-angle bend. One-inch (25.4 mm) minimum thickness of cement grout shall be placed between the backing and the stone veneer.\n\n2. With wood stud backing, a 2-inch by 2-inch (50.8 mm by 50.8 mm) 0.0625-inch (1.59 mm) zinc-coated or nonmetallic coated wire mesh with two layers of water-resistive barrier in accordance with Section 1404.2 shall be applied directly to wood studs spaced not more than 16 inches (406.4 mm) on center. On studs, the mesh shall be attached with 2-inch (50.8 mm) long corrosion-resistant steel wire furring nails at 4 inches (101.6 mm) on center providing a minimum 1.125-inch (28.58 mm) penetration into each stud and with 8d (0.120 in. diameter) annular threaded nails at 8 inches (203.2 mm) on center into top and bottom plates or with equivalent wire ties. There shall be not less than a 0.1055-inch (2.68 mm) zinc-coated or nonmetallic coated wire, or approved equal, attached to the stud with not smaller than an 8d (0.120 in. diameter) annular threaded nail for every 2 square feet (0.2 m 2 ) of stone veneer. This tie shall be a loop having legs not less than 15 inches (381 mm) in length, so bent that the tie will lie in the stone veneer mortar joint. The last 2 inches (50.8 mm) of each wire leg shall have a right-angle bend. One-inch (25.4 mm) minimum thickness of cement grout shall be placed between the backing and the stone veneer.\n\n3. With cold-formed steel stud backing, a 2-inch by 2-inch (50.8 mm by 50.8 mm) 0.0625-inch (1.59 mm) zinc-coated or nonmetallic coated wire mesh with two layers of water-resistive barrier in accordance with Section 1404.2 shall be applied directly to steel studs spaced at not more than 16 inches (406.4 mm) on center. The mesh shall be attached with corrosion-resistant #8 self-drilling, tapping screws at 4 inches (101.6 mm) on center, and at 8 inches (203.2 mm) on center into top and bottom tracks or with equivalent wire ties. Screws shall extend through the steel connection not fewer than three exposed threads. There shall be not less than a 0.1055-inch (2.68 mm) corrosion-resistant wire, or approved equal, attached to the stud with not smaller than a #8 self-drilling, tapping screw extending through the steel framing not fewer than three exposed threads for every 2 square feet (0.2 m 2 ) of stone veneer. This tie shall be a loop having legs not less than 15 inches (381 mm) in length, so bent that the tie will lie in the stone veneer mortar joint. The last 2 inches (50.8 mm) of each wire leg shall have a right-angle bend. One inch (25.4 mm) minimum thickness of cement grout shall be placed between the backing and the stone veneer. The cold-formed steel framing members shall have a minimum bare steel thickness of 0.0428 inches (1.087 mm).\n\n#--- 1405.8 Slab-type veneer.\n\nAnchored slab-type veneer units not exceeding 2 inches (50.8 mm) in thickness shall be anchored directly to masonry, concrete or light-frame construction. For veneer units of marble, travertine, granite or other stone units of slab form, ties of corrosion-resistant dowels in drilled holes shall be located in the middle third of the edge of the units, spaced not more than 24 inches (609.6 mm) apart around the periphery of each unit with not less than four ties per veneer unit. Units shall not exceed 20 square feet (1.9 m 2 ) in area. If the dowels are not tight fitting, the holes shall be drilled not more than 0.063 inch (1.6 mm) larger in diameter than the dowel, with the hole countersunk to a diameter and depth equal to twice the diameter of the dowel in order to provide a tight-fitting key of cement mortar at the dowel locations where the mortar in the joint has set. Veneer ties shall be corrosion-resistant metal capable of resisting, in tension or compression, a force equal to two times the weight of the attached veneer. If made of sheet metal, veneer ties shall be not smaller in area than 0.0336 by 1 inch (0.853 by 25.4 mm) or, if made of wire, not smaller in diameter than 0.1483-inch (3.76 mm) wire.\n\n#--- 1405.9 Terra cotta.\n\nAnchored terra cotta or ceramic units not less than 1 inch (25.4 mm) thick shall be anchored directly to masonry, concrete or stud construction. Terra cotta or ceramic unit anchorage shall be engineered to transfer loads to stable backup walls utilizing not less than two non-corrosive anchors per unit.\n\n#--- 1405.10 Adhered masonry veneer.\n\nAdhered masonry veneer shall comply with the applicable requirements in this section and Sections 12.1 and 12.3 of TMS 402, as modified by Chapter 21 of this code.\n\n#---- 1405.10.1 Exterior adhered masonry veneer.\n\nExterior adhered masonry veneer shall be installed in accordance with the manufacturer's instructions and Section 1405.10.\n\n#----- 1405.10.1.1 Water-resistive barriers.\n\nWater-resistive barriers shall be installed as required in Section 2510.6.\n\n#----- 1405.10.1.2 Flashing.\n\nFlashing shall comply with this section and the applicable requirements of Section 1405.4.\n\n#------ 1405.10.1.2.1 Flashing at foundation.\n\nA corrosion-resistant screed or flashing of a minimum 0.019-inch (0.48 mm) or 26 gage galvanized or plastic with a minimum vertical attachment flange of 3 1\/2 inches (88.9 mm) shall be installed to extend not less than 1 inch (25.4 mm) below the foundation plate line on exterior stud walls in accordance with Section 1405.4. The water-resistive barrier shall lap over the exterior of the attachment flange of the screed or flashing.\n\n#----- 1405.10.1.3 Clearances.\n\nOn exterior stud walls, adhered masonry veneer shall be installed not less than 4 inches (101.6 mm) above the earth, or not less than 2 inches (50.8 mm) above paved areas, or not less than 1\/2 inch (12.7 mm) above exterior walking surfaces that are supported by the same foundation that supports the exterior wall.\n\n#----- 1405.10.1.4 Adhered masonry veneer installed with lath and mortar.\n\nExterior adhered masonry veneer installed with lath and mortar shall comply with the following.\n\n#------ 1405.10.1.4.1 Lathing.\n\nLathing shall comply with the requirements of Section 2510.\n\n#------ 1405.10.1.4.2 Scratch coat.\n\nA nominal 1\/2-inch (12.7 mm) thick layer of mortar complying with the material requirements of Sections 2103 and 2512.2 shall be applied, encapsulating the lathing. The surface of this mortar shall be scored horizontally, resulting in a scratch coat.\n\n#------ 1405.10.1.4.3 Adhering veneer.\n\nThe masonry veneer units shall be adhered to the mortar scratch coat with a nominal 1\/2-inch (12.7 mm) thick setting bed of mortar complying with Sections 2103 and 2512.2 applied to create a full setting bed for the back of the masonry veneer units. The masonry veneer units shall be worked into the setting bed resulting in a nominal 3\/8-inch (9.5 mm) setting bed after the masonry veneer units are applied.\n\n#----- 1405.10.1.5 Adhered masonry veneer applied directly to masonry and concrete.\n\nAdhered masonry veneer applied directly to masonry or concrete shall comply with the applicable requirements of Section 1405.10, and with the requirements of Section 1405.10.1.4 or 2510.7.\n\n#----- 1405.10.1.6 Cold weather construction.\n\nCold weather construction of adhered masonry veneer shall comply with the requirements of Sections 2104 and 2512.4.\n\n#----- 1405.10.1.7 Hot weather construction.\n\nHot weather construction of adhered masonry veneer shall comply with the requirements of Section 2104.\n\n#---- 1405.10.2 Exterior adhered masonry veneers – porcelain tile.\n\nAdhered units shall not exceed 5\/8 inch (15.8 mm) thickness and 24 inches (609.6 mm) in any face dimension nor more than 3 square feet (0.28 m 2 ) in total face area and shall not weigh more than 9 pounds psf (0.43 kN\/m 2 ). Porcelain tile shall be adhered to an approved backing system.\n\n#---- 1405.10.3 Interior adhered masonry veneers.\n\nInterior adhered masonry veneers shall have a maximum weight of 20 psf (0.958 kg\/m 2 ) and shall be installed in accordance with Section 1405.10. The supporting members shall be designed to limit deflection to 1\/600 of the span of the supporting members.\n\n#--- 1405.11 Metal veneers.\n\nVeneers of metal shall be fabricated from approved corrosion-resistant materials or shall be protected front and back with porcelain enamel, or otherwise be treated to render the metal resistant to corrosion. Such veneers shall be not less than 0.0149-inch (0.378 mm) nominal thickness sheet steel mounted on wood or metal furring strips or approved sheathing on light-frame construction.\n\n#---- 1405.11.1 Attachment.\n\nExterior metal veneer shall be securely attached to the supporting masonry or framing members with corrosion-resistant fastenings, metal ties or by other approved devices or methods. The spacing of the fastenings or ties shall not exceed 24 inches (609.6 mm) either vertically or horizontally, but where units exceed 4 square feet (0.4 m 2 ) in area there shall be not less than four attachments per unit. The metal attachments shall have a cross-sectional area not less than provided by W 1.7 wire. Such attachments and their supports shall be designed and constructed to resist the wind loads as specified in Section 1609 for components and cladding.\n\n#---- 1405.11.2 Weather protection.\n\nMetal supports for exterior metal veneer shall be protected by painting, galvanizing or by other approved coating or treatment. Wood studs, furring strips or other wood supports for exterior metal veneer shall be approved pressure-treated wood or protected as required in Section 1403.2. Joints and edges exposed to the weather shall be caulked with approved durable waterproofing material or by other approved means to prevent penetration of moisture.\n\n#---- 1405.11.3 Backup.\n\nMasonry backup shall not be required for metal veneer unless required by the fire-resistance requirements of this code.\n\n#---- 1405.11.4 Grounding.\n\nGrounding of metal veneers on buildings shall comply with the requirements of the New York City Electrical Code and Chapter 27 of this code.\n\n#--- 1405.12 Thin exterior structural glass veneer.\n\nThe area of a single section of thin exterior structural glass veneer shall not exceed 10 square feet (0.93 m 2 ) where that section is not more than 15 feet (4572 mm) above the level of the sidewalk or grade level directly below, and shall not exceed 6 square feet (0.56 m 2 ) where it is more than 15 feet (4572 mm) above that level. In no event shall thin exterior structural glass veneer be installed more than 35 feet (10 668 mm) above the level of the sidewalk or grade level directly below.\n\n#---- 1405.12.1 Length and height.\n\nThe length or height of any section of thin exterior structural glass veneer shall not exceed 48 inches (1220 mm).\n\n#---- 1405.12.2 Thickness.\n\nThe thickness of thin exterior structural glass veneer shall be not less than 0.344 inch (8.7 mm).\n\n#---- 1405.12.3 Application.\n\nThin exterior structural glass veneer shall be set only after backing is thoroughly dry and after application of an approved bond coat uniformly over the entire surface of the backing so as to effectively seal the surface. Glass shall be set in place with an approved mastic cement in sufficient quantity so that at least 50 percent of the area of each glass unit is directly bonded to the backing by mastic not less than 1\/4 inch (6.4 mm) thick and not more than 5\/8 inch (15.9 mm) thick. The bond coat and mastic shall be evaluated for compatibility and shall bond firmly together.\n\n#---- 1405.12.4 Installation at sidewalk level.\n\nWhere thin exterior structural glass veneer extends to a sidewalk surface, each section shall rest in an approved metal molding, and be set at least 1\/4 inch (6.4 mm) above the highest point of the sidewalk. The space between the molding and the sidewalk shall be thoroughly caulked and made water tight.\n\n#----- 1405.12.4.1 Installation above sidewalk level.\n\nWhere thin exterior structural glass veneer is installed above the level of the top of a bulkhead facing, or at a level more than 36 inches (914.4 mm) above the sidewalk level, the mastic cement binding shall be supplemented with approved nonferrous metal shelf angles located in the horizontal joints in every course. Such shelf angles shall be not less than 0.0478 inch (1.2 mm) thick and not less than 2 inches (50.8 mm) long and shall be spaced at approved intervals, with not less than two angles for each glass unit. Shelf angles shall be secured to the wall or backing with expansion bolts, toggle bolts or by other approved methods.\n\n#---- 1405.12.5 Joints.\n\nUnless otherwise specifically approved by the commissioner, abutting edges of thin exterior structural glass veneer shall be ground square. Mitered joints shall not be used except where specifically approved for wide angles. Joints shall be uniformly buttered with an approved jointing compound and horizontal joints shall be held to not less than 0.063 inch (1.6 mm) by an approved nonrigid substance or device. Where thin exterior structural glass veneer abuts nonresilient material at sides or top, expansion joints not less than 1\/4 inch (6.4 mm) wide shall be provided.\n\n#---- 1405.12.6 Mechanical fastenings.\n\nThin exterior structural glass veneer installed above the level of the heads of show windows and veneer installed more than 12 feet (3657.6 mm) above sidewalk level shall, in addition to the mastic cement and shelf angles, be held in place by the use of fastenings at each vertical or horizontal edge, or at the four corners of each glass unit. Fastenings shall be secured to the wall or backing with expansion bolts, toggle bolts or by other methods. Fastenings shall be so designed as to hold the glass veneer in a vertical plane independent of the mastic cement. Shelf angles providing both support and fastenings shall be permitted.\n\n#---- 1405.12.7 Flashing.\n\nExposed edges of thin exterior structural glass veneer shall be flashed with overlapping corrosion-resistant metal flashing or equivalent and caulked with a waterproof compound in a manner to effectively prevent the entrance of moisture between the glass veneer and the backing.\n\n#--- 1405.13 Exterior windows and doors.\n\nWindows and doors installed in exterior walls shall conform to the testing and performance requirements of Section 1709.5.\n\n#---- 1405.13.1 Installation.\n\nWindows and doors shall be installed in accordance with the manufacturer's instructions. Fastener size and spacing shall be provided in such instructions and shall be calculated based on maximum loads and spacing used in the tests.\n\n#---- 1405.13.2 Windows in Group R-2 and R-3 occupancies.\n\nWindows in Group R-2 and R-3 occupancies shall comply with Sections 1015.9 and 1015.8, respectively.\n\n#---- 1405.13.3 Windows in R-2 Occupancy.\n\nWindows in R-2 occupancy shall be subject to any applicable requirements of the New York City Department of Health and Mental Hygiene with regard to window guards.\n\n#--- 1405.14 Vinyl siding.\n\nVinyl siding conforming to the requirements of this section and complying with ASTM D 3679 shall be permitted on exterior walls of buildings located in areas where the allowable stress design speed V asd , as determined in accordance with Section 1609.3.1, does not exceed 100 miles per hour (44.7 m\/s) and the building height is less than or equal to 40 feet (12 192 mm) in Exposure C. Where construction is located in areas where the allowable stress design speed V asd , as determined in accordance with Section 1609.3.1, exceeds 100 miles per hour (44.7 m\/s), or building heights are in excess of 40 feet (12 192 mm), tests or calculations showing compliance with Chapter 16 of this code shall be submitted. Vinyl siding shall be secured to the building so as to provide weather protection for the exterior walls of the building.\n\n#---- 1405.14.1 Application.\n\nThe siding shall be applied over sheathing or materials listed in Section 2304.6. Siding shall be applied to conform to the water-resistive barrier requirements in Section 1403. Siding and accessories shall be installed in accordance with the manufacturer's instructions. Unless otherwise specified in the manufacturer's instructions, nails used to fasten the siding and accessories shall have a minimum 0.313-inch (7.9 mm) head diameter and 1\/8-inch (3.18 mm) shank diameter. The nails shall be corrosion resistant and shall be long enough to penetrate the studs or nailing strip at least 3\/4 inch (19.1 mm). For cold-formed steel light-frame construction, corrosion-resistant fasteners shall be used. Screw fasteners shall penetrate the cold-formed steel framing at least three exposed threads. Other fasteners shall be installed in accordance with the manufacturer's instructions. Where the siding is installed horizontally, the fastener spacing shall not exceed 16 inches (406.4 mm) horizontally and 12 inches (304.8 mm) vertically. Where the siding is installed vertically, the fastener spacing shall not exceed 12 inches (304.8 mm) horizontally and 12 inches (304.8 mm) vertically.\n\n#--- 1405.15 Cement plaster.\n\nCement plaster applied to exterior walls shall conform to the requirements specified in Chapter 25.\n\n#--- 1405.16 Fiber-cement siding.\n\nFiber-cement siding complying with Section 1404.10 shall be permitted on exterior walls of Type I, II, III, IV and V construction for wind pressure resistance or wind speed exposures as indicated by the manufacturer's listing and label and the installation instructions. Where specified, the siding shall be installed over sheathing or materials listed in Section 2304.6 and shall be installed to conform to the water-resistive barrier requirements in Section 1403. Siding and accessories shall be installed in accordance with the manufacturer's instructions. Unless otherwise specified in the the manufacturer's instructions, nails used to fasten the siding to wood studs shall be corrosion-resistant round head smooth shank and shall be long enough to penetrate the studs at least 1 inch (25.4 mm). For cold-formed steel light-frame construction, corrosion-resistant fasteners shall be used. Screw fasteners shall penetrate the cold-formed steel framing at least three exposed full threads. Other fasteners shall be installed in accordance with the manufacturer's instructions.\n\n#---- 1405.16.1 Panel siding.\n\nFiber-cement panels shall comply with the requirements of ASTM C 1186, Type A, minimum Grade II or ISO 8336, Category A, minimum Class 2. Panels shall be installed with the long dimension either parallel or perpendicular to framing. Vertical and horizontal joints shall occur over framing members and shall be protected with sealant, battens or flashing. Alternatively, vertical or horizontal joints shall be shiplap or otherwise designed to comply with Section 1403.2 of this code. Panel siding shall be installed with fasteners in accordance with the manufacturer's instructions.\n\n#---- 1405.16.2 Lap siding.\n\nFiber-cement lap siding having a maximum width of 12 inches (304.8 mm) shall comply with the requirements of ASTM C 1186, Type A, minimum Grade II or ISO 8336, Category A, minimum Class 2. Lap siding shall be lapped a minimum of 1 1\/4 inches (32 mm) and lap siding not having tongue-and-groove end joints shall have the ends protected with caulking, covered with an H-section joint cover, located over a strip of flashing or shall be otherwise designed to comply with Section 1403.2 of this code. Lap siding courses shall be installed with the fastener heads exposed or concealed in accordance with the manufacturer's instructions.\n\n#--- 1405.17 Fastening.\n\nWeather boarding and wall coverings shall be securely fastened with aluminum, copper, zinc, zinc-coated or other approved corrosion-resistant fasteners in accordance with the nailing schedule in Table 2304.10.1 or the manufacturer's instructions. Shingles and other weather coverings shall be attached with appropriate standard-shingle nails to furring strips securely nailed to studs, or with approved mechanically bonding nails, except where sheathing is of wood not less than 1-inch (25.4 mm) nominal thickness or of wood structural panels as specified in Table 2308.6.3(3).\n\n#--- 1405.18 Polypropylene siding.\n\nPolypropylene siding conforming to the requirements of this section and complying with Section 1404.12 shall be limited to exterior walls of Type VB construction located in areas where the wind speed specified in Chapter 16 does not exceed 100 miles per hour (44.7 m\/s) and the building height is less than or equal to 40 feet (12 192 mm) in Exposure C. Where construction is located in areas where the basic wind speed exceeds 100 miles per hour (44.7 m\/s), or building heights are in excess of 40 feet (12 192 mm), tests or calculations showing compliance with Chapter 16 shall be submitted. Polypropylene siding shall be installed in accordance with the manufacturer's instructions. Polypropylene siding shall be secured to the building so as to provide weather protection for the exterior walls of the building.\n\n#-- Section BC 1406: Combustible Materials on the Exterior Side of Exterior Walls\n\n#--- 1406.1 General.\n\n#-- Section 1406 shall apply to exterior wall coverings, exterior balconies and similar projections, bay and oriel windows, decks, porches, porticos, entranceways, and storm enclosures constructed of combustible materials. Combustible water-resistive barriers complying with Section 1403.5.1 shall be permitted in exterior wall coverings. Fireblocking shall be installed in accordance with Section 1406.2.3. Existing building retrofits utilizing combustible exterior wall coverings shall also comply with Section 1406.5. Combustible exterior wall coverings shall be subject to the special inspection requirements of Section 1705.16.\n\n#--- 1406.2 Combustible exterior wall coverings.\n\nCombustible exterior wall coverings, including architectural trim, shall comply with this section.\n\nExceptions:\n\n1. Plastics complying with Chapter 26.\n\n2. Metal composite materials (MCM) complying with Section 1407.\n\n3. High-pressure decorative exterior-grade compact laminates (HPL) complying with Section 1409.\n\n#---- 1406.2.1 Type I, II, III and IV construction.\n\nIn buildings of Type I, II, III and IV construction, exterior wall coverings shall be permitted to be constructed of combustible materials in accordance with Section 1406.2.1.1, subject to the following limitations:\n\n1. Combustible exterior wall coverings shall not exceed 10 percent of an exterior wall surface area on any given story. Such combustible exterior wall covering shall not be permitted on exterior walls where the fire separation distance is 5 feet (1524 mm) or less.\n\n2. Combustible exterior wall coverings shall be limited to 40 feet (12 192 mm) in height above grade plane.\n\n3. Combustible exterior wall coverings constructed of fire-retardant-treated wood complying with Section 2303.2 for exterior installation shall not be limited in wall surface area where the fire separation distance is 5 feet (1524 mm) or less and shall be permitted up to 60 feet (18 288 mm) in height above grade plane, regardless of the fire separation distance.\n\n4. Wood veneers shall comply with Section 1405.5.\n\n5. Combustible exterior wall coverings shall not be permitted on buildings of Type IV construction utilizing CLT or SCL complying with Section 602.4.\n\n6. Combustible exterior wall coverings shall not be permitted at exterior balconies in accordance with Section 1406.3.\n\n#----- 1406.2.1.1 Ignition resistance.\n\nWhere permitted by Section 1406.2.1 of this code, combustible exterior wall coverings shall be tested in accordance with NFPA 268.\n\nExceptions: The following materials are not required to be tested in accordance with NFPA 268. However, such materials shall comply with all other provisions of Section 1406 of this code.\n\n1. Wood or wood-based products.\n\n2. Other combustible materials covered with an exterior weather covering other than vinyl sidings included in and complying with the thickness requirements of Table 1405.2 of this code.\n\n3. Aluminum having a minimum thickness of 0.019 inch (0.48 mm).\n\n#------ 1406.2.1.1.1 Fire separation 5 feet or less.\n\nWhere installed on exterior walls having a fire separation distance of 5 feet (1524 mm) or less, combustible exterior wall coverings shall not exhibit sustained flaming as defined in NFPA 268.\n\n#------ 1406.2.1.1.2 Fire separation greater than 5 feet.\n\nFor fire separation distances greater than 5 feet (1524 mm), any exterior wall covering shall be permitted that has been exposed to a reduced level of incident radiant heat flux in accordance with the NFPA 268 test method without exhibiting sustained flaming. The minimum fire separation distance required for the exterior wall covering shall be determined from Table 1406.2.1.1.2 of this code based on the maximum tolerable level of incident radiant heat flux that does not cause sustained flaming of the exterior wall covering.\n\nTable 1406.2.1.1.2 Minimum Fire Separation for Combustible Exterior Wall Coverings\n\nFor SI: 1 foot = 304.8 mm, 1 Btu\/H 2 × °F = 0.0057 kW\/m 2 × K.\n\n#---- 1406.2.2 Location.\n\nCombustible exterior wall coverings located along the top of exterior walls shall be completely backed up by the exterior wall and shall not extend over or above the top of the exterior walls.\n\n#---- 1406.2.3 Fireblocking.\n\nExterior wall coverings shall be fireblocked in accordance with Section 718.2.6.\n\n#--- 1406.3 Exterior balconies and similar projections.\n\nExterior wall covering on walls abutting balconies, and cladding on the sides and underside of balconies, shall be constructed of noncombustible materials. Exterior walls abutting balconies shall be noncombustible up to 12 feet (3657.6 mm) above the walking surface or to the underside of the balcony above, whichever is less. On cantilevered balconies, the exterior wall abutting the balcony, plus 3 feet (914.4 mm) on each side, shall be constructed of noncombustible materials. On recessed and semirecessed balconies, the exterior walls abutting the balconies shall be constructed of noncombustible materials.\n\nException: Combustible exterior wall coverings shall be allowed on balconies in Type V construction with a fire separation distance greater than or equal to 5 feet (1524 mm).\n\n#--- 1406.4 Bay and oriel windows, decks, porches, porticos, entranceways, and storm enclosures.\n\nBay and oriel windows, decks, porches, porticos, entranceways and storm enclosures shall conform to the type of construction required for the building to which they are attached, including required fire rating, unless otherwise modified by the requirements of this section. For the purposes of this section, such structures shall be referred to as, \"appendages\".\n\nException: Plastic complying with Chapter 26.\n\n#---- 1406.4.1 Appendages on Type I and II construction.\n\nAppendages on buildings of Type I or II construction shall be constructed of noncombustible materials. However, on buildings not more than three stories or 40 feet (12 192 mm) in height, whichever is less, fire-retardant-treated wood shall be permitted.\n\n#---- 1406.4.2 Appendages on Type III, IV and VA construction.\n\nAppendages on buildings of Type III, IV and VA construction may be constructed of combustible materials, provided that all the following conditions are met:\n\n1. Such building does not exceed three stories or 40 feet (12 192 mm) in height, whichever is less.\n\n2. The main use or dominant occupancy of such building is classified in Occupancy Group R-2 or R-3.\n\n3. The appendage has an exterior separation on all exposed sides of at least 15 feet (4572 mm), measured from the outermost surface of the appendage, except that appendages with exposed sides protected by minimum 1-hour fire-rated construction extending at least 36 inches (914.4 mm) above the highest combustible horizontal surface may be located up to a minimum distance of 36 inches (914.4 mm) from any property line.\n\n4. The appendage is so constructed that its removal or destruction will not reduce the structural stability or fire-resistive integrity of the building.\n\n5. The appendage has a superficial area not exceeding 150 square feet (13.9 m 2 ) when viewed from directly above and is included in the area limitations of Table 503* for the entire building.\n\n* Editor's note: As set forth in L.L. 2021\/126; Table 503 was deleted by L.L. 2021\/126.\n\n6. The appendage is not higher than the sills of the second-story windows.\n\n7. The vertical surface area of the combustible portions of the appendage does not exceed 10 percent of the total wall area (windows excluded) of the building.\n\n8. For enclosed appendages, the roof of the appendage has a class A roof covering, and the soffit or ceiling covering the combustible roof framing shall have a minimum 1-hour fire-resistance rating.\n\nException: Appendages constructed of fire-retardant-treated wood, on buildings not exceeding 3 stories or40 feet (12 192 mm) in height, whichever is less, need not comply with Items 2 through 8.\n\n#---- 1406.4.3 Appendages on Type VB construction.\n\nAppendages may be constructed of combustible materials on buildings of construction Type VB.\n\n#--- 1406.5 Retrofit of existing buildings.\n\nCombustible materials shall not be permitted for use at the outermost surface of the exterior wall covering for exterior envelope retrofits of existing nonsprinklered buildings over 75 feet (22 860 mm), unless the following conditions are satisfied:\n\n1. The outermost surface of the combustible exterior wall covering shall be interrupted by a noncombustible material at least 3 feet (914.4 mm) high between the top of one opening and the bottom of the opening immediately above to form a continuous band across building elevations.\n\n2. On walls without openings, a 3 feet (914.4 mm) high noncombustible band shall interrupt the outermost surface of the combustible exterior wall covering at least every 15 feet (4572 mm) vertically.\n\n#-- Section BC 1407: Metal Composite Materials (MCM)\n\n#--- 1407.1 General.\n\nThe provisions of this section shall govern the materials, construction and quality of metal composite materials (MCM) for use as exterior wall coverings in addition to other applicable requirements of Chapters 14 and 16.\n\n#---- 1407.1.1 Plastic core.\n\nThe plastic core of the MCM shall not contain foam plastic insulation as defined in Section 202.\n\n#---- 1407.1.2 Prohibited locations.\n\nThe use of MCM in exterior wall coverings is subject to the following limitations:\n\n1. MCM is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n2. MCM is prohibited in exterior wall coverings at exterior balconies in accordance with Section 1406.3.\n\n#--- 1407.2 Exterior wall finish.\n\nMCM used as exterior wall finish or as elements of bay and oriel windows to provide cladding or weather resistance shall comply with Sections 1407.4 through 1407.16.\n\n#--- 1407.3 Architectural trim and embellishments.\n\nMCM used as architectural trim or embellishments shall comply with Sections 1407.7 through 1407.14.\n\n#--- 1407.4 Structural design.\n\nMCM systems shall be designed and constructed to resist wind loads as required by Chapter 16 for components and cladding.\n\n#--- 1407.5 Approval.\n\nResults of approved tests or an engineering analysis shall be submitted to the commissioner to verify compliance with the requirements of Chapter 16 for wind loads.\n\n#--- 1407.6 Weather resistance.\n\nMCM systems shall comply with Section 1403 and shall be designed and constructed to resist wind and rain in accordance with this section and the manufacturer's installation instructions.\n\n#--- 1407.7 Durability.\n\nMCM systems shall be constructed of approved materials that maintain the performance characteristics required in Section 1407 for the duration of use.\n\n#--- 1407.8 Fire-resistance rating.\n\nWhere MCM systems are used on exterior walls required to have a fire-resistance rating in accordance with Section 705, evidence shall be submitted to the commissioner that the required fire-resistance rating is maintained.\n\nException: MCM systems not containing foam plastic insulation, which are installed on the outer surface of a fire-resistance-rated exterior wall in a manner such that the attachments do not penetrate through the entire exterior wall assembly, shall not be required to comply with this section.\n\n#--- 1407.9 Surface-burning characteristics.\n\nMCM shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested as an assembly in the maximum thickness intended for use in accordance with ASTM E 84 or UL 723.\n\n#--- 1407.10 Thermal barriers.\n\nMCM shall be separated from the interior of a building by an approved thermal barrier consisting of 5\/8-inch (15.9 mm) Type X gypsum wallboard or equivalent thermal barrier material that will limit the average temperature rise of the unexposed surface to not more than 250°F (12 1°C) after 20 minutes of fire exposure in accordance with the standard time-temperature curve of ASTM E 119 or UL 263. The thermal barrier shall be installed in accordance with criteria established by testing in accordance with UL 1715, where the thermal barrier shall remain in place for 20 minutes.\n\n#--- 1407.11 Full-scale tests.\n\nAll MCM systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285. Such testing shall be performed on the MCM system with the MCM in the maximum thickness intended for use, including any required fireblocking. Approved NFPA 285 tested assembly design documentation of the MCM system shall be included on the submitted construction documents complying with Section 1401.2 of this code. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department.\n\n#--- 1407.12 Reserved.\n\n#--- 1407.13 Foam plastic insulation.\n\nMCM systems containing foam plastic insulation shall also comply with the requirements of Section 2603.\n\n#--- 1407.14 Labeling.\n\nMCM shall be labeled in accordance with this code and Section 28-113 of the Administrative Code.\n\n#--- 1407.15 Special inspection.\n\nMCM shall be subject to special inspection in accordance with Chapter 17.\n\n#--- 1407.16 Fireblocking.\n\nMCM installations shall be fireblocked in accordance with Section 718.2.6.1.\n\n#-- Section BC 1408: Exterior Insulation and Finish Systems (EIFS)\n\n#--- 1408.1 General.\n\nThe provisions of this section shall govern the materials, construction and quality of exterior insulation and finish systems (EIFS) for use as exterior wall coverings in addition to other applicable requirements of Chapters 7, 14, 16, 17 and 26.\n\n#---- 1408.1.1 Prohibited locations.\n\nThe use of EIFS containing foam plastic insulation in exterior wall coverings is subject to the following limitations:\n\n1. EIFS containing foam plastic insulation is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n2. EIFS containing foam plastic insulation is prohibited in exterior wall coverings at exterior balconies in accordance with Section 1406.3.\n\n#--- 1408.2 Performance characteristics.\n\nEIFS shall be constructed such that it meets the performance characteristics required in ASTM E 2568.\n\n#--- 1408.3 Structural design.\n\nThe underlying structural framing and substrate shall be designed and constructed to resist loads as required by Chapter 16.\n\n#--- 1408.4 Weather resistance.\n\nEIFS shall comply with Section 1403 and shall be designed and constructed to resist environmental conditions in accordance with this section, the approved construction documents and manufacturer's installation instructions.\n\n#---- 1408.4.1 EIFS with drainage.\n\nEIFS with drainage shall have an average minimum drainage efficiency of 90 percent when tested in accordance the requirements of ASTM E 2273 and is required on framed walls of Type V construction, Residential Group R occupancies.\n\n#----- 1408.4.1.1 Water-resistive barrier.\n\nFor EIFS with drainage, the water-resistive barrier shall comply with Section 1404.2 of this code or ASTM E 2570.\n\n#--- 1408.5 Installation.\n\nInstallation of the EIFS and EIFS with drainage shall be in accordance with the EIFS manufacturer's instructions and this section.\n\n#--- 1408.6 Special inspections.\n\nEIFS installations shall comply with the provisions of Chapter 17.\n\n#--- 1408.7 Fireblocking.\n\nEIFS installations containing foam plastic insulation shall be fireblocked in accordance with Section 718.2.6.1.\n\n#--- 1408.8 Foam plastic insulation.\n\nEIFS installations containing foam plastic insulation shall be tested and comply with the requirements of Section 2603.\n\n#--- 1408.9 Thermal barrier.\n\nEIFS installations containing foam plastic insulation shall be separated from the interior of a building in accordance with Section 2603.5.2.\n\n#-- Section BC 1409: High-Pressure Decorative Exterior-Grade Compact Laminates (HPL)\n\n#--- 1409.1 General.\n\nThe provisions of this section shall govern the materials, construction and quality of High-Pressure Decorative Exterior-Grade Compact Laminates (HPL) for use as exterior wall coverings in addition to other applicable requirements of Chapters 14 and 16.\n\n#---- 1409.1.1 Prohibited locations.\n\nThe use of HPL in exterior wall coverings is subject to the following limitations:\n\n1. HPL is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n2. HPL is prohibited in exterior wall coverings at exterior balconies and shall comply with Section 1406.3.\n\n#--- 1409.2 Exterior wall finish.\n\nHPL used as exterior wall covering or as elements of bay and oriel windows to provide cladding or weather resistance shall comply with Sections 1409.4 through 1409.16.\n\n#--- 1409.3 Architectural trim and embellishments.\n\nHPL used as architectural trim or embellishments shall comply with Sections 1409.7 through 1409.14.\n\n#--- 1409.4 Structural design.\n\nHPL systems shall be designed and constructed to resist wind loads as required by Chapter 16 for components and cladding.\n\n#--- 1409.5 Approval.\n\nResults of approved tests or an engineering analysis shall be submitted to the commissioner to verify compliance with the requirements of Chapter 16 for wind loads.\n\n#--- 1409.6 Weather resistance.\n\nHPL systems shall comply with Section 1403 and shall be designed and constructed to resist wind and rain in accordance with this section and the manufacturer's instructions.\n\n#--- 1409.7 Durability.\n\nHPL systems shall be constructed of approved materials that maintain the performance characteristics required in Section 1409 for the duration of use.\n\n#--- 1409.8 Fire-resistance rating.\n\nWhere HPL systems are used on exterior walls required to have a fire-resistance rating in accordance with Section 705, evidence shall be submitted to the commissioner that the required fire-resistance rating is maintained.\n\nException: HPL systems not containing foam plastic insulation that are installed on the outer surface of a fire-resistance-rated exterior wall in a manner such that the attachments do not penetrate through the entire exterior wall assembly shall not be required to comply with this section.\n\n#--- 1409.9 Surface-burning characteristics.\n\nHPL shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in the minimum and maximum thicknesses intended for use in accordance with ASTM E 84 or UL 723.\n\n#--- 1409.10 Thermal barriers.\n\nHPL shall be separated from the interior of a building by an approved thermal barrier consisting of 5\/8-inch (15.9 mm) Type X gypsum wallboard or equivalent thermal barrier material that will limit the average temperature rise of the unexposed surface to not more than 250°F (121°C) after 20 minutes of fire exposure in accordance with the standard time temperature curve of ASTM E 119 or UL 263. The thermal barrier shall be installed in accordance with criteria established by testing performed in accordance with UL 1715, where the thermal barrier shall remain in place for 20 minutes.\n\n#--- 1409.11 Full-scale tests.\n\nAll HPL systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285. Such testing shall be performed on the HPL system with the HPL in the minimum and maximum thicknesses intended for use, including any required fireblocking. Approved NFPA 285 tested assembly design documentation of the HPL system shall be included on the submitted construction documents complying with Section 1401.2 of this code. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department.\n\n#--- 1409.12 Reserved.\n\n#--- 1409.13 Foam plastic insulation.\n\nHPL systems containing foam plastic insulation shall also comply with the requirements of Section 2603.\n\n#--- 1409.14 Labeling.\n\nHPL shall be labeled in accordance with this code and Article 113 of Title 28 of the Administrative Code.\n\n#--- 1409.15 Special inspection.\n\nHPL shall be subject to the special inspection requirements of Chapter 17.\n\n#--- 1409.16 Fireblocking.\n\nHPL installations shall be fireblocked in accordance with Section 718.2.6.1.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#-- Section BC 1410: Plastic Composite Decking\n\n#--- 1410.1 Plastic composite decking.\n\nExterior deck boards, stair treads, handrails and guardrail systems constructed of plastic composites, including plastic lumber, shall comply with Section 2612.",
-  "schemaVersion" : 1
+  "rawDraftText": "#- Chapter 14: Exterior Walls\n\n#-- Section BC 1401: General\n\n#--- 1401.1 Scope.\n\nThe provisions of this chapter shall establish the minimum requirements for exterior: walls; wall coverings; wall openings; windows and doors; architectural trim; balconies; projections; and other appendages.\n\n#--- 1401.2 Construction documents.\n\nConstruction documents for exterior wall coverings required to be tested in accordance with NFPA 285 pursuant to this code shall include the following data and information:\n\n1. Design documentation of the NFPA 285 tested assembly from the manufacturer shall be included in the construction documents. This shall include section and elevation drawings that identify materials and components of the tested assembly, including panel sizes and joint locations. All components used in the tested assembly shall be clearly identified. Material thicknesses, relative locations of components and offsets shall be fully dimensioned.\n\n2. Information shall be provided for verification in accordance with Sections 1705.16 and 1705.20 special inspections.\n\n3. A certification by the applicant that \"Any deviation which occurs during the course of installation will be evaluated and approved by the applicant of record or registered design professional. No deviation shall be approved that would result in an assembly that would otherwise fail to pass the acceptance criteria of NFPA 285.\"\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#-- Section BC 1402: Definitions\n\n#--- 1402.1 Definitions.\n\nThe following terms are defined in Chapter 2:\n\nADHERED MASONRY VENEER.\n\nANCHORED MASONRY VENEER.\n\nBACKING.\n\nBIRD FRIENDLY MATERIAL.\n\nBIRD HAZARD INSTALLATIONS.\n\nCURTAIN WALL.\n\nEXTERIOR INSULATION AND FINISH SYSTEMS (EIFS).\n\nEXTERIOR INSULATION AND FINISH SYSTEMS (EIFS) WITH DRAINAGE.\n\nEXTERIOR WALL.\n\nEXTERIOR WALL COVERING.\n\nEXTERIOR WALL ENVELOPE.\n\nFENESTRATION.\n\nFIBER-CEMENT SIDING.\n\nFLY-THROUGH CONDITIONS.\n\nHIGH-PRESSURE DECORATIVE EXTERIOR-GRADE COMPACT LAMINATE (HPL).\n\nMETAL COMPOSITE MATERIAL (MCM).\n\nMETAL COMPOSITE MATERIAL (MCM) SYSTEM.\n\nPOLYPROPYLENE SIDING.\n\nPORCELAIN TILE.\n\nVENEER.\n\nVINYL SIDING.\n\nWATER-RESISTIVE BARRIER.\n\n(Am. L.L. 2020/015, 1/10/2020, eff. 1/10/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/015.\n\n#-- Section BC 1403: Performance Requirements\n\n#--- 1403.1 General.\n\nThe provisions of this section shall apply to exterior walls, exterior wall coverings and components thereof.\n\n#--- 1403.2 Weather protection.\n\nExterior walls shall provide the building with a weather-resistant exterior wall envelope. The exterior wall envelope shall include flashing, as described in Section 1405.4. The exterior wall envelope shall be designed and constructed in such a manner as to prevent the accumulation of water within the wall assembly by providing a water-resistive barrier behind the exterior veneer, as described in Section 1404.2, and a means for draining water that enters the assembly to the exterior. Protection against condensation shall be provided as required.\n\nExceptions:\n\n1. A weather-resistant exterior wall envelope shall not be required over concrete and masonry walls designed to resist water penetration and detrimental effects from freeze/thaw cycling and in accordance with Chapters 19 and 21 of this code, as applicable.\n\n2. Compliance with the requirements for a means of drainage, and the requirements of Sections 1404.2 and 1405.4 of this code, shall not be required for an exterior wall envelope that has been demonstrated through testing to resist wind-driven rain, including joints, penetrations and intersections with dissimilar materials, in accordance with ASTM E 331 under the following conditions:\n\n#--- 2.1. Exterior wall envelope test assemblies shall include at least one opening, one control joint, and where required one wall/eave interface and one wall sill. Tested openings and penetrations shall be representative of the intended end-use configuration.\n\n#--- 2.2. Exterior wall envelope test assemblies shall be at least 4 feet by 8 feet (1220 mm by 2438.4 mm) in size.\n\n#--- 2.3. Exterior wall envelope assemblies shall be tested at a minimum differential pressure of 6.24 pounds per square foot (psf) (0.297 kN/m 2 ) for a duration of 2 hours. The exterior wall envelope assemblies shall also be tested at a minimum differential pressure not less than 20 percent of the positive design wind load as calculated per Chapter 16, or 15 pounds per square foot (psf) (0.718 kN/m 2 for a duration of 15 minutes.\n\n#--- 2.4. The exterior wall envelope design shall be considered to resist wind-driven rain where the results of testing indicate that water did not penetrate the test assembly including control joints in the exterior wall envelope, joints at the perimeter of openings or intersections of terminations with dissimilar materials.\n\n3. Exterior insulation and finish systems (EIFS) complying with Section 1408.4.1.\n\n#--- 1403.3 Structural.\n\nExterior wall envelope, and the associated openings, shall be designed and constructed to resist safely the superimposed loads required by Chapter 16.\n\n#--- 1403.4 Fire resistance.\n\nExterior wall envelope shall be fire-resistance rated as required by other sections of this code with opening protection as required by Chapter 7.\n\n#--- 1403.5 Vertical and lateral flame propagation.\n\nExterior walls that contain foam plastic insulation including exterior insulation and finish systems (EIFS), metal composite material (MCM) systems, high-pressure decorative exterior-grade compact laminates (HPL), and fiber-reinforced polymer (FRP) shall be tested in accordance with and comply with the acceptance criteria of NFPA 285. Foam plastic insulation assemblies and FRP shall be tested in accordance with Section 2603.5.5. MCM systems shall be tested in accordance with Section 1407.11. HPL systems shall be tested in accordance with Section 1409.11. Approved NFPA 285 tested assembly design documentation shall be included on the submitted construction documents complying with Section 1401.2. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department. Combustible exterior wall coverings shall comply with Section 1406 of this code.\n\nException: Fiber-reinforced polymer (FRP) where permitted by Section 2613.5 not to be tested.\n\n#---- 1403.5.1 Exterior walls with water-resistive barriers.\n\nExterior walls on buildings of Type I, II, III, or IV construction that are greater than 40 feet (12 192 mm) in height above grade plane and contain a combustible water-resistive barrier shall be tested in accordance with and comply with the acceptance criteria of NFPA 285. For the purposes of this section, fenestration products and flashing of fenestration products and water-resistive barrier flashing and accessories at other locations, including through wall flashings and attachment accessories, shall not be considered part of the water-resistive barrier.\n\nExceptions:\n\n1. Walls in which the water-resistive barrier is the only combustible component and the exterior wall has a wall covering of brick, concrete, stone, terra cotta, stucco or steel with minimum thicknesses in accordance with Table 1405.2 of this code.\n\n2. Walls in which the water-resistive barrier is the only combustible component and the water-resistive barrier has a peak heat release rate of less than 150 kW/m2 (203.9 hp/m 2 ), a total heat release of less than 20 MJ/m2 (18 956 BTU/m 2 ) and an effective heat of combustion of less than 18 MJ/kg (17 060 BTU/lb) as determined in accordance with ASTM E 1354 and has a flame spread index of 25 or less and a smoke-developed index of 450 or less as determined in accordance with ASTM E 84 or UL 723. The ASTM E 1354 test shall be conducted on specimens at the thickness intended for use, in the horizontal orientation and at an incident radiant heat flux of 50 kW/m 2 .\n\n#--- 1403.6 Flood resistance.\n\nFor buildings in flood hazard areas, the exterior wall envelope extending below the design flood elevation shall be resistant to water damage and shall comply with Appendix G.\n\n#--- 1403.7 Thermal and condensation resistance.\n\nThe exterior wall envelope shall be designed and constructed for thermal and condensation resistance as necessary to meet the requirements of the New York City Energy Conservation Code.\n\n#--- 1403.8 Bird friendly materials.\n\nBird friendly materials shall be required in accordance with Sections 1403.8.1 through 1403.8.4.\n\n(L.L. 2020/015, 1/10/2020, eff. 1/10/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/015.\n\n#---- 1403.8.1 Exterior wall envelope.\n\nThe exterior wall envelope, and any associated openings, shall be constructed with bird friendly materials up to 75 feet (22 860 mm) above grade. Materials other than bird friendly materials shall not exceed an aggregate of 10 square feet (0.93 m 2 ) within any 10 feet (3048 mm) by 10 feet (3048 mm) square area of exterior wall below 75 feet (22 860 mm) above grade.\n\nExceptions:\n\n1. Where ground floor transparency is required by the New York City Zoning Resolution, transparent bird friendly material with a UV-reflective pattern and a maximum threat factor of 27 shall be provided.\n\n2. In areas of special flood hazard and shaded X-Zones where flood resistant glazing is proposed and ground floor transparency is required by the New York City Zoning Resolution, transparent bird friendly material with a UV-reflective pattern and a maximum threat factor of 36 shall be provided.\n\n(L.L. 2020/015, 1/10/2020, eff. 1/10/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/015.\n\n#---- 1403.8.2 Bird hazard installations.\n\nBird hazard installations shall be constructed of bird friendly materials regardless of their height above grade.\n\n(L.L. 2020/015, 1/10/2020, eff. 1/10/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/015.\n\n#---- 1403.8.3 Fly-through conditions.\n\nFly-through conditions located 75 feet (22 860 mm) or less above grade shall be constructed with bird friendly materials.\n\n(L.L. 2020/015, 1/10/2020, eff. 1/10/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/015.\n\n#---- 1403.8.4 Adjacency to green roofs.\n\nThe exterior wall envelope, and any associated openings, installed adjacent to a green roof system on the same building shall be constructed with bird friendly materials up to 12 feet (3657.6 mm) above the walking surface.\n\n(L.L. 2020/015, 1/10/2020, eff. 1/10/2021)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/015.\n\n#--- 1403.9 Air barrier.\n\nThe exterior wall envelope shall be designed and constructed with an air barrier as necessary to meet the requirements of the New York City Energy Conservation Code and this code.\n\n#-- Section BC 1404: Materials\n\n#--- 1404.1 General.\n\nMaterials used for the construction of exterior walls shall comply with the provisions of this section. Materials not prescribed herein shall be permitted, provided that any such alternative has been approved.\n\n#--- 1404.2 Water-resistive barrier.\n\nNot fewer than one layer of No. 15 asphalt felt complying with ASTM D 226 for Type 1 felt or other approved materials shall be attached to the studs or sheathing, with flashing as described in Section 1405.4 of this code, in such a manner as to provide a continuous water-resistive barrier behind the exterior wall veneer. Combustible water-resistive barriers shall comply with special inspection requirements of Chapter 17 of this code.\n\n#--- 1404.3 Wood.\n\nExterior walls of wood construction shall be designed and constructed in accordance with Chapter 23.\n\n#---- 1404.3.1 Basic hardboard.\n\nBasic hardboard shall conform to the requirements of ANSI A135.4.\n\n#---- 1404.3.2 Hardboard siding.\n\nHardboard siding shall conform to the requirements of ANSI A135.6 and, where used structurally, shall be so identified by the label of an approved agency.\n\n#--- 1404.4 Masonry.\n\nExterior walls of masonry construction shall be designed and constructed in accordance with this chapter and Chapter 21. Masonry units, mortar and metal accessories used in anchored and adhered veneer shall meet the physical requirements of Chapter 21. The backing of anchored and adhered veneer shall be of concrete, masonry, steel framing or wood framing. Continuous insulation meeting the applicable requirements of this code shall be permitted between the backing and the masonry veneer.\n\n#--- 1404.5 Metal.\n\nExterior walls constructed of cold-formed steel, structural steel or aluminum shall be designed in accordance with Chapters 20 and 22, as applicable.\n\n#---- 1404.5.1 Aluminum siding.\n\nAluminum siding shall conform to the requirements of AAMA 1402.\n\n#---- 1404.5.2 Cold-rolled copper.\n\nCopper shall conform to the requirements of ASTM B 370.\n\n#---- 1404.5.3 Lead-coated copper.\n\nLead-coated copper shall conform to the requirements of ASTM B 101.\n\n#--- 1404.6 Concrete.\n\nExterior walls of concrete construction shall be designed and constructed in accordance with Chapter 19.\n\n#--- 1404.7 Glass-unit masonry.\n\nExterior walls of glass-unit masonry shall be designed and constructed in accordance with Chapter 21.\n\n#--- 1404.8 Plastics.\n\nPlastic panel, apron or spandrel walls as defined in this code shall not be limited in thickness, provided that such plastics and their assemblies conform to the requirements of Chapter 26 and other applicable requirements of this chapter, and are constructed of approved weather-resistant materials of adequate strength to resist the wind loads for cladding specified in Chapter 16.\n\n#--- 1404.9 Vinyl siding.\n\nVinyl siding shall be certified and labeled as conforming to the requirements of ASTM D 3679 by an approved agency.\n\n#--- 1404.10 Fiber-cement siding.\n\nFiber-cement siding shall conform to the requirements of ASTM C 1186, Type A or ISO 8336, Category A, and shall be so identified on labeling listing an approved agency.\n\n#--- 1404.11 Exterior insulation finish system (EIFS).\n\nEIFS shall be designed and constructed in accordance with Section 1408.\n\n#--- 1404.12 Polypropylene siding.\n\nPolypropylene siding shall be certified and labeled as conforming to the requirements of ASTM D 7254 and those of Section 1404.12.1 or 1404.12.2 of this code by an approved agency. Polypropylene siding shall be installed in accordance with manufacturer's instructions and the requirements of Section 1405.18 of this code. Polypropylene siding shall be secured to the building so as to provide weather protection for the exterior walls of the building.\n\n#---- 1404.12.1 Flame spread index.\n\nThe certification of the flame spread index shall be accompanied by a test report stating that all portions of the test specimen ahead of the flame front remained in position during the test in accordance with ASTM E 84 or UL 723.\n\n#---- 1404.12.2 Distance between adjacent buildings.\n\nThe distance between a building with polypropylene siding and the adjacent building shall be not less than 10 feet (3048 mm).\n\n#--- 1404.13 Foam plastic insulation.\n\nFoam plastic insulation used in exterior wall covering assemblies shall comply with Chapter 26 and be fireblocked in accordance with Section 718.2.6.1.\n\n#-- Section BC 1405: Installation of Wall Coverings\n\n#--- 1405.1 General.\n\nExterior wall coverings shall be designed and constructed in accordance with the applicable provisions of this section. Installations not prescribed herein shall be permitted, provided that such alternative has been approved. Installations shall be in accordance with approved construction documents where a permit is required. Installations of exterior wall coverings shall comply with the special inspection requirements of Chapter 17.\n\n#--- 1405.2 Weather protection.\n\nThe exterior wall envelope shall provide weather protection for the building. The materials of the minimum nominal thickness specified in Table 1405.2 shall be acceptable as approved weather coverings.\n\nException: Weather coverings not meeting the minimum nominal thicknesses specified in Table 1405.2 shall be permitted provided such alternative has been approved.\n\nTable 1405.2 Minimum Thickness of Weather Coverings\n\nFor SI: 1 inch = 25.4 mm, 1 ounce = 28.35 g, 1 square foot = 0.093 m 2 .\n\na. Wood siding of thicknesses less than 0.5 inch shall be placed over sheathing that conforms to Section 2304.6.\n\nb. Exclusive of texture.\n\nc. As measured at the bottom of decorative grooves.\n\nd. 16 ounces per square foot for cold-rolled copper and lead-coated copper, 12 ounces per square foot for copper shingles, high-yield copper and lead-coated high-yield copper.\n\n* Veneer units in this group shall be of an approved type and not be greater than 2 inches in thickness.\n\n#--- 1405.3 Vapor retarders.\n\nVapor retarders as described in Section 1405.3.3 shall be provided based on an approved design using accepted engineering practice for hygrothermal analysis.\n\n#---- 1405.3.1 Reserved.\n\n#---- 1405.3.2 Reserved.\n\n#---- 1405.3.3 Material vapor retarder class.\n\nThe vapor retarder class shall be based on the manufacturer's certified testing or a tested assembly. The following shall be deemed to meet the class specified:\n\nClass I: Sheet polyethylene, non-perforated aluminum foil with a perm rating of less than or equal to 0.1.\n\nClass II: Kraft-faced fiberglass batts or paint with a perm rating greater than 0.1 and less than or equal to 1.0.\n\nClass III: Latex or enamel paint with a perm rating of greater than 1.0 and less than or equal to 10.0.\n\n#---- 1405.3.4 Minimum clear airspaces and vented openings for vented cladding.\n\nFor the purposes of this section, vented cladding shall include the following minimum clear airspaces:\n\n1. Vinyl lap or horizontal aluminum siding applied over a weather-resistive barrier as specified in this chapter.\n\n2. Brick veneer with a clear airspace as specified in this code.\n\n3. Other approved vented claddings.\n\n#--- 1405.4 Flashing.\n\nFlashing shall be installed in such a manner so as to prevent moisture from entering the wall or to redirect moisture to the exterior. Flashing shall be installed where required at the perimeters of exterior door and window assemblies, penetrations and terminations of exterior wall assemblies, exterior wall intersections with roofs, chimneys, porches, decks, balconies and similar projections and at built-in gutters and similar locations where moisture could enter the wall. Flashing with projecting flanges shall be installed on both sides and the ends of copings, under sills and continuously above projecting trim.\n\n#---- 1405.4.1 Exterior wall pockets.\n\nIn exterior walls of buildings or structures, wall pockets or crevices in which moisture can accumulate shall be avoided or protected with caps or drips, or other approved means shall be provided to prevent water damage.\n\n#---- 1405.4.2 Masonry.\n\nFlashing and weep holes in anchored veneer shall be located in the first course of masonry above finished ground level above the foundation wall or slab, and other points of support, including structural floors, shelf angles and lintels where anchored veneers are designed in accordance with Section 1405.6.\n\n#--- 1405.5 Wood veneers.\n\nWood veneers on exterior walls of buildings of Type I, II, III and IV construction shall be not less than 1-inch (25.4 mm) nominal thickness, 0.438-inch (11.1 mm) exterior hardboard siding or 0.375-inch (9.5 mm) exterior-type wood structural panels or particleboard and shall conform to the following:\n\n1. The veneer shall not exceed 40 feet (12190 mm) in height above grade. Where fire-retardant-treated wood is used, the height shall not exceed 60 feet (18290 mm) in height above grade.\n\n2. The veneer is attached to or furred from a noncombustible backing that is fire-resistance rated as required by other provisions of this code.\n\n3. Where open or spaced wood veneers (without concealed spaces) are used, they shall not project more than 24 inches (609.6 mm) from the building wall.\n\n#--- 1405.6 Anchored masonry veneer.\n\nAnchored masonry veneer shall comply with the provisions of Sections 1405.6, 1405.7, 1405.8 and 1405.9 and Sections 12.1 and 12.2 of TMS 402, as modified by Chapter 21 of this code.\n\n#---- 1405.6.1 Tolerances.\n\nAnchored masonry veneers in accordance with Chapter 14 are not required to meet the tolerances in Article 3.3 F1 of TMS 602.\n\n#---- 1405.6.2 Seismic requirements.\n\nAnchored masonry veneer located in Seismic Design Category C or D shall conform to the requirements of Section 12.2.2.10 of TMS 402, as modified by Chapter 21 of this code\n\n#--- 1405.7 Stone veneer.\n\nAnchored stone veneer units not exceeding 10 inches (254 mm) in thickness shall be anchored directly to masonry, concrete or to stud construction by one of the following methods:\n\n1. With concrete or masonry backing, anchor ties shall be not less than 0.1055-inch (2.68 mm) corrosion-resistant wire, or approved equal, formed beyond the base of the backing. The legs of the loops shall be not less than 6 inches (152.4 mm) in length bent at right angles and laid in the mortar joint, and spaced so that the eyes or loops are 12 inches (304.8 mm) maximum on center in both directions. There shall be provided not less than a 0.1055-inch (2.68 mm) corrosion-resistant wire tie, or approved equal, threaded through the exposed loops for every 2 square feet (0.2 m 2 ) of stone veneer. This tie shall be a loop having legs not less than 15 inches (381 mm) in length, so bent that the tie will lie in the stone veneer mortar joint. The last 2 inches (50.8 mm) of each wire leg shall have a right-angle bend. One-inch (25.4 mm) minimum thickness of cement grout shall be placed between the backing and the stone veneer.\n\n2. With wood stud backing, a 2-inch by 2-inch (50.8 mm by 50.8 mm) 0.0625-inch (1.59 mm) zinc-coated or nonmetallic coated wire mesh with two layers of water-resistive barrier in accordance with Section 1404.2 shall be applied directly to wood studs spaced not more than 16 inches (406.4 mm) on center. On studs, the mesh shall be attached with 2-inch (50.8 mm) long corrosion-resistant steel wire furring nails at 4 inches (101.6 mm) on center providing a minimum 1.125-inch (28.58 mm) penetration into each stud and with 8d (0.120 in. diameter) annular threaded nails at 8 inches (203.2 mm) on center into top and bottom plates or with equivalent wire ties. There shall be not less than a 0.1055-inch (2.68 mm) zinc-coated or nonmetallic coated wire, or approved equal, attached to the stud with not smaller than an 8d (0.120 in. diameter) annular threaded nail for every 2 square feet (0.2 m 2 ) of stone veneer. This tie shall be a loop having legs not less than 15 inches (381 mm) in length, so bent that the tie will lie in the stone veneer mortar joint. The last 2 inches (50.8 mm) of each wire leg shall have a right-angle bend. One-inch (25.4 mm) minimum thickness of cement grout shall be placed between the backing and the stone veneer.\n\n3. With cold-formed steel stud backing, a 2-inch by 2-inch (50.8 mm by 50.8 mm) 0.0625-inch (1.59 mm) zinc-coated or nonmetallic coated wire mesh with two layers of water-resistive barrier in accordance with Section 1404.2 shall be applied directly to steel studs spaced at not more than 16 inches (406.4 mm) on center. The mesh shall be attached with corrosion-resistant #8 self-drilling, tapping screws at 4 inches (101.6 mm) on center, and at 8 inches (203.2 mm) on center into top and bottom tracks or with equivalent wire ties. Screws shall extend through the steel connection not fewer than three exposed threads. There shall be not less than a 0.1055-inch (2.68 mm) corrosion-resistant wire, or approved equal, attached to the stud with not smaller than a #8 self-drilling, tapping screw extending through the steel framing not fewer than three exposed threads for every 2 square feet (0.2 m 2 ) of stone veneer. This tie shall be a loop having legs not less than 15 inches (381 mm) in length, so bent that the tie will lie in the stone veneer mortar joint. The last 2 inches (50.8 mm) of each wire leg shall have a right-angle bend. One inch (25.4 mm) minimum thickness of cement grout shall be placed between the backing and the stone veneer. The cold-formed steel framing members shall have a minimum bare steel thickness of 0.0428 inches (1.087 mm).\n\n#--- 1405.8 Slab-type veneer.\n\nAnchored slab-type veneer units not exceeding 2 inches (50.8 mm) in thickness shall be anchored directly to masonry, concrete or light-frame construction. For veneer units of marble, travertine, granite or other stone units of slab form, ties of corrosion-resistant dowels in drilled holes shall be located in the middle third of the edge of the units, spaced not more than 24 inches (609.6 mm) apart around the periphery of each unit with not less than four ties per veneer unit. Units shall not exceed 20 square feet (1.9 m 2 ) in area. If the dowels are not tight fitting, the holes shall be drilled not more than 0.063 inch (1.6 mm) larger in diameter than the dowel, with the hole countersunk to a diameter and depth equal to twice the diameter of the dowel in order to provide a tight-fitting key of cement mortar at the dowel locations where the mortar in the joint has set. Veneer ties shall be corrosion-resistant metal capable of resisting, in tension or compression, a force equal to two times the weight of the attached veneer. If made of sheet metal, veneer ties shall be not smaller in area than 0.0336 by 1 inch (0.853 by 25.4 mm) or, if made of wire, not smaller in diameter than 0.1483-inch (3.76 mm) wire.\n\n#--- 1405.9 Terra cotta.\n\nAnchored terra cotta or ceramic units not less than 1 inch (25.4 mm) thick shall be anchored directly to masonry, concrete or stud construction. Terra cotta or ceramic unit anchorage shall be engineered to transfer loads to stable backup walls utilizing not less than two non-corrosive anchors per unit.\n\n#--- 1405.10 Adhered masonry veneer.\n\nAdhered masonry veneer shall comply with the applicable requirements in this section and Sections 12.1 and 12.3 of TMS 402, as modified by Chapter 21 of this code.\n\n#---- 1405.10.1 Exterior adhered masonry veneer.\n\nExterior adhered masonry veneer shall be installed in accordance with the manufacturer's instructions and Section 1405.10.\n\n#----- 1405.10.1.1 Water-resistive barriers.\n\nWater-resistive barriers shall be installed as required in Section 2510.6.\n\n#----- 1405.10.1.2 Flashing.\n\nFlashing shall comply with this section and the applicable requirements of Section 1405.4.\n\n#------ 1405.10.1.2.1 Flashing at foundation.\n\nA corrosion-resistant screed or flashing of a minimum 0.019-inch (0.48 mm) or 26 gage galvanized or plastic with a minimum vertical attachment flange of 3 1/2 inches (88.9 mm) shall be installed to extend not less than 1 inch (25.4 mm) below the foundation plate line on exterior stud walls in accordance with Section 1405.4. The water-resistive barrier shall lap over the exterior of the attachment flange of the screed or flashing.\n\n#----- 1405.10.1.3 Clearances.\n\nOn exterior stud walls, adhered masonry veneer shall be installed not less than 4 inches (101.6 mm) above the earth, or not less than 2 inches (50.8 mm) above paved areas, or not less than 1/2 inch (12.7 mm) above exterior walking surfaces that are supported by the same foundation that supports the exterior wall.\n\n#----- 1405.10.1.4 Adhered masonry veneer installed with lath and mortar.\n\nExterior adhered masonry veneer installed with lath and mortar shall comply with the following.\n\n#------ 1405.10.1.4.1 Lathing.\n\nLathing shall comply with the requirements of Section 2510.\n\n#------ 1405.10.1.4.2 Scratch coat.\n\nA nominal 1/2-inch (12.7 mm) thick layer of mortar complying with the material requirements of Sections 2103 and 2512.2 shall be applied, encapsulating the lathing. The surface of this mortar shall be scored horizontally, resulting in a scratch coat.\n\n#------ 1405.10.1.4.3 Adhering veneer.\n\nThe masonry veneer units shall be adhered to the mortar scratch coat with a nominal 1/2-inch (12.7 mm) thick setting bed of mortar complying with Sections 2103 and 2512.2 applied to create a full setting bed for the back of the masonry veneer units. The masonry veneer units shall be worked into the setting bed resulting in a nominal 3/8-inch (9.5 mm) setting bed after the masonry veneer units are applied.\n\n#----- 1405.10.1.5 Adhered masonry veneer applied directly to masonry and concrete.\n\nAdhered masonry veneer applied directly to masonry or concrete shall comply with the applicable requirements of Section 1405.10, and with the requirements of Section 1405.10.1.4 or 2510.7.\n\n#----- 1405.10.1.6 Cold weather construction.\n\nCold weather construction of adhered masonry veneer shall comply with the requirements of Sections 2104 and 2512.4.\n\n#----- 1405.10.1.7 Hot weather construction.\n\nHot weather construction of adhered masonry veneer shall comply with the requirements of Section 2104.\n\n#---- 1405.10.2 Exterior adhered masonry veneers – porcelain tile.\n\nAdhered units shall not exceed 5/8 inch (15.8 mm) thickness and 24 inches (609.6 mm) in any face dimension nor more than 3 square feet (0.28 m 2 ) in total face area and shall not weigh more than 9 pounds psf (0.43 kN/m 2 ). Porcelain tile shall be adhered to an approved backing system.\n\n#---- 1405.10.3 Interior adhered masonry veneers.\n\nInterior adhered masonry veneers shall have a maximum weight of 20 psf (0.958 kg/m 2 ) and shall be installed in accordance with Section 1405.10. The supporting members shall be designed to limit deflection to 1/600 of the span of the supporting members.\n\n#--- 1405.11 Metal veneers.\n\nVeneers of metal shall be fabricated from approved corrosion-resistant materials or shall be protected front and back with porcelain enamel, or otherwise be treated to render the metal resistant to corrosion. Such veneers shall be not less than 0.0149-inch (0.378 mm) nominal thickness sheet steel mounted on wood or metal furring strips or approved sheathing on light-frame construction.\n\n#---- 1405.11.1 Attachment.\n\nExterior metal veneer shall be securely attached to the supporting masonry or framing members with corrosion-resistant fastenings, metal ties or by other approved devices or methods. The spacing of the fastenings or ties shall not exceed 24 inches (609.6 mm) either vertically or horizontally, but where units exceed 4 square feet (0.4 m 2 ) in area there shall be not less than four attachments per unit. The metal attachments shall have a cross-sectional area not less than provided by W 1.7 wire. Such attachments and their supports shall be designed and constructed to resist the wind loads as specified in Section 1609 for components and cladding.\n\n#---- 1405.11.2 Weather protection.\n\nMetal supports for exterior metal veneer shall be protected by painting, galvanizing or by other approved coating or treatment. Wood studs, furring strips or other wood supports for exterior metal veneer shall be approved pressure-treated wood or protected as required in Section 1403.2. Joints and edges exposed to the weather shall be caulked with approved durable waterproofing material or by other approved means to prevent penetration of moisture.\n\n#---- 1405.11.3 Backup.\n\nMasonry backup shall not be required for metal veneer unless required by the fire-resistance requirements of this code.\n\n#---- 1405.11.4 Grounding.\n\nGrounding of metal veneers on buildings shall comply with the requirements of the New York City Electrical Code and Chapter 27 of this code.\n\n#--- 1405.12 Thin exterior structural glass veneer.\n\nThe area of a single section of thin exterior structural glass veneer shall not exceed 10 square feet (0.93 m 2 ) where that section is not more than 15 feet (4572 mm) above the level of the sidewalk or grade level directly below, and shall not exceed 6 square feet (0.56 m 2 ) where it is more than 15 feet (4572 mm) above that level. In no event shall thin exterior structural glass veneer be installed more than 35 feet (10 668 mm) above the level of the sidewalk or grade level directly below.\n\n#---- 1405.12.1 Length and height.\n\nThe length or height of any section of thin exterior structural glass veneer shall not exceed 48 inches (1220 mm).\n\n#---- 1405.12.2 Thickness.\n\nThe thickness of thin exterior structural glass veneer shall be not less than 0.344 inch (8.7 mm).\n\n#---- 1405.12.3 Application.\n\nThin exterior structural glass veneer shall be set only after backing is thoroughly dry and after application of an approved bond coat uniformly over the entire surface of the backing so as to effectively seal the surface. Glass shall be set in place with an approved mastic cement in sufficient quantity so that at least 50 percent of the area of each glass unit is directly bonded to the backing by mastic not less than 1/4 inch (6.4 mm) thick and not more than 5/8 inch (15.9 mm) thick. The bond coat and mastic shall be evaluated for compatibility and shall bond firmly together.\n\n#---- 1405.12.4 Installation at sidewalk level.\n\nWhere thin exterior structural glass veneer extends to a sidewalk surface, each section shall rest in an approved metal molding, and be set at least 1/4 inch (6.4 mm) above the highest point of the sidewalk. The space between the molding and the sidewalk shall be thoroughly caulked and made water tight.\n\n#----- 1405.12.4.1 Installation above sidewalk level.\n\nWhere thin exterior structural glass veneer is installed above the level of the top of a bulkhead facing, or at a level more than 36 inches (914.4 mm) above the sidewalk level, the mastic cement binding shall be supplemented with approved nonferrous metal shelf angles located in the horizontal joints in every course. Such shelf angles shall be not less than 0.0478 inch (1.2 mm) thick and not less than 2 inches (50.8 mm) long and shall be spaced at approved intervals, with not less than two angles for each glass unit. Shelf angles shall be secured to the wall or backing with expansion bolts, toggle bolts or by other approved methods.\n\n#---- 1405.12.5 Joints.\n\nUnless otherwise specifically approved by the commissioner, abutting edges of thin exterior structural glass veneer shall be ground square. Mitered joints shall not be used except where specifically approved for wide angles. Joints shall be uniformly buttered with an approved jointing compound and horizontal joints shall be held to not less than 0.063 inch (1.6 mm) by an approved nonrigid substance or device. Where thin exterior structural glass veneer abuts nonresilient material at sides or top, expansion joints not less than 1/4 inch (6.4 mm) wide shall be provided.\n\n#---- 1405.12.6 Mechanical fastenings.\n\nThin exterior structural glass veneer installed above the level of the heads of show windows and veneer installed more than 12 feet (3657.6 mm) above sidewalk level shall, in addition to the mastic cement and shelf angles, be held in place by the use of fastenings at each vertical or horizontal edge, or at the four corners of each glass unit. Fastenings shall be secured to the wall or backing with expansion bolts, toggle bolts or by other methods. Fastenings shall be so designed as to hold the glass veneer in a vertical plane independent of the mastic cement. Shelf angles providing both support and fastenings shall be permitted.\n\n#---- 1405.12.7 Flashing.\n\nExposed edges of thin exterior structural glass veneer shall be flashed with overlapping corrosion-resistant metal flashing or equivalent and caulked with a waterproof compound in a manner to effectively prevent the entrance of moisture between the glass veneer and the backing.\n\n#--- 1405.13 Exterior windows and doors.\n\nWindows and doors installed in exterior walls shall conform to the testing and performance requirements of Section 1709.5.\n\n#---- 1405.13.1 Installation.\n\nWindows and doors shall be installed in accordance with the manufacturer's instructions. Fastener size and spacing shall be provided in such instructions and shall be calculated based on maximum loads and spacing used in the tests.\n\n#---- 1405.13.2 Windows in Group R-2 and R-3 occupancies.\n\nWindows in Group R-2 and R-3 occupancies shall comply with Sections 1015.9 and 1015.8, respectively.\n\n#---- 1405.13.3 Windows in R-2 Occupancy.\n\nWindows in R-2 occupancy shall be subject to any applicable requirements of the New York City Department of Health and Mental Hygiene with regard to window guards.\n\n#--- 1405.14 Vinyl siding.\n\nVinyl siding conforming to the requirements of this section and complying with ASTM D 3679 shall be permitted on exterior walls of buildings located in areas where the allowable stress design speed V asd , as determined in accordance with Section 1609.3.1, does not exceed 100 miles per hour (44.7 m/s) and the building height is less than or equal to 40 feet (12 192 mm) in Exposure C. Where construction is located in areas where the allowable stress design speed V asd , as determined in accordance with Section 1609.3.1, exceeds 100 miles per hour (44.7 m/s), or building heights are in excess of 40 feet (12 192 mm), tests or calculations showing compliance with Chapter 16 of this code shall be submitted. Vinyl siding shall be secured to the building so as to provide weather protection for the exterior walls of the building.\n\n#---- 1405.14.1 Application.\n\nThe siding shall be applied over sheathing or materials listed in Section 2304.6. Siding shall be applied to conform to the water-resistive barrier requirements in Section 1403. Siding and accessories shall be installed in accordance with the manufacturer's instructions. Unless otherwise specified in the manufacturer's instructions, nails used to fasten the siding and accessories shall have a minimum 0.313-inch (7.9 mm) head diameter and 1/8-inch (3.18 mm) shank diameter. The nails shall be corrosion resistant and shall be long enough to penetrate the studs or nailing strip at least 3/4 inch (19.1 mm). For cold-formed steel light-frame construction, corrosion-resistant fasteners shall be used. Screw fasteners shall penetrate the cold-formed steel framing at least three exposed threads. Other fasteners shall be installed in accordance with the manufacturer's instructions. Where the siding is installed horizontally, the fastener spacing shall not exceed 16 inches (406.4 mm) horizontally and 12 inches (304.8 mm) vertically. Where the siding is installed vertically, the fastener spacing shall not exceed 12 inches (304.8 mm) horizontally and 12 inches (304.8 mm) vertically.\n\n#--- 1405.15 Cement plaster.\n\nCement plaster applied to exterior walls shall conform to the requirements specified in Chapter 25.\n\n#--- 1405.16 Fiber-cement siding.\n\nFiber-cement siding complying with Section 1404.10 shall be permitted on exterior walls of Type I, II, III, IV and V construction for wind pressure resistance or wind speed exposures as indicated by the manufacturer's listing and label and the installation instructions. Where specified, the siding shall be installed over sheathing or materials listed in Section 2304.6 and shall be installed to conform to the water-resistive barrier requirements in Section 1403. Siding and accessories shall be installed in accordance with the manufacturer's instructions. Unless otherwise specified in the the manufacturer's instructions, nails used to fasten the siding to wood studs shall be corrosion-resistant round head smooth shank and shall be long enough to penetrate the studs at least 1 inch (25.4 mm). For cold-formed steel light-frame construction, corrosion-resistant fasteners shall be used. Screw fasteners shall penetrate the cold-formed steel framing at least three exposed full threads. Other fasteners shall be installed in accordance with the manufacturer's instructions.\n\n#---- 1405.16.1 Panel siding.\n\nFiber-cement panels shall comply with the requirements of ASTM C 1186, Type A, minimum Grade II or ISO 8336, Category A, minimum Class 2. Panels shall be installed with the long dimension either parallel or perpendicular to framing. Vertical and horizontal joints shall occur over framing members and shall be protected with sealant, battens or flashing. Alternatively, vertical or horizontal joints shall be shiplap or otherwise designed to comply with Section 1403.2 of this code. Panel siding shall be installed with fasteners in accordance with the manufacturer's instructions.\n\n#---- 1405.16.2 Lap siding.\n\nFiber-cement lap siding having a maximum width of 12 inches (304.8 mm) shall comply with the requirements of ASTM C 1186, Type A, minimum Grade II or ISO 8336, Category A, minimum Class 2. Lap siding shall be lapped a minimum of 1 1/4 inches (32 mm) and lap siding not having tongue-and-groove end joints shall have the ends protected with caulking, covered with an H-section joint cover, located over a strip of flashing or shall be otherwise designed to comply with Section 1403.2 of this code. Lap siding courses shall be installed with the fastener heads exposed or concealed in accordance with the manufacturer's instructions.\n\n#--- 1405.17 Fastening.\n\nWeather boarding and wall coverings shall be securely fastened with aluminum, copper, zinc, zinc-coated or other approved corrosion-resistant fasteners in accordance with the nailing schedule in Table 2304.10.1 or the manufacturer's instructions. Shingles and other weather coverings shall be attached with appropriate standard-shingle nails to furring strips securely nailed to studs, or with approved mechanically bonding nails, except where sheathing is of wood not less than 1-inch (25.4 mm) nominal thickness or of wood structural panels as specified in Table 2308.6.3(3).\n\n#--- 1405.18 Polypropylene siding.\n\nPolypropylene siding conforming to the requirements of this section and complying with Section 1404.12 shall be limited to exterior walls of Type VB construction located in areas where the wind speed specified in Chapter 16 does not exceed 100 miles per hour (44.7 m/s) and the building height is less than or equal to 40 feet (12 192 mm) in Exposure C. Where construction is located in areas where the basic wind speed exceeds 100 miles per hour (44.7 m/s), or building heights are in excess of 40 feet (12 192 mm), tests or calculations showing compliance with Chapter 16 shall be submitted. Polypropylene siding shall be installed in accordance with the manufacturer's instructions. Polypropylene siding shall be secured to the building so as to provide weather protection for the exterior walls of the building.\n\n#-- Section BC 1406: Combustible Materials on the Exterior Side of Exterior Walls\n\n#--- 1406.1 General.\n\n#-- Section 1406 shall apply to exterior wall coverings, exterior balconies and similar projections, bay and oriel windows, decks, porches, porticos, entranceways, and storm enclosures constructed of combustible materials. Combustible water-resistive barriers complying with Section 1403.5.1 shall be permitted in exterior wall coverings. Fireblocking shall be installed in accordance with Section 1406.2.3. Existing building retrofits utilizing combustible exterior wall coverings shall also comply with Section 1406.5. Combustible exterior wall coverings shall be subject to the special inspection requirements of Section 1705.16.\n\n#--- 1406.2 Combustible exterior wall coverings.\n\nCombustible exterior wall coverings, including architectural trim, shall comply with this section.\n\nExceptions:\n\n1. Plastics complying with Chapter 26.\n\n2. Metal composite materials (MCM) complying with Section 1407.\n\n3. High-pressure decorative exterior-grade compact laminates (HPL) complying with Section 1409.\n\n#---- 1406.2.1 Type I, II, III and IV construction.\n\nIn buildings of Type I, II, III and IV construction, exterior wall coverings shall be permitted to be constructed of combustible materials in accordance with Section 1406.2.1.1, subject to the following limitations:\n\n1. Combustible exterior wall coverings shall not exceed 10 percent of an exterior wall surface area on any given story. Such combustible exterior wall covering shall not be permitted on exterior walls where the fire separation distance is 5 feet (1524 mm) or less.\n\n2. Combustible exterior wall coverings shall be limited to 40 feet (12 192 mm) in height above grade plane.\n\n3. Combustible exterior wall coverings constructed of fire-retardant-treated wood complying with Section 2303.2 for exterior installation shall not be limited in wall surface area where the fire separation distance is 5 feet (1524 mm) or less and shall be permitted up to 60 feet (18 288 mm) in height above grade plane, regardless of the fire separation distance.\n\n4. Wood veneers shall comply with Section 1405.5.\n\n5. Combustible exterior wall coverings shall not be permitted on buildings of Type IV construction utilizing CLT or SCL complying with Section 602.4.\n\n6. Combustible exterior wall coverings shall not be permitted at exterior balconies in accordance with Section 1406.3.\n\n#----- 1406.2.1.1 Ignition resistance.\n\nWhere permitted by Section 1406.2.1 of this code, combustible exterior wall coverings shall be tested in accordance with NFPA 268.\n\nExceptions: The following materials are not required to be tested in accordance with NFPA 268. However, such materials shall comply with all other provisions of Section 1406 of this code.\n\n1. Wood or wood-based products.\n\n2. Other combustible materials covered with an exterior weather covering other than vinyl sidings included in and complying with the thickness requirements of Table 1405.2 of this code.\n\n3. Aluminum having a minimum thickness of 0.019 inch (0.48 mm).\n\n#------ 1406.2.1.1.1 Fire separation 5 feet or less.\n\nWhere installed on exterior walls having a fire separation distance of 5 feet (1524 mm) or less, combustible exterior wall coverings shall not exhibit sustained flaming as defined in NFPA 268.\n\n#------ 1406.2.1.1.2 Fire separation greater than 5 feet.\n\nFor fire separation distances greater than 5 feet (1524 mm), any exterior wall covering shall be permitted that has been exposed to a reduced level of incident radiant heat flux in accordance with the NFPA 268 test method without exhibiting sustained flaming. The minimum fire separation distance required for the exterior wall covering shall be determined from Table 1406.2.1.1.2 of this code based on the maximum tolerable level of incident radiant heat flux that does not cause sustained flaming of the exterior wall covering.\n\nTable 1406.2.1.1.2 Minimum Fire Separation for Combustible Exterior Wall Coverings\n\nFor SI: 1 foot = 304.8 mm, 1 Btu/H 2 × °F = 0.0057 kW/m 2 × K.\n\n#---- 1406.2.2 Location.\n\nCombustible exterior wall coverings located along the top of exterior walls shall be completely backed up by the exterior wall and shall not extend over or above the top of the exterior walls.\n\n#---- 1406.2.3 Fireblocking.\n\nExterior wall coverings shall be fireblocked in accordance with Section 718.2.6.\n\n#--- 1406.3 Exterior balconies and similar projections.\n\nExterior wall covering on walls abutting balconies, and cladding on the sides and underside of balconies, shall be constructed of noncombustible materials. Exterior walls abutting balconies shall be noncombustible up to 12 feet (3657.6 mm) above the walking surface or to the underside of the balcony above, whichever is less. On cantilevered balconies, the exterior wall abutting the balcony, plus 3 feet (914.4 mm) on each side, shall be constructed of noncombustible materials. On recessed and semirecessed balconies, the exterior walls abutting the balconies shall be constructed of noncombustible materials.\n\nException: Combustible exterior wall coverings shall be allowed on balconies in Type V construction with a fire separation distance greater than or equal to 5 feet (1524 mm).\n\n#--- 1406.4 Bay and oriel windows, decks, porches, porticos, entranceways, and storm enclosures.\n\nBay and oriel windows, decks, porches, porticos, entranceways and storm enclosures shall conform to the type of construction required for the building to which they are attached, including required fire rating, unless otherwise modified by the requirements of this section. For the purposes of this section, such structures shall be referred to as, \"appendages\".\n\nException: Plastic complying with Chapter 26.\n\n#---- 1406.4.1 Appendages on Type I and II construction.\n\nAppendages on buildings of Type I or II construction shall be constructed of noncombustible materials. However, on buildings not more than three stories or 40 feet (12 192 mm) in height, whichever is less, fire-retardant-treated wood shall be permitted.\n\n#---- 1406.4.2 Appendages on Type III, IV and VA construction.\n\nAppendages on buildings of Type III, IV and VA construction may be constructed of combustible materials, provided that all the following conditions are met:\n\n1. Such building does not exceed three stories or 40 feet (12 192 mm) in height, whichever is less.\n\n2. The main use or dominant occupancy of such building is classified in Occupancy Group R-2 or R-3.\n\n3. The appendage has an exterior separation on all exposed sides of at least 15 feet (4572 mm), measured from the outermost surface of the appendage, except that appendages with exposed sides protected by minimum 1-hour fire-rated construction extending at least 36 inches (914.4 mm) above the highest combustible horizontal surface may be located up to a minimum distance of 36 inches (914.4 mm) from any property line.\n\n4. The appendage is so constructed that its removal or destruction will not reduce the structural stability or fire-resistive integrity of the building.\n\n5. The appendage has a superficial area not exceeding 150 square feet (13.9 m 2 ) when viewed from directly above and is included in the area limitations of Table 503* for the entire building.\n\n* Editor's note: As set forth in L.L. 2021/126; Table 503 was deleted by L.L. 2021/126.\n\n6. The appendage is not higher than the sills of the second-story windows.\n\n7. The vertical surface area of the combustible portions of the appendage does not exceed 10 percent of the total wall area (windows excluded) of the building.\n\n8. For enclosed appendages, the roof of the appendage has a class A roof covering, and the soffit or ceiling covering the combustible roof framing shall have a minimum 1-hour fire-resistance rating.\n\nException: Appendages constructed of fire-retardant-treated wood, on buildings not exceeding 3 stories or40 feet (12 192 mm) in height, whichever is less, need not comply with Items 2 through 8.\n\n#---- 1406.4.3 Appendages on Type VB construction.\n\nAppendages may be constructed of combustible materials on buildings of construction Type VB.\n\n#--- 1406.5 Retrofit of existing buildings.\n\nCombustible materials shall not be permitted for use at the outermost surface of the exterior wall covering for exterior envelope retrofits of existing nonsprinklered buildings over 75 feet (22 860 mm), unless the following conditions are satisfied:\n\n1. The outermost surface of the combustible exterior wall covering shall be interrupted by a noncombustible material at least 3 feet (914.4 mm) high between the top of one opening and the bottom of the opening immediately above to form a continuous band across building elevations.\n\n2. On walls without openings, a 3 feet (914.4 mm) high noncombustible band shall interrupt the outermost surface of the combustible exterior wall covering at least every 15 feet (4572 mm) vertically.\n\n#-- Section BC 1407: Metal Composite Materials (MCM)\n\n#--- 1407.1 General.\n\nThe provisions of this section shall govern the materials, construction and quality of metal composite materials (MCM) for use as exterior wall coverings in addition to other applicable requirements of Chapters 14 and 16.\n\n#---- 1407.1.1 Plastic core.\n\nThe plastic core of the MCM shall not contain foam plastic insulation as defined in Section 202.\n\n#---- 1407.1.2 Prohibited locations.\n\nThe use of MCM in exterior wall coverings is subject to the following limitations:\n\n1. MCM is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n2. MCM is prohibited in exterior wall coverings at exterior balconies in accordance with Section 1406.3.\n\n#--- 1407.2 Exterior wall finish.\n\nMCM used as exterior wall finish or as elements of bay and oriel windows to provide cladding or weather resistance shall comply with Sections 1407.4 through 1407.16.\n\n#--- 1407.3 Architectural trim and embellishments.\n\nMCM used as architectural trim or embellishments shall comply with Sections 1407.7 through 1407.14.\n\n#--- 1407.4 Structural design.\n\nMCM systems shall be designed and constructed to resist wind loads as required by Chapter 16 for components and cladding.\n\n#--- 1407.5 Approval.\n\nResults of approved tests or an engineering analysis shall be submitted to the commissioner to verify compliance with the requirements of Chapter 16 for wind loads.\n\n#--- 1407.6 Weather resistance.\n\nMCM systems shall comply with Section 1403 and shall be designed and constructed to resist wind and rain in accordance with this section and the manufacturer's installation instructions.\n\n#--- 1407.7 Durability.\n\nMCM systems shall be constructed of approved materials that maintain the performance characteristics required in Section 1407 for the duration of use.\n\n#--- 1407.8 Fire-resistance rating.\n\nWhere MCM systems are used on exterior walls required to have a fire-resistance rating in accordance with Section 705, evidence shall be submitted to the commissioner that the required fire-resistance rating is maintained.\n\nException: MCM systems not containing foam plastic insulation, which are installed on the outer surface of a fire-resistance-rated exterior wall in a manner such that the attachments do not penetrate through the entire exterior wall assembly, shall not be required to comply with this section.\n\n#--- 1407.9 Surface-burning characteristics.\n\nMCM shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested as an assembly in the maximum thickness intended for use in accordance with ASTM E 84 or UL 723.\n\n#--- 1407.10 Thermal barriers.\n\nMCM shall be separated from the interior of a building by an approved thermal barrier consisting of 5/8-inch (15.9 mm) Type X gypsum wallboard or equivalent thermal barrier material that will limit the average temperature rise of the unexposed surface to not more than 250°F (12 1°C) after 20 minutes of fire exposure in accordance with the standard time-temperature curve of ASTM E 119 or UL 263. The thermal barrier shall be installed in accordance with criteria established by testing in accordance with UL 1715, where the thermal barrier shall remain in place for 20 minutes.\n\n#--- 1407.11 Full-scale tests.\n\nAll MCM systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285. Such testing shall be performed on the MCM system with the MCM in the maximum thickness intended for use, including any required fireblocking. Approved NFPA 285 tested assembly design documentation of the MCM system shall be included on the submitted construction documents complying with Section 1401.2 of this code. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department.\n\n#--- 1407.12 Reserved.\n\n#--- 1407.13 Foam plastic insulation.\n\nMCM systems containing foam plastic insulation shall also comply with the requirements of Section 2603.\n\n#--- 1407.14 Labeling.\n\nMCM shall be labeled in accordance with this code and Section 28-113 of the Administrative Code.\n\n#--- 1407.15 Special inspection.\n\nMCM shall be subject to special inspection in accordance with Chapter 17.\n\n#--- 1407.16 Fireblocking.\n\nMCM installations shall be fireblocked in accordance with Section 718.2.6.1.\n\n#-- Section BC 1408: Exterior Insulation and Finish Systems (EIFS)\n\n#--- 1408.1 General.\n\nThe provisions of this section shall govern the materials, construction and quality of exterior insulation and finish systems (EIFS) for use as exterior wall coverings in addition to other applicable requirements of Chapters 7, 14, 16, 17 and 26.\n\n#---- 1408.1.1 Prohibited locations.\n\nThe use of EIFS containing foam plastic insulation in exterior wall coverings is subject to the following limitations:\n\n1. EIFS containing foam plastic insulation is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n2. EIFS containing foam plastic insulation is prohibited in exterior wall coverings at exterior balconies in accordance with Section 1406.3.\n\n#--- 1408.2 Performance characteristics.\n\nEIFS shall be constructed such that it meets the performance characteristics required in ASTM E 2568.\n\n#--- 1408.3 Structural design.\n\nThe underlying structural framing and substrate shall be designed and constructed to resist loads as required by Chapter 16.\n\n#--- 1408.4 Weather resistance.\n\nEIFS shall comply with Section 1403 and shall be designed and constructed to resist environmental conditions in accordance with this section, the approved construction documents and manufacturer's installation instructions.\n\n#---- 1408.4.1 EIFS with drainage.\n\nEIFS with drainage shall have an average minimum drainage efficiency of 90 percent when tested in accordance the requirements of ASTM E 2273 and is required on framed walls of Type V construction, Residential Group R occupancies.\n\n#----- 1408.4.1.1 Water-resistive barrier.\n\nFor EIFS with drainage, the water-resistive barrier shall comply with Section 1404.2 of this code or ASTM E 2570.\n\n#--- 1408.5 Installation.\n\nInstallation of the EIFS and EIFS with drainage shall be in accordance with the EIFS manufacturer's instructions and this section.\n\n#--- 1408.6 Special inspections.\n\nEIFS installations shall comply with the provisions of Chapter 17.\n\n#--- 1408.7 Fireblocking.\n\nEIFS installations containing foam plastic insulation shall be fireblocked in accordance with Section 718.2.6.1.\n\n#--- 1408.8 Foam plastic insulation.\n\nEIFS installations containing foam plastic insulation shall be tested and comply with the requirements of Section 2603.\n\n#--- 1408.9 Thermal barrier.\n\nEIFS installations containing foam plastic insulation shall be separated from the interior of a building in accordance with Section 2603.5.2.\n\n#-- Section BC 1409: High-Pressure Decorative Exterior-Grade Compact Laminates (HPL)\n\n#--- 1409.1 General.\n\nThe provisions of this section shall govern the materials, construction and quality of High-Pressure Decorative Exterior-Grade Compact Laminates (HPL) for use as exterior wall coverings in addition to other applicable requirements of Chapters 14 and 16.\n\n#---- 1409.1.1 Prohibited locations.\n\nThe use of HPL in exterior wall coverings is subject to the following limitations:\n\n1. HPL is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n2. HPL is prohibited in exterior wall coverings at exterior balconies and shall comply with Section 1406.3.\n\n#--- 1409.2 Exterior wall finish.\n\nHPL used as exterior wall covering or as elements of bay and oriel windows to provide cladding or weather resistance shall comply with Sections 1409.4 through 1409.16.\n\n#--- 1409.3 Architectural trim and embellishments.\n\nHPL used as architectural trim or embellishments shall comply with Sections 1409.7 through 1409.14.\n\n#--- 1409.4 Structural design.\n\nHPL systems shall be designed and constructed to resist wind loads as required by Chapter 16 for components and cladding.\n\n#--- 1409.5 Approval.\n\nResults of approved tests or an engineering analysis shall be submitted to the commissioner to verify compliance with the requirements of Chapter 16 for wind loads.\n\n#--- 1409.6 Weather resistance.\n\nHPL systems shall comply with Section 1403 and shall be designed and constructed to resist wind and rain in accordance with this section and the manufacturer's instructions.\n\n#--- 1409.7 Durability.\n\nHPL systems shall be constructed of approved materials that maintain the performance characteristics required in Section 1409 for the duration of use.\n\n#--- 1409.8 Fire-resistance rating.\n\nWhere HPL systems are used on exterior walls required to have a fire-resistance rating in accordance with Section 705, evidence shall be submitted to the commissioner that the required fire-resistance rating is maintained.\n\nException: HPL systems not containing foam plastic insulation that are installed on the outer surface of a fire-resistance-rated exterior wall in a manner such that the attachments do not penetrate through the entire exterior wall assembly shall not be required to comply with this section.\n\n#--- 1409.9 Surface-burning characteristics.\n\nHPL shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in the minimum and maximum thicknesses intended for use in accordance with ASTM E 84 or UL 723.\n\n#--- 1409.10 Thermal barriers.\n\nHPL shall be separated from the interior of a building by an approved thermal barrier consisting of 5/8-inch (15.9 mm) Type X gypsum wallboard or equivalent thermal barrier material that will limit the average temperature rise of the unexposed surface to not more than 250°F (121°C) after 20 minutes of fire exposure in accordance with the standard time temperature curve of ASTM E 119 or UL 263. The thermal barrier shall be installed in accordance with criteria established by testing performed in accordance with UL 1715, where the thermal barrier shall remain in place for 20 minutes.\n\n#--- 1409.11 Full-scale tests.\n\nAll HPL systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285. Such testing shall be performed on the HPL system with the HPL in the minimum and maximum thicknesses intended for use, including any required fireblocking. Approved NFPA 285 tested assembly design documentation of the HPL system shall be included on the submitted construction documents complying with Section 1401.2 of this code. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department.\n\n#--- 1409.12 Reserved.\n\n#--- 1409.13 Foam plastic insulation.\n\nHPL systems containing foam plastic insulation shall also comply with the requirements of Section 2603.\n\n#--- 1409.14 Labeling.\n\nHPL shall be labeled in accordance with this code and Article 113 of Title 28 of the Administrative Code.\n\n#--- 1409.15 Special inspection.\n\nHPL shall be subject to the special inspection requirements of Chapter 17.\n\n#--- 1409.16 Fireblocking.\n\nHPL installations shall be fireblocked in accordance with Section 718.2.6.1.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#-- Section BC 1410: Plastic Composite Decking\n\n#--- 1410.1 Plastic composite decking.\n\nExterior deck boards, stair treads, handrails and guardrail systems constructed of plastic composites, including plastic lumber, shall comply with Section 2612.",
+  "schemaVersion": 1
 }

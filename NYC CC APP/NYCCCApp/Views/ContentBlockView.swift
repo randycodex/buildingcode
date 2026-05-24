@@ -237,7 +237,7 @@ private struct RawTableBlockView: View {
 
     var body: some View {
         TableHTMLView(
-            html: TableHTMLRenderer.html(forRawFragment: htmlFragment),
+            html: TableHTMLRenderer.html(forRawFragment: htmlFragment, tableID: tableID),
             tableID: tableID
         )
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -348,6 +348,7 @@ private final class ImageBlockCache {
 
     private init() {
         cache.countLimit = 64
+        cache.totalCostLimit = 32 * 1024 * 1024
     }
 
     static func sizeBucket(forMaxPixelSize maxPixelSize: CGFloat) -> Int {
@@ -373,7 +374,7 @@ private final class ImageBlockCache {
     }
 
     func setInlineImage(_ image: UIImage, for url: URL, sizeBucket: Int) {
-        cache.setObject(image, forKey: inlineCacheKey(url: url, sizeBucket: sizeBucket))
+        cache.setObject(image, forKey: inlineCacheKey(url: url, sizeBucket: sizeBucket), cost: Self.memoryCost(of: image))
     }
 
     func fullImage(for url: URL) -> UIImage? {
@@ -381,7 +382,7 @@ private final class ImageBlockCache {
     }
 
     func setFullImage(_ image: UIImage, for url: URL) {
-        cache.setObject(image, forKey: fullCacheKey(url: url))
+        cache.setObject(image, forKey: fullCacheKey(url: url), cost: Self.memoryCost(of: image))
     }
 
     func loadFullImage(from url: URL) async -> UIImage? {
@@ -403,6 +404,14 @@ private final class ImageBlockCache {
 
     private func fullCacheKey(url: URL) -> NSString {
         "\(url.path)|full" as NSString
+    }
+
+    private static func memoryCost(of image: UIImage) -> Int {
+        if let cgImage = image.cgImage {
+            return cgImage.bytesPerRow * cgImage.height
+        }
+        let pixels = max(1, Int(image.size.width * image.scale)) * max(1, Int(image.size.height * image.scale))
+        return pixels * 4
     }
 }
 
@@ -447,6 +456,7 @@ private struct TableHTMLView: View {
     let tableID: String
     @State private var height: CGFloat
     @State private var shouldLoad = false
+    @State private var loadTask: Task<Void, Never>?
 
     init(html: String, tableID: String) {
         self.html = html
@@ -471,16 +481,27 @@ private struct TableHTMLView: View {
             }
         }
         .onAppear {
+            scheduleLoadIfNeeded()
+        }
+        .onDisappear {
             guard !shouldLoad else { return }
-            Task { @MainActor in
-                let delay = UInt64(staggerDelay(for: tableID) * 1_000_000_000)
-                if delay > 0 {
-                    try? await Task.sleep(nanoseconds: delay)
-                } else {
-                    await Task.yield()
-                }
-                shouldLoad = true
+            loadTask?.cancel()
+            loadTask = nil
+        }
+    }
+
+    private func scheduleLoadIfNeeded() {
+        guard !shouldLoad, loadTask == nil else { return }
+        loadTask = Task { @MainActor in
+            let delay = UInt64(staggerDelay(for: tableID) * 1_000_000_000)
+            if delay > 0 {
+                try? await Task.sleep(nanoseconds: delay)
+            } else {
+                await Task.yield()
             }
+            guard !Task.isCancelled else { return }
+            shouldLoad = true
+            loadTask = nil
         }
     }
 
@@ -534,6 +555,10 @@ private struct TableWebView: UIViewRepresentable {
         var tableID: String?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            measureHeight(in: webView, remainingPasses: 4)
+        }
+
+        private func measureHeight(in webView: WKWebView, remainingPasses: Int) {
             webView.evaluateJavaScript("Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)") { result, _ in
                 if let value = result as? CGFloat {
                     self.heightChanged?(value)
@@ -541,6 +566,11 @@ private struct TableWebView: UIViewRepresentable {
                     self.heightChanged?(CGFloat(value))
                 } else if let value = result as? Int {
                     self.heightChanged?(CGFloat(value))
+                }
+                guard remainingPasses > 0 else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self, weak webView] in
+                    guard let self, let webView else { return }
+                    self.measureHeight(in: webView, remainingPasses: remainingPasses - 1)
                 }
             }
         }
@@ -555,6 +585,8 @@ private struct TableWebView: UIViewRepresentable {
 
 private enum TableHTMLHeightCache {
     private static var heights: [String: CGFloat] = [:]
+    private static var keys: [String] = []
+    private static let limit = 256
 
     static func height(for id: String) -> CGFloat? {
         heights[id]
@@ -562,16 +594,48 @@ private enum TableHTMLHeightCache {
 
     static func setHeight(_ height: CGFloat, for id: String) {
         heights[id] = height
+        if let existingIndex = keys.firstIndex(of: id) {
+            keys.remove(at: existingIndex)
+        }
+        keys.append(id)
+        while keys.count > limit {
+            let evicted = keys.removeFirst()
+            heights.removeValue(forKey: evicted)
+        }
+    }
+}
+
+private final class TableHTMLDocumentCache {
+    static let shared = TableHTMLDocumentCache()
+
+    private let cache = NSCache<NSString, NSString>()
+
+    private init() {
+        cache.countLimit = 96
+        cache.totalCostLimit = 16 * 1024 * 1024
+    }
+
+    func document(for key: String, build: () -> String) -> String {
+        let cacheKey = key as NSString
+        if let cached = cache.object(forKey: cacheKey) {
+            return cached as String
+        }
+        let html = build()
+        cache.setObject(html as NSString, forKey: cacheKey, cost: html.utf8.count)
+        return html
     }
 }
 
 private enum TableHTMLRenderer {
-    static func html(forRawFragment fragment: String) -> String {
-        let bodyHTML = fragment
-            .replacingOccurrences(of: "<ScrollTable", with: "<div class=\"scroll-table\"", options: .caseInsensitive)
-            .replacingOccurrences(of: "</ScrollTable>", with: "</div>", options: .caseInsensitive)
+    static func html(forRawFragment fragment: String, tableID: String) -> String {
+        TableHTMLDocumentCache.shared.document(
+            for: "raw|\(tableID)|\(fragment.count)"
+        ) {
+            let bodyHTML = fragment
+                .replacingOccurrences(of: "<ScrollTable", with: "<div class=\"scroll-table\"", options: .caseInsensitive)
+                .replacingOccurrences(of: "</ScrollTable>", with: "</div>", options: .caseInsensitive)
 
-        return """
+            return """
         <!doctype html>
         <html>
         <head>
@@ -650,24 +714,28 @@ private enum TableHTMLRenderer {
         </body>
         </html>
         """
+        }
     }
 
     static func html(for table: CodeTableBlock) -> String {
-        let colGroupHTML = colGroup(for: table)
-        let rows = (0..<max(0, table.rowCount)).map { rowIndex in
-            let rowStyle = rowStyle(for: table, rowIndex: rowIndex)
-            let cells = table.cells
-                .filter { $0.row == rowIndex }
-                .sorted { $0.column < $1.column }
-                .map(cellHTML)
-                .joined()
-            if rowStyle.isEmpty {
-                return "<tr>\(cells)</tr>"
-            }
-            return "<tr style=\"\(rowStyle)\">\(cells)</tr>"
-        }.joined()
+        TableHTMLDocumentCache.shared.document(
+            for: "table|\(table.id)|\(table.rowCount)|\(table.columnCount)|\(table.cells.count)|\(table.hashValue)"
+        ) {
+            let colGroupHTML = colGroup(for: table)
+            let rows = (0..<max(0, table.rowCount)).map { rowIndex in
+                let rowStyle = rowStyle(for: table, rowIndex: rowIndex)
+                let cells = table.cells
+                    .filter { $0.row == rowIndex }
+                    .sorted { $0.column < $1.column }
+                    .map(cellHTML)
+                    .joined()
+                if rowStyle.isEmpty {
+                    return "<tr>\(cells)</tr>"
+                }
+                return "<tr style=\"\(rowStyle)\">\(cells)</tr>"
+            }.joined()
 
-        return """
+            return """
         <!doctype html>
         <html>
         <head>
@@ -711,6 +779,7 @@ private enum TableHTMLRenderer {
         <body><div class="table-wrap"><table>\(colGroupHTML)\(rows)</table></div></body>
         </html>
         """
+        }
     }
 
     private static func cellHTML(_ cell: CodeTableCell) -> String {

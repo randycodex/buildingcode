@@ -1,712 +1,712 @@
 {
-  "chapterID" : 32,
-  "chapterNumber" : "32",
-  "groups" : [
+  "chapterID": 32,
+  "chapterNumber": "32",
+  "groups": [
     {
-      "headerLine" : "SECTION 3201",
-      "headingLine" : "GENERAL",
-      "id" : "SECTION 3201",
-      "sections" : [
+      "headerLine": "SECTION BC 3201",
+      "headingLine": "GENERAL",
+      "id": "SECTION BC 3201",
+      "sections": [
         {
-          "id" : 5715,
-          "kind" : "title",
-          "sectionNumber" : "3201.1",
-          "title" : "3201.1 Scope."
+          "id": 5715,
+          "kind": "title",
+          "sectionNumber": "3201.1",
+          "title": "3201.1 Scope."
         },
         {
-          "id" : 5716,
-          "kind" : "title",
-          "sectionNumber" : "3201.1.1",
-          "title" : "3201.1.1 Encroachments removable."
+          "id": 5716,
+          "kind": "title",
+          "sectionNumber": "3201.1.1",
+          "title": "3201.1.1 Encroachments removable."
         },
         {
-          "id" : 5717,
-          "kind" : "title",
-          "sectionNumber" : "3201.2",
-          "title" : "3201.2 Measurement."
+          "id": 5717,
+          "kind": "title",
+          "sectionNumber": "3201.2",
+          "title": "3201.2 Measurement."
         },
         {
-          "id" : 5718,
-          "kind" : "title",
-          "sectionNumber" : "3201.3",
-          "title" : "3201.3 Other laws."
+          "id": 5718,
+          "kind": "title",
+          "sectionNumber": "3201.3",
+          "title": "3201.3 Other laws."
         },
         {
-          "id" : 5719,
-          "kind" : "title",
-          "sectionNumber" : "3201.3.1",
-          "title" : "3201.3.1 Restrictions on construction and projections on certain streets, parkways, boardwalks and beaches."
+          "id": 5719,
+          "kind": "title",
+          "sectionNumber": "3201.3.1",
+          "title": "3201.3.1 Restrictions on construction and projections on certain streets, parkways, boardwalks and beaches."
         },
         {
-          "id" : 5720,
-          "kind" : "title",
-          "sectionNumber" : "3201.4",
-          "title" : "3201.4 Drainage."
+          "id": 5720,
+          "kind": "title",
+          "sectionNumber": "3201.4",
+          "title": "3201.4 Drainage."
         },
         {
-          "id" : 5721,
-          "kind" : "title",
-          "sectionNumber" : "3201.5",
-          "title" : "3201.5 Permission revocable."
+          "id": 5721,
+          "kind": "title",
+          "sectionNumber": "3201.5",
+          "title": "3201.5 Permission revocable."
         },
         {
-          "id" : 5722,
-          "kind" : "title",
-          "sectionNumber" : "3201.6",
-          "title" : "3201.6 Existing projections."
+          "id": 5722,
+          "kind": "title",
+          "sectionNumber": "3201.6",
+          "title": "3201.6 Existing projections."
         },
         {
-          "id" : 5723,
-          "kind" : "title",
-          "sectionNumber" : "3201.7",
-          "title" : "3201.7 Alteration of existing encroachments."
+          "id": 5723,
+          "kind": "title",
+          "sectionNumber": "3201.7",
+          "title": "3201.7 Alteration of existing encroachments."
         },
         {
-          "id" : 5724,
-          "kind" : "title",
-          "sectionNumber" : "3201.7.1",
-          "title" : "3201.7.1 Fences, guards and railings."
+          "id": 5724,
+          "kind": "title",
+          "sectionNumber": "3201.7.1",
+          "title": "3201.7.1 Fences, guards and railings."
         },
         {
-          "id" : 5725,
-          "kind" : "title",
-          "sectionNumber" : "3201.8",
-          "title" : "3201.8 Definitions."
+          "id": 5725,
+          "kind": "title",
+          "sectionNumber": "3201.8",
+          "title": "3201.8 Definitions."
         },
         {
-          "id" : 5726,
-          "kind" : "title",
-          "sectionNumber" : "3201.9",
-          "title" : "3201.9 Department of Transportation approval."
+          "id": 5726,
+          "kind": "title",
+          "sectionNumber": "3201.9",
+          "title": "3201.9 Department of Transportation approval."
         }
       ]
     },
     {
-      "headerLine" : "SECTION 3202",
-      "headingLine" : "ENCROACHMENTS",
-      "id" : "SECTION 3202",
-      "sections" : [
+      "headerLine": "SECTION BC 3202",
+      "headingLine": "ENCROACHMENTS",
+      "id": "SECTION BC 3202",
+      "sections": [
         {
-          "id" : 5727,
-          "kind" : "title",
-          "sectionNumber" : "3202.1",
-          "title" : "3202.1 Encroachments below grade."
+          "id": 5727,
+          "kind": "title",
+          "sectionNumber": "3202.1",
+          "title": "3202.1 Encroachments below grade."
         },
         {
-          "id" : 5728,
-          "kind" : "title",
-          "sectionNumber" : "3202.1.1",
-          "title" : "3202.1.1 Footings."
+          "id": 5728,
+          "kind": "title",
+          "sectionNumber": "3202.1.1",
+          "title": "3202.1.1 Footings."
         },
         {
-          "id" : 5729,
-          "kind" : "title",
-          "sectionNumber" : "3202.1.1.1",
-          "title" : "3202.1.1.1 Footings for temporary barriers or shields in flood hazard areas or shaded X-Zones."
+          "id": 5729,
+          "kind": "title",
+          "sectionNumber": "3202.1.1.1",
+          "title": "3202.1.1.1 Footings for temporary barriers or shields in flood hazard areas or shaded X-Zones."
         },
         {
-          "id" : 5730,
-          "kind" : "title",
-          "sectionNumber" : "3202.1.2",
-          "title" : "3202.1.2 Vaults."
+          "id": 5730,
+          "kind": "title",
+          "sectionNumber": "3202.1.2",
+          "title": "3202.1.2 Vaults."
         },
         {
-          "id" : 5731,
-          "kind" : "title",
-          "sectionNumber" : "3202.1.3",
-          "title" : "3202.1.3 Areaways."
+          "id": 5731,
+          "kind": "title",
+          "sectionNumber": "3202.1.3",
+          "title": "3202.1.3 Areaways."
         },
         {
-          "id" : 5732,
-          "kind" : "title",
-          "sectionNumber" : "3202.1.4",
-          "title" : "3202.1.4 Tunnels between buildings."
+          "id": 5732,
+          "kind": "title",
+          "sectionNumber": "3202.1.4",
+          "title": "3202.1.4 Tunnels between buildings."
         },
         {
-          "id" : 5733,
-          "kind" : "title",
-          "sectionNumber" : "3202.1.5",
-          "title" : "3202.1.5 Sidewalk supports."
+          "id": 5733,
+          "kind": "title",
+          "sectionNumber": "3202.1.5",
+          "title": "3202.1.5 Sidewalk supports."
         },
         {
-          "id" : 5734,
-          "kind" : "title",
-          "sectionNumber" : "3202.1.6",
-          "title" : "3202.1.6 Insulation."
+          "id": 5734,
+          "kind": "title",
+          "sectionNumber": "3202.1.6",
+          "title": "3202.1.6 Insulation."
         },
         {
-          "id" : 5735,
-          "kind" : "title",
-          "sectionNumber" : "3202.2",
-          "title" : "3202.2 Encroachments above grade."
+          "id": 5735,
+          "kind": "title",
+          "sectionNumber": "3202.2",
+          "title": "3202.2 Encroachments above grade."
         },
         {
-          "id" : 5736,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1",
-          "title" : "3202.2.1 Encroachments subject to the area limitations."
+          "id": 5736,
+          "kind": "title",
+          "sectionNumber": "3202.2.1",
+          "title": "3202.2.1 Encroachments subject to the area limitations."
         },
         {
-          "id" : 5737,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.1",
-          "title" : "3202.2.1.1 Entrance details."
+          "id": 5737,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.1",
+          "title": "3202.2.1.1 Entrance details."
         },
         {
-          "id" : 5738,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.2",
-          "title" : "3202.2.1.2 Architectural details."
+          "id": 5738,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.2",
+          "title": "3202.2.1.2 Architectural details."
         },
         {
-          "id" : 5739,
-          "kind" : "title",
-          "sectionNumber" : "1.1.",
-          "title" : "1.1. Located more than 10 feet (3048 mm) above the sidewalk and that project more than 10 inches (254 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission; or"
+          "id": 5739,
+          "kind": "title",
+          "sectionNumber": "1.1.",
+          "title": "1.1. Located more than 10 feet (3048 mm) above the sidewalk and that project more than 10 inches (254 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission; or"
         },
         {
-          "id" : 5740,
-          "kind" : "title",
-          "sectionNumber" : "1.2.",
-          "title" : "1.2. Located 10 feet (3048 mm) or less above the sidewalk, and that project more than 4 inches (102 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission, and further provided that if the projection exceeds 18 inches (457 mm), the applicant demonstrates to the Department of Transportation's satisfaction that the replacement or restoration will not adversely impact the use of the public right of way."
+          "id": 5740,
+          "kind": "title",
+          "sectionNumber": "1.2.",
+          "title": "1.2. Located 10 feet (3048 mm) or less above the sidewalk, and that project more than 4 inches (102 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission, and further provided that if the projection exceeds 18 inches (457 mm), the applicant demonstrates to the Department of Transportation's satisfaction that the replacement or restoration will not adversely impact the use of the public right of way."
         },
         {
-          "id" : 5741,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.3",
-          "title" : "3202.2.1.3 Balconies."
+          "id": 5741,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.3",
+          "title": "3202.2.1.3 Balconies."
         },
         {
-          "id" : 5742,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4",
-          "title" : "3202.2.1.4 Marquees."
+          "id": 5742,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4",
+          "title": "3202.2.1.4 Marquees."
         },
         {
-          "id" : 5743,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4.1",
-          "title" : "3202.2.1.4.1 Height."
+          "id": 5743,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4.1",
+          "title": "3202.2.1.4.1 Height."
         },
         {
-          "id" : 5744,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4.2",
-          "title" : "3202.2.1.4.2 Projection."
+          "id": 5744,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4.2",
+          "title": "3202.2.1.4.2 Projection."
         },
         {
-          "id" : 5745,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4.3",
-          "title" : "3202.2.1.4.3 Thickness."
+          "id": 5745,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4.3",
+          "title": "3202.2.1.4.3 Thickness."
         },
         {
-          "id" : 5746,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4.4",
-          "title" : "3202.2.1.4.4 Dimensions."
+          "id": 5746,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4.4",
+          "title": "3202.2.1.4.4 Dimensions."
         },
         {
-          "id" : 5747,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4.5",
-          "title" : "3202.2.1.4.5 Occupancy restrictions."
+          "id": 5747,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4.5",
+          "title": "3202.2.1.4.5 Occupancy restrictions."
         },
         {
-          "id" : 5748,
-          "kind" : "title",
-          "sectionNumber" : "1.1",
-          "title" : "1.1 Public buildings, including schools."
+          "id": 5748,
+          "kind": "title",
+          "sectionNumber": "1.1",
+          "title": "1.1 Public buildings, including schools."
         },
         {
-          "id" : 5749,
-          "kind" : "title",
-          "sectionNumber" : "1.3.",
-          "title" : "1.3. Hotels."
+          "id": 5749,
+          "kind": "title",
+          "sectionNumber": "1.3.",
+          "title": "1.3. Hotels."
         },
         {
-          "id" : 5750,
-          "kind" : "title",
-          "sectionNumber" : "1.4.",
-          "title" : "1.4. Terminals."
+          "id": 5750,
+          "kind": "title",
+          "sectionNumber": "1.4.",
+          "title": "1.4. Terminals."
         },
         {
-          "id" : 5751,
-          "kind" : "title",
-          "sectionNumber" : "1.5.",
-          "title" : "1.5. Large department stores."
+          "id": 5751,
+          "kind": "title",
+          "sectionNumber": "1.5.",
+          "title": "1.5. Large department stores."
         },
         {
-          "id" : 5752,
-          "kind" : "title",
-          "sectionNumber" : "1.6.",
-          "title" : "1.6. Supermarkets."
+          "id": 5752,
+          "kind": "title",
+          "sectionNumber": "1.6.",
+          "title": "1.6. Supermarkets."
         },
         {
-          "id" : 5753,
-          "kind" : "title",
-          "sectionNumber" : "1.7.",
-          "title" : "1.7. Multiple dwellings."
+          "id": 5753,
+          "kind": "title",
+          "sectionNumber": "1.7.",
+          "title": "1.7. Multiple dwellings."
         },
         {
-          "id" : 5754,
-          "kind" : "title",
-          "sectionNumber" : "1.8.",
-          "title" : "1.8. Office buildings."
+          "id": 5754,
+          "kind": "title",
+          "sectionNumber": "1.8.",
+          "title": "1.8. Office buildings."
         },
         {
-          "id" : 5755,
-          "kind" : "title",
-          "sectionNumber" : "2.1.",
-          "title" : "2.1. Bronx."
+          "id": 5755,
+          "kind": "title",
+          "sectionNumber": "2.1.",
+          "title": "2.1. Bronx."
         },
         {
-          "id" : 5756,
-          "kind" : "title",
-          "sectionNumber" : "2.1.1.",
-          "title" : "2.1.1. Edgewater Road and Halleck Street between Lafayette Avenue and East Bay Avenue."
+          "id": 5756,
+          "kind": "title",
+          "sectionNumber": "2.1.1.",
+          "title": "2.1.1. Edgewater Road and Halleck Street between Lafayette Avenue and East Bay Avenue."
         },
         {
-          "id" : 5757,
-          "kind" : "title",
-          "sectionNumber" : "2.1.2.",
-          "title" : "2.1.2. Lafayette Avenue between Edgewater Road and the Bronx River."
+          "id": 5757,
+          "kind": "title",
+          "sectionNumber": "2.1.2.",
+          "title": "2.1.2. Lafayette Avenue between Edgewater Road and the Bronx River."
         },
         {
-          "id" : 5758,
-          "kind" : "title",
-          "sectionNumber" : "2.1.3.",
-          "title" : "2.1.3. East Bay Avenue between Halleck Street and the Bronx River."
+          "id": 5758,
+          "kind": "title",
+          "sectionNumber": "2.1.3.",
+          "title": "2.1.3. East Bay Avenue between Halleck Street and the Bronx River."
         },
         {
-          "id" : 5759,
-          "kind" : "title",
-          "sectionNumber" : "2.1.4.",
-          "title" : "2.1.4. Hunt's Point Avenue between East Bay Avenue and the Bronx River."
+          "id": 5759,
+          "kind": "title",
+          "sectionNumber": "2.1.4.",
+          "title": "2.1.4. Hunt's Point Avenue between East Bay Avenue and the Bronx River."
         },
         {
-          "id" : 5760,
-          "kind" : "title",
-          "sectionNumber" : "2.1.5.",
-          "title" : "2.1.5. Exterior Street between East 149th Street and East 157th Street."
+          "id": 5760,
+          "kind": "title",
+          "sectionNumber": "2.1.5.",
+          "title": "2.1.5. Exterior Street between East 149th Street and East 157th Street."
         },
         {
-          "id" : 5761,
-          "kind" : "title",
-          "sectionNumber" : "2.1.6.",
-          "title" : "2.1.6. Cromwell Avenue between East 150th Street and East 153rd Street."
+          "id": 5761,
+          "kind": "title",
+          "sectionNumber": "2.1.6.",
+          "title": "2.1.6. Cromwell Avenue between East 150th Street and East 153rd Street."
         },
         {
-          "id" : 5762,
-          "kind" : "title",
-          "sectionNumber" : "2.1.7.",
-          "title" : "2.1.7. East 150th Street between Exterior Street and River Avenue."
+          "id": 5762,
+          "kind": "title",
+          "sectionNumber": "2.1.7.",
+          "title": "2.1.7. East 150th Street between Exterior Street and River Avenue."
         },
         {
-          "id" : 5763,
-          "kind" : "title",
-          "sectionNumber" : "2.1.8.",
-          "title" : "2.1.8. Westchester Avenue between St. Ann's Avenue and Bergen Avenue."
+          "id": 5763,
+          "kind": "title",
+          "sectionNumber": "2.1.8.",
+          "title": "2.1.8. Westchester Avenue between St. Ann's Avenue and Bergen Avenue."
         },
         {
-          "id" : 5764,
-          "kind" : "title",
-          "sectionNumber" : "2.1.9.",
-          "title" : "2.1.9. Brook Avenue between East 150th Street and East 156th Street."
+          "id": 5764,
+          "kind": "title",
+          "sectionNumber": "2.1.9.",
+          "title": "2.1.9. Brook Avenue between East 150th Street and East 156th Street."
         },
         {
-          "id" : 5765,
-          "kind" : "title",
-          "sectionNumber" : "2.1.10.",
-          "title" : "2.1.10. Bergen Avenue between East 149th Street and East 156th Street."
+          "id": 5765,
+          "kind": "title",
+          "sectionNumber": "2.1.10.",
+          "title": "2.1.10. Bergen Avenue between East 149th Street and East 156th Street."
         },
         {
-          "id" : 5766,
-          "kind" : "title",
-          "sectionNumber" : "2.1.11.",
-          "title" : "2.1.11. East 152nd Street between Bergen Avenue and Brook Avenue."
+          "id": 5766,
+          "kind": "title",
+          "sectionNumber": "2.1.11.",
+          "title": "2.1.11. East 152nd Street between Bergen Avenue and Brook Avenue."
         },
         {
-          "id" : 5767,
-          "kind" : "title",
-          "sectionNumber" : "2.1.12.",
-          "title" : "2.1.12. East 153rd Street between Bergen Avenue and Brook Avenue."
+          "id": 5767,
+          "kind": "title",
+          "sectionNumber": "2.1.12.",
+          "title": "2.1.12. East 153rd Street between Bergen Avenue and Brook Avenue."
         },
         {
-          "id" : 5768,
-          "kind" : "title",
-          "sectionNumber" : "2.2.",
-          "title" : "2.2. Brooklyn."
+          "id": 5768,
+          "kind": "title",
+          "sectionNumber": "2.2.",
+          "title": "2.2. Brooklyn."
         },
         {
-          "id" : 5769,
-          "kind" : "title",
-          "sectionNumber" : "2.2.1.",
-          "title" : "2.2.1. North 6th Street between Berry Street and Wythe Avenue."
+          "id": 5769,
+          "kind": "title",
+          "sectionNumber": "2.2.1.",
+          "title": "2.2.1. North 6th Street between Berry Street and Wythe Avenue."
         },
         {
-          "id" : 5770,
-          "kind" : "title",
-          "sectionNumber" : "2.3.",
-          "title" : "2.3. Manhattan."
+          "id": 5770,
+          "kind": "title",
+          "sectionNumber": "2.3.",
+          "title": "2.3. Manhattan."
         },
         {
-          "id" : 5771,
-          "kind" : "title",
-          "sectionNumber" : "2.3.1.",
-          "title" : "2.3.1. John Street to Fulton Street between South Street and Front Street."
+          "id": 5771,
+          "kind": "title",
+          "sectionNumber": "2.3.1.",
+          "title": "2.3.1. John Street to Fulton Street between South Street and Front Street."
         },
         {
-          "id" : 5772,
-          "kind" : "title",
-          "sectionNumber" : "2.3.2.",
-          "title" : "2.3.2. Fulton Street to Dover Street between South Street and Water Street."
+          "id": 5772,
+          "kind": "title",
+          "sectionNumber": "2.3.2.",
+          "title": "2.3.2. Fulton Street to Dover Street between South Street and Water Street."
         },
         {
-          "id" : 5773,
-          "kind" : "title",
-          "sectionNumber" : "2.3.3.",
-          "title" : "2.3.3. South Street and Front Street between John Street and Dover Street."
+          "id": 5773,
+          "kind": "title",
+          "sectionNumber": "2.3.3.",
+          "title": "2.3.3. South Street and Front Street between John Street and Dover Street."
         },
         {
-          "id" : 5774,
-          "kind" : "title",
-          "sectionNumber" : "2.3.4.",
-          "title" : "2.3.4. Water Street between Fulton Street and Dover Street."
+          "id": 5774,
+          "kind": "title",
+          "sectionNumber": "2.3.4.",
+          "title": "2.3.4. Water Street between Fulton Street and Dover Street."
         },
         {
-          "id" : 5775,
-          "kind" : "title",
-          "sectionNumber" : "2.3.5.",
-          "title" : "2.3.5. Horatio Street to West 14th Street between West Street and 9th Avenue."
+          "id": 5775,
+          "kind": "title",
+          "sectionNumber": "2.3.5.",
+          "title": "2.3.5. Horatio Street to West 14th Street between West Street and 9th Avenue."
         },
         {
-          "id" : 5776,
-          "kind" : "title",
-          "sectionNumber" : "2.3.6.",
-          "title" : "2.3.6. West Street, Washington Street, Greenwich Street"
+          "id": 5776,
+          "kind": "title",
+          "sectionNumber": "2.3.6.",
+          "title": "2.3.6. West Street, Washington Street, Greenwich Street"
         },
         {
-          "id" : 5777,
-          "kind" : "title",
-          "sectionNumber" : "2.3.7.",
-          "title" : "2.3.7. 9th Avenue and 10th Avenue between Horatio Street and West 14th Street."
+          "id": 5777,
+          "kind": "title",
+          "sectionNumber": "2.3.7.",
+          "title": "2.3.7. 9th Avenue and 10th Avenue between Horatio Street and West 14th Street."
         },
         {
-          "id" : 5778,
-          "kind" : "title",
-          "sectionNumber" : "2.3.8.",
-          "title" : "2.3.8. West 16th Street, north side, and West 17th Street, south side, between 10th Avenue and 11th Avenue."
+          "id": 5778,
+          "kind": "title",
+          "sectionNumber": "2.3.8.",
+          "title": "2.3.8. West 16th Street, north side, and West 17th Street, south side, between 10th Avenue and 11th Avenue."
         },
         {
-          "id" : 5779,
-          "kind" : "title",
-          "sectionNumber" : "2.3.9.",
-          "title" : "2.3.9. West 24th Street to West 26th Street, south side, between 11th Avenue and 12th Avenue."
+          "id": 5779,
+          "kind": "title",
+          "sectionNumber": "2.3.9.",
+          "title": "2.3.9. West 24th Street to West 26th Street, south side, between 11th Avenue and 12th Avenue."
         },
         {
-          "id" : 5780,
-          "kind" : "title",
-          "sectionNumber" : "2.3.10.",
-          "title" : "2.3.10. West 27th Street, north side, to West 28th Street between 11th Avenue and 12th Avenue."
+          "id": 5780,
+          "kind": "title",
+          "sectionNumber": "2.3.10.",
+          "title": "2.3.10. West 27th Street, north side, to West 28th Street between 11th Avenue and 12th Avenue."
         },
         {
-          "id" : 5781,
-          "kind" : "title",
-          "sectionNumber" : "2.3.11.",
-          "title" : "2.3.11. 12th Avenue and St. Claire Place between 125th Street and 132nd Street."
+          "id": 5781,
+          "kind": "title",
+          "sectionNumber": "2.3.11.",
+          "title": "2.3.11. 12th Avenue and St. Claire Place between 125th Street and 132nd Street."
         },
         {
-          "id" : 5782,
-          "kind" : "title",
-          "sectionNumber" : "2.3.12.",
-          "title" : "2.3.12. 12th Avenue, west side, between 132nd Street and 133rd Street."
+          "id": 5782,
+          "kind": "title",
+          "sectionNumber": "2.3.12.",
+          "title": "2.3.12. 12th Avenue, west side, between 132nd Street and 133rd Street."
         },
         {
-          "id" : 5783,
-          "kind" : "title",
-          "sectionNumber" : "2.4.",
-          "title" : "2.4. Queens."
+          "id": 5783,
+          "kind": "title",
+          "sectionNumber": "2.4.",
+          "title": "2.4. Queens."
         },
         {
-          "id" : 5784,
-          "kind" : "title",
-          "sectionNumber" : "2.4.1.",
-          "title" : "2.4.1. 95th Avenue, north side, between Sutphin Boulevard and 148th Street."
+          "id": 5784,
+          "kind": "title",
+          "sectionNumber": "2.4.1.",
+          "title": "2.4.1. 95th Avenue, north side, between Sutphin Boulevard and 148th Street."
         },
         {
-          "id" : 5785,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4.6",
-          "title" : "3202.2.1.4.6 Change of occupancy."
+          "id": 5785,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4.6",
+          "title": "3202.2.1.4.6 Change of occupancy."
         },
         {
-          "id" : 5786,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.4.7",
-          "title" : "3202.2.1.4.7 Other agency approvals."
+          "id": 5786,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.4.7",
+          "title": "3202.2.1.4.7 Other agency approvals."
         },
         {
-          "id" : 5787,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.5",
-          "title" : "3202.2.1.5 Light fixtures."
+          "id": 5787,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.5",
+          "title": "3202.2.1.5 Light fixtures."
         },
         {
-          "id" : 5788,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.6",
-          "title" : "3202.2.1.6 Flagpoles."
+          "id": 5788,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.6",
+          "title": "3202.2.1.6 Flagpoles."
         },
         {
-          "id" : 5789,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.7",
-          "title" : "3202.2.1.7 Wall signs."
+          "id": 5789,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.7",
+          "title": "3202.2.1.7 Wall signs."
         },
         {
-          "id" : 5790,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.8",
-          "title" : "3202.2.1.8 Projecting signs."
+          "id": 5790,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.8",
+          "title": "3202.2.1.8 Projecting signs."
         },
         {
-          "id" : 5791,
-          "kind" : "title",
-          "sectionNumber" : "1.1.1.",
-          "title" : "1.1.1. 5th Avenue between Washington Square north and 110th Street;"
+          "id": 5791,
+          "kind": "title",
+          "sectionNumber": "1.1.1.",
+          "title": "1.1.1. 5th Avenue between Washington Square north and 110th Street;"
         },
         {
-          "id" : 5792,
-          "kind" : "title",
-          "sectionNumber" : "1.1.2.",
-          "title" : "1.1.2. 34th Street between Park Avenue and 7th Avenue;"
+          "id": 5792,
+          "kind": "title",
+          "sectionNumber": "1.1.2.",
+          "title": "1.1.2. 34th Street between Park Avenue and 7th Avenue;"
         },
         {
-          "id" : 5793,
-          "kind" : "title",
-          "sectionNumber" : "1.1.3.",
-          "title" : "1.1.3. Madison Avenue between 23rd Street and 96th Street;"
+          "id": 5793,
+          "kind": "title",
+          "sectionNumber": "1.1.3.",
+          "title": "1.1.3. Madison Avenue between 23rd Street and 96th Street;"
         },
         {
-          "id" : 5794,
-          "kind" : "title",
-          "sectionNumber" : "1.1.4.",
-          "title" : "1.1.4. 57th Street between Lexington Avenue and Broadway;"
+          "id": 5794,
+          "kind": "title",
+          "sectionNumber": "1.1.4.",
+          "title": "1.1.4. 57th Street between Lexington Avenue and Broadway;"
         },
         {
-          "id" : 5795,
-          "kind" : "title",
-          "sectionNumber" : "1.1.5.",
-          "title" : "1.1.5. Vanderbilt Avenue between 42nd Street and 47th Street;"
+          "id": 5795,
+          "kind": "title",
+          "sectionNumber": "1.1.5.",
+          "title": "1.1.5. Vanderbilt Avenue between 42nd Street and 47th Street;"
         },
         {
-          "id" : 5796,
-          "kind" : "title",
-          "sectionNumber" : "1.1.6.",
-          "title" : "1.1.6. Park Avenue between 32nd Street and 40th Street;"
+          "id": 5796,
+          "kind": "title",
+          "sectionNumber": "1.1.6.",
+          "title": "1.1.6. Park Avenue between 32nd Street and 40th Street;"
         },
         {
-          "id" : 5797,
-          "kind" : "title",
-          "sectionNumber" : "1.1.7.",
-          "title" : "1.1.7. Park Avenue between 45th Street and 96th Street;"
+          "id": 5797,
+          "kind": "title",
+          "sectionNumber": "1.1.7.",
+          "title": "1.1.7. Park Avenue between 45th Street and 96th Street;"
         },
         {
-          "id" : 5798,
-          "kind" : "title",
-          "sectionNumber" : "1.1.8.",
-          "title" : "1.1.8. 33rd Street between Lexington Avenue and 5th Avenue;"
+          "id": 5798,
+          "kind": "title",
+          "sectionNumber": "1.1.8.",
+          "title": "1.1.8. 33rd Street between Lexington Avenue and 5th Avenue;"
         },
         {
-          "id" : 5799,
-          "kind" : "title",
-          "sectionNumber" : "1.1.9.",
-          "title" : "1.1.9. 35th through 41st Streets between Lexington Avenue and 5th Avenue;"
+          "id": 5799,
+          "kind": "title",
+          "sectionNumber": "1.1.9.",
+          "title": "1.1.9. 35th through 41st Streets between Lexington Avenue and 5th Avenue;"
         },
         {
-          "id" : 5800,
-          "kind" : "title",
-          "sectionNumber" : "1.1.10.",
-          "title" : "1.1.10. 43rd through 56th Streets between Lexington Avenue and 5th Avenue;"
+          "id": 5800,
+          "kind": "title",
+          "sectionNumber": "1.1.10.",
+          "title": "1.1.10. 43rd through 56th Streets between Lexington Avenue and 5th Avenue;"
         },
         {
-          "id" : 5801,
-          "kind" : "title",
-          "sectionNumber" : "1.1.11.",
-          "title" : "1.1.11. 58th Street between Lexington Avenue and 5th Avenue;"
+          "id": 5801,
+          "kind": "title",
+          "sectionNumber": "1.1.11.",
+          "title": "1.1.11. 58th Street between Lexington Avenue and 5th Avenue;"
         },
         {
-          "id" : 5802,
-          "kind" : "title",
-          "sectionNumber" : "1.1.12.",
-          "title" : "1.1.12. 60th Street between Lexington Avenue and 5th Avenue;"
+          "id": 5802,
+          "kind": "title",
+          "sectionNumber": "1.1.12.",
+          "title": "1.1.12. 60th Street between Lexington Avenue and 5th Avenue;"
         },
         {
-          "id" : 5803,
-          "kind" : "title",
-          "sectionNumber" : "1.1.13.",
-          "title" : "1.1.13. Nassau Street between Wall Street and Frankfort Street; or"
+          "id": 5803,
+          "kind": "title",
+          "sectionNumber": "1.1.13.",
+          "title": "1.1.13. Nassau Street between Wall Street and Frankfort Street; or"
         },
         {
-          "id" : 5804,
-          "kind" : "title",
-          "sectionNumber" : "1.1.14.",
-          "title" : "1.1.14. John Street between Broadway and William Street."
+          "id": 5804,
+          "kind": "title",
+          "sectionNumber": "1.1.14.",
+          "title": "1.1.14. John Street between Broadway and William Street."
         },
         {
-          "id" : 5805,
-          "kind" : "title",
-          "sectionNumber" : "1.2.1.",
-          "title" : "1.2.1. 72nd Street between Central Park West and River Drive."
+          "id": 5805,
+          "kind": "title",
+          "sectionNumber": "1.2.1.",
+          "title": "1.2.1. 72nd Street between Central Park West and River Drive."
         },
         {
-          "id" : 5806,
-          "kind" : "title",
-          "sectionNumber" : "2.2.2.",
-          "title" : "2.2.2. Washington Street between Myrtle Avenue and Prospect Street;"
+          "id": 5806,
+          "kind": "title",
+          "sectionNumber": "2.2.2.",
+          "title": "2.2.2. Washington Street between Myrtle Avenue and Prospect Street;"
         },
         {
-          "id" : 5807,
-          "kind" : "title",
-          "sectionNumber" : "2.2.3.",
-          "title" : "2.2.3. Court Street between Fulton Street and Livingston Street;"
+          "id": 5807,
+          "kind": "title",
+          "sectionNumber": "2.2.3.",
+          "title": "2.2.3. Court Street between Fulton Street and Livingston Street;"
         },
         {
-          "id" : 5808,
-          "kind" : "title",
-          "sectionNumber" : "2.2.4.",
-          "title" : "2.2.4. Pierrepont Street between Fulton Street and Clinton Street;"
+          "id": 5808,
+          "kind": "title",
+          "sectionNumber": "2.2.4.",
+          "title": "2.2.4. Pierrepont Street between Fulton Street and Clinton Street;"
         },
         {
-          "id" : 5809,
-          "kind" : "title",
-          "sectionNumber" : "2.2.5.",
-          "title" : "2.2.5. Montague Street between Court Street and Clinton Street;"
+          "id": 5809,
+          "kind": "title",
+          "sectionNumber": "2.2.5.",
+          "title": "2.2.5. Montague Street between Court Street and Clinton Street;"
         },
         {
-          "id" : 5810,
-          "kind" : "title",
-          "sectionNumber" : "2.2.6.",
-          "title" : "2.2.6. Remsen Street between Court Street and Clinton Street; or"
+          "id": 5810,
+          "kind": "title",
+          "sectionNumber": "2.2.6.",
+          "title": "2.2.6. Remsen Street between Court Street and Clinton Street; or"
         },
         {
-          "id" : 5811,
-          "kind" : "title",
-          "sectionNumber" : "2.2.7.",
-          "title" : "2.2.7. Joralemon Street between Court Street and Clinton Street."
+          "id": 5811,
+          "kind": "title",
+          "sectionNumber": "2.2.7.",
+          "title": "2.2.7. Joralemon Street between Court Street and Clinton Street."
         },
         {
-          "id" : 5812,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.1.9",
-          "title" : "3202.2.1.9 Sun control devices."
+          "id": 5812,
+          "kind": "title",
+          "sectionNumber": "3202.2.1.9",
+          "title": "3202.2.1.9 Sun control devices."
         },
         {
-          "id" : 5813,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.2",
-          "title" : "3202.2.2 Encroachments not subject to area limitations."
+          "id": 5813,
+          "kind": "title",
+          "sectionNumber": "3202.2.2",
+          "title": "3202.2.2 Encroachments not subject to area limitations."
         },
         {
-          "id" : 5814,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.2.1",
-          "title" : "3202.2.2.1 Ramps."
+          "id": 5814,
+          "kind": "title",
+          "sectionNumber": "3202.2.2.1",
+          "title": "3202.2.2.1 Ramps."
         },
         {
-          "id" : 5815,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.2.2",
-          "title" : "3202.2.2.2 Bridges between buildings."
+          "id": 5815,
+          "kind": "title",
+          "sectionNumber": "3202.2.2.2",
+          "title": "3202.2.2.2 Bridges between buildings."
         },
         {
-          "id" : 5816,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.2.3",
-          "title" : "3202.2.2.3 Flood shield supports."
+          "id": 5816,
+          "kind": "title",
+          "sectionNumber": "3202.2.2.3",
+          "title": "3202.2.2.3 Flood shield supports."
         },
         {
-          "id" : 5817,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.2.4",
-          "title" : "3202.2.2.4 Curb cuts."
+          "id": 5817,
+          "kind": "title",
+          "sectionNumber": "3202.2.2.4",
+          "title": "3202.2.2.4 Curb cuts."
         },
         {
-          "id" : 5818,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.2.4.1",
-          "title" : "3202.2.2.4.1 Curb cut removal."
+          "id": 5818,
+          "kind": "title",
+          "sectionNumber": "3202.2.2.4.1",
+          "title": "3202.2.2.4.1 Curb cut removal."
         },
         {
-          "id" : 5819,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.3",
-          "title" : "3202.2.3 Awnings."
+          "id": 5819,
+          "kind": "title",
+          "sectionNumber": "3202.2.3",
+          "title": "3202.2.3 Awnings."
         },
         {
-          "id" : 5820,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.3.1",
-          "title" : "3202.2.3.1 Store front awnings."
+          "id": 5820,
+          "kind": "title",
+          "sectionNumber": "3202.2.3.1",
+          "title": "3202.2.3.1 Store front awnings."
         },
         {
-          "id" : 5821,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.3.2",
-          "title" : "3202.2.3.2 Awnings over windows or doors."
+          "id": 5821,
+          "kind": "title",
+          "sectionNumber": "3202.2.3.2",
+          "title": "3202.2.3.2 Awnings over windows or doors."
         },
         {
-          "id" : 5822,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.4",
-          "title" : "3202.2.4 Fire department connections, caps or plugs."
+          "id": 5822,
+          "kind": "title",
+          "sectionNumber": "3202.2.4",
+          "title": "3202.2.4 Fire department connections, caps or plugs."
         },
         {
-          "id" : 5823,
-          "kind" : "title",
-          "sectionNumber" : "3202.2.5",
-          "title" : "3202.2.5 Exterior wall covering systems for prior code buildings."
+          "id": 5823,
+          "kind": "title",
+          "sectionNumber": "3202.2.5",
+          "title": "3202.2.5 Exterior wall covering systems for prior code buildings."
         },
         {
-          "id" : 5824,
-          "kind" : "title",
-          "sectionNumber" : "3202.3",
-          "title" : "3202.3 Temporary encroachments."
+          "id": 5824,
+          "kind": "title",
+          "sectionNumber": "3202.3",
+          "title": "3202.3 Temporary encroachments."
         },
         {
-          "id" : 5825,
-          "kind" : "title",
-          "sectionNumber" : "3202.3.1",
-          "title" : "3202.3.1 Sidewalk cafes."
+          "id": 5825,
+          "kind": "title",
+          "sectionNumber": "3202.3.1",
+          "title": "3202.3.1 Sidewalk cafes."
         },
         {
-          "id" : 5826,
-          "kind" : "title",
-          "sectionNumber" : "3202.3.2",
-          "title" : "3202.3.2 Temporary storm enclosures."
+          "id": 5826,
+          "kind": "title",
+          "sectionNumber": "3202.3.2",
+          "title": "3202.3.2 Temporary storm enclosures."
         },
         {
-          "id" : 5827,
-          "kind" : "title",
-          "sectionNumber" : "3202.3.2.1",
-          "title" : "3202.3.2.1 Temporary storm enclosures for eating and drinking establishments."
+          "id": 5827,
+          "kind": "title",
+          "sectionNumber": "3202.3.2.1",
+          "title": "3202.3.2.1 Temporary storm enclosures for eating and drinking establishments."
         },
         {
-          "id" : 5828,
-          "kind" : "title",
-          "sectionNumber" : "3202.3.2.2",
-          "title" : "3202.3.2.2 Temporary storm enclosures for other establishments."
+          "id": 5828,
+          "kind": "title",
+          "sectionNumber": "3202.3.2.2",
+          "title": "3202.3.2.2 Temporary storm enclosures for other establishments."
         },
         {
-          "id" : 5829,
-          "kind" : "title",
-          "sectionNumber" : "3202.3.3",
-          "title" : "3202.3.3 Temporary flood shields, stairs and ramps in flood hazard areas and shaded X-Zones."
+          "id": 5829,
+          "kind": "title",
+          "sectionNumber": "3202.3.3",
+          "title": "3202.3.3 Temporary flood shields, stairs and ramps in flood hazard areas and shaded X-Zones."
         }
       ]
     }
   ],
-  "rawDraftText" : "#- Chapter 32: Encroachments Into the Public Right-of-Way\n\n#-- Section BC 3201: General\n\n#--- 3201.1 Scope.\n\nThe provisions of this chapter shall govern the encroachment of structures into the public right-of-way.\n\n#---- 3201.1.1 Encroachments removable.\n\nAll encroachments permitted beyond the street line by the provisions of this chapter shall be constructed so that they may be removed at any time without endangering the structural safety or fire safety of the building except that footings as permitted under Section 3202.1.1 of this code need not be removable.\n\n#--- 3201.2 Measurement.\n\nThe projection of any structure or portion thereof shall be the distance measured horizontally from the lot line to the outermost point of the projection.\n\n#--- 3201.3 Other laws.\n\nThe provisions of this chapter shall not be construed to permit the violation of other laws regulating the use and occupancy of public property.\n\n#---- 3201.3.1 Restrictions on construction and projections on certain streets, parkways, boardwalks and beaches.\n\nNotwithstanding the provisions of this chapter, it shall be unlawful to build, erect, or make areaways, steps or other encroachments or projections prohibited by Sections 19-131, 19-132, 19-135, 18-109, 18-112 and 18-113 of the Administrative Code.\n\n#--- 3201.4 Drainage.\n\nDrainage water collected from a roof, awning, canopy or marquee, other than canvas and flexible material, and condensate from mechanical equipment shall not flow over a public walking surface.\n\n#--- 3201.5 Permission revocable.\n\nAny permission, expressed or implied, permitting the construction of encroachments within the area of the street under the provisions of this chapter shall be revocable, except footings as permitted under Section 3202.1.1.\n\n#--- 3201.6 Existing projections.\n\nAny part of a building that projects beyond a street line on January 1, 1938 may be maintained as constructed until its removal is directed in accordance with applicable law.\n\n#--- 3201.7 Alteration of existing encroachments.\n\nAlterations to existing encroachments beyond the street line may be permitted in whole or in part, provided that such alterations conform with the requirements of this chapter.\n\n#---- 3201.7.1 Fences, guards and railings.\n\nElements of existing fences, guards and railings shall not be increased in height, thickness, spacing or opacity.\n\nExceptions:\n\n1. Fences, guards and railings that are required to comply with other requirements of this code, including Chapters 10 and 16.\n\n2. Buildings or structures designated by the Landmarks Preservation Commission, where such fences, guards or railings are approved by the Landmarks Preservation Commission.\n\n#--- 3201.8 Definitions.\n\nThe following terms are defined in Chapter 2:\n\nAREAWAY.\n\nCURB LINE.\n\nFOOTING.\n\nPROJECTING SIGN.\n\nSIGN.\n\nSTREET.\n\nSTREET LINE.\n\nVAULT.\n\n#--- 3201.9 Department of Transportation approval.\n\nAny encroachment into the public right-of-way that exceeds the limitation provided for in this chapter shall require the approval of the Department of Transportation.\n\n#-- Section BC 3202: Encroachments\n\n#--- 3202.1 Encroachments below grade.\n\nEncroachments below grade shall comply with Sections 3202.1.1 through 3202.1.6.\n\n#---- 3202.1.1 Footings.\n\nExterior wall and column footings may be constructed to project beyond the street line not more than 12 inches (305 mm), provided that the top of the footing is not less than 8 feet (2438 mm) below the ground or sidewalk level. Foundation walls required to support permitted projections may be constructed to project not more than the permitted projection beyond the street line.\n\n#----- 3202.1.1.1 Footings for temporary barriers or shields in flood hazard areas or shaded X-Zones.\n\nIn flood hazard areas or shaded X-Zones, continuous footings for the support and attachment of temporary, removable dry floodproofing barriers or shields may be constructed to project beyond the street line not more than 12 inches (305 mm) both at grade and below grade.\n\n#---- 3202.1.2 Vaults.\n\nVaults may be permitted in accordance with the New York City Charter and Title 19 of the Administrative Code. Such vaults shall comply with the provisions of this code and other applicable laws and rules.\n\n#---- 3202.1.3 Areaways.\n\nAreaways shall be protected by grates, guards or other approved means, subject to approval by the Commissioner of the Department of Transportation.\n\n#---- 3202.1.4 Tunnels between buildings.\n\nTunnels connecting buildings, and projecting beyond street lines, may be constructed subject to the approval of the Commissioner of the Department of Transportation. Such tunnels shall comply with the provisions of this code and other applicable laws and regulations.\n\n#---- 3202.1.5 Sidewalk supports.\n\nExterior foundation walls are permitted to be constructed with a ledge that projects beyond the street line not more than 4 inches (102 mm) to support sidewalk construction, provided that:\n\n1. the top of the ledge is not more than 8 inches (203 mm) below the ground or sidewalk level; and\n\n2. bottom of the ledge is not more than 24 inches (610 mm) below the ground or sidewalk level.\n\n#---- 3202.1.6 Insulation.\n\nInsulation shall be permitted to encroach into the public right of way not more than 6 inches (152 mm) beyond the face of the structural element being insulated, in accordance with the following:\n\n1. The insulation is necessary to comply with the New York City Energy Conservation Code; or\n\n2. In existing buildings, the installation of the insulation will reduce greenhouse gas emissions, as demonstrated by achieving not less than a thirty percent reduction of the existing thermal envelope UA (the area-weighted average of assembly u-factors, as defined in the New York City Energy Conservation Code) as compared to the improved thermal envelope UA. For the purposes of calculating the reduction in the thermal envelope UA, the improved thermal envelope UA is the area-weighted average of the proposed opaque U-factor times the alteration area of the opaque wall assembly compared to the area-weighted average UA of the existing wall assembly. The UA calculation shall be performed using a method consistent with the New York City Energy Conservation Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 3202.2 Encroachments above grade.\n\nEncroachments into the public right-of-way above grade shall be prohibited except as provided for in Sections 3202.2.1 through 3202.2.5.\n\n#---- 3202.2.1 Encroachments subject to the area limitations.\n\nEncroachments that are subject to area limitations are those elements listed in Sections 3202.2.1.1 through 3202.2.1.9, generally of an architectural character, that form an integral part of the building facade. The aggregate area of all such elements constructed to extend beyond the street line shall not exceed 10 square feet (0.93 m 2 ) within any 10 feet (3048 mm) by 10 feet (3048 mm) square area of wall. The area of any such projection shall be measured at that vertical plane, parallel to the wall, in which the area of the projection is greatest. This plane of measurement may be at the street line, the line of maximum projection or any point in between. For the purpose of measuring the projected area of a balcony, air spaces of less than 6 inches (152 mm) between closely spaced railing or guards elements shall contribute to the area of the projection.\n\nExceptions:\n\n1. The aggregate area of all elements subject to area limitations that includes a balcony or associated railings and brackets shall not exceed 24 square feet (2.2 m 2 ) in any 240 square foot (22.3 m 2 ) area on a given story.\n\n2. The aggregate area of elements on existing buildings or structures designated by the Landmarks Preservation Commission as landmarks or within historic districts shall not be limited provided that such elements are approved by the Landmarks Preservation Commission.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012\/028.\n\n#----- 3202.2.1.1 Entrance details.\n\nEntrance details, including steps and doors when fully open, may be constructed to project beyond the street line not more than 18 inches (457 mm). Entrance steps that project beyond the street line shall be guarded at each end by railings at least 3 feet (914 mm) high or by other members of the entrance detail providing equivalent protection.\n\n#----- 3202.2.1.2 Architectural details.\n\nDetails such as cornices, eaves, bases, sills, headers, band course, opening frames, rustications, applied ornament or sculpture, grilles, windows when fully open, air conditioning units, and other similar elements may be constructed:\n\n1. To project not more than 4 inches (102 mm) beyond the street line when less than 10 feet (3048 mm) above the ground or sidewalk level.\n\n2. To project not more than 10 inches (254 mm) beyond the street line when more than 10 feet (3048 mm) above the ground or sidewalk level.\n\nExceptions:\n\n1. Replacement or restoration of historical architectural details that are, or were:\n\n#--- 1.1. Located more than 10 feet (3048 mm) above the sidewalk and that project more than 10 inches (254 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission; or\n\n#--- 1.2. Located 10 feet (3048 mm) or less above the sidewalk, and that project more than 4 inches (102 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission, and further provided that if the projection exceeds 18 inches (457 mm), the applicant demonstrates to the Department of Transportation's satisfaction that the replacement or restoration will not adversely impact the use of the public right of way.\n\n2. New architectural details on new or existing buildings, additions or structures subject to the jurisdiction of the Landmarks Preservation Commission, that are more than 10 feet (3048 mm) above the sidewalk and that project more than 10 inches (254 mm) and no more than 3 feet (914 mm), may be permitted provided that the Landmarks Preservation Commission finds that the proposed detail is appropriate to the historic character of the historic district or landmarked building, structure or site.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012\/028 and L.L. 2023\/077.\n\n#----- 3202.2.1.3 Balconies.\n\nBalconies, including railings and supporting brackets, no parts of which are less than 10 feet (3048 mm) above the ground or sidewalk level, may be constructed to project not more than 2 feet 6 inches (762 mm) beyond the street line. When permitted by the provisions of this code, fire escapes that are part of a required exit may be constructed to project not more than 4 feet 6 inches (1372 mm) beyond the street line provided no part, including any movable ladder or stair, is lower than 10 feet (3048 mm) above the ground or sidewalk level when not in use.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012\/028.\n\n#----- 3202.2.1.4 Marquees.\n\nMarquees may be constructed to project beyond the street line provided that they comply with Section 3106 and Sections 3202.2.1.4.1 through 3202.2.1.4.5.\n\n#------ 3202.2.1.4.1 Height.\n\nMarquees shall receive structural support only from the building, and shall be at least 10 feet (3048 mm) above the ground level or sidewalk.\n\n#------ 3202.2.1.4.2 Projection.\n\nMarquees shall project no closer to the curb line than 2 feet (610 mm).\n\n#------ 3202.2.1.4.3 Thickness.\n\nMarquees shall be no thicker nor shall the fascia be higher than 3 feet (914 mm) when measured vertically from its lowest to its highest point.\n\n#------ 3202.2.1.4.4 Dimensions.\n\nDimensions shall include all decoration, but shall exclude any tension supports suspending the marquee from the wall.\n\n#------ 3202.2.1.4.5 Occupancy restrictions.\n\nMarquees may be erected on:\n\n1. Buildings of an essentially public nature including but not limited to the following:\n\n#--- 1.1 Public buildings, including schools.\n\n#--- 1.2. Theatres.\n\n#--- 1.3. Hotels.\n\n#--- 1.4. Terminals.\n\n#--- 1.5. Large department stores.\n\n#--- 1.6. Supermarkets.\n\n#--- 1.7. Multiple dwellings.\n\n#--- 1.8. Office buildings.\n\n2. Warehouses or markets in one of the following established market areas:\n\n#--- 2.1. Bronx.\n\n#---- 2.1.1. Edgewater Road and Halleck Street between Lafayette Avenue and East Bay Avenue.\n\n#---- 2.1.2. Lafayette Avenue between Edgewater Road and the Bronx River.\n\n#---- 2.1.3. East Bay Avenue between Halleck Street and the Bronx River.\n\n#---- 2.1.4. Hunt's Point Avenue between East Bay Avenue and the Bronx River.\n\n#---- 2.1.5. Exterior Street between East 149th Street and East 157th Street.\n\n#---- 2.1.6. Cromwell Avenue between East 150th Street and East 153rd Street.\n\n#---- 2.1.7. East 150th Street between Exterior Street and River Avenue.\n\n#---- 2.1.8. Westchester Avenue between St. Ann's Avenue and Bergen Avenue.\n\n#---- 2.1.9. Brook Avenue between East 150th Street and East 156th Street.\n\n#---- 2.1.10. Bergen Avenue between East 149th Street and East 156th Street.\n\n#---- 2.1.11. East 152nd Street between Bergen Avenue and Brook Avenue.\n\n#---- 2.1.12. East 153rd Street between Bergen Avenue and Brook Avenue.\n\n#--- 2.2. Brooklyn.\n\n#---- 2.2.1. North 6th Street between Berry Street and Wythe Avenue.\n\n#--- 2.3. Manhattan.\n\n#---- 2.3.1. John Street to Fulton Street between South Street and Front Street.\n\n#---- 2.3.2. Fulton Street to Dover Street between South Street and Water Street.\n\n#---- 2.3.3. South Street and Front Street between John Street and Dover Street.\n\n#---- 2.3.4. Water Street between Fulton Street and Dover Street.\n\n#---- 2.3.5. Horatio Street to West 14th Street between West Street and 9th Avenue.\n\n#---- 2.3.6. West Street, Washington Street, Greenwich Street\n\n#---- 2.3.7. 9th Avenue and 10th Avenue between Horatio Street and West 14th Street.\n\n#---- 2.3.8. West 16th Street, north side, and West 17th Street, south side, between 10th Avenue and 11th Avenue.\n\n#---- 2.3.9. West 24th Street to West 26th Street, south side, between 11th Avenue and 12th Avenue.\n\n#---- 2.3.10. West 27th Street, north side, to West 28th Street between 11th Avenue and 12th Avenue.\n\n#---- 2.3.11. 12th Avenue and St. Claire Place between 125th Street and 132nd Street.\n\n#---- 2.3.12. 12th Avenue, west side, between 132nd Street and 133rd Street.\n\n#--- 2.4. Queens.\n\n#---- 2.4.1. 95th Avenue, north side, between Sutphin Boulevard and 148th Street.\n\n#------ 3202.2.1.4.6 Change of occupancy.\n\nWhen the occupancy or use of a building with a marquee is changed to an occupancy or use for which a projecting marquee is not permitted, the marquee shall be removed.\n\nException: For buildings subject to the jurisdiction of the Landmarks Preservation Commission, Section 3202.2.1.4.6 shall not apply when the Landmarks Preservation Commission makes a determination that the removal of the marquee would be inappropriate to the architectural character of the building or historic district.\n\n#------ 3202.2.1.4.7 Other agency approvals.\n\nAn applicant wishing to erect a marquee shall provide proof that the Commissioners of the Departments of Transportation, Consumer and Worker Protection, and Environmental Protection have not permitted the use of a space or structure on or under the sidewalk beneath the proposed marquee in such a manner that the construction of the proposed marquee shall interfere with the removal or repair of any such permitted use or structure.\n\n(Am. L.L. 2020\/080, 8\/28\/2020, eff. 8\/28\/2020)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/080.\n\n#----- 3202.2.1.5 Light fixtures.\n\nLight fixtures that are supported entirely from the building may be constructed to project not more than 2 feet (610 mm) beyond the street line, provided no part of the fixture is less than 8 feet (2438 mm) above the ground or sidewalk level.\n\n#----- 3202.2.1.6 Flagpoles.\n\nFlagpoles that are supported entirely from the building may be constructed to project not more than 18 feet (5486 mm) beyond the street line, but not closer than 2 feet (610 mm) to the curb line, provided that no part of the flagpole is less than 15 feet (4572 mm) above the ground or sidewalk level.\n\n#----- 3202.2.1.7 Wall signs.\n\nWall signs may be constructed to project not more than 12 inches (305 mm) beyond the street line when conforming to the requirements of this code and Section H111 of Appendix H.\n\n#----- 3202.2.1.8 Projecting signs.\n\nAll permitted projecting signs may be constructed to project not more than 10 feet (3048 mm) beyond the street line, but not closer to the curb line than 2 feet (610 mm), when conforming to the requirements of this code and Section H112 of Appendix H, and provided that no part of the sign is less than 10 feet (3048 mm) above the ground or sidewalk level.\n\nExceptions: Permanent projecting signs are prohibited on buildings in the areas indicated below:\n\n1. Borough of Manhattan.\n\n#--- 1.1. Projecting signs. No permanent projecting sign shall be erected on any building on:\n\n#---- 1.1.1. 5th Avenue between Washington Square north and 110th Street;\n\n#---- 1.1.2. 34th Street between Park Avenue and 7th Avenue;\n\n#---- 1.1.3. Madison Avenue between 23rd Street and 96th Street;\n\n#---- 1.1.4. 57th Street between Lexington Avenue and Broadway;\n\n#---- 1.1.5. Vanderbilt Avenue between 42nd Street and 47th Street;\n\n#---- 1.1.6. Park Avenue between 32nd Street and 40th Street;\n\n#---- 1.1.7. Park Avenue between 45th Street and 96th Street;\n\n#---- 1.1.8. 33rd Street between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.9. 35th through 41st Streets between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.10. 43rd through 56th Streets between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.11. 58th Street between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.12. 60th Street between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.13. Nassau Street between Wall Street and Frankfort Street; or\n\n#---- 1.1.14. John Street between Broadway and William Street.\n\n#--- 1.2. Illuminated projecting signs. No permanent illuminated projecting sign shall be erected on any building on:\n\n#---- 1.2.1. 72nd Street between Central Park West and River Drive.\n\n2. Borough of Brooklyn.\n\n#--- 2.1. Projecting signs. No permanent projecting sign shall be erected on any building on:\n\n#---- 2.1.1. Fulton Street between Flatbush Avenue and Joralemon Street and Willoughby Street.\n\n#--- 2.2. Illuminated projecting signs. No permanent illuminated projecting sign shall be erected on any building on:\n\n#---- 2.2.1. Fulton Street between Flatbush Avenue and Prospect Street and Henry Street;\n\n#---- 2.2.2. Washington Street between Myrtle Avenue and Prospect Street;\n\n#---- 2.2.3. Court Street between Fulton Street and Livingston Street;\n\n#---- 2.2.4. Pierrepont Street between Fulton Street and Clinton Street;\n\n#---- 2.2.5. Montague Street between Court Street and Clinton Street;\n\n#---- 2.2.6. Remsen Street between Court Street and Clinton Street; or\n\n#---- 2.2.7. Joralemon Street between Court Street and Clinton Street.\n\n#----- 3202.2.1.9 Sun control devices.\n\nSun control devices constructed in accordance with Section 3105 and supported entirely from the building may project beyond the street line not more than 2 feet 6 inches (762 mm), provided that no part of the sun control device is less than 8 feet (2438 mm) above the ground or sidewalk level. Any portion of a sun control device that is located over a sidewalk vault and is more than 10 inches (254 mm) beyond the street line and less than 40 feet (12 192 mm) above the ground or sidewalk shall be removable or retractable to less than 10 inches (254 mm) beyond the street line.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012\/028 and L.L. 2023\/077.\n\n#---- 3202.2.2 Encroachments not subject to area limitations.\n\n#----- 3202.2.2.1 Ramps.\n\nWhen a building erected prior to December 6, 1969 is altered to provide access to individuals who use wheelchairs, ramps constructed to provide such access may, with the approval of the commissioner, project beyond the street line for a distance of not more than 44 inches (1118 mm). Ramps shall comply with the applicable provisions of Chapter 11.\n\n#----- 3202.2.2.2 Bridges between buildings.\n\nBridges connecting buildings, and projecting beyond street lines may be permitted in accordance with applicable law. Such bridges shall be of a construction class that is at least equal to the higher class of the two buildings connected, and shall otherwise comply with the provisions of this code and other applicable laws and rules.\n\n#----- 3202.2.2.3 Flood shield supports.\n\nIn flood hazard areas or shaded X-Zones, permanent attachments to building facades necessary for the support and attachment of temporary, removable dry floodproofing barriers or shields may be constructed to project beyond the street line for a distance of not more than 6 inches (152 mm).\n\n#----- 3202.2.2.4 Curb cuts.\n\nThe lowering of any curb or the change of grade of any sidewalk for the purpose of providing a driveway across such curb or sidewalk shall be constructed in accordance with the specifications prescribed in Section 406.10.\n\n#------ 3202.2.2.4.1 Curb cut removal.\n\nVehicular access curb cuts that can no longer serve as vehicular access across a curb or sidewalk, including where an existing building served by such a curb cut is demolished, shall be removed and the curb and sidewalk shall be restored in accordance with standards of the Department of Transportation. The commissioner may order such removal and restoration. The commissioner shall limit the length of any curb cut for the purpose of providing a driveway across such curb or sidewalk, when in the opinion of the commissioner the actual use or intended use of such driveway would endanger the public. Where the vehicular use of such driveway, in the opinion of the commissioner is dangerous to the public, the commissioner shall order the owner to discontinue use of such driveway and restore the curb and sidewalk in accordance with standards of the Department of Transportation. Upon the failure of the owner to comply with any of the orders provided for in Section 3202.2.2.4, in such cases where the restoration of such curb cuts are needed to facilitate department of transportation work, the commissioner may inform the commissioner of transportation of such failure to comply and may request the cooperation of the commissioner of transportation acting under his or her authority pursuant to Section 2903(b)(7) of the New York City Charter in the enforcement of this section.\n\n#---- 3202.2.3 Awnings.\n\nAwnings constructed in accordance with Section 3105 and supported entirely from the building may project beyond the street line as follows:\n\n#----- 3202.2.3.1 Store front awnings.\n\nStore front awnings may project beyond the street line not more than 8 feet (2428 mm), provided no part of the awning is less than 8 feet (2438 mm) above the ground or sidewalk level, except for a flexible valance which may be not less than 7 feet (2134 mm) above the ground or sidewalk level, and provided that the awning box or cover does not project more than 12 inches (305 mm).\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#----- 3202.2.3.2 Awnings over windows or doors.\n\nAwnings over windows or doors may project beyond the street line not more than 5 feet (1524 mm), provided that no part of the awning is less than 8 feet (2438 mm) above the ground or sidewalk level.\n\n#---- 3202.2.4 Fire department connections, caps or plugs.\n\nFire department connection swivels, caps and plugs including test headers shall be permitted to project beyond the street line as provided for in NFPA 14, as amended by Appendix Q of this code.\n\n#---- 3202.2.5 Exterior wall covering systems for prior code buildings.\n\nFor prior code buildings, exterior insulation and associated cladding systems (i.e. rain screens, EIFS, etc.) that comply with Chapter 14 may be applied to the entire facade of a building and may project not more than 8 inches (203 mm) beyond the street line, in accordance with the following:\n\n1. The exterior wall covering system is necessary to comply with the New York City Energy Conservation Code; or\n\n2. In prior code buildings, the installation of the insulation will reduce greenhouse gas emissions, as demonstrated by achieving not less than a thirty percent reduction of the existing thermal envelope UA (the area-weighted average of assembly u-factors, as defined in the New York City Energy Conservation Code) as compared to the improved thermal envelope UA. For the purposes of calculating the reduction in the thermal envelope UA, the improved thermal envelope UA is the area-weighted average of the proposed opaque U-factor times the alteration area of the opaque wall assembly compared to the area-weighted average UA of the existing wall assembly. The UA calculation shall be performed using a method consistent with the New York City Energy Conservation Code.\n\nExceptions:\n\n1. A veneer may be applied to the entire facade of a building erected before December 6, 1968, provided such veneer does not project more than 4 inches (102 mm) beyond the street line.\n\n2. Exterior wall covering systems installed in accordance with this section on prior code buildings may project not more than 10 inches (254 mm) beyond the street, provided they are located more than 10 feet (3048 mm) above grade.\n\n3. The department may approve the installation of exterior wall covering systems in accordance with this section that project more than 8 inches (203 mm) but not more than 12 inches (305 mm) beyond the street line provided they are substantiated with engineering calculations demonstrating need and practical difficulty, and provided that the applicant demonstrates to the Department of Transportation's satisfaction that the projection of the wall covering system will not adversely impact the use of the public right of way.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 3202.3 Temporary encroachments.\n\nEncroachments of temporary nature shall comply with Sections 3202.3.1 through 3202.3.3.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#---- 3202.3.1 Sidewalk cafes.\n\nEnclosures for sidewalk cafes, where permitted by the Commissioner of the Department of Consumer Affairs pursuant to applicable law and constructed in compliance with Section 3111, may be constructed beyond the street line.\n\n#---- 3202.3.2 Temporary storm enclosures.\n\nConstruction of temporary storm enclosures must comply with the requirements of this code, including the fire-resistance rating of the building to which it is appurtenant, and Chapter 11. Such enclosures may be permitted during the period between November 15 and the following April 15 and must be removed at the end of this period.\n\n#----- 3202.3.2.1 Temporary storm enclosures for eating and drinking establishments.\n\nProvided a minimum clear unobstructed sidewalk width of 5 feet is maintained, temporary storm enclosures for eating and drinking establishments with a projection of not more than 25 square feet (2.32 m 2 ) in area and door maneuvering clearances complying with Chapter 11, and related reference standards, including Section 404 (Doors and Doorways) of ICC A117.1, may be permitted.\n\n#----- 3202.3.2.2 Temporary storm enclosures for other establishments.\n\nTemporary storm enclosures projecting not more than 18 inches (457 mm) beyond the street line may be permitted at other establishments.\n\n#---- 3202.3.3 Temporary flood shields, stairs and ramps in flood hazard areas and shaded X-Zones.\n\nIn flood hazard areas and shaded X-Zones, temporary flood shields, stairs and ramps shall comply with Sections G308.9 and G308.10 of Appendix G of the New York City Building Code and shall be permitted in accordance with plans approved by the department subject to the following conditions:\n\n1. Such flood shields, stairs and ramps shall project no more than one foot (305 mm) beyond the street line.\n\n2. Such flood shields, stairs and ramps shall be removed in a timely manner after a flood event.",
-  "schemaVersion" : 1
+  "rawDraftText": "#- Chapter 32: Encroachments Into the Public Right-of-Way\n\n#-- Section BC 3201: General\n\n#--- 3201.1 Scope.\n\nThe provisions of this chapter shall govern the encroachment of structures into the public right-of-way.\n\n#---- 3201.1.1 Encroachments removable.\n\nAll encroachments permitted beyond the street line by the provisions of this chapter shall be constructed so that they may be removed at any time without endangering the structural safety or fire safety of the building except that footings as permitted under Section 3202.1.1 of this code need not be removable.\n\n#--- 3201.2 Measurement.\n\nThe projection of any structure or portion thereof shall be the distance measured horizontally from the lot line to the outermost point of the projection.\n\n#--- 3201.3 Other laws.\n\nThe provisions of this chapter shall not be construed to permit the violation of other laws regulating the use and occupancy of public property.\n\n#---- 3201.3.1 Restrictions on construction and projections on certain streets, parkways, boardwalks and beaches.\n\nNotwithstanding the provisions of this chapter, it shall be unlawful to build, erect, or make areaways, steps or other encroachments or projections prohibited by Sections 19-131, 19-132, 19-135, 18-109, 18-112 and 18-113 of the Administrative Code.\n\n#--- 3201.4 Drainage.\n\nDrainage water collected from a roof, awning, canopy or marquee, other than canvas and flexible material, and condensate from mechanical equipment shall not flow over a public walking surface.\n\n#--- 3201.5 Permission revocable.\n\nAny permission, expressed or implied, permitting the construction of encroachments within the area of the street under the provisions of this chapter shall be revocable, except footings as permitted under Section 3202.1.1.\n\n#--- 3201.6 Existing projections.\n\nAny part of a building that projects beyond a street line on January 1, 1938 may be maintained as constructed until its removal is directed in accordance with applicable law.\n\n#--- 3201.7 Alteration of existing encroachments.\n\nAlterations to existing encroachments beyond the street line may be permitted in whole or in part, provided that such alterations conform with the requirements of this chapter.\n\n#---- 3201.7.1 Fences, guards and railings.\n\nElements of existing fences, guards and railings shall not be increased in height, thickness, spacing or opacity.\n\nExceptions:\n\n1. Fences, guards and railings that are required to comply with other requirements of this code, including Chapters 10 and 16.\n\n2. Buildings or structures designated by the Landmarks Preservation Commission, where such fences, guards or railings are approved by the Landmarks Preservation Commission.\n\n#--- 3201.8 Definitions.\n\nThe following terms are defined in Chapter 2:\n\nAREAWAY.\n\nCURB LINE.\n\nFOOTING.\n\nPROJECTING SIGN.\n\nSIGN.\n\nSTREET.\n\nSTREET LINE.\n\nVAULT.\n\n#--- 3201.9 Department of Transportation approval.\n\nAny encroachment into the public right-of-way that exceeds the limitation provided for in this chapter shall require the approval of the Department of Transportation.\n\n#-- Section BC 3202: Encroachments\n\n#--- 3202.1 Encroachments below grade.\n\nEncroachments below grade shall comply with Sections 3202.1.1 through 3202.1.6.\n\n#---- 3202.1.1 Footings.\n\nExterior wall and column footings may be constructed to project beyond the street line not more than 12 inches (305 mm), provided that the top of the footing is not less than 8 feet (2438 mm) below the ground or sidewalk level. Foundation walls required to support permitted projections may be constructed to project not more than the permitted projection beyond the street line.\n\n#----- 3202.1.1.1 Footings for temporary barriers or shields in flood hazard areas or shaded X-Zones.\n\nIn flood hazard areas or shaded X-Zones, continuous footings for the support and attachment of temporary, removable dry floodproofing barriers or shields may be constructed to project beyond the street line not more than 12 inches (305 mm) both at grade and below grade.\n\n#---- 3202.1.2 Vaults.\n\nVaults may be permitted in accordance with the New York City Charter and Title 19 of the Administrative Code. Such vaults shall comply with the provisions of this code and other applicable laws and rules.\n\n#---- 3202.1.3 Areaways.\n\nAreaways shall be protected by grates, guards or other approved means, subject to approval by the Commissioner of the Department of Transportation.\n\n#---- 3202.1.4 Tunnels between buildings.\n\nTunnels connecting buildings, and projecting beyond street lines, may be constructed subject to the approval of the Commissioner of the Department of Transportation. Such tunnels shall comply with the provisions of this code and other applicable laws and regulations.\n\n#---- 3202.1.5 Sidewalk supports.\n\nExterior foundation walls are permitted to be constructed with a ledge that projects beyond the street line not more than 4 inches (102 mm) to support sidewalk construction, provided that:\n\n1. the top of the ledge is not more than 8 inches (203 mm) below the ground or sidewalk level; and\n\n2. bottom of the ledge is not more than 24 inches (610 mm) below the ground or sidewalk level.\n\n#---- 3202.1.6 Insulation.\n\nInsulation shall be permitted to encroach into the public right of way not more than 6 inches (152 mm) beyond the face of the structural element being insulated, in accordance with the following:\n\n1. The insulation is necessary to comply with the New York City Energy Conservation Code; or\n\n2. In existing buildings, the installation of the insulation will reduce greenhouse gas emissions, as demonstrated by achieving not less than a thirty percent reduction of the existing thermal envelope UA (the area-weighted average of assembly u-factors, as defined in the New York City Energy Conservation Code) as compared to the improved thermal envelope UA. For the purposes of calculating the reduction in the thermal envelope UA, the improved thermal envelope UA is the area-weighted average of the proposed opaque U-factor times the alteration area of the opaque wall assembly compared to the area-weighted average UA of the existing wall assembly. The UA calculation shall be performed using a method consistent with the New York City Energy Conservation Code.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 3202.2 Encroachments above grade.\n\nEncroachments into the public right-of-way above grade shall be prohibited except as provided for in Sections 3202.2.1 through 3202.2.5.\n\n#---- 3202.2.1 Encroachments subject to the area limitations.\n\nEncroachments that are subject to area limitations are those elements listed in Sections 3202.2.1.1 through 3202.2.1.9, generally of an architectural character, that form an integral part of the building facade. The aggregate area of all such elements constructed to extend beyond the street line shall not exceed 10 square feet (0.93 m 2 ) within any 10 feet (3048 mm) by 10 feet (3048 mm) square area of wall. The area of any such projection shall be measured at that vertical plane, parallel to the wall, in which the area of the projection is greatest. This plane of measurement may be at the street line, the line of maximum projection or any point in between. For the purpose of measuring the projected area of a balcony, air spaces of less than 6 inches (152 mm) between closely spaced railing or guards elements shall contribute to the area of the projection.\n\nExceptions:\n\n1. The aggregate area of all elements subject to area limitations that includes a balcony or associated railings and brackets shall not exceed 24 square feet (2.2 m 2 ) in any 240 square foot (22.3 m 2 ) area on a given story.\n\n2. The aggregate area of elements on existing buildings or structures designated by the Landmarks Preservation Commission as landmarks or within historic districts shall not be limited provided that such elements are approved by the Landmarks Preservation Commission.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012/028.\n\n#----- 3202.2.1.1 Entrance details.\n\nEntrance details, including steps and doors when fully open, may be constructed to project beyond the street line not more than 18 inches (457 mm). Entrance steps that project beyond the street line shall be guarded at each end by railings at least 3 feet (914 mm) high or by other members of the entrance detail providing equivalent protection.\n\n#----- 3202.2.1.2 Architectural details.\n\nDetails such as cornices, eaves, bases, sills, headers, band course, opening frames, rustications, applied ornament or sculpture, grilles, windows when fully open, air conditioning units, and other similar elements may be constructed:\n\n1. To project not more than 4 inches (102 mm) beyond the street line when less than 10 feet (3048 mm) above the ground or sidewalk level.\n\n2. To project not more than 10 inches (254 mm) beyond the street line when more than 10 feet (3048 mm) above the ground or sidewalk level.\n\nExceptions:\n\n1. Replacement or restoration of historical architectural details that are, or were:\n\n#--- 1.1. Located more than 10 feet (3048 mm) above the sidewalk and that project more than 10 inches (254 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission; or\n\n#--- 1.2. Located 10 feet (3048 mm) or less above the sidewalk, and that project more than 4 inches (102 mm), on existing buildings or structures designated by the Landmarks Preservation Commission, may be permitted provided they do not exceed the historic projections and provided that they are approved by the Landmarks Preservation Commission, and further provided that if the projection exceeds 18 inches (457 mm), the applicant demonstrates to the Department of Transportation's satisfaction that the replacement or restoration will not adversely impact the use of the public right of way.\n\n2. New architectural details on new or existing buildings, additions or structures subject to the jurisdiction of the Landmarks Preservation Commission, that are more than 10 feet (3048 mm) above the sidewalk and that project more than 10 inches (254 mm) and no more than 3 feet (914 mm), may be permitted provided that the Landmarks Preservation Commission finds that the proposed detail is appropriate to the historic character of the historic district or landmarked building, structure or site.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012/028 and L.L. 2023/077.\n\n#----- 3202.2.1.3 Balconies.\n\nBalconies, including railings and supporting brackets, no parts of which are less than 10 feet (3048 mm) above the ground or sidewalk level, may be constructed to project not more than 2 feet 6 inches (762 mm) beyond the street line. When permitted by the provisions of this code, fire escapes that are part of a required exit may be constructed to project not more than 4 feet 6 inches (1372 mm) beyond the street line provided no part, including any movable ladder or stair, is lower than 10 feet (3048 mm) above the ground or sidewalk level when not in use.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012/028.\n\n#----- 3202.2.1.4 Marquees.\n\nMarquees may be constructed to project beyond the street line provided that they comply with Section 3106 and Sections 3202.2.1.4.1 through 3202.2.1.4.5.\n\n#------ 3202.2.1.4.1 Height.\n\nMarquees shall receive structural support only from the building, and shall be at least 10 feet (3048 mm) above the ground level or sidewalk.\n\n#------ 3202.2.1.4.2 Projection.\n\nMarquees shall project no closer to the curb line than 2 feet (610 mm).\n\n#------ 3202.2.1.4.3 Thickness.\n\nMarquees shall be no thicker nor shall the fascia be higher than 3 feet (914 mm) when measured vertically from its lowest to its highest point.\n\n#------ 3202.2.1.4.4 Dimensions.\n\nDimensions shall include all decoration, but shall exclude any tension supports suspending the marquee from the wall.\n\n#------ 3202.2.1.4.5 Occupancy restrictions.\n\nMarquees may be erected on:\n\n1. Buildings of an essentially public nature including but not limited to the following:\n\n#--- 1.1 Public buildings, including schools.\n\n#--- 1.2. Theatres.\n\n#--- 1.3. Hotels.\n\n#--- 1.4. Terminals.\n\n#--- 1.5. Large department stores.\n\n#--- 1.6. Supermarkets.\n\n#--- 1.7. Multiple dwellings.\n\n#--- 1.8. Office buildings.\n\n2. Warehouses or markets in one of the following established market areas:\n\n#--- 2.1. Bronx.\n\n#---- 2.1.1. Edgewater Road and Halleck Street between Lafayette Avenue and East Bay Avenue.\n\n#---- 2.1.2. Lafayette Avenue between Edgewater Road and the Bronx River.\n\n#---- 2.1.3. East Bay Avenue between Halleck Street and the Bronx River.\n\n#---- 2.1.4. Hunt's Point Avenue between East Bay Avenue and the Bronx River.\n\n#---- 2.1.5. Exterior Street between East 149th Street and East 157th Street.\n\n#---- 2.1.6. Cromwell Avenue between East 150th Street and East 153rd Street.\n\n#---- 2.1.7. East 150th Street between Exterior Street and River Avenue.\n\n#---- 2.1.8. Westchester Avenue between St. Ann's Avenue and Bergen Avenue.\n\n#---- 2.1.9. Brook Avenue between East 150th Street and East 156th Street.\n\n#---- 2.1.10. Bergen Avenue between East 149th Street and East 156th Street.\n\n#---- 2.1.11. East 152nd Street between Bergen Avenue and Brook Avenue.\n\n#---- 2.1.12. East 153rd Street between Bergen Avenue and Brook Avenue.\n\n#--- 2.2. Brooklyn.\n\n#---- 2.2.1. North 6th Street between Berry Street and Wythe Avenue.\n\n#--- 2.3. Manhattan.\n\n#---- 2.3.1. John Street to Fulton Street between South Street and Front Street.\n\n#---- 2.3.2. Fulton Street to Dover Street between South Street and Water Street.\n\n#---- 2.3.3. South Street and Front Street between John Street and Dover Street.\n\n#---- 2.3.4. Water Street between Fulton Street and Dover Street.\n\n#---- 2.3.5. Horatio Street to West 14th Street between West Street and 9th Avenue.\n\n#---- 2.3.6. West Street, Washington Street, Greenwich Street\n\n#---- 2.3.7. 9th Avenue and 10th Avenue between Horatio Street and West 14th Street.\n\n#---- 2.3.8. West 16th Street, north side, and West 17th Street, south side, between 10th Avenue and 11th Avenue.\n\n#---- 2.3.9. West 24th Street to West 26th Street, south side, between 11th Avenue and 12th Avenue.\n\n#---- 2.3.10. West 27th Street, north side, to West 28th Street between 11th Avenue and 12th Avenue.\n\n#---- 2.3.11. 12th Avenue and St. Claire Place between 125th Street and 132nd Street.\n\n#---- 2.3.12. 12th Avenue, west side, between 132nd Street and 133rd Street.\n\n#--- 2.4. Queens.\n\n#---- 2.4.1. 95th Avenue, north side, between Sutphin Boulevard and 148th Street.\n\n#------ 3202.2.1.4.6 Change of occupancy.\n\nWhen the occupancy or use of a building with a marquee is changed to an occupancy or use for which a projecting marquee is not permitted, the marquee shall be removed.\n\nException: For buildings subject to the jurisdiction of the Landmarks Preservation Commission, Section 3202.2.1.4.6 shall not apply when the Landmarks Preservation Commission makes a determination that the removal of the marquee would be inappropriate to the architectural character of the building or historic district.\n\n#------ 3202.2.1.4.7 Other agency approvals.\n\nAn applicant wishing to erect a marquee shall provide proof that the Commissioners of the Departments of Transportation, Consumer and Worker Protection, and Environmental Protection have not permitted the use of a space or structure on or under the sidewalk beneath the proposed marquee in such a manner that the construction of the proposed marquee shall interfere with the removal or repair of any such permitted use or structure.\n\n(Am. L.L. 2020/080, 8/28/2020, eff. 8/28/2020)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/080.\n\n#----- 3202.2.1.5 Light fixtures.\n\nLight fixtures that are supported entirely from the building may be constructed to project not more than 2 feet (610 mm) beyond the street line, provided no part of the fixture is less than 8 feet (2438 mm) above the ground or sidewalk level.\n\n#----- 3202.2.1.6 Flagpoles.\n\nFlagpoles that are supported entirely from the building may be constructed to project not more than 18 feet (5486 mm) beyond the street line, but not closer than 2 feet (610 mm) to the curb line, provided that no part of the flagpole is less than 15 feet (4572 mm) above the ground or sidewalk level.\n\n#----- 3202.2.1.7 Wall signs.\n\nWall signs may be constructed to project not more than 12 inches (305 mm) beyond the street line when conforming to the requirements of this code and Section H111 of Appendix H.\n\n#----- 3202.2.1.8 Projecting signs.\n\nAll permitted projecting signs may be constructed to project not more than 10 feet (3048 mm) beyond the street line, but not closer to the curb line than 2 feet (610 mm), when conforming to the requirements of this code and Section H112 of Appendix H, and provided that no part of the sign is less than 10 feet (3048 mm) above the ground or sidewalk level.\n\nExceptions: Permanent projecting signs are prohibited on buildings in the areas indicated below:\n\n1. Borough of Manhattan.\n\n#--- 1.1. Projecting signs. No permanent projecting sign shall be erected on any building on:\n\n#---- 1.1.1. 5th Avenue between Washington Square north and 110th Street;\n\n#---- 1.1.2. 34th Street between Park Avenue and 7th Avenue;\n\n#---- 1.1.3. Madison Avenue between 23rd Street and 96th Street;\n\n#---- 1.1.4. 57th Street between Lexington Avenue and Broadway;\n\n#---- 1.1.5. Vanderbilt Avenue between 42nd Street and 47th Street;\n\n#---- 1.1.6. Park Avenue between 32nd Street and 40th Street;\n\n#---- 1.1.7. Park Avenue between 45th Street and 96th Street;\n\n#---- 1.1.8. 33rd Street between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.9. 35th through 41st Streets between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.10. 43rd through 56th Streets between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.11. 58th Street between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.12. 60th Street between Lexington Avenue and 5th Avenue;\n\n#---- 1.1.13. Nassau Street between Wall Street and Frankfort Street; or\n\n#---- 1.1.14. John Street between Broadway and William Street.\n\n#--- 1.2. Illuminated projecting signs. No permanent illuminated projecting sign shall be erected on any building on:\n\n#---- 1.2.1. 72nd Street between Central Park West and River Drive.\n\n2. Borough of Brooklyn.\n\n#--- 2.1. Projecting signs. No permanent projecting sign shall be erected on any building on:\n\n#---- 2.1.1. Fulton Street between Flatbush Avenue and Joralemon Street and Willoughby Street.\n\n#--- 2.2. Illuminated projecting signs. No permanent illuminated projecting sign shall be erected on any building on:\n\n#---- 2.2.1. Fulton Street between Flatbush Avenue and Prospect Street and Henry Street;\n\n#---- 2.2.2. Washington Street between Myrtle Avenue and Prospect Street;\n\n#---- 2.2.3. Court Street between Fulton Street and Livingston Street;\n\n#---- 2.2.4. Pierrepont Street between Fulton Street and Clinton Street;\n\n#---- 2.2.5. Montague Street between Court Street and Clinton Street;\n\n#---- 2.2.6. Remsen Street between Court Street and Clinton Street; or\n\n#---- 2.2.7. Joralemon Street between Court Street and Clinton Street.\n\n#----- 3202.2.1.9 Sun control devices.\n\nSun control devices constructed in accordance with Section 3105 and supported entirely from the building may project beyond the street line not more than 2 feet 6 inches (762 mm), provided that no part of the sun control device is less than 8 feet (2438 mm) above the ground or sidewalk level. Any portion of a sun control device that is located over a sidewalk vault and is more than 10 inches (254 mm) beyond the street line and less than 40 feet (12 192 mm) above the ground or sidewalk shall be removable or retractable to less than 10 inches (254 mm) beyond the street line.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012/028 and L.L. 2023/077.\n\n#---- 3202.2.2 Encroachments not subject to area limitations.\n\n#----- 3202.2.2.1 Ramps.\n\nWhen a building erected prior to December 6, 1969 is altered to provide access to individuals who use wheelchairs, ramps constructed to provide such access may, with the approval of the commissioner, project beyond the street line for a distance of not more than 44 inches (1118 mm). Ramps shall comply with the applicable provisions of Chapter 11.\n\n#----- 3202.2.2.2 Bridges between buildings.\n\nBridges connecting buildings, and projecting beyond street lines may be permitted in accordance with applicable law. Such bridges shall be of a construction class that is at least equal to the higher class of the two buildings connected, and shall otherwise comply with the provisions of this code and other applicable laws and rules.\n\n#----- 3202.2.2.3 Flood shield supports.\n\nIn flood hazard areas or shaded X-Zones, permanent attachments to building facades necessary for the support and attachment of temporary, removable dry floodproofing barriers or shields may be constructed to project beyond the street line for a distance of not more than 6 inches (152 mm).\n\n#----- 3202.2.2.4 Curb cuts.\n\nThe lowering of any curb or the change of grade of any sidewalk for the purpose of providing a driveway across such curb or sidewalk shall be constructed in accordance with the specifications prescribed in Section 406.10.\n\n#------ 3202.2.2.4.1 Curb cut removal.\n\nVehicular access curb cuts that can no longer serve as vehicular access across a curb or sidewalk, including where an existing building served by such a curb cut is demolished, shall be removed and the curb and sidewalk shall be restored in accordance with standards of the Department of Transportation. The commissioner may order such removal and restoration. The commissioner shall limit the length of any curb cut for the purpose of providing a driveway across such curb or sidewalk, when in the opinion of the commissioner the actual use or intended use of such driveway would endanger the public. Where the vehicular use of such driveway, in the opinion of the commissioner is dangerous to the public, the commissioner shall order the owner to discontinue use of such driveway and restore the curb and sidewalk in accordance with standards of the Department of Transportation. Upon the failure of the owner to comply with any of the orders provided for in Section 3202.2.2.4, in such cases where the restoration of such curb cuts are needed to facilitate department of transportation work, the commissioner may inform the commissioner of transportation of such failure to comply and may request the cooperation of the commissioner of transportation acting under his or her authority pursuant to Section 2903(b)(7) of the New York City Charter in the enforcement of this section.\n\n#---- 3202.2.3 Awnings.\n\nAwnings constructed in accordance with Section 3105 and supported entirely from the building may project beyond the street line as follows:\n\n#----- 3202.2.3.1 Store front awnings.\n\nStore front awnings may project beyond the street line not more than 8 feet (2428 mm), provided no part of the awning is less than 8 feet (2438 mm) above the ground or sidewalk level, except for a flexible valance which may be not less than 7 feet (2134 mm) above the ground or sidewalk level, and provided that the awning box or cover does not project more than 12 inches (305 mm).\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#----- 3202.2.3.2 Awnings over windows or doors.\n\nAwnings over windows or doors may project beyond the street line not more than 5 feet (1524 mm), provided that no part of the awning is less than 8 feet (2438 mm) above the ground or sidewalk level.\n\n#---- 3202.2.4 Fire department connections, caps or plugs.\n\nFire department connection swivels, caps and plugs including test headers shall be permitted to project beyond the street line as provided for in NFPA 14, as amended by Appendix Q of this code.\n\n#---- 3202.2.5 Exterior wall covering systems for prior code buildings.\n\nFor prior code buildings, exterior insulation and associated cladding systems (i.e. rain screens, EIFS, etc.) that comply with Chapter 14 may be applied to the entire facade of a building and may project not more than 8 inches (203 mm) beyond the street line, in accordance with the following:\n\n1. The exterior wall covering system is necessary to comply with the New York City Energy Conservation Code; or\n\n2. In prior code buildings, the installation of the insulation will reduce greenhouse gas emissions, as demonstrated by achieving not less than a thirty percent reduction of the existing thermal envelope UA (the area-weighted average of assembly u-factors, as defined in the New York City Energy Conservation Code) as compared to the improved thermal envelope UA. For the purposes of calculating the reduction in the thermal envelope UA, the improved thermal envelope UA is the area-weighted average of the proposed opaque U-factor times the alteration area of the opaque wall assembly compared to the area-weighted average UA of the existing wall assembly. The UA calculation shall be performed using a method consistent with the New York City Energy Conservation Code.\n\nExceptions:\n\n1. A veneer may be applied to the entire facade of a building erected before December 6, 1968, provided such veneer does not project more than 4 inches (102 mm) beyond the street line.\n\n2. Exterior wall covering systems installed in accordance with this section on prior code buildings may project not more than 10 inches (254 mm) beyond the street, provided they are located more than 10 feet (3048 mm) above grade.\n\n3. The department may approve the installation of exterior wall covering systems in accordance with this section that project more than 8 inches (203 mm) but not more than 12 inches (305 mm) beyond the street line provided they are substantiated with engineering calculations demonstrating need and practical difficulty, and provided that the applicant demonstrates to the Department of Transportation's satisfaction that the projection of the wall covering system will not adversely impact the use of the public right of way.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 3202.3 Temporary encroachments.\n\nEncroachments of temporary nature shall comply with Sections 3202.3.1 through 3202.3.3.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 3202.3.1 Sidewalk cafes.\n\nEnclosures for sidewalk cafes, where permitted by the Commissioner of the Department of Consumer Affairs pursuant to applicable law and constructed in compliance with Section 3111, may be constructed beyond the street line.\n\n#---- 3202.3.2 Temporary storm enclosures.\n\nConstruction of temporary storm enclosures must comply with the requirements of this code, including the fire-resistance rating of the building to which it is appurtenant, and Chapter 11. Such enclosures may be permitted during the period between November 15 and the following April 15 and must be removed at the end of this period.\n\n#----- 3202.3.2.1 Temporary storm enclosures for eating and drinking establishments.\n\nProvided a minimum clear unobstructed sidewalk width of 5 feet is maintained, temporary storm enclosures for eating and drinking establishments with a projection of not more than 25 square feet (2.32 m 2 ) in area and door maneuvering clearances complying with Chapter 11, and related reference standards, including Section 404 (Doors and Doorways) of ICC A117.1, may be permitted.\n\n#----- 3202.3.2.2 Temporary storm enclosures for other establishments.\n\nTemporary storm enclosures projecting not more than 18 inches (457 mm) beyond the street line may be permitted at other establishments.\n\n#---- 3202.3.3 Temporary flood shields, stairs and ramps in flood hazard areas and shaded X-Zones.\n\nIn flood hazard areas and shaded X-Zones, temporary flood shields, stairs and ramps shall comply with Sections G308.9 and G308.10 of Appendix G of the New York City Building Code and shall be permitted in accordance with plans approved by the department subject to the following conditions:\n\n1. Such flood shields, stairs and ramps shall project no more than one foot (305 mm) beyond the street line.\n\n2. Such flood shields, stairs and ramps shall be removed in a timely manner after a flood event.",
+  "schemaVersion": 1
 }

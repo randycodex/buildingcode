@@ -102,8 +102,13 @@ final class PublishedHTMLContentStore {
 
         guard let items else { return nil }
         let baseName = (trimmed as NSString).deletingPathExtension
-        guard let relativePath = items[trimmed] ?? items[baseName] else { return nil }
-        return readAccessURL.appendingPathComponent(relativePath)
+        let relativePaths = [items[trimmed], items[baseName]].compactMap { $0 }
+        for relativePath in relativePaths {
+            if let resolvedURL = existingImageURL(relativePath: relativePath, readAccessURL: readAccessURL) {
+                return resolvedURL
+            }
+        }
+        return nil
     }
 
     private static func loadImageManifest(readAccessURL: URL) -> [String: String]? {
@@ -113,6 +118,28 @@ final class PublishedHTMLContentStore {
         guard let data = try? Data(contentsOf: manifestURL) else { return nil }
         guard let manifest = try? JSONDecoder().decode(ImageManifestFile.self, from: data) else { return nil }
         return manifest.items
+    }
+
+    private static func existingImageURL(relativePath: String, readAccessURL: URL) -> URL? {
+        let trimmedPath = relativePath.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedPath.isEmpty else { return nil }
+
+        let directURL = readAccessURL.appendingPathComponent(trimmedPath)
+        if FileManager.default.fileExists(atPath: directURL.path) {
+            return directURL
+        }
+
+        let fileName = URL(fileURLWithPath: trimmedPath).lastPathComponent
+        guard !fileName.isEmpty else { return nil }
+
+        let assetURL = readAccessURL
+            .appendingPathComponent("assets", isDirectory: true)
+            .appendingPathComponent(fileName, isDirectory: false)
+        if FileManager.default.fileExists(atPath: assetURL.path) {
+            return assetURL
+        }
+
+        return nil
     }
 
     func anchor(chapterNumber: String, sectionNumber: String) -> PublishedHTMLAnchor? {

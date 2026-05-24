@@ -110,7 +110,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
                 return nil
             }
-            return rewriteImageSources(in: html, chapterURL: chapterURL, readAccessURL: readAccessURL)
+            let localizedHTML = rewriteImageSources(in: html, chapterURL: chapterURL, readAccessURL: readAccessURL)
+            return addImageLoadingAttributes(in: localizedHTML)
         }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -656,6 +657,30 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             return nil
         }
 
+        private func addImageLoadingAttributes(in html: String) -> String {
+            guard let regex = try? NSRegularExpression(pattern: #"(?i)<img\b[^>]*>"#) else {
+                return html
+            }
+            let nsHTML = html as NSString
+            let matches = regex.matches(in: html, range: NSRange(location: 0, length: nsHTML.length))
+            guard !matches.isEmpty else { return html }
+
+            var rewrittenHTML = html
+            for match in matches.reversed() {
+                let tag = nsHTML.substring(with: match.range)
+                var rewrittenTag = tag
+                if rewrittenTag.range(of: #"\sloading\s*="#, options: [.regularExpression, .caseInsensitive]) == nil {
+                    rewrittenTag = rewrittenTag.replacingOccurrences(of: "<img", with: #"<img loading="lazy""#, options: .caseInsensitive)
+                }
+                if rewrittenTag.range(of: #"\sdecoding\s*="#, options: [.regularExpression, .caseInsensitive]) == nil {
+                    rewrittenTag = rewrittenTag.replacingOccurrences(of: "<img", with: #"<img decoding="async""#, options: .caseInsensitive)
+                }
+                guard rewrittenTag != tag, let range = Range(match.range, in: rewrittenHTML) else { continue }
+                rewrittenHTML.replaceSubrange(range, with: rewrittenTag)
+            }
+            return rewrittenHTML
+        }
+
         private static func readerCSS(theme: ReaderTheme, colorScheme: ColorScheme, accentHex: String) -> String {
             let isDark = colorScheme == .dark
             let textColor = isDark ? "#f5f5f7" : "#111111"
@@ -931,6 +956,19 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               background: \(backgroundColor) !important;
             }
             figure[data-table-ref]:empty { display: none; }
+            figure[data-table-ref].nyccc-missing-table,
+            figure[data-table-ref]:empty {
+              display: block;
+              min-height: 2.75rem;
+              margin: 0.85rem 0;
+              padding: 0.7rem 0.85rem;
+              border: 1px dashed \(softBorderColor);
+              color: \(secondaryColor);
+              font-size: \(tableFontSize)px;
+            }
+            figure[data-table-ref]:empty::before {
+              content: "Table " attr(data-table-ref);
+            }
             [style*="color: #000000"], [style*="color:#000000"] { color: \(textColor) !important; }
             .Normal-Level { color: \(textColor) !important; }
             .Normal-Level + .clearfix { margin: 0; }

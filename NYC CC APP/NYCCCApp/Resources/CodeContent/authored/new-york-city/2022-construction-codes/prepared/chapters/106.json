@@ -1,555 +1,555 @@
 {
-  "chapterID" : 106,
-  "chapterNumber" : "3",
-  "groups" : [
+  "chapterID": 106,
+  "chapterNumber": "3",
+  "groups": [
     {
-      "headerLine" : "SECTION BC 301",
-      "headingLine" : "General",
-      "id" : "SECTION BC 301",
-      "sections" : [
+      "headerLine": "SECTION PC 301",
+      "headingLine": "General",
+      "id": "SECTION PC 301",
+      "sections": [
         {
-          "id" : 11812,
-          "kind" : "title",
-          "sectionNumber" : "301.1",
-          "title" : "301.1 Scope."
+          "id": 11812,
+          "kind": "title",
+          "sectionNumber": "301.1",
+          "title": "301.1 Scope."
         },
         {
-          "id" : 11813,
-          "kind" : "title",
-          "sectionNumber" : "301.2",
-          "title" : "301.2 System installation."
+          "id": 11813,
+          "kind": "title",
+          "sectionNumber": "301.2",
+          "title": "301.2 System installation."
         },
         {
-          "id" : 11814,
-          "kind" : "title",
-          "sectionNumber" : "301.3",
-          "title" : "301.3 Connections to drainage system."
+          "id": 11814,
+          "kind": "title",
+          "sectionNumber": "301.3",
+          "title": "301.3 Connections to drainage system."
         },
         {
-          "id" : 11815,
-          "kind" : "title",
-          "sectionNumber" : "301.4",
-          "title" : "301.4 Connections to water supply."
+          "id": 11815,
+          "kind": "title",
+          "sectionNumber": "301.4",
+          "title": "301.4 Connections to water supply."
         },
         {
-          "id" : 11816,
-          "kind" : "title",
-          "sectionNumber" : "301.5",
-          "title" : "301.5 Pipe, tube and fitting sizes."
+          "id": 11816,
+          "kind": "title",
+          "sectionNumber": "301.5",
+          "title": "301.5 Pipe, tube and fitting sizes."
         },
         {
-          "id" : 11817,
-          "kind" : "title",
-          "sectionNumber" : "301.6",
-          "title" : "301.6 Prohibited locations."
+          "id": 11817,
+          "kind": "title",
+          "sectionNumber": "301.6",
+          "title": "301.6 Prohibited locations."
         },
         {
-          "id" : 11818,
-          "kind" : "title",
-          "sectionNumber" : "301.7",
-          "title" : "301.7 Conflicts."
+          "id": 11818,
+          "kind": "title",
+          "sectionNumber": "301.7",
+          "title": "301.7 Conflicts."
         },
         {
-          "id" : 11819,
-          "kind" : "title",
-          "sectionNumber" : "302.1",
-          "title" : "302.1 Detrimental or dangerous materials."
+          "id": 11819,
+          "kind": "title",
+          "sectionNumber": "302.1",
+          "title": "302.1 Detrimental or dangerous materials."
         },
         {
-          "id" : 11820,
-          "kind" : "title",
-          "sectionNumber" : "302.2",
-          "title" : "302.2 Industrial wastes."
+          "id": 11820,
+          "kind": "title",
+          "sectionNumber": "302.2",
+          "title": "302.2 Industrial wastes."
         },
         {
-          "id" : 11821,
-          "kind" : "title",
-          "sectionNumber" : "303.1",
-          "title" : "303.1 Identification."
+          "id": 11821,
+          "kind": "title",
+          "sectionNumber": "303.1",
+          "title": "303.1 Identification."
         },
         {
-          "id" : 11822,
-          "kind" : "title",
-          "sectionNumber" : "303.2",
-          "title" : "303.2 Installation of materials."
+          "id": 11822,
+          "kind": "title",
+          "sectionNumber": "303.2",
+          "title": "303.2 Installation of materials."
         },
         {
-          "id" : 11823,
-          "kind" : "title",
-          "sectionNumber" : "303.3",
-          "title" : "303.3 Plastic pipe, fittings and components."
+          "id": 11823,
+          "kind": "title",
+          "sectionNumber": "303.3",
+          "title": "303.3 Plastic pipe, fittings and components."
         },
         {
-          "id" : 11824,
-          "kind" : "title",
-          "sectionNumber" : "303.4",
-          "title" : "303.4 Third-party certification."
+          "id": 11824,
+          "kind": "title",
+          "sectionNumber": "303.4",
+          "title": "303.4 Third-party certification."
         },
         {
-          "id" : 11825,
-          "kind" : "title",
-          "sectionNumber" : "304.1",
-          "title" : "304.1 General."
+          "id": 11825,
+          "kind": "title",
+          "sectionNumber": "304.1",
+          "title": "304.1 General."
         },
         {
-          "id" : 11826,
-          "kind" : "title",
-          "sectionNumber" : "304.2",
-          "title" : "304.2 Strainer plates."
+          "id": 11826,
+          "kind": "title",
+          "sectionNumber": "304.2",
+          "title": "304.2 Strainer plates."
         },
         {
-          "id" : 11827,
-          "kind" : "title",
-          "sectionNumber" : "304.3",
-          "title" : "304.3 Reserved."
+          "id": 11827,
+          "kind": "title",
+          "sectionNumber": "304.3",
+          "title": "304.3 Reserved."
         },
         {
-          "id" : 11828,
-          "kind" : "title",
-          "sectionNumber" : "304.4",
-          "title" : "304.4 Openings for pipes."
+          "id": 11828,
+          "kind": "title",
+          "sectionNumber": "304.4",
+          "title": "304.4 Openings for pipes."
         },
         {
-          "id" : 11829,
-          "kind" : "title",
-          "sectionNumber" : "305.1",
-          "title" : "305.1 Corrosion."
+          "id": 11829,
+          "kind": "title",
+          "sectionNumber": "305.1",
+          "title": "305.1 Corrosion."
         },
         {
-          "id" : 11830,
-          "kind" : "title",
-          "sectionNumber" : "305.2",
-          "title" : "305.2 Stress and strain."
+          "id": 11830,
+          "kind": "title",
+          "sectionNumber": "305.2",
+          "title": "305.2 Stress and strain."
         },
         {
-          "id" : 11831,
-          "kind" : "title",
-          "sectionNumber" : "305.3",
-          "title" : "305.3 Pipes through or under footings or foundation walls."
+          "id": 11831,
+          "kind": "title",
+          "sectionNumber": "305.3",
+          "title": "305.3 Pipes through or under footings or foundation walls."
         },
         {
-          "id" : 11832,
-          "kind" : "title",
-          "sectionNumber" : "305.4",
-          "title" : "305.4 Freezing."
+          "id": 11832,
+          "kind": "title",
+          "sectionNumber": "305.4",
+          "title": "305.4 Freezing."
         },
         {
-          "id" : 11833,
-          "kind" : "title",
-          "sectionNumber" : "305.4.1",
-          "title" : "305.4.1 Building sewer and building drain depth."
+          "id": 11833,
+          "kind": "title",
+          "sectionNumber": "305.4.1",
+          "title": "305.4.1 Building sewer and building drain depth."
         },
         {
-          "id" : 11834,
-          "kind" : "title",
-          "sectionNumber" : "305.5",
-          "title" : "305.5 Waterproofing of openings."
+          "id": 11834,
+          "kind": "title",
+          "sectionNumber": "305.5",
+          "title": "305.5 Waterproofing of openings."
         },
         {
-          "id" : 11835,
-          "kind" : "title",
-          "sectionNumber" : "305.6",
-          "title" : "305.6 Protection against physical damage."
+          "id": 11835,
+          "kind": "title",
+          "sectionNumber": "305.6",
+          "title": "305.6 Protection against physical damage."
         },
         {
-          "id" : 11836,
-          "kind" : "title",
-          "sectionNumber" : "305.7",
-          "title" : "305.7 Protection of components of plumbing system."
+          "id": 11836,
+          "kind": "title",
+          "sectionNumber": "305.7",
+          "title": "305.7 Protection of components of plumbing system."
         },
         {
-          "id" : 11837,
-          "kind" : "title",
-          "sectionNumber" : "305.8",
-          "title" : "305.8 Breakage."
+          "id": 11837,
+          "kind": "title",
+          "sectionNumber": "305.8",
+          "title": "305.8 Breakage."
         },
         {
-          "id" : 11838,
-          "kind" : "title",
-          "sectionNumber" : "305.9",
-          "title" : "305.9 Wind resistance."
+          "id": 11838,
+          "kind": "title",
+          "sectionNumber": "305.9",
+          "title": "305.9 Wind resistance."
         },
         {
-          "id" : 11839,
-          "kind" : "title",
-          "sectionNumber" : "306.1",
-          "title" : "306.1 Support of piping."
+          "id": 11839,
+          "kind": "title",
+          "sectionNumber": "306.1",
+          "title": "306.1 Support of piping."
         },
         {
-          "id" : 11840,
-          "kind" : "title",
-          "sectionNumber" : "306.2",
-          "title" : "306.2 Trenching and bedding."
+          "id": 11840,
+          "kind": "title",
+          "sectionNumber": "306.2",
+          "title": "306.2 Trenching and bedding."
         },
         {
-          "id" : 11841,
-          "kind" : "title",
-          "sectionNumber" : "306.2.1",
-          "title" : "306.2.1 Overexcavation."
+          "id": 11841,
+          "kind": "title",
+          "sectionNumber": "306.2.1",
+          "title": "306.2.1 Overexcavation."
         },
         {
-          "id" : 11842,
-          "kind" : "title",
-          "sectionNumber" : "306.2.2",
-          "title" : "306.2.2 Rock removal."
+          "id": 11842,
+          "kind": "title",
+          "sectionNumber": "306.2.2",
+          "title": "306.2.2 Rock removal."
         },
         {
-          "id" : 11843,
-          "kind" : "title",
-          "sectionNumber" : "306.2.3",
-          "title" : "306.2.3 Soft load-bearing materials."
+          "id": 11843,
+          "kind": "title",
+          "sectionNumber": "306.2.3",
+          "title": "306.2.3 Soft load-bearing materials."
         },
         {
-          "id" : 11844,
-          "kind" : "title",
-          "sectionNumber" : "306.3",
-          "title" : "306.3 Backfilling."
+          "id": 11844,
+          "kind": "title",
+          "sectionNumber": "306.3",
+          "title": "306.3 Backfilling."
         },
         {
-          "id" : 11845,
-          "kind" : "title",
-          "sectionNumber" : "306.4",
-          "title" : "306.4 Tunneling."
+          "id": 11845,
+          "kind": "title",
+          "sectionNumber": "306.4",
+          "title": "306.4 Tunneling."
         },
         {
-          "id" : 11846,
-          "kind" : "title",
-          "sectionNumber" : "307.1",
-          "title" : "307.1 General."
+          "id": 11846,
+          "kind": "title",
+          "sectionNumber": "307.1",
+          "title": "307.1 General."
         },
         {
-          "id" : 11847,
-          "kind" : "title",
-          "sectionNumber" : "307.2",
-          "title" : "307.2 Loading."
+          "id": 11847,
+          "kind": "title",
+          "sectionNumber": "307.2",
+          "title": "307.2 Loading."
         },
         {
-          "id" : 11848,
-          "kind" : "title",
-          "sectionNumber" : "307.3",
-          "title" : "307.3 Cutting, notching and boring."
+          "id": 11848,
+          "kind": "title",
+          "sectionNumber": "307.3",
+          "title": "307.3 Cutting, notching and boring."
         },
         {
-          "id" : 11849,
-          "kind" : "title",
-          "sectionNumber" : "307.4",
-          "title" : "307.4 Penetrations of floor\/ceiling assemblies and fire-resistance-rated assemblies."
+          "id": 11849,
+          "kind": "title",
+          "sectionNumber": "307.4",
+          "title": "307.4 Penetrations of floor/ceiling assemblies and fire-resistance-rated assemblies."
         },
         {
-          "id" : 11850,
-          "kind" : "title",
-          "sectionNumber" : "307.5",
-          "title" : "307.5 Trusses."
+          "id": 11850,
+          "kind": "title",
+          "sectionNumber": "307.5",
+          "title": "307.5 Trusses."
         },
         {
-          "id" : 11851,
-          "kind" : "title",
-          "sectionNumber" : "307.6",
-          "title" : "307.6 Protection of footings."
+          "id": 11851,
+          "kind": "title",
+          "sectionNumber": "307.6",
+          "title": "307.6 Protection of footings."
         },
         {
-          "id" : 11852,
-          "kind" : "title",
-          "sectionNumber" : "307.7",
-          "title" : "307.7 Piping materials exposed within plenums."
+          "id": 11852,
+          "kind": "title",
+          "sectionNumber": "307.7",
+          "title": "307.7 Piping materials exposed within plenums."
         },
         {
-          "id" : 11853,
-          "kind" : "title",
-          "sectionNumber" : "308.1",
-          "title" : "308.1 General."
+          "id": 11853,
+          "kind": "title",
+          "sectionNumber": "308.1",
+          "title": "308.1 General."
         },
         {
-          "id" : 11854,
-          "kind" : "title",
-          "sectionNumber" : "308.2",
-          "title" : "308.2 Piping seismic supports."
+          "id": 11854,
+          "kind": "title",
+          "sectionNumber": "308.2",
+          "title": "308.2 Piping seismic supports."
         },
         {
-          "id" : 11855,
-          "kind" : "title",
-          "sectionNumber" : "308.3",
-          "title" : "308.3 Materials."
+          "id": 11855,
+          "kind": "title",
+          "sectionNumber": "308.3",
+          "title": "308.3 Materials."
         },
         {
-          "id" : 11856,
-          "kind" : "title",
-          "sectionNumber" : "308.4",
-          "title" : "308.4 Structural attachment."
+          "id": 11856,
+          "kind": "title",
+          "sectionNumber": "308.4",
+          "title": "308.4 Structural attachment."
         },
         {
-          "id" : 11857,
-          "kind" : "title",
-          "sectionNumber" : "308.5",
-          "title" : "308.5 Interval of support."
+          "id": 11857,
+          "kind": "title",
+          "sectionNumber": "308.5",
+          "title": "308.5 Interval of support."
         },
         {
-          "id" : 11858,
-          "kind" : "title",
-          "sectionNumber" : "308.5.1",
-          "title" : "308.5.1 No-hub type cast iron soil pipe, fittings, and couplings."
+          "id": 11858,
+          "kind": "title",
+          "sectionNumber": "308.5.1",
+          "title": "308.5.1 No-hub type cast iron soil pipe, fittings, and couplings."
         },
         {
-          "id" : 11859,
-          "kind" : "title",
-          "sectionNumber" : "308.5.2",
-          "title" : "308.5.2 Movement."
+          "id": 11859,
+          "kind": "title",
+          "sectionNumber": "308.5.2",
+          "title": "308.5.2 Movement."
         },
         {
-          "id" : 11860,
-          "kind" : "title",
-          "sectionNumber" : "308.6",
-          "title" : "308.6 Sway bracing."
+          "id": 11860,
+          "kind": "title",
+          "sectionNumber": "308.6",
+          "title": "308.6 Sway bracing."
         },
         {
-          "id" : 11861,
-          "kind" : "title",
-          "sectionNumber" : "308.6.1",
-          "title" : "308.6.1 No-hub type cast iron soil pipe, fittings, and couplings."
+          "id": 11861,
+          "kind": "title",
+          "sectionNumber": "308.6.1",
+          "title": "308.6.1 No-hub type cast iron soil pipe, fittings, and couplings."
         },
         {
-          "id" : 11862,
-          "kind" : "title",
-          "sectionNumber" : "308.7",
-          "title" : "308.7 Anchorage."
+          "id": 11862,
+          "kind": "title",
+          "sectionNumber": "308.7",
+          "title": "308.7 Anchorage."
         },
         {
-          "id" : 11863,
-          "kind" : "title",
-          "sectionNumber" : "308.7.1",
-          "title" : "308.7.1 Location."
+          "id": 11863,
+          "kind": "title",
+          "sectionNumber": "308.7.1",
+          "title": "308.7.1 Location."
         },
         {
-          "id" : 11864,
-          "kind" : "title",
-          "sectionNumber" : "308.8",
-          "title" : "308.8 Expansion joint fittings."
+          "id": 11864,
+          "kind": "title",
+          "sectionNumber": "308.8",
+          "title": "308.8 Expansion joint fittings."
         },
         {
-          "id" : 11865,
-          "kind" : "title",
-          "sectionNumber" : "309.1",
-          "title" : "309.1 General."
+          "id": 11865,
+          "kind": "title",
+          "sectionNumber": "309.1",
+          "title": "309.1 General."
         },
         {
-          "id" : 11866,
-          "kind" : "title",
-          "sectionNumber" : "309.2",
-          "title" : "309.2 Flood hazard."
+          "id": 11866,
+          "kind": "title",
+          "sectionNumber": "309.2",
+          "title": "309.2 Flood hazard."
         },
         {
-          "id" : 11867,
-          "kind" : "title",
-          "sectionNumber" : "309.3",
-          "title" : "309.3 Coastal high-hazard areas and coastal A zones."
+          "id": 11867,
+          "kind": "title",
+          "sectionNumber": "309.3",
+          "title": "309.3 Coastal high-hazard areas and coastal A zones."
         },
         {
-          "id" : 11868,
-          "kind" : "title",
-          "sectionNumber" : "310.1",
-          "title" : "310.1 Light and ventilation."
+          "id": 11868,
+          "kind": "title",
+          "sectionNumber": "310.1",
+          "title": "310.1 Light and ventilation."
         },
         {
-          "id" : 11869,
-          "kind" : "title",
-          "sectionNumber" : "310.2",
-          "title" : "310.2 Location of fixtures and compartments"
+          "id": 11869,
+          "kind": "title",
+          "sectionNumber": "310.2",
+          "title": "310.2 Location of fixtures and compartments"
         },
         {
-          "id" : 11870,
-          "kind" : "title",
-          "sectionNumber" : "310.3",
-          "title" : "310.3 Interior finish."
+          "id": 11870,
+          "kind": "title",
+          "sectionNumber": "310.3",
+          "title": "310.3 Interior finish."
         },
         {
-          "id" : 11871,
-          "kind" : "title",
-          "sectionNumber" : "311.1",
-          "title" : "311.1 General."
+          "id": 11871,
+          "kind": "title",
+          "sectionNumber": "311.1",
+          "title": "311.1 General."
         },
         {
-          "id" : 11872,
-          "kind" : "title",
-          "sectionNumber" : "312.1",
-          "title" : "312.1 Required tests."
+          "id": 11872,
+          "kind": "title",
+          "sectionNumber": "312.1",
+          "title": "312.1 Required tests."
         },
         {
-          "id" : 11873,
-          "kind" : "title",
-          "sectionNumber" : "312.1.1",
-          "title" : "312.1.1 Test gauges."
+          "id": 11873,
+          "kind": "title",
+          "sectionNumber": "312.1.1",
+          "title": "312.1.1 Test gauges."
         },
         {
-          "id" : 11874,
-          "kind" : "title",
-          "sectionNumber" : "312.1.2",
-          "title" : "312.1.2 Witnessing tests."
+          "id": 11874,
+          "kind": "title",
+          "sectionNumber": "312.1.2",
+          "title": "312.1.2 Witnessing tests."
         },
         {
-          "id" : 11875,
-          "kind" : "title",
-          "sectionNumber" : "312.2",
-          "title" : "312.2 Drainage and vent water test."
+          "id": 11875,
+          "kind": "title",
+          "sectionNumber": "312.2",
+          "title": "312.2 Drainage and vent water test."
         },
         {
-          "id" : 11876,
-          "kind" : "title",
-          "sectionNumber" : "312.3",
-          "title" : "312.3 Drainage and vent air test."
+          "id": 11876,
+          "kind": "title",
+          "sectionNumber": "312.3",
+          "title": "312.3 Drainage and vent air test."
         },
         {
-          "id" : 11877,
-          "kind" : "title",
-          "sectionNumber" : "312.4",
-          "title" : "312.4 Drainage and vent final inspection."
+          "id": 11877,
+          "kind": "title",
+          "sectionNumber": "312.4",
+          "title": "312.4 Drainage and vent final inspection."
         },
         {
-          "id" : 11878,
-          "kind" : "title",
-          "sectionNumber" : "312.5",
-          "title" : "312.5 Water supply system test."
+          "id": 11878,
+          "kind": "title",
+          "sectionNumber": "312.5",
+          "title": "312.5 Water supply system test."
         },
         {
-          "id" : 11879,
-          "kind" : "title",
-          "sectionNumber" : "312.5.1",
-          "title" : "312.5.1 Water service pipe."
+          "id": 11879,
+          "kind": "title",
+          "sectionNumber": "312.5.1",
+          "title": "312.5.1 Water service pipe."
         },
         {
-          "id" : 11880,
-          "kind" : "title",
-          "sectionNumber" : "312.6",
-          "title" : "312.6 Reserved."
+          "id": 11880,
+          "kind": "title",
+          "sectionNumber": "312.6",
+          "title": "312.6 Reserved."
         },
         {
-          "id" : 11881,
-          "kind" : "title",
-          "sectionNumber" : "312.7",
-          "title" : "312.7 Forced drain test."
+          "id": 11881,
+          "kind": "title",
+          "sectionNumber": "312.7",
+          "title": "312.7 Forced drain test."
         },
         {
-          "id" : 11882,
-          "kind" : "title",
-          "sectionNumber" : "312.8",
-          "title" : "312.8 Storm drainage system test."
+          "id": 11882,
+          "kind": "title",
+          "sectionNumber": "312.8",
+          "title": "312.8 Storm drainage system test."
         },
         {
-          "id" : 11883,
-          "kind" : "title",
-          "sectionNumber" : "312.9",
-          "title" : "312.9 Shower liner test."
+          "id": 11883,
+          "kind": "title",
+          "sectionNumber": "312.9",
+          "title": "312.9 Shower liner test."
         },
         {
-          "id" : 11884,
-          "kind" : "title",
-          "sectionNumber" : "312.10",
-          "title" : "312.10 Inspection and testing of backflow prevention assemblies."
+          "id": 11884,
+          "kind": "title",
+          "sectionNumber": "312.10",
+          "title": "312.10 Inspection and testing of backflow prevention assemblies."
         },
         {
-          "id" : 11885,
-          "kind" : "title",
-          "sectionNumber" : "312.10.1",
-          "title" : "312.10.1 Inspections."
+          "id": 11885,
+          "kind": "title",
+          "sectionNumber": "312.10.1",
+          "title": "312.10.1 Inspections."
         },
         {
-          "id" : 11886,
-          "kind" : "title",
-          "sectionNumber" : "312.10.2",
-          "title" : "312.10.2 Testing."
+          "id": 11886,
+          "kind": "title",
+          "sectionNumber": "312.10.2",
+          "title": "312.10.2 Testing."
         },
         {
-          "id" : 11887,
-          "kind" : "title",
-          "sectionNumber" : "312.11",
-          "title" : "312.11 Joint inspection."
+          "id": 11887,
+          "kind": "title",
+          "sectionNumber": "312.11",
+          "title": "312.11 Joint inspection."
         },
         {
-          "id" : 11888,
-          "kind" : "title",
-          "sectionNumber" : "312.11.1",
-          "title" : "312.11.1 Welder's qualifications."
+          "id": 11888,
+          "kind": "title",
+          "sectionNumber": "312.11.1",
+          "title": "312.11.1 Welder's qualifications."
         },
         {
-          "id" : 11889,
-          "kind" : "title",
-          "sectionNumber" : "313.1",
-          "title" : "313.1 General."
+          "id": 11889,
+          "kind": "title",
+          "sectionNumber": "313.1",
+          "title": "313.1 General."
         },
         {
-          "id" : 11890,
-          "kind" : "title",
-          "sectionNumber" : "314.1",
-          "title" : "314.1 Fuel-burning appliances."
+          "id": 11890,
+          "kind": "title",
+          "sectionNumber": "314.1",
+          "title": "314.1 Fuel-burning appliances."
         },
         {
-          "id" : 11891,
-          "kind" : "title",
-          "sectionNumber" : "314.1.1",
-          "title" : "314.1.1 Condensate disposal."
+          "id": 11891,
+          "kind": "title",
+          "sectionNumber": "314.1.1",
+          "title": "314.1.1 Condensate disposal."
         },
         {
-          "id" : 11892,
-          "kind" : "title",
-          "sectionNumber" : "314.2",
-          "title" : "314.2 Evaporators and cooling coils."
+          "id": 11892,
+          "kind": "title",
+          "sectionNumber": "314.2",
+          "title": "314.2 Evaporators and cooling coils."
         },
         {
-          "id" : 11893,
-          "kind" : "title",
-          "sectionNumber" : "314.2.1",
-          "title" : "314.2.1 Condensate disposal."
+          "id": 11893,
+          "kind": "title",
+          "sectionNumber": "314.2.1",
+          "title": "314.2.1 Condensate disposal."
         },
         {
-          "id" : 11894,
-          "kind" : "title",
-          "sectionNumber" : "314.2.2",
-          "title" : "314.2.2 Drain pipe materials and sizes."
+          "id": 11894,
+          "kind": "title",
+          "sectionNumber": "314.2.2",
+          "title": "314.2.2 Drain pipe materials and sizes."
         },
         {
-          "id" : 11895,
-          "kind" : "title",
-          "sectionNumber" : "314.2.3",
-          "title" : "314.2.3 Auxiliary and secondary drain systems."
+          "id": 11895,
+          "kind": "title",
+          "sectionNumber": "314.2.3",
+          "title": "314.2.3 Auxiliary and secondary drain systems."
         },
         {
-          "id" : 11896,
-          "kind" : "title",
-          "sectionNumber" : "314.2.3.1",
-          "title" : "314.2.3.1 Water-level monitoring devices."
+          "id": 11896,
+          "kind": "title",
+          "sectionNumber": "314.2.3.1",
+          "title": "314.2.3.1 Water-level monitoring devices."
         },
         {
-          "id" : 11897,
-          "kind" : "title",
-          "sectionNumber" : "314.2.3.2",
-          "title" : "314.2.3.2 Appliance, equipment and insulation in pans."
+          "id": 11897,
+          "kind": "title",
+          "sectionNumber": "314.2.3.2",
+          "title": "314.2.3.2 Appliance, equipment and insulation in pans."
         },
         {
-          "id" : 11898,
-          "kind" : "title",
-          "sectionNumber" : "314.2.4",
-          "title" : "314.2.4 Traps."
+          "id": 11898,
+          "kind": "title",
+          "sectionNumber": "314.2.4",
+          "title": "314.2.4 Traps."
         },
         {
-          "id" : 11899,
-          "kind" : "title",
-          "sectionNumber" : "314.2.5",
-          "title" : "314.2.5 Drain line maintenance."
+          "id": 11899,
+          "kind": "title",
+          "sectionNumber": "314.2.5",
+          "title": "314.2.5 Drain line maintenance."
         },
         {
-          "id" : 11900,
-          "kind" : "title",
-          "sectionNumber" : "314.2.6",
-          "title" : "314.2.6 Condensate discharge."
+          "id": 11900,
+          "kind": "title",
+          "sectionNumber": "314.2.6",
+          "title": "314.2.6 Condensate discharge."
         },
         {
-          "id" : 11901,
-          "kind" : "title",
-          "sectionNumber" : "315.1",
-          "title" : "315.1 Sealing of annular spaces."
+          "id": 11901,
+          "kind": "title",
+          "sectionNumber": "315.1",
+          "title": "315.1 Sealing of annular spaces."
         }
       ]
     }
   ],
-  "rawDraftText" : "#- Chapter 3: General Regulations\n\nSection PC 301: General\n\n#--- 301.1 Scope.\n\nThe provisions of this chapter shall govern the general regulations regarding the installation of plumbing not specific to other chapters.\n\n#--- 301.2 System installation.\n\nPlumbing shall be installed with due regard to preservation of the strength of structural members and prevention of damage to walls and other surfaces through fixture usage.\n\n#--- 301.3 Connections to drainage system.\n\nPlumbing fixtures, drains, appurtenances and appliances used to receive or discharge liquid waste or sewage shall be directly connected to the sanitary drainage system of the building or premises, in accordance with the requirements of this code. This section shall not be construed to prevent indirect waste systems required by Chapter 8.\n\nException: Fixtures discharging wastewater shall not be required to discharge to the sanitary drainage system where such fixtures discharge to a water recycling system in accordance with Chapter 13.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#--- 301.4 Connections to water supply.\n\nEvery building intended for human habitation, occupancy or use shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code. Every plumbing fixture, device or appliance requiring or using water for its proper operation shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code.\n\n#--- 301.5 Pipe, tube and fitting sizes.\n\nU nless otherwise indicated, the pipe, tube and fitting sizes specified in this code are expressed in nominal or standard sizes as designated in the referenced material standards.\n\n#--- 301.6 Prohibited locations.\n\nPlumbing systems shall not be located in an elevator shaft and plumbing systems not related to elevator machinery shall not be located in elevator equipment rooms.\n\nException: Floor drains, sumps and sump pumps shall be permitted at the base of the shaft, provided that they are indirectly connected to the plumbing system and comply with Section 1003.4.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/051.\n\n#--- 301.7 Conflicts.\n\nIn instances where conflicts occur between this code and the manufacturer's instructions, the more restrictive provisions shall apply.\n\nSection PC 302: Exclusion of Materials Detrimental to the Sewer System\n\n#--- 302.1 Detrimental or dangerous materials.\n\nAshes, cinders or rags; flammable, poisonous or explosive liquids or gases; oil, grease or any other insoluble material capable of obstructing, damaging or overloading the building drainage or sewer system, or capable of interfering with the normal operation of the sewage treatment processes; or any other substance or material prohibited from being discharged into the public sewers in accordance with the rules of the Department of Environmental Protection, shall not be deposited, by any means, into such systems.\n\n#--- 302.2 Industrial wastes.\n\nWaste products from manufacturing or industrial operations shall not be introduced into the public sewer except in accordance with the rules of the Department of Environmental Protection.\n\nSection PC 303: Materials\n\n#--- 303.1 Identification.\n\nEach length of pipe and each pipe fitting, trap, fixture, material and device utilized in a plumbing system shall bear the identification of the manufacturer and any markings required by the applicable referenced standards.\n\n#--- 303.2 Installation of materials.\n\nAll materials used shall be installed in strict accordance with the standards under which the materials are accepted and approved. In the absence of such installation procedures, the manufacturer's instructions shall be followed. Where the requirements of referenced standards or installation instructions do not conform to minimum provisions of this code, the provisions of this code shall apply.\n\n#--- 303.3 Plastic pipe, fittings and components.\n\nWhere permitted by this code, plastic pipe, fittings and components shall be third-party certified as conforming to NSF 14.\n\n#--- 303.4 Third-party certification.\n\nAll plumbing products and materials shall be listed by a third-party certification agency as complying with the referenced standards. Products and materials shall be identified in accordance with Section 303.1.\n\nSection PC 304: Rodent Proofing\n\n#--- 304.1 General.\n\nPlumbing systems shall be designed and installed in accordance with Sections 304.2 and 304.4 to prevent rodents from entering structures.\n\n#--- 304.2 Strainer plates.\n\nAll strainer plates on drain inlets shall be designed and installed so that all openings are not greater than 1\/2 inch (12.7 mm) in least dimension.\n\n#--- 304.3 Reserved.\n\n#--- 304.4 Openings for pipes.\n\nIn or on structures where openings have been made in walls, floors or ceilings for the passage of pipes, the annular space between the pipe and the sides of the opening shall be sealed with caulking materials or closed with gasketing systems compatible with the piping materials and locations.\n\nSection PC 305: Protection of Pipes and Plumbing System Components\n\n#--- 305.1 Corrosion.\n\nPipes passing through or encased in concrete or cinder walls and floors or other corrosive material shall be protected against external corrosion by a protective sheathing or wrapping or other means that will withstand any reaction from the lime and acid of concrete, cinder or other corrosive material. Sheathing or wrapping shall allow for movement including expansion and contraction of piping to prevent any rubbing action. Thickness of sheathing or wrapping material shall be not less than 0.025 inch (0.64 mm).\n\n#--- 305.2 Stress and strain.\n\nPiping in a plumbing system shall be installed so as to prevent strains and stresses that exceed the structural strength of the pipe. Where necessary, provisions shall be made to protect piping from damage resulting from expansion, contraction and structural settlement.\n\n#--- 305.3 Pipes through or under footings or foundation walls.\n\nAny pipe that passes under a footing or through a foundation wall shall be provided with a relieving arch, or a pipe sleeve pipe shall be built into the foundation wall. The sleeve shall be two pipe sizes greater than the pipe passing through the wall.\n\n#--- 305.4 Freezing.\n\nWater, soil and waste pipes shall not be installed outside of a building, in attics or crawl spaces, concealed in outside walls, or in any other place subjected to freezing temperatures unless adequate provision is made to protect such pipes from freezing by insulation or heat or both. Exterior water supply system piping shall be installed not less than 48 inches (1219 mm) below grade.\n\n#---- 305.4.1 Building sewer and building drain depth.\n\nBuilding drains that connect to private sewage disposal systems shall be a minimum of 36 inches (914 mm) below finished grade at the point of septic tank connection. Building sewers and drains shall be a minimum of 36 inches (914 mm) below grade.\n\n#--- 305.5 Waterproofing of openings.\n\nJoints at the roof and around vent pipes, shall be made water tight by the use of lead, copper, galvanized steel, aluminum, plastic or other approved flashings or flashing material. Exterior wall openings shall be made water tight.\n\n#--- 305.6 Protection against physical damage.\n\nIn concealed locations where piping, other than cast-iron or galvanized steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38 mm) from the nearest edge of the member, the pipe shall be protected by steel shield plates. Such shield plates shall have a thickness of not less than 0.0575 inch (1.463 mm) (No. 16 gage). Such plates shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (51 mm) above sole plates and below top plates.\n\n#--- 305.7 Protection of components of plumbing system.\n\nComponents of a plumbing system installed along alleyways, driveways, parking garages or other locations exposed to damage shall be recessed into the wall or otherwise protected in an approved manner.\n\n#--- 305.8 Breakage.\n\nPipes passing through or under walls shall be protected from breakage.\n\n#--- 305.9 Wind resistance.\n\nEquipment, appliances and supports that are exposed to wind shall be designed and installed to resist the wind pressures determined in accordance with the New York City Building Code.\n\nSection PC 306: Trenching, Excavation and Backfill\n\n#--- 306.1 Support of piping.\n\nBuried piping shall be supported throughout its entire length.\n\n#--- 306.2 Trenching and bedding.\n\nWhere trenches are excavated such that the bottom of the trench forms the bed for the pipe, solid and continuous load-bearing support shall be provided between joints. Bell holes, hub holes and coupling holes shall be provided at points where the pipe is joined. Such pipe shall not be supported on blocks to grade. In instances where the materials manufacturer's installation instructions are more restrictive than those prescribed by the code, the material shall be installed in accordance with the more restrictive requirement.\n\n#---- 306.2.1 Overexcavation.\n\nWhere trenches are excavated below the installation level of the pipe such that the bottom of the trench does not form the bed for the pipe, the trench shall be backfilled to the installation level of the bottom of the pipe with sand or fine gravel placed in layers not greater than 6 inches (152 mm) in depth and such backfill shall be compacted after each placement.\n\n#---- 306.2.2 Rock removal.\n\nWhere rock is encountered in trenching, the rock shall be removed to not less than 3 inches (76 mm) below the installation level of the bottom of the pipe, and the trench shall be backfilled to the installation level of the bottom of the pipe with sand tamped in place so as to provide uniform load- bearing support for the pipe between joints. The pipe, including the joints, shall not rest on rock at any point.\n\n#---- 306.2.3 Soft load-bearing materials.\n\nIf soft materials of poor load-bearing quality are found at the bottom of the trench, pipe shall be hung from slab above.\n\n#--- 306.3 Backfilling.\n\nMaterial used under and beside pipes shall be clean backfill, free of discarded construction material and debris. Loose earth free from rocks, broken concrete and frozen chunks shall be placed in the trench in 6-inch (152 mm) layers and tamped in place until the crown of the pipe is covered by 12 inches (305 mm) of tamped earth. The backfill under and beside the pipe shall be compacted for pipe support. Backfill shall be brought up evenly on both sides of the pipe so that the pipe remains aligned. In instances where the manufacturer's installation instructions for materials are more restrictive than those prescribed by the code, the material shall be installed in accordance with the more restrictive requirement. Backfilling is subject to progress inspection in accordance with Section 108.\n\n#--- 306.4 Tunneling.\n\nWhere pipe is to be installed by tunneling, jacking or a combination of both, the pipe shall be protected from damage during installation and from subsequent uneven loading. Where earth tunnels are used, adequate supporting structures shall be provided to prevent future settling or caving.\n\nSection PC 307: Structural Safety\n\n#--- 307.1 General.\n\nIn the process of installing or repairing any part of a plumbing and drainage installation, the finished floors, walls, ceilings, tile work or any other part of the building or premises that must be changed or replaced shall be left in a safe structural condition in accordance with the requirements of the New York city building code.\n\n#--- 307.2 Loading.\n\nAlterations resulting in the addition of loads to any member, such as appliances and equipment, shall not be permitted without verification that the members are capable of supporting such additional loading.\n\n#--- 307.3 Cutting, notching and boring.\n\nThe cutting, notching and boring of structural elements shall be in accordance with the limitations specified in Appendix C.\n\n#--- 307.4 Penetrations of floor\/ceiling assemblies and fire-resistance-rated assemblies.\n\nPenetrations of floor\/ceiling assemblies and assemblies required to have a fire-resistance rating shall be protected in accordance with the New York City Building Code.\n\n#--- 307.5 Trusses.\n\nTruss members of any material and components shall not be cut, drilled, notched, spliced or otherwise altered in any way without written concurrence and approval of a registered design professional.\n\n#--- 307.6 Protection of footings.\n\nTrenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall. The upper boundary of the bearing plane is a line that extends downward, at an angle of 34 degrees (1:1.5 slope) from horizontal, from the outside bottom edge of the footing or wall.\n\n#--- 307.7 Piping materials exposed within plenums.\n\nPiping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code.\n\nSection PC 308: Piping Support\n\n#--- 308.1 General.\n\nPlumbing piping shall be supported in accordance with this section.\n\n#--- 308.2 Piping seismic supports.\n\nWhere earthquake loads are applicable in accordance with the building code, plumbing piping supports shall be designed and installed for the seismic forces in accordance with the New York city building code.\n\n#--- 308.3 Materials.\n\nHangers, anchors and supports shall support the piping and the contents of the piping. Hangers and strapping material shall be of approved material that will not promote galvanic action.\n\n#--- 308.4 Structural attachment.\n\nHangers and anchors shall be attached to the building construction in an approved manner.\n\n#--- 308.5 Interval of support.\n\nPipe shall be supported in accordance with Table 308.5.\n\nTable 308.5 Hanger Spacing\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na. The maximum horizontal spacing of cast-iron pipe hangers shall be increased to 10 feet where 10-foot lengths of pipe are installed.\n\nb. For sizes 2 inches and smaller, a guide shall be installed midway between required vertical supports. Such guides shall prevent pipe movement in a direction perpendicular to the axis of the pipe.\n\n#---- 308.5.1 No-hub type cast iron soil pipe, fittings, and couplings.\n\nIntervals of support for no-hub cast iron soil pipe, fittings, and couplings shall comply with CISPI 310.\n\n#---- 308.5.2 Movement.\n\nPiping systems and supports shall be designed to account for thermal expansion and contraction, building movement, and seismic conditions.\n\n#--- 308.6 Sway bracing.\n\nRigid support sway bracing shall be provided at changes in direction greater than 45 degrees (0.79 rad) for pipe sizes 4 inches (102 mm) and larger.\n\n#---- 308.6.1 No-hub type cast iron soil pipe, fittings, and couplings.\n\nInstallation of sway bracing for no-hub cast iron soil pipe, fittings, and couplings shall comply with CISPI 310.\n\n#--- 308.7 Anchorage.\n\nAnchorage shall be provided to restrain drainage piping from axial movement.\n\n#---- 308.7.1 Location.\n\nFor pipe sizes greater than 4 inches (102 mm), restraints shall be provided for drain pipes at all changes in direction and at all changes in diameter greater than two pipe sizes. Braces, blocks, rodding and other suitable methods as specified by the coupling manufacturer shall be utilized.\n\n#--- 308.8 Expansion joint fittings.\n\nExpansion joint fittings shall be used only where necessary to provide for expansion and contraction of the pipes. Expansion joint fittings shall be of the typical material suitable for use with the type of piping in which such fittings are installed.\n\nSection PC 309: Flood Hazard Resistance\n\n#--- 309.1 General.\n\nPlumbing systems and equipment in structures erected in flood hazard areas shall be constructed in accordance with the requirements of this section and Appendix G of the New York City Building Code.\n\n#--- 309.2 Flood hazard.\n\nFor structures located in flood hazard areas, the following systems and equipment shall be located and installed as required by Appendix G of the New York City Building Code:\n\n1. Water service pipes.\n\n2. Pump seals in individual water supply systems where the pump is located below the design flood elevation.\n\n3. Covers on potable water wells shall be sealed, except where the top of the casing well or pipe sleeve is elevated to not less than 1 foot (305 mm) above the design flood elevation.\n\n4. Sanitary drainage piping.\n\n5. Storm drainage piping.\n\n6. Manhole covers shall be sealed, except where elevated to or above the design flood elevation.\n\n7. Other plumbing fixtures, faucets, fixture fittings, piping systems and equipment.\n\n8. Water heaters.\n\n9. Vents and vent systems.\n\nException: In accordance with Appendix G of the New York City Building Code, the above systems are permitted to be located below the design flood elevation provided that the systems are designed and installed to prevent water from entering or accumulating within their components and the systems are constructed to resist hydrostatic and hydrodynamic loads and stresses, including the effects of buoyancy, during the occurrence of flooding to the design flood elevation.\n\n#--- 309.3 Coastal high-hazard areas and coastal A zones.\n\nStructures located in coastal high-hazard areas and coastal A zones shall meet the requirements of Section 309.2. The plumbing systems, pipes and fixtures shall not be mounted on or penetrate through walls intended to break away under flood loads.\n\nSection PC 310: Washroom and Toilet Room Requirements\n\n#--- 310.1 Light and ventilation.\n\nWashrooms and toilet rooms shall be illuminated and ventilated in accordance with the New York city building code and New York city mechanical code.\n\n#--- 310.2 Location of fixtures and compartments\n\nThe location of plumbing fixtures and the requirements for compartments and partitions shall be in accordance with Section 405.\n\n#--- 310.3 Interior finish.\n\nInterior finish surfaces of toilet rooms shall comply with the New York City Building Code.\n\nSection PC 311: Toilet Facilities for Workers\n\n#--- 311.1 General.\n\nToilet facilities shall be provided for construction workers and such facilities shall be maintained in a sanitary condition. Construction worker toilet facilities of the nonsewer type shall conform to ANSI Z4.3.\n\nSection PC 312: Tests and Inspections\n\n#--- 312.1 Required tests.\n\nThe licensed master plumber shall make the applicable tests prescribed in Sections 312.2 through 312.11 to determine compliance with the provisions of this code. The licensed master plumber shall give two days notice to the commissioner when the plumbing work is ready for tests. The equipment, material, power and labor necessary for the inspection and test shall be furnished by the licensed master plumber and the licensed master plumber shall be responsible for determining that the work will withstand the test pressure prescribed in the following tests. All plumbing system piping shall be tested with either water or, for piping systems other than plastic, by air. After the plumbing fixtures have been set and their traps filled with water, the entire drainage system shall be submitted to final tests. The commissioner shall require the removal of any cleanouts if necessary to ascertain whether the pressure has reached all parts of the system.\n\nExceptions:\n\n1. The repair, replacement or alteration to existing water, waste, vent, storm water piping or, building drain in an existing occupied building shall require only a visual inspection of waste, vent and storm water pipe roughing and finish in addition to a pressure test of water piping at available building water pressure.\n\n2. The addition of no more than five (5) plumbing fixtures or roof drains to an existing floor of an existing occupied building shall require only a visual inspection of waste, vent and storm water pipe roughing and finish in addition to a pressure test of water piping at available building water pressure.\n\n#---- 312.1.1 Test gauges.\n\nGauges used for testing shall be as follows:\n\n1. Tests requiring a pressure of 10 pounds per square inch (psi) (69 kPa) or less shall utilize a testing gauge having increments of 0.10 psi (0.69 kPa) or less.\n\n2. Tests requiring a pressure of greater than 10 psi (69 kPa) but less than or equal to 100 psi (689 kPa) shall utilize a testing gauge having increments of 1 psi (6.9 kPa) or less.\n\n3. Tests requiring a pressure of greater than 100 psi (689 kPa) shall utilize a testing gauge having increments of 2 psi (14 kPa) or less.\n\n#---- 312.1.2 Witnessing tests.\n\nTests in accordance with this code shall be witnessed by department plumbing inspectors or approved agencies. The department shall prescribe qualifications for individuals who are authorized to witness such tests on behalf of approved agencies, including but not limited to the requirement that such individuals shall be licensed master plumbers or registered design professionals with not less than 5 years experience in the inspection and testing of piping systems. Such tests may be conducted without any inspection or tests witnessed by the department, provided that verified statements and supporting inspectorial and test reports are filed with the department within two working days of such tests.\n\n#--- 312.2 Drainage and vent water test.\n\nA water test shall be applied to the drainage system either in its entirety or in sections. If applied to the entire system, all openings in the piping shall be tightly closed, except the highest opening, and the system shall be filled with water to the point of overflow. If the system is tested in sections, each opening shall be tightly plugged except the highest openings of the section under test, and each section shall be filled with water, but no section shall be tested with less than a 10-foot (3048 mm) head of water. In testing successive sections, at least the upper 10 feet (3048 mm) of the next preceding section shall be tested so that no joint or pipe in the building, except the uppermost 10 feet (3048 mm) of the system, shall have been submitted to a test of less than a 10-foot (3048 mm) head of water. This pressure shall be held for not less than15 minutes. The system shall then be tight at all points.\n\n#--- 312.3 Drainage and vent air test.\n\nPlastic piping shall not be tested using air. An air test shall be made by forcing air into the system until there is a uniform gauge of 5 psi (34.5 kPa). This pressure shall be held for a test period of not less than 15 minutes. Any adjustments to the test pressure required because of changes in ambient temperatures or the seating of gaskets shall be made prior to the beginning of the test period.\n\n#--- 312.4 Drainage and vent final inspection.\n\nThe final inspection of the completed drainage and vent systems shall be visual and in sufficient detail to determine compliance with the provisions of this code. Where a smoke test is utilized, it shall be made by filling all traps with water and then introducing into the entire system a pungent, thick smoke produced by one or more smoke machines. When the smoke appears at stack openings on the roof, the stack openings shall be closed and a pressure equivalent to a 1-inch water column (248.8 Pa) shall be held for a test period of not less than 15 minutes.\n\n#--- 312.5 Water supply system test.\n\nUpon completion of a section of or the entire water supply system, the system, or portion completed, shall be tested and proved tight under a water pressure of 50 psi (344 kPa) above its normal working pressure but not less than 150 psi (1033 kPa). This pressure shall be held for not less than 15 minutes. The water utilized for tests shall be obtained from a potable source of supply. The required tests shall be performed in accordance with this section and Section 108.\n\n#---- 312.5.1 Water service pipe.\n\nIn addition to any requirements of Section 312.5, tests for water service pipes shall comply with the following:\n\n1. In the presence of the tapper or inspector of the Department of Environmental Protection, each new service pipe or repaired service pipe shall be subjected to a water test made under the street main pressure.\n\n2. All such pipes and appurtenances shall remain uncovered for the duration of the test and shall show no sign of leakage.\n\n3. When any question arises as to the installation conforming with these regulations, an internal hydrostatic test as specified for materials may be applied, subject to the approval of the Department of Environmental Protection.\n\n#--- 312.6 Reserved.\n\n#--- 312.7 Forced drain test.\n\nForced drain tests shall consist of plugging the end of the pump discharge at the point of connection with the building drain and applying a pressure of 5 psi (34.5 kPa) greater than the shut off pump rating, and maintaining such pressure for 15 minutes.\n\n#--- 312.8 Storm drainage system test.\n\nStorm drain systems shall be tested by water or air in accordance with Section 312.2 or 312.3. Where storm drainage piping is designed to run full, the system shall be tested to withstand the head of 10 feet (3048 mm) of water above the anticipated high water level.\n\nException: Storm drainage piping installed outside of a building shall be tested to withstand the head of water equal to grade, but such testing may be conducted after inspection and backfilling.\n\n#--- 312.9 Shower liner test.\n\nWhere shower floors and receptors are made water tight by the application of materials required by Section 417.5.2, the completed liner installation shall be tested. The pipe from the shower drain shall be plugged water tight for the test. The floor and receptor area shall be filled with potable water to a depth of not less than 2 inches (51 mm) measured at the threshold. Where a threshold of at least 2 inches (51 mm) high does not exist, a temporary threshold shall be constructed to retain the test water in the lined floor or receptor area to a level not less than 2 inches (51 mm) deep measured at the threshold. The water shall be retained for a test period of not less than 15 minutes, and there shall not be evidence of leakage.\n\n#--- 312.10 Inspection and testing of backflow prevention assemblies.\n\nInspection and testing of secondary backflow prevention assemblies shall comply with Sections 312.10.1 and 312.10.2.\n\n#---- 312.10.1 Inspections.\n\nAnnual inspections shall be made of all backflow prevention assemblies, air gaps, spill-proof vacuum breakers, pressure vacuum breaker assemblies, and hose connection backflow preventers to determine whether they are operable on forms provided by the department. Such forms shall be retained by the owner and shall be made available upon request to the department for a period of five years.\n\n#---- 312.10.2 Testing.\n\nReduced pressure principle, double check, pressure vacuum breaker, reduced pressure detector fire protection, double check detector fire protection, and spill-resistant vacuum breaker backflow preventer assemblies and hose connection backflow preventers shall be tested at the time of installation, immediately after repairs or relocation and annually thereafter. The testing procedure shall be performed in accordance with one of the following standards: ASSE 5013, ASSE 5015, ASSE 5020, ASSE 5047, ASSE 5048, ASSE 5052, ASSE 5056, CSA B64.10 or CSA B64.10.1. Refer to Section 608.13 and the Department of Environmental Protection for additional testing requirements.\n\n#--- 312.11 Joint inspection.\n\nInspections of welded joints shall consist of visual examination, during or after manufacture, fabrication, assembly, or pressure tests as appropriate. Supplementary types of nondestructive inspection techniques, such as magnetic-particle, radiographic, ultrasonic, etc., shall not be required unless specifically listed herein or in the engineering design.\n\n#---- 312.11.1 Welder's qualifications.\n\nWelders installing domestic water piping within buildings at any pressure shall comply with the following:\n\n1. Welders shall be qualified for all pipe sizes, wall thicknesses and all positions in accordance with the ASME Boiler and Pressure Vessel Code, Section IX. Requalification of a welder is required should the welder fail to maintain welder's continuity every 6 months. The licensed master plumber employing the welder shall maintain a welder continuity log and the log shall be made available to the department upon request.\n\n2. Welder qualification testing shall be performed by an approved agency and the inspector witnessing the test shall be an authorized AWS Certified Welding Inspector.\n\n3. Copies of the certified welder qualification reports shall be maintained by both the approved agency and the licensed master plumber employing the welder for at least six years and shall be made available to the department upon request.\n\nSection PC 313: Equipment Efficiencies\n\n#--- 313.1 General.\n\nEquipment efficiencies shall be in accordance with the New York City Energy Conservation Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085.\n\nSection PC 314: Condensate Disposal\n\n#--- 314.1 Fuel-burning appliances.\n\nLiquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture or disposal area in accordance with the manufacturer's instructions. Condensate piping shall be of approved corrosion-resistant material in accordance with Section 803 and shall not be smaller than the drain connection on the appliance. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope).\n\n#---- 314.1.1 Condensate disposal.\n\nCondensate from all fuel-burning appliances and associated flues shall be neutralized to a pH of at least 6 and no more than 8 prior to disposal to a sanitary system.\n\n#--- 314.2 Evaporators and cooling coils.\n\nCondensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 314.2.1 through 314.2.5.\n\nException: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.\n\n#---- 314.2.1 Condensate disposal.\n\nCondensate from all cooling coils and evaporators shall be conveyed from the drain pan outlet to an approved place of disposal. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope). Condensate shall not discharge into a street, alley or other areas so as to cause a nuisance.\n\n#---- 314.2.2 Drain pipe materials and sizes.\n\nComponents of the condensate disposal system shall be cast iron, galvanized steel, copper, cross-linked polyethylene, polyethylene, ABS, CPVC, or PVC pipe or tubing. Polypropylene tubing may be used in lengths that do not exceed 12 inches (304.8 mm) for an individual drain application. Components shall be selected for the pressure and temperature rating of the installation. Joints and connections shall be made in accordance with the applicable provisions of Chapter 7 relative to the material type. Condensate waste and drain line size shall be not less than 3\/4-inch (19.1 mm) internal diameter and shall not decrease in size from the drain pan connection to the place of condensate disposal. Where the drain pipes from more than one unit are manifolded together for condensate drainage, the pipe or tubing shall be sized in accordance with Table 314.2.2.\n\nTable 314.2.2 Condensate Drain Sizing\n\nFor SI: 1 inch = 25.4 mm, 1 ton of capacity = 3.517 kW.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.\n\n#---- 314.2.3 Auxiliary and secondary drain systems.\n\nIn addition to the requirements of Section 314.2.1, where damage to any building components could occur as a result of overflow from the equipment primary condensate removal system, one of the following auxiliary protection methods shall be provided for each cooling coil or fuel-fired appliance that produces condensate:\n\n1. An auxiliary drain pan with a separate drain shall be provided under the coils on which condensation will occur. The auxiliary pan drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The pan shall have a depth of not less than 1 1\/2 inches (38 mm), shall be not less than 3 inches (76 mm) larger than the unit or the coil dimensions in width and length and shall be constructed of corrosion-resistant material. Metallic pans shall have a thickness of not less than 0.0236-inch (0.6010 mm) (No. 24 gage) for galvanized sheet metal pans, 0.0179 inches (0.4546 mm) (No. 26 gage) for stainless steel pans, or 0.0320 inches (0.8128 mm) (No. 20 gage) for aluminum pans. Nonmetallic pans shall have a thickness of not less than 0.0625-inch (1.6 mm).\n\n2. A separate overflow drain line shall be connected to the drain pan provided with the equipment. Such overflow drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The overflow drain line shall connect to the drain pan at a higher level than the primary drain connection.\n\n3. An auxiliary drain pan without a separate drain line shall be provided under the coils on which condensate will occur. Such pan shall be equipped with a listed water-level detection device that will shut off the equipment served prior to overflow of the pan. The auxiliary drain pan shall be constructed in accordance with Item 1 of this section.\n\n4. A listed water-level detection device shall be provided that will shut off the equipment served in the event that the primary drain is blocked. The device shall be installed in the primary drain line, the overflow drain line or in the equipment-supplied drain pan, located at a point higher than the primary drain line connection and below the overflow rim of such pan.\n\nExceptions:\n\n1. An auxiliary drain protection method shall not be required for fuel-fired appliances that automatically shut down operation in the event of a stoppage in the condensate drainage system.\n\n2. An auxiliary drain protection method shall not be required where a suitably sized and located floor drain is provided.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/051 and L.L. 2023\/077.\n\n#----- 314.2.3.1 Water-level monitoring devices.\n\nOn down-flow units and all other coils that do not have a secondary drain or provisions to install a secondary or auxiliary drain pan, a water-level monitoring device shall be installed inside the primary drain pan. This device shall shut off the equipment served in the event that the primary drain becomes restricted. Devices installed in the drain line shall not be permitted.\n\n#----- 314.2.3.2 Appliance, equipment and insulation in pans.\n\nWhere an appliance, equipment or insulation is subject to water damage when auxiliary drain pans fill, that portion of the appliance, equipment and insulation shall be installed above the flood level rim of the pans. Supports located inside of the pans to support the appliance or equipment or insulation shall be water resistant and approved.\n\n#---- 314.2.4 Traps.\n\nCondensate drains shall be trapped as required by the equipment or appliance manufacturer.\n\n#---- 314.2.5 Drain line maintenance.\n\nCondensate drain lines shall be configured to permit the clearing of blockages and performance of maintenance without requiring the drain line to be cut.\n\n#---- 314.2.6 Condensate discharge.\n\nWhere multiple evaporators and or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.\n\nSection PC 315: Penetrations\n\n#--- 315.1 Sealing of annular spaces.\n\nThe annular space between the outside of a pipe and the inside of a pipe sleeve or between the outside of a pipe and an opening in a building envelope wall, floor, or ceiling assembly penetrated by a pipe shall be sealed in an approved manner with caulking material, foam sealant or closed with a gasketing system. The caulking material, foam sealant or gasketing system shall be designed for the conditions at the penetration location and shall be compatible with the pipe, sleeve and building materials in contact with the sealing materials. Annular spaces created by pipes penetrating fire-resistance-rated assemblies or membranes of such assemblies shall be sealed or closed in accordance with Section 714 of the New York City Building Code.\n\nSection PC 316: Reserved",
-  "schemaVersion" : 1
+  "rawDraftText": "#- Chapter 3: General Regulations\n\nSection PC 301: General\n\n#--- 301.1 Scope.\n\nThe provisions of this chapter shall govern the general regulations regarding the installation of plumbing not specific to other chapters.\n\n#--- 301.2 System installation.\n\nPlumbing shall be installed with due regard to preservation of the strength of structural members and prevention of damage to walls and other surfaces through fixture usage.\n\n#--- 301.3 Connections to drainage system.\n\nPlumbing fixtures, drains, appurtenances and appliances used to receive or discharge liquid waste or sewage shall be directly connected to the sanitary drainage system of the building or premises, in accordance with the requirements of this code. This section shall not be construed to prevent indirect waste systems required by Chapter 8.\n\nException: Fixtures discharging wastewater shall not be required to discharge to the sanitary drainage system where such fixtures discharge to a water recycling system in accordance with Chapter 13.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 301.4 Connections to water supply.\n\nEvery building intended for human habitation, occupancy or use shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code. Every plumbing fixture, device or appliance requiring or using water for its proper operation shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code.\n\n#--- 301.5 Pipe, tube and fitting sizes.\n\nU nless otherwise indicated, the pipe, tube and fitting sizes specified in this code are expressed in nominal or standard sizes as designated in the referenced material standards.\n\n#--- 301.6 Prohibited locations.\n\nPlumbing systems shall not be located in an elevator shaft and plumbing systems not related to elevator machinery shall not be located in elevator equipment rooms.\n\nException: Floor drains, sumps and sump pumps shall be permitted at the base of the shaft, provided that they are indirectly connected to the plumbing system and comply with Section 1003.4.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051.\n\n#--- 301.7 Conflicts.\n\nIn instances where conflicts occur between this code and the manufacturer's instructions, the more restrictive provisions shall apply.\n\nSection PC 302: Exclusion of Materials Detrimental to the Sewer System\n\n#--- 302.1 Detrimental or dangerous materials.\n\nAshes, cinders or rags; flammable, poisonous or explosive liquids or gases; oil, grease or any other insoluble material capable of obstructing, damaging or overloading the building drainage or sewer system, or capable of interfering with the normal operation of the sewage treatment processes; or any other substance or material prohibited from being discharged into the public sewers in accordance with the rules of the Department of Environmental Protection, shall not be deposited, by any means, into such systems.\n\n#--- 302.2 Industrial wastes.\n\nWaste products from manufacturing or industrial operations shall not be introduced into the public sewer except in accordance with the rules of the Department of Environmental Protection.\n\nSection PC 303: Materials\n\n#--- 303.1 Identification.\n\nEach length of pipe and each pipe fitting, trap, fixture, material and device utilized in a plumbing system shall bear the identification of the manufacturer and any markings required by the applicable referenced standards.\n\n#--- 303.2 Installation of materials.\n\nAll materials used shall be installed in strict accordance with the standards under which the materials are accepted and approved. In the absence of such installation procedures, the manufacturer's instructions shall be followed. Where the requirements of referenced standards or installation instructions do not conform to minimum provisions of this code, the provisions of this code shall apply.\n\n#--- 303.3 Plastic pipe, fittings and components.\n\nWhere permitted by this code, plastic pipe, fittings and components shall be third-party certified as conforming to NSF 14.\n\n#--- 303.4 Third-party certification.\n\nAll plumbing products and materials shall be listed by a third-party certification agency as complying with the referenced standards. Products and materials shall be identified in accordance with Section 303.1.\n\nSection PC 304: Rodent Proofing\n\n#--- 304.1 General.\n\nPlumbing systems shall be designed and installed in accordance with Sections 304.2 and 304.4 to prevent rodents from entering structures.\n\n#--- 304.2 Strainer plates.\n\nAll strainer plates on drain inlets shall be designed and installed so that all openings are not greater than 1/2 inch (12.7 mm) in least dimension.\n\n#--- 304.3 Reserved.\n\n#--- 304.4 Openings for pipes.\n\nIn or on structures where openings have been made in walls, floors or ceilings for the passage of pipes, the annular space between the pipe and the sides of the opening shall be sealed with caulking materials or closed with gasketing systems compatible with the piping materials and locations.\n\nSection PC 305: Protection of Pipes and Plumbing System Components\n\n#--- 305.1 Corrosion.\n\nPipes passing through or encased in concrete or cinder walls and floors or other corrosive material shall be protected against external corrosion by a protective sheathing or wrapping or other means that will withstand any reaction from the lime and acid of concrete, cinder or other corrosive material. Sheathing or wrapping shall allow for movement including expansion and contraction of piping to prevent any rubbing action. Thickness of sheathing or wrapping material shall be not less than 0.025 inch (0.64 mm).\n\n#--- 305.2 Stress and strain.\n\nPiping in a plumbing system shall be installed so as to prevent strains and stresses that exceed the structural strength of the pipe. Where necessary, provisions shall be made to protect piping from damage resulting from expansion, contraction and structural settlement.\n\n#--- 305.3 Pipes through or under footings or foundation walls.\n\nAny pipe that passes under a footing or through a foundation wall shall be provided with a relieving arch, or a pipe sleeve pipe shall be built into the foundation wall. The sleeve shall be two pipe sizes greater than the pipe passing through the wall.\n\n#--- 305.4 Freezing.\n\nWater, soil and waste pipes shall not be installed outside of a building, in attics or crawl spaces, concealed in outside walls, or in any other place subjected to freezing temperatures unless adequate provision is made to protect such pipes from freezing by insulation or heat or both. Exterior water supply system piping shall be installed not less than 48 inches (1219 mm) below grade.\n\n#---- 305.4.1 Building sewer and building drain depth.\n\nBuilding drains that connect to private sewage disposal systems shall be a minimum of 36 inches (914 mm) below finished grade at the point of septic tank connection. Building sewers and drains shall be a minimum of 36 inches (914 mm) below grade.\n\n#--- 305.5 Waterproofing of openings.\n\nJoints at the roof and around vent pipes, shall be made water tight by the use of lead, copper, galvanized steel, aluminum, plastic or other approved flashings or flashing material. Exterior wall openings shall be made water tight.\n\n#--- 305.6 Protection against physical damage.\n\nIn concealed locations where piping, other than cast-iron or galvanized steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1/2 inches (38 mm) from the nearest edge of the member, the pipe shall be protected by steel shield plates. Such shield plates shall have a thickness of not less than 0.0575 inch (1.463 mm) (No. 16 gage). Such plates shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (51 mm) above sole plates and below top plates.\n\n#--- 305.7 Protection of components of plumbing system.\n\nComponents of a plumbing system installed along alleyways, driveways, parking garages or other locations exposed to damage shall be recessed into the wall or otherwise protected in an approved manner.\n\n#--- 305.8 Breakage.\n\nPipes passing through or under walls shall be protected from breakage.\n\n#--- 305.9 Wind resistance.\n\nEquipment, appliances and supports that are exposed to wind shall be designed and installed to resist the wind pressures determined in accordance with the New York City Building Code.\n\nSection PC 306: Trenching, Excavation and Backfill\n\n#--- 306.1 Support of piping.\n\nBuried piping shall be supported throughout its entire length.\n\n#--- 306.2 Trenching and bedding.\n\nWhere trenches are excavated such that the bottom of the trench forms the bed for the pipe, solid and continuous load-bearing support shall be provided between joints. Bell holes, hub holes and coupling holes shall be provided at points where the pipe is joined. Such pipe shall not be supported on blocks to grade. In instances where the materials manufacturer's installation instructions are more restrictive than those prescribed by the code, the material shall be installed in accordance with the more restrictive requirement.\n\n#---- 306.2.1 Overexcavation.\n\nWhere trenches are excavated below the installation level of the pipe such that the bottom of the trench does not form the bed for the pipe, the trench shall be backfilled to the installation level of the bottom of the pipe with sand or fine gravel placed in layers not greater than 6 inches (152 mm) in depth and such backfill shall be compacted after each placement.\n\n#---- 306.2.2 Rock removal.\n\nWhere rock is encountered in trenching, the rock shall be removed to not less than 3 inches (76 mm) below the installation level of the bottom of the pipe, and the trench shall be backfilled to the installation level of the bottom of the pipe with sand tamped in place so as to provide uniform load- bearing support for the pipe between joints. The pipe, including the joints, shall not rest on rock at any point.\n\n#---- 306.2.3 Soft load-bearing materials.\n\nIf soft materials of poor load-bearing quality are found at the bottom of the trench, pipe shall be hung from slab above.\n\n#--- 306.3 Backfilling.\n\nMaterial used under and beside pipes shall be clean backfill, free of discarded construction material and debris. Loose earth free from rocks, broken concrete and frozen chunks shall be placed in the trench in 6-inch (152 mm) layers and tamped in place until the crown of the pipe is covered by 12 inches (305 mm) of tamped earth. The backfill under and beside the pipe shall be compacted for pipe support. Backfill shall be brought up evenly on both sides of the pipe so that the pipe remains aligned. In instances where the manufacturer's installation instructions for materials are more restrictive than those prescribed by the code, the material shall be installed in accordance with the more restrictive requirement. Backfilling is subject to progress inspection in accordance with Section 108.\n\n#--- 306.4 Tunneling.\n\nWhere pipe is to be installed by tunneling, jacking or a combination of both, the pipe shall be protected from damage during installation and from subsequent uneven loading. Where earth tunnels are used, adequate supporting structures shall be provided to prevent future settling or caving.\n\nSection PC 307: Structural Safety\n\n#--- 307.1 General.\n\nIn the process of installing or repairing any part of a plumbing and drainage installation, the finished floors, walls, ceilings, tile work or any other part of the building or premises that must be changed or replaced shall be left in a safe structural condition in accordance with the requirements of the New York city building code.\n\n#--- 307.2 Loading.\n\nAlterations resulting in the addition of loads to any member, such as appliances and equipment, shall not be permitted without verification that the members are capable of supporting such additional loading.\n\n#--- 307.3 Cutting, notching and boring.\n\nThe cutting, notching and boring of structural elements shall be in accordance with the limitations specified in Appendix C.\n\n#--- 307.4 Penetrations of floor/ceiling assemblies and fire-resistance-rated assemblies.\n\nPenetrations of floor/ceiling assemblies and assemblies required to have a fire-resistance rating shall be protected in accordance with the New York City Building Code.\n\n#--- 307.5 Trusses.\n\nTruss members of any material and components shall not be cut, drilled, notched, spliced or otherwise altered in any way without written concurrence and approval of a registered design professional.\n\n#--- 307.6 Protection of footings.\n\nTrenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall. The upper boundary of the bearing plane is a line that extends downward, at an angle of 34 degrees (1:1.5 slope) from horizontal, from the outside bottom edge of the footing or wall.\n\n#--- 307.7 Piping materials exposed within plenums.\n\nPiping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code.\n\nSection PC 308: Piping Support\n\n#--- 308.1 General.\n\nPlumbing piping shall be supported in accordance with this section.\n\n#--- 308.2 Piping seismic supports.\n\nWhere earthquake loads are applicable in accordance with the building code, plumbing piping supports shall be designed and installed for the seismic forces in accordance with the New York city building code.\n\n#--- 308.3 Materials.\n\nHangers, anchors and supports shall support the piping and the contents of the piping. Hangers and strapping material shall be of approved material that will not promote galvanic action.\n\n#--- 308.4 Structural attachment.\n\nHangers and anchors shall be attached to the building construction in an approved manner.\n\n#--- 308.5 Interval of support.\n\nPipe shall be supported in accordance with Table 308.5.\n\nTable 308.5 Hanger Spacing\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\na. The maximum horizontal spacing of cast-iron pipe hangers shall be increased to 10 feet where 10-foot lengths of pipe are installed.\n\nb. For sizes 2 inches and smaller, a guide shall be installed midway between required vertical supports. Such guides shall prevent pipe movement in a direction perpendicular to the axis of the pipe.\n\n#---- 308.5.1 No-hub type cast iron soil pipe, fittings, and couplings.\n\nIntervals of support for no-hub cast iron soil pipe, fittings, and couplings shall comply with CISPI 310.\n\n#---- 308.5.2 Movement.\n\nPiping systems and supports shall be designed to account for thermal expansion and contraction, building movement, and seismic conditions.\n\n#--- 308.6 Sway bracing.\n\nRigid support sway bracing shall be provided at changes in direction greater than 45 degrees (0.79 rad) for pipe sizes 4 inches (102 mm) and larger.\n\n#---- 308.6.1 No-hub type cast iron soil pipe, fittings, and couplings.\n\nInstallation of sway bracing for no-hub cast iron soil pipe, fittings, and couplings shall comply with CISPI 310.\n\n#--- 308.7 Anchorage.\n\nAnchorage shall be provided to restrain drainage piping from axial movement.\n\n#---- 308.7.1 Location.\n\nFor pipe sizes greater than 4 inches (102 mm), restraints shall be provided for drain pipes at all changes in direction and at all changes in diameter greater than two pipe sizes. Braces, blocks, rodding and other suitable methods as specified by the coupling manufacturer shall be utilized.\n\n#--- 308.8 Expansion joint fittings.\n\nExpansion joint fittings shall be used only where necessary to provide for expansion and contraction of the pipes. Expansion joint fittings shall be of the typical material suitable for use with the type of piping in which such fittings are installed.\n\nSection PC 309: Flood Hazard Resistance\n\n#--- 309.1 General.\n\nPlumbing systems and equipment in structures erected in flood hazard areas shall be constructed in accordance with the requirements of this section and Appendix G of the New York City Building Code.\n\n#--- 309.2 Flood hazard.\n\nFor structures located in flood hazard areas, the following systems and equipment shall be located and installed as required by Appendix G of the New York City Building Code:\n\n1. Water service pipes.\n\n2. Pump seals in individual water supply systems where the pump is located below the design flood elevation.\n\n3. Covers on potable water wells shall be sealed, except where the top of the casing well or pipe sleeve is elevated to not less than 1 foot (305 mm) above the design flood elevation.\n\n4. Sanitary drainage piping.\n\n5. Storm drainage piping.\n\n6. Manhole covers shall be sealed, except where elevated to or above the design flood elevation.\n\n7. Other plumbing fixtures, faucets, fixture fittings, piping systems and equipment.\n\n8. Water heaters.\n\n9. Vents and vent systems.\n\nException: In accordance with Appendix G of the New York City Building Code, the above systems are permitted to be located below the design flood elevation provided that the systems are designed and installed to prevent water from entering or accumulating within their components and the systems are constructed to resist hydrostatic and hydrodynamic loads and stresses, including the effects of buoyancy, during the occurrence of flooding to the design flood elevation.\n\n#--- 309.3 Coastal high-hazard areas and coastal A zones.\n\nStructures located in coastal high-hazard areas and coastal A zones shall meet the requirements of Section 309.2. The plumbing systems, pipes and fixtures shall not be mounted on or penetrate through walls intended to break away under flood loads.\n\nSection PC 310: Washroom and Toilet Room Requirements\n\n#--- 310.1 Light and ventilation.\n\nWashrooms and toilet rooms shall be illuminated and ventilated in accordance with the New York city building code and New York city mechanical code.\n\n#--- 310.2 Location of fixtures and compartments\n\nThe location of plumbing fixtures and the requirements for compartments and partitions shall be in accordance with Section 405.\n\n#--- 310.3 Interior finish.\n\nInterior finish surfaces of toilet rooms shall comply with the New York City Building Code.\n\nSection PC 311: Toilet Facilities for Workers\n\n#--- 311.1 General.\n\nToilet facilities shall be provided for construction workers and such facilities shall be maintained in a sanitary condition. Construction worker toilet facilities of the nonsewer type shall conform to ANSI Z4.3.\n\nSection PC 312: Tests and Inspections\n\n#--- 312.1 Required tests.\n\nThe licensed master plumber shall make the applicable tests prescribed in Sections 312.2 through 312.11 to determine compliance with the provisions of this code. The licensed master plumber shall give two days notice to the commissioner when the plumbing work is ready for tests. The equipment, material, power and labor necessary for the inspection and test shall be furnished by the licensed master plumber and the licensed master plumber shall be responsible for determining that the work will withstand the test pressure prescribed in the following tests. All plumbing system piping shall be tested with either water or, for piping systems other than plastic, by air. After the plumbing fixtures have been set and their traps filled with water, the entire drainage system shall be submitted to final tests. The commissioner shall require the removal of any cleanouts if necessary to ascertain whether the pressure has reached all parts of the system.\n\nExceptions:\n\n1. The repair, replacement or alteration to existing water, waste, vent, storm water piping or, building drain in an existing occupied building shall require only a visual inspection of waste, vent and storm water pipe roughing and finish in addition to a pressure test of water piping at available building water pressure.\n\n2. The addition of no more than five (5) plumbing fixtures or roof drains to an existing floor of an existing occupied building shall require only a visual inspection of waste, vent and storm water pipe roughing and finish in addition to a pressure test of water piping at available building water pressure.\n\n#---- 312.1.1 Test gauges.\n\nGauges used for testing shall be as follows:\n\n1. Tests requiring a pressure of 10 pounds per square inch (psi) (69 kPa) or less shall utilize a testing gauge having increments of 0.10 psi (0.69 kPa) or less.\n\n2. Tests requiring a pressure of greater than 10 psi (69 kPa) but less than or equal to 100 psi (689 kPa) shall utilize a testing gauge having increments of 1 psi (6.9 kPa) or less.\n\n3. Tests requiring a pressure of greater than 100 psi (689 kPa) shall utilize a testing gauge having increments of 2 psi (14 kPa) or less.\n\n#---- 312.1.2 Witnessing tests.\n\nTests in accordance with this code shall be witnessed by department plumbing inspectors or approved agencies. The department shall prescribe qualifications for individuals who are authorized to witness such tests on behalf of approved agencies, including but not limited to the requirement that such individuals shall be licensed master plumbers or registered design professionals with not less than 5 years experience in the inspection and testing of piping systems. Such tests may be conducted without any inspection or tests witnessed by the department, provided that verified statements and supporting inspectorial and test reports are filed with the department within two working days of such tests.\n\n#--- 312.2 Drainage and vent water test.\n\nA water test shall be applied to the drainage system either in its entirety or in sections. If applied to the entire system, all openings in the piping shall be tightly closed, except the highest opening, and the system shall be filled with water to the point of overflow. If the system is tested in sections, each opening shall be tightly plugged except the highest openings of the section under test, and each section shall be filled with water, but no section shall be tested with less than a 10-foot (3048 mm) head of water. In testing successive sections, at least the upper 10 feet (3048 mm) of the next preceding section shall be tested so that no joint or pipe in the building, except the uppermost 10 feet (3048 mm) of the system, shall have been submitted to a test of less than a 10-foot (3048 mm) head of water. This pressure shall be held for not less than15 minutes. The system shall then be tight at all points.\n\n#--- 312.3 Drainage and vent air test.\n\nPlastic piping shall not be tested using air. An air test shall be made by forcing air into the system until there is a uniform gauge of 5 psi (34.5 kPa). This pressure shall be held for a test period of not less than 15 minutes. Any adjustments to the test pressure required because of changes in ambient temperatures or the seating of gaskets shall be made prior to the beginning of the test period.\n\n#--- 312.4 Drainage and vent final inspection.\n\nThe final inspection of the completed drainage and vent systems shall be visual and in sufficient detail to determine compliance with the provisions of this code. Where a smoke test is utilized, it shall be made by filling all traps with water and then introducing into the entire system a pungent, thick smoke produced by one or more smoke machines. When the smoke appears at stack openings on the roof, the stack openings shall be closed and a pressure equivalent to a 1-inch water column (248.8 Pa) shall be held for a test period of not less than 15 minutes.\n\n#--- 312.5 Water supply system test.\n\nUpon completion of a section of or the entire water supply system, the system, or portion completed, shall be tested and proved tight under a water pressure of 50 psi (344 kPa) above its normal working pressure but not less than 150 psi (1033 kPa). This pressure shall be held for not less than 15 minutes. The water utilized for tests shall be obtained from a potable source of supply. The required tests shall be performed in accordance with this section and Section 108.\n\n#---- 312.5.1 Water service pipe.\n\nIn addition to any requirements of Section 312.5, tests for water service pipes shall comply with the following:\n\n1. In the presence of the tapper or inspector of the Department of Environmental Protection, each new service pipe or repaired service pipe shall be subjected to a water test made under the street main pressure.\n\n2. All such pipes and appurtenances shall remain uncovered for the duration of the test and shall show no sign of leakage.\n\n3. When any question arises as to the installation conforming with these regulations, an internal hydrostatic test as specified for materials may be applied, subject to the approval of the Department of Environmental Protection.\n\n#--- 312.6 Reserved.\n\n#--- 312.7 Forced drain test.\n\nForced drain tests shall consist of plugging the end of the pump discharge at the point of connection with the building drain and applying a pressure of 5 psi (34.5 kPa) greater than the shut off pump rating, and maintaining such pressure for 15 minutes.\n\n#--- 312.8 Storm drainage system test.\n\nStorm drain systems shall be tested by water or air in accordance with Section 312.2 or 312.3. Where storm drainage piping is designed to run full, the system shall be tested to withstand the head of 10 feet (3048 mm) of water above the anticipated high water level.\n\nException: Storm drainage piping installed outside of a building shall be tested to withstand the head of water equal to grade, but such testing may be conducted after inspection and backfilling.\n\n#--- 312.9 Shower liner test.\n\nWhere shower floors and receptors are made water tight by the application of materials required by Section 417.5.2, the completed liner installation shall be tested. The pipe from the shower drain shall be plugged water tight for the test. The floor and receptor area shall be filled with potable water to a depth of not less than 2 inches (51 mm) measured at the threshold. Where a threshold of at least 2 inches (51 mm) high does not exist, a temporary threshold shall be constructed to retain the test water in the lined floor or receptor area to a level not less than 2 inches (51 mm) deep measured at the threshold. The water shall be retained for a test period of not less than 15 minutes, and there shall not be evidence of leakage.\n\n#--- 312.10 Inspection and testing of backflow prevention assemblies.\n\nInspection and testing of secondary backflow prevention assemblies shall comply with Sections 312.10.1 and 312.10.2.\n\n#---- 312.10.1 Inspections.\n\nAnnual inspections shall be made of all backflow prevention assemblies, air gaps, spill-proof vacuum breakers, pressure vacuum breaker assemblies, and hose connection backflow preventers to determine whether they are operable on forms provided by the department. Such forms shall be retained by the owner and shall be made available upon request to the department for a period of five years.\n\n#---- 312.10.2 Testing.\n\nReduced pressure principle, double check, pressure vacuum breaker, reduced pressure detector fire protection, double check detector fire protection, and spill-resistant vacuum breaker backflow preventer assemblies and hose connection backflow preventers shall be tested at the time of installation, immediately after repairs or relocation and annually thereafter. The testing procedure shall be performed in accordance with one of the following standards: ASSE 5013, ASSE 5015, ASSE 5020, ASSE 5047, ASSE 5048, ASSE 5052, ASSE 5056, CSA B64.10 or CSA B64.10.1. Refer to Section 608.13 and the Department of Environmental Protection for additional testing requirements.\n\n#--- 312.11 Joint inspection.\n\nInspections of welded joints shall consist of visual examination, during or after manufacture, fabrication, assembly, or pressure tests as appropriate. Supplementary types of nondestructive inspection techniques, such as magnetic-particle, radiographic, ultrasonic, etc., shall not be required unless specifically listed herein or in the engineering design.\n\n#---- 312.11.1 Welder's qualifications.\n\nWelders installing domestic water piping within buildings at any pressure shall comply with the following:\n\n1. Welders shall be qualified for all pipe sizes, wall thicknesses and all positions in accordance with the ASME Boiler and Pressure Vessel Code, Section IX. Requalification of a welder is required should the welder fail to maintain welder's continuity every 6 months. The licensed master plumber employing the welder shall maintain a welder continuity log and the log shall be made available to the department upon request.\n\n2. Welder qualification testing shall be performed by an approved agency and the inspector witnessing the test shall be an authorized AWS Certified Welding Inspector.\n\n3. Copies of the certified welder qualification reports shall be maintained by both the approved agency and the licensed master plumber employing the welder for at least six years and shall be made available to the department upon request.\n\nSection PC 313: Equipment Efficiencies\n\n#--- 313.1 General.\n\nEquipment efficiencies shall be in accordance with the New York City Energy Conservation Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/085.\n\nSection PC 314: Condensate Disposal\n\n#--- 314.1 Fuel-burning appliances.\n\nLiquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture or disposal area in accordance with the manufacturer's instructions. Condensate piping shall be of approved corrosion-resistant material in accordance with Section 803 and shall not be smaller than the drain connection on the appliance. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope).\n\n#---- 314.1.1 Condensate disposal.\n\nCondensate from all fuel-burning appliances and associated flues shall be neutralized to a pH of at least 6 and no more than 8 prior to disposal to a sanitary system.\n\n#--- 314.2 Evaporators and cooling coils.\n\nCondensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 314.2.1 through 314.2.5.\n\nException: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.\n\n#---- 314.2.1 Condensate disposal.\n\nCondensate from all cooling coils and evaporators shall be conveyed from the drain pan outlet to an approved place of disposal. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope). Condensate shall not discharge into a street, alley or other areas so as to cause a nuisance.\n\n#---- 314.2.2 Drain pipe materials and sizes.\n\nComponents of the condensate disposal system shall be cast iron, galvanized steel, copper, cross-linked polyethylene, polyethylene, ABS, CPVC, or PVC pipe or tubing. Polypropylene tubing may be used in lengths that do not exceed 12 inches (304.8 mm) for an individual drain application. Components shall be selected for the pressure and temperature rating of the installation. Joints and connections shall be made in accordance with the applicable provisions of Chapter 7 relative to the material type. Condensate waste and drain line size shall be not less than 3/4-inch (19.1 mm) internal diameter and shall not decrease in size from the drain pan connection to the place of condensate disposal. Where the drain pipes from more than one unit are manifolded together for condensate drainage, the pipe or tubing shall be sized in accordance with Table 314.2.2.\n\nTable 314.2.2 Condensate Drain Sizing\n\nFor SI: 1 inch = 25.4 mm, 1 ton of capacity = 3.517 kW.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 314.2.3 Auxiliary and secondary drain systems.\n\nIn addition to the requirements of Section 314.2.1, where damage to any building components could occur as a result of overflow from the equipment primary condensate removal system, one of the following auxiliary protection methods shall be provided for each cooling coil or fuel-fired appliance that produces condensate:\n\n1. An auxiliary drain pan with a separate drain shall be provided under the coils on which condensation will occur. The auxiliary pan drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The pan shall have a depth of not less than 1 1/2 inches (38 mm), shall be not less than 3 inches (76 mm) larger than the unit or the coil dimensions in width and length and shall be constructed of corrosion-resistant material. Metallic pans shall have a thickness of not less than 0.0236-inch (0.6010 mm) (No. 24 gage) for galvanized sheet metal pans, 0.0179 inches (0.4546 mm) (No. 26 gage) for stainless steel pans, or 0.0320 inches (0.8128 mm) (No. 20 gage) for aluminum pans. Nonmetallic pans shall have a thickness of not less than 0.0625-inch (1.6 mm).\n\n2. A separate overflow drain line shall be connected to the drain pan provided with the equipment. Such overflow drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The overflow drain line shall connect to the drain pan at a higher level than the primary drain connection.\n\n3. An auxiliary drain pan without a separate drain line shall be provided under the coils on which condensate will occur. Such pan shall be equipped with a listed water-level detection device that will shut off the equipment served prior to overflow of the pan. The auxiliary drain pan shall be constructed in accordance with Item 1 of this section.\n\n4. A listed water-level detection device shall be provided that will shut off the equipment served in the event that the primary drain is blocked. The device shall be installed in the primary drain line, the overflow drain line or in the equipment-supplied drain pan, located at a point higher than the primary drain line connection and below the overflow rim of such pan.\n\nExceptions:\n\n1. An auxiliary drain protection method shall not be required for fuel-fired appliances that automatically shut down operation in the event of a stoppage in the condensate drainage system.\n\n2. An auxiliary drain protection method shall not be required where a suitably sized and located floor drain is provided.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051 and L.L. 2023/077.\n\n#----- 314.2.3.1 Water-level monitoring devices.\n\nOn down-flow units and all other coils that do not have a secondary drain or provisions to install a secondary or auxiliary drain pan, a water-level monitoring device shall be installed inside the primary drain pan. This device shall shut off the equipment served in the event that the primary drain becomes restricted. Devices installed in the drain line shall not be permitted.\n\n#----- 314.2.3.2 Appliance, equipment and insulation in pans.\n\nWhere an appliance, equipment or insulation is subject to water damage when auxiliary drain pans fill, that portion of the appliance, equipment and insulation shall be installed above the flood level rim of the pans. Supports located inside of the pans to support the appliance or equipment or insulation shall be water resistant and approved.\n\n#---- 314.2.4 Traps.\n\nCondensate drains shall be trapped as required by the equipment or appliance manufacturer.\n\n#---- 314.2.5 Drain line maintenance.\n\nCondensate drain lines shall be configured to permit the clearing of blockages and performance of maintenance without requiring the drain line to be cut.\n\n#---- 314.2.6 Condensate discharge.\n\nWhere multiple evaporators and or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.\n\nSection PC 315: Penetrations\n\n#--- 315.1 Sealing of annular spaces.\n\nThe annular space between the outside of a pipe and the inside of a pipe sleeve or between the outside of a pipe and an opening in a building envelope wall, floor, or ceiling assembly penetrated by a pipe shall be sealed in an approved manner with caulking material, foam sealant or closed with a gasketing system. The caulking material, foam sealant or gasketing system shall be designed for the conditions at the penetration location and shall be compatible with the pipe, sleeve and building materials in contact with the sealing materials. Annular spaces created by pipes penetrating fire-resistance-rated assemblies or membranes of such assemblies shall be sealed or closed in accordance with Section 714 of the New York City Building Code.\n\nSection PC 316: Reserved",
+  "schemaVersion": 1
 }

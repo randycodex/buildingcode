@@ -620,6 +620,8 @@ final class CodeLibraryViewModel: ObservableObject {
             groups = []
         }
 
+        let codeSectionName = codeSectionName(id: chapter.codeSectionID)
+
         return groups.flatMap { group in
             group.sections.enumerated().map { index, section in
                 ChapterReaderBlockSummary(
@@ -628,19 +630,21 @@ final class CodeLibraryViewModel: ObservableObject {
                     title: section.title,
                     displayTitle: section.displayTitle,
                     kind: section.kind,
-                    groupLabel: index == 0 ? group.displayLabel : nil
+                    groupLabel: index == 0 ? group.displayLabel(codeSectionName: codeSectionName) : nil
                 )
             }
         }
     }
 
     func chapterBlockDescriptors(for chapter: CodeChapter) async -> [ChapterBlockDescriptor] {
+        let codeSectionName = codeSectionName(id: chapter.codeSectionID)
+
         if let authoredCodeStore {
             return authoredCodeStore.sectionGroups(chapterID: chapter.id).flatMap { group in
                 group.sections.enumerated().map { index, section in
                     ChapterBlockDescriptor(
                         sectionID: section.id,
-                        groupLabel: index == 0 ? group.displayLabel : nil
+                        groupLabel: index == 0 ? group.displayLabel(codeSectionName: codeSectionName) : nil
                     )
                 }
             }
@@ -651,7 +655,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 group.sections.enumerated().map { index, section in
                     ChapterBlockDescriptor(
                         sectionID: section.id,
-                        groupLabel: index == 0 ? group.displayLabel : nil
+                        groupLabel: index == 0 ? group.displayLabel(codeSectionName: codeSectionName) : nil
                     )
                 }
             }
@@ -666,7 +670,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 group.sections.enumerated().map { index, section in
                     ChapterBlockDescriptor(
                         sectionID: section.id,
-                        groupLabel: index == 0 ? group.displayLabel : nil
+                        groupLabel: index == 0 ? group.displayLabel(codeSectionName: codeSectionName) : nil
                     )
                 }
             }

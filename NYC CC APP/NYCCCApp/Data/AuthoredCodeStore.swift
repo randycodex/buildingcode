@@ -323,7 +323,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         var sectionsByChapterIDIndex: [Int64: [Section]] = [:]
         var sectionNumberIndex: [String: CodeSectionSummary] = [:]
         var chapterNumberIndex: [String: CodeChapter] = [:]
-        let tableBlocksByID = Dictionary(uniqueKeysWithValues: (decodedProject.tableBlocks ?? []).map { ($0.id, $0) })
+        let tableBlocksByID = Self.tableBlockLookup(decodedProject.tableBlocks ?? [])
         let authoredHTMLChaptersURL = jsonURL
             .deletingLastPathComponent()
             .appendingPathComponent("chapters", isDirectory: true)
@@ -460,7 +460,9 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             codeSectionID: indexed.chapter.codeSectionID,
             chapterNumber: indexed.chapter.chapterNumber,
             chapterTitle: indexed.chapter.title,
-            sectionGroupLabel: indexed.group.displayLabel,
+            sectionGroupLabel: indexed.group.displayLabel(
+                codeSectionName: indexed.chapter.codeSectionID.flatMap { codeSectionNameByID[$0] }
+            ),
             sectionNumber: indexed.section.sectionNumber,
             title: indexed.section.title,
             officialText: officialText,
@@ -472,7 +474,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             contentBlocks: contentBlocks,
             tableBlocks: contentBlocks.compactMap { block in
                 guard let tableID = block.tableID else { return nil }
-                return tableBlocksByID[tableID]
+                return tableBlocksByID[tableID] ?? tableBlocksByID[Self.normalizedTableID(tableID)]
             }
         )
     }
@@ -742,6 +744,22 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
             return SearchIndexEntry(indexed: indexed, searchHaystack: haystack)
         }
+    }
+
+    private static func tableBlockLookup(_ tableBlocks: [CodeTableBlock]) -> [String: CodeTableBlock] {
+        var lookup: [String: CodeTableBlock] = [:]
+        for table in tableBlocks {
+            lookup[table.id] = table
+            lookup[normalizedTableID(table.id)] = table
+        }
+        return lookup
+    }
+
+    private static func normalizedTableID(_ id: String) -> String {
+        id
+            .uppercased()
+            .replacingOccurrences(of: #"[^A-Z0-9]+"#, with: "-", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
     }
 
     private func invertedIndex(for codeSectionID: Int64?) -> [String: Set<Int64>] {
@@ -1049,7 +1067,20 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             if isTableStart(in: html, at: richStart) {
                 let tableEnd = matchingTableEnd(in: html, from: richStart) ?? html.endIndex
                 let tableHTML = String(html[richStart..<tableEnd]).trimmingCharacters(in: .whitespacesAndNewlines)
-                if !tableHTML.isEmpty {
+                if let tableID = tableReferenceID(in: tableHTML) {
+                    ordinal += 1
+                    blocks.append(
+                        CodeContentBlock(
+                            id: "\(sectionID)-table-\(ordinal)",
+                            kind: .table,
+                            html: nil,
+                            tableID: tableID,
+                            imageID: nil,
+                            caption: nil,
+                            plainText: nil
+                        )
+                    )
+                } else if !tableHTML.isEmpty {
                     ordinal += 1
                     blocks.append(
                         CodeContentBlock(
@@ -1103,21 +1134,28 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     private static func isTableStart(in html: String, at index: String.Index) -> Bool {
         let lowercased = html[index...].lowercased()
-        return lowercased.hasPrefix("<scrolltable") || lowercased.hasPrefix("<table")
+        return lowercased.hasPrefix("<scrolltable") ||
+            lowercased.hasPrefix("<table") ||
+            lowercased.hasPrefix("<figure")
     }
 
     private static func nextTableStart(in html: String, from cursor: String.Index) -> String.Index? {
         let scrollTable = html.range(of: "<ScrollTable", options: [.caseInsensitive], range: cursor..<html.endIndex)?.lowerBound
         let table = html.range(of: "<table", options: [.caseInsensitive], range: cursor..<html.endIndex)?.lowerBound
+        let tableReference = html.range(
+            of: #"<figure\b[^>]*\bdata-table-ref\s*="#,
+            options: [.regularExpression, .caseInsensitive],
+            range: cursor..<html.endIndex
+        )?.lowerBound
         switch (scrollTable, table) {
         case let (lhs?, rhs?):
-            return lhs < rhs ? lhs : rhs
+            return [lhs, rhs, tableReference].compactMap { $0 }.min()
         case let (lhs?, nil):
-            return lhs
+            return [lhs, tableReference].compactMap { $0 }.min()
         case let (nil, rhs?):
-            return rhs
+            return [rhs, tableReference].compactMap { $0 }.min()
         case (nil, nil):
-            return nil
+            return tableReference
         }
     }
 
@@ -1125,6 +1163,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         if html[start...].lowercased().hasPrefix("<scrolltable"),
            let range = html.range(of: "</ScrollTable>", options: [.caseInsensitive], range: start..<html.endIndex) {
             return range.upperBound
+        }
+        if html[start...].lowercased().hasPrefix("<figure") {
+            if let range = html.range(of: "</figure>", options: [.caseInsensitive], range: start..<html.endIndex) {
+                return range.upperBound
+            }
+            return html.range(of: ">", range: start..<html.endIndex)?.upperBound
         }
         if let range = html.range(of: "</table>", options: [.caseInsensitive], range: start..<html.endIndex) {
             return range.upperBound
@@ -1164,6 +1208,19 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .split(separator: "/")
             .last
             .map(String.init)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func tableReferenceID(in html: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: #"(?i)\bdata-table-ref\s*=\s*"([^"]+)""#) else {
+            return nil
+        }
+        let nsHTML = html as NSString
+        guard let match = regex.firstMatch(in: html, range: NSRange(location: 0, length: nsHTML.length)),
+              match.numberOfRanges > 1 else {
+            return nil
+        }
+        return nsHTML.substring(with: match.range(at: 1))
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 

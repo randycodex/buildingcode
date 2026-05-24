@@ -1,219 +1,219 @@
 {
-  "chapterID" : 88,
-  "chapterNumber" : "7",
-  "groups" : [
+  "chapterID": 88,
+  "chapterNumber": "7",
+  "groups": [
     {
-      "headerLine" : "SECTION BC 701",
-      "headingLine" : "General",
-      "id" : "SECTION BC 701",
-      "sections" : [
+      "headerLine": "SECTION MC 701",
+      "headingLine": "General",
+      "id": "SECTION MC 701",
+      "sections": [
         {
-          "id" : 10904,
-          "kind" : "title",
-          "sectionNumber" : "701.1",
-          "title" : "701.1 Scope."
+          "id": 10904,
+          "kind": "title",
+          "sectionNumber": "701.1",
+          "title": "701.1 Scope."
         },
         {
-          "id" : 10905,
-          "kind" : "title",
-          "sectionNumber" : "701.2",
-          "title" : "701.2 Combustion, ventilation, and dilution air required."
+          "id": 10905,
+          "kind": "title",
+          "sectionNumber": "701.2",
+          "title": "701.2 Combustion, ventilation, and dilution air required."
         },
         {
-          "id" : 10906,
-          "kind" : "title",
-          "sectionNumber" : "701.3",
-          "title" : "701.3 Circulation of air."
+          "id": 10906,
+          "kind": "title",
+          "sectionNumber": "701.3",
+          "title": "701.3 Circulation of air."
         },
         {
-          "id" : 10907,
-          "kind" : "title",
-          "sectionNumber" : "701.3.1",
-          "title" : "701.3.1 Makeup air for fuel burning devices."
+          "id": 10907,
+          "kind": "title",
+          "sectionNumber": "701.3.1",
+          "title": "701.3.1 Makeup air for fuel burning devices."
         },
         {
-          "id" : 10908,
-          "kind" : "title",
-          "sectionNumber" : "701.3.2",
-          "title" : "701.3.2 Ventilation air for fuel-burning devices."
+          "id": 10908,
+          "kind": "title",
+          "sectionNumber": "701.3.2",
+          "title": "701.3.2 Ventilation air for fuel-burning devices."
         },
         {
-          "id" : 10909,
-          "kind" : "title",
-          "sectionNumber" : "701.4",
-          "title" : "701.4 Crawl space and attic space."
+          "id": 10909,
+          "kind": "title",
+          "sectionNumber": "701.4",
+          "title": "701.4 Crawl space and attic space."
         },
         {
-          "id" : 10910,
-          "kind" : "title",
-          "sectionNumber" : "701.4.1",
-          "title" : "701.4.1 Crawl space."
+          "id": 10910,
+          "kind": "title",
+          "sectionNumber": "701.4.1",
+          "title": "701.4.1 Crawl space."
         },
         {
-          "id" : 10911,
-          "kind" : "title",
-          "sectionNumber" : "701.4.2",
-          "title" : "701.4.2 Attic space."
+          "id": 10911,
+          "kind": "title",
+          "sectionNumber": "701.4.2",
+          "title": "701.4.2 Attic space."
         },
         {
-          "id" : 10912,
-          "kind" : "title",
-          "sectionNumber" : "701.5",
-          "title" : "701.5 Prohibited sources."
+          "id": 10912,
+          "kind": "title",
+          "sectionNumber": "701.5",
+          "title": "701.5 Prohibited sources."
         },
         {
-          "id" : 10913,
-          "kind" : "title",
-          "sectionNumber" : "702.1",
-          "title" : "702.1 All air from indoors."
+          "id": 10913,
+          "kind": "title",
+          "sectionNumber": "702.1",
+          "title": "702.1 All air from indoors."
         },
         {
-          "id" : 10914,
-          "kind" : "title",
-          "sectionNumber" : "702.2",
-          "title" : "702.2 Air from the same room or space."
+          "id": 10914,
+          "kind": "title",
+          "sectionNumber": "702.2",
+          "title": "702.2 Air from the same room or space."
         },
         {
-          "id" : 10915,
-          "kind" : "title",
-          "sectionNumber" : "702.3",
-          "title" : "702.3 Air from adjacent spaces."
+          "id": 10915,
+          "kind": "title",
+          "sectionNumber": "702.3",
+          "title": "702.3 Air from adjacent spaces."
         },
         {
-          "id" : 10916,
-          "kind" : "title",
-          "sectionNumber" : "702.3.1",
-          "title" : "702.3.1 Number and location of openings."
+          "id": 10916,
+          "kind": "title",
+          "sectionNumber": "702.3.1",
+          "title": "702.3.1 Number and location of openings."
         },
         {
-          "id" : 10917,
-          "kind" : "title",
-          "sectionNumber" : "702.3.2",
-          "title" : "702.3.2 Size of openings."
+          "id": 10917,
+          "kind": "title",
+          "sectionNumber": "702.3.2",
+          "title": "702.3.2 Size of openings."
         },
         {
-          "id" : 10918,
-          "kind" : "title",
-          "sectionNumber" : "703.1",
-          "title" : "703.1 All air from the outdoors."
+          "id": 10918,
+          "kind": "title",
+          "sectionNumber": "703.1",
+          "title": "703.1 All air from the outdoors."
         },
         {
-          "id" : 10919,
-          "kind" : "title",
-          "sectionNumber" : "703.1.1",
-          "title" : "703.1.1 Two-permanent-openings method."
+          "id": 10919,
+          "kind": "title",
+          "sectionNumber": "703.1.1",
+          "title": "703.1.1 Two-permanent-openings method."
         },
         {
-          "id" : 10920,
-          "kind" : "title",
-          "sectionNumber" : "703.1.2",
-          "title" : "703.1.2 One-permanent-opening method."
+          "id": 10920,
+          "kind": "title",
+          "sectionNumber": "703.1.2",
+          "title": "703.1.2 One-permanent-opening method."
         },
         {
-          "id" : 10921,
-          "kind" : "title",
-          "sectionNumber" : "704.1",
-          "title" : "704.1 Combination of air from inside and outdoors."
+          "id": 10921,
+          "kind": "title",
+          "sectionNumber": "704.1",
+          "title": "704.1 Combination of air from inside and outdoors."
         },
         {
-          "id" : 10922,
-          "kind" : "title",
-          "sectionNumber" : "704.1.1",
-          "title" : "704.1.1 Number and location of openings."
+          "id": 10922,
+          "kind": "title",
+          "sectionNumber": "704.1.1",
+          "title": "704.1.1 Number and location of openings."
         },
         {
-          "id" : 10923,
-          "kind" : "title",
-          "sectionNumber" : "704.1.2",
-          "title" : "704.1.2 Ratio of direct openings."
+          "id": 10923,
+          "kind": "title",
+          "sectionNumber": "704.1.2",
+          "title": "704.1.2 Ratio of direct openings."
         },
         {
-          "id" : 10924,
-          "kind" : "title",
-          "sectionNumber" : "704.1.3",
-          "title" : "704.1.3 Ratio of horizontal openings."
+          "id": 10924,
+          "kind": "title",
+          "sectionNumber": "704.1.3",
+          "title": "704.1.3 Ratio of horizontal openings."
         },
         {
-          "id" : 10925,
-          "kind" : "title",
-          "sectionNumber" : "704.1.4",
-          "title" : "704.1.4 Ratio of vertical openings."
+          "id": 10925,
+          "kind": "title",
+          "sectionNumber": "704.1.4",
+          "title": "704.1.4 Ratio of vertical openings."
         },
         {
-          "id" : 10926,
-          "kind" : "title",
-          "sectionNumber" : "704.1.5",
-          "title" : "704.1.5 Ratio of interior spaces."
+          "id": 10926,
+          "kind": "title",
+          "sectionNumber": "704.1.5",
+          "title": "704.1.5 Ratio of interior spaces."
         },
         {
-          "id" : 10927,
-          "kind" : "title",
-          "sectionNumber" : "704.1.6",
-          "title" : "704.1.6 Prorating of inside and outdoor air."
+          "id": 10927,
+          "kind": "title",
+          "sectionNumber": "704.1.6",
+          "title": "704.1.6 Prorating of inside and outdoor air."
         },
         {
-          "id" : 10928,
-          "kind" : "title",
-          "sectionNumber" : "705.1",
-          "title" : "705.1 General."
+          "id": 10928,
+          "kind": "title",
+          "sectionNumber": "705.1",
+          "title": "705.1 General."
         },
         {
-          "id" : 10929,
-          "kind" : "title",
-          "sectionNumber" : "705.1.1",
-          "title" : "705.1.1 Openings and supply ducts."
+          "id": 10929,
+          "kind": "title",
+          "sectionNumber": "705.1.1",
+          "title": "705.1.1 Openings and supply ducts."
         },
         {
-          "id" : 10930,
-          "kind" : "title",
-          "sectionNumber" : "706.1",
-          "title" : "706.1 Rate of air supplied."
+          "id": 10930,
+          "kind": "title",
+          "sectionNumber": "706.1",
+          "title": "706.1 Rate of air supplied."
         },
         {
-          "id" : 10931,
-          "kind" : "title",
-          "sectionNumber" : "706.1.1",
-          "title" : "706.1.1 Appliance interlock."
+          "id": 10931,
+          "kind": "title",
+          "sectionNumber": "706.1.1",
+          "title": "706.1.1 Appliance interlock."
         },
         {
-          "id" : 10932,
-          "kind" : "title",
-          "sectionNumber" : "707.1",
-          "title" : "707.1 General."
+          "id": 10932,
+          "kind": "title",
+          "sectionNumber": "707.1",
+          "title": "707.1 General."
         },
         {
-          "id" : 10933,
-          "kind" : "title",
-          "sectionNumber" : "708.1",
-          "title" : "708.1 General."
+          "id": 10933,
+          "kind": "title",
+          "sectionNumber": "708.1",
+          "title": "708.1 General."
         },
         {
-          "id" : 10934,
-          "kind" : "title",
-          "sectionNumber" : "709.1",
-          "title" : "709.1 General."
+          "id": 10934,
+          "kind": "title",
+          "sectionNumber": "709.1",
+          "title": "709.1 General."
         },
         {
-          "id" : 10935,
-          "kind" : "title",
-          "sectionNumber" : "709.2",
-          "title" : "709.2 Dampered openings."
+          "id": 10935,
+          "kind": "title",
+          "sectionNumber": "709.2",
+          "title": "709.2 Dampered openings."
         },
         {
-          "id" : 10936,
-          "kind" : "title",
-          "sectionNumber" : "709.3",
-          "title" : "709.3 Caution sign."
+          "id": 10936,
+          "kind": "title",
+          "sectionNumber": "709.3",
+          "title": "709.3 Caution sign."
         },
         {
-          "id" : 10937,
-          "kind" : "title",
-          "sectionNumber" : "710.1",
-          "title" : "710.1 General."
+          "id": 10937,
+          "kind": "title",
+          "sectionNumber": "710.1",
+          "title": "710.1 General."
         }
       ]
     }
   ],
-  "rawDraftText" : "#- Chapter 7: Combustion, Ventilation, and Dilution Air\n\nSection MC 701: General\n\n#--- 701.1 Scope.\n\nThe provisions of this chapter shall govern the requirements for combustion, ventilation, and dilution air for fuel-burning appliances other than gas-fired appliances. The requirements for combustion, ventilation, and dilution air for gas-fired appliances shall be in accordance with the New York City Fuel Gas Code.\n\n#--- 701.2 Combustion, ventilation, and dilution air required.\n\nEvery room or space containing fuel-burning appliances shall be provided with combustion, ventilation, and dilution air as required by this code. Combustion, ventilation, and dilution air shall be provided in accordance with Section 702, 703, 704, 705, 706 or 707. Direct-vent appliances or equipment that do not draw combustion air from inside of the building are not required to be considered in the determination of the combustion and dilution air requirements and shall be installed in accordance with the equipment manufacturer's instructions and listing. Combustion air requirements shall be determined based on the simultaneous operation of all fuel-burning appliances drawing combustion, ventilation, and dilution air from the room or space. Combustion, ventilation, and dilution air shall be obtained solely from the outdoors for fuel-burning appliances with an input greater than 350,000 Btu\/h (102.6 kW). The room or space containing fuel-burning appliances shall comply with the requirements of Sections C402.5.3 and R402.4.4, as applicable, of the New York City Energy Conservation Code and Section 1012 of this code.\n\n#--- 701.3 Circulation of air.\n\nThe equipment and appliances within every room containing fuel-burning appliances shall be installed so as to allow free circulation of air. Provisions shall be made to allow for the simultaneous operation of mechanical exhaust systems, fireplaces or other equipment and appliances operating in the same room or space from which combustion, ventilation, and dilution air is being drawn. Such provisions shall prevent the operation of such appliances, equipment and systems from affecting the supply of combustion, ventilation, and dilution air.\n\n#---- 701.3.1 Makeup air for fuel burning devices.\n\nWhere exhaust fans are installed, makeup air shall be provided to replace the exhausted air. Calculations shall be provided on the construction documents to validate the use of the exhaust fan(s) and compliance with this chapter.\n\n#---- 701.3.2 Ventilation air for fuel-burning devices.\n\nWhere ventilation air is brought in by mechanical means for heat generation mitigation, provisions must be made for proper air balance to prevent a negative or positive pressure in the boiler room and to discharge the ventilation air directly to the outside.\n\n#--- 701.4 Crawl space and attic space.\n\nFor the purposes of this chapter, an opening to a naturally ventilated crawl space or attic space shall be considered equivalent to an opening to the outdoors.\n\n#---- 701.4.1 Crawl space.\n\nWhere lower combustion air openings connect with crawl spaces, such spaces shall have unobstructed openings to the outdoors at least twice that required for the combustion air openings. The height of the crawl space shall comply with the requirements of the New York City Building Code and shall be without obstruction to the free flow of air.\n\n#---- 701.4.2 Attic space.\n\nWhere combustion air is obtained from an attic area, the attic ventilating openings shall not be subject to ice or snow blockage, and the attic shall have not less than 30 inches (762 mm) vertical clear height at its maximum point. Attic ventilation openings shall be sufficient to provide the required volume of combustion air and the attic ventilation required by the New York City Building Code. The combustion air openings shall be provided with a sleeve of not less than 0.019 inch (0.48 mm) (No.26 Gage) galvanized steel or other approved material extending from the appliance enclosure to at least 6 inches (152.4 mm) above the top of the ceiling joists and insulation.\n\n#--- 701.5 Prohibited sources.\n\nOpenings and ducts shall not connect appliance enclosures with a space in which the operation of a fan will adversely affect the flow of the combustion, ventilation, and dilution air. Combustion, ventilation, and dilution air shall not be subject to ice or snow blockage. No combustion, ventilation, and dilution air inlet shall be less than 30 inches (762 mm) above grade. Combustion, ventilation, and dilution air shall not be obtained from a hazardous location, except where the fuel-fired appliances are located within the hazardous location and are installed in accordance with this code. Combustion, ventilation, and dilution air shall not be taken from a refrigeration machinery room, except where a refrigerant vapor detector system is installed to automatically shut off the combustion process in the event of refrigerant leakage. For structures in flood hazard areas, air shall be obtained from a location complying with the additional requirements of Appendix G of the New York City Building Code.\n\nSection MC 702: Inside Air\n\n#--- 702.1 All air from indoors.\n\nCombustion, ventilation, and dilution air shall be permitted to be obtained entirely from the indoors in buildings that are not of unusually tight construction. In buildings of unusually tight construction, combustion air shall be obtained from the outdoors in accordance with Section 703, 705, 706 or 707.\n\n#--- 702.2 Air from the same room or space.\n\nThe room or space containing fuel-burning appliances shall be an unconfined space as defined in Section 202.\n\n#--- 702.3 Air from adjacent spaces.\n\nWhere the volume of the room in which the fuel-burning appliances are located does not comply with Section 702.2, additional inside combustion, ventilation, and dilution air shall be obtained by opening the room to adjacent spaces so that the combined volume of all communicating spaces meets the volumetric requirement of Section 702.2. Openings connecting the spaces shall comply with Sections 702.3.1, 702.3.2 and Figure A-1 of Appendix A.\n\n#---- 702.3.1 Number and location of openings.\n\nTwo openings shall be provided, one within 1 foot (305 mm) of the ceiling of the room and one within 1 foot (304.8 mm) of the floor.\n\n#---- 702.3.2 Size of openings.\n\nThe net free area of each opening, calculated in accordance with Section 708, shall be a minimum of 1 square inch per 1,000 Btu\/h (2201 mm 2 \/kW) of input rating of the fuel-burning appliances drawing combustion, ventilation, and dilution air from the communicating spaces and shall be not less than 100 square inches (64 516 mm 2 ).\n\nSection MC 703: Outdoor Air\n\n#--- 703.1 All air from the outdoors.\n\nWhere all combustion, ventilation, and dilution air is to be provided by outdoor air, the required combustion, ventilation, and dilution air shall be obtained by direct opening by louver or a duct(s) from the boiler room to the outdoors. Openings connecting the room to the outdoor air shall comply with Sections 703.1.1 through 703.1.2 of this code, and Figures 304.6.1(1), 304.6.1(2), 304.6.1(3) and 304.6.2 of the New York City Fuel Gas Code. The size of the openings connecting the room to the outdoor air supply shall also comply with any applicable rules of the New York City Department of Environmental Protection.\n\n#---- 703.1.1 Two-permanent-openings method.\n\nTwo permanent openings, one commencing within 12 inches (304.8 mm) of the top and one commencing within 12 inches (304.8 mm) of the bottom of the room, shall be provided. The openings shall communicate directly, or by ducts, with the outdoors or spaces that freely communicate with the outdoors as follows:\n\n1. Where directly communicating with the outdoors, or where communicating with the outdoors through vertical ducts, each opening shall have a minimum free area of 1 square inch per 4,000 Btu\/h (550 mm 2 \/kW) of total input rating of all equipment in the room.\n\n2. Where communicating with the outdoors through horizontal ducts, each opening shall have a minimum free area of not less than 1 square inch per 2,000 Btu\/h (1100 mm 2 \/kW) of total input rating of all equipment in the room.\n\n#---- 703.1.2 One-permanent-opening method.\n\nOne permanent opening, commencing within 12 inches (304.8 mm) of the top of the enclosure, shall be provided. The equipment shall have clearances of at least 1 inch (25.4 mm) from the sides and back and 6 inches (152.4 mm) from the front of the appliance. The opening shall directly communicate with the outdoors or through a vertical or horizontal duct to the outdoors or spaces that freely communicate with the outdoors and shall have a minimum free area of 1 square inch per 3,000 Btu\/h (734 mm 2 \/kW) of the total input rating of all equipment located in the enclosure, and not less than the sum of the areas of all vent connectors in the space.\n\nSection MC 704: Combined Use of Inside and Outdoor Air (Condition 1)\n\n#--- 704.1 Combination of air from inside and outdoors.\n\nThis section shall apply only to appliances located in confined spaces in buildings not of unusually tight construction. Where the volumes of rooms and spaces are combined for the purpose of providing indoor combustion air, such rooms and spaces shall communicate through permanent openings in compliance with Sections 702.3.1 and 702.3.2. The required combustion, ventilation, and dilution air shall be obtained by opening the room to the outdoors using a combination of inside and outdoor air, prorated in accordance with Section 704.1.6. The ratio of interior spaces shall comply with Section 704.1.5. The number, location and ratios of openings connecting the space with the outdoor air shall comply with Sections 704.1.1 through 704.1.4.\n\n#---- 704.1.1 Number and location of openings.\n\nAt least two openings shall be provided, one within 1 foot (304.8 mm) of the ceiling of the room and one within 1 foot (304.8 mm) of the floor.\n\n#---- 704.1.2 Ratio of direct openings.\n\nWhere direct openings to the outdoors are provided in accordance with Section 703.1, the ratio of direct openings shall be the sum of the net free areas of both direct openings to the outdoors, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.2.\n\n#---- 704.1.3 Ratio of horizontal openings.\n\nWhere openings connected to the outdoors through horizontal ducts are provided in accordance with Section 703.1, the ratio of horizontal openings shall be the sum of the net free areas of both such openings, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.3.\n\n#---- 704.1.4 Ratio of vertical openings.\n\nWhere openings connected to the outdoors through vertical ducts are provided in accordance with Section 703.1, the ratio of vertical openings shall be the sum of the net free areas of both such openings, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.4.\n\n#---- 704.1.5 Ratio of interior spaces.\n\nThe ratio of interior spaces shall be the available volume of all communicating spaces, divided by the required volume as determined in accordance with Sections 702.2 and 702.3.\n\n#---- 704.1.6 Prorating of inside and outdoor air.\n\nIn spaces that utilize a combination of inside and outdoor air, the sum of the ratios of all direct openings, horizontal openings, vertical openings and interior spaces shall equal or exceed 1.\n\nSection MC 705: Combined Use of Inside and Outdoor Air (Condition 2)\n\n#--- 705.1 General.\n\nThis section shall apply only to appliances located in unconfined spaces in buildings of unusually tight construction. Combustion air supplied by a combined use of indoor and outdoor air shall be supplied through openings and ducts extending to the appliance room or to the vicinity of the appliance.\n\n#---- 705.1.1 Openings and supply ducts.\n\nOpenings shall be provided, located and sized in accordance with Sections 702.3.1 and 702.3.2; additionally, there shall be one opening to the outdoors having a free area of at least 1 square inch per 5,000 Btu\/h (440 mm 2 \/kW) of total input of all appliances in the space.\n\nSection MC 706: Mechanical Combustion Air Supply\n\n#--- 706.1 Rate of air supplied.\n\nWhere all combustion air is provided by a mechanical air supply system, the combustion air shall be supplied from the outdoors at a rate of not less than 0.35 cubic feet per minute per 1,000 Btu\/h (0.034 m 3 \/min per kW) of total input rating for all the fuel-burning appliances located within the space. Combustion air rates shall also comply with any applicable rules of the New York City Department of Environmental Protection. The mechanical air supply shall be sufficient to accommodate combustion air, ventilation air, and dilution air requirements of the installation.\n\n#---- 706.1.1 Appliance interlock.\n\nEach of the appliances served shall be interlocked with the mechanical air supply system to prevent main burner operation when the mechanical air supply system is not in operation. The air flow and the damper operation shall be proven prior to burner operation.\n\nSection MC 707: Direct Connection\n\n#--- 707.1 General.\n\nFuel-burning appliances that are listed and labeled for direct combustion air connection to the outdoors shall be installed in accordance with the manufacturer's instructions.\n\nSection MC 708: Combustion Air Ducts\n\n#--- 708.1 General.\n\nCombustion air ducts shall comply with all of the following:\n\n1. Be of galvanized steel complying with Chapter 6 or of equivalent corrosion-resistant material approved for this application.\n\nException: Within dwelling units, unobstructed stud and joist spaces shall not be prohibited from conveying combustion air, provided that not more than one required fireblock is removed.\n\n2. Have a minimum dimension of 3 inches (76.2 mm) in all directions.\n\n3. Terminate in an unobstructed space allowing free movement of combustion air to the appliances.\n\n4. Have the same cross-sectional areas as the free area of the openings to which they connect.\n\n5. Serve a single appliance enclosure.\n\n6. Not serve both upper and lower combustion air openings where both such openings are used. The separation between ducts serving upper and lower combustion air openings shall be maintained to the source of combustion air.\n\n7. Not be screened where terminating in an attic space.\n\n8. Not slope downward toward the source of combustion air, where serving the upper required combustion air opening.\n\n9. Be constructed so that the remaining space surrounding a chimney or chimney liner, installed within a masonry, metal or factory-built chimney cannot be used to supply combustion, ventilation and dilution air, except for direct vent appliances designed and installed in accordance with the equipment manufacturer's instructions and listing.\n\n10. Be insulated in accordance with Section C402.5.3 of the New York City Energy Conservation Code.\n\nSection MC 709: Opening Obstructions\n\n#--- 709.1 General.\n\nThe required size of openings for combustion, ventilation, and dilution air shall be based on the net free area of each opening. The net free area of an opening shall be that specified by the manufacturer of the opening covering. In the absence of such information, openings covered with metal louvers shall be deemed to have a net free area of 60 percent of the area of the opening, and openings covered with wood louvers shall be deemed to have a net free area of 10 percent of the area of the opening. Louvers and grills shall be fixed in the open position.\n\nException: Operable louvers shall be interlocked with the appliance so that they are proven to be in the full open position prior to main burner ignition and during main burner operation. Means shall be provided to prevent the main burner from igniting if the louvers fail to open during burner startup and to shut down the main burner if the louvers close during operation.\n\n#--- 709.2 Dampered openings.\n\nWhere the combustion air openings are provided with automatic, smoke or fire dampers, the dampers shall be electrically interlocked with the appliances served, so as to prevent operation of any appliance when any of the dampers are closed. Manually operated dampers shall not be installed in combustion air openings. The damper opening shall be proven prior to burner operation. Dampers shall be provided in accordance with Chapter 6.\n\n#--- 709.3 Caution sign.\n\nA sign stating, \"Louvers, dampers and\/or ventilation openings must not be blocked or disabled.\" shall be permanently affixed, in clear view, and adjacent to the opening(s) within the room containing the equipment. The letters used on the sign shall be at least 1 inch (25.4 mm) in height.\n\nSection MC 710: Opening Location and Protection\n\n#--- 710.1 General.\n\nCombustion air openings to the outdoors shall comply with the location and protection provisions applicable to outside air intake openings of Sections 401.5 and 401.6.",
-  "schemaVersion" : 1
+  "rawDraftText": "#- Chapter 7: Combustion, Ventilation, and Dilution Air\n\nSection MC 701: General\n\n#--- 701.1 Scope.\n\nThe provisions of this chapter shall govern the requirements for combustion, ventilation, and dilution air for fuel-burning appliances other than gas-fired appliances. The requirements for combustion, ventilation, and dilution air for gas-fired appliances shall be in accordance with the New York City Fuel Gas Code.\n\n#--- 701.2 Combustion, ventilation, and dilution air required.\n\nEvery room or space containing fuel-burning appliances shall be provided with combustion, ventilation, and dilution air as required by this code. Combustion, ventilation, and dilution air shall be provided in accordance with Section 702, 703, 704, 705, 706 or 707. Direct-vent appliances or equipment that do not draw combustion air from inside of the building are not required to be considered in the determination of the combustion and dilution air requirements and shall be installed in accordance with the equipment manufacturer's instructions and listing. Combustion air requirements shall be determined based on the simultaneous operation of all fuel-burning appliances drawing combustion, ventilation, and dilution air from the room or space. Combustion, ventilation, and dilution air shall be obtained solely from the outdoors for fuel-burning appliances with an input greater than 350,000 Btu/h (102.6 kW). The room or space containing fuel-burning appliances shall comply with the requirements of Sections C402.5.3 and R402.4.4, as applicable, of the New York City Energy Conservation Code and Section 1012 of this code.\n\n#--- 701.3 Circulation of air.\n\nThe equipment and appliances within every room containing fuel-burning appliances shall be installed so as to allow free circulation of air. Provisions shall be made to allow for the simultaneous operation of mechanical exhaust systems, fireplaces or other equipment and appliances operating in the same room or space from which combustion, ventilation, and dilution air is being drawn. Such provisions shall prevent the operation of such appliances, equipment and systems from affecting the supply of combustion, ventilation, and dilution air.\n\n#---- 701.3.1 Makeup air for fuel burning devices.\n\nWhere exhaust fans are installed, makeup air shall be provided to replace the exhausted air. Calculations shall be provided on the construction documents to validate the use of the exhaust fan(s) and compliance with this chapter.\n\n#---- 701.3.2 Ventilation air for fuel-burning devices.\n\nWhere ventilation air is brought in by mechanical means for heat generation mitigation, provisions must be made for proper air balance to prevent a negative or positive pressure in the boiler room and to discharge the ventilation air directly to the outside.\n\n#--- 701.4 Crawl space and attic space.\n\nFor the purposes of this chapter, an opening to a naturally ventilated crawl space or attic space shall be considered equivalent to an opening to the outdoors.\n\n#---- 701.4.1 Crawl space.\n\nWhere lower combustion air openings connect with crawl spaces, such spaces shall have unobstructed openings to the outdoors at least twice that required for the combustion air openings. The height of the crawl space shall comply with the requirements of the New York City Building Code and shall be without obstruction to the free flow of air.\n\n#---- 701.4.2 Attic space.\n\nWhere combustion air is obtained from an attic area, the attic ventilating openings shall not be subject to ice or snow blockage, and the attic shall have not less than 30 inches (762 mm) vertical clear height at its maximum point. Attic ventilation openings shall be sufficient to provide the required volume of combustion air and the attic ventilation required by the New York City Building Code. The combustion air openings shall be provided with a sleeve of not less than 0.019 inch (0.48 mm) (No.26 Gage) galvanized steel or other approved material extending from the appliance enclosure to at least 6 inches (152.4 mm) above the top of the ceiling joists and insulation.\n\n#--- 701.5 Prohibited sources.\n\nOpenings and ducts shall not connect appliance enclosures with a space in which the operation of a fan will adversely affect the flow of the combustion, ventilation, and dilution air. Combustion, ventilation, and dilution air shall not be subject to ice or snow blockage. No combustion, ventilation, and dilution air inlet shall be less than 30 inches (762 mm) above grade. Combustion, ventilation, and dilution air shall not be obtained from a hazardous location, except where the fuel-fired appliances are located within the hazardous location and are installed in accordance with this code. Combustion, ventilation, and dilution air shall not be taken from a refrigeration machinery room, except where a refrigerant vapor detector system is installed to automatically shut off the combustion process in the event of refrigerant leakage. For structures in flood hazard areas, air shall be obtained from a location complying with the additional requirements of Appendix G of the New York City Building Code.\n\nSection MC 702: Inside Air\n\n#--- 702.1 All air from indoors.\n\nCombustion, ventilation, and dilution air shall be permitted to be obtained entirely from the indoors in buildings that are not of unusually tight construction. In buildings of unusually tight construction, combustion air shall be obtained from the outdoors in accordance with Section 703, 705, 706 or 707.\n\n#--- 702.2 Air from the same room or space.\n\nThe room or space containing fuel-burning appliances shall be an unconfined space as defined in Section 202.\n\n#--- 702.3 Air from adjacent spaces.\n\nWhere the volume of the room in which the fuel-burning appliances are located does not comply with Section 702.2, additional inside combustion, ventilation, and dilution air shall be obtained by opening the room to adjacent spaces so that the combined volume of all communicating spaces meets the volumetric requirement of Section 702.2. Openings connecting the spaces shall comply with Sections 702.3.1, 702.3.2 and Figure A-1 of Appendix A.\n\n#---- 702.3.1 Number and location of openings.\n\nTwo openings shall be provided, one within 1 foot (305 mm) of the ceiling of the room and one within 1 foot (304.8 mm) of the floor.\n\n#---- 702.3.2 Size of openings.\n\nThe net free area of each opening, calculated in accordance with Section 708, shall be a minimum of 1 square inch per 1,000 Btu/h (2201 mm 2 /kW) of input rating of the fuel-burning appliances drawing combustion, ventilation, and dilution air from the communicating spaces and shall be not less than 100 square inches (64 516 mm 2 ).\n\nSection MC 703: Outdoor Air\n\n#--- 703.1 All air from the outdoors.\n\nWhere all combustion, ventilation, and dilution air is to be provided by outdoor air, the required combustion, ventilation, and dilution air shall be obtained by direct opening by louver or a duct(s) from the boiler room to the outdoors. Openings connecting the room to the outdoor air shall comply with Sections 703.1.1 through 703.1.2 of this code, and Figures 304.6.1(1), 304.6.1(2), 304.6.1(3) and 304.6.2 of the New York City Fuel Gas Code. The size of the openings connecting the room to the outdoor air supply shall also comply with any applicable rules of the New York City Department of Environmental Protection.\n\n#---- 703.1.1 Two-permanent-openings method.\n\nTwo permanent openings, one commencing within 12 inches (304.8 mm) of the top and one commencing within 12 inches (304.8 mm) of the bottom of the room, shall be provided. The openings shall communicate directly, or by ducts, with the outdoors or spaces that freely communicate with the outdoors as follows:\n\n1. Where directly communicating with the outdoors, or where communicating with the outdoors through vertical ducts, each opening shall have a minimum free area of 1 square inch per 4,000 Btu/h (550 mm 2 /kW) of total input rating of all equipment in the room.\n\n2. Where communicating with the outdoors through horizontal ducts, each opening shall have a minimum free area of not less than 1 square inch per 2,000 Btu/h (1100 mm 2 /kW) of total input rating of all equipment in the room.\n\n#---- 703.1.2 One-permanent-opening method.\n\nOne permanent opening, commencing within 12 inches (304.8 mm) of the top of the enclosure, shall be provided. The equipment shall have clearances of at least 1 inch (25.4 mm) from the sides and back and 6 inches (152.4 mm) from the front of the appliance. The opening shall directly communicate with the outdoors or through a vertical or horizontal duct to the outdoors or spaces that freely communicate with the outdoors and shall have a minimum free area of 1 square inch per 3,000 Btu/h (734 mm 2 /kW) of the total input rating of all equipment located in the enclosure, and not less than the sum of the areas of all vent connectors in the space.\n\nSection MC 704: Combined Use of Inside and Outdoor Air (Condition 1)\n\n#--- 704.1 Combination of air from inside and outdoors.\n\nThis section shall apply only to appliances located in confined spaces in buildings not of unusually tight construction. Where the volumes of rooms and spaces are combined for the purpose of providing indoor combustion air, such rooms and spaces shall communicate through permanent openings in compliance with Sections 702.3.1 and 702.3.2. The required combustion, ventilation, and dilution air shall be obtained by opening the room to the outdoors using a combination of inside and outdoor air, prorated in accordance with Section 704.1.6. The ratio of interior spaces shall comply with Section 704.1.5. The number, location and ratios of openings connecting the space with the outdoor air shall comply with Sections 704.1.1 through 704.1.4.\n\n#---- 704.1.1 Number and location of openings.\n\nAt least two openings shall be provided, one within 1 foot (304.8 mm) of the ceiling of the room and one within 1 foot (304.8 mm) of the floor.\n\n#---- 704.1.2 Ratio of direct openings.\n\nWhere direct openings to the outdoors are provided in accordance with Section 703.1, the ratio of direct openings shall be the sum of the net free areas of both direct openings to the outdoors, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.2.\n\n#---- 704.1.3 Ratio of horizontal openings.\n\nWhere openings connected to the outdoors through horizontal ducts are provided in accordance with Section 703.1, the ratio of horizontal openings shall be the sum of the net free areas of both such openings, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.3.\n\n#---- 704.1.4 Ratio of vertical openings.\n\nWhere openings connected to the outdoors through vertical ducts are provided in accordance with Section 703.1, the ratio of vertical openings shall be the sum of the net free areas of both such openings, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.4.\n\n#---- 704.1.5 Ratio of interior spaces.\n\nThe ratio of interior spaces shall be the available volume of all communicating spaces, divided by the required volume as determined in accordance with Sections 702.2 and 702.3.\n\n#---- 704.1.6 Prorating of inside and outdoor air.\n\nIn spaces that utilize a combination of inside and outdoor air, the sum of the ratios of all direct openings, horizontal openings, vertical openings and interior spaces shall equal or exceed 1.\n\nSection MC 705: Combined Use of Inside and Outdoor Air (Condition 2)\n\n#--- 705.1 General.\n\nThis section shall apply only to appliances located in unconfined spaces in buildings of unusually tight construction. Combustion air supplied by a combined use of indoor and outdoor air shall be supplied through openings and ducts extending to the appliance room or to the vicinity of the appliance.\n\n#---- 705.1.1 Openings and supply ducts.\n\nOpenings shall be provided, located and sized in accordance with Sections 702.3.1 and 702.3.2; additionally, there shall be one opening to the outdoors having a free area of at least 1 square inch per 5,000 Btu/h (440 mm 2 /kW) of total input of all appliances in the space.\n\nSection MC 706: Mechanical Combustion Air Supply\n\n#--- 706.1 Rate of air supplied.\n\nWhere all combustion air is provided by a mechanical air supply system, the combustion air shall be supplied from the outdoors at a rate of not less than 0.35 cubic feet per minute per 1,000 Btu/h (0.034 m 3 /min per kW) of total input rating for all the fuel-burning appliances located within the space. Combustion air rates shall also comply with any applicable rules of the New York City Department of Environmental Protection. The mechanical air supply shall be sufficient to accommodate combustion air, ventilation air, and dilution air requirements of the installation.\n\n#---- 706.1.1 Appliance interlock.\n\nEach of the appliances served shall be interlocked with the mechanical air supply system to prevent main burner operation when the mechanical air supply system is not in operation. The air flow and the damper operation shall be proven prior to burner operation.\n\nSection MC 707: Direct Connection\n\n#--- 707.1 General.\n\nFuel-burning appliances that are listed and labeled for direct combustion air connection to the outdoors shall be installed in accordance with the manufacturer's instructions.\n\nSection MC 708: Combustion Air Ducts\n\n#--- 708.1 General.\n\nCombustion air ducts shall comply with all of the following:\n\n1. Be of galvanized steel complying with Chapter 6 or of equivalent corrosion-resistant material approved for this application.\n\nException: Within dwelling units, unobstructed stud and joist spaces shall not be prohibited from conveying combustion air, provided that not more than one required fireblock is removed.\n\n2. Have a minimum dimension of 3 inches (76.2 mm) in all directions.\n\n3. Terminate in an unobstructed space allowing free movement of combustion air to the appliances.\n\n4. Have the same cross-sectional areas as the free area of the openings to which they connect.\n\n5. Serve a single appliance enclosure.\n\n6. Not serve both upper and lower combustion air openings where both such openings are used. The separation between ducts serving upper and lower combustion air openings shall be maintained to the source of combustion air.\n\n7. Not be screened where terminating in an attic space.\n\n8. Not slope downward toward the source of combustion air, where serving the upper required combustion air opening.\n\n9. Be constructed so that the remaining space surrounding a chimney or chimney liner, installed within a masonry, metal or factory-built chimney cannot be used to supply combustion, ventilation and dilution air, except for direct vent appliances designed and installed in accordance with the equipment manufacturer's instructions and listing.\n\n10. Be insulated in accordance with Section C402.5.3 of the New York City Energy Conservation Code.\n\nSection MC 709: Opening Obstructions\n\n#--- 709.1 General.\n\nThe required size of openings for combustion, ventilation, and dilution air shall be based on the net free area of each opening. The net free area of an opening shall be that specified by the manufacturer of the opening covering. In the absence of such information, openings covered with metal louvers shall be deemed to have a net free area of 60 percent of the area of the opening, and openings covered with wood louvers shall be deemed to have a net free area of 10 percent of the area of the opening. Louvers and grills shall be fixed in the open position.\n\nException: Operable louvers shall be interlocked with the appliance so that they are proven to be in the full open position prior to main burner ignition and during main burner operation. Means shall be provided to prevent the main burner from igniting if the louvers fail to open during burner startup and to shut down the main burner if the louvers close during operation.\n\n#--- 709.2 Dampered openings.\n\nWhere the combustion air openings are provided with automatic, smoke or fire dampers, the dampers shall be electrically interlocked with the appliances served, so as to prevent operation of any appliance when any of the dampers are closed. Manually operated dampers shall not be installed in combustion air openings. The damper opening shall be proven prior to burner operation. Dampers shall be provided in accordance with Chapter 6.\n\n#--- 709.3 Caution sign.\n\nA sign stating, \"Louvers, dampers and/or ventilation openings must not be blocked or disabled.\" shall be permanently affixed, in clear view, and adjacent to the opening(s) within the room containing the equipment. The letters used on the sign shall be at least 1 inch (25.4 mm) in height.\n\nSection MC 710: Opening Location and Protection\n\n#--- 710.1 General.\n\nCombustion air openings to the outdoors shall comply with the location and protection provisions applicable to outside air intake openings of Sections 401.5 and 401.6.",
+  "schemaVersion": 1
 }
