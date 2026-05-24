@@ -40,6 +40,8 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var statusMessage: String?
     @Published var readerTheme: ReaderTheme
     @Published private(set) var isInitialContentLoaded: Bool = false
+    @Published var comparisonModeEnabled: Bool
+    @Published var browserTabSwitchRequest: BrowserContextID?
 
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
@@ -54,6 +56,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let selectedJurisdictionDefaultsKey = "selectedJurisdictionKey"
     private let selectedCodeSectionDefaultsKey = "selectedCodeSectionID"
     private let lastOpenedChapterIDDefaultsKey = "lastOpenedChapterID"
+    private let comparisonModeDefaultsKey = "comparisonModeEnabled"
     private var lastChapterPreloadTask: Task<Void, Never>?
     private var sectionsCache: [Int64: [CodeSectionSummary]] = [:]
     private var sectionGroupsCache: [Int64: [CodeSectionGroup]] = [:]
@@ -89,6 +92,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.readerTheme = readerThemeStore.load()
         self.userDataStore = try? UserDataStore()
         self.recentSearches = Self.loadRecentSearches()
+        self.comparisonModeEnabled = UserDefaults.standard.bool(forKey: comparisonModeDefaultsKey)
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         reload()
@@ -222,6 +226,21 @@ final class CodeLibraryViewModel: ObservableObject {
         codeSections = authoredCodeStore.codeSections()
         chapters = authoredCodeStore.chapters(codeSectionID: id)
         searchResults = []
+    }
+
+    func updateComparisonMode(enabled: Bool) {
+        comparisonModeEnabled = enabled
+        UserDefaults.standard.set(enabled, forKey: comparisonModeDefaultsKey)
+    }
+
+    func requestBrowserTabSwitch(to context: BrowserContextID) {
+        browserTabSwitchRequest = context
+    }
+
+    func syncSelectedCodeSection(from context: BrowserContextID) {
+        let codeSectionID = BrowserContextID.storedCodeSectionID(for: context)
+            ?? (context == .primary ? selectedCodeSectionID : nil)
+        updateSelectedCodeSection(id: codeSectionID)
     }
 
     func codeSectionName(id: Int64?) -> String {

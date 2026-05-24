@@ -2,13 +2,15 @@ import SwiftUI
 import UIKit
 
 struct BrowseView: View {
+    var browserContext: BrowserContextID = .primary
+
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
     @Namespace private var chapterTileNamespace
     @State private var scrollOffset: CGFloat = 0
     @State private var browseCodeSectionID: Int64?
     @State private var hasSeededBrowseSection = false
-    private static let codeSectionDefaultsKey = "browseLeftCodeSectionID"
+    @State private var rememberedSectionIDs: [Int64: Int64] = [:]
     private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
@@ -36,9 +38,6 @@ struct BrowseView: View {
                     browseContent
                         .onAppear {
                             seedBrowseSectionIfNeeded()
-                            DispatchQueue.main.async {
-                                library.updateSelectedCodeSection(id: browseCodeSectionID)
-                            }
                         }
                 }
             }
@@ -100,7 +99,10 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.chapterItems) { chapter in
                                         NavigationLink {
-                                            ChapterLaunchView(chapter: chapter)
+                                            ChapterLaunchView(
+                                                chapter: chapter,
+                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id)
+                                            )
                                                 .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
@@ -119,7 +121,10 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         NavigationLink {
-                                            ChapterLaunchView(chapter: chapter)
+                                            ChapterLaunchView(
+                                                chapter: chapter,
+                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id)
+                                            )
                                                 .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
@@ -150,7 +155,23 @@ struct BrowseView: View {
 
     private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 14) {
+            if library.comparisonModeEnabled {
+                CodeEyebrow(text: browserContext.displayName, accent: accentColor)
+            }
+
             Menu {
+                if library.comparisonModeEnabled {
+                    ForEach(BrowserContextID.allCases) { context in
+                        Button {
+                            library.requestBrowserTabSwitch(to: context)
+                        } label: {
+                            codeSectionPickerLabel(context.displayName, isSelected: context == browserContext)
+                        }
+                    }
+
+                    Divider()
+                }
+
                 Button {
                     updateCodeSection(nil)
                 } label: {
@@ -252,23 +273,46 @@ struct BrowseView: View {
 
     private func updateCodeSection(_ id: Int64?) {
         browseCodeSectionID = id
-        UserDefaults.standard.set(id ?? -1, forKey: Self.codeSectionDefaultsKey)
+        BrowserContextID.persistCodeSectionID(id, for: browserContext)
         library.updateSelectedCodeSection(id: id)
+    }
+
+    private func rememberedSectionBinding(for chapterID: Int64) -> Binding<Int64?> {
+        Binding(
+            get: { rememberedSectionIDs[chapterID] },
+            set: { newValue in
+                if let newValue {
+                    rememberedSectionIDs[chapterID] = newValue
+                } else {
+                    rememberedSectionIDs.removeValue(forKey: chapterID)
+                }
+            }
+        )
     }
 
     private func seedBrowseSectionIfNeeded() {
         guard !hasSeededBrowseSection else { return }
         hasSeededBrowseSection = true
 
-        browseCodeSectionID = storedCodeSectionID(forKey: Self.codeSectionDefaultsKey)
-            ?? library.selectedCodeSectionID
-            ?? library.codeSections.first?.id
-    }
+        let stored = BrowserContextID.storedCodeSectionID(for: browserContext)
 
-    private func storedCodeSectionID(forKey key: String) -> Int64? {
-        guard UserDefaults.standard.object(forKey: key) != nil else { return nil }
-        let storedValue = UserDefaults.standard.integer(forKey: key)
-        return storedValue < 0 ? nil : Int64(storedValue)
+        switch browserContext {
+        case .primary:
+            browseCodeSectionID = stored
+                ?? library.selectedCodeSectionID
+                ?? library.codeSections.first?.id
+        case .secondary:
+            let primarySectionID = BrowserContextID.storedCodeSectionID(for: .primary)
+                ?? library.selectedCodeSectionID
+                ?? library.codeSections.first?.id
+            browseCodeSectionID = stored
+                ?? library.codeSections.first(where: { $0.id != primarySectionID })?.id
+                ?? primarySectionID
+        }
+
+        if stored == nil {
+            BrowserContextID.persistCodeSectionID(browseCodeSectionID, for: browserContext)
+        }
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {
