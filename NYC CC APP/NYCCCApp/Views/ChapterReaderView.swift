@@ -4,6 +4,7 @@ import UIKit
 struct ChapterReaderView: View {
     let chapter: CodeChapter
     let initialSectionID: Int64
+    var rememberedSectionID: Binding<Int64?> = .constant(nil)
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var blocks: [CodeLibraryViewModel.ChapterReaderBlockContent] = []
@@ -60,7 +61,7 @@ struct ChapterReaderView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 28)
-            .padding(.bottom, 24)
+            .padding(.bottom, 8)
         }
         .contentShape(Rectangle())
         .coordinateSpace(name: chapterReaderCoordinateSpace)
@@ -81,6 +82,7 @@ struct ChapterReaderView: View {
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .disablesInteractivePopGesture()
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {
@@ -390,8 +392,13 @@ struct ChapterReaderView: View {
             }
         )
 
-        if let selectedDescriptor = descriptors.first(where: { $0.sectionID == initialSectionID }),
-           let selectedDetail = await library.loadSectionDetailAsync(sectionID: initialSectionID) {
+        let restoreSectionID = rememberedSectionID.wrappedValue ?? initialSectionID
+        let initialLoadSectionID = descriptors.contains(where: { $0.sectionID == restoreSectionID })
+            ? restoreSectionID
+            : initialSectionID
+
+        if let selectedDescriptor = descriptors.first(where: { $0.sectionID == initialLoadSectionID }),
+           let selectedDetail = await library.loadSectionDetailAsync(sectionID: initialLoadSectionID) {
             let selectedBlock = library.chapterReaderBlock(
                 detail: selectedDetail,
                 groupLabel: selectedDescriptor.groupLabel
@@ -400,15 +407,15 @@ struct ChapterReaderView: View {
 
             prewarmedBodyText = [selectedDetail.id: selectedBodyText]
             blocks = [selectedBlock]
-            selectedJumpSectionID = initialSectionID
-            pendingScrollSectionID = initialSectionID
+            selectedJumpSectionID = initialLoadSectionID
+            pendingScrollSectionID = initialLoadSectionID
             scrollIfNeeded(with: proxy, animated: false)
         }
 
         await prewarmVisibleSectionBodies(from: descriptors)
 
         var loadedBlocksByID = Dictionary(uniqueKeysWithValues: blocks.map { ($0.id, $0) })
-        let remainingDescriptors = descriptors.filter { $0.sectionID != initialSectionID }
+        let remainingDescriptors = descriptors.filter { $0.sectionID != initialLoadSectionID }
 
         for batch in remainingDescriptors.chunked(into: 16) {
             let details = await library.loadSectionDetailsAsync(sectionIDs: batch.map(\.sectionID))
@@ -441,6 +448,7 @@ struct ChapterReaderView: View {
 
     private func jumpToSection(id: Int64, with proxy: ScrollViewProxy) {
         selectedJumpSectionID = id
+        rememberedSectionID.wrappedValue = id
         pendingScrollSectionID = id
         scrollIfNeeded(with: proxy, animated: true)
     }
@@ -453,6 +461,7 @@ struct ChapterReaderView: View {
 
         pendingFocusedSectionID = topMost
         selectedJumpSectionID = topMost
+        rememberedSectionID.wrappedValue = topMost
         focusedSectionUpdateTask?.cancel()
         focusedSectionUpdateTask = Task {
             try? await Task.sleep(for: focusedSectionUpdateDelay)

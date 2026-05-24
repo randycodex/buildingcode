@@ -3,6 +3,7 @@ import SwiftUI
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
+    var rememberedNativeSectionID: Binding<Int64?> = .constant(nil)
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
@@ -117,7 +118,11 @@ struct ChapterHTMLReaderView: View {
     var body: some View {
         Group {
             if shouldUseNativeAuthoredReader {
-                ChapterReaderView(chapter: chapter, initialSectionID: initialSection.id)
+                ChapterReaderView(
+                    chapter: chapter,
+                    initialSectionID: initialSection.id,
+                    rememberedSectionID: rememberedNativeSectionID
+                )
             } else if let chapterURL, let readAccessURL {
                 if hasActivatedHTMLReader {
                     htmlReader(chapterURL: chapterURL, readAccessURL: readAccessURL)
@@ -127,11 +132,16 @@ struct ChapterHTMLReaderView: View {
             } else if library.selectedVersion?.contentKind == .authored {
                 missingAuthoredContentView
             } else {
-                ChapterReaderView(chapter: chapter, initialSectionID: initialSection.id)
+                ChapterReaderView(
+                    chapter: chapter,
+                    initialSectionID: initialSection.id,
+                    rememberedSectionID: rememberedNativeSectionID
+                )
             }
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .disablesInteractivePopGesture()
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {

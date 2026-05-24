@@ -41,7 +41,11 @@ struct ReaderView: View {
 
                     if !references.isEmpty {
                         CodeHairline().padding(.top, 2)
-                        ReferenceListSection(references: references, accent: accentColor)
+                        ReferenceListSection(
+                            references: references,
+                            sourceCodeSectionID: detail.codeSectionID,
+                            accent: accentColor
+                        )
                     }
 
                     if !detail.figures.isEmpty {
@@ -258,6 +262,7 @@ struct ReaderView: View {
 
     private struct ReferenceListSection: View {
         let references: [ResolvedCodeReference]
+        let sourceCodeSectionID: Int64?
         let accent: Color
 
         var body: some View {
@@ -266,23 +271,53 @@ struct ReaderView: View {
                     .font(.headline)
 
                 ForEach(references) { reference in
-                    switch reference.destination {
-                    case .section(let section):
+                    HStack(alignment: .center, spacing: 10) {
+                        switch reference.destination {
+                        case .section(let section):
+                            NavigationLink {
+                                ReaderView(sectionID: section.id)
+                            } label: {
+                                ReferenceRow(reference: reference, accent: accent)
+                            }
+                            .buttonStyle(.plain)
+                        case .chapter(let chapter):
+                            NavigationLink {
+                                ReferenceChapterDestination(chapter: chapter)
+                            } label: {
+                                ReferenceRow(reference: reference, accent: accent)
+                            }
+                            .buttonStyle(.plain)
+                        }
+
                         NavigationLink {
-                            ReaderView(sectionID: section.id)
+                            CompareWorkspaceView(referenceTarget: compareTarget(for: reference))
                         } label: {
-                            ReferenceRow(reference: reference, accent: accent)
+                            Image(systemName: "square.split.2x1")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(accent)
+                                .frame(width: 36, height: 36)
                         }
                         .buttonStyle(.plain)
-                    case .chapter(let chapter):
-                        NavigationLink {
-                            ReferenceChapterDestination(chapter: chapter)
-                        } label: {
-                            ReferenceRow(reference: reference, accent: accent)
-                        }
-                        .buttonStyle(.plain)
+                        .accessibilityLabel("Open reference in compare")
                     }
                 }
+            }
+        }
+
+        private func compareTarget(for reference: ResolvedCodeReference) -> CompareLaunchTarget {
+            switch reference.destination {
+            case .section(let section):
+                return CompareLaunchTarget(
+                    codeSectionID: sourceCodeSectionID,
+                    chapterNumber: section.chapterNumber,
+                    sectionID: section.id
+                )
+            case .chapter(let chapter):
+                return CompareLaunchTarget(
+                    codeSectionID: chapter.codeSectionID ?? sourceCodeSectionID,
+                    chapterID: chapter.id,
+                    chapterNumber: chapter.chapterNumber
+                )
             }
         }
     }
