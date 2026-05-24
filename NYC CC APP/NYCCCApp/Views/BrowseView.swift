@@ -12,6 +12,7 @@ struct BrowseView: View {
     @State private var hasSeededBrowseSides = false
     private static let leftCodeSectionDefaultsKey = "browseLeftCodeSectionID"
     private static let rightCodeSectionDefaultsKey = "browseRightCodeSectionID"
+    private let tabBarClearance: CGFloat = 88
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: activeCodeSectionID))
@@ -71,98 +72,103 @@ struct BrowseView: View {
         let sideChapters = library.chapters(for: codeSectionID(for: side))
 
         return ScrollView {
-            GeometryReader { proxy in
-                Color.clear
-                    .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("browseScroll")).minY)
-            }
-            .frame(height: 0)
+            VStack(alignment: .leading, spacing: 0) {
+                GeometryReader { proxy in
+                    Color.clear
+                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("browseScroll")).minY)
+                }
+                .frame(height: 0)
 
-            libraryHeader(for: side)
-                .padding(.horizontal, 16)
-                .padding(.top, 18)
-                .padding(.bottom, 12)
+                libraryHeader(for: side)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 18)
+                    .padding(.bottom, 12)
 
-            if sideChapters.isEmpty {
-                CodeEmptyStateCard(
-                    title: "No Chapters",
-                    systemImage: "text.book.closed",
-                    description: "The selected code section does not have any chapters yet.",
-                    accent: Color(uiColor: library.accentColor(for: codeSectionID(for: side)))
-                )
-                .padding(.horizontal, 16)
-            } else {
-                let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
-                let codeSectionName = codeSectionName(for: side)
-                let chapterGroups = groupedChapterGroups(
-                    from: sideChapters,
-                    selectedCodeSectionName: codeSectionName
-                )
+                if sideChapters.isEmpty {
+                    CodeEmptyStateCard(
+                        title: "No Chapters",
+                        systemImage: "text.book.closed",
+                        description: "The selected code section does not have any chapters yet.",
+                        accent: Color(uiColor: library.accentColor(for: codeSectionID(for: side)))
+                    )
+                    .padding(.horizontal, 16)
+                } else {
+                    let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+                    let codeSectionName = codeSectionName(for: side)
+                    let chapterGroups = groupedChapterGroups(
+                        from: sideChapters,
+                        selectedCodeSectionName: codeSectionName
+                    )
 
-                LazyVStack(alignment: .leading, spacing: 12) {
-                    ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
-                        if codeSectionName == "All Sections" {
-                            codeSectionGroupHeader(
-                                title: group.title,
-                                color: group.palette.chapterTitleColor
-                            )
-                            .padding(.top, index == 0 ? 0 : 8)
-                        }
+                    LazyVStack(alignment: .leading, spacing: 12) {
+                        ForEach(Array(chapterGroups.enumerated()), id: \.element.id) { index, group in
+                            if codeSectionName == "All Sections" {
+                                codeSectionGroupHeader(
+                                    title: group.title,
+                                    color: group.palette.chapterTitleColor
+                                )
+                                .padding(.top, index == 0 ? 0 : 8)
+                            }
 
-                        if !group.chapterItems.isEmpty {
-                            LazyVGrid(columns: columns, spacing: 12) {
-                                ForEach(group.chapterItems) { chapter in
-                                    NavigationLink {
-                                        ChapterSwipeLaunchView(
-                                            chapter: chapter,
-                                            initialSide: side,
-                                            leftCodeSectionID: leftCodeSectionID,
-                                            rightCodeSectionID: rightCodeSectionID,
-                                            parentActiveSide: $activeBrowseSide
-                                        )
-                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
-                                    } label: {
-                                        ChapterTile(
-                                            chapter: chapter,
-                                            palette: tilePalette(for: chapter),
-                                            kind: .chapter
-                                        )
+                            if !group.chapterItems.isEmpty {
+                                LazyVGrid(columns: columns, spacing: 12) {
+                                    ForEach(group.chapterItems) { chapter in
+                                        NavigationLink {
+                                            ChapterSwipeLaunchView(
+                                                chapter: chapter,
+                                                initialSide: side,
+                                                leftCodeSectionID: leftCodeSectionID,
+                                                rightCodeSectionID: rightCodeSectionID,
+                                                parentActiveSide: $activeBrowseSide
+                                            )
+                                                .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+                                        } label: {
+                                            ChapterTile(
+                                                chapter: chapter,
+                                                palette: tilePalette(for: chapter),
+                                                kind: .chapter
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
+                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                     }
-                                    .buttonStyle(.plain)
-                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                 }
                             }
-                        }
 
-                        if !group.appendixItems.isEmpty {
-                            LazyVGrid(columns: columns, spacing: 12) {
-                                ForEach(group.appendixItems) { chapter in
-                                    NavigationLink {
-                                        ChapterSwipeLaunchView(
-                                            chapter: chapter,
-                                            initialSide: side,
-                                            leftCodeSectionID: leftCodeSectionID,
-                                            rightCodeSectionID: rightCodeSectionID,
-                                            parentActiveSide: $activeBrowseSide
-                                        )
-                                            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
-                                    } label: {
-                                        ChapterTile(
-                                            chapter: chapter,
-                                            palette: tilePalette(for: chapter),
-                                            kind: .appendix
-                                        )
+                            if !group.appendixItems.isEmpty {
+                                LazyVGrid(columns: columns, spacing: 12) {
+                                    ForEach(group.appendixItems) { chapter in
+                                        NavigationLink {
+                                            ChapterSwipeLaunchView(
+                                                chapter: chapter,
+                                                initialSide: side,
+                                                leftCodeSectionID: leftCodeSectionID,
+                                                rightCodeSectionID: rightCodeSectionID,
+                                                parentActiveSide: $activeBrowseSide
+                                            )
+                                                .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+                                        } label: {
+                                            ChapterTile(
+                                                chapter: chapter,
+                                                palette: tilePalette(for: chapter),
+                                                kind: .appendix
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
+                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                     }
-                                    .buttonStyle(.plain)
-                                    .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
                                 }
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
             }
-
-            Spacer(minLength: 32)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .padding(.bottom, tabBarClearance)
+        }
+        .overlay(alignment: .top) {
+            CodeTopContentFade(title: codeSectionName(for: side), progress: collapseProgress)
         }
         .scrollIndicators(.hidden)
     }
