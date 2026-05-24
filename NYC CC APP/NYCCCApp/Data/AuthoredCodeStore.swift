@@ -10,6 +10,7 @@ protocol CodeReferenceLookup {
 final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private struct Project: Decodable {
         let schemaVersion: Int
+        let sectionContentSchemaVersion: Int?
         let nextCodeID: Int64?
         let nextCodeSectionID: Int64?
         let nextChapterID: Int64
@@ -19,6 +20,65 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let codeSections: [CodeSection]?
         let chapters: [Chapter]
         let tableBlocks: [CodeTableBlock]?
+
+        private enum CodingKeys: String, CodingKey {
+            case schemaVersion
+            case sectionContentSchemaVersion
+            case nextCodeID
+            case nextCodeSectionID
+            case nextChapterID
+            case nextSectionID
+            case jurisdictions
+            case codes
+            case codeSections
+            case chapters
+            case tableBlocks
+            case tables
+        }
+
+        init(
+            schemaVersion: Int,
+            sectionContentSchemaVersion: Int?,
+            nextCodeID: Int64?,
+            nextCodeSectionID: Int64?,
+            nextChapterID: Int64,
+            nextSectionID: Int64,
+            jurisdictions: [Jurisdiction]?,
+            codes: [Code]?,
+            codeSections: [CodeSection]?,
+            chapters: [Chapter],
+            tableBlocks: [CodeTableBlock]?
+        ) {
+            self.schemaVersion = schemaVersion
+            self.sectionContentSchemaVersion = sectionContentSchemaVersion
+            self.nextCodeID = nextCodeID
+            self.nextCodeSectionID = nextCodeSectionID
+            self.nextChapterID = nextChapterID
+            self.nextSectionID = nextSectionID
+            self.jurisdictions = jurisdictions
+            self.codes = codes
+            self.codeSections = codeSections
+            self.chapters = chapters
+            self.tableBlocks = tableBlocks
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            try self.init(
+                schemaVersion: container.decode(Int.self, forKey: .schemaVersion),
+                sectionContentSchemaVersion: container.decodeIfPresent(Int.self, forKey: .sectionContentSchemaVersion),
+                nextCodeID: container.decodeIfPresent(Int64.self, forKey: .nextCodeID),
+                nextCodeSectionID: container.decodeIfPresent(Int64.self, forKey: .nextCodeSectionID),
+                nextChapterID: container.decode(Int64.self, forKey: .nextChapterID),
+                nextSectionID: container.decode(Int64.self, forKey: .nextSectionID),
+                jurisdictions: container.decodeIfPresent([Jurisdiction].self, forKey: .jurisdictions),
+                codes: container.decodeIfPresent([Code].self, forKey: .codes),
+                codeSections: container.decodeIfPresent([CodeSection].self, forKey: .codeSections),
+                chapters: container.decode([Chapter].self, forKey: .chapters),
+                tableBlocks: container.decodeIfPresent([CodeTableBlock].self, forKey: .tableBlocks)
+                    ?? container.decodeIfPresent([CodeTableBlock].self, forKey: .tables)
+            )
+        }
     }
 
     private struct Jurisdiction: Decodable {
@@ -80,7 +140,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             id = try container.decode(Int64.self, forKey: .id)
             sectionNumber = try container.decode(String.self, forKey: .sectionNumber)
             title = try container.decode(String.self, forKey: .title)
-            officialText = try container.decode(String.self, forKey: .officialText)
+            officialText = try container.decodeIfPresent(String.self, forKey: .officialText) ?? ""
             richTextOverrideData = try container.decodeIfPresent(Data.self, forKey: .richTextOverrideData)
             kind = try container.decodeIfPresent(CodeSectionKind.self, forKey: .kind) ?? .title
             contentBlocks = try container.decodeIfPresent([CodeContentBlock].self, forKey: .contentBlocks) ?? []
@@ -107,7 +167,22 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let schemaVersion: Int
         let sectionID: Int64
         let chapterNumber: String
+        let officialText: String?
+        let richTextOverrideData: Data?
+        let previewText: String?
         let blocks: [CodeContentBlock]
+    }
+
+    private struct PreparedSectionData {
+        let officialText: String
+        let richTextOverrideData: Data?
+        let previewText: String
+        let blocks: [CodeContentBlock]
+    }
+
+    private struct ShippedSearchIndexFile: Decodable {
+        let schemaVersion: Int
+        let tokens: [String: [Int64]]
     }
 
     private let project: Project
@@ -131,8 +206,13 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let authoredHTMLChaptersURL: URL
     private let preparedSectionsURL: URL
     private var preparedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
+    private var preparedSectionDataBySectionID: [Int64: PreparedSectionData] = [:]
+    private var previewTextBySectionID: [Int64: String] = [:]
     private var missingPreparedSectionIDs: Set<Int64> = []
     private let preparedContentLock = NSLock()
+    private let bundleUsesExternalSectionText: Bool
+    private var shippedSearchIndex: [String: Set<Int64>]?
+    private var shippedSearchIndexByCodeSectionID: [Int64: [String: Set<Int64>]] = [:]
     private var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
     private var synthesizedChapterNumbers: Set<String> = []
     private let synthesizedContentLock = NSLock()
@@ -184,8 +264,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
             return true
         }
+        bundleUsesExternalSectionText = (decodedProject.sectionContentSchemaVersion ?? 1) >= 2
         self.project = Project(
             schemaVersion: decodedProject.schemaVersion,
+            sectionContentSchemaVersion: decodedProject.sectionContentSchemaVersion,
             nextCodeID: decodedProject.nextCodeID,
             nextCodeSectionID: decodedProject.nextCodeSectionID,
             nextChapterID: decodedProject.nextChapterID,
@@ -318,14 +400,19 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     func sectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
         guard let indexed = sectionIndex[sectionID] else { return nil }
+        let preparedData = bundleUsesExternalSectionText ? preparedSectionData(sectionID: sectionID) : nil
         let contentBlocks: [CodeContentBlock]
         if !indexed.section.contentBlocks.isEmpty {
             contentBlocks = indexed.section.contentBlocks
+        } else if let preparedBlocks = preparedData?.blocks, !preparedBlocks.isEmpty {
+            contentBlocks = preparedBlocks
         } else if let preparedBlocks = preparedContentBlocks(sectionID: indexed.section.id) {
             contentBlocks = preparedBlocks
         } else {
             contentBlocks = synthesizedContentBlocks(for: indexed)
         }
+        let officialText = preparedData?.officialText ?? indexed.section.officialText
+        let richTextOverrideData = preparedData?.richTextOverrideData ?? indexed.section.richTextOverrideData
         return ReaderSectionDetail(
             id: indexed.section.id,
             codeSectionID: indexed.chapter.codeSectionID,
@@ -334,11 +421,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             sectionGroupLabel: indexed.group.displayLabel,
             sectionNumber: indexed.section.sectionNumber,
             title: indexed.section.title,
-            officialText: indexed.section.officialText,
+            officialText: officialText,
             figures: [],
             customDiagrams: [],
             textSpans: [],
-            richTextOverrideData: indexed.section.richTextOverrideData,
+            richTextOverrideData: richTextOverrideData,
             kind: indexed.section.kind,
             contentBlocks: contentBlocks,
             tableBlocks: contentBlocks.compactMap { block in
@@ -348,7 +435,55 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         )
     }
 
+    private func preparedSectionData(sectionID: Int64) -> PreparedSectionData? {
+        preparedContentLock.lock()
+        if let cached = preparedSectionDataBySectionID[sectionID] {
+            preparedContentLock.unlock()
+            return cached
+        }
+        if missingPreparedSectionIDs.contains(sectionID) {
+            preparedContentLock.unlock()
+            return nil
+        }
+        preparedContentLock.unlock()
+
+        let url = preparedSectionsURL.appendingPathComponent("\(sectionID).json", isDirectory: false)
+        guard let data = try? Data(contentsOf: url),
+              let prepared = try? JSONDecoder().decode(PreparedSectionContent.self, from: data),
+              prepared.sectionID == sectionID else {
+            preparedContentLock.lock()
+            missingPreparedSectionIDs.insert(sectionID)
+            preparedContentLock.unlock()
+            return nil
+        }
+
+        let officialText = prepared.officialText ?? ""
+        let previewText = prepared.previewText ?? officialText.titleThroughFirstPeriod
+        let sectionData = PreparedSectionData(
+            officialText: officialText,
+            richTextOverrideData: prepared.richTextOverrideData,
+            previewText: previewText,
+            blocks: prepared.blocks
+        )
+
+        preparedContentLock.lock()
+        preparedSectionDataBySectionID[sectionID] = sectionData
+        previewTextBySectionID[sectionID] = previewText
+        if !prepared.blocks.isEmpty {
+            preparedContentBlocksBySectionID[sectionID] = prepared.blocks
+        }
+        preparedContentLock.unlock()
+        return sectionData
+    }
+
     private func preparedContentBlocks(sectionID: Int64) -> [CodeContentBlock]? {
+        if bundleUsesExternalSectionText {
+            guard let prepared = preparedSectionData(sectionID: sectionID), !prepared.blocks.isEmpty else {
+                return nil
+            }
+            return prepared.blocks
+        }
+
         preparedContentLock.lock()
         if let cached = preparedContentBlocksBySectionID[sectionID] {
             preparedContentLock.unlock()
@@ -376,6 +511,27 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         preparedContentBlocksBySectionID[sectionID] = prepared.blocks
         preparedContentLock.unlock()
         return prepared.blocks
+    }
+
+    private func officialText(for indexed: IndexedSection) -> String {
+        if bundleUsesExternalSectionText {
+            return preparedSectionData(sectionID: indexed.section.id)?.officialText ?? indexed.section.officialText
+        }
+        return indexed.section.officialText
+    }
+
+    private func previewText(for sectionID: Int64, fallbackOfficialText: String) -> String {
+        preparedContentLock.lock()
+        if let cached = previewTextBySectionID[sectionID] {
+            preparedContentLock.unlock()
+            return cached
+        }
+        preparedContentLock.unlock()
+
+        if bundleUsesExternalSectionText, let prepared = preparedSectionData(sectionID: sectionID) {
+            return prepared.previewText
+        }
+        return fallbackOfficialText.titleThroughFirstPeriod
     }
 
     private func synthesizedContentBlocks(for indexed: IndexedSection) -> [CodeContentBlock] {
@@ -459,7 +615,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                         chapterNumber: indexed.chapter.chapterNumber,
                         sectionNumber: indexed.section.sectionNumber,
                         title: indexed.section.title,
-                        snippet: Self.snippet(in: indexed.section.officialText, query: trimmed),
+                        snippet: Self.snippet(in: officialText(for: indexed), query: trimmed),
                         kind: indexed.section.kind
                     )
                 )
@@ -486,7 +642,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             }
             searchIndexLock.unlock()
 
-            let entries = Self.buildSearchEntries(from: indexedSectionsByCodeSectionID[codeSectionID] ?? [])
+            let entries = Self.buildSearchEntries(
+                from: indexedSectionsByCodeSectionID[codeSectionID] ?? [],
+                includeOfficialText: !bundleUsesExternalSectionText
+            )
 
             searchIndexLock.lock()
             if indexedSearchSectionsByCodeSectionID[codeSectionID] == nil {
@@ -504,7 +663,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
         searchIndexLock.unlock()
 
-        let entries = Self.buildSearchEntries(from: indexedSections)
+        let entries = Self.buildSearchEntries(
+            from: indexedSections,
+            includeOfficialText: !bundleUsesExternalSectionText
+        )
 
         searchIndexLock.lock()
         if indexedSearchSections == nil {
@@ -515,16 +677,26 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return cached
     }
 
-    private static func buildSearchEntries(from sections: [IndexedSection]) -> [SearchIndexEntry] {
+    private static func buildSearchEntries(
+        from sections: [IndexedSection],
+        includeOfficialText: Bool = true
+    ) -> [SearchIndexEntry] {
         sections.map { indexed in
-            SearchIndexEntry(
-                indexed: indexed,
-                searchHaystack: "\(indexed.section.sectionNumber) \(indexed.section.title) \(indexed.section.officialText)".lowercased()
-            )
+            let haystack: String
+            if includeOfficialText {
+                haystack = "\(indexed.section.sectionNumber) \(indexed.section.title) \(indexed.section.officialText)".lowercased()
+            } else {
+                haystack = "\(indexed.section.sectionNumber) \(indexed.section.title)".lowercased()
+            }
+            return SearchIndexEntry(indexed: indexed, searchHaystack: haystack)
         }
     }
 
     private func invertedIndex(for codeSectionID: Int64?) -> [String: Set<Int64>] {
+        if bundleUsesExternalSectionText {
+            return shippedInvertedIndex(codeSectionID: codeSectionID)
+        }
+
         if let codeSectionID {
             searchIndexLock.lock()
             if let cached = invertedIndexByCodeSection[codeSectionID] {
@@ -534,7 +706,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             searchIndexLock.unlock()
 
             let sections = indexedSectionsByCodeSectionID[codeSectionID] ?? []
-            let entries = Self.buildSearchEntries(from: sections)
+            let entries = Self.buildSearchEntries(from: sections, includeOfficialText: !bundleUsesExternalSectionText)
             let index = Self.buildInvertedIndex(from: entries)
 
             searchIndexLock.lock()
@@ -553,7 +725,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
         searchIndexLock.unlock()
 
-        let entries = Self.buildSearchEntries(from: indexedSections)
+        let entries = Self.buildSearchEntries(from: indexedSections, includeOfficialText: !bundleUsesExternalSectionText)
         let index = Self.buildInvertedIndex(from: entries)
 
         searchIndexLock.lock()
@@ -591,6 +763,58 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return tokens
     }
 
+    private func shippedInvertedIndex(codeSectionID: Int64?) -> [String: Set<Int64>] {
+        if let codeSectionID {
+            searchIndexLock.lock()
+            if let cached = shippedSearchIndexByCodeSectionID[codeSectionID] {
+                searchIndexLock.unlock()
+                return cached
+            }
+            searchIndexLock.unlock()
+
+            let baseIndex = loadShippedSearchIndex()
+            let sectionIDs = Set((indexedSectionsByCodeSectionID[codeSectionID] ?? []).map(\.section.id))
+            var filtered: [String: Set<Int64>] = [:]
+            filtered.reserveCapacity(baseIndex.count)
+            for (token, ids) in baseIndex {
+                let matches = ids.intersection(sectionIDs)
+                if !matches.isEmpty {
+                    filtered[token] = matches
+                }
+            }
+
+            searchIndexLock.lock()
+            shippedSearchIndexByCodeSectionID[codeSectionID] = filtered
+            searchIndexLock.unlock()
+            return filtered
+        }
+
+        return loadShippedSearchIndex()
+    }
+
+    private func loadShippedSearchIndex() -> [String: Set<Int64>] {
+        searchIndexLock.lock()
+        if let cached = shippedSearchIndex {
+            searchIndexLock.unlock()
+            return cached
+        }
+        searchIndexLock.unlock()
+
+        let url = preparedSectionsURL
+            .deletingLastPathComponent()
+            .appendingPathComponent("searchIndex.json", isDirectory: false)
+        guard let data = try? Data(contentsOf: url),
+              let decoded = try? JSONDecoder().decode(ShippedSearchIndexFile.self, from: data) else {
+            return [:]
+        }
+
+        let index = decoded.tokens.mapValues { Set($0) }
+        searchIndexLock.lock()
+        shippedSearchIndex = index
+        searchIndexLock.unlock()
+        return index
+    }
+
     private static func buildInvertedIndex(from entries: [SearchIndexEntry]) -> [String: Set<Int64>] {
         var index: [String: Set<Int64>] = [:]
         for entry in entries {
@@ -619,7 +843,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 chapterTitle: indexed.chapter.title,
                 sectionNumber: indexed.section.sectionNumber,
                 title: indexed.section.title,
-                previewText: indexed.section.officialText.titleThroughFirstPeriod,
+                previewText: previewText(for: indexed.section.id, fallbackOfficialText: indexed.section.officialText),
                 kind: indexed.section.kind,
                 isBookmarked: bookmarkedSectionIDs.contains(id),
                 noteBody: notesBySectionID[id] ?? ""
