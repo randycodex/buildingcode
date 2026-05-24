@@ -51,6 +51,22 @@ def load_json(path: Path) -> Any:
         return json.load(handle)
 
 
+def chapter_groups(bundle: dict[str, Any], bundle_root: Path, chapter: dict[str, Any]) -> list[dict[str, Any]]:
+    groups = chapter.get("groups")
+    if groups:
+        return groups
+    if bundle.get("chapterStructureSchemaVersion", 1) < 2:
+        return []
+    chapter_id = chapter.get("id")
+    if chapter_id is None:
+        return []
+    prepared_path = bundle_root / "prepared" / "chapters" / f"{chapter_id}.json"
+    if not prepared_path.exists():
+        return []
+    prepared = load_json(prepared_path)
+    return prepared.get("groups", [])
+
+
 def iter_sections(bundle: dict[str, Any], bundle_root: Path, use_prepared_text: bool) -> list[dict[str, Any]]:
     sections: list[dict[str, Any]] = []
     prepared_dir = bundle_root / "prepared" / "sections"
@@ -58,7 +74,7 @@ def iter_sections(bundle: dict[str, Any], bundle_root: Path, use_prepared_text: 
     for chapter in bundle.get("chapters", []):
         chapter_number = chapter.get("chapterNumber", "")
         code_section_id = chapter.get("codeSectionID")
-        for group in chapter.get("groups", []):
+        for group in chapter_groups(bundle, bundle_root, chapter):
             for section in group.get("sections", []):
                 section_id = section["id"]
                 official_text = section.get("officialText", "")

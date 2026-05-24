@@ -11,6 +11,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private struct Project: Decodable {
         let schemaVersion: Int
         let sectionContentSchemaVersion: Int?
+        let chapterStructureSchemaVersion: Int?
         let nextCodeID: Int64?
         let nextCodeSectionID: Int64?
         let nextChapterID: Int64
@@ -24,6 +25,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         private enum CodingKeys: String, CodingKey {
             case schemaVersion
             case sectionContentSchemaVersion
+            case chapterStructureSchemaVersion
             case nextCodeID
             case nextCodeSectionID
             case nextChapterID
@@ -39,6 +41,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         init(
             schemaVersion: Int,
             sectionContentSchemaVersion: Int?,
+            chapterStructureSchemaVersion: Int?,
             nextCodeID: Int64?,
             nextCodeSectionID: Int64?,
             nextChapterID: Int64,
@@ -51,6 +54,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         ) {
             self.schemaVersion = schemaVersion
             self.sectionContentSchemaVersion = sectionContentSchemaVersion
+            self.chapterStructureSchemaVersion = chapterStructureSchemaVersion
             self.nextCodeID = nextCodeID
             self.nextCodeSectionID = nextCodeSectionID
             self.nextChapterID = nextChapterID
@@ -67,6 +71,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             try self.init(
                 schemaVersion: container.decode(Int.self, forKey: .schemaVersion),
                 sectionContentSchemaVersion: container.decodeIfPresent(Int.self, forKey: .sectionContentSchemaVersion),
+                chapterStructureSchemaVersion: container.decodeIfPresent(Int.self, forKey: .chapterStructureSchemaVersion),
                 nextCodeID: container.decodeIfPresent(Int64.self, forKey: .nextCodeID),
                 nextCodeSectionID: container.decodeIfPresent(Int64.self, forKey: .nextCodeSectionID),
                 nextChapterID: container.decode(Int64.self, forKey: .nextChapterID),
@@ -98,6 +103,31 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let codeSectionID: Int64?
         let chapterNumber: String
         let title: String
+        let groups: [SectionGroup]
+
+        private enum CodingKeys: String, CodingKey {
+            case id
+            case codeID
+            case codeSectionID
+            case chapterNumber
+            case title
+            case groups
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(Int64.self, forKey: .id)
+            codeID = try container.decodeIfPresent(Int64.self, forKey: .codeID)
+            codeSectionID = try container.decodeIfPresent(Int64.self, forKey: .codeSectionID)
+            chapterNumber = try container.decode(String.self, forKey: .chapterNumber)
+            title = try container.decode(String.self, forKey: .title)
+            groups = try container.decodeIfPresent([SectionGroup].self, forKey: .groups) ?? []
+        }
+    }
+
+    private struct PreparedChapterStructure: Decodable {
+        let schemaVersion: Int
+        let chapterID: Int64
         let groups: [SectionGroup]
     }
 
@@ -211,6 +241,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private var missingPreparedSectionIDs: Set<Int64> = []
     private let preparedContentLock = NSLock()
     private let bundleUsesExternalSectionText: Bool
+    private let bundleUsesExternalChapterStructure: Bool
+    private let preparedChaptersURL: URL
     private var shippedSearchIndex: [String: Set<Int64>]?
     private var shippedSearchIndexByCodeSectionID: [Int64: [String: Set<Int64>]] = [:]
     private var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
@@ -265,9 +297,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return true
         }
         bundleUsesExternalSectionText = (decodedProject.sectionContentSchemaVersion ?? 1) >= 2
+        bundleUsesExternalChapterStructure = (decodedProject.chapterStructureSchemaVersion ?? 1) >= 2
         self.project = Project(
             schemaVersion: decodedProject.schemaVersion,
             sectionContentSchemaVersion: decodedProject.sectionContentSchemaVersion,
+            chapterStructureSchemaVersion: decodedProject.chapterStructureSchemaVersion,
             nextCodeID: decodedProject.nextCodeID,
             nextCodeSectionID: decodedProject.nextCodeSectionID,
             nextChapterID: decodedProject.nextChapterID,
@@ -297,6 +331,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .deletingLastPathComponent()
             .appendingPathComponent("prepared", isDirectory: true)
             .appendingPathComponent("sections", isDirectory: true)
+        let preparedChaptersURL = jsonURL
+            .deletingLastPathComponent()
+            .appendingPathComponent("prepared", isDirectory: true)
+            .appendingPathComponent("chapters", isDirectory: true)
 
         for codeSection in visibleCodeSections.sorted(by: { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) == .orderedAscending }) {
             codeSections.append(
@@ -319,7 +357,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             chapterNumberIndex[chapter.chapterNumber.uppercased()] = chapterModel
 
             var chapterSectionList: [Section] = []
-            let groups = chapter.groups.map { group in
+            let chapterGroups = bundleUsesExternalChapterStructure
+                ? Self.preparedChapterGroups(chapterID: chapter.id, preparedChaptersURL: preparedChaptersURL)
+                : chapter.groups
+            let groups = chapterGroups.map { group in
                 let summaries = group.sections.map { section in
                         chapterSectionList.append(section)
                         let summary = CodeSectionSummary(
@@ -375,6 +416,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         self.tableBlocksByID = tableBlocksByID
         self.authoredHTMLChaptersURL = authoredHTMLChaptersURL
         self.preparedSectionsURL = preparedSectionsURL
+        self.preparedChaptersURL = preparedChaptersURL
     }
 
     func chapters() -> [CodeChapter] {
@@ -433,6 +475,16 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 return tableBlocksByID[tableID]
             }
         )
+    }
+
+    private static func preparedChapterGroups(chapterID: Int64, preparedChaptersURL: URL) -> [SectionGroup] {
+        let url = preparedChaptersURL.appendingPathComponent("\(chapterID).json", isDirectory: false)
+        guard let data = try? Data(contentsOf: url),
+              let prepared = try? JSONDecoder().decode(PreparedChapterStructure.self, from: data),
+              prepared.chapterID == chapterID else {
+            return []
+        }
+        return prepared.groups
     }
 
     private func preparedSectionData(sectionID: Int64) -> PreparedSectionData? {

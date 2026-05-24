@@ -28,6 +28,9 @@ let bundleURL = bundleRoot.appendingPathComponent("bundle.json")
 let preparedSectionsURL = bundleRoot
     .appendingPathComponent("prepared", isDirectory: true)
     .appendingPathComponent("sections", isDirectory: true)
+let preparedChaptersURL = bundleRoot
+    .appendingPathComponent("prepared", isDirectory: true)
+    .appendingPathComponent("chapters", isDirectory: true)
 let searchIndexURL = bundleRoot
     .appendingPathComponent("prepared", isDirectory: true)
     .appendingPathComponent("searchIndex.json", isDirectory: false)
@@ -83,10 +86,24 @@ guard var chapters = root["chapters"] as? [[String: Any]] else {
 }
 
 try FileManager.default.createDirectory(at: preparedSectionsURL, withIntermediateDirectories: true)
+try FileManager.default.createDirectory(at: preparedChaptersURL, withIntermediateDirectories: true)
+
+func officialTextForSection(sectionID: Int64, bundledText: String) -> String {
+    if !bundledText.isEmpty {
+        return bundledText
+    }
+    let preparedURL = preparedSectionsURL.appendingPathComponent("\(sectionID).json")
+    guard let data = try? Data(contentsOf: preparedURL),
+          let prepared = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+        return ""
+    }
+    return prepared["officialText"] as? String ?? ""
+}
 
 for chapterIndex in chapters.indices {
     guard var chapter = chapters[chapterIndex] as? [String: Any],
           let chapterNumber = chapter["chapterNumber"] as? String,
+          let chapterID = jsonInt64(chapter["id"]),
           var groups = chapter["groups"] as? [[String: Any]] else {
         continue
     }
@@ -105,7 +122,7 @@ for chapterIndex in chapters.indices {
 
             let sectionNumber = section["sectionNumber"] as? String ?? ""
             let title = section["title"] as? String ?? ""
-            let officialText = section["officialText"] as? String ?? ""
+            let officialText = officialTextForSection(sectionID: sectionID, bundledText: section["officialText"] as? String ?? "")
             let kind = section["kind"] as? String ?? "title"
             let richTextOverrideData = section["richTextOverrideData"]
             let contentBlocks = section["contentBlocks"] as? [[String: Any]] ?? []
@@ -156,12 +173,41 @@ for chapterIndex in chapters.indices {
         groups[groupIndex] = group
     }
 
-    chapter["groups"] = groups
-    chapters[chapterIndex] = chapter
+    var chapterStructure: [String: Any] = [
+        "schemaVersion": 1,
+        "chapterID": chapterID,
+        "chapterNumber": chapterNumber,
+        "groups": groups
+    ]
+    if let rawDraftText = chapter["rawDraftText"] {
+        chapterStructure["rawDraftText"] = rawDraftText
+    }
+    let chapterData = try JSONSerialization.data(
+        withJSONObject: chapterStructure,
+        options: [.prettyPrinted, .sortedKeys]
+    )
+    try chapterData.write(
+        to: preparedChaptersURL.appendingPathComponent("\(chapterID).json"),
+        options: .atomic
+    )
+
+    var chapterStub: [String: Any] = [
+        "id": chapterID,
+        "chapterNumber": chapterNumber,
+        "title": chapter["title"] as? String ?? ""
+    ]
+    if let codeID = chapter["codeID"] {
+        chapterStub["codeID"] = codeID
+    }
+    if let codeSectionID = chapter["codeSectionID"] {
+        chapterStub["codeSectionID"] = codeSectionID
+    }
+    chapters[chapterIndex] = chapterStub
 }
 
 root["chapters"] = chapters
 root["sectionContentSchemaVersion"] = 2
+root["chapterStructureSchemaVersion"] = 2
 
 let slimData = try JSONSerialization.data(withJSONObject: root, options: [.prettyPrinted, .sortedKeys])
 try slimData.write(to: bundleURL, options: .atomic)
