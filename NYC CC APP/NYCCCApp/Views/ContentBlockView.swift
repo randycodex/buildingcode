@@ -1,3 +1,4 @@
+import os.signpost
 import SwiftUI
 import WebKit
 
@@ -91,9 +92,11 @@ struct ContentBlockListView: View {
         }
 
         if let manifestURL = PublishedHTMLContentStore.resolvedImageURL(imageID: imageID, readAccessURL: readAccessURL) {
+            os_signpost(.event, log: AppSignpost.reader, name: "imageResolve", "%{public}s", "manifest")
             return manifestURL
         }
 
+        os_signpost(.event, log: AppSignpost.reader, name: "imageResolve", "%{public}s", "probe")
         return ContentBlockImageURLCache.shared.resolvedURL(
             imageID: imageID,
             readAccessURL: readAccessURL,
