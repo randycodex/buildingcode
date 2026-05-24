@@ -67,6 +67,9 @@ struct CompareWorkspaceView: View {
                 }
             }
         }
+        .overlay(alignment: .top) {
+            CodeTopContentFade(alwaysVisible: true)
+        }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Compare")
         .navigationBarTitleDisplayMode(.inline)

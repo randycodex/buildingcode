@@ -696,16 +696,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let paragraphSpacing = max(theme.paragraphSpacing / 20, 0.42)
             let fontFamily: String
             switch theme.fontChoice {
+            case .sanFrancisco, .sfCompact:
+                fontFamily = #"-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif"#
             case .sfPro:
                 fontFamily = #""SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif"#
-            case .sfCompact:
-                fontFamily = #""SF Compact Text", "SF Compact Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif"#
             case .sfMono:
                 fontFamily = #""SF Mono", ui-monospace, Menlo, Monaco, monospace"#
             case .newYork:
                 fontFamily = #""New York", "NewYork", ui-serif, Georgia, "Times New Roman", serif"#
-            case .sanFrancisco:
-                fontFamily = #""SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif"#
             case .serif:
                 fontFamily = #"ui-serif, Georgia, "Times New Roman", serif"#
             case .rounded:

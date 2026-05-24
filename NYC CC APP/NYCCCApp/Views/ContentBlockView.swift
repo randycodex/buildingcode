@@ -512,10 +512,6 @@ private struct TableHTMLView: View {
     }
 }
 
-private enum TableWebKitConfig {
-    static let sharedProcessPool = WKProcessPool()
-}
-
 private struct TableWebView: UIViewRepresentable {
     let html: String
     let tableID: String
@@ -523,7 +519,6 @@ private struct TableWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
-        configuration.processPool = TableWebKitConfig.sharedProcessPool
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.scrollView.isScrollEnabled = false

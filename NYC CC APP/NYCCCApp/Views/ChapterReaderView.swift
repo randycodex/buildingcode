@@ -90,7 +90,7 @@ struct ChapterReaderView: View {
             dismissTextSelection()
         }
         .overlay(alignment: .top) {
-            CodeTopContentFade()
+            CodeTopContentFade(alwaysVisible: true)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar(proxy: proxy)

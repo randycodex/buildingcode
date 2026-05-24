@@ -89,6 +89,7 @@ struct SearchView: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, 16)
                 .padding(.top, 18)
                 .padding(.bottom, tabBarClearance)

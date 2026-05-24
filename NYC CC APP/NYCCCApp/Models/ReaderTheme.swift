@@ -22,7 +22,7 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     case monospaced
 
     static var allCases: [ReaderFontChoice] {
-        [.sfPro, .sfCompact, .sfMono, .newYork]
+        [.sanFrancisco, .sfPro, .sfMono, .newYork]
     }
 
     var id: String { rawValue }
@@ -32,7 +32,7 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
         case .sfPro:
             return "SF Pro"
         case .sfCompact:
-            return "SF Compact"
+            return "San Francisco"
         case .sfMono:
             return "SF Mono"
         case .newYork:
@@ -50,9 +50,11 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
 
     var normalizedChoice: ReaderFontChoice {
         switch self {
-        case .sfPro, .sfCompact, .sfMono, .newYork:
+        case .sanFrancisco, .sfPro, .sfMono, .newYork:
             return self
-        case .sanFrancisco, .rounded:
+        case .sfCompact:
+            return .sanFrancisco
+        case .rounded:
             return .sfPro
         case .serif:
             return .newYork
@@ -227,11 +229,9 @@ private extension ReaderFontChoice {
             #else
             return .systemFont(ofSize: size)
             #endif
-        case .sfCompact:
+        case .sanFrancisco, .sfCompact:
             #if canImport(UIKit)
-            return UIFont(name: "SFCompactText-Regular", size: size)
-                ?? UIFont(name: ".SFCompactText-Regular", size: size)
-                ?? .systemFont(ofSize: size)
+            return .systemFont(ofSize: size)
             #else
             return .systemFont(ofSize: size)
             #endif
@@ -249,12 +249,6 @@ private extension ReaderFontChoice {
                 ?? UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body), size: size)
             #else
             return NSFont(name: "New York", size: size) ?? .systemFont(ofSize: size)
-            #endif
-        case .sanFrancisco:
-            #if canImport(UIKit)
-            return UIFont(name: "SFProText-Regular", size: size) ?? .systemFont(ofSize: size)
-            #else
-            return .systemFont(ofSize: size)
             #endif
         case .serif:
             #if canImport(UIKit)
@@ -283,11 +277,9 @@ private extension ReaderFontChoice {
             #else
             return .boldSystemFont(ofSize: size)
             #endif
-        case .sfCompact:
+        case .sanFrancisco, .sfCompact:
             #if canImport(UIKit)
-            return UIFont(name: "SFCompactText-Semibold", size: size)
-                ?? UIFont(name: ".SFCompactText-Semibold", size: size)
-                ?? .systemFont(ofSize: size, weight: .semibold)
+            return .systemFont(ofSize: size, weight: .semibold)
             #else
             return .boldSystemFont(ofSize: size)
             #endif
@@ -305,12 +297,6 @@ private extension ReaderFontChoice {
                 ?? UIFont(descriptor: UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline).withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .headline), size: size)
             #else
             return NSFont(name: "New York Bold", size: size) ?? .boldSystemFont(ofSize: size)
-            #endif
-        case .sanFrancisco:
-            #if canImport(UIKit)
-            return UIFont(name: "SFProText-Semibold", size: size) ?? .systemFont(ofSize: size, weight: .semibold)
-            #else
-            return .boldSystemFont(ofSize: size)
             #endif
         case .serif:
             #if canImport(UIKit)

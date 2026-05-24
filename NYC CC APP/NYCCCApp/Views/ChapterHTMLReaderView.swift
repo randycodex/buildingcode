@@ -258,6 +258,9 @@ struct ChapterHTMLReaderView: View {
                 openedSection = sectionSummary(for: target)
             }
         )
+        .overlay(alignment: .top) {
+            CodeTopContentFade(alwaysVisible: true)
+        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar
                 .background(pageBackgroundColor)

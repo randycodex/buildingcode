@@ -43,7 +43,10 @@ struct NYCCCApp: App {
                         .tag(AppTab.browse)
 
                     if library.comparisonModeEnabled {
-                        BrowseView(browserContext: .secondary)
+                        DeferredBrowseTabView(
+                            browserContext: .secondary,
+                            isActive: selectedTab == .browseSecondary
+                        )
                             .tabItem {
                                 Image(systemName: "text.line.last.and.arrowtriangle.forward")
                                 Text("")
@@ -104,6 +107,7 @@ struct NYCCCApp: App {
                         break
                     }
                 }
+                .id(library.comparisonModeEnabled)
 
                 if !library.isInitialContentLoaded {
                     loadingOverlay
@@ -144,6 +148,34 @@ struct NYCCCApp: App {
         case search
         case bookmarks
         case settings
+    }
+}
+
+private struct DeferredBrowseTabView: View {
+    let browserContext: BrowserContextID
+    let isActive: Bool
+
+    @State private var hasActivated = false
+
+    var body: some View {
+        Group {
+            if hasActivated || isActive {
+                BrowseView(browserContext: browserContext)
+            } else {
+                Color.clear
+                    .accessibilityHidden(true)
+            }
+        }
+        .onAppear {
+            if isActive {
+                hasActivated = true
+            }
+        }
+        .onChange(of: isActive) { _, newValue in
+            if newValue {
+                hasActivated = true
+            }
+        }
     }
 }
 

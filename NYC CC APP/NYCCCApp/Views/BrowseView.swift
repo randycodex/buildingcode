@@ -147,6 +147,9 @@ struct BrowseView: View {
         }
         .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
+        .overlay(alignment: .top) {
+            CodeTopContentFade(title: selectedCodeSectionName, progress: collapseProgress)
+        }
         .background(
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
                 .ignoresSafeArea()
@@ -159,8 +162,8 @@ struct BrowseView: View {
                 CodeEyebrow(text: browserContext.displayName, accent: accentColor)
             }
 
-            Menu {
-                if library.comparisonModeEnabled {
+            if library.comparisonModeEnabled {
+                Menu {
                     ForEach(BrowserContextID.allCases) { context in
                         Button {
                             library.requestBrowserTabSwitch(to: context)
@@ -170,41 +173,30 @@ struct BrowseView: View {
                     }
 
                     Divider()
-                }
 
-                Button {
-                    updateCodeSection(nil)
-                } label: {
-                    codeSectionPickerLabel("All Sections", isSelected: browseCodeSectionID == nil)
-                }
-
-                ForEach(library.codeSections) { codeSection in
                     Button {
-                        updateCodeSection(codeSection.id)
+                        updateCodeSection(nil)
                     } label: {
-                        codeSectionPickerLabel(
-                            CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                            isSelected: browseCodeSectionID == codeSection.id
-                        )
+                        codeSectionPickerLabel("All Sections", isSelected: browseCodeSectionID == nil)
                     }
-                }
-            } label: {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(selectedCodeSectionName)
-                        .font(.system(size: 32, weight: .bold, design: .default))
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
 
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(Color(uiColor: library.accentColor(for: browseCodeSectionID)))
+                    ForEach(library.codeSections) { codeSection in
+                        Button {
+                            updateCodeSection(codeSection.id)
+                        } label: {
+                            codeSectionPickerLabel(
+                                CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
+                                isSelected: browseCodeSectionID == codeSection.id
+                            )
+                        }
+                    }
+                } label: {
+                    headerTitle(showPicker: true)
                 }
-                .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
-                .opacity(1 - (collapseProgress * 0.22))
+                .buttonStyle(.plain)
+            } else {
+                headerTitle(showPicker: false)
             }
-            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(selectedVersionName)
@@ -222,6 +214,26 @@ struct BrowseView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
+    }
+
+    private func headerTitle(showPicker: Bool) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text(selectedCodeSectionName)
+                .font(.system(size: 32, weight: .bold, design: .default))
+                .foregroundStyle(.primary)
+                .multilineTextAlignment(.leading)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if showPicker {
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(Color(uiColor: library.accentColor(for: browseCodeSectionID)))
+                    .padding(.top, 9)
+            }
+        }
+        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+        .opacity(1 - (collapseProgress * 0.22))
     }
 
     private func codeSectionPickerLabel(_ title: String, isSelected: Bool) -> some View {
@@ -940,38 +952,49 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
 struct CodeTopContentFade: View {
     let title: String?
     let progress: CGFloat
+    let alwaysVisible: Bool
+    @Environment(\.colorScheme) private var colorScheme
 
-    init(title: String? = nil, progress: CGFloat = 0) {
+    init(title: String? = nil, progress: CGFloat = 0, alwaysVisible: Bool = true) {
         self.title = title
         self.progress = progress
+        self.alwaysVisible = alwaysVisible
     }
 
     var body: some View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
-            let collapsedOpacity = min(max((progress - 0.08) / 0.22, 0), 1)
+            let collapsedOpacity = alwaysVisible
+                ? 1
+                : min(max((progress - 0.08) / 0.22, 0), 1)
 
             VStack(spacing: 0) {
-                ZStack(alignment: .bottomLeading) {
+                ZStack {
                     Rectangle()
                         .fill(.ultraThinMaterial)
 
-                    if let title, !title.isEmpty {
-                        Text(title)
-                            .font(.headline.weight(.semibold))
-                            .foregroundStyle(.primary)
-                            .lineLimit(1)
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 10)
-                    }
+                    Rectangle()
+                        .fill(colorScheme == .dark ? Color.black.opacity(0.86) : Color.clear)
                 }
-                .frame(height: topInset + 50)
+                    .mask(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .black, location: 0),
+                                .init(color: .black.opacity(0.82), location: 0.48),
+                                .init(color: .black.opacity(0), location: 1)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(height: topInset)
 
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .top)
             .opacity(collapsedOpacity)
             .allowsHitTesting(false)
+            .ignoresSafeArea(.container, edges: .top)
         }
     }
 }
