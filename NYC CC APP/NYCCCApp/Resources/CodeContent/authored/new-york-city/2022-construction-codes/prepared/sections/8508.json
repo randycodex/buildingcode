@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198704\"><\/AnnotationDrawer><div>Gas vents shall be permanently identified by a label attached to the wall or ceiling at a point where the vent connector enters the gas vent. The label shall read:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198705\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198705\"><\/AnnotationDrawer><div>\"This gas vent is for appliances that burn gas. Do not connect to solid or liquid fuel- burning appliances or incinerators.\" <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8508-html-1",
+      "kind" : "html",
+      "plainText" : "Gas vents shall be permanently identified by a label attached to the wall or ceiling at a point where the vent connector enters the gas vent. The label shall read:\n\n \"This gas vent is for appliances that burn gas. Do not connect to solid or liquid fuel- burning appliances or incinerators.\""
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Gas vents shall be permanently identified by a label attached to the wall or ceiling at a point where the vent connector enters the gas vent. The label shall read:\n\n\"This gas vent is for appliances that burn gas. Do not connect to solid or liquid fuel- burning appliances or incinerators.\"",
+  "previewText" : "Gas vents shall be permanently identified by a label attached to the wall or ceiling at a point where the vent connector enters the gas vent.",
+  "schemaVersion" : 2,
+  "sectionID" : 8508
+}

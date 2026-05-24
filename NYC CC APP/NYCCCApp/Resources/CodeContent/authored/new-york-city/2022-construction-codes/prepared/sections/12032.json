@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161752\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161752\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The water supplied to specialty plumbing fixtures, such as pedicure chairs having an integral foot bathtub, footbaths, and head shampoo sinks, shall be limited to a maximum temperature of 120&#176;F (49&#176;C) by a water temperature limiting device that conforms to ASSE 1070 or CSA B125.3.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161753\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161753\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161753\"><\/AnnotationDrawer><h6><a name=\"JD_PC424\" id=\"JD_PC424\" title=\"PC 424\"><\/a>Section PC 424: Faucets and Other Fixture Fittings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12032-html-1",
+      "kind" : "html",
+      "plainText" : "The water supplied to specialty plumbing fixtures, such as pedicure chairs having an integral foot bathtub, footbaths, and head shampoo sinks, shall be limited to a maximum temperature of 120°F (49°C) by a water temperature limiting device that conforms to ASSE 1070 or CSA B125.3. \n\n Section PC 424: Faucets and Other Fixture Fittings"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The water supplied to specialty plumbing fixtures, such as pedicure chairs having an integral foot bathtub, footbaths, and head shampoo sinks, shall be limited to a maximum temperature of 120°F (49°C) by a water temperature limiting device that conforms to ASSE 1070 or CSA B125.3.\n\nSection PC 424: Faucets and Other Fixture Fittings",
+  "previewText" : "The water supplied to specialty plumbing fixtures, such as pedicure chairs having an integral foot bathtub, footbaths, and head shampoo sinks, shall be limited to a maximum temperature of 120°F (49°C) by a water temperature limiting device that conforms to ASSE 1070 or CSA B125.",
+  "schemaVersion" : 2,
+  "sectionID" : 12032
+}

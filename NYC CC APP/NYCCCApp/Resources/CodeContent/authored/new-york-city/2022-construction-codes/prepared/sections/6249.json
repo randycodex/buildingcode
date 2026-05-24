@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185977\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185977\"><\/AnnotationDrawer><div>Structural steel, reinforced concrete, and heavy timber buildings, or portions thereof, shall be demolished column length-by-column length and tier-by-tier. Structural members shall be chained or lashed in place to prevent any uncontrolled swing or drop.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185978\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185978\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where the design applicant who prepared the submittal documents required by Section 3306.5 has demonstrated the adequacy of alternate means of demolition through plans, calculations, or the establishment of safety zones, as appropriate, the commissioner may accept such alternative means of demolition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6249-html-1",
+      "kind" : "html",
+      "plainText" : "Structural steel, reinforced concrete, and heavy timber buildings, or portions thereof, shall be demolished column length-by-column length and tier-by-tier. Structural members shall be chained or lashed in place to prevent any uncontrolled swing or drop.\n\n Exception: Where the design applicant who prepared the submittal documents required by Section 3306.5 has demonstrated the adequacy of alternate means of demolition through plans, calculations, or the establishment of safety zones, as appropriate, the commissioner may accept such alternative means of demolition."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Structural steel, reinforced concrete, and heavy timber buildings, or portions thereof, shall be demolished column length-by-column length and tier-by-tier. Structural members shall be chained or lashed in place to prevent any uncontrolled swing or drop.\n\nException: Where the design applicant who prepared the submittal documents required by Section 3306.5 has demonstrated the adequacy of alternate means of demolition through plans, calculations, or the establishment of safety zones, as appropriate, the commissioner may accept such alternative means of demolition.",
+  "previewText" : "Structural steel, reinforced concrete, and heavy timber buildings, or portions thereof, shall be demolished column length-by-column length and tier-by-tier.",
+  "schemaVersion" : 2,
+  "sectionID" : 6249
+}

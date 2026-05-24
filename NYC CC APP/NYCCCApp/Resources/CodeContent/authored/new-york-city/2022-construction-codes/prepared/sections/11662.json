@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196709\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196709\"><\/AnnotationDrawer><div>A relief valve shall be installed on the discharge line of fuel-oil-heating appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11662-html-1",
+      "kind" : "html",
+      "plainText" : "A relief valve shall be installed on the discharge line of fuel-oil-heating appliances."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "A relief valve shall be installed on the discharge line of fuel-oil-heating appliances.",
+  "previewText" : "A relief valve shall be installed on the discharge line of fuel-oil-heating appliances.",
+  "schemaVersion" : 2,
+  "sectionID" : 11662
+}

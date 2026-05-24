@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162002\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162002\"><\/AnnotationDrawer><div>Where street water main pressures fluctuate, the building water distribution system shall be designed for the minimum pressure available.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12125-html-1",
+      "kind" : "html",
+      "plainText" : "Where street water main pressures fluctuate, the building water distribution system shall be designed for the minimum pressure available."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Where street water main pressures fluctuate, the building water distribution system shall be designed for the minimum pressure available.",
+  "previewText" : "Where street water main pressures fluctuate, the building water distribution system shall be designed for the minimum pressure available.",
+  "schemaVersion" : 2,
+  "sectionID" : 12125
+}

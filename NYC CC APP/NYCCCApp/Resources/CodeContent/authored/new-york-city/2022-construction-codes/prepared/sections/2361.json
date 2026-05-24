@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173787\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173787\"><\/AnnotationDrawer><div>A curb, rail, wall or barrier serving as edge protection shall be provided as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173788\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173788\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Solid barriers.<\/span> Solid barriers shall extend at least 4 inches (101.6 mm) from the floor or ground surface.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173789\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173789\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Other types of barriers.<\/span> Other types of barriers shall prevent the passage of a 4-inch (101.6 mm) diameter sphere, where any portion of the sphere is within 4 inches (101.6 mm) of the floor or ground surface.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-173790\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-173790\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-173790\"><\/AnnotationDrawer><h6><a name=\"JD_BC1013\" id=\"JD_BC1013\" title=\"BC 1013\"><\/a>Section BC 1013: Exit Signs<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2361-html-1",
+      "kind" : "html",
+      "plainText" : "A curb, rail, wall or barrier serving as edge protection shall be provided as follows:\n\n 1. Solid barriers. Solid barriers shall extend at least 4 inches (101.6 mm) from the floor or ground surface.\n\n 2. Other types of barriers. Other types of barriers shall prevent the passage of a 4-inch (101.6 mm) diameter sphere, where any portion of the sphere is within 4 inches (101.6 mm) of the floor or ground surface.\n\n Section BC 1013: Exit Signs"
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "A curb, rail, wall or barrier serving as edge protection shall be provided as follows:\n\n1. Solid barriers. Solid barriers shall extend at least 4 inches (101.6 mm) from the floor or ground surface.\n\n2. Other types of barriers. Other types of barriers shall prevent the passage of a 4-inch (101.6 mm) diameter sphere, where any portion of the sphere is within 4 inches (101.6 mm) of the floor or ground surface.",
+  "previewText" : "A curb, rail, wall or barrier serving as edge protection shall be provided as follows:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 2361
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172368\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172368\"><\/AnnotationDrawer><div>Ducts that are part of a smoke control system shall be traversed using generally accepted practices to determine actual air quantities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1946-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts that are part of a smoke control system shall be traversed using generally accepted practices to determine actual air quantities."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Ducts that are part of a smoke control system shall be traversed using generally accepted practices to determine actual air quantities.",
+  "previewText" : "Ducts that are part of a smoke control system shall be traversed using generally accepted practices to determine actual air quantities.",
+  "schemaVersion" : 2,
+  "sectionID" : 1946
+}

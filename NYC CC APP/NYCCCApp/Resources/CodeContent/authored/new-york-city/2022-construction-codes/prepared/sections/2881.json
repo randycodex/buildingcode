@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175502\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175502\"><\/AnnotationDrawer><div>Food service lines shall be accessible. Where self-service shelves are provided, at least 50 percent, but not less than one, of each type provided shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2881-html-1",
+      "kind" : "html",
+      "plainText" : "Food service lines shall be accessible. Where self-service shelves are provided, at least 50 percent, but not less than one, of each type provided shall be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Food service lines shall be accessible. Where self-service shelves are provided, at least 50 percent, but not less than one, of each type provided shall be accessible.",
+  "previewText" : "Food service lines shall be accessible.",
+  "schemaVersion" : 2,
+  "sectionID" : 2881
+}

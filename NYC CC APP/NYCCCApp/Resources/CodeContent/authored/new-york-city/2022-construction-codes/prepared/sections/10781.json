@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194301\"><\/AnnotationDrawer><div>Round metallic ducts shall be mechanically fastened by means of not less than three sheet metal screws or rivets spaced equally around the joint.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194302\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194302\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where a duct connection is made that is partially inaccessible, three screws or rivets shall be equally spaced on the exposed portion so as to prevent a hinge effect.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10781-html-1",
+      "kind" : "html",
+      "plainText" : "Round metallic ducts shall be mechanically fastened by means of not less than three sheet metal screws or rivets spaced equally around the joint.\n\n Exception: Where a duct connection is made that is partially inaccessible, three screws or rivets shall be equally spaced on the exposed portion so as to prevent a hinge effect."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Round metallic ducts shall be mechanically fastened by means of not less than three sheet metal screws or rivets spaced equally around the joint.\n\nException: Where a duct connection is made that is partially inaccessible, three screws or rivets shall be equally spaced on the exposed portion so as to prevent a hinge effect.",
+  "previewText" : "Round metallic ducts shall be mechanically fastened by means of not less than three sheet metal screws or rivets spaced equally around the joint.",
+  "schemaVersion" : 2,
+  "sectionID" : 10781
+}

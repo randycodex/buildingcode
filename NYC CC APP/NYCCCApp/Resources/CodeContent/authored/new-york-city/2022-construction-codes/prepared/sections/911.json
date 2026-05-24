@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168670\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168670\"><\/AnnotationDrawer><div>Accessory occupancies shall be individually classified in accordance with Section 302.1. The requirements of this code shall apply to each portion of the building based on the occupancy classification of that space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "911-html-1",
+      "kind" : "html",
+      "plainText" : "Accessory occupancies shall be individually classified in accordance with Section 302.1. The requirements of this code shall apply to each portion of the building based on the occupancy classification of that space."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Accessory occupancies shall be individually classified in accordance with Section 302.1. The requirements of this code shall apply to each portion of the building based on the occupancy classification of that space.",
+  "previewText" : "Accessory occupancies shall be individually classified in accordance with Section 302.",
+  "schemaVersion" : 2,
+  "sectionID" : 911
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195574\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195574\"><\/AnnotationDrawer><div>This chapter shall govern the design, installation, construction, alteration and repair of refrigeration systems that vaporize and liquefy a fluid during the refrigerating cycle. Refrigerant piping design and installation, including pressure vessels and pressure relief devices, shall conform to this code. Permanently installed refrigerant storage systems and other components shall be considered as part of the refrigeration system to which they are attached. This chapter shall also govern the change of refrigerants in existing refrigerating systems having a different safety group classification.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11220-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern the design, installation, construction, alteration and repair of refrigeration systems that vaporize and liquefy a fluid during the refrigerating cycle. Refrigerant piping design and installation, including pressure vessels and pressure relief devices, shall conform to this code. Permanently installed refrigerant storage systems and other components shall be considered as part of the refrigeration system to which they are attached. This chapter shall also govern the change of refrigerants in existing refrigerating systems having a different safety group classification."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "This chapter shall govern the design, installation, construction, alteration and repair of refrigeration systems that vaporize and liquefy a fluid during the refrigerating cycle. Refrigerant piping design and installation, including pressure vessels and pressure relief devices, shall conform to this code. Permanently installed refrigerant storage systems and other components shall be considered as part of the refrigeration system to which they are attached. This chapter shall also govern the change of refrigerants in existing refrigerating systems having a different safety group classification.",
+  "previewText" : "This chapter shall govern the design, installation, construction, alteration and repair of refrigeration systems that vaporize and liquefy a fluid during the refrigerating cycle.",
+  "schemaVersion" : 2,
+  "sectionID" : 11220
+}

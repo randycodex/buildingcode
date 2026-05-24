@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162598\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162598\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Solder joints shall be made in accordance with the methods of ASTM B 828. Cut tube ends shall be reamed to the full inside diameter of the tube end. All joint surfaces shall be cleaned. A flux conforming to ASTM B 813 shall be applied. The joint shall be soldered with a solder conforming to ASTM B 32.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12365-html-1",
+      "kind" : "html",
+      "plainText" : "Solder joints shall be made in accordance with the methods of ASTM B 828. Cut tube ends shall be reamed to the full inside diameter of the tube end. All joint surfaces shall be cleaned. A flux conforming to ASTM B 813 shall be applied. The joint shall be soldered with a solder conforming to ASTM B 32."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Solder joints shall be made in accordance with the methods of ASTM B 828. Cut tube ends shall be reamed to the full inside diameter of the tube end. All joint surfaces shall be cleaned. A flux conforming to ASTM B 813 shall be applied. The joint shall be soldered with a solder conforming to ASTM B 32.",
+  "previewText" : "Solder joints shall be made in accordance with the methods of ASTM B 828.",
+  "schemaVersion" : 2,
+  "sectionID" : 12365
+}

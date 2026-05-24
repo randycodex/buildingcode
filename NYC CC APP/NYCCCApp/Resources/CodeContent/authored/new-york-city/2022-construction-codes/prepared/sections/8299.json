@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198127\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198127\"><\/AnnotationDrawer><div>During the process of turning gas on into a system of new gas piping, the entire system shall be inspected to determine that there are no open fittings or ends and that all valves at unused outlets are closed and plugged or capped.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8299-html-1",
+      "kind" : "html",
+      "plainText" : "During the process of turning gas on into a system of new gas piping, the entire system shall be inspected to determine that there are no open fittings or ends and that all valves at unused outlets are closed and plugged or capped."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "During the process of turning gas on into a system of new gas piping, the entire system shall be inspected to determine that there are no open fittings or ends and that all valves at unused outlets are closed and plugged or capped.",
+  "previewText" : "During the process of turning gas on into a system of new gas piping, the entire system shall be inspected to determine that there are no open fittings or ends and that all valves at unused outlets are closed and plugged or capped.",
+  "schemaVersion" : 2,
+  "sectionID" : 8299
+}

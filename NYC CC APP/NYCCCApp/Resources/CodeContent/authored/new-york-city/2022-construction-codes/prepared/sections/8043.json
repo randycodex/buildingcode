@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197378\"><\/AnnotationDrawer><div>The building shall not be weakened by the installation of any gas piping. In the process of installing or repairing any gas piping, finished floors, walls, ceilings, tile work or any other part of the building or premises which is required to be changed or replaced shall be left in a safe structural condition in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8043-html-1",
+      "kind" : "html",
+      "plainText" : "The building shall not be weakened by the installation of any gas piping. In the process of installing or repairing any gas piping, finished floors, walls, ceilings, tile work or any other part of the building or premises which is required to be changed or replaced shall be left in a safe structural condition in accordance with the requirements of the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "The building shall not be weakened by the installation of any gas piping. In the process of installing or repairing any gas piping, finished floors, walls, ceilings, tile work or any other part of the building or premises which is required to be changed or replaced shall be left in a safe structural condition in accordance with the requirements of the New York City Building Code.",
+  "previewText" : "The building shall not be weakened by the installation of any gas piping.",
+  "schemaVersion" : 2,
+  "sectionID" : 8043
+}

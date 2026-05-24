@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161716\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161716\"><\/AnnotationDrawer><div>Doors within a whirlpool enclosure shall conform to ASME A112.19.15.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161717\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161717\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161717\"><\/AnnotationDrawer><h6><a name=\"JD_PC422\" id=\"JD_PC422\" title=\"PC 422\"><\/a>Section PC 422: Health Care Fixtures and Equipment<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12015-html-1",
+      "kind" : "html",
+      "plainText" : "Doors within a whirlpool enclosure shall conform to ASME A112.19.15.\n\n Section PC 422: Health Care Fixtures and Equipment"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Doors within a whirlpool enclosure shall conform to ASME A112.19.15.\n\nSection PC 422: Health Care Fixtures and Equipment",
+  "previewText" : "Doors within a whirlpool enclosure shall conform to ASME A112.",
+  "schemaVersion" : 2,
+  "sectionID" : 12015
+}

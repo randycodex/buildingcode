@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169781\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169781\"><\/AnnotationDrawer><div>Fire-protection-rated glazing in excess of 100 square inches (0.065 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) is not permitted. Fire-resistance-rated glazing in excess of 100 square inches (64 516 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) shall be permitted in fire doors. Listed fire-resistance-rated glazing in a fire door shall have a maximum transmitted temperature rise in accordance with Section 716.5.5 of this code when the fire door is tested in accordance with NFPA 252, UL 10B or UL 10C.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1240-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-protection-rated glazing in excess of 100 square inches (0.065 m\n\n 2 \n\n ) is not permitted. Fire-resistance-rated glazing in excess of 100 square inches (64 516 mm\n\n 2 \n\n ) shall be permitted in fire doors. Listed fire-resistance-rated glazing in a fire door shall have a maximum transmitted temperature rise in accordance with Section 716.5.5 of this code when the fire door is tested in accordance with NFPA 252, UL 10B or UL 10C."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire-protection-rated glazing in excess of 100 square inches (0.065 m 2 ) is not permitted. Fire-resistance-rated glazing in excess of 100 square inches (64 516 mm 2 ) shall be permitted in fire doors. Listed fire-resistance-rated glazing in a fire door shall have a maximum transmitted temperature rise in accordance with Section 716.5.5 of this code when the fire door is tested in accordance with NFPA 252, UL 10B or UL 10C.",
+  "previewText" : "Fire-protection-rated glazing in excess of 100 square inches (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 1240
+}

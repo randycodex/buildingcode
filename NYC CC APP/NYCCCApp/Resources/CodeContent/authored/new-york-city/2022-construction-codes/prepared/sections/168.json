@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166318\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166318\"><\/AnnotationDrawer><div>This occupancy condition shall include buildings in which free movement is allowed from sleeping areas, and other spaces where access or occupancy is permitted, to the exterior via means of egress without restraint. A Condition 1 facility is permitted to be constructed as Group R.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "168-html-1",
+      "kind" : "html",
+      "plainText" : "This occupancy condition shall include buildings in which free movement is allowed from sleeping areas, and other spaces where access or occupancy is permitted, to the exterior via means of egress without restraint. A Condition 1 facility is permitted to be constructed as Group R."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "This occupancy condition shall include buildings in which free movement is allowed from sleeping areas, and other spaces where access or occupancy is permitted, to the exterior via means of egress without restraint. A Condition 1 facility is permitted to be constructed as Group R.",
+  "previewText" : "This occupancy condition shall include buildings in which free movement is allowed from sleeping areas, and other spaces where access or occupancy is permitted, to the exterior via means of egress without restraint.",
+  "schemaVersion" : 2,
+  "sectionID" : 168
+}

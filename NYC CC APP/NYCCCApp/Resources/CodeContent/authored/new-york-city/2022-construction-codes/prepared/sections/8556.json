@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198833\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198833\"><\/AnnotationDrawer><div>A vent connector shall be supported in accordance with the manufacturer's recommendations for the design and weight of the material employed to maintain clearances and prevent physical damage and separation of joints.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8556-html-1",
+      "kind" : "html",
+      "plainText" : "A vent connector shall be supported in accordance with the manufacturer's recommendations for the design and weight of the material employed to maintain clearances and prevent physical damage and separation of joints."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "A vent connector shall be supported in accordance with the manufacturer's recommendations for the design and weight of the material employed to maintain clearances and prevent physical damage and separation of joints.",
+  "previewText" : "A vent connector shall be supported in accordance with the manufacturer's recommendations for the design and weight of the material employed to maintain clearances and prevent physical damage and separation of joints.",
+  "schemaVersion" : 2,
+  "sectionID" : 8556
+}

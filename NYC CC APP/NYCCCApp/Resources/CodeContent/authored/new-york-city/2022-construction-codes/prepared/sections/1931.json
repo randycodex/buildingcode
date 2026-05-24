@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172315\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172315\"><\/AnnotationDrawer><div>Where completely automatic control is required or used, the automatic-control sequences shall be initiated from an appropriately zoned automatic sprinkler system complying with Section 903.3.1.1, manual controls that are readily accessible to the Fire Department and any smoke detectors required by engineering analysis. See Section 909.16 for manual control requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1931-html-1",
+      "kind" : "html",
+      "plainText" : "Where completely automatic control is required or used, the automatic-control sequences shall be initiated from an appropriately zoned automatic sprinkler system complying with Section 903.3.1.1, manual controls that are readily accessible to the Fire Department and any smoke detectors required by engineering analysis. See Section 909.16 for manual control requirements."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Where completely automatic control is required or used, the automatic-control sequences shall be initiated from an appropriately zoned automatic sprinkler system complying with Section 903.3.1.1, manual controls that are readily accessible to the Fire Department and any smoke detectors required by engineering analysis. See Section 909.16 for manual control requirements.",
+  "previewText" : "Where completely automatic control is required or used, the automatic-control sequences shall be initiated from an appropriately zoned automatic sprinkler system complying with Section 903.",
+  "schemaVersion" : 2,
+  "sectionID" : 1931
+}

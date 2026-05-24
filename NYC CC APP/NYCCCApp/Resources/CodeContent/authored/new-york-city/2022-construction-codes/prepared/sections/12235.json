@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162271\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162271\"><\/AnnotationDrawer><div>Water utilized for the cooling of equipment or other processes shall not be returned to the potable water system. Such water shall be discharged into a drainage system through an air gap or shall be utilized for nonpotable purposes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12235-html-1",
+      "kind" : "html",
+      "plainText" : "Water utilized for the cooling of equipment or other processes shall not be returned to the potable water system. Such water shall be discharged into a drainage system through an air gap or shall be utilized for nonpotable purposes."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Water utilized for the cooling of equipment or other processes shall not be returned to the potable water system. Such water shall be discharged into a drainage system through an air gap or shall be utilized for nonpotable purposes.",
+  "previewText" : "Water utilized for the cooling of equipment or other processes shall not be returned to the potable water system.",
+  "schemaVersion" : 2,
+  "sectionID" : 12235
+}

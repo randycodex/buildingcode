@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178019\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178019\"><\/AnnotationDrawer><div>It shall be verified that the structural design is in general conformance with the requirements of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3634-html-1",
+      "kind" : "html",
+      "plainText" : "It shall be verified that the structural design is in general conformance with the requirements of this code."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "It shall be verified that the structural design is in general conformance with the requirements of this code.",
+  "previewText" : "It shall be verified that the structural design is in general conformance with the requirements of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 3634
+}

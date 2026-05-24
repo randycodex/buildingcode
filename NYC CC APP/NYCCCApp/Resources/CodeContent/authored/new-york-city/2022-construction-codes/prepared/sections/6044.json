@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185415\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185415\"><\/AnnotationDrawer><div>Collected concrete washout water shall be transported off site for treatment and disposal or contained on site until completely evaporated. Any hardened concrete remaining after evaporation shall be disposed of, reused or recycled.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6044-html-1",
+      "kind" : "html",
+      "plainText" : "Collected concrete washout water shall be transported off site for treatment and disposal or contained on site until completely evaporated. Any hardened concrete remaining after evaporation shall be disposed of, reused or recycled."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Collected concrete washout water shall be transported off site for treatment and disposal or contained on site until completely evaporated. Any hardened concrete remaining after evaporation shall be disposed of, reused or recycled.",
+  "previewText" : "Collected concrete washout water shall be transported off site for treatment and disposal or contained on site until completely evaporated.",
+  "schemaVersion" : 2,
+  "sectionID" : 6044
+}

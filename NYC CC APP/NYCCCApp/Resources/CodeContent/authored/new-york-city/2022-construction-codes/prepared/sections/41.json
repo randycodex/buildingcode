@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164340\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164340\"><\/annotationdrawer><div>Construction documents shall comply with <link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-237170', hash: '#JD_T28C001' }}\">Chapter 1 of Title 28 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code,<\/span> this section and other applicable provisions of this code and its referenced standards.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "41-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents shall comply with Chapter 1 of Title 28 of the Administrative Code, this section and other applicable provisions of this code and its referenced standards."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Construction documents shall comply with Chapter 1 of Title 28 of the Administrative Code, this section and other applicable provisions of this code and its referenced standards.",
+  "previewText" : "Construction documents shall comply with Chapter 1 of Title 28 of the Administrative Code, this section and other applicable provisions of this code and its referenced standards.",
+  "schemaVersion" : 2,
+  "sectionID" : 41
+}

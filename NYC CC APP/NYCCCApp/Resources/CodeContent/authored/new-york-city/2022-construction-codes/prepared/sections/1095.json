@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169373\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169373\"><\/AnnotationDrawer><div>A 1-hour fire-resistance rating is required for smoke barriers.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169374\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Smoke barriers constructed of minimum 0.10-inch (2.5 mm) thick steel in Group I-3 buildings. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1095-html-1",
+      "kind" : "html",
+      "plainText" : "A 1-hour fire-resistance rating is required for smoke barriers.\n\n Exception: Smoke barriers constructed of minimum 0.10-inch (2.5 mm) thick steel in Group I-3 buildings."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "A 1-hour fire-resistance rating is required for smoke barriers.\n\nException: Smoke barriers constructed of minimum 0.10-inch (2.5 mm) thick steel in Group I-3 buildings.",
+  "previewText" : "A 1-hour fire-resistance rating is required for smoke barriers.",
+  "schemaVersion" : 2,
+  "sectionID" : 1095
+}

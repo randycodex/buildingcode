@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185536\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185536\"><\/AnnotationDrawer><div>Every site with an excavation shall be enclosed with a fence that meets the requirements of Section 3307.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6079-html-1",
+      "kind" : "html",
+      "plainText" : "Every site with an excavation shall be enclosed with a fence that meets the requirements of Section 3307.7."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Every site with an excavation shall be enclosed with a fence that meets the requirements of Section 3307.7.",
+  "previewText" : "Every site with an excavation shall be enclosed with a fence that meets the requirements of Section 3307.",
+  "schemaVersion" : 2,
+  "sectionID" : 6079
+}

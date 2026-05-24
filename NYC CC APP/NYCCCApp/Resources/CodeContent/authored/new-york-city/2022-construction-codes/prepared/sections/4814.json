@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181454\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181454\"><\/AnnotationDrawer><div>Where a response modification coefficient, R, in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177905', hash: '#JD_BCTable1613.5' }}\">Table 1613.5<\/Link> is used for the design of cold-formed steel light-frame construction assigned to Seismic Design Category B or C, the seismic force-resisting system shall be designed and detailed in accordance with the requirements of AISI S400.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181455\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181455\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The response modification coefficient, R, designated for \"Steel systems not specifically detailed for seismic resistance, excluding cantilever column systems\" in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177905', hash: '#JD_BCTable1613.5' }}\">Table 1613.5<\/Link> shall be permitted for systems designed and detailed in accordance with AISI S240 and need not be designed and detailed in accordance with AISI S400.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4814-html-1",
+      "kind" : "html",
+      "plainText" : "Where a response modification coefficient, R, in accordance with Table 1613.5 is used for the design of cold-formed steel light-frame construction assigned to Seismic Design Category B or C, the seismic force-resisting system shall be designed and detailed in accordance with the requirements of AISI S400.\n\n Exception: The response modification coefficient, R, designated for \"Steel systems not specifically detailed for seismic resistance, excluding cantilever column systems\" in Table 1613.5 shall be permitted for systems designed and detailed in accordance with AISI S240 and need not be designed and detailed in accordance with AISI S400."
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "Where a response modification coefficient, R, in accordance with Table 1613.5 is used for the design of cold-formed steel light-frame construction assigned to Seismic Design Category B or C, the seismic force-resisting system shall be designed and detailed in accordance with the requirements of AISI S400.\n\nException: The response modification coefficient, R, designated for \"Steel systems not specifically detailed for seismic resistance, excluding cantilever column systems\" in Table 1613.5 shall be permitted for systems designed and detailed in accordance with AISI S240 and need not be designed and detailed in accordance with AISI S400.",
+  "previewText" : "Where a response modification coefficient, R, in accordance with Table 1613.",
+  "schemaVersion" : 2,
+  "sectionID" : 4814
+}

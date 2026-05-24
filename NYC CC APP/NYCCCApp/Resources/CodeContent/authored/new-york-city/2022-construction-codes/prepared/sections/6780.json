@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187648\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187648\"><\/AnnotationDrawer><div>Material hoists and bucket hoists shall require a permit in accordance with Section 3316.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6780-html-1",
+      "kind" : "html",
+      "plainText" : "Material hoists and bucket hoists shall require a permit in accordance with Section 3316.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Material hoists and bucket hoists shall require a permit in accordance with Section 3316.4.",
+  "previewText" : "Material hoists and bucket hoists shall require a permit in accordance with Section 3316.",
+  "schemaVersion" : 2,
+  "sectionID" : 6780
+}

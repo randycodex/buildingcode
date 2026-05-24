@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166554\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166554\"><\/AnnotationDrawer><div>Interior wall and ceiling finishes within the mall of a covered mall building and within the exits of covered or open mall buildings shall have a minimum flame spread index and smoke-developed index of Class B in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170820', hash: '#JD_BCCh.8' }}\">Chapter 8<\/Link>. Interior floor finishes shall meet the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170943', hash: '#JD_BC804' }}\">804<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "208-html-1",
+      "kind" : "html",
+      "plainText" : "Interior wall and ceiling finishes within the mall of a covered mall building and within the exits of covered or open mall buildings shall have a minimum flame spread index and smoke-developed index of Class B in accordance with Chapter 8 . Interior floor finishes shall meet the requirements of Section 804 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Interior wall and ceiling finishes within the mall of a covered mall building and within the exits of covered or open mall buildings shall have a minimum flame spread index and smoke-developed index of Class B in accordance with Chapter 8. Interior floor finishes shall meet the requirements of Section 804.",
+  "previewText" : "Interior wall and ceiling finishes within the mall of a covered mall building and within the exits of covered or open mall buildings shall have a minimum flame spread index and smoke-developed index of Class B in accordance with Chapter 8.",
+  "schemaVersion" : 2,
+  "sectionID" : 208
+}

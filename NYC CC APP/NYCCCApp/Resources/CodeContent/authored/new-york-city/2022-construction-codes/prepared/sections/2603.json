@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174695\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174695\"><\/AnnotationDrawer><div>The minimum net clear opening height dimension shall be 30 inches (762 mm). The net clear opening width dimension shall not be less than 24 inches (609.6 mm). The final dimensions shall result in a net clear opening area as required above. The net clear opening dimensions shall be the result of normal operation of the opening.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2603-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum net clear opening height dimension shall be 30 inches (762 mm). The net clear opening width dimension shall not be less than 24 inches (609.6 mm). The final dimensions shall result in a net clear opening area as required above. The net clear opening dimensions shall be the result of normal operation of the opening."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The minimum net clear opening height dimension shall be 30 inches (762 mm). The net clear opening width dimension shall not be less than 24 inches (609.6 mm). The final dimensions shall result in a net clear opening area as required above. The net clear opening dimensions shall be the result of normal operation of the opening.",
+  "previewText" : "The minimum net clear opening height dimension shall be 30 inches (762 mm).",
+  "schemaVersion" : 2,
+  "sectionID" : 2603
+}

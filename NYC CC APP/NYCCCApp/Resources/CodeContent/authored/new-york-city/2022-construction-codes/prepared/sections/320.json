@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166840\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166840\"><\/AnnotationDrawer><div>A maximum of 50 percent of interior exit stairways are permitted to egress through an atrium on the level of exit discharge in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174357', hash: '#JD_BC1028' }}\">1028<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-166841\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-166841\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-166841\"><\/AnnotationDrawer><h6><a name=\"JD_BC405\" id=\"JD_BC405\" title=\"BC 405\"><\/a>Section BC 405: Underground Buildings and Spaces<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "320-html-1",
+      "kind" : "html",
+      "plainText" : "A maximum of 50 percent of interior exit stairways are permitted to egress through an atrium on the level of exit discharge in accordance with Section 1028 .\n\n Section BC 405: Underground Buildings and Spaces"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A maximum of 50 percent of interior exit stairways are permitted to egress through an atrium on the level of exit discharge in accordance with Section 1028.",
+  "previewText" : "A maximum of 50 percent of interior exit stairways are permitted to egress through an atrium on the level of exit discharge in accordance with Section 1028.",
+  "schemaVersion" : 2,
+  "sectionID" : 320
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160863\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160863\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Refer to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-207300', hash: '#JD_T28' }}\">Title 28<\/Link> of the <\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Administrative Code<\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-160864\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-160864\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-160864\"><\/AnnotationDrawer><h6><a name=\"JD_PC109\" id=\"JD_PC109\" title=\"PC 109\"><\/a>Section PC 109: Violations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11805-html-1",
+      "kind" : "html",
+      "plainText" : "Refer to Title 28 of the Administrative Code . \n\n Section PC 109: Violations"
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Refer to Title 28 of the Administrative Code.\n\nSection PC 109: Violations",
+  "previewText" : "Refer to Title 28 of the Administrative Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11805
+}

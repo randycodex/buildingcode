@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195999\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195999\"><\/AnnotationDrawer><div>Joints between CPVC plastic pipe or fittings shall be solvent-cemented or threaded joints conforming to Section 1203.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11375-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between CPVC plastic pipe or fittings shall be solvent-cemented or threaded joints conforming to Section 1203.3."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Joints between CPVC plastic pipe or fittings shall be solvent-cemented or threaded joints conforming to Section 1203.3.",
+  "previewText" : "Joints between CPVC plastic pipe or fittings shall be solvent-cemented or threaded joints conforming to Section 1203.",
+  "schemaVersion" : 2,
+  "sectionID" : 11375
+}

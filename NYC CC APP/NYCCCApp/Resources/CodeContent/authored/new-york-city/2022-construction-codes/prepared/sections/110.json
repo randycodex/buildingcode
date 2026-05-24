@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164541\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164541\"><\/AnnotationDrawer><div>Where terms are not defined in this code and are defined in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code<\/span>, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>, or the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code<\/span>, such terms shall have the meanings ascribed to them as in those codes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "110-html-1",
+      "kind" : "html",
+      "plainText" : "Where terms are not defined in this code and are defined in the New York City Fuel Gas Code , New York City Fire Code , New York City Mechanical Code , New York City Electrical Code , New York City Plumbing Code , or the New York City Energy Conservation Code , such terms shall have the meanings ascribed to them as in those codes."
+    }
+  ],
+  "chapterNumber" : "2",
+  "officialText" : "Where terms are not defined in this code and are defined in the New York City Fuel Gas Code, New York City Fire Code, New York City Mechanical Code, New York City Electrical Code, New York City Plumbing Code, or the New York City Energy Conservation Code, such terms shall have the meanings ascribed to them as in those codes.",
+  "previewText" : "Where terms are not defined in this code and are defined in the New York City Fuel Gas Code, New York City Fire Code, New York City Mechanical Code, New York City Electrical Code, New York City Plumbing Code, or the New York City Energy Conservation Code, such terms shall have the meanings ascribed to them as in those codes.",
+  "schemaVersion" : 2,
+  "sectionID" : 110
+}

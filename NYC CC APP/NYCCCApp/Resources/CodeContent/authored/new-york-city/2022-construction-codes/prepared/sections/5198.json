@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183002\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183002\"><\/AnnotationDrawer><div>Gypsum backing for cement plaster shall be in accordance with Section 2510.5.2.1 or 2510.5.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5198-html-1",
+      "kind" : "html",
+      "plainText" : "Gypsum backing for cement plaster shall be in accordance with Section 2510.5.2.1 or 2510.5.2.2."
+    }
+  ],
+  "chapterNumber" : "25",
+  "officialText" : "Gypsum backing for cement plaster shall be in accordance with Section 2510.5.2.1 or 2510.5.2.2.",
+  "previewText" : "Gypsum backing for cement plaster shall be in accordance with Section 2510.",
+  "schemaVersion" : 2,
+  "sectionID" : 5198
+}

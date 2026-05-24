@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175667\"><\/AnnotationDrawer><div>The provisions of this chapter shall govern ventilation, temperature control, lighting, yards and courts, sound transmission, room dimensions, surrounding materials and rodent proofing associated with the interior spaces of buildings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-175668\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-175668\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-175668\"><\/AnnotationDrawer><h6><a name=\"JD_BC1202\" id=\"JD_BC1202\" title=\"BC 1202\"><\/a>Section BC 1202: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2927-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this chapter shall govern ventilation, temperature control, lighting, yards and courts, sound transmission, room dimensions, surrounding materials and rodent proofing associated with the interior spaces of buildings.\n\n Section BC 1202: Definitions"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "The provisions of this chapter shall govern ventilation, temperature control, lighting, yards and courts, sound transmission, room dimensions, surrounding materials and rodent proofing associated with the interior spaces of buildings.",
+  "previewText" : "The provisions of this chapter shall govern ventilation, temperature control, lighting, yards and courts, sound transmission, room dimensions, surrounding materials and rodent proofing associated with the interior spaces of buildings.",
+  "schemaVersion" : 2,
+  "sectionID" : 2927
+}

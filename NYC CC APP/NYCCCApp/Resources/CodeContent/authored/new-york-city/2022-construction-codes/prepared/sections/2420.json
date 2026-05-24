@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174065\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174065\"><\/AnnotationDrawer><div>Use of corridors as part of direct supply, return, or exhaust air system shall be subject to the limitations of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2420-html-1",
+      "kind" : "html",
+      "plainText" : "Use of corridors as part of direct supply, return, or exhaust air system shall be subject to the limitations of the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Use of corridors as part of direct supply, return, or exhaust air system shall be subject to the limitations of the New York City Mechanical Code.",
+  "previewText" : "Use of corridors as part of direct supply, return, or exhaust air system shall be subject to the limitations of the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 2420
+}

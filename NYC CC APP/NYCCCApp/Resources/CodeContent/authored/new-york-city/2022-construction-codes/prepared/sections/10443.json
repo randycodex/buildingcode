@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193339\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193339\"><\/AnnotationDrawer><div>Automatic operation of the system shall not reduce the ventilation airflow rate below 0.05 cfm per square foot (0.00025 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s &#8226; m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of the floor area and the system shall be capable of producing a ventilation airflow rate of 0.75 cfm per square foot (0.0038 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s &#8226; m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of floor area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10443-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic operation of the system shall not reduce the ventilation airflow rate below 0.05 cfm per square foot (0.00025 m\n 3 \n \/s &#8226; m\n\n 2 \n\n ) of the floor area and the system shall be capable of producing a ventilation airflow rate of 0.75 cfm per square foot (0.0038 m\n 3 \n \/s &#8226; m\n\n 2 \n\n ) of floor area."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Automatic operation of the system shall not reduce the ventilation airflow rate below 0.05 cfm per square foot (0.00025 m 3 \/s • m 2 ) of the floor area and the system shall be capable of producing a ventilation airflow rate of 0.75 cfm per square foot (0.0038 m 3 \/s • m 2 ) of floor area.",
+  "previewText" : "Automatic operation of the system shall not reduce the ventilation airflow rate below 0.",
+  "schemaVersion" : 2,
+  "sectionID" : 10443
+}

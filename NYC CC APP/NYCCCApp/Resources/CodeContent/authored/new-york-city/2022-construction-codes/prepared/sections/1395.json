@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170379\"><\/AnnotationDrawer><div>The fire-resistance ratings of floors that consist of a base slab of concrete with a topping (overlay) of a different type of concrete shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170378', hash: '#JD_BCFigure722.2.2.2' }}\">Figure 722.2.2.2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170380\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170380\"><\/AnnotationDrawer><div>",
+      "id" : "1395-html-1",
+      "kind" : "html",
+      "plainText" : "The fire-resistance ratings of floors that consist of a base slab of concrete with a topping (overlay) of a different type of concrete shall comply with Figure 722.2.2.2 ."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/5619c288780b1f9a07d5fc1b0d8599f2b0d8abef.png\" width=\"576\" height=\"628.866666666667\"><\/img><\/span>",
+      "id" : "1395-image-2",
+      "imageID" : "5619c288780b1f9a07d5fc1b0d8599f2b0d8abef.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170381\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170381\"><\/AnnotationDrawer><div class=\"Small\">For SI: 1 inch = 25.4 mm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170382\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure722.2.2.2\" id=\"JD_BCFigure722.2.2.2\" title=\"BC Figure 722.2.2.2\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 722.2.2.2<br><\/br>Fire-Resistance Ratings for Two-Course Concrete Floors<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1395-html-3",
+      "kind" : "html",
+      "plainText" : "For SI: 1 inch = 25.4 mm.\n\n Figure 722.2.2.2\n Fire-Resistance Ratings for Two-Course Concrete Floors"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire-resistance ratings of floors that consist of a base slab of concrete with a topping (overlay) of a different type of concrete shall comply with Figure 722.2.2.2.\n\nFor SI: 1 inch = 25.4 mm.\n\nFigure 722.2.2.2 Fire-Resistance Ratings for Two-Course Concrete Floors",
+  "previewText" : "The fire-resistance ratings of floors that consist of a base slab of concrete with a topping (overlay) of a different type of concrete shall comply with Figure 722.",
+  "schemaVersion" : 2,
+  "sectionID" : 1395
+}

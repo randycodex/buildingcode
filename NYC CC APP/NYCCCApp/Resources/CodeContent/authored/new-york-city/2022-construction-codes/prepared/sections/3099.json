@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176191\"><\/AnnotationDrawer><div>Vapor retarders as described in Section 1405.3.3 shall be provided based on an approved design using accepted engineering practice for hygrothermal analysis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3099-html-1",
+      "kind" : "html",
+      "plainText" : "Vapor retarders as described in Section 1405.3.3 shall be provided based on an approved design using accepted engineering practice for hygrothermal analysis."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Vapor retarders as described in Section 1405.3.3 shall be provided based on an approved design using accepted engineering practice for hygrothermal analysis.",
+  "previewText" : "Vapor retarders as described in Section 1405.",
+  "schemaVersion" : 2,
+  "sectionID" : 3099
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178758\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178758\"><\/AnnotationDrawer><div>Chimneys, vents, and exhaust systems under positive pressure that penetrate ducts or plenums installed in accordance with exceptions 1 and 2 of Section 601.4 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> shall be inspected for conformance with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3880-html-1",
+      "kind" : "html",
+      "plainText" : "Chimneys, vents, and exhaust systems under positive pressure that penetrate ducts or plenums installed in accordance with exceptions 1 and 2 of Section 601.4 of the New York City Mechanical Code shall be inspected for conformance with the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Chimneys, vents, and exhaust systems under positive pressure that penetrate ducts or plenums installed in accordance with exceptions 1 and 2 of Section 601.4 of the New York City Mechanical Code shall be inspected for conformance with the approved construction documents.",
+  "previewText" : "Chimneys, vents, and exhaust systems under positive pressure that penetrate ducts or plenums installed in accordance with exceptions 1 and 2 of Section 601.",
+  "schemaVersion" : 2,
+  "sectionID" : 3880
+}

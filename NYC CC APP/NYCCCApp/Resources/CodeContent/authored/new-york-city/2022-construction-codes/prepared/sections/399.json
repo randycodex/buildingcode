@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167070\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167070\"><\/AnnotationDrawer><div>All vehicular activities associated with the operation of open parking lots shall be entirely within the property lines of the premises. Vehicles shall not be permitted to encroach upon the sidewalks. No motor vehicle may be stored or parked in any location where it would obstruct a required window or required exit of any adjacent building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "399-html-1",
+      "kind" : "html",
+      "plainText" : "All vehicular activities associated with the operation of open parking lots shall be entirely within the property lines of the premises. Vehicles shall not be permitted to encroach upon the sidewalks. No motor vehicle may be stored or parked in any location where it would obstruct a required window or required exit of any adjacent building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "All vehicular activities associated with the operation of open parking lots shall be entirely within the property lines of the premises. Vehicles shall not be permitted to encroach upon the sidewalks. No motor vehicle may be stored or parked in any location where it would obstruct a required window or required exit of any adjacent building.",
+  "previewText" : "All vehicular activities associated with the operation of open parking lots shall be entirely within the property lines of the premises.",
+  "schemaVersion" : 2,
+  "sectionID" : 399
+}

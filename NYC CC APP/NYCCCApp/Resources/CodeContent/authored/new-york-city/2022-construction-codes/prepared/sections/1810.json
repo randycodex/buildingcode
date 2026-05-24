@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171957\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171957\"><\/AnnotationDrawer><div>Where the total floor area exceeds 50,000 square feet (4645.2 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) within either a covered mall building or within the perimeter line of an open mall building, an emergency voice\/alarm communication system shall be provided. Emergency voice\/alarm communication systems serving a mall, required or otherwise, shall be accessible to the Fire Department. The system shall be provided in accordance with Section 907.5.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1810-html-1",
+      "kind" : "html",
+      "plainText" : "Where the total floor area exceeds 50,000 square feet (4645.2 m\n\n 2 \n\n ) within either a covered mall building or within the perimeter line of an open mall building, an emergency voice\/alarm communication system shall be provided. Emergency voice\/alarm communication systems serving a mall, required or otherwise, shall be accessible to the Fire Department. The system shall be provided in accordance with Section 907.5.2.2."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Where the total floor area exceeds 50,000 square feet (4645.2 m 2 ) within either a covered mall building or within the perimeter line of an open mall building, an emergency voice\/alarm communication system shall be provided. Emergency voice\/alarm communication systems serving a mall, required or otherwise, shall be accessible to the Fire Department. The system shall be provided in accordance with Section 907.5.2.2.",
+  "previewText" : "Where the total floor area exceeds 50,000 square feet (4645.",
+  "schemaVersion" : 2,
+  "sectionID" : 1810
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179120\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179120\"><\/AnnotationDrawer><div>Shallow foundations shall be designed and constructed in accordance with Sections 1809.1 through 1809.6. Shallow foundations shall be constructed on suitable bearing materials established in accordance with the requirements of Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224377', hash: '#JD_BC1804' }}\">1804<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179056', hash: '#JD_BC1806' }}\">1806<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3980-html-1",
+      "kind" : "html",
+      "plainText" : "Shallow foundations shall be designed and constructed in accordance with Sections 1809.1 through 1809.6. Shallow foundations shall be constructed on suitable bearing materials established in accordance with the requirements of Sections 1804 and 1806 ."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Shallow foundations shall be designed and constructed in accordance with Sections 1809.1 through 1809.6. Shallow foundations shall be constructed on suitable bearing materials established in accordance with the requirements of Sections 1804 and 1806.",
+  "previewText" : "Shallow foundations shall be designed and constructed in accordance with Sections 1809.",
+  "schemaVersion" : 2,
+  "sectionID" : 3980
+}

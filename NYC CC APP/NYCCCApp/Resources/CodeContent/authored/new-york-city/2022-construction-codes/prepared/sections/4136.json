@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179591\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179591\"><\/AnnotationDrawer><div>Specific gravity testing shall be performed using the American Petroleum Institute (API) Recommended Practice 13B-1 or in accordance with ASTM C 138.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4136-html-1",
+      "kind" : "html",
+      "plainText" : "Specific gravity testing shall be performed using the American Petroleum Institute (API) Recommended Practice 13B-1 or in accordance with ASTM C 138."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Specific gravity testing shall be performed using the American Petroleum Institute (API) Recommended Practice 13B-1 or in accordance with ASTM C 138.",
+  "previewText" : "Specific gravity testing shall be performed using the American Petroleum Institute (API) Recommended Practice 13B-1 or in accordance with ASTM C 138.",
+  "schemaVersion" : 2,
+  "sectionID" : 4136
+}

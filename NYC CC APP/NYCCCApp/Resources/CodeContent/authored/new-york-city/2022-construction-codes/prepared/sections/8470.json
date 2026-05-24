@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198584\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198584\"><\/AnnotationDrawer><div>Factory-built chimneys shall be installed in accordance with their listing and the manufacturers' instructions. Factory-built chimneys used to vent appliances that operate at positive vent pressure shall be listed for such application.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8470-html-1",
+      "kind" : "html",
+      "plainText" : "Factory-built chimneys shall be installed in accordance with their listing and the manufacturers' instructions. Factory-built chimneys used to vent appliances that operate at positive vent pressure shall be listed for such application."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Factory-built chimneys shall be installed in accordance with their listing and the manufacturers' instructions. Factory-built chimneys used to vent appliances that operate at positive vent pressure shall be listed for such application.",
+  "previewText" : "Factory-built chimneys shall be installed in accordance with their listing and the manufacturers' instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 8470
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178633\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178633\"><\/AnnotationDrawer><div>The design documents for structural stability shall include any requirements for monitoring of the subject structure and\/or adjacent structures, as determined by the registered design professional responsible for the design. The monitoring plan shall be specific to the buildings to be monitored and operations to be undertaken, and shall specify the scope and frequency of monitoring, acceptable tolerances, and reporting criteria for when tolerances are exceeded, including when the department is required to be notified. The monitoring plan shall include provisions for daily monitoring, at a minimum, until the structural stability protection methods are no longer necessary. Such monitoring can be accomplished by remote means, in-person monitoring or any combination thereof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3832-html-1",
+      "kind" : "html",
+      "plainText" : "The design documents for structural stability shall include any requirements for monitoring of the subject structure and\/or adjacent structures, as determined by the registered design professional responsible for the design. The monitoring plan shall be specific to the buildings to be monitored and operations to be undertaken, and shall specify the scope and frequency of monitoring, acceptable tolerances, and reporting criteria for when tolerances are exceeded, including when the department is required to be notified. The monitoring plan shall include provisions for daily monitoring, at a minimum, until the structural stability protection methods are no longer necessary. Such monitoring can be accomplished by remote means, in-person monitoring or any combination thereof."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "The design documents for structural stability shall include any requirements for monitoring of the subject structure and\/or adjacent structures, as determined by the registered design professional responsible for the design. The monitoring plan shall be specific to the buildings to be monitored and operations to be undertaken, and shall specify the scope and frequency of monitoring, acceptable tolerances, and reporting criteria for when tolerances are exceeded, including when the department is required to be notified. The monitoring plan shall include provisions for daily monitoring, at a minimum, until the structural stability protection methods are no longer necessary. Such monitoring can be accomplished by remote means, in-person monitoring or any combination thereof.",
+  "previewText" : "The design documents for structural stability shall include any requirements for monitoring of the subject structure and\/or adjacent structures, as determined by the registered design professional responsible for the design.",
+  "schemaVersion" : 2,
+  "sectionID" : 3832
+}

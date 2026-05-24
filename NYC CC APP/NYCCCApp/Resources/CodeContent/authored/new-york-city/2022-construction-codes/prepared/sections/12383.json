@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162634\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162634\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints between different piping materials shall be made with a mechanical joint of the compression or mechanical-sealing type conforming to ASTM C 1173, ASTM C 1460 or ASTM C 1461. Connectors and adapters shall be approved for the application and such joints shall have an elastomeric seal conforming to ASTM C 425, ASTM C 443, ASTM C 564, ASTM C 1440, ASTM F 477, CSA A257.3M or CSA B602, or as required in Sections 705.16.1 through 705.16.7. Joints between glass pipe and other types of materials shall be made with adapters having a TFE seal. Joints shall be installed in accordance with the manufacturer's instructions.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12383-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between different piping materials shall be made with a mechanical joint of the compression or mechanical-sealing type conforming to ASTM C 1173, ASTM C 1460 or ASTM C 1461. Connectors and adapters shall be approved for the application and such joints shall have an elastomeric seal conforming to ASTM C 425, ASTM C 443, ASTM C 564, ASTM C 1440, ASTM F 477, CSA A257.3M or CSA B602, or as required in Sections 705.16.1 through 705.16.7. Joints between glass pipe and other types of materials shall be made with adapters having a TFE seal. Joints shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Joints between different piping materials shall be made with a mechanical joint of the compression or mechanical-sealing type conforming to ASTM C 1173, ASTM C 1460 or ASTM C 1461. Connectors and adapters shall be approved for the application and such joints shall have an elastomeric seal conforming to ASTM C 425, ASTM C 443, ASTM C 564, ASTM C 1440, ASTM F 477, CSA A257.3M or CSA B602, or as required in Sections 705.16.1 through 705.16.7. Joints between glass pipe and other types of materials shall be made with adapters having a TFE seal. Joints shall be installed in accordance with the manufacturer's instructions.",
+  "previewText" : "Joints between different piping materials shall be made with a mechanical joint of the compression or mechanical-sealing type conforming to ASTM C 1173, ASTM C 1460 or ASTM C 1461.",
+  "schemaVersion" : 2,
+  "sectionID" : 12383
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183493\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183493\"><\/AnnotationDrawer><div>Stationary emergency and standby power generators required by this code shall be listed in accordance with UL 2200<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5361-html-1",
+      "kind" : "html",
+      "plainText" : "Stationary emergency and standby power generators required by this code shall be listed in accordance with UL 2200"
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Stationary emergency and standby power generators required by this code shall be listed in accordance with UL 2200",
+  "previewText" : "Stationary emergency and standby power generators required by this code shall be listed in accordance with UL 2200",
+  "schemaVersion" : 2,
+  "sectionID" : 5361
+}

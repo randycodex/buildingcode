@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183218\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183218\"><\/AnnotationDrawer><div>The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.1.2 when tested in accordance with NFPA 286. The foam plastic insulation shall be approved based on tests conducted in accordance with Section 2603.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5272-html-1",
+      "kind" : "html",
+      "plainText" : "The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.1.2 when tested in accordance with NFPA 286. The foam plastic insulation shall be approved based on tests conducted in accordance with Section 2603.9."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.1.2 when tested in accordance with NFPA 286. The foam plastic insulation shall be approved based on tests conducted in accordance with Section 2603.9.",
+  "previewText" : "The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.",
+  "schemaVersion" : 2,
+  "sectionID" : 5272
+}

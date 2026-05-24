@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167703\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167703\"><\/AnnotationDrawer><div>Systems involving hazardous materials shall be suitable for the intended application. Controls shall be designed to prevent materials from entering or leaving process or reaction systems at other than the intended time, rate or path. Automatic controls, where provided, shall be designed to be fail safe.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "603-html-1",
+      "kind" : "html",
+      "plainText" : "Systems involving hazardous materials shall be suitable for the intended application. Controls shall be designed to prevent materials from entering or leaving process or reaction systems at other than the intended time, rate or path. Automatic controls, where provided, shall be designed to be fail safe."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Systems involving hazardous materials shall be suitable for the intended application. Controls shall be designed to prevent materials from entering or leaving process or reaction systems at other than the intended time, rate or path. Automatic controls, where provided, shall be designed to be fail safe.",
+  "previewText" : "Systems involving hazardous materials shall be suitable for the intended application.",
+  "schemaVersion" : 2,
+  "sectionID" : 603
+}

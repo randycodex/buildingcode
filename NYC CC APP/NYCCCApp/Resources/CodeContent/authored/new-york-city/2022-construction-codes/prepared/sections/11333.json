@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195889\"><\/AnnotationDrawer><div>Where required, refrigerant safety alarms shall comply with the requirements of EN378 Part 3, Sections 8.1 through 8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11333-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, refrigerant safety alarms shall comply with the requirements of EN378 Part 3, Sections 8.1 through 8.2."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where required, refrigerant safety alarms shall comply with the requirements of EN378 Part 3, Sections 8.1 through 8.2.",
+  "previewText" : "Where required, refrigerant safety alarms shall comply with the requirements of EN378 Part 3, Sections 8.",
+  "schemaVersion" : 2,
+  "sectionID" : 11333
+}

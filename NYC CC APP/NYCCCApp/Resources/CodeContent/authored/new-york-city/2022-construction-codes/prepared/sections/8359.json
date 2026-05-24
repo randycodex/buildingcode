@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198299\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198299\"><\/AnnotationDrawer><div>Manufactured homes shall be connected to the distribution piping system by one of the following materials:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198300\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Metallic pipe in accordance with Section 403.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198301\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Listed and labeled connectors in compliance with ANSI Z21.75\/CSA 6.27 and installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8359-html-1",
+      "kind" : "html",
+      "plainText" : "Manufactured homes shall be connected to the distribution piping system by one of the following materials:\n\n 1. Metallic pipe in accordance with Section 403.4.\n\n 2. Listed and labeled connectors in compliance with ANSI Z21.75\/CSA 6.27 and installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Manufactured homes shall be connected to the distribution piping system by one of the following materials:\n\n1. Metallic pipe in accordance with Section 403.4.\n\n2. Listed and labeled connectors in compliance with ANSI Z21.75\/CSA 6.27 and installed in accordance with the manufacturer's instructions.",
+  "previewText" : "Manufactured homes shall be connected to the distribution piping system by one of the following materials:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 8359
+}

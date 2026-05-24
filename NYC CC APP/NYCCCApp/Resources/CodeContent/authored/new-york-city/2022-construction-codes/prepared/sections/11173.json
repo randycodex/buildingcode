@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195441\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195441\"><\/AnnotationDrawer><div>All pressure vessels shall be constructed and certified in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span>, and shall bear the label of an approved agency. Pressure vessels shall be installed in accordance with the manufacturer's instructions and nationally recognized standards. Directly fired pressure vessels shall meet the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195446', hash: '#JD_MC1004' }}\">1004<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11173-html-1",
+      "kind" : "html",
+      "plainText" : "All pressure vessels shall be constructed and certified in accordance with the ASME Boiler and Pressure Vessel Code , and shall bear the label of an approved agency. Pressure vessels shall be installed in accordance with the manufacturer's instructions and nationally recognized standards. Directly fired pressure vessels shall meet the requirements of Section 1004 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "All pressure vessels shall be constructed and certified in accordance with the ASME Boiler and Pressure Vessel Code, and shall bear the label of an approved agency. Pressure vessels shall be installed in accordance with the manufacturer's instructions and nationally recognized standards. Directly fired pressure vessels shall meet the requirements of Section 1004.",
+  "previewText" : "All pressure vessels shall be constructed and certified in accordance with the ASME Boiler and Pressure Vessel Code, and shall bear the label of an approved agency.",
+  "schemaVersion" : 2,
+  "sectionID" : 11173
+}

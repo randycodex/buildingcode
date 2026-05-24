@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180885\"><\/AnnotationDrawer><div>Walls adjoining structural framing shall comply with Sections 2104.8.1 and 2104.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4603-html-1",
+      "kind" : "html",
+      "plainText" : "Walls adjoining structural framing shall comply with Sections 2104.8.1 and 2104.8.2."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Walls adjoining structural framing shall comply with Sections 2104.8.1 and 2104.8.2.",
+  "previewText" : "Walls adjoining structural framing shall comply with Sections 2104.",
+  "schemaVersion" : 2,
+  "sectionID" : 4603
+}

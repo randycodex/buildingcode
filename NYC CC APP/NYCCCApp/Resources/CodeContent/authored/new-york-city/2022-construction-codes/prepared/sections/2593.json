@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174643\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174643\"><\/AnnotationDrawer><div>Standing spaces may be permitted within assembly spaces provided each standee has a minimum of 5 square feet (0.47 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of occupiable floor space. Standing spaces shall not encroach on the required exit facilities and shall be separated from the space to be left clear for passage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2593-html-1",
+      "kind" : "html",
+      "plainText" : "Standing spaces may be permitted within assembly spaces provided each standee has a minimum of 5 square feet (0.47 m\n\n 2 \n\n ) of occupiable floor space. Standing spaces shall not encroach on the required exit facilities and shall be separated from the space to be left clear for passage."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Standing spaces may be permitted within assembly spaces provided each standee has a minimum of 5 square feet (0.47 m 2 ) of occupiable floor space. Standing spaces shall not encroach on the required exit facilities and shall be separated from the space to be left clear for passage.",
+  "previewText" : "Standing spaces may be permitted within assembly spaces provided each standee has a minimum of 5 square feet (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 2593
+}

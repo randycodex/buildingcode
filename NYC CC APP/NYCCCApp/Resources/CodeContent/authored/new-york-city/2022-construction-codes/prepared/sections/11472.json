@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196207\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196207\"><\/AnnotationDrawer><div>Antifreeze and other materials used in the system shall be chemically compatible with the pipe, tubing, fittings, and mechanical systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11472-html-1",
+      "kind" : "html",
+      "plainText" : "Antifreeze and other materials used in the system shall be chemically compatible with the pipe, tubing, fittings, and mechanical systems."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Antifreeze and other materials used in the system shall be chemically compatible with the pipe, tubing, fittings, and mechanical systems.",
+  "previewText" : "Antifreeze and other materials used in the system shall be chemically compatible with the pipe, tubing, fittings, and mechanical systems.",
+  "schemaVersion" : 2,
+  "sectionID" : 11472
+}

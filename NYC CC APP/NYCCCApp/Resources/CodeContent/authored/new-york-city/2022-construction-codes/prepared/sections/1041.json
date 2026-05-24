@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169210\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169210\"><\/AnnotationDrawer><div>Each portion of a building separated by one or more fire walls that comply with the provisions of this section shall be considered a separate building. The extent and location of such fire walls shall provide a complete separation. Where a fire wall also separates occupancies that are required to be separated by a fire barrier wall, the most restrictive requirements of each separation shall apply. Concealed spaces in cornices and eaves shall comply with the provisions of Section 705.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1041-html-1",
+      "kind" : "html",
+      "plainText" : "Each portion of a building separated by one or more fire walls that comply with the provisions of this section shall be considered a separate building. The extent and location of such fire walls shall provide a complete separation. Where a fire wall also separates occupancies that are required to be separated by a fire barrier wall, the most restrictive requirements of each separation shall apply. Concealed spaces in cornices and eaves shall comply with the provisions of Section 705.2.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Each portion of a building separated by one or more fire walls that comply with the provisions of this section shall be considered a separate building. The extent and location of such fire walls shall provide a complete separation. Where a fire wall also separates occupancies that are required to be separated by a fire barrier wall, the most restrictive requirements of each separation shall apply. Concealed spaces in cornices and eaves shall comply with the provisions of Section 705.2.2.",
+  "previewText" : "Each portion of a building separated by one or more fire walls that comply with the provisions of this section shall be considered a separate building.",
+  "schemaVersion" : 2,
+  "sectionID" : 1041
+}

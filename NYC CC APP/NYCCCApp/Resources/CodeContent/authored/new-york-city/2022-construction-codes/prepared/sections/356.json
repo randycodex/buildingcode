@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166947\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166947\"><\/AnnotationDrawer><div>Openings from a parking garage directly into a room used for sleeping purposes shall not be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "356-html-1",
+      "kind" : "html",
+      "plainText" : "Openings from a parking garage directly into a room used for sleeping purposes shall not be permitted."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Openings from a parking garage directly into a room used for sleeping purposes shall not be permitted.",
+  "previewText" : "Openings from a parking garage directly into a room used for sleeping purposes shall not be permitted.",
+  "schemaVersion" : 2,
+  "sectionID" : 356
+}

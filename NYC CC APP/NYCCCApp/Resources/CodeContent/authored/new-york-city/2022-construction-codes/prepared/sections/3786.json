@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178504\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178504\"><\/AnnotationDrawer><div>A water-resistive barrier coating complying with ASTM E 2570 requires special inspection of the water-resistive barrier coating when installed over a sheathing substrate. Inspection of water-resistive barrier coating must verify conformance with approved construction documents, manufacturer's installation instructions, and NFPA 285 tested assembly design documentation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3786-html-1",
+      "kind" : "html",
+      "plainText" : "A water-resistive barrier coating complying with ASTM E 2570 requires special inspection of the water-resistive barrier coating when installed over a sheathing substrate. Inspection of water-resistive barrier coating must verify conformance with approved construction documents, manufacturer's installation instructions, and NFPA 285 tested assembly design documentation."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "A water-resistive barrier coating complying with ASTM E 2570 requires special inspection of the water-resistive barrier coating when installed over a sheathing substrate. Inspection of water-resistive barrier coating must verify conformance with approved construction documents, manufacturer's installation instructions, and NFPA 285 tested assembly design documentation.",
+  "previewText" : "A water-resistive barrier coating complying with ASTM E 2570 requires special inspection of the water-resistive barrier coating when installed over a sheathing substrate.",
+  "schemaVersion" : 2,
+  "sectionID" : 3786
+}

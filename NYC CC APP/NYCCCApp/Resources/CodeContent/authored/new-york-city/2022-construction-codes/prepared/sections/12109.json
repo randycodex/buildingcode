@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161942\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161942\"><\/AnnotationDrawer><div>Pumps shall be rated for the transport of potable water. Pumps in an individual water supply system shall be constructed and installed so as to prevent contamination from entering a potable water supply through the pump units. Pumps shall be sealed to the well casing or covered with a water-tight seal. Pumps shall be designed to maintain a prime and installed such that ready access is provided to the pump parts of the entire assembly for repairs.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12109-html-1",
+      "kind" : "html",
+      "plainText" : "Pumps shall be rated for the transport of potable water. Pumps in an individual water supply system shall be constructed and installed so as to prevent contamination from entering a potable water supply through the pump units. Pumps shall be sealed to the well casing or covered with a water-tight seal. Pumps shall be designed to maintain a prime and installed such that ready access is provided to the pump parts of the entire assembly for repairs."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Pumps shall be rated for the transport of potable water. Pumps in an individual water supply system shall be constructed and installed so as to prevent contamination from entering a potable water supply through the pump units. Pumps shall be sealed to the well casing or covered with a water-tight seal. Pumps shall be designed to maintain a prime and installed such that ready access is provided to the pump parts of the entire assembly for repairs.",
+  "previewText" : "Pumps shall be rated for the transport of potable water.",
+  "schemaVersion" : 2,
+  "sectionID" : 12109
+}

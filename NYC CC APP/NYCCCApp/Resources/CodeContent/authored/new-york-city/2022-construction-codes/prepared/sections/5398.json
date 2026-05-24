@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183583\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183583\"><\/AnnotationDrawer><div>Standby power systems shall be provided for fans or fan systems being designed in accordance with Section 607.5 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code <\/span>and Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169875', hash: '#JD_BC717' }}\">717<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5398-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power systems shall be provided for fans or fan systems being designed in accordance with Section 607.5 of the New York City Mechanical Code and Section 717 of this code."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Standby power systems shall be provided for fans or fan systems being designed in accordance with Section 607.5 of the New York City Mechanical Code and Section 717 of this code.",
+  "previewText" : "Standby power systems shall be provided for fans or fan systems being designed in accordance with Section 607.",
+  "schemaVersion" : 2,
+  "sectionID" : 5398
+}

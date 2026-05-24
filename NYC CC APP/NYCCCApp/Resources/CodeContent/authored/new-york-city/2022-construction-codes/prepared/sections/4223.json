@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179809\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179809\"><\/AnnotationDrawer><div>Where load tests are required, the helical pile being tested shall be used to determine the minimum required site-specific torque for installation of production helical piles. For each helical pile, the special inspector shall measure and log the installation torque for each foot of depth and the final torque in the helice's soil-bearing zone. The shaft advancement shall equal or exceed 85 percent of helix pitch per revolution at time of final torque measurement. Where load tests are not required, installation torque shall be in accordance with the exception defined under Section 1814.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4223-html-1",
+      "kind" : "html",
+      "plainText" : "Where load tests are required, the helical pile being tested shall be used to determine the minimum required site-specific torque for installation of production helical piles. For each helical pile, the special inspector shall measure and log the installation torque for each foot of depth and the final torque in the helice's soil-bearing zone. The shaft advancement shall equal or exceed 85 percent of helix pitch per revolution at time of final torque measurement. Where load tests are not required, installation torque shall be in accordance with the exception defined under Section 1814.4.3."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Where load tests are required, the helical pile being tested shall be used to determine the minimum required site-specific torque for installation of production helical piles. For each helical pile, the special inspector shall measure and log the installation torque for each foot of depth and the final torque in the helice's soil-bearing zone. The shaft advancement shall equal or exceed 85 percent of helix pitch per revolution at time of final torque measurement. Where load tests are not required, installation torque shall be in accordance with the exception defined under Section 1814.4.3.",
+  "previewText" : "Where load tests are required, the helical pile being tested shall be used to determine the minimum required site-specific torque for installation of production helical piles.",
+  "schemaVersion" : 2,
+  "sectionID" : 4223
+}

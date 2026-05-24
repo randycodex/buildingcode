@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175394\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175394\"><\/AnnotationDrawer><div>Floors other than those subject to Section 1109.7.2.1.1 shall provide one hall call console for every five elevators, or fraction thereof, on each side of the elevator landing. The hall call console shall be located immediately adjacent to one or more elevator hoistway entrances. When the accessibility function button is activated, the system shall assign the elevator car located closest to one side (left or right) of the hall call console to be the responding elevator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2836-html-1",
+      "kind" : "html",
+      "plainText" : "Floors other than those subject to Section 1109.7.2.1.1 shall provide one hall call console for every five elevators, or fraction thereof, on each side of the elevator landing. The hall call console shall be located immediately adjacent to one or more elevator hoistway entrances. When the accessibility function button is activated, the system shall assign the elevator car located closest to one side (left or right) of the hall call console to be the responding elevator."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Floors other than those subject to Section 1109.7.2.1.1 shall provide one hall call console for every five elevators, or fraction thereof, on each side of the elevator landing. The hall call console shall be located immediately adjacent to one or more elevator hoistway entrances. When the accessibility function button is activated, the system shall assign the elevator car located closest to one side (left or right) of the hall call console to be the responding elevator.",
+  "previewText" : "Floors other than those subject to Section 1109.",
+  "schemaVersion" : 2,
+  "sectionID" : 2836
+}

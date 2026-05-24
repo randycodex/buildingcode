@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181430\"><\/AnnotationDrawer><div>The design, testing, and utilization of cantilevered storage racks made of cold-formed or hot-rolled steel structural members shall be in accordance with RMI ANSI\/MH 16.3 Where required by ASCE 7, the seismic design of cantilevered steel storage racks shall be in accordance with Section 15.5.3 of ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181431\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181431\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181431\"><\/AnnotationDrawer><h6><a name=\"JD_BC2210\" id=\"JD_BC2210\" title=\"BC 2210\"><\/a>Section BC 2210: Cold-Formed Steel<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4805-html-1",
+      "kind" : "html",
+      "plainText" : "The design, testing, and utilization of cantilevered storage racks made of cold-formed or hot-rolled steel structural members shall be in accordance with RMI ANSI\/MH 16.3 Where required by ASCE 7, the seismic design of cantilevered steel storage racks shall be in accordance with Section 15.5.3 of ASCE 7.\n\n Section BC 2210: Cold-Formed Steel"
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "The design, testing, and utilization of cantilevered storage racks made of cold-formed or hot-rolled steel structural members shall be in accordance with RMI ANSI\/MH 16.3 Where required by ASCE 7, the seismic design of cantilevered steel storage racks shall be in accordance with Section 15.5.3 of ASCE 7.",
+  "previewText" : "The design, testing, and utilization of cantilevered storage racks made of cold-formed or hot-rolled steel structural members shall be in accordance with RMI ANSI\/MH 16.",
+  "schemaVersion" : 2,
+  "sectionID" : 4805
+}

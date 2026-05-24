@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178557\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178557\"><\/AnnotationDrawer><div>Listed and labeled self-contained factory-built equipment and appliances deemed by the registered design professional to meet the design, manufacture and factory test requirements of this code shall be field tested in accordance with the manufacturers' installation and operational test standards.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3800-html-1",
+      "kind" : "html",
+      "plainText" : "Listed and labeled self-contained factory-built equipment and appliances deemed by the registered design professional to meet the design, manufacture and factory test requirements of this code shall be field tested in accordance with the manufacturers' installation and operational test standards."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Listed and labeled self-contained factory-built equipment and appliances deemed by the registered design professional to meet the design, manufacture and factory test requirements of this code shall be field tested in accordance with the manufacturers' installation and operational test standards.",
+  "previewText" : "Listed and labeled self-contained factory-built equipment and appliances deemed by the registered design professional to meet the design, manufacture and factory test requirements of this code shall be field tested in accordance with the manufacturers' installation and operational test standards.",
+  "schemaVersion" : 2,
+  "sectionID" : 3800
+}

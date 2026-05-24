@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196211\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196211\"><\/AnnotationDrawer><div>Before connection header trenches are backfilled, the assembled loop system shall be pressure tested with water at 100 psi (689.5 kPa) for 15 minutes, in which time there shall not be observed leaks. Flow and pressure loss testing shall be performed and the actual flow rates and pressure drops shall be compared to the calculated design values. If actual flow rate or pressure drop values differ from calculated design values by more than 10 percent, the cause shall be identified and corrective action taken.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11474-html-1",
+      "kind" : "html",
+      "plainText" : "Before connection header trenches are backfilled, the assembled loop system shall be pressure tested with water at 100 psi (689.5 kPa) for 15 minutes, in which time there shall not be observed leaks. Flow and pressure loss testing shall be performed and the actual flow rates and pressure drops shall be compared to the calculated design values. If actual flow rate or pressure drop values differ from calculated design values by more than 10 percent, the cause shall be identified and corrective action taken."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Before connection header trenches are backfilled, the assembled loop system shall be pressure tested with water at 100 psi (689.5 kPa) for 15 minutes, in which time there shall not be observed leaks. Flow and pressure loss testing shall be performed and the actual flow rates and pressure drops shall be compared to the calculated design values. If actual flow rate or pressure drop values differ from calculated design values by more than 10 percent, the cause shall be identified and corrective action taken.",
+  "previewText" : "Before connection header trenches are backfilled, the assembled loop system shall be pressure tested with water at 100 psi (689.",
+  "schemaVersion" : 2,
+  "sectionID" : 11474
+}

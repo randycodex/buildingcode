@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181097\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181097\"><\/AnnotationDrawer><div>Applications for a new or altered building shall include a chimney and vent plan submitted pursuant to Section 107.18.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4683-html-1",
+      "kind" : "html",
+      "plainText" : "Applications for a new or altered building shall include a chimney and vent plan submitted pursuant to Section 107.18."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Applications for a new or altered building shall include a chimney and vent plan submitted pursuant to Section 107.18.",
+  "previewText" : "Applications for a new or altered building shall include a chimney and vent plan submitted pursuant to Section 107.",
+  "schemaVersion" : 2,
+  "sectionID" : 4683
+}

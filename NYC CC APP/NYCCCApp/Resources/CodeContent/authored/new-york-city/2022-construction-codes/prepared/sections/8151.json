@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197710\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197710\"><\/AnnotationDrawer><div>Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.4 mm) from the supply plenum. Clearance is not required beyond the 3-foot (914.4 mm) distance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8151-html-1",
+      "kind" : "html",
+      "plainText" : "Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.4 mm) from the supply plenum. Clearance is not required beyond the 3-foot (914.4 mm) distance."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.4 mm) from the supply plenum. Clearance is not required beyond the 3-foot (914.4 mm) distance.",
+  "previewText" : "Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.",
+  "schemaVersion" : 2,
+  "sectionID" : 8151
+}

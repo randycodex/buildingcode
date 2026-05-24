@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166928\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166928\"><\/AnnotationDrawer><div>The clear height of each floor level in vehicle and pedestrian traffic areas shall be not less than 7 feet (2134 mm). Vehicle and pedestrian areas accommodating van-accessible parking shall comply with Section 1106.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "349-html-1",
+      "kind" : "html",
+      "plainText" : "The clear height of each floor level in vehicle and pedestrian traffic areas shall be not less than 7 feet (2134 mm). Vehicle and pedestrian areas accommodating van-accessible parking shall comply with Section 1106.5."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The clear height of each floor level in vehicle and pedestrian traffic areas shall be not less than 7 feet (2134 mm). Vehicle and pedestrian areas accommodating van-accessible parking shall comply with Section 1106.5.",
+  "previewText" : "The clear height of each floor level in vehicle and pedestrian traffic areas shall be not less than 7 feet (2134 mm).",
+  "schemaVersion" : 2,
+  "sectionID" : 349
+}

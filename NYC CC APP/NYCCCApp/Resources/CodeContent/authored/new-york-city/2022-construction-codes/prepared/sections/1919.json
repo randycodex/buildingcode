@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172287\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172287\"><\/AnnotationDrawer><div>Automatic dampers, regardless of the purpose for which they are installed within the smoke control system, shall comply with Section 717.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1919-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic dampers, regardless of the purpose for which they are installed within the smoke control system, shall comply with Section 717.3.1."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Automatic dampers, regardless of the purpose for which they are installed within the smoke control system, shall comply with Section 717.3.1.",
+  "previewText" : "Automatic dampers, regardless of the purpose for which they are installed within the smoke control system, shall comply with Section 717.",
+  "schemaVersion" : 2,
+  "sectionID" : 1919
+}

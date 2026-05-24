@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188182\"><\/AnnotationDrawer><div>Where three or fewer clothes dryers are provided, at least one shall comply with ICC A117.1, including Section 611 (Washing Machines and Clothes Dryers), and shall be accessible. Where more than three clothes dryers are provided, at least two shall comply with ICC A117.1, including Section 611, and shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6898-html-1",
+      "kind" : "html",
+      "plainText" : "Where three or fewer clothes dryers are provided, at least one shall comply with ICC A117.1, including Section 611 (Washing Machines and Clothes Dryers), and shall be accessible. Where more than three clothes dryers are provided, at least two shall comply with ICC A117.1, including Section 611, and shall be accessible."
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "Where three or fewer clothes dryers are provided, at least one shall comply with ICC A117.1, including Section 611 (Washing Machines and Clothes Dryers), and shall be accessible. Where more than three clothes dryers are provided, at least two shall comply with ICC A117.1, including Section 611, and shall be accessible.",
+  "previewText" : "Where three or fewer clothes dryers are provided, at least one shall comply with ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 6898
+}

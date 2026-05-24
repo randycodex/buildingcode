@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164078\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164078\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">This appendix outlines the procedure that may be utilized for sizing a water piping system (see Section E103.3). The design procedure is based on the minimum static pressure available from the supply source, the head changes in the system caused by friction and elevation, and the rates of flow necessary for operation of various fixtures.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-164079\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-164079\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-164079\"><\/AnnotationDrawer><h6><a name=\"JD_PCE102\" id=\"JD_PCE102\" title=\"PC E102\"><\/a>Section PC E102: Information Required<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11708-html-1",
+      "kind" : "html",
+      "plainText" : "This appendix outlines the procedure that may be utilized for sizing a water piping system (see Section E103.3). The design procedure is based on the minimum static pressure available from the supply source, the head changes in the system caused by friction and elevation, and the rates of flow necessary for operation of various fixtures. \n\n Section PC E102: Information Required"
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "This appendix outlines the procedure that may be utilized for sizing a water piping system (see Section E103.3). The design procedure is based on the minimum static pressure available from the supply source, the head changes in the system caused by friction and elevation, and the rates of flow necessary for operation of various fixtures.\n\nSection PC E102: Information Required",
+  "previewText" : "This appendix outlines the procedure that may be utilized for sizing a water piping system (see Section E103.",
+  "schemaVersion" : 2,
+  "sectionID" : 11708
+}

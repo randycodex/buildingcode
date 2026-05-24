@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183881\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183881\"><\/AnnotationDrawer><div>The following features serving each fire service access elevator shall be supplied by both normal power and Type 60\/Class 6\/Level 1 standby power:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183882\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Elevator equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183883\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Elevator hoistway lighting.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183884\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183884\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Ventilation and cooling equipment for elevator machine rooms, control rooms, machine spaces and machinery\/control spaces.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183885\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Elevator car lighting.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183886\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183886\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Standby power relying on natural gas as a fuel source need not be Class 6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5506-html-1",
+      "kind" : "html",
+      "plainText" : "The following features serving each fire service access elevator shall be supplied by both normal power and Type 60\/Class 6\/Level 1 standby power:\n\n 1. Elevator equipment.\n\n 2. Elevator hoistway lighting.\n\n 3. Ventilation and cooling equipment for elevator machine rooms, control rooms, machine spaces and machinery\/control spaces.\n\n 4. Elevator car lighting.\n\n Exception: Standby power relying on natural gas as a fuel source need not be Class 6."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "The following features serving each fire service access elevator shall be supplied by both normal power and Type 60\/Class 6\/Level 1 standby power:\n\n1. Elevator equipment.\n\n2. Elevator hoistway lighting.\n\n3. Ventilation and cooling equipment for elevator machine rooms, control rooms, machine spaces and machinery\/control spaces.\n\n4. Elevator car lighting.\n\nException: Standby power relying on natural gas as a fuel source need not be Class 6.",
+  "previewText" : "The following features serving each fire service access elevator shall be supplied by both normal power and Type 60\/Class 6\/Level 1 standby power:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 5506
+}

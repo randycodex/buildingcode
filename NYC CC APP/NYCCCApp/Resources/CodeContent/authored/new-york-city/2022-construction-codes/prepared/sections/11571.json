@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196437\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196437\"><\/AnnotationDrawer><div>Normal vent pipes shall be located so that they are not subjected to physical damage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11571-html-1",
+      "kind" : "html",
+      "plainText" : "Normal vent pipes shall be located so that they are not subjected to physical damage."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Normal vent pipes shall be located so that they are not subjected to physical damage.",
+  "previewText" : "Normal vent pipes shall be located so that they are not subjected to physical damage.",
+  "schemaVersion" : 2,
+  "sectionID" : 11571
+}

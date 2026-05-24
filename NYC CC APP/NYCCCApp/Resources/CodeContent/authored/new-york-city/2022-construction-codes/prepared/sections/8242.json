@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197968\"><\/AnnotationDrawer><div>Threaded or uncoated welded joints shall not be used in piping in contact with soil. Uncoated piping, fittings, and joints shall be prohibited where internal or external corrosion is known to occur.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8242-html-1",
+      "kind" : "html",
+      "plainText" : "Threaded or uncoated welded joints shall not be used in piping in contact with soil. Uncoated piping, fittings, and joints shall be prohibited where internal or external corrosion is known to occur."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Threaded or uncoated welded joints shall not be used in piping in contact with soil. Uncoated piping, fittings, and joints shall be prohibited where internal or external corrosion is known to occur.",
+  "previewText" : "Threaded or uncoated welded joints shall not be used in piping in contact with soil.",
+  "schemaVersion" : 2,
+  "sectionID" : 8242
+}

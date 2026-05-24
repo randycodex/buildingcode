@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166858\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166858\"><\/AnnotationDrawer><div>A building having a floor level more than 60 feet (18 288 mm) below the finished floor of the lowest level of exit discharge shall be divided into no fewer than two compartments of approximately equal size. Such compartmentation shall extend through the highest level of exit discharge serving the underground portions of the building and all levels below.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166859\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166859\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The lowest story need not be compartmented where the area is not greater than 1,500 square feet (139 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) and has an occupant load of less than 10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "325-html-1",
+      "kind" : "html",
+      "plainText" : "A building having a floor level more than 60 feet (18 288 mm) below the finished floor of the lowest level of exit discharge shall be divided into no fewer than two compartments of approximately equal size. Such compartmentation shall extend through the highest level of exit discharge serving the underground portions of the building and all levels below.\n\n Exception: The lowest story need not be compartmented where the area is not greater than 1,500 square feet (139 m\n\n 2 \n\n ) and has an occupant load of less than 10."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A building having a floor level more than 60 feet (18 288 mm) below the finished floor of the lowest level of exit discharge shall be divided into no fewer than two compartments of approximately equal size. Such compartmentation shall extend through the highest level of exit discharge serving the underground portions of the building and all levels below.\n\nException: The lowest story need not be compartmented where the area is not greater than 1,500 square feet (139 m 2 ) and has an occupant load of less than 10.",
+  "previewText" : "A building having a floor level more than 60 feet (18 288 mm) below the finished floor of the lowest level of exit discharge shall be divided into no fewer than two compartments of approximately equal size.",
+  "schemaVersion" : 2,
+  "sectionID" : 325
+}

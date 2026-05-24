@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182868\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182868\"><\/AnnotationDrawer><div>The marking design shall be at least 4 inches (102 mm) in diameter if circular or 4 inches (102 mm) in its least dimension if elliptical or polygonal, or shall be at least 12 inches (305 mm) in horizontal dimension if the marking is less than 4 inches (102 mm) in its least dimension. In no event shall the vertical dimension of any marking including lettering be less than 1 1\/2 inches (38 mm) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5160-html-1",
+      "kind" : "html",
+      "plainText" : "The marking design shall be at least 4 inches (102 mm) in diameter if circular or 4 inches (102 mm) in its least dimension if elliptical or polygonal, or shall be at least 12 inches (305 mm) in horizontal dimension if the marking is less than 4 inches (102 mm) in its least dimension. In no event shall the vertical dimension of any marking including lettering be less than 1 1\/2 inches (38 mm) in height."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "The marking design shall be at least 4 inches (102 mm) in diameter if circular or 4 inches (102 mm) in its least dimension if elliptical or polygonal, or shall be at least 12 inches (305 mm) in horizontal dimension if the marking is less than 4 inches (102 mm) in its least dimension. In no event shall the vertical dimension of any marking including lettering be less than 1 1\/2 inches (38 mm) in height.",
+  "previewText" : "The marking design shall be at least 4 inches (102 mm) in diameter if circular or 4 inches (102 mm) in its least dimension if elliptical or polygonal, or shall be at least 12 inches (305 mm) in horizontal dimension if the marking is less than 4 inches (102 mm) in its least dimension.",
+  "schemaVersion" : 2,
+  "sectionID" : 5160
+}

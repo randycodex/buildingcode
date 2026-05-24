@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167355\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167355\"><\/AnnotationDrawer><div>Projection rooms are permitted to be exhausted through the lamp exhaust system. The lamp exhaust system shall be positively interconnected with the lamp so that the lamp will not operate unless there is the required airflow. Exhaust air ducts shall terminate at the exterior of the building in such a location that the exhaust air cannot be readily recirculated into any air supply system. The projection room ventilation system is permitted to also serve appurtenant rooms, such as the generator and rewind rooms.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "491-html-1",
+      "kind" : "html",
+      "plainText" : "Projection rooms are permitted to be exhausted through the lamp exhaust system. The lamp exhaust system shall be positively interconnected with the lamp so that the lamp will not operate unless there is the required airflow. Exhaust air ducts shall terminate at the exterior of the building in such a location that the exhaust air cannot be readily recirculated into any air supply system. The projection room ventilation system is permitted to also serve appurtenant rooms, such as the generator and rewind rooms."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Projection rooms are permitted to be exhausted through the lamp exhaust system. The lamp exhaust system shall be positively interconnected with the lamp so that the lamp will not operate unless there is the required airflow. Exhaust air ducts shall terminate at the exterior of the building in such a location that the exhaust air cannot be readily recirculated into any air supply system. The projection room ventilation system is permitted to also serve appurtenant rooms, such as the generator and rewind rooms.",
+  "previewText" : "Projection rooms are permitted to be exhausted through the lamp exhaust system.",
+  "schemaVersion" : 2,
+  "sectionID" : 491
+}

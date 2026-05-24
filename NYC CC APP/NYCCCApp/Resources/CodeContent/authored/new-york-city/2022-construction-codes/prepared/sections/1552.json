@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171048\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171048\"><\/AnnotationDrawer><div>Fire protection systems governed by this chapter shall be provided:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171049\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171049\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171050\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171050\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Throughout a space, where a change is made in the occupancy group classification or usage of the space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1552-html-1",
+      "kind" : "html",
+      "plainText" : "Fire protection systems governed by this chapter shall be provided:\n\n 1. To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building.\n\n 2. Throughout a space, where a change is made in the occupancy group classification or usage of the space."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fire protection systems governed by this chapter shall be provided:\n\n1. To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building.\n\n2. Throughout a space, where a change is made in the occupancy group classification or usage of the space.",
+  "previewText" : "Fire protection systems governed by this chapter shall be provided:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 1552
+}

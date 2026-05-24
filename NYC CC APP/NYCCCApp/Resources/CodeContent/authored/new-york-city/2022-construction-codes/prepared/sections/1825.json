@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172007\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172007\"><\/AnnotationDrawer><div>Manual fire alarm boxes shall be located not more than 5 feet (1524 mm) from the entrance to each exit. Additional manual fire alarm boxes shall be located so that travel distance to the nearest box does not exceed 200 feet (60 960 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1825-html-1",
+      "kind" : "html",
+      "plainText" : "Manual fire alarm boxes shall be located not more than 5 feet (1524 mm) from the entrance to each exit. Additional manual fire alarm boxes shall be located so that travel distance to the nearest box does not exceed 200 feet (60 960 mm)."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Manual fire alarm boxes shall be located not more than 5 feet (1524 mm) from the entrance to each exit. Additional manual fire alarm boxes shall be located so that travel distance to the nearest box does not exceed 200 feet (60 960 mm).",
+  "previewText" : "Manual fire alarm boxes shall be located not more than 5 feet (1524 mm) from the entrance to each exit.",
+  "schemaVersion" : 2,
+  "sectionID" : 1825
+}

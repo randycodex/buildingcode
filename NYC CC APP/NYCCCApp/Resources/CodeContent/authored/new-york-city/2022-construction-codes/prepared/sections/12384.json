@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162636\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162636\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints between copper or copper- alloy tubing and cast-iron hub pipe shall be made with a brass ferrule or compression joint. The copper or copper-alloy tubing shall be soldered to the ferrule in an approved manner, and the ferrule shall be joined to the cast-iron hub by a caulked joint or a mechanical compression joint.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12384-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between copper or copper- alloy tubing and cast-iron hub pipe shall be made with a brass ferrule or compression joint. The copper or copper-alloy tubing shall be soldered to the ferrule in an approved manner, and the ferrule shall be joined to the cast-iron hub by a caulked joint or a mechanical compression joint."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Joints between copper or copper- alloy tubing and cast-iron hub pipe shall be made with a brass ferrule or compression joint. The copper or copper-alloy tubing shall be soldered to the ferrule in an approved manner, and the ferrule shall be joined to the cast-iron hub by a caulked joint or a mechanical compression joint.",
+  "previewText" : "Joints between copper or copper- alloy tubing and cast-iron hub pipe shall be made with a brass ferrule or compression joint.",
+  "schemaVersion" : 2,
+  "sectionID" : 12384
+}

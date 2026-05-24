@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184225\"><\/AnnotationDrawer><div>Pool alarms shall activate upon detecting entry into the water and shall sound poolside and inside the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5633-html-1",
+      "kind" : "html",
+      "plainText" : "Pool alarms shall activate upon detecting entry into the water and shall sound poolside and inside the building."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Pool alarms shall activate upon detecting entry into the water and shall sound poolside and inside the building.",
+  "previewText" : "Pool alarms shall activate upon detecting entry into the water and shall sound poolside and inside the building.",
+  "schemaVersion" : 2,
+  "sectionID" : 5633
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171982\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171982\"><\/AnnotationDrawer><div>Automatic fire detectors utilized for the purpose of performing fire safety functions shall be connected to the building's fire alarm control unit where a fire alarm system is required by Section 907.2. Detectors shall, upon actuation, perform the intended function and activate the alarm notification appliances or activate a visible and audible supervisory signal at a constantly attended location.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171983\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171983\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> In buildings not equipped with a fire alarm system, the automatic fire detector shall be powered by normal electrical service and, upon actuation, perform the intended function. The detectors shall be located in accordance with NFPA 72.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1816-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic fire detectors utilized for the purpose of performing fire safety functions shall be connected to the building's fire alarm control unit where a fire alarm system is required by Section 907.2. Detectors shall, upon actuation, perform the intended function and activate the alarm notification appliances or activate a visible and audible supervisory signal at a constantly attended location.\n\n Exception: In buildings not equipped with a fire alarm system, the automatic fire detector shall be powered by normal electrical service and, upon actuation, perform the intended function. The detectors shall be located in accordance with NFPA 72."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Automatic fire detectors utilized for the purpose of performing fire safety functions shall be connected to the building's fire alarm control unit where a fire alarm system is required by Section 907.2. Detectors shall, upon actuation, perform the intended function and activate the alarm notification appliances or activate a visible and audible supervisory signal at a constantly attended location.\n\nException: In buildings not equipped with a fire alarm system, the automatic fire detector shall be powered by normal electrical service and, upon actuation, perform the intended function. The detectors shall be located in accordance with NFPA 72.",
+  "previewText" : "Automatic fire detectors utilized for the purpose of performing fire safety functions shall be connected to the building's fire alarm control unit where a fire alarm system is required by Section 907.",
+  "schemaVersion" : 2,
+  "sectionID" : 1816
+}

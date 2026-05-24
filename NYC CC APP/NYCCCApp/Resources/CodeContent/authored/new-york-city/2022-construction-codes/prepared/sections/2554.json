@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174534\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174534\"><\/AnnotationDrawer><div>Transitions to stairways from stepped aisles with riser and tread dimensions that differ from the stairways shall comply with Sections 1029.10.2.1 through 1029.10.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2554-html-1",
+      "kind" : "html",
+      "plainText" : "Transitions to stairways from stepped aisles with riser and tread dimensions that differ from the stairways shall comply with Sections 1029.10.2.1 through 1029.10.3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Transitions to stairways from stepped aisles with riser and tread dimensions that differ from the stairways shall comply with Sections 1029.10.2.1 through 1029.10.3.",
+  "previewText" : "Transitions to stairways from stepped aisles with riser and tread dimensions that differ from the stairways shall comply with Sections 1029.",
+  "schemaVersion" : 2,
+  "sectionID" : 2554
+}

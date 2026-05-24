@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194078\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194078\"><\/AnnotationDrawer><div>Hoods or enclosures shall be used where contaminants originate in a limited area of a space. The design of the hood or enclosure shall be such that air currents created by the exhaust systems will capture the contaminants and transport them directly to the exhaust duct.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10708-html-1",
+      "kind" : "html",
+      "plainText" : "Hoods or enclosures shall be used where contaminants originate in a limited area of a space. The design of the hood or enclosure shall be such that air currents created by the exhaust systems will capture the contaminants and transport them directly to the exhaust duct."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Hoods or enclosures shall be used where contaminants originate in a limited area of a space. The design of the hood or enclosure shall be such that air currents created by the exhaust systems will capture the contaminants and transport them directly to the exhaust duct.",
+  "previewText" : "Hoods or enclosures shall be used where contaminants originate in a limited area of a space.",
+  "schemaVersion" : 2,
+  "sectionID" : 10708
+}

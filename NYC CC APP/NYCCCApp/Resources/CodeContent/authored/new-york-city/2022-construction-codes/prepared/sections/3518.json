@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177515\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177515\"><\/AnnotationDrawer><div>Areas of roofs that are occupiable, such as vegetative roofs, roof gardens or for assembly or other similar purposes, and marquees are permitted to have their uniformly distributed live loads reduced in accordance with Section 1607.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3518-html-1",
+      "kind" : "html",
+      "plainText" : "Areas of roofs that are occupiable, such as vegetative roofs, roof gardens or for assembly or other similar purposes, and marquees are permitted to have their uniformly distributed live loads reduced in accordance with Section 1607.11."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Areas of roofs that are occupiable, such as vegetative roofs, roof gardens or for assembly or other similar purposes, and marquees are permitted to have their uniformly distributed live loads reduced in accordance with Section 1607.11.",
+  "previewText" : "Areas of roofs that are occupiable, such as vegetative roofs, roof gardens or for assembly or other similar purposes, and marquees are permitted to have their uniformly distributed live loads reduced in accordance with Section 1607.",
+  "schemaVersion" : 2,
+  "sectionID" : 3518
+}

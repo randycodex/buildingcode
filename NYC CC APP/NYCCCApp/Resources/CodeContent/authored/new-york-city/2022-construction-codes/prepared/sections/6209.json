@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185854\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185854\"><\/AnnotationDrawer><div>No person, material, or equipment shall be permitted on any joist, temporary decking or permanent decking, until all members, fasteners, shoring and bracing have been installed as indicated on the drawings required by Section 3305.8.6.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6209-html-1",
+      "kind" : "html",
+      "plainText" : "No person, material, or equipment shall be permitted on any joist, temporary decking or permanent decking, until all members, fasteners, shoring and bracing have been installed as indicated on the drawings required by Section 3305.8.6.1."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "No person, material, or equipment shall be permitted on any joist, temporary decking or permanent decking, until all members, fasteners, shoring and bracing have been installed as indicated on the drawings required by Section 3305.8.6.1.",
+  "previewText" : "No person, material, or equipment shall be permitted on any joist, temporary decking or permanent decking, until all members, fasteners, shoring and bracing have been installed as indicated on the drawings required by Section 3305.",
+  "schemaVersion" : 2,
+  "sectionID" : 6209
+}

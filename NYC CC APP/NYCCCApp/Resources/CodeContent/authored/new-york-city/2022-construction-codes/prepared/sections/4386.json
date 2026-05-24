@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180300\"><\/AnnotationDrawer><div>Cylinders for strength tests shall be molded and standard-cured in accordance with ASTM C 31.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4386-html-1",
+      "kind" : "html",
+      "plainText" : "Cylinders for strength tests shall be molded and standard-cured in accordance with ASTM C 31."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Cylinders for strength tests shall be molded and standard-cured in accordance with ASTM C 31.",
+  "previewText" : "Cylinders for strength tests shall be molded and standard-cured in accordance with ASTM C 31.",
+  "schemaVersion" : 2,
+  "sectionID" : 4386
+}

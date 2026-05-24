@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189141\"><\/AnnotationDrawer><div>Wall signs erected inside the fire districts shall be constructed entirely of noncombustible materials, and the facings of such signs shall be of noncombustible materials, except as permitted by Section H107. Outside of the fire districts, the structure of wall signs exceeding 500 square feet (46 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in display area shall be constructed of noncombustible materials, and the facings of such signs shall be of noncombustible materials, except as permitted in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-189099', hash: '#JD_BCH107' }}\">H107<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7244-html-1",
+      "kind" : "html",
+      "plainText" : "Wall signs erected inside the fire districts shall be constructed entirely of noncombustible materials, and the facings of such signs shall be of noncombustible materials, except as permitted by Section H107. Outside of the fire districts, the structure of wall signs exceeding 500 square feet (46 m\n\n 2 \n\n ) in display area shall be constructed of noncombustible materials, and the facings of such signs shall be of noncombustible materials, except as permitted in Section H107 ."
+    }
+  ],
+  "chapterNumber" : "H",
+  "officialText" : "Wall signs erected inside the fire districts shall be constructed entirely of noncombustible materials, and the facings of such signs shall be of noncombustible materials, except as permitted by Section H107. Outside of the fire districts, the structure of wall signs exceeding 500 square feet (46 m 2 ) in display area shall be constructed of noncombustible materials, and the facings of such signs shall be of noncombustible materials, except as permitted in Section H107.",
+  "previewText" : "Wall signs erected inside the fire districts shall be constructed entirely of noncombustible materials, and the facings of such signs shall be of noncombustible materials, except as permitted by Section H107.",
+  "schemaVersion" : 2,
+  "sectionID" : 7244
+}

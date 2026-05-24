@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185279\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185279\"><\/AnnotationDrawer><div>The pre-shift safety meetings required by Section 3301.12 shall contain instruction on fire hazards, fire safety safeguards, and fire safety procedures applicable to the individual worker.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5986-html-1",
+      "kind" : "html",
+      "plainText" : "The pre-shift safety meetings required by Section 3301.12 shall contain instruction on fire hazards, fire safety safeguards, and fire safety procedures applicable to the individual worker."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The pre-shift safety meetings required by Section 3301.12 shall contain instruction on fire hazards, fire safety safeguards, and fire safety procedures applicable to the individual worker.",
+  "previewText" : "The pre-shift safety meetings required by Section 3301.",
+  "schemaVersion" : 2,
+  "sectionID" : 5986
+}

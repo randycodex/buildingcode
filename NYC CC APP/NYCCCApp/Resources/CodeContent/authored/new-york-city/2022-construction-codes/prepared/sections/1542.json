@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171020\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171020\"><\/AnnotationDrawer><div>Fire protection systems shall be tested in accordance with the requirements of this code and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span> When required by this chapter, the tests shall be conducted in the presence of the department or an approved agency. Tests required by this code, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and the standards listed in this code shall be conducted at the expense of the owner or the owner's representative. It shall be unlawful to occupy portions of a structure until the required fire protection systems within that portion of the structure have been tested and approved.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1542-html-1",
+      "kind" : "html",
+      "plainText" : "Fire protection systems shall be tested in accordance with the requirements of this code and the New York City Fire Code. When required by this chapter, the tests shall be conducted in the presence of the department or an approved agency. Tests required by this code, the New York City Fire Code and the standards listed in this code shall be conducted at the expense of the owner or the owner's representative. It shall be unlawful to occupy portions of a structure until the required fire protection systems within that portion of the structure have been tested and approved."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fire protection systems shall be tested in accordance with the requirements of this code and the New York City Fire Code. When required by this chapter, the tests shall be conducted in the presence of the department or an approved agency. Tests required by this code, the New York City Fire Code and the standards listed in this code shall be conducted at the expense of the owner or the owner's representative. It shall be unlawful to occupy portions of a structure until the required fire protection systems within that portion of the structure have been tested and approved.",
+  "previewText" : "Fire protection systems shall be tested in accordance with the requirements of this code and the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 1542
+}

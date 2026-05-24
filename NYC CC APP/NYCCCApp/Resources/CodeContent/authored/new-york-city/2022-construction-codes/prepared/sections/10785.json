@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194310\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194310\"><\/AnnotationDrawer><div>Air ducts shall be permitted to be rigid or flexible and shall be constructed of materials that are reinforced and sealed to satisfy the requirements for the use of the air duct system, such as the supply air system, the return or exhaust air system, and the variable volume\/pressure air system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10785-html-1",
+      "kind" : "html",
+      "plainText" : "Air ducts shall be permitted to be rigid or flexible and shall be constructed of materials that are reinforced and sealed to satisfy the requirements for the use of the air duct system, such as the supply air system, the return or exhaust air system, and the variable volume\/pressure air system."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Air ducts shall be permitted to be rigid or flexible and shall be constructed of materials that are reinforced and sealed to satisfy the requirements for the use of the air duct system, such as the supply air system, the return or exhaust air system, and the variable volume\/pressure air system.",
+  "previewText" : "Air ducts shall be permitted to be rigid or flexible and shall be constructed of materials that are reinforced and sealed to satisfy the requirements for the use of the air duct system, such as the supply air system, the return or exhaust air system, and the variable volume\/pressure air system.",
+  "schemaVersion" : 2,
+  "sectionID" : 10785
+}

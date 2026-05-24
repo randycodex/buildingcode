@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174570\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174570\"><\/AnnotationDrawer><div>Ramped aisles shall comply with Section 1029.13.1. Stepped aisles shall comply with Section 1029.13.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2568-html-1",
+      "kind" : "html",
+      "plainText" : "Ramped aisles shall comply with Section 1029.13.1. Stepped aisles shall comply with Section 1029.13.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Ramped aisles shall comply with Section 1029.13.1. Stepped aisles shall comply with Section 1029.13.2.",
+  "previewText" : "Ramped aisles shall comply with Section 1029.",
+  "schemaVersion" : 2,
+  "sectionID" : 2568
+}

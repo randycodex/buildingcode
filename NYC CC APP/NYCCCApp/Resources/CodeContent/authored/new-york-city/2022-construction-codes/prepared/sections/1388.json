@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170347\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170347\"><\/AnnotationDrawer><div>Where finishes applied to one or both sides of a concrete wall contribute to the fire-resistance rating, the concrete alone shall provide not less than one-half of the total required fire-resistance rating. Additionally, the contribution to the fire resistance of the finish on the nonfire-exposed side of a load-bearing wall shall not exceed one-half the contribution of the concrete alone.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1388-html-1",
+      "kind" : "html",
+      "plainText" : "Where finishes applied to one or both sides of a concrete wall contribute to the fire-resistance rating, the concrete alone shall provide not less than one-half of the total required fire-resistance rating. Additionally, the contribution to the fire resistance of the finish on the nonfire-exposed side of a load-bearing wall shall not exceed one-half the contribution of the concrete alone."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where finishes applied to one or both sides of a concrete wall contribute to the fire-resistance rating, the concrete alone shall provide not less than one-half of the total required fire-resistance rating. Additionally, the contribution to the fire resistance of the finish on the nonfire-exposed side of a load-bearing wall shall not exceed one-half the contribution of the concrete alone.",
+  "previewText" : "Where finishes applied to one or both sides of a concrete wall contribute to the fire-resistance rating, the concrete alone shall provide not less than one-half of the total required fire-resistance rating.",
+  "schemaVersion" : 2,
+  "sectionID" : 1388
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183161\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183161\"><\/AnnotationDrawer><div>Garage doors using foam plastic insulation complying with Section 2603.3 in detached and attached garages associated with one- and two-family dwellings need not be provided with a thermal barrier.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5251-html-1",
+      "kind" : "html",
+      "plainText" : "Garage doors using foam plastic insulation complying with Section 2603.3 in detached and attached garages associated with one- and two-family dwellings need not be provided with a thermal barrier."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "Garage doors using foam plastic insulation complying with Section 2603.3 in detached and attached garages associated with one- and two-family dwellings need not be provided with a thermal barrier.",
+  "previewText" : "Garage doors using foam plastic insulation complying with Section 2603.",
+  "schemaVersion" : 2,
+  "sectionID" : 5251
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198633\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198633\"><\/AnnotationDrawer><div>Chimneys serving appliances burning other fuels shall comply with Sections 503.5.7.1 through 503.5.7.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8482-html-1",
+      "kind" : "html",
+      "plainText" : "Chimneys serving appliances burning other fuels shall comply with Sections 503.5.7.1 through 503.5.7.4."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Chimneys serving appliances burning other fuels shall comply with Sections 503.5.7.1 through 503.5.7.4.",
+  "previewText" : "Chimneys serving appliances burning other fuels shall comply with Sections 503.",
+  "schemaVersion" : 2,
+  "sectionID" : 8482
+}

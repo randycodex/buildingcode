@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161772\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161772\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Faucets and fixture fittings with hose-connected outlets shall conform to ASME A112.18.3 or ASME A112.18.1\/CSA B125.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12041-html-1",
+      "kind" : "html",
+      "plainText" : "Faucets and fixture fittings with hose-connected outlets shall conform to ASME A112.18.3 or ASME A112.18.1\/CSA B125.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Faucets and fixture fittings with hose-connected outlets shall conform to ASME A112.18.3 or ASME A112.18.1\/CSA B125.1.",
+  "previewText" : "Faucets and fixture fittings with hose-connected outlets shall conform to ASME A112.",
+  "schemaVersion" : 2,
+  "sectionID" : 12041
+}

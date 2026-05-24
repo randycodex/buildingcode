@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197996\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197996\"><\/AnnotationDrawer><div>Piping installed underground beneath buildings is prohibited except where the piping is encased in a conduit of wrought iron or steel pipe designed to withstand the superimposed loads. The conduit shall be protected from corrosion in accordance with Section 404.11 and shall be installed in accordance with Section 404.14.1, 404.14.2 or 404.14.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8251-html-1",
+      "kind" : "html",
+      "plainText" : "Piping installed underground beneath buildings is prohibited except where the piping is encased in a conduit of wrought iron or steel pipe designed to withstand the superimposed loads. The conduit shall be protected from corrosion in accordance with Section 404.11 and shall be installed in accordance with Section 404.14.1, 404.14.2 or 404.14.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Piping installed underground beneath buildings is prohibited except where the piping is encased in a conduit of wrought iron or steel pipe designed to withstand the superimposed loads. The conduit shall be protected from corrosion in accordance with Section 404.11 and shall be installed in accordance with Section 404.14.1, 404.14.2 or 404.14.3.",
+  "previewText" : "Piping installed underground beneath buildings is prohibited except where the piping is encased in a conduit of wrought iron or steel pipe designed to withstand the superimposed loads.",
+  "schemaVersion" : 2,
+  "sectionID" : 8251
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162697\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162697\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where a horizontal drainage pipe, a building drain or a building sewer has a change of horizontal direction greater than 45 degrees (0.79 rad), a cleanout shall be installed at the change of direction. Where more than one change of horizontal direction greater than 45 degrees (0.79 rad) occurs within 40 feet (12 192 mm) of developed length of piping, the cleanout installed for the first change of direction shall serve as the cleanout for all changes in direction within that 40 feet (12 192 mm) of developed length of piping.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12404-html-1",
+      "kind" : "html",
+      "plainText" : "Where a horizontal drainage pipe, a building drain or a building sewer has a change of horizontal direction greater than 45 degrees (0.79 rad), a cleanout shall be installed at the change of direction. Where more than one change of horizontal direction greater than 45 degrees (0.79 rad) occurs within 40 feet (12 192 mm) of developed length of piping, the cleanout installed for the first change of direction shall serve as the cleanout for all changes in direction within that 40 feet (12 192 mm) of developed length of piping."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where a horizontal drainage pipe, a building drain or a building sewer has a change of horizontal direction greater than 45 degrees (0.79 rad), a cleanout shall be installed at the change of direction. Where more than one change of horizontal direction greater than 45 degrees (0.79 rad) occurs within 40 feet (12 192 mm) of developed length of piping, the cleanout installed for the first change of direction shall serve as the cleanout for all changes in direction within that 40 feet (12 192 mm) of developed length of piping.",
+  "previewText" : "Where a horizontal drainage pipe, a building drain or a building sewer has a change of horizontal direction greater than 45 degrees (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 12404
+}

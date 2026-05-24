@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188053\"><\/AnnotationDrawer><div>Roof covering in the fire district shall conform to the requirements of Class A or B roof coverings as defined in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-204929', hash: '#JD_BC1505' }}\">1505<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6873-html-1",
+      "kind" : "html",
+      "plainText" : "Roof covering in the fire district shall conform to the requirements of Class A or B roof coverings as defined in Section 1505 ."
+    }
+  ],
+  "chapterNumber" : "D",
+  "officialText" : "Roof covering in the fire district shall conform to the requirements of Class A or B roof coverings as defined in Section 1505.",
+  "previewText" : "Roof covering in the fire district shall conform to the requirements of Class A or B roof coverings as defined in Section 1505.",
+  "schemaVersion" : 2,
+  "sectionID" : 6873
+}

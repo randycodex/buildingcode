@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185794\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185794\"><\/AnnotationDrawer><div>The requirements of Section 2104.5 shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6188-html-1",
+      "kind" : "html",
+      "plainText" : "The requirements of Section 2104.5 shall apply."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The requirements of Section 2104.5 shall apply.",
+  "previewText" : "The requirements of Section 2104.",
+  "schemaVersion" : 2,
+  "sectionID" : 6188
+}

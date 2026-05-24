@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187095\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187095\"><\/AnnotationDrawer><div>With the exception of the planking, the following scaffolds shall be constructed of non-combustible materials:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187096\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187096\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Exterior scaffolds exceeding 75 feet (22 860 mm) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187097\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187097\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Interior scaffolds exceeding 21 feet (6401 mm) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187098\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;All scaffolds used in the alteration, repair, or partial demolition of buildings in Occupancy Groups I-1 to I-4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6602-html-1",
+      "kind" : "html",
+      "plainText" : "With the exception of the planking, the following scaffolds shall be constructed of non-combustible materials:\n\n 1. Exterior scaffolds exceeding 75 feet (22 860 mm) in height.\n\n 2. Interior scaffolds exceeding 21 feet (6401 mm) in height.\n\n 3. All scaffolds used in the alteration, repair, or partial demolition of buildings in Occupancy Groups I-1 to I-4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "With the exception of the planking, the following scaffolds shall be constructed of non-combustible materials:\n\n1. Exterior scaffolds exceeding 75 feet (22 860 mm) in height.\n\n2. Interior scaffolds exceeding 21 feet (6401 mm) in height.\n\n3. All scaffolds used in the alteration, repair, or partial demolition of buildings in Occupancy Groups I-1 to I-4.",
+  "previewText" : "With the exception of the planking, the following scaffolds shall be constructed of non-combustible materials:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 6602
+}

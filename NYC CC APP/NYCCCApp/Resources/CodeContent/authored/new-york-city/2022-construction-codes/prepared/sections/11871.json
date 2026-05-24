@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161336\"><\/AnnotationDrawer><div>Toilet facilities shall be provided for construction workers and such facilities shall be maintained in a sanitary condition. Construction worker toilet facilities of the nonsewer type shall conform to ANSI Z4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161337\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161337\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161337\"><\/AnnotationDrawer><h6><a name=\"JD_PC312\" id=\"JD_PC312\" title=\"PC 312\"><\/a>Section PC 312: Tests and Inspections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11871-html-1",
+      "kind" : "html",
+      "plainText" : "Toilet facilities shall be provided for construction workers and such facilities shall be maintained in a sanitary condition. Construction worker toilet facilities of the nonsewer type shall conform to ANSI Z4.3.\n\n Section PC 312: Tests and Inspections"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Toilet facilities shall be provided for construction workers and such facilities shall be maintained in a sanitary condition. Construction worker toilet facilities of the nonsewer type shall conform to ANSI Z4.3.\n\nSection PC 312: Tests and Inspections",
+  "previewText" : "Toilet facilities shall be provided for construction workers and such facilities shall be maintained in a sanitary condition.",
+  "schemaVersion" : 2,
+  "sectionID" : 11871
+}

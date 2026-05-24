@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170055\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170055\"><\/AnnotationDrawer><div>Fireblocking shall be provided in concealed spaces of stud walls and partitions, including furred spaces, and parallel rows of studs or staggered studs, as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170056\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170056\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Vertically at the ceiling and floor levels.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170057\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170057\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Horizontally at intervals not exceeding 10 feet (3048 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1328-html-1",
+      "kind" : "html",
+      "plainText" : "Fireblocking shall be provided in concealed spaces of stud walls and partitions, including furred spaces, and parallel rows of studs or staggered studs, as follows:\n\n 1. Vertically at the ceiling and floor levels.\n\n 2. Horizontally at intervals not exceeding 10 feet (3048 mm)."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fireblocking shall be provided in concealed spaces of stud walls and partitions, including furred spaces, and parallel rows of studs or staggered studs, as follows:\n\n1. Vertically at the ceiling and floor levels.\n\n2. Horizontally at intervals not exceeding 10 feet (3048 mm).",
+  "previewText" : "Fireblocking shall be provided in concealed spaces of stud walls and partitions, including furred spaces, and parallel rows of studs or staggered studs, as follows:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 1328
+}

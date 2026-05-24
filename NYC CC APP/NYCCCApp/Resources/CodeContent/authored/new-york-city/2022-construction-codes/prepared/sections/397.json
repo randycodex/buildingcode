@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167053\"><\/AnnotationDrawer><div>The following term is defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167054\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167054\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;OPEN PARKING LOT.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "397-html-1",
+      "kind" : "html",
+      "plainText" : "The following term is defined in Chapter 2 :\n\n OPEN PARKING LOT."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The following term is defined in Chapter 2:\n\nOPEN PARKING LOT.",
+  "previewText" : "The following term is defined in Chapter 2:\n\nOPEN PARKING LOT.",
+  "schemaVersion" : 2,
+  "sectionID" : 397
+}

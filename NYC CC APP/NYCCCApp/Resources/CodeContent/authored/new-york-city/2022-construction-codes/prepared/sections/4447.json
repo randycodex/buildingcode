@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180448\"><\/AnnotationDrawer><div>Prestressing reinforcement shall be clean and free of oil, dirt, scale, pitting and excessive rust. A light coating of rust is permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4447-html-1",
+      "kind" : "html",
+      "plainText" : "Prestressing reinforcement shall be clean and free of oil, dirt, scale, pitting and excessive rust. A light coating of rust is permitted."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Prestressing reinforcement shall be clean and free of oil, dirt, scale, pitting and excessive rust. A light coating of rust is permitted.",
+  "previewText" : "Prestressing reinforcement shall be clean and free of oil, dirt, scale, pitting and excessive rust.",
+  "schemaVersion" : 2,
+  "sectionID" : 4447
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162387\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162387\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Hot water shall be provided to supply all of the hospital fixture, kitchen and laundry requirements. Special fixtures and equipment shall have hot water supplied at a temperature specified by the manufacturer. The hot water system shall be installed in accordance with Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224168', hash: '#JD_PC607' }}\">607<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12284-html-1",
+      "kind" : "html",
+      "plainText" : "Hot water shall be provided to supply all of the hospital fixture, kitchen and laundry requirements. Special fixtures and equipment shall have hot water supplied at a temperature specified by the manufacturer. The hot water system shall be installed in accordance with Section 607 ."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Hot water shall be provided to supply all of the hospital fixture, kitchen and laundry requirements. Special fixtures and equipment shall have hot water supplied at a temperature specified by the manufacturer. The hot water system shall be installed in accordance with Section 607.",
+  "previewText" : "Hot water shall be provided to supply all of the hospital fixture, kitchen and laundry requirements.",
+  "schemaVersion" : 2,
+  "sectionID" : 12284
+}

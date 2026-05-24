@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168136\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168136\"><\/AnnotationDrawer><div>Group R occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.8. Group I-1 occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.6. Quick response or residential automatic sprinklers shall be installed in accordance with Section 903.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "748-html-1",
+      "kind" : "html",
+      "plainText" : "Group R occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.8. Group I-1 occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.6. Quick response or residential automatic sprinklers shall be installed in accordance with Section 903.3.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Group R occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.8. Group I-1 occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.6. Quick response or residential automatic sprinklers shall be installed in accordance with Section 903.3.2.",
+  "previewText" : "Group R occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.",
+  "schemaVersion" : 2,
+  "sectionID" : 748
+}

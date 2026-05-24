@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181260\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181260\"><\/AnnotationDrawer><div>Cleanout openings shall be provided within 6 inches (152 mm) of the base of each flue within every masonry chimney. The upper edge of the cleanout shall be located not less than 6 inches (152 mm) below the lowest chimney inlet opening. The height of the opening shall be not less than 6 inches (152 mm). The cleanout shall be provided with a noncombustible cover.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181261\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181261\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Chimney flues serving masonry fireplaces, where cleaning is possible through the fireplace opening.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4737-html-1",
+      "kind" : "html",
+      "plainText" : "Cleanout openings shall be provided within 6 inches (152 mm) of the base of each flue within every masonry chimney. The upper edge of the cleanout shall be located not less than 6 inches (152 mm) below the lowest chimney inlet opening. The height of the opening shall be not less than 6 inches (152 mm). The cleanout shall be provided with a noncombustible cover.\n\n Exception: Chimney flues serving masonry fireplaces, where cleaning is possible through the fireplace opening."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Cleanout openings shall be provided within 6 inches (152 mm) of the base of each flue within every masonry chimney. The upper edge of the cleanout shall be located not less than 6 inches (152 mm) below the lowest chimney inlet opening. The height of the opening shall be not less than 6 inches (152 mm). The cleanout shall be provided with a noncombustible cover.\n\nException: Chimney flues serving masonry fireplaces, where cleaning is possible through the fireplace opening.",
+  "previewText" : "Cleanout openings shall be provided within 6 inches (152 mm) of the base of each flue within every masonry chimney.",
+  "schemaVersion" : 2,
+  "sectionID" : 4737
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181912\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181912\"><\/AnnotationDrawer><div>Roofs shall be without concealed spaces and roof decks shall be constructed in accordance with Section 2304.11.4.1 or 2304.11.4.2. Other types of decking shall be an alternative that provides equivalent fire resistance and structural properties. Where supported by a wall, roof decks shall be anchored to walls to resist forces determined in accordance with Chapter 16. Such anchors shall consist of steel bolts, lags, screws or approved hardware of sufficient strength to resist prescribed forces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4952-html-1",
+      "kind" : "html",
+      "plainText" : "Roofs shall be without concealed spaces and roof decks shall be constructed in accordance with Section 2304.11.4.1 or 2304.11.4.2. Other types of decking shall be an alternative that provides equivalent fire resistance and structural properties. Where supported by a wall, roof decks shall be anchored to walls to resist forces determined in accordance with Chapter 16. Such anchors shall consist of steel bolts, lags, screws or approved hardware of sufficient strength to resist prescribed forces."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Roofs shall be without concealed spaces and roof decks shall be constructed in accordance with Section 2304.11.4.1 or 2304.11.4.2. Other types of decking shall be an alternative that provides equivalent fire resistance and structural properties. Where supported by a wall, roof decks shall be anchored to walls to resist forces determined in accordance with Chapter 16. Such anchors shall consist of steel bolts, lags, screws or approved hardware of sufficient strength to resist prescribed forces.",
+  "previewText" : "Roofs shall be without concealed spaces and roof decks shall be constructed in accordance with Section 2304.",
+  "schemaVersion" : 2,
+  "sectionID" : 4952
+}

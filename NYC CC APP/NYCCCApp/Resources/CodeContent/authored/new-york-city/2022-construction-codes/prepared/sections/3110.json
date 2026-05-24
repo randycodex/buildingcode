@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176220\"><\/AnnotationDrawer><div>Anchored masonry veneer located in Seismic Design Category C or D shall conform to the requirements of Section 12.2.2.10 of TMS 402, as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180723', hash: '#JD_BCCh.21' }}\">Chapter 21<\/Link> of this code<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3110-html-1",
+      "kind" : "html",
+      "plainText" : "Anchored masonry veneer located in Seismic Design Category C or D shall conform to the requirements of Section 12.2.2.10 of TMS 402, as modified by Chapter 21 of this code"
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Anchored masonry veneer located in Seismic Design Category C or D shall conform to the requirements of Section 12.2.2.10 of TMS 402, as modified by Chapter 21 of this code",
+  "previewText" : "Anchored masonry veneer located in Seismic Design Category C or D shall conform to the requirements of Section 12.",
+  "schemaVersion" : 2,
+  "sectionID" : 3110
+}

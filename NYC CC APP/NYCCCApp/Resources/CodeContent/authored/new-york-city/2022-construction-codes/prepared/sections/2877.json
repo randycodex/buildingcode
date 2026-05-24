@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175491\"><\/AnnotationDrawer><div>Service facilities shall provide for accessible features in accordance with Sections 1109.12.1 through 1109.12.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2877-html-1",
+      "kind" : "html",
+      "plainText" : "Service facilities shall provide for accessible features in accordance with Sections 1109.12.1 through 1109.12.5."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Service facilities shall provide for accessible features in accordance with Sections 1109.12.1 through 1109.12.5.",
+  "previewText" : "Service facilities shall provide for accessible features in accordance with Sections 1109.",
+  "schemaVersion" : 2,
+  "sectionID" : 2877
+}

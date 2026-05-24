@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167623\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167623\"><\/AnnotationDrawer><div>The landing area for helicopters less than 3,500 pounds (1588 kg) shall be not less than 20 feet (6096 mm) in length and width. The landing area shall be surrounded on all sides by a clear area having a minimum average width at roof level of 15 feet (4572 mm) but with no width less than 5 feet (1524 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "582-html-1",
+      "kind" : "html",
+      "plainText" : "The landing area for helicopters less than 3,500 pounds (1588 kg) shall be not less than 20 feet (6096 mm) in length and width. The landing area shall be surrounded on all sides by a clear area having a minimum average width at roof level of 15 feet (4572 mm) but with no width less than 5 feet (1524 mm)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The landing area for helicopters less than 3,500 pounds (1588 kg) shall be not less than 20 feet (6096 mm) in length and width. The landing area shall be surrounded on all sides by a clear area having a minimum average width at roof level of 15 feet (4572 mm) but with no width less than 5 feet (1524 mm).",
+  "previewText" : "The landing area for helicopters less than 3,500 pounds (1588 kg) shall be not less than 20 feet (6096 mm) in length and width.",
+  "schemaVersion" : 2,
+  "sectionID" : 582
+}

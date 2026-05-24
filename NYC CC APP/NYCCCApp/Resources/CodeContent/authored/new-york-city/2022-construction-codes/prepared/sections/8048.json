@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197388\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197388\"><\/AnnotationDrawer><div>In exterior walls and bearing partitions, wood studs are permitted to be cut or notched to a depth not exceeding 25 percent of the width of the stud. Cutting or notching of studs to a depth not greater than 40 percent of the width of the stud is permitted in nonbearing partitions supporting no loads other than the weight of the partition. See <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182278', hash: '#JD_BCFIgure2308.5.8' }}\">Figure 2308.5.8<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8048-html-1",
+      "kind" : "html",
+      "plainText" : "In exterior walls and bearing partitions, wood studs are permitted to be cut or notched to a depth not exceeding 25 percent of the width of the stud. Cutting or notching of studs to a depth not greater than 40 percent of the width of the stud is permitted in nonbearing partitions supporting no loads other than the weight of the partition. See Figure 2308.5.8 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "In exterior walls and bearing partitions, wood studs are permitted to be cut or notched to a depth not exceeding 25 percent of the width of the stud. Cutting or notching of studs to a depth not greater than 40 percent of the width of the stud is permitted in nonbearing partitions supporting no loads other than the weight of the partition. See Figure 2308.5.8 of the New York City Building Code.",
+  "previewText" : "In exterior walls and bearing partitions, wood studs are permitted to be cut or notched to a depth not exceeding 25 percent of the width of the stud.",
+  "schemaVersion" : 2,
+  "sectionID" : 8048
+}

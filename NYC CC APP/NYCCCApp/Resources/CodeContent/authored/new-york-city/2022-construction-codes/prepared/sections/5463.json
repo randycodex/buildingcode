@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183769\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183769\"><\/AnnotationDrawer><div>Amusement devices shall comply with rules of the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183770\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183770\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183770\"><\/AnnotationDrawer><h6><a name=\"JD_BC3005\" id=\"JD_BC3005\" title=\"BC 3005\"><\/a>Section BC 3005: Machinery Spaces, Machine Rooms, Control Spaces and Control Rooms<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5463-html-1",
+      "kind" : "html",
+      "plainText" : "Amusement devices shall comply with rules of the department.\n\n Section BC 3005: Machinery Spaces, Machine Rooms, Control Spaces and Control Rooms"
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Amusement devices shall comply with rules of the department.",
+  "previewText" : "Amusement devices shall comply with rules of the department.",
+  "schemaVersion" : 2,
+  "sectionID" : 5463
+}

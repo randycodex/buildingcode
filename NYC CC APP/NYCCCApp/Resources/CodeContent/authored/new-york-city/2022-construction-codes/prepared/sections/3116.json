@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176235\"><\/AnnotationDrawer><div>Water-resistive barriers shall be installed as required in Section 2510.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3116-html-1",
+      "kind" : "html",
+      "plainText" : "Water-resistive barriers shall be installed as required in Section 2510.6."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Water-resistive barriers shall be installed as required in Section 2510.6.",
+  "previewText" : "Water-resistive barriers shall be installed as required in Section 2510.",
+  "schemaVersion" : 2,
+  "sectionID" : 3116
+}

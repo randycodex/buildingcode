@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198635\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198635\"><\/AnnotationDrawer><div>An appliance shall not be connected to a chimney flue serving a separate appliance designed to burn solid fuel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8483-html-1",
+      "kind" : "html",
+      "plainText" : "An appliance shall not be connected to a chimney flue serving a separate appliance designed to burn solid fuel."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "An appliance shall not be connected to a chimney flue serving a separate appliance designed to burn solid fuel.",
+  "previewText" : "An appliance shall not be connected to a chimney flue serving a separate appliance designed to burn solid fuel.",
+  "schemaVersion" : 2,
+  "sectionID" : 8483
+}

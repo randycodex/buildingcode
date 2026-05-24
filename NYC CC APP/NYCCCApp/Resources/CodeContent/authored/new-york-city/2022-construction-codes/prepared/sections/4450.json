@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180456\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180456\"><\/AnnotationDrawer><div>Unless otherwise specified by the registered design professional of record, reinforcement, including tendons, and posttensioning ducts shall be placed within the tolerances specified in Sections 1907.5.2.1 and 1907.5.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4450-html-1",
+      "kind" : "html",
+      "plainText" : "Unless otherwise specified by the registered design professional of record, reinforcement, including tendons, and posttensioning ducts shall be placed within the tolerances specified in Sections 1907.5.2.1 and 1907.5.2.2."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Unless otherwise specified by the registered design professional of record, reinforcement, including tendons, and posttensioning ducts shall be placed within the tolerances specified in Sections 1907.5.2.1 and 1907.5.2.2.",
+  "previewText" : "Unless otherwise specified by the registered design professional of record, reinforcement, including tendons, and posttensioning ducts shall be placed within the tolerances specified in Sections 1907.",
+  "schemaVersion" : 2,
+  "sectionID" : 4450
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168723\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168723\"><\/AnnotationDrawer><div>Required separations shall be fire barriers constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169272', hash: '#JD_BC707' }}\">707<\/Link> or horizontal assemblies constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169425', hash: '#JD_BC711' }}\">711<\/Link>, or both, so as to completely separate adjacent occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168724\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168724\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168724\"><\/AnnotationDrawer><h6><a name=\"JD_BC509\" id=\"JD_BC509\" title=\"BC 509\"><\/a>Section BC 509: Incidental Uses<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "927-html-1",
+      "kind" : "html",
+      "plainText" : "Required separations shall be fire barriers constructed in accordance with Section 707 or horizontal assemblies constructed in accordance with Section 711 , or both, so as to completely separate adjacent occupancies.\n\n Section BC 509: Incidental Uses"
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Required separations shall be fire barriers constructed in accordance with Section 707 or horizontal assemblies constructed in accordance with Section 711, or both, so as to completely separate adjacent occupancies.",
+  "previewText" : "Required separations shall be fire barriers constructed in accordance with Section 707 or horizontal assemblies constructed in accordance with Section 711, or both, so as to completely separate adjacent occupancies.",
+  "schemaVersion" : 2,
+  "sectionID" : 927
+}

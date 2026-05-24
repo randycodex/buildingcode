@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169915\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169915\"><\/AnnotationDrawer><div>The fire damper actuation device shall meet one of the following requirements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169916\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169916\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The operating temperature shall be approximately 50&#176;F (10&#176;C) above the normal temperature within the duct system, but not less than 160&#176;F (71.1&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169917\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169917\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The operating temperature shall be not more than 350&#176;F (176.7&#176;C) where located in a smoke control system complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-234097', hash: '#JD_BC909' }}\">909<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1293-html-1",
+      "kind" : "html",
+      "plainText" : "The fire damper actuation device shall meet one of the following requirements:\n\n 1. The operating temperature shall be approximately 50°F (10°C) above the normal temperature within the duct system, but not less than 160°F (71.1°C).\n\n 2. The operating temperature shall be not more than 350°F (176.7°C) where located in a smoke control system complying with Section 909 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire damper actuation device shall meet one of the following requirements:\n\n1. The operating temperature shall be approximately 50°F (10°C) above the normal temperature within the duct system, but not less than 160°F (71.1°C).\n\n2. The operating temperature shall be not more than 350°F (176.7°C) where located in a smoke control system complying with Section 909.",
+  "previewText" : "The fire damper actuation device shall meet one of the following requirements:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 1293
+}

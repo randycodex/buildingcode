@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198422\"><\/AnnotationDrawer><div>Every appliance shall discharge the products of combustion to the outdoors, except for appliances exempted by Section 501.8.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198423\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198423\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Commercial cooking appliances vented by a Type I hood installed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193937', hash: '#JD_MC507' }}\">507<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8407-html-1",
+      "kind" : "html",
+      "plainText" : "Every appliance shall discharge the products of combustion to the outdoors, except for appliances exempted by Section 501.8.\n\n Exception: Commercial cooking appliances vented by a Type I hood installed in accordance with Section 507 of the New York City Mechanical Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Every appliance shall discharge the products of combustion to the outdoors, except for appliances exempted by Section 501.8.\n\nException: Commercial cooking appliances vented by a Type I hood installed in accordance with Section 507 of the New York City Mechanical Code.",
+  "previewText" : "Every appliance shall discharge the products of combustion to the outdoors, except for appliances exempted by Section 501.",
+  "schemaVersion" : 2,
+  "sectionID" : 8407
+}

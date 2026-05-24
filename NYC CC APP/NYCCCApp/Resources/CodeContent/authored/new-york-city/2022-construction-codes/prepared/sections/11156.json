@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195382\"><\/AnnotationDrawer><div>Masonry heaters shall be constructed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195383\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195383\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195383\"><\/AnnotationDrawer><h6><a name=\"JD_MC926\" id=\"JD_MC926\" title=\"MC 926\"><\/a>Section MC 926: Gaseous Hydrogen Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11156-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry heaters shall be constructed in accordance with the New York City Building Code .\n\n Section MC 926: Gaseous Hydrogen Systems"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Masonry heaters shall be constructed in accordance with the New York City Building Code.\n\nSection MC 926: Gaseous Hydrogen Systems",
+  "previewText" : "Masonry heaters shall be constructed in accordance with the New York City Building Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11156
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162662\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162662\"><\/AnnotationDrawer><div>O-ring joints for stainless steel drainage systems shall be made with an approved elastomeric seal.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162663\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162663\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162663\"><\/AnnotationDrawer><h6><a name=\"JD_PC706\" id=\"JD_PC706\" title=\"PC 706\"><\/a>Section PC 706: Connections Between Drainage Piping and Fittings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12394-html-1",
+      "kind" : "html",
+      "plainText" : "O-ring joints for stainless steel drainage systems shall be made with an approved elastomeric seal.\n\n Section PC 706: Connections Between Drainage Piping and Fittings"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "O-ring joints for stainless steel drainage systems shall be made with an approved elastomeric seal.\n\nSection PC 706: Connections Between Drainage Piping and Fittings",
+  "previewText" : "O-ring joints for stainless steel drainage systems shall be made with an approved elastomeric seal.",
+  "schemaVersion" : 2,
+  "sectionID" : 12394
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169014\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169014\"><\/AnnotationDrawer><div>The required thickness and construction of fire-resistance-rated assemblies enclosing trusses shall be based on the results of full-scale tests or combinations of tests on truss components or on approved calculations based on such tests that satisfactorily demonstrate that the assembly has the required fire resistance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "985-html-1",
+      "kind" : "html",
+      "plainText" : "The required thickness and construction of fire-resistance-rated assemblies enclosing trusses shall be based on the results of full-scale tests or combinations of tests on truss components or on approved calculations based on such tests that satisfactorily demonstrate that the assembly has the required fire resistance."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The required thickness and construction of fire-resistance-rated assemblies enclosing trusses shall be based on the results of full-scale tests or combinations of tests on truss components or on approved calculations based on such tests that satisfactorily demonstrate that the assembly has the required fire resistance.",
+  "previewText" : "The required thickness and construction of fire-resistance-rated assemblies enclosing trusses shall be based on the results of full-scale tests or combinations of tests on truss components or on approved calculations based on such tests that satisfactorily demonstrate that the assembly has the required fire resistance.",
+  "schemaVersion" : 2,
+  "sectionID" : 985
+}

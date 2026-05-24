@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193059\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193059\"><\/AnnotationDrawer><div>Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 307.2.1 through 307.2.6.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193060\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193060\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10357-html-1",
+      "kind" : "html",
+      "plainText" : "Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 307.2.1 through 307.2.6.\n\n Exception: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 307.2.1 through 307.2.6.\n\nException: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.",
+  "previewText" : "Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils.",
+  "schemaVersion" : 2,
+  "sectionID" : 10357
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162688\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162688\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Cleanouts shall be provided for drainage piping in accordance with Sections 708.1.1 through 708.1.12.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12400-html-1",
+      "kind" : "html",
+      "plainText" : "Cleanouts shall be provided for drainage piping in accordance with Sections 708.1.1 through 708.1.12."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Cleanouts shall be provided for drainage piping in accordance with Sections 708.1.1 through 708.1.12.",
+  "previewText" : "Cleanouts shall be provided for drainage piping in accordance with Sections 708.",
+  "schemaVersion" : 2,
+  "sectionID" : 12400
+}

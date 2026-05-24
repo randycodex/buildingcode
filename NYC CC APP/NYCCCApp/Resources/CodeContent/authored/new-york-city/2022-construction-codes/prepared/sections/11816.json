@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161201\"><\/AnnotationDrawer><div>U\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">nless otherwise indicated, the pipe, tube and fitting sizes specified in this code are expressed in nominal or standard sizes as designated in the referenced material standards.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11816-html-1",
+      "kind" : "html",
+      "plainText" : "U\n\n nless otherwise indicated, the pipe, tube and fitting sizes specified in this code are expressed in nominal or standard sizes as designated in the referenced material standards."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "U nless otherwise indicated, the pipe, tube and fitting sizes specified in this code are expressed in nominal or standard sizes as designated in the referenced material standards.",
+  "previewText" : "U nless otherwise indicated, the pipe, tube and fitting sizes specified in this code are expressed in nominal or standard sizes as designated in the referenced material standards.",
+  "schemaVersion" : 2,
+  "sectionID" : 11816
+}

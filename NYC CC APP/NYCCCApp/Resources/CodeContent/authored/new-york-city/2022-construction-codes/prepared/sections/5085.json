@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182559\"><\/AnnotationDrawer><div>Joints in lumber sheathing shall occur over supports unless approved end-matched lumber is used, in which case each piece shall bear on at least two supports.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182560\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182560\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224436\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224436\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5085-html-1",
+      "kind" : "html",
+      "plainText" : "Joints in lumber sheathing shall occur over supports unless approved end-matched lumber is used, in which case each piece shall bear on at least two supports.\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Joints in lumber sheathing shall occur over supports unless approved end-matched lumber is used, in which case each piece shall bear on at least two supports.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "Joints in lumber sheathing shall occur over supports unless approved end-matched lumber is used, in which case each piece shall bear on at least two supports.",
+  "schemaVersion" : 2,
+  "sectionID" : 5085
+}

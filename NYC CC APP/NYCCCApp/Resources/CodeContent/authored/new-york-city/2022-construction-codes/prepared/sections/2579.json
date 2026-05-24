@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174596\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174596\"><\/AnnotationDrawer><div>Aisles, cross aisles and stepped aisles shall be illuminated in accordance with Section 1008.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2579-html-1",
+      "kind" : "html",
+      "plainText" : "Aisles, cross aisles and stepped aisles shall be illuminated in accordance with Section 1008.2.1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Aisles, cross aisles and stepped aisles shall be illuminated in accordance with Section 1008.2.1.",
+  "previewText" : "Aisles, cross aisles and stepped aisles shall be illuminated in accordance with Section 1008.",
+  "schemaVersion" : 2,
+  "sectionID" : 2579
+}

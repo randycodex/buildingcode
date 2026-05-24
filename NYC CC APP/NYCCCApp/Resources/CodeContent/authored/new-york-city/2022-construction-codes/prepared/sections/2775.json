@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175218\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175218\"><\/AnnotationDrawer><div>If a service or facility is provided in an area that is not required to be accessible in accordance with Section 1108.2.9, the same service or facility shall be provided on an accessible level and shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2775-html-1",
+      "kind" : "html",
+      "plainText" : "If a service or facility is provided in an area that is not required to be accessible in accordance with Section 1108.2.9, the same service or facility shall be provided on an accessible level and shall be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "If a service or facility is provided in an area that is not required to be accessible in accordance with Section 1108.2.9, the same service or facility shall be provided on an accessible level and shall be accessible.",
+  "previewText" : "If a service or facility is provided in an area that is not required to be accessible in accordance with Section 1108.",
+  "schemaVersion" : 2,
+  "sectionID" : 2775
+}

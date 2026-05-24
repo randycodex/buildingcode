@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168341\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168341\"><\/AnnotationDrawer><div>Ducts shall be of sheet steel of not less than No. 16 manufacturers' standard gauge or of other equivalent noncombustible material having a melting point above 1800&#176;F (982&#176;C). Exhaust ducts within the building, on the discharge side of the fan, shall be welded airtight. Exhaust ducts within the building, on the suction side of the fan, shall have laps in the direction of airflow with smoke-tight joints, and shall be subjected to a smoke test in accordance with the requirements for chimneys in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span> Access hatches with tight-closing covers shall be provided for cleaning and for fire-fighting in the exhaust system ducts.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "822-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts shall be of sheet steel of not less than No. 16 manufacturers' standard gauge or of other equivalent noncombustible material having a melting point above 1800°F (982°C). Exhaust ducts within the building, on the discharge side of the fan, shall be welded airtight. Exhaust ducts within the building, on the suction side of the fan, shall have laps in the direction of airflow with smoke-tight joints, and shall be subjected to a smoke test in accordance with the requirements for chimneys in the New York City Mechanical Code. Access hatches with tight-closing covers shall be provided for cleaning and for fire-fighting in the exhaust system ducts."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Ducts shall be of sheet steel of not less than No. 16 manufacturers' standard gauge or of other equivalent noncombustible material having a melting point above 1800°F (982°C). Exhaust ducts within the building, on the discharge side of the fan, shall be welded airtight. Exhaust ducts within the building, on the suction side of the fan, shall have laps in the direction of airflow with smoke-tight joints, and shall be subjected to a smoke test in accordance with the requirements for chimneys in the New York City Mechanical Code. Access hatches with tight-closing covers shall be provided for cleaning and for fire-fighting in the exhaust system ducts.",
+  "previewText" : "Ducts shall be of sheet steel of not less than No.",
+  "schemaVersion" : 2,
+  "sectionID" : 822
+}

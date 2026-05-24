@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194487\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194487\"><\/AnnotationDrawer><div>Combination fire and smoke dampers shall be operable by remote controls where necessary for smoke removal. Such dampers shall have provisions that allow them to reclose automatically upon reaching the damper's maximum degradation test temperature in accordance with UL 555S.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10848-html-1",
+      "kind" : "html",
+      "plainText" : "Combination fire and smoke dampers shall be operable by remote controls where necessary for smoke removal. Such dampers shall have provisions that allow them to reclose automatically upon reaching the damper's maximum degradation test temperature in accordance with UL 555S."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Combination fire and smoke dampers shall be operable by remote controls where necessary for smoke removal. Such dampers shall have provisions that allow them to reclose automatically upon reaching the damper's maximum degradation test temperature in accordance with UL 555S.",
+  "previewText" : "Combination fire and smoke dampers shall be operable by remote controls where necessary for smoke removal.",
+  "schemaVersion" : 2,
+  "sectionID" : 10848
+}

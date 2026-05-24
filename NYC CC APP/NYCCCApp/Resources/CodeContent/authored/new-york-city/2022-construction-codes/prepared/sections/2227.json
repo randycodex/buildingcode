@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173254\"><\/AnnotationDrawer><div>The maximum travel distance from any accessible space to an area of rescue assistance shall not exceed the exit access travel distance permitted for the occupancy in accordance with Section 1017.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2227-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum travel distance from any accessible space to an area of rescue assistance shall not exceed the exit access travel distance permitted for the occupancy in accordance with Section 1017.1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The maximum travel distance from any accessible space to an area of rescue assistance shall not exceed the exit access travel distance permitted for the occupancy in accordance with Section 1017.1.",
+  "previewText" : "The maximum travel distance from any accessible space to an area of rescue assistance shall not exceed the exit access travel distance permitted for the occupancy in accordance with Section 1017.",
+  "schemaVersion" : 2,
+  "sectionID" : 2227
+}

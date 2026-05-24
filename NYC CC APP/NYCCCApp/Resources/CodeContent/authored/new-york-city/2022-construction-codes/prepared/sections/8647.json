@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199149\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199149\"><\/AnnotationDrawer><div>The requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code<\/span> concerning combustion air supply shall be followed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199150\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199150\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205686', hash: '#JD_L.L.2009\/085' }}\">L.L. 2009\/085<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-205711\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-205711\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-205711\"><\/AnnotationDrawer><h6><a name=\"JD_FGC606\" id=\"JD_FGC606\" title=\"FGC 606\"><\/a>Section FGC 606: Reserved<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199151\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199151\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199151\"><\/AnnotationDrawer><h6><a name=\"JD_FGC607\" id=\"JD_FGC607\" title=\"FGC 607\"><\/a>Section FGC 607: Commercial-Industrial Incinerators and Crematories<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8647-html-1",
+      "kind" : "html",
+      "plainText" : "The requirements of the New York City Energy Conservation Code concerning combustion air supply shall be followed.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085 . \n\n Section FGC 606: Reserved\n\n Section FGC 607: Commercial-Industrial Incinerators and Crematories"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "The requirements of the New York City Energy Conservation Code concerning combustion air supply shall be followed.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085.\n\nSection FGC 606: Reserved\n\nSection FGC 607: Commercial-Industrial Incinerators and Crematories",
+  "previewText" : "The requirements of the New York City Energy Conservation Code concerning combustion air supply shall be followed.",
+  "schemaVersion" : 2,
+  "sectionID" : 8647
+}

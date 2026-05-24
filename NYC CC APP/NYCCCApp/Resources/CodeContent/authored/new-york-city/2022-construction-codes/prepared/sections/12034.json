@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161757\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161757\"><\/AnnotationDrawer><div>Faucets and supply fittings shall conform to the water consumption requirements of Section 604.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12034-html-1",
+      "kind" : "html",
+      "plainText" : "Faucets and supply fittings shall conform to the water consumption requirements of Section 604.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Faucets and supply fittings shall conform to the water consumption requirements of Section 604.4.",
+  "previewText" : "Faucets and supply fittings shall conform to the water consumption requirements of Section 604.",
+  "schemaVersion" : 2,
+  "sectionID" : 12034
+}

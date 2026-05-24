@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195885\"><\/AnnotationDrawer><div>Where required, dilution transfer openings shall be provided in accordance with EN378 Part 3, Section 6.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11331-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, dilution transfer openings shall be provided in accordance with EN378 Part 3, Section 6.3.2."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where required, dilution transfer openings shall be provided in accordance with EN378 Part 3, Section 6.3.2.",
+  "previewText" : "Where required, dilution transfer openings shall be provided in accordance with EN378 Part 3, Section 6.",
+  "schemaVersion" : 2,
+  "sectionID" : 11331
+}

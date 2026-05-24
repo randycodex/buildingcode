@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188801\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188801\"><\/AnnotationDrawer><div>Recreational vehicles in A-Zones that are not fully licensed and ready for highway use, or that are to be placed on a site for 180 or more consecutive days, shall meet the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188783', hash: '#JD_BCG305' }}\">G305<\/Link> for manufactured homes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188802\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188802\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188802\"><\/AnnotationDrawer><h6><a name=\"JD_BCG307\" id=\"JD_BCG307\" title=\"BC G307\"><\/a>Section BC G307: Tanks<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7120-html-1",
+      "kind" : "html",
+      "plainText" : "Recreational vehicles in A-Zones that are not fully licensed and ready for highway use, or that are to be placed on a site for 180 or more consecutive days, shall meet the requirements of Section G305 for manufactured homes.\n\n Section BC G307: Tanks"
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Recreational vehicles in A-Zones that are not fully licensed and ready for highway use, or that are to be placed on a site for 180 or more consecutive days, shall meet the requirements of Section G305 for manufactured homes.",
+  "previewText" : "Recreational vehicles in A-Zones that are not fully licensed and ready for highway use, or that are to be placed on a site for 180 or more consecutive days, shall meet the requirements of Section G305 for manufactured homes.",
+  "schemaVersion" : 2,
+  "sectionID" : 7120
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196741\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196741\"><\/AnnotationDrawer><div>Roof-mounted solar collectors that also serve as a roof covering shall conform to the requirements for roof coverings in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196742\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The use of plastic solar collector covers shall be limited to those approved plastics meeting the requirements for plastic roof panels in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11675-html-1",
+      "kind" : "html",
+      "plainText" : "Roof-mounted solar collectors that also serve as a roof covering shall conform to the requirements for roof coverings in accordance with the New York City Building Code. \n\n Exception: The use of plastic solar collector covers shall be limited to those approved plastics meeting the requirements for plastic roof panels in the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Roof-mounted solar collectors that also serve as a roof covering shall conform to the requirements for roof coverings in accordance with the New York City Building Code.\n\nException: The use of plastic solar collector covers shall be limited to those approved plastics meeting the requirements for plastic roof panels in the New York City Building Code.",
+  "previewText" : "Roof-mounted solar collectors that also serve as a roof covering shall conform to the requirements for roof coverings in accordance with the New York City Building Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11675
+}

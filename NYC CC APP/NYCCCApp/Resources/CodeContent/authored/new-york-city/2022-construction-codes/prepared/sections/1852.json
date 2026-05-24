@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172082\"><\/AnnotationDrawer><div>The primary and secondary power supply for the fire alarm system shall be provided in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172083\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172083\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Secondary power for single-station and multiple-station smoke alarms as required in Section 907.2.11.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1852-html-1",
+      "kind" : "html",
+      "plainText" : "The primary and secondary power supply for the fire alarm system shall be provided in accordance with the New York City Electrical Code .\n\n Exception: Secondary power for single-station and multiple-station smoke alarms as required in Section 907.2.11.2."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The primary and secondary power supply for the fire alarm system shall be provided in accordance with the New York City Electrical Code.\n\nException: Secondary power for single-station and multiple-station smoke alarms as required in Section 907.2.11.2.",
+  "previewText" : "The primary and secondary power supply for the fire alarm system shall be provided in accordance with the New York City Electrical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 1852
+}

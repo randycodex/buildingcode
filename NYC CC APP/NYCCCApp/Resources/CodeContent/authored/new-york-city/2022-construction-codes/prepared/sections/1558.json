@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171063\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171063\"><\/AnnotationDrawer><div>In buildings or spaces not otherwise required to provide fire protection systems in accordance with this chapter, fire protection systems shall be provided for the types of alterations described in Sections 901.9.5.1 through 901.9.5.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1558-html-1",
+      "kind" : "html",
+      "plainText" : "In buildings or spaces not otherwise required to provide fire protection systems in accordance with this chapter, fire protection systems shall be provided for the types of alterations described in Sections 901.9.5.1 through 901.9.5.4."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "In buildings or spaces not otherwise required to provide fire protection systems in accordance with this chapter, fire protection systems shall be provided for the types of alterations described in Sections 901.9.5.1 through 901.9.5.4.",
+  "previewText" : "In buildings or spaces not otherwise required to provide fire protection systems in accordance with this chapter, fire protection systems shall be provided for the types of alterations described in Sections 901.",
+  "schemaVersion" : 2,
+  "sectionID" : 1558
+}

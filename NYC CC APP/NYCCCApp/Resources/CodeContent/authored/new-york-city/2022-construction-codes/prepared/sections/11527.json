@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196336\"><\/AnnotationDrawer><div>Where required by Sections 1303.4 through 1303.10, the preparation and installation of brazed, threaded and welded joints shall comply with Sections 1303.3.1 through 1303.3.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11527-html-1",
+      "kind" : "html",
+      "plainText" : "Where required by Sections 1303.4 through 1303.10, the preparation and installation of brazed, threaded and welded joints shall comply with Sections 1303.3.1 through 1303.3.4."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Where required by Sections 1303.4 through 1303.10, the preparation and installation of brazed, threaded and welded joints shall comply with Sections 1303.3.1 through 1303.3.4.",
+  "previewText" : "Where required by Sections 1303.",
+  "schemaVersion" : 2,
+  "sectionID" : 11527
+}

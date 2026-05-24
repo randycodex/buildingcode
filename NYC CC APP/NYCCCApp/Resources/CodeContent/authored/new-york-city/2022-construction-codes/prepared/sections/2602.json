@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174692\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174692\"><\/AnnotationDrawer><div>Emergency escape and rescue openings shall have a minimum net clear opening of 6 square feet (0.56 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174693\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174693\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The minimum net clear opening for grade-floor emergency escape and rescue openings shall be 5 square feet (0.46 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) unless such opening is required for natural ventilation in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175664', hash: '#JD_BCCh.12' }}\">Chapter 12<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2602-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency escape and rescue openings shall have a minimum net clear opening of 6 square feet (0.56 m\n\n 2 \n\n ).\n\n Exception: The minimum net clear opening for grade-floor emergency escape and rescue openings shall be 5 square feet (0.46 m\n\n 2 \n\n ) unless such opening is required for natural ventilation in accordance with Chapter 12 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Emergency escape and rescue openings shall have a minimum net clear opening of 6 square feet (0.56 m 2 ).\n\nException: The minimum net clear opening for grade-floor emergency escape and rescue openings shall be 5 square feet (0.46 m 2 ) unless such opening is required for natural ventilation in accordance with Chapter 12.",
+  "previewText" : "Emergency escape and rescue openings shall have a minimum net clear opening of 6 square feet (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 2602
+}

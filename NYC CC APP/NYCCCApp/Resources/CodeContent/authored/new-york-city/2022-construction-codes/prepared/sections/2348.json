@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173752\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173752\"><\/AnnotationDrawer><div>Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2348-html-1",
+      "kind" : "html",
+      "plainText" : "Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm)."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Means of egress ramps shall not reduce in width in the direction of egress travel. Projections into the required ramp and landing width are prohibited. Doors opening onto a landing shall not reduce the clear width to less than 42 inches (1066.8 mm).",
+  "previewText" : "Means of egress ramps shall not reduce in width in the direction of egress travel.",
+  "schemaVersion" : 2,
+  "sectionID" : 2348
+}

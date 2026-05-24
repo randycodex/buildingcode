@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168572\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168572\"><\/AnnotationDrawer><div>The area of buildings of the occupancies and configurations specified in Sections 507.1 through 507.18 shall not be limited, except that only one cellar or one basement shall be permissible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "876-html-1",
+      "kind" : "html",
+      "plainText" : "The area of buildings of the occupancies and configurations specified in Sections 507.1 through 507.18 shall not be limited, except that only one cellar or one basement shall be permissible."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "The area of buildings of the occupancies and configurations specified in Sections 507.1 through 507.18 shall not be limited, except that only one cellar or one basement shall be permissible.",
+  "previewText" : "The area of buildings of the occupancies and configurations specified in Sections 507.",
+  "schemaVersion" : 2,
+  "sectionID" : 876
+}

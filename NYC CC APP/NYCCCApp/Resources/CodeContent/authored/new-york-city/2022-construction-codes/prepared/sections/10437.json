@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "If it is known that peak occupancy will be of short duration and\/or ventilation will be varied or interrupted for a short period of time, the design may be based on the average conditions over a time period T determined by Equation 4-9.\n\nwhere:\n\nAcceptable design adjustments based on this optional provision include the following:\n\n1. Zone with fluctuating occupancy: the zone population (Pz) may be averaged over time T.\n\n2. Zone with intermittent interruption of supply air: the average outdoor airflow supplied to breathing zone over time T shall be no less than the breathing zone outdoor airflow (Vbz) calculated using Equation 4-1.\n\n3. A system with intermittent closure of outdoor air intake: the average outdoor air intake over time T shall be no less than the minimum outdoor air intake (V ot ) calculated using Equation 4-3, 4-4 or 4-8 as appropriate.",
+  "previewText" : "If it is known that peak occupancy will be of short duration and\/or ventilation will be varied or interrupted for a short period of time, the design may be based on the average conditions over a time period T determined by Equation 4-9.",
+  "schemaVersion" : 2,
+  "sectionID" : 10437
+}

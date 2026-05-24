@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166603\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166603\"><\/AnnotationDrawer><div>The calculated occupant load used to determine the required number of means of egress shall be in accordance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "232-html-1",
+      "kind" : "html",
+      "plainText" : "The calculated occupant load used to determine the required number of means of egress shall be in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The calculated occupant load used to determine the required number of means of egress shall be in accordance with this section.",
+  "previewText" : "The calculated occupant load used to determine the required number of means of egress shall be in accordance with this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 232
+}

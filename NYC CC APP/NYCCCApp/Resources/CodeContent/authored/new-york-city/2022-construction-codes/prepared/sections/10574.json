@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193668\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193668\"><\/AnnotationDrawer><div>Specific rooms, including bathrooms, locker rooms, smoking lounges and toilet rooms, shall be exhausted in accordance with the ventilation requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193177', hash: '#JD_MCCh.4' }}\">Chapter 4<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10574-html-1",
+      "kind" : "html",
+      "plainText" : "Specific rooms, including bathrooms, locker rooms, smoking lounges and toilet rooms, shall be exhausted in accordance with the ventilation requirements of Chapter 4 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Specific rooms, including bathrooms, locker rooms, smoking lounges and toilet rooms, shall be exhausted in accordance with the ventilation requirements of Chapter 4.",
+  "previewText" : "Specific rooms, including bathrooms, locker rooms, smoking lounges and toilet rooms, shall be exhausted in accordance with the ventilation requirements of Chapter 4.",
+  "schemaVersion" : 2,
+  "sectionID" : 10574
+}

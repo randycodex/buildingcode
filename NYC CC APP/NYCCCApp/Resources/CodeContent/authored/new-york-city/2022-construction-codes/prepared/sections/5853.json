@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184703\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184703\"><\/AnnotationDrawer><div>Where a site is enclosed with a fence in accordance with Section 3307.7, a project information panel meeting the requirements of Sections 3301.9.1.1 through 3301.9.1.6 shall be posted. Required project information panels shall be in place throughout the duration that the fence remains at the site.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184704\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Project information panels at government-owned sites or at sites with government funding may be modified in accordance with department rule.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5853-html-1",
+      "kind" : "html",
+      "plainText" : "Where a site is enclosed with a fence in accordance with Section 3307.7, a project information panel meeting the requirements of Sections 3301.9.1.1 through 3301.9.1.6 shall be posted. Required project information panels shall be in place throughout the duration that the fence remains at the site.\n\n Exception: Project information panels at government-owned sites or at sites with government funding may be modified in accordance with department rule."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Where a site is enclosed with a fence in accordance with Section 3307.7, a project information panel meeting the requirements of Sections 3301.9.1.1 through 3301.9.1.6 shall be posted. Required project information panels shall be in place throughout the duration that the fence remains at the site.\n\nException: Project information panels at government-owned sites or at sites with government funding may be modified in accordance with department rule.",
+  "previewText" : "Where a site is enclosed with a fence in accordance with Section 3307.",
+  "schemaVersion" : 2,
+  "sectionID" : 5853
+}

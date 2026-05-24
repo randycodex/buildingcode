@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177596\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177596\"><\/AnnotationDrawer><div>Louvers protecting intake and exhaust ventilation ducts not assumed to be open that are located within 30 feet (9144 mm) of grade shall meet the requirements of AMCA 540.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3542-html-1",
+      "kind" : "html",
+      "plainText" : "Louvers protecting intake and exhaust ventilation ducts not assumed to be open that are located within 30 feet (9144 mm) of grade shall meet the requirements of AMCA 540."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Louvers protecting intake and exhaust ventilation ducts not assumed to be open that are located within 30 feet (9144 mm) of grade shall meet the requirements of AMCA 540.",
+  "previewText" : "Louvers protecting intake and exhaust ventilation ducts not assumed to be open that are located within 30 feet (9144 mm) of grade shall meet the requirements of AMCA 540.",
+  "schemaVersion" : 2,
+  "sectionID" : 3542
+}

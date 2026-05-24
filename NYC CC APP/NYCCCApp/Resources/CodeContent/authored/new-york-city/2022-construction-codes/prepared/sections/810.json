@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168306\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168306\"><\/AnnotationDrawer><div>Storage rooms for laboratory chemicals accessory to a laboratory unit shall be classified as Occupancy Group S-1 provided they comply with the provisions of Section 427.9. Storage rooms not in compliance with the provisions of Section 427.9 for laboratory chemical quantity limitations shall be classified as a Group H occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "810-html-1",
+      "kind" : "html",
+      "plainText" : "Storage rooms for laboratory chemicals accessory to a laboratory unit shall be classified as Occupancy Group S-1 provided they comply with the provisions of Section 427.9. Storage rooms not in compliance with the provisions of Section 427.9 for laboratory chemical quantity limitations shall be classified as a Group H occupancy."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Storage rooms for laboratory chemicals accessory to a laboratory unit shall be classified as Occupancy Group S-1 provided they comply with the provisions of Section 427.9. Storage rooms not in compliance with the provisions of Section 427.9 for laboratory chemical quantity limitations shall be classified as a Group H occupancy.",
+  "previewText" : "Storage rooms for laboratory chemicals accessory to a laboratory unit shall be classified as Occupancy Group S-1 provided they comply with the provisions of Section 427.",
+  "schemaVersion" : 2,
+  "sectionID" : 810
+}

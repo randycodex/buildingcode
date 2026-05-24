@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177038\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177038\"><\/AnnotationDrawer><div>A roof recover shall not be permitted where any of the following conditions occur:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177039\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Where the existing roof or roof covering is water soaked or has deteriorated to the point that the existing roof or roof covering is not adequate as a base for additional roofing.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177040\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177040\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Where the existing roof covering is slate, clay, cement or asbestos-cement tile.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177041\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177041\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Where the existing roof has two or more applications of any type of roof covering.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3408-html-1",
+      "kind" : "html",
+      "plainText" : "A roof recover shall not be permitted where any of the following conditions occur:\n\n 1. Where the existing roof or roof covering is water soaked or has deteriorated to the point that the existing roof or roof covering is not adequate as a base for additional roofing.\n\n 2. Where the existing roof covering is slate, clay, cement or asbestos-cement tile.\n\n 3. Where the existing roof has two or more applications of any type of roof covering."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "A roof recover shall not be permitted where any of the following conditions occur:\n\n1. Where the existing roof or roof covering is water soaked or has deteriorated to the point that the existing roof or roof covering is not adequate as a base for additional roofing.\n\n2. Where the existing roof covering is slate, clay, cement or asbestos-cement tile.\n\n3. Where the existing roof has two or more applications of any type of roof covering.",
+  "previewText" : "A roof recover shall not be permitted where any of the following conditions occur:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 3408
+}

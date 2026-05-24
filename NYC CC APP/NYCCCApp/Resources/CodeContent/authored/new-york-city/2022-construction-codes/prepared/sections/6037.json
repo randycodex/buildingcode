@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185393\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185393\"><\/AnnotationDrawer><div>All excavations shall be drained, and the drainage shall be maintained as long as the excavation continues or remains. Where necessary, pumping shall be used, provided proper permits are obtained from the New York City Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6037-html-1",
+      "kind" : "html",
+      "plainText" : "All excavations shall be drained, and the drainage shall be maintained as long as the excavation continues or remains. Where necessary, pumping shall be used, provided proper permits are obtained from the New York City Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "All excavations shall be drained, and the drainage shall be maintained as long as the excavation continues or remains. Where necessary, pumping shall be used, provided proper permits are obtained from the New York City Department of Environmental Protection.",
+  "previewText" : "All excavations shall be drained, and the drainage shall be maintained as long as the excavation continues or remains.",
+  "schemaVersion" : 2,
+  "sectionID" : 6037
+}

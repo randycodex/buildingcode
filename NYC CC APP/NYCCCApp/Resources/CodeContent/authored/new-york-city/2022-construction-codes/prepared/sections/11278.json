@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195768\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195768\"><\/AnnotationDrawer><div>A refrigerating system equipped with an automatic crossover valve shall be designed, when such valve is activated, to cause all compressors on the affected system to immediately cease operating. Dedicated pressure-sensing devices located immediately adjacent to crossover valves may be used as a means for activating such crossover valve. To ensure that the automatic crossover valve system provides a redundant means of ceasing operation of the compressors in an overpressure condition, high-pressure cutout sensors associated with compressors shall not be used for purposes of activating such crossover valve.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11278-html-1",
+      "kind" : "html",
+      "plainText" : "A refrigerating system equipped with an automatic crossover valve shall be designed, when such valve is activated, to cause all compressors on the affected system to immediately cease operating. Dedicated pressure-sensing devices located immediately adjacent to crossover valves may be used as a means for activating such crossover valve. To ensure that the automatic crossover valve system provides a redundant means of ceasing operation of the compressors in an overpressure condition, high-pressure cutout sensors associated with compressors shall not be used for purposes of activating such crossover valve."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "A refrigerating system equipped with an automatic crossover valve shall be designed, when such valve is activated, to cause all compressors on the affected system to immediately cease operating. Dedicated pressure-sensing devices located immediately adjacent to crossover valves may be used as a means for activating such crossover valve. To ensure that the automatic crossover valve system provides a redundant means of ceasing operation of the compressors in an overpressure condition, high-pressure cutout sensors associated with compressors shall not be used for purposes of activating such crossover valve.",
+  "previewText" : "A refrigerating system equipped with an automatic crossover valve shall be designed, when such valve is activated, to cause all compressors on the affected system to immediately cease operating.",
+  "schemaVersion" : 2,
+  "sectionID" : 11278
+}

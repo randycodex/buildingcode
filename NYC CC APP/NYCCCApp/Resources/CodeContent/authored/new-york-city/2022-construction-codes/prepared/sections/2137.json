@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172942\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172942\"><\/AnnotationDrawer><div>Design occupant load. In determining means of egress requirements, the number of occupants for whom means of egress facilities shall be provided shall be established by the largest number computed in accordance with Section 1004.1.3, unless otherwise permitted by Section 1004.1.3.1, 1004.1.3.2 or 1004.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2137-html-1",
+      "kind" : "html",
+      "plainText" : "Design occupant load. In determining means of egress requirements, the number of occupants for whom means of egress facilities shall be provided shall be established by the largest number computed in accordance with Section 1004.1.3, unless otherwise permitted by Section 1004.1.3.1, 1004.1.3.2 or 1004.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Design occupant load. In determining means of egress requirements, the number of occupants for whom means of egress facilities shall be provided shall be established by the largest number computed in accordance with Section 1004.1.3, unless otherwise permitted by Section 1004.1.3.1, 1004.1.3.2 or 1004.2.",
+  "previewText" : "Design occupant load.",
+  "schemaVersion" : 2,
+  "sectionID" : 2137
+}

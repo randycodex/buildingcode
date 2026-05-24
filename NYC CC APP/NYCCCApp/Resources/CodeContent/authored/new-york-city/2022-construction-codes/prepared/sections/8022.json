@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197335\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197335\"><\/AnnotationDrawer><div>This chapter shall govern the approval and installation of all equipment and appliances that comprise parts of the installations regulated by this code in accordance with Section 101.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8022-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern the approval and installation of all equipment and appliances that comprise parts of the installations regulated by this code in accordance with Section 101.2."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "This chapter shall govern the approval and installation of all equipment and appliances that comprise parts of the installations regulated by this code in accordance with Section 101.2.",
+  "previewText" : "This chapter shall govern the approval and installation of all equipment and appliances that comprise parts of the installations regulated by this code in accordance with Section 101.",
+  "schemaVersion" : 2,
+  "sectionID" : 8022
+}

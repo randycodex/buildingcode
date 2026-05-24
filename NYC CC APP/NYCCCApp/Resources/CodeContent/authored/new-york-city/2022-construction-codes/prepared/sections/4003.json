@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179177\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179177\"><\/AnnotationDrawer><div>Where adequate lateral support is furnished by the surrounding materials defined in Section 1810.7 of this code, piers may be constructed of plain or reinforced concrete and the requirements of ACI 318 shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179178\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179178\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where adequate lateral support is not provided, and the ratio of unsupported height to least horizontal dimension does not exceed three, piers of plain concrete shall be designed and constructed as pedestals in accordance with ACI 318. Where the unsupported height to least horizontal dimension exceeds three, piers shall be constructed of reinforced concrete, and shall conform to the requirements for columns in ACI 318.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4003-html-1",
+      "kind" : "html",
+      "plainText" : "Where adequate lateral support is furnished by the surrounding materials defined in Section 1810.7 of this code, piers may be constructed of plain or reinforced concrete and the requirements of ACI 318 shall apply.\n\n Exception: Where adequate lateral support is not provided, and the ratio of unsupported height to least horizontal dimension does not exceed three, piers of plain concrete shall be designed and constructed as pedestals in accordance with ACI 318. Where the unsupported height to least horizontal dimension exceeds three, piers shall be constructed of reinforced concrete, and shall conform to the requirements for columns in ACI 318."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Where adequate lateral support is furnished by the surrounding materials defined in Section 1810.7 of this code, piers may be constructed of plain or reinforced concrete and the requirements of ACI 318 shall apply.\n\nException: Where adequate lateral support is not provided, and the ratio of unsupported height to least horizontal dimension does not exceed three, piers of plain concrete shall be designed and constructed as pedestals in accordance with ACI 318. Where the unsupported height to least horizontal dimension exceeds three, piers shall be constructed of reinforced concrete, and shall conform to the requirements for columns in ACI 318.",
+  "previewText" : "Where adequate lateral support is furnished by the surrounding materials defined in Section 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4003
+}

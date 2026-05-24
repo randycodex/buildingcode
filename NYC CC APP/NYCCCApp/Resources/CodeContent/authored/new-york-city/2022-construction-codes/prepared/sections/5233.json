@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183094\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183094\"><\/AnnotationDrawer><div>These provisions shall govern the materials, design, application, construction and installation of foam plastic, foam plastic insulation, plastic veneer, interior plastic finish and trim, light-transmitting plastics and plastic composites, including plastic lumber. See <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205704', hash: '#JD_BCCh.14' }}\">Chapter 14<\/Link> for requirements for exterior wall finish and trim.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5233-html-1",
+      "kind" : "html",
+      "plainText" : "These provisions shall govern the materials, design, application, construction and installation of foam plastic, foam plastic insulation, plastic veneer, interior plastic finish and trim, light-transmitting plastics and plastic composites, including plastic lumber. See Chapter 14 for requirements for exterior wall finish and trim."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "These provisions shall govern the materials, design, application, construction and installation of foam plastic, foam plastic insulation, plastic veneer, interior plastic finish and trim, light-transmitting plastics and plastic composites, including plastic lumber. See Chapter 14 for requirements for exterior wall finish and trim.",
+  "previewText" : "These provisions shall govern the materials, design, application, construction and installation of foam plastic, foam plastic insulation, plastic veneer, interior plastic finish and trim, light-transmitting plastics and plastic composites, including plastic lumber.",
+  "schemaVersion" : 2,
+  "sectionID" : 5233
+}

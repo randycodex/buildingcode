@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169724\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169724\"><\/AnnotationDrawer><div>Height and fire-resistance requirements for curtain wall spandrels shall comply with Section 705.8.5. Where Section 705.8.5 does not require a fire-resistance-rated spandrel wall, the requirements of Section 715.4 shall still apply to the intersection between the spandrel wall and the floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1223-html-1",
+      "kind" : "html",
+      "plainText" : "Height and fire-resistance requirements for curtain wall spandrels shall comply with Section 705.8.5. Where Section 705.8.5 does not require a fire-resistance-rated spandrel wall, the requirements of Section 715.4 shall still apply to the intersection between the spandrel wall and the floor."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Height and fire-resistance requirements for curtain wall spandrels shall comply with Section 705.8.5. Where Section 705.8.5 does not require a fire-resistance-rated spandrel wall, the requirements of Section 715.4 shall still apply to the intersection between the spandrel wall and the floor.",
+  "previewText" : "Height and fire-resistance requirements for curtain wall spandrels shall comply with Section 705.",
+  "schemaVersion" : 2,
+  "sectionID" : 1223
+}

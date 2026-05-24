@@ -1,0 +1,39 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182215\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182215\"><\/AnnotationDrawer><div>Openings in horizontal diaphragms in Seismic Design Categories B, C, and D with a dimension that is greater than 4 feet (1219 mm) shall be constructed with metal ties and blocking in accordance with this section and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182214', hash: '#JD_BCFigure2308.4.4.1(1)' }}\">Figure 2308.4.4.1(1)<\/Link>. Metal ties shall be not less than 0.058 inch (1.47 mm) (16 galvanized gage) in thickness by 1 1\/2 inches (38 mm) in width and shall have a yield stress not less than 33,000 psi (227 Mpa). Blocking shall extend not less than the dimension of the opening in the direction of the tie and blocking. Ties shall be attached to blocking in accordance with the manufacturer's instructions but with not less than eight 16d common nails on each side of the header-joist intersection.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182216\"><\/AnnotationDrawer><div>Openings in floor diaphragms in Seismic Design Category D shall not have any dimension exceeding 50 percent of the distance between braced wall lines or an area greater than 25 percent of the area between orthogonal pairs of braced wall lines (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182214', hash: '#JD_BCFigure2308.4.4.1(2)' }}\">Figure 2308.4.4.1(2)<\/Link>); or the portion of the structure containing the opening shall be designed in accordance with accepted engineering practice to resist the forces specified in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link>, to the extent such irregular opening affects the performance of the conventional framing system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182217\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182217\"><\/AnnotationDrawer><div>",
+      "id" : "5013-html-1",
+      "kind" : "html",
+      "plainText" : "Openings in horizontal diaphragms in Seismic Design Categories B, C, and D with a dimension that is greater than 4 feet (1219 mm) shall be constructed with metal ties and blocking in accordance with this section and Figure 2308.4.4.1(1) . Metal ties shall be not less than 0.058 inch (1.47 mm) (16 galvanized gage) in thickness by 1 1\/2 inches (38 mm) in width and shall have a yield stress not less than 33,000 psi (227 Mpa). Blocking shall extend not less than the dimension of the opening in the direction of the tie and blocking. Ties shall be attached to blocking in accordance with the manufacturer's instructions but with not less than eight 16d common nails on each side of the header-joist intersection.\n\n Openings in floor diaphragms in Seismic Design Category D shall not have any dimension exceeding 50 percent of the distance between braced wall lines or an area greater than 25 percent of the area between orthogonal pairs of braced wall lines (see Figure 2308.4.4.1(2) ); or the portion of the structure containing the opening shall be designed in accordance with accepted engineering practice to resist the forces specified in Chapter 16 , to the extent such irregular opening affects the performance of the conventional framing system."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/569b32edd0130a2d1b9ec0264569b4fa87ce267e.png\" width=\"672\" height=\"576.8\"><\/img><\/span>",
+      "id" : "5013-image-2",
+      "imageID" : "569b32edd0130a2d1b9ec0264569b4fa87ce267e.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182218\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182218\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure2308.4.4.1(1)\" id=\"JD_BCFigure2308.4.4.1(1)\" title=\"BC Figure 2308.4.4.1(1)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 2308.4.4.1(1)<br><\/br>Openings in Floor and Roof Diaphragms<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182219\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182219\"><\/AnnotationDrawer><div>",
+      "id" : "5013-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 2308.4.4.1(1)\n Openings in Floor and Roof Diaphragms"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/2536456dfdd85ef6b5b38f1d708d5a96de1e6090.png\" width=\"864\" height=\"243.666666666667\"><\/img><\/span>",
+      "id" : "5013-image-4",
+      "imageID" : "2536456dfdd85ef6b5b38f1d708d5a96de1e6090.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182220\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure2308.4.4.1(2)\" id=\"JD_BCFigure2308.4.4.1(2)\" title=\"BC Figure 2308.4.4.1(2)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 2308.4.4.1(2)<br><\/br>Opening Limitations for Floor and Roof Diaphragms<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5013-html-5",
+      "kind" : "html",
+      "plainText" : "Figure 2308.4.4.1(2)\n Opening Limitations for Floor and Roof Diaphragms"
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Openings in horizontal diaphragms in Seismic Design Categories B, C, and D with a dimension that is greater than 4 feet (1219 mm) shall be constructed with metal ties and blocking in accordance with this section and Figure 2308.4.4.1(1). Metal ties shall be not less than 0.058 inch (1.47 mm) (16 galvanized gage) in thickness by 1 1\/2 inches (38 mm) in width and shall have a yield stress not less than 33,000 psi (227 Mpa). Blocking shall extend not less than the dimension of the opening in the direction of the tie and blocking. Ties shall be attached to blocking in accordance with the manufacturer's instructions but with not less than eight 16d common nails on each side of the header-joist intersection.\n\nOpenings in floor diaphragms in Seismic Design Category D shall not have any dimension exceeding 50 percent of the distance between braced wall lines or an area greater than 25 percent of the area between orthogonal pairs of braced wall lines (see Figure 2308.4.4.1(2)); or the portion of the structure containing the opening shall be designed in accordance with accepted engineering practice to resist the forces specified in Chapter 16, to the extent such irregular opening affects the performance of the conventional framing system.\n\nFigure 2308.4.4.1(1) Openings in Floor and Roof Diaphragms\n\nFigure 2308.4.4.1(2) Opening Limitations for Floor and Roof Diaphragms",
+  "previewText" : "Openings in horizontal diaphragms in Seismic Design Categories B, C, and D with a dimension that is greater than 4 feet (1219 mm) shall be constructed with metal ties and blocking in accordance with this section and Figure 2308.",
+  "schemaVersion" : 2,
+  "sectionID" : 5013
+}

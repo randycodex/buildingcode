@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192954\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192954\"><\/AnnotationDrawer><div>Appliances installed in other than indoor locations shall be listed and labeled for outdoor installation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10323-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances installed in other than indoor locations shall be listed and labeled for outdoor installation."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Appliances installed in other than indoor locations shall be listed and labeled for outdoor installation.",
+  "previewText" : "Appliances installed in other than indoor locations shall be listed and labeled for outdoor installation.",
+  "schemaVersion" : 2,
+  "sectionID" : 10323
+}

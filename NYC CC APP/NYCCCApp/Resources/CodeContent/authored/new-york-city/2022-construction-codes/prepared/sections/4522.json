@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180617\"><\/AnnotationDrawer><div>When No. 5 or smaller bars are used, there shall be a minimum clearance between parallel reinforcement bars of 2 1\/2 inches (64 mm). When bars larger than No. 5 are permitted, there shall be a minimum clearance between parallel bars equal to six diameters of the bars used. When two curtains of steel are provided, the curtain nearer the nozzle shall have a minimum spacing equal to 12 bar diameters and the remaining curtain shall have a minimum spacing of six bar diameters.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180618\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Subject to the approval of the commissioner, required clearances shall be reduced where it is demonstrated by preconstruction tests that adequate encasement of the bars used in the design will be achieved.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4522-html-1",
+      "kind" : "html",
+      "plainText" : "When No. 5 or smaller bars are used, there shall be a minimum clearance between parallel reinforcement bars of 2 1\/2 inches (64 mm). When bars larger than No. 5 are permitted, there shall be a minimum clearance between parallel bars equal to six diameters of the bars used. When two curtains of steel are provided, the curtain nearer the nozzle shall have a minimum spacing equal to 12 bar diameters and the remaining curtain shall have a minimum spacing of six bar diameters.\n\n Exception: Subject to the approval of the commissioner, required clearances shall be reduced where it is demonstrated by preconstruction tests that adequate encasement of the bars used in the design will be achieved."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "When No. 5 or smaller bars are used, there shall be a minimum clearance between parallel reinforcement bars of 2 1\/2 inches (64 mm). When bars larger than No. 5 are permitted, there shall be a minimum clearance between parallel bars equal to six diameters of the bars used. When two curtains of steel are provided, the curtain nearer the nozzle shall have a minimum spacing equal to 12 bar diameters and the remaining curtain shall have a minimum spacing of six bar diameters.\n\nException: Subject to the approval of the commissioner, required clearances shall be reduced where it is demonstrated by preconstruction tests that adequate encasement of the bars used in the design will be achieved.",
+  "previewText" : "When No.",
+  "schemaVersion" : 2,
+  "sectionID" : 4522
+}

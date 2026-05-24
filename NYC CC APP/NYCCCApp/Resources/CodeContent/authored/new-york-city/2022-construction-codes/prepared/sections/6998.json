@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188441\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188441\"><\/AnnotationDrawer><div>Any person, owner or owner's authorized agent who intends to conduct any development, as applicable pursuant to Section G102.1, within a flood hazard area, shall first make application to the commissioner and shall obtain the required permit in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156206', hash: '#JD_28-105.1' }}\">28-105.1<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>, notwithstanding any exemption pursuant to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156291', hash: '#JD_28-105.4' }}\">28-105.4<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6998-html-1",
+      "kind" : "html",
+      "plainText" : "Any person, owner or owner's authorized agent who intends to conduct any development, as applicable pursuant to Section G102.1, within a flood hazard area, shall first make application to the commissioner and shall obtain the required permit in accordance with Section 28-105.1 of the Administrative Code , notwithstanding any exemption pursuant to Section 28-105.4 of the Administrative Code ."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Any person, owner or owner's authorized agent who intends to conduct any development, as applicable pursuant to Section G102.1, within a flood hazard area, shall first make application to the commissioner and shall obtain the required permit in accordance with Section 28-105.1 of the Administrative Code, notwithstanding any exemption pursuant to Section 28-105.4 of the Administrative Code.",
+  "previewText" : "Any person, owner or owner's authorized agent who intends to conduct any development, as applicable pursuant to Section G102.",
+  "schemaVersion" : 2,
+  "sectionID" : 6998
+}

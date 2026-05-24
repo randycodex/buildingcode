@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184738\"><\/AnnotationDrawer><div>Sidewalk shed parapet information panels shall contain the following information and be arranged in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184737', hash: '#JD_BCFigure3301.9.2.1' }}\">Figure 3301.9.2.1<\/Link>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184739\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184739\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The street, address of the site;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184740\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184740\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Name (which may incorporate a logo) of the contractor responsible for the site or where there is no contractor, the name (which may incorporate a logo) of the owner of the site; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184741\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184741\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The statement \"For more information, visit <a rel=\"noopener noreferrer\" target=\"_blank\" class=\"Web\" href=\"http:\/\/www.nyc.gov\/buildings\" title=\"Web Link (opens in new tab)\">www.nyc.gov\/buildings<\/a>.\" <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184742\"><\/AnnotationDrawer><div>",
+      "id" : "5861-html-1",
+      "kind" : "html",
+      "plainText" : "Sidewalk shed parapet information panels shall contain the following information and be arranged in accordance with Figure 3301.9.2.1 :\n\n 1. The street, address of the site;\n\n 2. Name (which may incorporate a logo) of the contractor responsible for the site or where there is no contractor, the name (which may incorporate a logo) of the owner of the site; and\n\n 3. The statement \"For more information, visit www.nyc.gov\/buildings .\""
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/d4591bd83d5d3bd0b310be26b36719b72faad0e4.png\" width=\"672\" height=\"339.066666666667\"><\/img><\/span>",
+      "id" : "5861-image-2",
+      "imageID" : "d4591bd83d5d3bd0b310be26b36719b72faad0e4.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184743\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184743\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure3301.9.2.1\" id=\"JD_BCFigure3301.9.2.1\" title=\"BC Figure 3301.9.2.1\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 3301.9.2.1<br><\/br>Sidewalk Shed Parapet Information Panel Layout<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5861-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 3301.9.2.1\n Sidewalk Shed Parapet Information Panel Layout"
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Sidewalk shed parapet information panels shall contain the following information and be arranged in accordance with Figure 3301.9.2.1:\n\n1. The street, address of the site;\n\n2. Name (which may incorporate a logo) of the contractor responsible for the site or where there is no contractor, the name (which may incorporate a logo) of the owner of the site; and\n\n3. The statement \"For more information, visit www.nyc.gov\/buildings.\"\n\nFigure 3301.9.2.1 Sidewalk Shed Parapet Information Panel Layout",
+  "previewText" : "Sidewalk shed parapet information panels shall contain the following information and be arranged in accordance with Figure 3301.",
+  "schemaVersion" : 2,
+  "sectionID" : 5861
+}

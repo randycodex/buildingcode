@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166599\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166599\"><\/AnnotationDrawer><div>For the purpose of providing required egress, malls are permitted to be considered as corridors but need not comply with the requirements of Section 1005.1 of this code where the width of the mall is as specified in this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "230-html-1",
+      "kind" : "html",
+      "plainText" : "For the purpose of providing required egress, malls are permitted to be considered as corridors but need not comply with the requirements of Section 1005.1 of this code where the width of the mall is as specified in this section."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "For the purpose of providing required egress, malls are permitted to be considered as corridors but need not comply with the requirements of Section 1005.1 of this code where the width of the mall is as specified in this section.",
+  "previewText" : "For the purpose of providing required egress, malls are permitted to be considered as corridors but need not comply with the requirements of Section 1005.",
+  "schemaVersion" : 2,
+  "sectionID" : 230
+}

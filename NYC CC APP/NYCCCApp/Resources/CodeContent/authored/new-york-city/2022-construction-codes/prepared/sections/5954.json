@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185191\"><\/AnnotationDrawer><div>The provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Air Pollution Control Code<\/span> shall apply in order to prevent dust from becoming airborne.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185192\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185192\"><\/AnnotationDrawer><div>(Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5954-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of the Air Pollution Control Code shall apply in order to prevent dust from becoming airborne.\n\n (Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The provisions of the Air Pollution Control Code shall apply in order to prevent dust from becoming airborne.\n\n(Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)",
+  "previewText" : "The provisions of the Air Pollution Control Code shall apply in order to prevent dust from becoming airborne.",
+  "schemaVersion" : 2,
+  "sectionID" : 5954
+}

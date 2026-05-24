@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195064\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195064\"><\/AnnotationDrawer><div>Vertical terminations and discharges shall comply with Section 801.21.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11030-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical terminations and discharges shall comply with Section 801.21."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Vertical terminations and discharges shall comply with Section 801.21.",
+  "previewText" : "Vertical terminations and discharges shall comply with Section 801.",
+  "schemaVersion" : 2,
+  "sectionID" : 11030
+}

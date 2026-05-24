@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163544\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163544\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Soil shall be evaluated for estimated percolation based on a permeability test performed in place, in accordance with procedures established by the New York City Department of Environmental Protection and accepted engineering practice.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12716-html-1",
+      "kind" : "html",
+      "plainText" : "Soil shall be evaluated for estimated percolation based on a permeability test performed in place, in accordance with procedures established by the New York City Department of Environmental Protection and accepted engineering practice."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Soil shall be evaluated for estimated percolation based on a permeability test performed in place, in accordance with procedures established by the New York City Department of Environmental Protection and accepted engineering practice.",
+  "previewText" : "Soil shall be evaluated for estimated percolation based on a permeability test performed in place, in accordance with procedures established by the New York City Department of Environmental Protection and accepted engineering practice.",
+  "schemaVersion" : 2,
+  "sectionID" : 12716
+}

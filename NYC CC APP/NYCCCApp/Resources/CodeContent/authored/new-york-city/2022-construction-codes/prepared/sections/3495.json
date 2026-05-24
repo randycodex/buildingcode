@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177414\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177414\"><\/AnnotationDrawer><div>Vehicle barriers for passenger vehicles shall be designed to resist a concentrated load of 6,000 pounds (26.70 kN) in accordance with Section 4.5.3 of ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177415\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177415\"><\/AnnotationDrawer><div>Garages accommodating trucks and buses shall be designed in accordance with an approved method that contains provisions for traffic railings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3495-html-1",
+      "kind" : "html",
+      "plainText" : "Vehicle barriers for passenger vehicles shall be designed to resist a concentrated load of 6,000 pounds (26.70 kN) in accordance with Section 4.5.3 of ASCE 7.\n\n Garages accommodating trucks and buses shall be designed in accordance with an approved method that contains provisions for traffic railings."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Vehicle barriers for passenger vehicles shall be designed to resist a concentrated load of 6,000 pounds (26.70 kN) in accordance with Section 4.5.3 of ASCE 7.\n\nGarages accommodating trucks and buses shall be designed in accordance with an approved method that contains provisions for traffic railings.",
+  "previewText" : "Vehicle barriers for passenger vehicles shall be designed to resist a concentrated load of 6,000 pounds (26.",
+  "schemaVersion" : 2,
+  "sectionID" : 3495
+}

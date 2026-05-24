@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178742\"><\/AnnotationDrawer><div>Testing and inspection of nonpotable water systems shall be in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163651', hash: '#JD_PCCh.13' }}\">Chapter 13<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>. The special inspector shall witness all required tests in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163651', hash: '#JD_PCCh.13' }}\">Chapter 13<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3872-html-1",
+      "kind" : "html",
+      "plainText" : "Testing and inspection of nonpotable water systems shall be in accordance with Chapter 13 of the New York City Plumbing Code . The special inspector shall witness all required tests in accordance with Chapter 13 of the New York City Plumbing Code ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Testing and inspection of nonpotable water systems shall be in accordance with Chapter 13 of the New York City Plumbing Code. The special inspector shall witness all required tests in accordance with Chapter 13 of the New York City Plumbing Code.",
+  "previewText" : "Testing and inspection of nonpotable water systems shall be in accordance with Chapter 13 of the New York City Plumbing Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 3872
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169778\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169778\"><\/AnnotationDrawer><div>Fire door assemblies in interior exit stairways and ramps and exit passageways shall have a maximum transmitted temperature rise of not more than 450&#176;F (232.2&#176;C) above ambient at the end of 30 minutes of standard fire test exposure.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169779\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169779\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The maximum transmitted temperature rise is not required in buildings equipped throughout with an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1239-html-1",
+      "kind" : "html",
+      "plainText" : "Fire door assemblies in interior exit stairways and ramps and exit passageways shall have a maximum transmitted temperature rise of not more than 450°F (232.2°C) above ambient at the end of 30 minutes of standard fire test exposure.\n\n Exception: The maximum transmitted temperature rise is not required in buildings equipped throughout with an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire door assemblies in interior exit stairways and ramps and exit passageways shall have a maximum transmitted temperature rise of not more than 450°F (232.2°C) above ambient at the end of 30 minutes of standard fire test exposure.\n\nException: The maximum transmitted temperature rise is not required in buildings equipped throughout with an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2.",
+  "previewText" : "Fire door assemblies in interior exit stairways and ramps and exit passageways shall have a maximum transmitted temperature rise of not more than 450°F (232.",
+  "schemaVersion" : 2,
+  "sectionID" : 1239
+}

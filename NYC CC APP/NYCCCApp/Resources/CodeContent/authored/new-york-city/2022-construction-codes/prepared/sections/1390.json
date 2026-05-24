@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170351\"><\/AnnotationDrawer><div>Reinforced and prestressed floors and roofs shall comply with Section 722.2.2.1. Multicourse floors and roofs shall comply with Sections 722.2.2.2 and 722.2.2.3, respectively.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1390-html-1",
+      "kind" : "html",
+      "plainText" : "Reinforced and prestressed floors and roofs shall comply with Section 722.2.2.1. Multicourse floors and roofs shall comply with Sections 722.2.2.2 and 722.2.2.3, respectively."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Reinforced and prestressed floors and roofs shall comply with Section 722.2.2.1. Multicourse floors and roofs shall comply with Sections 722.2.2.2 and 722.2.2.3, respectively.",
+  "previewText" : "Reinforced and prestressed floors and roofs shall comply with Section 722.",
+  "schemaVersion" : 2,
+  "sectionID" : 1390
+}

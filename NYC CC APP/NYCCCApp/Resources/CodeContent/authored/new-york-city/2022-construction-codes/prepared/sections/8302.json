@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198135\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198135\"><\/AnnotationDrawer><div>A certificate of approval of gas installation may be issued for a portion of a gas piping system provided the remainder of the system is locked-off by the gas service provider.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8302-html-1",
+      "kind" : "html",
+      "plainText" : "A certificate of approval of gas installation may be issued for a portion of a gas piping system provided the remainder of the system is locked-off by the gas service provider."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A certificate of approval of gas installation may be issued for a portion of a gas piping system provided the remainder of the system is locked-off by the gas service provider.",
+  "previewText" : "A certificate of approval of gas installation may be issued for a portion of a gas piping system provided the remainder of the system is locked-off by the gas service provider.",
+  "schemaVersion" : 2,
+  "sectionID" : 8302
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198443\"><\/AnnotationDrawer><div>Connection of appliances to chimney flues serving fireplaces shall be in accordance with Sections 501.7.1 through 501.7.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8417-html-1",
+      "kind" : "html",
+      "plainText" : "Connection of appliances to chimney flues serving fireplaces shall be in accordance with Sections 501.7.1 through 501.7.3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Connection of appliances to chimney flues serving fireplaces shall be in accordance with Sections 501.7.1 through 501.7.3.",
+  "previewText" : "Connection of appliances to chimney flues serving fireplaces shall be in accordance with Sections 501.",
+  "schemaVersion" : 2,
+  "sectionID" : 8417
+}

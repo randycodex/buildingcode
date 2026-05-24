@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194669\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194669\"><\/AnnotationDrawer><div>Air inlets shall be constructed of noncombustible material or a material that has a maximum flame spread index\/rating of 25 and a maximum smoke developed index\/rating of 50.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10900-html-1",
+      "kind" : "html",
+      "plainText" : "Air inlets shall be constructed of noncombustible material or a material that has a maximum flame spread index\/rating of 25 and a maximum smoke developed index\/rating of 50."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Air inlets shall be constructed of noncombustible material or a material that has a maximum flame spread index\/rating of 25 and a maximum smoke developed index\/rating of 50.",
+  "previewText" : "Air inlets shall be constructed of noncombustible material or a material that has a maximum flame spread index\/rating of 25 and a maximum smoke developed index\/rating of 50.",
+  "schemaVersion" : 2,
+  "sectionID" : 10900
+}

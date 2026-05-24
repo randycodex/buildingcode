@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164086\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164086\"><\/AnnotationDrawer><div>Estimate continuous supply demands in gallons per minute (L\/m) for lawn sprinklers, air conditioners, etc., and add the sum to the total demand for fixtures. The result is the estimated supply demand for the building supply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-164087\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-164087\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-164087\"><\/AnnotationDrawer><h6><a name=\"JD_PCE103\" id=\"JD_PCE103\" title=\"PC E103\"><\/a>Section PC E103: Selection of Pipe Size<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11712-html-1",
+      "kind" : "html",
+      "plainText" : "Estimate continuous supply demands in gallons per minute (L\/m) for lawn sprinklers, air conditioners, etc., and add the sum to the total demand for fixtures. The result is the estimated supply demand for the building supply.\n\n Section PC E103: Selection of Pipe Size"
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "Estimate continuous supply demands in gallons per minute (L\/m) for lawn sprinklers, air conditioners, etc., and add the sum to the total demand for fixtures. The result is the estimated supply demand for the building supply.\n\nSection PC E103: Selection of Pipe Size",
+  "previewText" : "Estimate continuous supply demands in gallons per minute (L\/m) for lawn sprinklers, air conditioners, etc.",
+  "schemaVersion" : 2,
+  "sectionID" : 11712
+}

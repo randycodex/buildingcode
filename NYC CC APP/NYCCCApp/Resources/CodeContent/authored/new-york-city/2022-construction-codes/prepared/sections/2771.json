@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175206\"><\/AnnotationDrawer><div>In buildings or structures where no elevator service is provided or required by other sections of this code, only the dwelling units and sleeping units that are located on stories indicated in Section 1107.7.4.1.1 are required to be Type B+NYC units. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2771-html-1",
+      "kind" : "html",
+      "plainText" : "In buildings or structures where no elevator service is provided or required by other sections of this code, only the dwelling units and sleeping units that are located on stories indicated in Section 1107.7.4.1.1 are required to be Type B+NYC units."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "In buildings or structures where no elevator service is provided or required by other sections of this code, only the dwelling units and sleeping units that are located on stories indicated in Section 1107.7.4.1.1 are required to be Type B+NYC units.",
+  "previewText" : "In buildings or structures where no elevator service is provided or required by other sections of this code, only the dwelling units and sleeping units that are located on stories indicated in Section 1107.",
+  "schemaVersion" : 2,
+  "sectionID" : 2771
+}

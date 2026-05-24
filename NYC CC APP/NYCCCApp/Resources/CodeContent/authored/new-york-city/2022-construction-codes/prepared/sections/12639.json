@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163321\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163321\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Interceptors and separators shall be designed so as not to become air bound. Interceptors and separators shall be vented in accordance with one of the methods in <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162998', hash: '#JD_PCCh.9' }}\">Chapter 9<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12639-html-1",
+      "kind" : "html",
+      "plainText" : "Interceptors and separators shall be designed so as not to become air bound. Interceptors and separators shall be vented in accordance with one of the methods in Chapter 9 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Interceptors and separators shall be designed so as not to become air bound. Interceptors and separators shall be vented in accordance with one of the methods in Chapter 9.",
+  "previewText" : "Interceptors and separators shall be designed so as not to become air bound.",
+  "schemaVersion" : 2,
+  "sectionID" : 12639
+}

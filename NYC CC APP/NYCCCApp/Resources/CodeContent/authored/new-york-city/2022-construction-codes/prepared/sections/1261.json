@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169826\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169826\"><\/AnnotationDrawer><div>Automatic- closing fire door assemblies shall be self-closing in accordance with NFPA 80.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1261-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic- closing fire door assemblies shall be self-closing in accordance with NFPA 80."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Automatic- closing fire door assemblies shall be self-closing in accordance with NFPA 80.",
+  "previewText" : "Automatic- closing fire door assemblies shall be self-closing in accordance with NFPA 80.",
+  "schemaVersion" : 2,
+  "sectionID" : 1261
+}

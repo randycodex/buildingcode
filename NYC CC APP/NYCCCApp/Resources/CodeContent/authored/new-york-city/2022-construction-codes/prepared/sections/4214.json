@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179787\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179787\"><\/AnnotationDrawer><div>The allowable axial compression load of a helical pile shall be verified by load tests in accordance with the requirements of Section 1810.4, except that ASTM D 1143 may be conducted using the Quick Load Test Loading Procedure. Following each compression load test, the helical pile being tested shall be removed by unscrewing and inspected for any deformations to the helices to verify the structural integrity of the shaft and its connections.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4214-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable axial compression load of a helical pile shall be verified by load tests in accordance with the requirements of Section 1810.4, except that ASTM D 1143 may be conducted using the Quick Load Test Loading Procedure. Following each compression load test, the helical pile being tested shall be removed by unscrewing and inspected for any deformations to the helices to verify the structural integrity of the shaft and its connections."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The allowable axial compression load of a helical pile shall be verified by load tests in accordance with the requirements of Section 1810.4, except that ASTM D 1143 may be conducted using the Quick Load Test Loading Procedure. Following each compression load test, the helical pile being tested shall be removed by unscrewing and inspected for any deformations to the helices to verify the structural integrity of the shaft and its connections.",
+  "previewText" : "The allowable axial compression load of a helical pile shall be verified by load tests in accordance with the requirements of Section 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4214
+}

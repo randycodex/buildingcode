@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194082\"><\/AnnotationDrawer><div>Makeup air shall be provided at a rate approximately equal to the rate that air is exhausted by the hazardous exhaust system. Makeup air intakes shall be located in accordance with Section 401.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10710-html-1",
+      "kind" : "html",
+      "plainText" : "Makeup air shall be provided at a rate approximately equal to the rate that air is exhausted by the hazardous exhaust system. Makeup air intakes shall be located in accordance with Section 401.4."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Makeup air shall be provided at a rate approximately equal to the rate that air is exhausted by the hazardous exhaust system. Makeup air intakes shall be located in accordance with Section 401.4.",
+  "previewText" : "Makeup air shall be provided at a rate approximately equal to the rate that air is exhausted by the hazardous exhaust system.",
+  "schemaVersion" : 2,
+  "sectionID" : 10710
+}

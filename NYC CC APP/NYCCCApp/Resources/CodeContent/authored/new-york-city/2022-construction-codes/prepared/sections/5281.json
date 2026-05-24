@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183268\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183268\"><\/AnnotationDrawer><div>Plastic materials installed as interior finish or trim shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170820', hash: '#JD_BCCh.8' }}\">Chapter 8<\/Link>. Foam plastics shall only be installed as interior finish where approved in accordance with the special provisions of Section 2603.9. Foam plastics that are used as interior finish shall also meet the flame and smoke-developed spread index requirements for interior finish in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170820', hash: '#JD_BCCh.8' }}\">Chapter 8<\/Link>. Foam plastics installed as interior trim shall comply with Section 2604.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5281-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic materials installed as interior finish or trim shall comply with Chapter 8 . Foam plastics shall only be installed as interior finish where approved in accordance with the special provisions of Section 2603.9. Foam plastics that are used as interior finish shall also meet the flame and smoke-developed spread index requirements for interior finish in accordance with Chapter 8 . Foam plastics installed as interior trim shall comply with Section 2604.2."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "Plastic materials installed as interior finish or trim shall comply with Chapter 8. Foam plastics shall only be installed as interior finish where approved in accordance with the special provisions of Section 2603.9. Foam plastics that are used as interior finish shall also meet the flame and smoke-developed spread index requirements for interior finish in accordance with Chapter 8. Foam plastics installed as interior trim shall comply with Section 2604.2.",
+  "previewText" : "Plastic materials installed as interior finish or trim shall comply with Chapter 8.",
+  "schemaVersion" : 2,
+  "sectionID" : 5281
+}

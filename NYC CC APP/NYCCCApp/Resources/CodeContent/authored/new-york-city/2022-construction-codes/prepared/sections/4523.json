@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180620\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180620\"><\/AnnotationDrawer><div>Lap splices of reinforcing bars shall utilize the noncontact lap splice method with a minimum clearance of 2 inches (51 mm) between bars. The use of contact lap splices necessary for support of the reinforcing is permitted when approved by the commissioner, based on satisfactory preconstruction tests that show that adequate encasement of the bars will be achieved, and provided that the splice is oriented so that a plane through the center of the spliced bars is perpendicular to the surface of the shotcrete.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4523-html-1",
+      "kind" : "html",
+      "plainText" : "Lap splices of reinforcing bars shall utilize the noncontact lap splice method with a minimum clearance of 2 inches (51 mm) between bars. The use of contact lap splices necessary for support of the reinforcing is permitted when approved by the commissioner, based on satisfactory preconstruction tests that show that adequate encasement of the bars will be achieved, and provided that the splice is oriented so that a plane through the center of the spliced bars is perpendicular to the surface of the shotcrete."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Lap splices of reinforcing bars shall utilize the noncontact lap splice method with a minimum clearance of 2 inches (51 mm) between bars. The use of contact lap splices necessary for support of the reinforcing is permitted when approved by the commissioner, based on satisfactory preconstruction tests that show that adequate encasement of the bars will be achieved, and provided that the splice is oriented so that a plane through the center of the spliced bars is perpendicular to the surface of the shotcrete.",
+  "previewText" : "Lap splices of reinforcing bars shall utilize the noncontact lap splice method with a minimum clearance of 2 inches (51 mm) between bars.",
+  "schemaVersion" : 2,
+  "sectionID" : 4523
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197722\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197722\"><\/AnnotationDrawer><div>Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.4 mm) from the supply plenum. Clearance is not required beyond the 3-foot (914.4 mm) distance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-197723\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-197723\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-197723\"><\/AnnotationDrawer><h6><a name=\"JD_FGC309\" id=\"JD_FGC309\" title=\"FGC 309\"><\/a>Section FGC 309: Electrical<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8157-html-1",
+      "kind" : "html",
+      "plainText" : "Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.4 mm) from the supply plenum. Clearance is not required beyond the 3-foot (914.4 mm) distance.\n\n Section FGC 309: Electrical"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.4 mm) from the supply plenum. Clearance is not required beyond the 3-foot (914.4 mm) distance.\n\nSection FGC 309: Electrical",
+  "previewText" : "Supply air ducts connecting to listed central heating furnaces shall have the same minimum clearance to combustibles as required for the furnace supply plenum for a distance of not less than 3 feet (914.",
+  "schemaVersion" : 2,
+  "sectionID" : 8157
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174918\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174918\"><\/AnnotationDrawer><div>All entrances to tenant spaces that are required to be accessible shall be accessible entrances.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174919\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> An accessible entrance is not required to self-service storage units that are not required to be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2672-html-1",
+      "kind" : "html",
+      "plainText" : "All entrances to tenant spaces that are required to be accessible shall be accessible entrances.\n\n Exception: An accessible entrance is not required to self-service storage units that are not required to be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "All entrances to tenant spaces that are required to be accessible shall be accessible entrances.\n\nException: An accessible entrance is not required to self-service storage units that are not required to be accessible.",
+  "previewText" : "All entrances to tenant spaces that are required to be accessible shall be accessible entrances.",
+  "schemaVersion" : 2,
+  "sectionID" : 2672
+}

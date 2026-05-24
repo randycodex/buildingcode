@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194340\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194340\"><\/AnnotationDrawer><div>Plastic ducts shall be constructed of PVC having a minimum pipe stiffness of 8 psi (55.1 kPa) at 5-percent deflection when tested in accordance with ASTM D 2412. Plastic duct fittings shall be constructed of either PVC or high-density polyethylene. Plastic duct and fittings shall be utilized in underground installations only. The maximum design temperature for systems utilizing plastic duct and fittings shall be 150&#176;F (65.6&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10794-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic ducts shall be constructed of PVC having a minimum pipe stiffness of 8 psi (55.1 kPa) at 5-percent deflection when tested in accordance with ASTM D 2412. Plastic duct fittings shall be constructed of either PVC or high-density polyethylene. Plastic duct and fittings shall be utilized in underground installations only. The maximum design temperature for systems utilizing plastic duct and fittings shall be 150°F (65.6°C)."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Plastic ducts shall be constructed of PVC having a minimum pipe stiffness of 8 psi (55.1 kPa) at 5-percent deflection when tested in accordance with ASTM D 2412. Plastic duct fittings shall be constructed of either PVC or high-density polyethylene. Plastic duct and fittings shall be utilized in underground installations only. The maximum design temperature for systems utilizing plastic duct and fittings shall be 150°F (65.6°C).",
+  "previewText" : "Plastic ducts shall be constructed of PVC having a minimum pipe stiffness of 8 psi (55.",
+  "schemaVersion" : 2,
+  "sectionID" : 10794
+}

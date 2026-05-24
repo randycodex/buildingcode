@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197652\"><\/AnnotationDrawer><div>Liquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture, or disposal area in accordance with the manufacturer's instructions. Condensate piping shall conform to one of the standards listed in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162936', hash: '#JD_PC803' }}\">803<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span> and shall not be smaller than the drain connection on the appliance. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than 1\/8 unit vertical in 12 units horizontal (1-percent slope).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8138-html-1",
+      "kind" : "html",
+      "plainText" : "Liquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture, or disposal area in accordance with the manufacturer's instructions. Condensate piping shall conform to one of the standards listed in Section 803 of the New York City Plumbing Code and shall not be smaller than the drain connection on the appliance. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than 1\/8 unit vertical in 12 units horizontal (1-percent slope)."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Liquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture, or disposal area in accordance with the manufacturer's instructions. Condensate piping shall conform to one of the standards listed in Section 803 of the New York City Plumbing Code and shall not be smaller than the drain connection on the appliance. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than 1\/8 unit vertical in 12 units horizontal (1-percent slope).",
+  "previewText" : "Liquid combustion by-products of condensing appliances shall be collected and discharged to an approved plumbing fixture, or disposal area in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 8138
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171918\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171918\"><\/AnnotationDrawer><div>In addition to smoke detection otherwise required by this code, automatic smoke detection in high-rise buildings shall be in accordance with Sections 907.2.13.1.1 and 907.2.13.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171919\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception for Group R-2 occupancies:<\/span> In R-2 occupancies, the activation of smoke detectors shall initiate a signal at a central supervising station or a constantly attended location and shall not initiate a signal to alarm notification appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1797-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to smoke detection otherwise required by this code, automatic smoke detection in high-rise buildings shall be in accordance with Sections 907.2.13.1.1 and 907.2.13.1.2.\n\n Exception for Group R-2 occupancies: In R-2 occupancies, the activation of smoke detectors shall initiate a signal at a central supervising station or a constantly attended location and shall not initiate a signal to alarm notification appliances."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "In addition to smoke detection otherwise required by this code, automatic smoke detection in high-rise buildings shall be in accordance with Sections 907.2.13.1.1 and 907.2.13.1.2.\n\nException for Group R-2 occupancies: In R-2 occupancies, the activation of smoke detectors shall initiate a signal at a central supervising station or a constantly attended location and shall not initiate a signal to alarm notification appliances.",
+  "previewText" : "In addition to smoke detection otherwise required by this code, automatic smoke detection in high-rise buildings shall be in accordance with Sections 907.",
+  "schemaVersion" : 2,
+  "sectionID" : 1797
+}

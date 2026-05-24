@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193948\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193948\"><\/AnnotationDrawer><div>Where heat or radiant energy sensors are utilized in hood systems consisting of multiple hoods served by a single exhaust system, such sensors shall be provided in each hood. Sensors shall be capable of being accessed from the hood outlet or from a cleanout location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10660-html-1",
+      "kind" : "html",
+      "plainText" : "Where heat or radiant energy sensors are utilized in hood systems consisting of multiple hoods served by a single exhaust system, such sensors shall be provided in each hood. Sensors shall be capable of being accessed from the hood outlet or from a cleanout location."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Where heat or radiant energy sensors are utilized in hood systems consisting of multiple hoods served by a single exhaust system, such sensors shall be provided in each hood. Sensors shall be capable of being accessed from the hood outlet or from a cleanout location.",
+  "previewText" : "Where heat or radiant energy sensors are utilized in hood systems consisting of multiple hoods served by a single exhaust system, such sensors shall be provided in each hood.",
+  "schemaVersion" : 2,
+  "sectionID" : 10660
+}

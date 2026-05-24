@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168119\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168119\"><\/AnnotationDrawer><div>Mills operating with close clearances and that process flammable and heat-sensitive materials, such as nitrocellulose, shall be classified as Group H-1 occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "740-html-1",
+      "kind" : "html",
+      "plainText" : "Mills operating with close clearances and that process flammable and heat-sensitive materials, such as nitrocellulose, shall be classified as Group H-1 occupancy."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Mills operating with close clearances and that process flammable and heat-sensitive materials, such as nitrocellulose, shall be classified as Group H-1 occupancy.",
+  "previewText" : "Mills operating with close clearances and that process flammable and heat-sensitive materials, such as nitrocellulose, shall be classified as Group H-1 occupancy.",
+  "schemaVersion" : 2,
+  "sectionID" : 740
+}

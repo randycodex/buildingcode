@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194713\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194713\"><\/AnnotationDrawer><div>The room or space containing fuel-burning appliances shall be an unconfined space as defined in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192562', hash: '#JD_MC202' }}\">202<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10914-html-1",
+      "kind" : "html",
+      "plainText" : "The room or space containing fuel-burning appliances shall be an unconfined space as defined in Section 202 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The room or space containing fuel-burning appliances shall be an unconfined space as defined in Section 202.",
+  "previewText" : "The room or space containing fuel-burning appliances shall be an unconfined space as defined in Section 202.",
+  "schemaVersion" : 2,
+  "sectionID" : 10914
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187093\"><\/AnnotationDrawer><div>Only personnel, materials, and uses authorized by the person responsible for supervising the installation, repair, maintenance, adjustment, or removal of a scaffold shall be located on and using the scaffold during such work.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6601-html-1",
+      "kind" : "html",
+      "plainText" : "Only personnel, materials, and uses authorized by the person responsible for supervising the installation, repair, maintenance, adjustment, or removal of a scaffold shall be located on and using the scaffold during such work."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Only personnel, materials, and uses authorized by the person responsible for supervising the installation, repair, maintenance, adjustment, or removal of a scaffold shall be located on and using the scaffold during such work.",
+  "previewText" : "Only personnel, materials, and uses authorized by the person responsible for supervising the installation, repair, maintenance, adjustment, or removal of a scaffold shall be located on and using the scaffold during such work.",
+  "schemaVersion" : 2,
+  "sectionID" : 6601
+}

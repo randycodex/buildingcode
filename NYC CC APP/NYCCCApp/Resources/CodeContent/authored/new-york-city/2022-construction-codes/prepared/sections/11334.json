@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195891\"><\/AnnotationDrawer><div>Where required, refrigerant detectors shall comply with the requirements of EN378 Part 3, Section 9.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195892\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195892\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195892\"><\/AnnotationDrawer><h6><a name=\"JD_MC1108\" id=\"JD_MC1108\" title=\"MC 1108\"><\/a>Section MC 1108: Field Test<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11334-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, refrigerant detectors shall comply with the requirements of EN378 Part 3, Section 9.3.1.\n\n Section MC 1108: Field Test"
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where required, refrigerant detectors shall comply with the requirements of EN378 Part 3, Section 9.3.1.\n\nSection MC 1108: Field Test",
+  "previewText" : "Where required, refrigerant detectors shall comply with the requirements of EN378 Part 3, Section 9.",
+  "schemaVersion" : 2,
+  "sectionID" : 11334
+}

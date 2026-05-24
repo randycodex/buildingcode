@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174055\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174055\"><\/AnnotationDrawer><div>The minimum width or required capacity of corridors shall be unobstructed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174056\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174056\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Encroachments complying with Section 1005.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2418-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum width or required capacity of corridors shall be unobstructed.\n\n Exception: Encroachments complying with Section 1005.7."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The minimum width or required capacity of corridors shall be unobstructed.\n\nException: Encroachments complying with Section 1005.7.",
+  "previewText" : "The minimum width or required capacity of corridors shall be unobstructed.",
+  "schemaVersion" : 2,
+  "sectionID" : 2418
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176107\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176107\"><\/AnnotationDrawer><div>For buildings in flood hazard areas, the exterior wall envelope extending below the design flood elevation shall be resistant to water damage and shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3069-html-1",
+      "kind" : "html",
+      "plainText" : "For buildings in flood hazard areas, the exterior wall envelope extending below the design flood elevation shall be resistant to water damage and shall comply with Appendix G ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "For buildings in flood hazard areas, the exterior wall envelope extending below the design flood elevation shall be resistant to water damage and shall comply with Appendix G.",
+  "previewText" : "For buildings in flood hazard areas, the exterior wall envelope extending below the design flood elevation shall be resistant to water damage and shall comply with Appendix G.",
+  "schemaVersion" : 2,
+  "sectionID" : 3069
+}

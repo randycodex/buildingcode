@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183703\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183703\"><\/AnnotationDrawer><div>An elevator with 60 feet (18 288 mm) but not more than 75 feet (22 860 mm) of maximum rise shall be permitted to serve within an individual dwelling unit provided the elevator car is in compliance with Parts 2 or 3 of ASME A17.1\/CSA B44 and Section 3001.3 of this code even if it does not serve on an accessible route within the dwelling unit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5435-html-1",
+      "kind" : "html",
+      "plainText" : "An elevator with 60 feet (18 288 mm) but not more than 75 feet (22 860 mm) of maximum rise shall be permitted to serve within an individual dwelling unit provided the elevator car is in compliance with Parts 2 or 3 of ASME A17.1\/CSA B44 and Section 3001.3 of this code even if it does not serve on an accessible route within the dwelling unit."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "An elevator with 60 feet (18 288 mm) but not more than 75 feet (22 860 mm) of maximum rise shall be permitted to serve within an individual dwelling unit provided the elevator car is in compliance with Parts 2 or 3 of ASME A17.1\/CSA B44 and Section 3001.3 of this code even if it does not serve on an accessible route within the dwelling unit.",
+  "previewText" : "An elevator with 60 feet (18 288 mm) but not more than 75 feet (22 860 mm) of maximum rise shall be permitted to serve within an individual dwelling unit provided the elevator car is in compliance with Parts 2 or 3 of ASME A17.",
+  "schemaVersion" : 2,
+  "sectionID" : 5435
+}

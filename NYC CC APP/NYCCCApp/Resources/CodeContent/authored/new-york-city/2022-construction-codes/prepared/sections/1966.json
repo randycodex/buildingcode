@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172415\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172415\"><\/AnnotationDrawer><div>Where access to the stairway or ramp is by way of a vestibule, the door assembly into the vestibule shall be a fire door assembly complying with Section 716.5. The door assembly from the vestibule to the stairway shall have not less than a 90-minute fire protection rating complying with Section 716.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1966-html-1",
+      "kind" : "html",
+      "plainText" : "Where access to the stairway or ramp is by way of a vestibule, the door assembly into the vestibule shall be a fire door assembly complying with Section 716.5. The door assembly from the vestibule to the stairway shall have not less than a 90-minute fire protection rating complying with Section 716.5."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Where access to the stairway or ramp is by way of a vestibule, the door assembly into the vestibule shall be a fire door assembly complying with Section 716.5. The door assembly from the vestibule to the stairway shall have not less than a 90-minute fire protection rating complying with Section 716.5.",
+  "previewText" : "Where access to the stairway or ramp is by way of a vestibule, the door assembly into the vestibule shall be a fire door assembly complying with Section 716.",
+  "schemaVersion" : 2,
+  "sectionID" : 1966
+}

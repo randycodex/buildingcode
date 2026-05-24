@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180364\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180364\"><\/AnnotationDrawer><div>Ready-mixed concrete shall be mixed and delivered in accordance with the requirements of ASTM C 94 or ASTM C 685.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4411-html-1",
+      "kind" : "html",
+      "plainText" : "Ready-mixed concrete shall be mixed and delivered in accordance with the requirements of ASTM C 94 or ASTM C 685."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Ready-mixed concrete shall be mixed and delivered in accordance with the requirements of ASTM C 94 or ASTM C 685.",
+  "previewText" : "Ready-mixed concrete shall be mixed and delivered in accordance with the requirements of ASTM C 94 or ASTM C 685.",
+  "schemaVersion" : 2,
+  "sectionID" : 4411
+}

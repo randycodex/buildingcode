@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "K1",
+  "officialText" : "(a) When placed in the \"FIREMAN SERVICE\" position, the control system shall:\n\n(1) disable all door reopening devices in the lower compartment; and\n\n(2) initiate closing of the lower compartment doors in accordance with Subsection 2.13.4.2.1(c).\n\n(b) When the upper compartment is stopped at the designated level, the Phase II Emergency In-Car Operation key switch is in the \"NORMAL\" position and Phase I Emergency Recall Operation is in effect; the lower compartment doors shall be opened.",
+  "previewText" : "(a) When placed in the \"FIREMAN SERVICE\" position, the control system shall:\n\n(1) disable all door reopening devices in the lower compartment; and\n\n(2) initiate closing of the lower compartment doors in accordance with Subsection 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 7436
+}

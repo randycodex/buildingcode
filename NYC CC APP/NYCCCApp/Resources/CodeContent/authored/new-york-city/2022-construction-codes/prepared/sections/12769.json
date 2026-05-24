@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163718\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Storage tanks shall be provided with a vent sized in accordance with Chapter 9 and based on the aggregate diameter of all tank influent pipes. The reservoir vent shall not be connected to sanitary drainage system vents. Vents shall be protected from contamination by means of an approved<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">cap or U-bend installed with the opening directed downward. Vent outlets shall extend not less than 4 inches (102 mm) above grade or as necessary to prevent surface water from entering the storage tank. Vent openings shall be protected against the entrance of vermin and insects in accordance with the requirements of Section 1301.7.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12769-html-1",
+      "kind" : "html",
+      "plainText" : "Storage tanks shall be provided with a vent sized in accordance with Chapter 9 and based on the aggregate diameter of all tank influent pipes. The reservoir vent shall not be connected to sanitary drainage system vents. Vents shall be protected from contamination by means of an approved cap or U-bend installed with the opening directed downward. Vent outlets shall extend not less than 4 inches (102 mm) above grade or as necessary to prevent surface water from entering the storage tank. Vent openings shall be protected against the entrance of vermin and insects in accordance with the requirements of Section 1301.7."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Storage tanks shall be provided with a vent sized in accordance with Chapter 9 and based on the aggregate diameter of all tank influent pipes. The reservoir vent shall not be connected to sanitary drainage system vents. Vents shall be protected from contamination by means of an approved cap or U-bend installed with the opening directed downward. Vent outlets shall extend not less than 4 inches (102 mm) above grade or as necessary to prevent surface water from entering the storage tank. Vent openings shall be protected against the entrance of vermin and insects in accordance with the requirements of Section 1301.7.",
+  "previewText" : "Storage tanks shall be provided with a vent sized in accordance with Chapter 9 and based on the aggregate diameter of all tank influent pipes.",
+  "schemaVersion" : 2,
+  "sectionID" : 12769
+}

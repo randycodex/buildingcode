@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180824\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180824\"><\/AnnotationDrawer><div>Surface-bonding mortar shall comply with ASTM C 887. Surface bonding of concrete masonry units shall comply with ASTM C 946.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4574-html-1",
+      "kind" : "html",
+      "plainText" : "Surface-bonding mortar shall comply with ASTM C 887. Surface bonding of concrete masonry units shall comply with ASTM C 946."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Surface-bonding mortar shall comply with ASTM C 887. Surface bonding of concrete masonry units shall comply with ASTM C 946.",
+  "previewText" : "Surface-bonding mortar shall comply with ASTM C 887.",
+  "schemaVersion" : 2,
+  "sectionID" : 4574
+}

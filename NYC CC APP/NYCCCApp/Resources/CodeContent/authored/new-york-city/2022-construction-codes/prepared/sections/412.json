@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167098\"><\/AnnotationDrawer><div>In any open parking lot, one or more aisles, at least 24 inches (610 mm) in width, shall be provided to permit access by fire-fighting personnel to all parts of the garage or lot. There shall not be more than three rows of parked motor vehicles between aisles.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "412-html-1",
+      "kind" : "html",
+      "plainText" : "In any open parking lot, one or more aisles, at least 24 inches (610 mm) in width, shall be provided to permit access by fire-fighting personnel to all parts of the garage or lot. There shall not be more than three rows of parked motor vehicles between aisles."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "In any open parking lot, one or more aisles, at least 24 inches (610 mm) in width, shall be provided to permit access by fire-fighting personnel to all parts of the garage or lot. There shall not be more than three rows of parked motor vehicles between aisles.",
+  "previewText" : "In any open parking lot, one or more aisles, at least 24 inches (610 mm) in width, shall be provided to permit access by fire-fighting personnel to all parts of the garage or lot.",
+  "schemaVersion" : 2,
+  "sectionID" : 412
+}

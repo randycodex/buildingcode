@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179690\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179690\"><\/AnnotationDrawer><div>Concrete-filled steel pipe and tube piles shall conform to the requirements of Sections 1812.6.1 through 1812.6.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4169-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete-filled steel pipe and tube piles shall conform to the requirements of Sections 1812.6.1 through 1812.6.5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Concrete-filled steel pipe and tube piles shall conform to the requirements of Sections 1812.6.1 through 1812.6.5.",
+  "previewText" : "Concrete-filled steel pipe and tube piles shall conform to the requirements of Sections 1812.",
+  "schemaVersion" : 2,
+  "sectionID" : 4169
+}

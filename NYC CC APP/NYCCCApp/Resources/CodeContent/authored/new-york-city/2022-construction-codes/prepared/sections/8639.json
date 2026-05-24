@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199130\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199130\"><\/AnnotationDrawer><div>Decorative appliances for installation in approved solid fuel-burning fireplaces, with the exception of those tested in accordance with ANSI Z21.84, shall utilize a direct ignition device, an ignitor or a pilot flame to ignite the fuel at the main burner, and shall be equipped with a flame safeguard device. The flame safeguard device shall automatically shut off the fuel supply to a main burner or group of burners when the means of ignition of such burners becomes inoperative.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8639-html-1",
+      "kind" : "html",
+      "plainText" : "Decorative appliances for installation in approved solid fuel-burning fireplaces, with the exception of those tested in accordance with ANSI Z21.84, shall utilize a direct ignition device, an ignitor or a pilot flame to ignite the fuel at the main burner, and shall be equipped with a flame safeguard device. The flame safeguard device shall automatically shut off the fuel supply to a main burner or group of burners when the means of ignition of such burners becomes inoperative."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Decorative appliances for installation in approved solid fuel-burning fireplaces, with the exception of those tested in accordance with ANSI Z21.84, shall utilize a direct ignition device, an ignitor or a pilot flame to ignite the fuel at the main burner, and shall be equipped with a flame safeguard device. The flame safeguard device shall automatically shut off the fuel supply to a main burner or group of burners when the means of ignition of such burners becomes inoperative.",
+  "previewText" : "Decorative appliances for installation in approved solid fuel-burning fireplaces, with the exception of those tested in accordance with ANSI Z21.",
+  "schemaVersion" : 2,
+  "sectionID" : 8639
+}

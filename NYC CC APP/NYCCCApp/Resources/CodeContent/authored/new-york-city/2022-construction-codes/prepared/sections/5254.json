@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183167\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183167\"><\/AnnotationDrawer><div>Foam plastic used for interior signs in covered mall buildings in accordance with Section 402.6.4 of this code shall be permitted without a thermal barrier. Foam plastic signs that are not affixed to interior building surfaces shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-143607', hash: '#JD_FCChapter8' }}\">Chapter 8<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5254-html-1",
+      "kind" : "html",
+      "plainText" : "Foam plastic used for interior signs in covered mall buildings in accordance with Section 402.6.4 of this code shall be permitted without a thermal barrier. Foam plastic signs that are not affixed to interior building surfaces shall comply with Chapter 8 of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "Foam plastic used for interior signs in covered mall buildings in accordance with Section 402.6.4 of this code shall be permitted without a thermal barrier. Foam plastic signs that are not affixed to interior building surfaces shall comply with Chapter 8 of the New York City Fire Code.",
+  "previewText" : "Foam plastic used for interior signs in covered mall buildings in accordance with Section 402.",
+  "schemaVersion" : 2,
+  "sectionID" : 5254
+}

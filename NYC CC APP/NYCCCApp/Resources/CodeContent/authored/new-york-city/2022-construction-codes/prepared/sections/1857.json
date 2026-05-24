@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172098\"><\/AnnotationDrawer><div>Fire alarm systems required by this chapter or by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> shall be monitored by a central supervising station in accordance with NFPA 72 and approved by the Fire Commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172099\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172099\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Monitoring by a central supervising station is not required for:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172100\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172100\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Single- and multiple-station smoke alarms required by Section 907.2.11.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172101\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172101\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Smoke detectors in Group I-3 occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172102\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172102\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;Automatic sprinkler systems in one- and two-family dwellings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1857-html-1",
+      "kind" : "html",
+      "plainText" : "Fire alarm systems required by this chapter or by the New York City Fire Code shall be monitored by a central supervising station in accordance with NFPA 72 and approved by the Fire Commissioner.\n\n Exception: Monitoring by a central supervising station is not required for:\n\n 1. Single- and multiple-station smoke alarms required by Section 907.2.11.\n\n 2. Smoke detectors in Group I-3 occupancies.\n\n 3. Automatic sprinkler systems in one- and two-family dwellings."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fire alarm systems required by this chapter or by the New York City Fire Code shall be monitored by a central supervising station in accordance with NFPA 72 and approved by the Fire Commissioner.\n\nException: Monitoring by a central supervising station is not required for:\n\n1. Single- and multiple-station smoke alarms required by Section 907.2.11.\n\n2. Smoke detectors in Group I-3 occupancies.\n\n3. Automatic sprinkler systems in one- and two-family dwellings.",
+  "previewText" : "Fire alarm systems required by this chapter or by the New York City Fire Code shall be monitored by a central supervising station in accordance with NFPA 72 and approved by the Fire Commissioner.",
+  "schemaVersion" : 2,
+  "sectionID" : 1857
+}

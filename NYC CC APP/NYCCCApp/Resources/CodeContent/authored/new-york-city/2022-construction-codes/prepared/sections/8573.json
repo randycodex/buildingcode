@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198868\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198868\"><\/AnnotationDrawer><div>Thermal safety (spill) switches shall be installed on barometric-draft regulators and all other appurtenances that allow dilution air into chimneys or vents. Thermal safety (spill) switches shall be interlocked with all of the appliances connected to the same chimney or gas vent.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8573-html-1",
+      "kind" : "html",
+      "plainText" : "Thermal safety (spill) switches shall be installed on barometric-draft regulators and all other appurtenances that allow dilution air into chimneys or vents. Thermal safety (spill) switches shall be interlocked with all of the appliances connected to the same chimney or gas vent."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Thermal safety (spill) switches shall be installed on barometric-draft regulators and all other appurtenances that allow dilution air into chimneys or vents. Thermal safety (spill) switches shall be interlocked with all of the appliances connected to the same chimney or gas vent.",
+  "previewText" : "Thermal safety (spill) switches shall be installed on barometric-draft regulators and all other appurtenances that allow dilution air into chimneys or vents.",
+  "schemaVersion" : 2,
+  "sectionID" : 8573
+}

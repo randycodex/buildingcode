@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198498\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198498\"><\/AnnotationDrawer><div>Outdoor portions of chimneys or vents shall be provided with integral R-8 insulation or be provided with an R-8 insulation enclosure, where exposed to the outdoors for more than 5 feet (1524 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8436-html-1",
+      "kind" : "html",
+      "plainText" : "Outdoor portions of chimneys or vents shall be provided with integral R-8 insulation or be provided with an R-8 insulation enclosure, where exposed to the outdoors for more than 5 feet (1524 mm)."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Outdoor portions of chimneys or vents shall be provided with integral R-8 insulation or be provided with an R-8 insulation enclosure, where exposed to the outdoors for more than 5 feet (1524 mm).",
+  "previewText" : "Outdoor portions of chimneys or vents shall be provided with integral R-8 insulation or be provided with an R-8 insulation enclosure, where exposed to the outdoors for more than 5 feet (1524 mm).",
+  "schemaVersion" : 2,
+  "sectionID" : 8436
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175795\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175795\"><\/AnnotationDrawer><div>Rooms containing bathtubs, showers, spas and similar bathing fixtures in other than Group R and I-1 occupancies shall be mechanically ventilated in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>, whether or not they are also provided with natural ventilation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2974-html-1",
+      "kind" : "html",
+      "plainText" : "Rooms containing bathtubs, showers, spas and similar bathing fixtures in other than Group R and I-1 occupancies shall be mechanically ventilated in accordance with the New York City Mechanical Code , whether or not they are also provided with natural ventilation."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Rooms containing bathtubs, showers, spas and similar bathing fixtures in other than Group R and I-1 occupancies shall be mechanically ventilated in accordance with the New York City Mechanical Code, whether or not they are also provided with natural ventilation.",
+  "previewText" : "Rooms containing bathtubs, showers, spas and similar bathing fixtures in other than Group R and I-1 occupancies shall be mechanically ventilated in accordance with the New York City Mechanical Code, whether or not they are also provided with natural ventilation.",
+  "schemaVersion" : 2,
+  "sectionID" : 2974
+}

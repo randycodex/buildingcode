@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196175\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196175\"><\/AnnotationDrawer><div>Shutoff valves shall be installed on the building supply and return of a central utility system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11456-html-1",
+      "kind" : "html",
+      "plainText" : "Shutoff valves shall be installed on the building supply and return of a central utility system."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Shutoff valves shall be installed on the building supply and return of a central utility system.",
+  "previewText" : "Shutoff valves shall be installed on the building supply and return of a central utility system.",
+  "schemaVersion" : 2,
+  "sectionID" : 11456
+}

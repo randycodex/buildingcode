@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166702\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166702\"><\/AnnotationDrawer><div>Fire pumps shall be located in rooms protected in accordance with Section 913.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "269-html-1",
+      "kind" : "html",
+      "plainText" : "Fire pumps shall be located in rooms protected in accordance with Section 913.2.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Fire pumps shall be located in rooms protected in accordance with Section 913.2.1.",
+  "previewText" : "Fire pumps shall be located in rooms protected in accordance with Section 913.",
+  "schemaVersion" : 2,
+  "sectionID" : 269
+}

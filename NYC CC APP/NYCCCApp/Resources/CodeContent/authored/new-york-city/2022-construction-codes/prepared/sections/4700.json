@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181152\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181152\"><\/AnnotationDrawer><div>The chimney wall or chimney flue lining shall not change in size or shape within 6 inches (152 mm) above or below where the chimney passes through floor components, ceiling components or roof components.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4700-html-1",
+      "kind" : "html",
+      "plainText" : "The chimney wall or chimney flue lining shall not change in size or shape within 6 inches (152 mm) above or below where the chimney passes through floor components, ceiling components or roof components."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "The chimney wall or chimney flue lining shall not change in size or shape within 6 inches (152 mm) above or below where the chimney passes through floor components, ceiling components or roof components.",
+  "previewText" : "The chimney wall or chimney flue lining shall not change in size or shape within 6 inches (152 mm) above or below where the chimney passes through floor components, ceiling components or roof components.",
+  "schemaVersion" : 2,
+  "sectionID" : 4700
+}

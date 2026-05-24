@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166692\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166692\"><\/AnnotationDrawer><div>Buildings and structures shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 and a secondary water supply where required by Section 403.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "264-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings and structures shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 and a secondary water supply where required by Section 403.3.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Buildings and structures shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 and a secondary water supply where required by Section 403.3.3.",
+  "previewText" : "Buildings and structures shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.",
+  "schemaVersion" : 2,
+  "sectionID" : 264
+}

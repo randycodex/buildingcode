@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183757\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183757\"><\/AnnotationDrawer><div>Escalator floor openings shall be enclosed with shaft enclosures complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169532', hash: '#JD_BC713' }}\">713<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5457-html-1",
+      "kind" : "html",
+      "plainText" : "Escalator floor openings shall be enclosed with shaft enclosures complying with Section 713 ."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Escalator floor openings shall be enclosed with shaft enclosures complying with Section 713.",
+  "previewText" : "Escalator floor openings shall be enclosed with shaft enclosures complying with Section 713.",
+  "schemaVersion" : 2,
+  "sectionID" : 5457
+}

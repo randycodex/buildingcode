@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198511\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198511\"><\/AnnotationDrawer><div>Where vents pass through insulated assemblies, an insulation shield constructed of steel having a minimum thickness of 0.0187 inch (0.4712 mm) (No. 26 gage) shall be installed to provide clearance between the vent and the insulation material. The clearance shall be not less than the clearance to combustibles specified by the vent manufacturer's instructions. Where vents pass through attic space, the shield shall terminate not less than 2 inches (50.8 mm) above the insulation materials and shall be secured in place to prevent displacement. Insulation shields provided as part of a listed vent system shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8441-html-1",
+      "kind" : "html",
+      "plainText" : "Where vents pass through insulated assemblies, an insulation shield constructed of steel having a minimum thickness of 0.0187 inch (0.4712 mm) (No. 26 gage) shall be installed to provide clearance between the vent and the insulation material. The clearance shall be not less than the clearance to combustibles specified by the vent manufacturer's instructions. Where vents pass through attic space, the shield shall terminate not less than 2 inches (50.8 mm) above the insulation materials and shall be secured in place to prevent displacement. Insulation shields provided as part of a listed vent system shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Where vents pass through insulated assemblies, an insulation shield constructed of steel having a minimum thickness of 0.0187 inch (0.4712 mm) (No. 26 gage) shall be installed to provide clearance between the vent and the insulation material. The clearance shall be not less than the clearance to combustibles specified by the vent manufacturer's instructions. Where vents pass through attic space, the shield shall terminate not less than 2 inches (50.8 mm) above the insulation materials and shall be secured in place to prevent displacement. Insulation shields provided as part of a listed vent system shall be installed in accordance with the manufacturer's instructions.",
+  "previewText" : "Where vents pass through insulated assemblies, an insulation shield constructed of steel having a minimum thickness of 0.",
+  "schemaVersion" : 2,
+  "sectionID" : 8441
+}

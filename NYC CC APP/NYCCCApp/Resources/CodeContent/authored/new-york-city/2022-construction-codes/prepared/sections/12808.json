@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163821\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163821\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water quality testing and monitoring shall be conducted in accordance with requirements of the Department of Health and Mental Hygiene.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12808-html-1",
+      "kind" : "html",
+      "plainText" : "Water quality testing and monitoring shall be conducted in accordance with requirements of the Department of Health and Mental Hygiene."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Water quality testing and monitoring shall be conducted in accordance with requirements of the Department of Health and Mental Hygiene.",
+  "previewText" : "Water quality testing and monitoring shall be conducted in accordance with requirements of the Department of Health and Mental Hygiene.",
+  "schemaVersion" : 2,
+  "sectionID" : 12808
+}

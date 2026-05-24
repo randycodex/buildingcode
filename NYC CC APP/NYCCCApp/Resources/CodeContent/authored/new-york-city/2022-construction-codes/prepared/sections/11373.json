@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195995\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195995\"><\/AnnotationDrawer><div>Flared joints shall be made by a tool designed for that operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11373-html-1",
+      "kind" : "html",
+      "plainText" : "Flared joints shall be made by a tool designed for that operation."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Flared joints shall be made by a tool designed for that operation.",
+  "previewText" : "Flared joints shall be made by a tool designed for that operation.",
+  "schemaVersion" : 2,
+  "sectionID" : 11373
+}

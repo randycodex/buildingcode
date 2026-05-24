@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186103\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186103\"><\/AnnotationDrawer><div>Sidewalk sheds shall be provided as required by Section 3307.6. Fences shall be provided as required by Section 3307.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6297-html-1",
+      "kind" : "html",
+      "plainText" : "Sidewalk sheds shall be provided as required by Section 3307.6. Fences shall be provided as required by Section 3307.7."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Sidewalk sheds shall be provided as required by Section 3307.6. Fences shall be provided as required by Section 3307.7.",
+  "previewText" : "Sidewalk sheds shall be provided as required by Section 3307.",
+  "schemaVersion" : 2,
+  "sectionID" : 6297
+}

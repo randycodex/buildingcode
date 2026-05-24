@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181150\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181150\"><\/AnnotationDrawer><div>Masonry chimneys shall not be corbeled more than half of the chimney's wall thickness from a wall or foundation, nor shall a chimney be corbeled from a wall or foundation that is less than 12 inches (305 mm) in thickness unless it projects equally on each side of the wall, except that on the second story of a two-story dwelling, corbeling of chimneys on the exterior of the enclosing walls is permitted to equal the wall thickness. The projection of a single course shall not exceed one-half the unit height or one-third of the unit bed depth, whichever is less. No masonry shall be corbeled from hollow or cavity wall masonry units.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4699-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry chimneys shall not be corbeled more than half of the chimney's wall thickness from a wall or foundation, nor shall a chimney be corbeled from a wall or foundation that is less than 12 inches (305 mm) in thickness unless it projects equally on each side of the wall, except that on the second story of a two-story dwelling, corbeling of chimneys on the exterior of the enclosing walls is permitted to equal the wall thickness. The projection of a single course shall not exceed one-half the unit height or one-third of the unit bed depth, whichever is less. No masonry shall be corbeled from hollow or cavity wall masonry units."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Masonry chimneys shall not be corbeled more than half of the chimney's wall thickness from a wall or foundation, nor shall a chimney be corbeled from a wall or foundation that is less than 12 inches (305 mm) in thickness unless it projects equally on each side of the wall, except that on the second story of a two-story dwelling, corbeling of chimneys on the exterior of the enclosing walls is permitted to equal the wall thickness. The projection of a single course shall not exceed one-half the unit height or one-third of the unit bed depth, whichever is less. No masonry shall be corbeled from hollow or cavity wall masonry units.",
+  "previewText" : "Masonry chimneys shall not be corbeled more than half of the chimney's wall thickness from a wall or foundation, nor shall a chimney be corbeled from a wall or foundation that is less than 12 inches (305 mm) in thickness unless it projects equally on each side of the wall, except that on the second story of a two-story dwelling, corbeling of chimneys on the exterior of the enclosing walls is permitted to equal the wall thickness.",
+  "schemaVersion" : 2,
+  "sectionID" : 4699
+}

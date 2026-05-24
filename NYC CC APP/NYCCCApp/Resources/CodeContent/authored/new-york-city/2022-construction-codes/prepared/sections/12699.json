@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163496\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163496\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Building subdrains located below the public sewer level shall discharge into a sump or receiving tank, the contents of which shall be automatically lifted and discharged into the drainage system as required for building sumps. The sump and pumping equipment shall comply with Section 1113.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163497\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163497\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163497\"><\/AnnotationDrawer><h6><a name=\"JD_PC1113\" id=\"JD_PC1113\" title=\"PC 1113\"><\/a>Section PC 1113: Sumps and Pumping Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12699-html-1",
+      "kind" : "html",
+      "plainText" : "Building subdrains located below the public sewer level shall discharge into a sump or receiving tank, the contents of which shall be automatically lifted and discharged into the drainage system as required for building sumps. The sump and pumping equipment shall comply with Section 1113.1. \n\n Section PC 1113: Sumps and Pumping Systems"
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Building subdrains located below the public sewer level shall discharge into a sump or receiving tank, the contents of which shall be automatically lifted and discharged into the drainage system as required for building sumps. The sump and pumping equipment shall comply with Section 1113.1.\n\nSection PC 1113: Sumps and Pumping Systems",
+  "previewText" : "Building subdrains located below the public sewer level shall discharge into a sump or receiving tank, the contents of which shall be automatically lifted and discharged into the drainage system as required for building sumps.",
+  "schemaVersion" : 2,
+  "sectionID" : 12699
+}

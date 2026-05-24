@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183746\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183746\"><\/AnnotationDrawer><div>Where a floor is serviced by more than three elevator cars, at least three elevator cars with a total rated load capacity of not less than 6,000 pounds (2722 kg) shall be kept available for sole use by the Fire Department. Such cars shall include not more than two cars that service all floors and at least one other car in another bank servicing that floor. If the total load capacity of all cars servicing the floor is less than 6,000 pounds (2722 kg), all such cars shall be kept available for sole use by the Fire Department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5452-html-1",
+      "kind" : "html",
+      "plainText" : "Where a floor is serviced by more than three elevator cars, at least three elevator cars with a total rated load capacity of not less than 6,000 pounds (2722 kg) shall be kept available for sole use by the Fire Department. Such cars shall include not more than two cars that service all floors and at least one other car in another bank servicing that floor. If the total load capacity of all cars servicing the floor is less than 6,000 pounds (2722 kg), all such cars shall be kept available for sole use by the Fire Department."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Where a floor is serviced by more than three elevator cars, at least three elevator cars with a total rated load capacity of not less than 6,000 pounds (2722 kg) shall be kept available for sole use by the Fire Department. Such cars shall include not more than two cars that service all floors and at least one other car in another bank servicing that floor. If the total load capacity of all cars servicing the floor is less than 6,000 pounds (2722 kg), all such cars shall be kept available for sole use by the Fire Department.",
+  "previewText" : "Where a floor is serviced by more than three elevator cars, at least three elevator cars with a total rated load capacity of not less than 6,000 pounds (2722 kg) shall be kept available for sole use by the Fire Department.",
+  "schemaVersion" : 2,
+  "sectionID" : 5452
+}

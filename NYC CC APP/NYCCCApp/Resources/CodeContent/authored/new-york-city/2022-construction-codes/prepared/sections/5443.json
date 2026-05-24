@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183724\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183724\"><\/AnnotationDrawer><div>Standby power shall be manually transferable to all elevators in each bank.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5443-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power shall be manually transferable to all elevators in each bank."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Standby power shall be manually transferable to all elevators in each bank.",
+  "previewText" : "Standby power shall be manually transferable to all elevators in each bank.",
+  "schemaVersion" : 2,
+  "sectionID" : 5443
+}

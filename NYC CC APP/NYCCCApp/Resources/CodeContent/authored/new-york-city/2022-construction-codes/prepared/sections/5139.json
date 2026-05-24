@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182809\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182809\"><\/AnnotationDrawer><div>Glass used as structural balustrade panels and in-fill panels in railings shall be laminated glass constructed of fully tempered or heat-strengthened glass and shall comply with Category II or CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1. For all glazing types, the minimum nominal thickness shall be 1\/4 inch (6.4 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182810\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182810\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> For Group R-3 occupancies, single fully tempered glass complying with Category II of CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1 shall be permitted to be used in handrails and guardrails where there is no walking surface beneath them or the walking surface is permanently protected from the risk of falling glass.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5139-html-1",
+      "kind" : "html",
+      "plainText" : "Glass used as structural balustrade panels and in-fill panels in railings shall be laminated glass constructed of fully tempered or heat-strengthened glass and shall comply with Category II or CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1. For all glazing types, the minimum nominal thickness shall be 1\/4 inch (6.4 mm).\n\n Exception: For Group R-3 occupancies, single fully tempered glass complying with Category II of CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1 shall be permitted to be used in handrails and guardrails where there is no walking surface beneath them or the walking surface is permanently protected from the risk of falling glass."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "Glass used as structural balustrade panels and in-fill panels in railings shall be laminated glass constructed of fully tempered or heat-strengthened glass and shall comply with Category II or CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1. For all glazing types, the minimum nominal thickness shall be 1\/4 inch (6.4 mm).\n\nException: For Group R-3 occupancies, single fully tempered glass complying with Category II of CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1 shall be permitted to be used in handrails and guardrails where there is no walking surface beneath them or the walking surface is permanently protected from the risk of falling glass.",
+  "previewText" : "Glass used as structural balustrade panels and in-fill panels in railings shall be laminated glass constructed of fully tempered or heat-strengthened glass and shall comply with Category II or CPSC 16 CFR Part 1201 or Class A of ANSI Z97.",
+  "schemaVersion" : 2,
+  "sectionID" : 5139
+}

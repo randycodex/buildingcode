@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171838\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171838\"><\/AnnotationDrawer><div>Group R-1 occupancies with a total of more than 50 sleeping rooms above street level located in buildings where the highest occupied floor is 75 feet (22 860 mm) or less above the lowest level of Fire Department vehicle access, or communal sleeping facilities above street level occupied or designed to be occupied by more than 50 lodgers, shall be provided with automatic smoke detection connected to an automatic fire alarm system in accordance with Section 907.2.13.1 and an emergency voice\/alarm communication system in accordance with Section 907.5.2.2 that initiates a total evacuation signal.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1775-html-1",
+      "kind" : "html",
+      "plainText" : "Group R-1 occupancies with a total of more than 50 sleeping rooms above street level located in buildings where the highest occupied floor is 75 feet (22 860 mm) or less above the lowest level of Fire Department vehicle access, or communal sleeping facilities above street level occupied or designed to be occupied by more than 50 lodgers, shall be provided with automatic smoke detection connected to an automatic fire alarm system in accordance with Section 907.2.13.1 and an emergency voice\/alarm communication system in accordance with Section 907.5.2.2 that initiates a total evacuation signal."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Group R-1 occupancies with a total of more than 50 sleeping rooms above street level located in buildings where the highest occupied floor is 75 feet (22 860 mm) or less above the lowest level of Fire Department vehicle access, or communal sleeping facilities above street level occupied or designed to be occupied by more than 50 lodgers, shall be provided with automatic smoke detection connected to an automatic fire alarm system in accordance with Section 907.2.13.1 and an emergency voice\/alarm communication system in accordance with Section 907.5.2.2 that initiates a total evacuation signal.",
+  "previewText" : "Group R-1 occupancies with a total of more than 50 sleeping rooms above street level located in buildings where the highest occupied floor is 75 feet (22 860 mm) or less above the lowest level of Fire Department vehicle access, or communal sleeping facilities above street level occupied or designed to be occupied by more than 50 lodgers, shall be provided with automatic smoke detection connected to an automatic fire alarm system in accordance with Section 907.",
+  "schemaVersion" : 2,
+  "sectionID" : 1775
+}

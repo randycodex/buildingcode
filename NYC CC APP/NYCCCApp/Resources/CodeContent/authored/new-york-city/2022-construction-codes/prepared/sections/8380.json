@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198337\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198337\"><\/AnnotationDrawer><div>Where piping systems serving appliances designed to operate with a gas supply pressure of 14 inches w.c. (3.49 kPa) or less are required to be equipped with overpressure protection by Section 416.1, each overpressure protection device shall be adjusted to limit the gas pressure to each connected appliance to 2 psi or less upon a failure of the line pressure regulator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8380-html-1",
+      "kind" : "html",
+      "plainText" : "Where piping systems serving appliances designed to operate with a gas supply pressure of 14 inches w.c. (3.49 kPa) or less are required to be equipped with overpressure protection by Section 416.1, each overpressure protection device shall be adjusted to limit the gas pressure to each connected appliance to 2 psi or less upon a failure of the line pressure regulator."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where piping systems serving appliances designed to operate with a gas supply pressure of 14 inches w.c. (3.49 kPa) or less are required to be equipped with overpressure protection by Section 416.1, each overpressure protection device shall be adjusted to limit the gas pressure to each connected appliance to 2 psi or less upon a failure of the line pressure regulator.",
+  "previewText" : "Where piping systems serving appliances designed to operate with a gas supply pressure of 14 inches w.",
+  "schemaVersion" : 2,
+  "sectionID" : 8380
+}

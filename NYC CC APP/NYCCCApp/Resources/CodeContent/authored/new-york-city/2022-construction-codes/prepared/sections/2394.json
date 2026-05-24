@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173920\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173920\"><\/AnnotationDrawer><div>The exit access shall comply with the applicable provisions of Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172896', hash: '#JD_BC1003' }}\">1003<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173863', hash: '#JD_BC1015' }}\">1015<\/Link>. Exit access arrangement shall comply with Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173918', hash: '#JD_BC1016' }}\">1016<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174073', hash: '#JD_BC1021' }}\">1021<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2394-html-1",
+      "kind" : "html",
+      "plainText" : "The exit access shall comply with the applicable provisions of Sections 1003 through 1015 . Exit access arrangement shall comply with Sections 1016 through 1021 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The exit access shall comply with the applicable provisions of Sections 1003 through 1015. Exit access arrangement shall comply with Sections 1016 through 1021.",
+  "previewText" : "The exit access shall comply with the applicable provisions of Sections 1003 through 1015.",
+  "schemaVersion" : 2,
+  "sectionID" : 2394
+}

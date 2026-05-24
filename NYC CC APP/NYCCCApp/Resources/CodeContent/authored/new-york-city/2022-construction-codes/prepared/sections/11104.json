@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195254\"><\/AnnotationDrawer><div>Floor furnaces shall be installed in accordance with their listing and the manufacturer's instructions. Oil-fired furnaces shall be tested in accordance with UL 729. Unvented floor furnaces are prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11104-html-1",
+      "kind" : "html",
+      "plainText" : "Floor furnaces shall be installed in accordance with their listing and the manufacturer's instructions. Oil-fired furnaces shall be tested in accordance with UL 729. Unvented floor furnaces are prohibited."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Floor furnaces shall be installed in accordance with their listing and the manufacturer's instructions. Oil-fired furnaces shall be tested in accordance with UL 729. Unvented floor furnaces are prohibited.",
+  "previewText" : "Floor furnaces shall be installed in accordance with their listing and the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 11104
+}

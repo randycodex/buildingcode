@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196280\"><\/AnnotationDrawer><div>Portable fire extinguishers shall be provided as required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and NFPA 10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11502-html-1",
+      "kind" : "html",
+      "plainText" : "Portable fire extinguishers shall be provided as required by the New York City Fire Code and NFPA 10."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Portable fire extinguishers shall be provided as required by the New York City Fire Code and NFPA 10.",
+  "previewText" : "Portable fire extinguishers shall be provided as required by the New York City Fire Code and NFPA 10.",
+  "schemaVersion" : 2,
+  "sectionID" : 11502
+}

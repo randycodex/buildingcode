@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The system ventilation efficiency (E v ) shall be determined using Table 403.3.1.1.2.3.2 or Appendix A of ASHRAE 62.1.\n\nTable 403.3.1.1.2.3.2 System Ventilation Efficiency a, b\n\na. Max (Z p ) is the largest value of Z p calculated using Equation 4-5 among all the zones served by the system.\n\nb. Interpolating between table values shall be permitted.",
+  "previewText" : "The system ventilation efficiency (E v ) shall be determined using Table 403.",
+  "schemaVersion" : 2,
+  "sectionID" : 10434
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197743\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197743\"><\/AnnotationDrawer><div>Where an additional appliance is to be served, the existing piping shall be checked to determine if it has adequate capacity for all appliances served. If inadequate, the existing system shall be enlarged as required or separate piping of adequate capacity shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8166-html-1",
+      "kind" : "html",
+      "plainText" : "Where an additional appliance is to be served, the existing piping shall be checked to determine if it has adequate capacity for all appliances served. If inadequate, the existing system shall be enlarged as required or separate piping of adequate capacity shall be provided."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where an additional appliance is to be served, the existing piping shall be checked to determine if it has adequate capacity for all appliances served. If inadequate, the existing system shall be enlarged as required or separate piping of adequate capacity shall be provided.",
+  "previewText" : "Where an additional appliance is to be served, the existing piping shall be checked to determine if it has adequate capacity for all appliances served.",
+  "schemaVersion" : 2,
+  "sectionID" : 8166
+}

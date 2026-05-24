@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169443\"><\/AnnotationDrawer><div>The fire-resistance rating of horizontal assemblies shall comply with Sections 711.2.4.1 through 711.2.4.6 but shall be not less than that required by the building type of construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1124-html-1",
+      "kind" : "html",
+      "plainText" : "The fire-resistance rating of horizontal assemblies shall comply with Sections 711.2.4.1 through 711.2.4.6 but shall be not less than that required by the building type of construction."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire-resistance rating of horizontal assemblies shall comply with Sections 711.2.4.1 through 711.2.4.6 but shall be not less than that required by the building type of construction.",
+  "previewText" : "The fire-resistance rating of horizontal assemblies shall comply with Sections 711.",
+  "schemaVersion" : 2,
+  "sectionID" : 1124
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161766\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161766\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Individual shower and tub-shower combination valves shall be balanced-pressure, thermostatic or combination balanced-pressure\/thermostatic valves that conform to the requirements of ASSE 1016\/ASME A112.1016\/CSA B125.16 or ASME A112.18.1\/CSA B125.1 and shall be installed at the point of use. Shower and tub-shower combination valves required by this section shall be equipped with a means to limit the maximum setting of the valve to 120&#176;F (49&#176;C), which shall be field adjusted in accordance with the manufacturer's instructions. In-line thermostatic valves shall not be utilized for compliance with this section.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12038-html-1",
+      "kind" : "html",
+      "plainText" : "Individual shower and tub-shower combination valves shall be balanced-pressure, thermostatic or combination balanced-pressure\/thermostatic valves that conform to the requirements of ASSE 1016\/ASME A112.1016\/CSA B125.16 or ASME A112.18.1\/CSA B125.1 and shall be installed at the point of use. Shower and tub-shower combination valves required by this section shall be equipped with a means to limit the maximum setting of the valve to 120°F (49°C), which shall be field adjusted in accordance with the manufacturer's instructions. In-line thermostatic valves shall not be utilized for compliance with this section."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Individual shower and tub-shower combination valves shall be balanced-pressure, thermostatic or combination balanced-pressure\/thermostatic valves that conform to the requirements of ASSE 1016\/ASME A112.1016\/CSA B125.16 or ASME A112.18.1\/CSA B125.1 and shall be installed at the point of use. Shower and tub-shower combination valves required by this section shall be equipped with a means to limit the maximum setting of the valve to 120°F (49°C), which shall be field adjusted in accordance with the manufacturer's instructions. In-line thermostatic valves shall not be utilized for compliance with this section.",
+  "previewText" : "Individual shower and tub-shower combination valves shall be balanced-pressure, thermostatic or combination balanced-pressure\/thermostatic valves that conform to the requirements of ASSE 1016\/ASME A112.",
+  "schemaVersion" : 2,
+  "sectionID" : 12038
+}

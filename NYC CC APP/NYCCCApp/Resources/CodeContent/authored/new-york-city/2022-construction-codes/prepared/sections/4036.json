@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179279\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179279\"><\/AnnotationDrawer><div>The allowable lateral load of a single deep foundation element or a group thereof shall be determined by an approved method of analysis in accordance with accepted engineering practice. The maximum allowable lateral load of a deep foundation shall be 1 ton (8.9 kN), unless verified by lateral load test. Load testing, where required, shall be in accordance with Section 1810.4.3. See Sections 1810.4.3.1 and 1810.4.3.2 for determining the allowable lateral load from the results of lateral load tests.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4036-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable lateral load of a single deep foundation element or a group thereof shall be determined by an approved method of analysis in accordance with accepted engineering practice. The maximum allowable lateral load of a deep foundation shall be 1 ton (8.9 kN), unless verified by lateral load test. Load testing, where required, shall be in accordance with Section 1810.4.3. See Sections 1810.4.3.1 and 1810.4.3.2 for determining the allowable lateral load from the results of lateral load tests."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The allowable lateral load of a single deep foundation element or a group thereof shall be determined by an approved method of analysis in accordance with accepted engineering practice. The maximum allowable lateral load of a deep foundation shall be 1 ton (8.9 kN), unless verified by lateral load test. Load testing, where required, shall be in accordance with Section 1810.4.3. See Sections 1810.4.3.1 and 1810.4.3.2 for determining the allowable lateral load from the results of lateral load tests.",
+  "previewText" : "The allowable lateral load of a single deep foundation element or a group thereof shall be determined by an approved method of analysis in accordance with accepted engineering practice.",
+  "schemaVersion" : 2,
+  "sectionID" : 4036
+}

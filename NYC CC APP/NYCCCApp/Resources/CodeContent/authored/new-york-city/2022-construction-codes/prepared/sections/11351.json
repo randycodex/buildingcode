@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195946\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195946\"><\/AnnotationDrawer><div>Valves shall be constructed of materials that are compatible with the type of piping material and fluids in the system. Valves shall be rated for the temperatures and pressures of the systems in which the valves are installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11351-html-1",
+      "kind" : "html",
+      "plainText" : "Valves shall be constructed of materials that are compatible with the type of piping material and fluids in the system. Valves shall be rated for the temperatures and pressures of the systems in which the valves are installed."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Valves shall be constructed of materials that are compatible with the type of piping material and fluids in the system. Valves shall be rated for the temperatures and pressures of the systems in which the valves are installed.",
+  "previewText" : "Valves shall be constructed of materials that are compatible with the type of piping material and fluids in the system.",
+  "schemaVersion" : 2,
+  "sectionID" : 11351
+}

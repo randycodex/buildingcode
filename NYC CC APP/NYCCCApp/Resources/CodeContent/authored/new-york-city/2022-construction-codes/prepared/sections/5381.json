@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183536\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183536\"><\/AnnotationDrawer><div>Standby power shall be provided for horizontal sliding doors in accordance with Section 1010.1.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5381-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power shall be provided for horizontal sliding doors in accordance with Section 1010.1.4.3."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Standby power shall be provided for horizontal sliding doors in accordance with Section 1010.1.4.3.",
+  "previewText" : "Standby power shall be provided for horizontal sliding doors in accordance with Section 1010.",
+  "schemaVersion" : 2,
+  "sectionID" : 5381
+}

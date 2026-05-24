@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172808\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172808\"><\/AnnotationDrawer><div>Gas detection systems shall be connected to and monitored at the Fire Command Center or fire alarm control unit where required or provided. Where a Fire Command Center or fire alarm control unit is not required or provided, an approved gas detection system control panel or annunciator shall be installed at the building main front entrance. A gas detection system shall be monitored by a central supervising station. Gas detection supervisory and alarm signals shall be transmitted as separate and distinct signals to the central supervising station.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "2116-html-1",
+      "kind" : "html",
+      "plainText" : "Gas detection systems shall be connected to and monitored at the Fire Command Center or fire alarm control unit where required or provided. Where a Fire Command Center or fire alarm control unit is not required or provided, an approved gas detection system control panel or annunciator shall be installed at the building main front entrance. A gas detection system shall be monitored by a central supervising station. Gas detection supervisory and alarm signals shall be transmitted as separate and distinct signals to the central supervising station."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Gas detection systems shall be connected to and monitored at the Fire Command Center or fire alarm control unit where required or provided. Where a Fire Command Center or fire alarm control unit is not required or provided, an approved gas detection system control panel or annunciator shall be installed at the building main front entrance. A gas detection system shall be monitored by a central supervising station. Gas detection supervisory and alarm signals shall be transmitted as separate and distinct signals to the central supervising station.",
+  "previewText" : "Gas detection systems shall be connected to and monitored at the Fire Command Center or fire alarm control unit where required or provided.",
+  "schemaVersion" : 2,
+  "sectionID" : 2116
+}

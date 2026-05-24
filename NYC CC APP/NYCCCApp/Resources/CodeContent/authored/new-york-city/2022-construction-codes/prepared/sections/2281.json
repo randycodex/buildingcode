@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173544\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173544\"><\/AnnotationDrawer><div>Exit or exit access doors serving transformer vaults, rooms designated for batteries or energy storage systems, or modular data centers shall be equipped with panic hardware or fire exit hardware. Where rooms contain electrical rooms with equipment rated 800 amperes or more that contain overcurrent devices, switching devices or control devices and where the exit or exit access door is less than 25 feet (7629 mm) from the equipment working space, shall be equipped with panic hardware or fire exit hardware. The doors shall swing in the direction of egress travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2281-html-1",
+      "kind" : "html",
+      "plainText" : "Exit or exit access doors serving transformer vaults, rooms designated for batteries or energy storage systems, or modular data centers shall be equipped with panic hardware or fire exit hardware. Where rooms contain electrical rooms with equipment rated 800 amperes or more that contain overcurrent devices, switching devices or control devices and where the exit or exit access door is less than 25 feet (7629 mm) from the equipment working space, shall be equipped with panic hardware or fire exit hardware. The doors shall swing in the direction of egress travel."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Exit or exit access doors serving transformer vaults, rooms designated for batteries or energy storage systems, or modular data centers shall be equipped with panic hardware or fire exit hardware. Where rooms contain electrical rooms with equipment rated 800 amperes or more that contain overcurrent devices, switching devices or control devices and where the exit or exit access door is less than 25 feet (7629 mm) from the equipment working space, shall be equipped with panic hardware or fire exit hardware. The doors shall swing in the direction of egress travel.",
+  "previewText" : "Exit or exit access doors serving transformer vaults, rooms designated for batteries or energy storage systems, or modular data centers shall be equipped with panic hardware or fire exit hardware.",
+  "schemaVersion" : 2,
+  "sectionID" : 2281
+}

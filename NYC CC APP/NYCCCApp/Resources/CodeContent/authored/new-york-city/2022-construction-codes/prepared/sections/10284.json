@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192865\"><\/AnnotationDrawer><div>Plastic pipe, fittings and components shall be third-party certified.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10284-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic pipe, fittings and components shall be third-party certified."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Plastic pipe, fittings and components shall be third-party certified.",
+  "previewText" : "Plastic pipe, fittings and components shall be third-party certified.",
+  "schemaVersion" : 2,
+  "sectionID" : 10284
+}

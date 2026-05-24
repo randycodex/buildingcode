@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168989\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168989\"><\/AnnotationDrawer><div>Materials required to be noncombustible shall be tested in accordance with ASTM E 136.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "975-html-1",
+      "kind" : "html",
+      "plainText" : "Materials required to be noncombustible shall be tested in accordance with ASTM E 136."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Materials required to be noncombustible shall be tested in accordance with ASTM E 136.",
+  "previewText" : "Materials required to be noncombustible shall be tested in accordance with ASTM E 136.",
+  "schemaVersion" : 2,
+  "sectionID" : 975
+}

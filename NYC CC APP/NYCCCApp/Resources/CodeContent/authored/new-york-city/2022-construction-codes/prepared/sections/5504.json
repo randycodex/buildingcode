@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183872\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183872\"><\/AnnotationDrawer><div>A pictorial symbol of a standardized design designating which elevators are fire service access elevators shall be installed on each side of the hoistway door frame on the portion of the frame at right angles to the fire service access elevator lobby. The fire service access elevator symbol shall be designed as shown in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183871', hash: '#JD_BCFigure3007.6.5' }}\">Figure 3007.6.5<\/Link> and shall comply with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183873\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183873\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The fire service access elevator symbol shall be not less than 3 inches (76 mm) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183874\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183874\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The helmet shall contrast with the background, with either a light helmet on a dark background or a dark helmet on a light background.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183875\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183875\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The vertical center line of the fire service access elevator symbol shall be centered on the hoistway door frame. Each symbol shall be not less than 78 inches (1981 mm), and not more than 84 (2134 mm) inches above the finished floor at the threshold.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183876\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183876\"><\/AnnotationDrawer><div>",
+      "id" : "5504-html-1",
+      "kind" : "html",
+      "plainText" : "A pictorial symbol of a standardized design designating which elevators are fire service access elevators shall be installed on each side of the hoistway door frame on the portion of the frame at right angles to the fire service access elevator lobby. The fire service access elevator symbol shall be designed as shown in Figure 3007.6.5 and shall comply with the following:\n\n 1. The fire service access elevator symbol shall be not less than 3 inches (76 mm) in height.\n\n 2. The helmet shall contrast with the background, with either a light helmet on a dark background or a dark helmet on a light background.\n\n 3. The vertical center line of the fire service access elevator symbol shall be centered on the hoistway door frame. Each symbol shall be not less than 78 inches (1981 mm), and not more than 84 (2134 mm) inches above the finished floor at the threshold."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/8bf15bf50191dbf361e4c77e4c62d21b527ba8bd.png\" width=\"336\" height=\"211.866666666667\"><\/img><\/span>",
+      "id" : "5504-image-2",
+      "imageID" : "8bf15bf50191dbf361e4c77e4c62d21b527ba8bd.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183877\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183877\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure3007.6.5\" id=\"JD_BCFigure3007.6.5\" title=\"BC Figure 3007.6.5\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 3007.6.5<br><\/br>Fire Service Access Elevator Symbol<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5504-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 3007.6.5\n Fire Service Access Elevator Symbol"
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "A pictorial symbol of a standardized design designating which elevators are fire service access elevators shall be installed on each side of the hoistway door frame on the portion of the frame at right angles to the fire service access elevator lobby. The fire service access elevator symbol shall be designed as shown in Figure 3007.6.5 and shall comply with the following:\n\n1. The fire service access elevator symbol shall be not less than 3 inches (76 mm) in height.\n\n2. The helmet shall contrast with the background, with either a light helmet on a dark background or a dark helmet on a light background.\n\n3. The vertical center line of the fire service access elevator symbol shall be centered on the hoistway door frame. Each symbol shall be not less than 78 inches (1981 mm), and not more than 84 (2134 mm) inches above the finished floor at the threshold.\n\nFigure 3007.6.5 Fire Service Access Elevator Symbol",
+  "previewText" : "A pictorial symbol of a standardized design designating which elevators are fire service access elevators shall be installed on each side of the hoistway door frame on the portion of the frame at right angles to the fire service access elevator lobby.",
+  "schemaVersion" : 2,
+  "sectionID" : 5504
+}

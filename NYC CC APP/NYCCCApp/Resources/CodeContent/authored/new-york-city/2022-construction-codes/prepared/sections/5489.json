@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183835\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183835\"><\/AnnotationDrawer><div>Hoistway pressurization systems shall comply with the requirements for smoke control system response time in Section 909.17.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183836\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183836\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183836\"><\/AnnotationDrawer><h6><a name=\"JD_BC3007\" id=\"JD_BC3007\" title=\"BC 3007\"><\/a>Section BC 3007: Fire Service Access Elevator<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5489-html-1",
+      "kind" : "html",
+      "plainText" : "Hoistway pressurization systems shall comply with the requirements for smoke control system response time in Section 909.17.\n\n Section BC 3007: Fire Service Access Elevator"
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Hoistway pressurization systems shall comply with the requirements for smoke control system response time in Section 909.17.",
+  "previewText" : "Hoistway pressurization systems shall comply with the requirements for smoke control system response time in Section 909.",
+  "schemaVersion" : 2,
+  "sectionID" : 5489
+}

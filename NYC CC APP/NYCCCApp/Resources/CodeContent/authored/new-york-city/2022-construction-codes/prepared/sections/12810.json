@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163825\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163825\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Operation and maintenance materials shall be supplied with nonpotable on-site water reuse systems in accordance with Sections 1302.13.1 through 1302.13.4 and in accordance with the requirements of the Department of Health and Mental Hygiene.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12810-html-1",
+      "kind" : "html",
+      "plainText" : "Operation and maintenance materials shall be supplied with nonpotable on-site water reuse systems in accordance with Sections 1302.13.1 through 1302.13.4 and in accordance with the requirements of the Department of Health and Mental Hygiene."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Operation and maintenance materials shall be supplied with nonpotable on-site water reuse systems in accordance with Sections 1302.13.1 through 1302.13.4 and in accordance with the requirements of the Department of Health and Mental Hygiene.",
+  "previewText" : "Operation and maintenance materials shall be supplied with nonpotable on-site water reuse systems in accordance with Sections 1302.",
+  "schemaVersion" : 2,
+  "sectionID" : 12810
+}

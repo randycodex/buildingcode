@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183601\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183601\"><\/AnnotationDrawer><div>Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall be subject to special inspection in accordance with Section 1704.31 and the rules of the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "5406-html-1",
+      "kind" : "html",
+      "plainText" : "Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall be subject to special inspection in accordance with Section 1704.31 and the rules of the department."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall be subject to special inspection in accordance with Section 1704.31 and the rules of the department.",
+  "previewText" : "Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall be subject to special inspection in accordance with Section 1704.",
+  "schemaVersion" : 2,
+  "sectionID" : 5406
+}

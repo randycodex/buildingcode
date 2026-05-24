@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176823\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176823\"><\/AnnotationDrawer><div>Solid sheathing is required in areas where the average daily temperature in January is 25&#176;F (-4&#176;C) or less or where there is a possibility of ice forming along the eaves causing a backup of water.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3323-html-1",
+      "kind" : "html",
+      "plainText" : "Solid sheathing is required in areas where the average daily temperature in January is 25°F (-4°C) or less or where there is a possibility of ice forming along the eaves causing a backup of water."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Solid sheathing is required in areas where the average daily temperature in January is 25°F (-4°C) or less or where there is a possibility of ice forming along the eaves causing a backup of water.",
+  "previewText" : "Solid sheathing is required in areas where the average daily temperature in January is 25°F (-4°C) or less or where there is a possibility of ice forming along the eaves causing a backup of water.",
+  "schemaVersion" : 2,
+  "sectionID" : 3323
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197905\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197905\"><\/AnnotationDrawer><div>Ductile-iron flanges shall be in accordance with ASME B16.42.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8213-html-1",
+      "kind" : "html",
+      "plainText" : "Ductile-iron flanges shall be in accordance with ASME B16.42."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Ductile-iron flanges shall be in accordance with ASME B16.42.",
+  "previewText" : "Ductile-iron flanges shall be in accordance with ASME B16.",
+  "schemaVersion" : 2,
+  "sectionID" : 8213
+}

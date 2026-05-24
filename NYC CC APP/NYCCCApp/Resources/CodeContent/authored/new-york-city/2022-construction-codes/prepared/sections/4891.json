@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181720\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181720\"><\/AnnotationDrawer><div>The provisions of this section apply to design methods specified in Section 2301.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4891-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this section apply to design methods specified in Section 2301.2."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "The provisions of this section apply to design methods specified in Section 2301.2.",
+  "previewText" : "The provisions of this section apply to design methods specified in Section 2301.",
+  "schemaVersion" : 2,
+  "sectionID" : 4891
+}

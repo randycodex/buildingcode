@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193936\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193936\"><\/AnnotationDrawer><div>All duct systems serving Type I and Type II exhaust equipment shall be permanently labeled: \"CAUTION: KITCHEN EXHAUST SYSTEM.\" At the base of each duct and at its termination point, a clearly identifiable permanent sign shall be installed identifying the facility from which the duct originates.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193937\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193937\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193937\"><\/AnnotationDrawer><h6><a name=\"JD_MC507\" id=\"JD_MC507\" title=\"MC 507\"><\/a>Section MC 507: Commercial Kitchen Hoods<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10657-html-1",
+      "kind" : "html",
+      "plainText" : "All duct systems serving Type I and Type II exhaust equipment shall be permanently labeled: \"CAUTION: KITCHEN EXHAUST SYSTEM.\" At the base of each duct and at its termination point, a clearly identifiable permanent sign shall be installed identifying the facility from which the duct originates.\n\n Section MC 507: Commercial Kitchen Hoods"
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "All duct systems serving Type I and Type II exhaust equipment shall be permanently labeled: \"CAUTION: KITCHEN EXHAUST SYSTEM.\" At the base of each duct and at its termination point, a clearly identifiable permanent sign shall be installed identifying the facility from which the duct originates.\n\nSection MC 507: Commercial Kitchen Hoods",
+  "previewText" : "All duct systems serving Type I and Type II exhaust equipment shall be permanently labeled: \"CAUTION: KITCHEN EXHAUST SYSTEM.",
+  "schemaVersion" : 2,
+  "sectionID" : 10657
+}

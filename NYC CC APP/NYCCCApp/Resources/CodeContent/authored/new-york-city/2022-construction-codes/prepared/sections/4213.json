@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179785\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179785\"><\/AnnotationDrawer><div>Load tests shall be in accordance with Sections 1810.4 and 1814.4.1 through 1814.4.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4213-html-1",
+      "kind" : "html",
+      "plainText" : "Load tests shall be in accordance with Sections 1810.4 and 1814.4.1 through 1814.4.4."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Load tests shall be in accordance with Sections 1810.4 and 1814.4.1 through 1814.4.4.",
+  "previewText" : "Load tests shall be in accordance with Sections 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4213
+}

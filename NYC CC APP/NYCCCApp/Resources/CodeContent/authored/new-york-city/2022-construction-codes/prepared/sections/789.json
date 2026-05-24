@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168244\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168244\"><\/AnnotationDrawer><div>The provisions of this section shall govern the design, construction and chemical quantity limitations of buildings and portions thereof occupied or designed to be occupied as a nonproduction laboratory. Nonproduction laboratories shall be classified into occupancy groups in accordance with Section 427.5. The provisions of this section shall not apply to production laboratories classified in Occupancy Group F or H.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "789-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this section shall govern the design, construction and chemical quantity limitations of buildings and portions thereof occupied or designed to be occupied as a nonproduction laboratory. Nonproduction laboratories shall be classified into occupancy groups in accordance with Section 427.5. The provisions of this section shall not apply to production laboratories classified in Occupancy Group F or H."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The provisions of this section shall govern the design, construction and chemical quantity limitations of buildings and portions thereof occupied or designed to be occupied as a nonproduction laboratory. Nonproduction laboratories shall be classified into occupancy groups in accordance with Section 427.5. The provisions of this section shall not apply to production laboratories classified in Occupancy Group F or H.",
+  "previewText" : "The provisions of this section shall govern the design, construction and chemical quantity limitations of buildings and portions thereof occupied or designed to be occupied as a nonproduction laboratory.",
+  "schemaVersion" : 2,
+  "sectionID" : 789
+}

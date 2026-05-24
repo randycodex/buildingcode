@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161901\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161901\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Unfired hot water storage tanks shall be insulated in accordance with the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Energy Conservation Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "12091-html-1",
+      "kind" : "html",
+      "plainText" : "Unfired hot water storage tanks shall be insulated in accordance with the New York City Energy Conservation Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Unfired hot water storage tanks shall be insulated in accordance with the New York City Energy Conservation Code.",
+  "previewText" : "Unfired hot water storage tanks shall be insulated in accordance with the New York City Energy Conservation Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 12091
+}

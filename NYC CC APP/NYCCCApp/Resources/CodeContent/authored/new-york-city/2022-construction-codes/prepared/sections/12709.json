@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163530\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163530\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The size of an on-site stormwater disposal system shall be predicated on a field investigation performed prior to construction document approval that is performed at the site of a proposed on-site stormwater disposal system to assess the suitability of the soil and site. The investigation shall conform to Sections 1114.2.1 and 1114.2.2 and shall occur prior to approval of construction documents for the system. The field investigation shall be subject to special inspection in accordance with Section 1704.21 of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Building Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12709-html-1",
+      "kind" : "html",
+      "plainText" : "The size of an on-site stormwater disposal system shall be predicated on a field investigation performed prior to construction document approval that is performed at the site of a proposed on-site stormwater disposal system to assess the suitability of the soil and site. The investigation shall conform to Sections 1114.2.1 and 1114.2.2 and shall occur prior to approval of construction documents for the system. The field investigation shall be subject to special inspection in accordance with Section 1704.21 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "The size of an on-site stormwater disposal system shall be predicated on a field investigation performed prior to construction document approval that is performed at the site of a proposed on-site stormwater disposal system to assess the suitability of the soil and site. The investigation shall conform to Sections 1114.2.1 and 1114.2.2 and shall occur prior to approval of construction documents for the system. The field investigation shall be subject to special inspection in accordance with Section 1704.21 of the New York City Building Code.",
+  "previewText" : "The size of an on-site stormwater disposal system shall be predicated on a field investigation performed prior to construction document approval that is performed at the site of a proposed on-site stormwater disposal system to assess the suitability of the soil and site.",
+  "schemaVersion" : 2,
+  "sectionID" : 12709
+}

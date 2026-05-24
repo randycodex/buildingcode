@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195066\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195066\"><\/AnnotationDrawer><div>An appliance vented by natural draft shall not be connected into a vent, chimney or vent connector on the discharge side of a mechanical flue or power exhauster.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11031-html-1",
+      "kind" : "html",
+      "plainText" : "An appliance vented by natural draft shall not be connected into a vent, chimney or vent connector on the discharge side of a mechanical flue or power exhauster."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "An appliance vented by natural draft shall not be connected into a vent, chimney or vent connector on the discharge side of a mechanical flue or power exhauster.",
+  "previewText" : "An appliance vented by natural draft shall not be connected into a vent, chimney or vent connector on the discharge side of a mechanical flue or power exhauster.",
+  "schemaVersion" : 2,
+  "sectionID" : 11031
+}

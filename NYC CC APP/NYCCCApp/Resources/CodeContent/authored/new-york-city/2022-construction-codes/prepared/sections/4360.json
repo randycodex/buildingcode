@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180225\"><\/AnnotationDrawer><div>Concrete mix designs shall be performed by an approved agency or by a concrete producer approved by the department as an approved fabricator authorized in accordance with Section 1704.2.2, and approved in accordance with the requirements of Sections 1905.3.2.1 through 1905.3.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4360-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete mix designs shall be performed by an approved agency or by a concrete producer approved by the department as an approved fabricator authorized in accordance with Section 1704.2.2, and approved in accordance with the requirements of Sections 1905.3.2.1 through 1905.3.2.3."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Concrete mix designs shall be performed by an approved agency or by a concrete producer approved by the department as an approved fabricator authorized in accordance with Section 1704.2.2, and approved in accordance with the requirements of Sections 1905.3.2.1 through 1905.3.2.3.",
+  "previewText" : "Concrete mix designs shall be performed by an approved agency or by a concrete producer approved by the department as an approved fabricator authorized in accordance with Section 1704.",
+  "schemaVersion" : 2,
+  "sectionID" : 4360
+}

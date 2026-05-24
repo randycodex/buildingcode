@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193509\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193509\"><\/AnnotationDrawer><div>Flammable vapor areas of dip tank operations shall be provided with mechanical ventilation adequate to prevent the dangerous accumulation of vapors. Required ventilation systems shall be so arranged that the failure of any ventilating fan will automatically stop the dipping conveyor system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10516-html-1",
+      "kind" : "html",
+      "plainText" : "Flammable vapor areas of dip tank operations shall be provided with mechanical ventilation adequate to prevent the dangerous accumulation of vapors. Required ventilation systems shall be so arranged that the failure of any ventilating fan will automatically stop the dipping conveyor system."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Flammable vapor areas of dip tank operations shall be provided with mechanical ventilation adequate to prevent the dangerous accumulation of vapors. Required ventilation systems shall be so arranged that the failure of any ventilating fan will automatically stop the dipping conveyor system.",
+  "previewText" : "Flammable vapor areas of dip tank operations shall be provided with mechanical ventilation adequate to prevent the dangerous accumulation of vapors.",
+  "schemaVersion" : 2,
+  "sectionID" : 10516
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192974\"><\/AnnotationDrawer><div>Hydrogen generating and refueling operations shall be prohibited except as permitted by the Commissioner of the Fire Department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10331-html-1",
+      "kind" : "html",
+      "plainText" : "Hydrogen generating and refueling operations shall be prohibited except as permitted by the Commissioner of the Fire Department."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Hydrogen generating and refueling operations shall be prohibited except as permitted by the Commissioner of the Fire Department.",
+  "previewText" : "Hydrogen generating and refueling operations shall be prohibited except as permitted by the Commissioner of the Fire Department.",
+  "schemaVersion" : 2,
+  "sectionID" : 10331
+}

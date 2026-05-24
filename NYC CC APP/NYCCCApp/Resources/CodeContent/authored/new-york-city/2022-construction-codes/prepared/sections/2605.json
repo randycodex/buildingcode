@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174699\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174699\"><\/AnnotationDrawer><div>Emergency escape and rescue openings shall be operational from the inside of the room without the use of keys or tools in accordance with the provisions of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-144545', hash: '#JD_FCChapter10' }}\">Chapter 10<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2605-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency escape and rescue openings shall be operational from the inside of the room without the use of keys or tools in accordance with the provisions of Chapter 10 of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Emergency escape and rescue openings shall be operational from the inside of the room without the use of keys or tools in accordance with the provisions of Chapter 10 of the New York City Fire Code.",
+  "previewText" : "Emergency escape and rescue openings shall be operational from the inside of the room without the use of keys or tools in accordance with the provisions of Chapter 10 of the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 2605
+}

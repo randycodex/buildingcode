@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194785\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194785\"><\/AnnotationDrawer><div>This chapter shall govern the installation, maintenance, design, minimum safety requirements, repair and approval of factory-built chimneys, chimney liners, vents and connectors, and field built chimneys and connectors for all nongas-fired appliances. This chapter shall also govern the utilization of masonry chimneys. Gas-fired appliances shall be vented in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span> The construction, repair, maintenance and approval of masonry chimneys shall be regulated by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>. Venting systems shall be designed in accordance with this chapter and comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Air Pollution Control Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10938-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern the installation, maintenance, design, minimum safety requirements, repair and approval of factory-built chimneys, chimney liners, vents and connectors, and field built chimneys and connectors for all nongas-fired appliances. This chapter shall also govern the utilization of masonry chimneys. Gas-fired appliances shall be vented in accordance with the New York City Fuel Gas Code. The construction, repair, maintenance and approval of masonry chimneys shall be regulated by the New York City Building Code . Venting systems shall be designed in accordance with this chapter and comply with the requirements of the New York City Air Pollution Control Code."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "This chapter shall govern the installation, maintenance, design, minimum safety requirements, repair and approval of factory-built chimneys, chimney liners, vents and connectors, and field built chimneys and connectors for all nongas-fired appliances. This chapter shall also govern the utilization of masonry chimneys. Gas-fired appliances shall be vented in accordance with the New York City Fuel Gas Code. The construction, repair, maintenance and approval of masonry chimneys shall be regulated by the New York City Building Code. Venting systems shall be designed in accordance with this chapter and comply with the requirements of the New York City Air Pollution Control Code.",
+  "previewText" : "This chapter shall govern the installation, maintenance, design, minimum safety requirements, repair and approval of factory-built chimneys, chimney liners, vents and connectors, and field built chimneys and connectors for all nongas-fired appliances.",
+  "schemaVersion" : 2,
+  "sectionID" : 10938
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183499\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183499\"><\/AnnotationDrawer><div>Equipment and fuel tanks located within the emergency generator room shall be limited to equipment and fuel tanks associated with the emergency and standby power systems. Piping within the room shall be limited to sprinkler piping.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183500\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183500\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183501\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183501\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Uninterrupted conduits not associated with the emergency and standby power system may pass through the emergency generator room.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183502\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183502\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Piping associated with generator cooling systems may be located within the emergency generator room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5364-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment and fuel tanks located within the emergency generator room shall be limited to equipment and fuel tanks associated with the emergency and standby power systems. Piping within the room shall be limited to sprinkler piping.\n\n Exceptions: \n\n 1. Uninterrupted conduits not associated with the emergency and standby power system may pass through the emergency generator room.\n\n 2. Piping associated with generator cooling systems may be located within the emergency generator room."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Equipment and fuel tanks located within the emergency generator room shall be limited to equipment and fuel tanks associated with the emergency and standby power systems. Piping within the room shall be limited to sprinkler piping.\n\nExceptions:\n\n1. Uninterrupted conduits not associated with the emergency and standby power system may pass through the emergency generator room.\n\n2. Piping associated with generator cooling systems may be located within the emergency generator room.",
+  "previewText" : "Equipment and fuel tanks located within the emergency generator room shall be limited to equipment and fuel tanks associated with the emergency and standby power systems.",
+  "schemaVersion" : 2,
+  "sectionID" : 5364
+}

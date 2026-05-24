@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195486\"><\/AnnotationDrawer><div>The water supply to all boilers, including but not limited to backflow prevention, shall be connected in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195487\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195487\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195487\"><\/AnnotationDrawer><h6><a name=\"JD_MC1006\" id=\"JD_MC1006\" title=\"MC 1006\"><\/a>Section MC 1006: Safety and Pressure Relief Valves And Controls<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11190-html-1",
+      "kind" : "html",
+      "plainText" : "The water supply to all boilers, including but not limited to backflow prevention, shall be connected in accordance with the New York City Plumbing Code. \n\n Section MC 1006: Safety and Pressure Relief Valves And Controls"
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The water supply to all boilers, including but not limited to backflow prevention, shall be connected in accordance with the New York City Plumbing Code.\n\nSection MC 1006: Safety and Pressure Relief Valves And Controls",
+  "previewText" : "The water supply to all boilers, including but not limited to backflow prevention, shall be connected in accordance with the New York City Plumbing Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11190
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167974\"><\/AnnotationDrawer><div>Except for surfacing, floors of HPM rooms and liquid storage rooms shall be of noncombustible liquid-tight construction. Raised grating over floors shall be of noncombustible materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "690-html-1",
+      "kind" : "html",
+      "plainText" : "Except for surfacing, floors of HPM rooms and liquid storage rooms shall be of noncombustible liquid-tight construction. Raised grating over floors shall be of noncombustible materials."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Except for surfacing, floors of HPM rooms and liquid storage rooms shall be of noncombustible liquid-tight construction. Raised grating over floors shall be of noncombustible materials.",
+  "previewText" : "Except for surfacing, floors of HPM rooms and liquid storage rooms shall be of noncombustible liquid-tight construction.",
+  "schemaVersion" : 2,
+  "sectionID" : 690
+}

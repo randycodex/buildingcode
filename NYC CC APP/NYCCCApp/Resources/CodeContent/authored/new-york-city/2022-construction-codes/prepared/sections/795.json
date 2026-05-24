@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168267\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168267\"><\/AnnotationDrawer><div>Fire protection systems in nonproduction laboratories shall be provided in accordance with Section 427.6.1 through 427.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "795-html-1",
+      "kind" : "html",
+      "plainText" : "Fire protection systems in nonproduction laboratories shall be provided in accordance with Section 427.6.1 through 427.6.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Fire protection systems in nonproduction laboratories shall be provided in accordance with Section 427.6.1 through 427.6.3.",
+  "previewText" : "Fire protection systems in nonproduction laboratories shall be provided in accordance with Section 427.",
+  "schemaVersion" : 2,
+  "sectionID" : 795
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195138\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195138\"><\/AnnotationDrawer><div>The location of the discharge outlet from all other engines and turbines shall comply with the termination requirements of Section 801.21, Item 2 or Section 801.21, Item 3 based on the temperature of the flue gas entering the exhaust system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11055-html-1",
+      "kind" : "html",
+      "plainText" : "The location of the discharge outlet from all other engines and turbines shall comply with the termination requirements of Section 801.21, Item 2 or Section 801.21, Item 3 based on the temperature of the flue gas entering the exhaust system."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "The location of the discharge outlet from all other engines and turbines shall comply with the termination requirements of Section 801.21, Item 2 or Section 801.21, Item 3 based on the temperature of the flue gas entering the exhaust system.",
+  "previewText" : "The location of the discharge outlet from all other engines and turbines shall comply with the termination requirements of Section 801.",
+  "schemaVersion" : 2,
+  "sectionID" : 11055
+}

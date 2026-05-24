@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163415\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163415\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Leaders and storm drains connected to a combined sewer shall be trapped. Individual storm water traps shall be installed on the storm water drain branch serving each conductor, or a single trap shall be installed in the main storm drain just before its connection with the combined building sewer or the public sewer. A hooded catch basin located within the property line shall be the equivalent of a building-house trap for the connection to a public sewer.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12671-html-1",
+      "kind" : "html",
+      "plainText" : "Leaders and storm drains connected to a combined sewer shall be trapped. Individual storm water traps shall be installed on the storm water drain branch serving each conductor, or a single trap shall be installed in the main storm drain just before its connection with the combined building sewer or the public sewer. A hooded catch basin located within the property line shall be the equivalent of a building-house trap for the connection to a public sewer."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Leaders and storm drains connected to a combined sewer shall be trapped. Individual storm water traps shall be installed on the storm water drain branch serving each conductor, or a single trap shall be installed in the main storm drain just before its connection with the combined building sewer or the public sewer. A hooded catch basin located within the property line shall be the equivalent of a building-house trap for the connection to a public sewer.",
+  "previewText" : "Leaders and storm drains connected to a combined sewer shall be trapped.",
+  "schemaVersion" : 2,
+  "sectionID" : 12671
+}

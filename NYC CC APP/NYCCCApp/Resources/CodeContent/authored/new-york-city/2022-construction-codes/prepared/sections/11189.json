@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195483\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195483\"><\/AnnotationDrawer><div>Every boiler or modular boiler shall have a shutoff valve in the supply and return piping. For multiple boiler or multiple modular boiler installations, each boiler or modular boiler shall have individual shutoff valves in the supply and return piping.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195484\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195484\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Shutoff valves are not required in a system having a single low-pressure steam boiler of 350,000 Btu\/h (103 kW) output or less.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11189-html-1",
+      "kind" : "html",
+      "plainText" : "Every boiler or modular boiler shall have a shutoff valve in the supply and return piping. For multiple boiler or multiple modular boiler installations, each boiler or modular boiler shall have individual shutoff valves in the supply and return piping.\n\n Exception: Shutoff valves are not required in a system having a single low-pressure steam boiler of 350,000 Btu\/h (103 kW) output or less."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Every boiler or modular boiler shall have a shutoff valve in the supply and return piping. For multiple boiler or multiple modular boiler installations, each boiler or modular boiler shall have individual shutoff valves in the supply and return piping.\n\nException: Shutoff valves are not required in a system having a single low-pressure steam boiler of 350,000 Btu\/h (103 kW) output or less.",
+  "previewText" : "Every boiler or modular boiler shall have a shutoff valve in the supply and return piping.",
+  "schemaVersion" : 2,
+  "sectionID" : 11189
+}

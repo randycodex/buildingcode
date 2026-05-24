@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172088\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172088\"><\/AnnotationDrawer><div>A zoning indicator panel and the associated controls shall be provided at the main building entrance accessible to responding Fire Department personnel and in other locations approved by the commissioner and the Fire Department. The visual zone indication shall lock in until the system is reset and shall not be canceled by the operation of an audible-alarm silencing switch.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1854-html-1",
+      "kind" : "html",
+      "plainText" : "A zoning indicator panel and the associated controls shall be provided at the main building entrance accessible to responding Fire Department personnel and in other locations approved by the commissioner and the Fire Department. The visual zone indication shall lock in until the system is reset and shall not be canceled by the operation of an audible-alarm silencing switch."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "A zoning indicator panel and the associated controls shall be provided at the main building entrance accessible to responding Fire Department personnel and in other locations approved by the commissioner and the Fire Department. The visual zone indication shall lock in until the system is reset and shall not be canceled by the operation of an audible-alarm silencing switch.",
+  "previewText" : "A zoning indicator panel and the associated controls shall be provided at the main building entrance accessible to responding Fire Department personnel and in other locations approved by the commissioner and the Fire Department.",
+  "schemaVersion" : 2,
+  "sectionID" : 1854
+}

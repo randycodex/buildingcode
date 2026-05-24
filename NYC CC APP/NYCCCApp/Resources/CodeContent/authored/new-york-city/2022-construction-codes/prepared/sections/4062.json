@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179343\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179343\"><\/AnnotationDrawer><div>A plan showing the location and designation of deep foundations by an identification system shall be filed with the commissioner prior to installation of such deep foundations. Detailed records for individual deep foundations shall bear an identification corresponding to that shown on the plan.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4062-html-1",
+      "kind" : "html",
+      "plainText" : "A plan showing the location and designation of deep foundations by an identification system shall be filed with the commissioner prior to installation of such deep foundations. Detailed records for individual deep foundations shall bear an identification corresponding to that shown on the plan."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "A plan showing the location and designation of deep foundations by an identification system shall be filed with the commissioner prior to installation of such deep foundations. Detailed records for individual deep foundations shall bear an identification corresponding to that shown on the plan.",
+  "previewText" : "A plan showing the location and designation of deep foundations by an identification system shall be filed with the commissioner prior to installation of such deep foundations.",
+  "schemaVersion" : 2,
+  "sectionID" : 4062
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197989\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197989\"><\/AnnotationDrawer><div>Underground piping systems shall be installed a minimum depth of 24 inches (609.6 mm) below grade, measured to the top of the pipe.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197990\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197990\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Burial depth less than 24 inches (609.6 mm) is permissible when the underground piping system is protected by steel protective plates not less than 1\/4-inch thick (6.36 mm) and with joints tack welded and overlapped a minimum of 3 inches (76.2 mm). The pipe shall be not less than 4 inches (101.6 mm) below the protective steel plate.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8248-html-1",
+      "kind" : "html",
+      "plainText" : "Underground piping systems shall be installed a minimum depth of 24 inches (609.6 mm) below grade, measured to the top of the pipe.\n\n Exception: Burial depth less than 24 inches (609.6 mm) is permissible when the underground piping system is protected by steel protective plates not less than 1\/4-inch thick (6.36 mm) and with joints tack welded and overlapped a minimum of 3 inches (76.2 mm). The pipe shall be not less than 4 inches (101.6 mm) below the protective steel plate."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Underground piping systems shall be installed a minimum depth of 24 inches (609.6 mm) below grade, measured to the top of the pipe.\n\nException: Burial depth less than 24 inches (609.6 mm) is permissible when the underground piping system is protected by steel protective plates not less than 1\/4-inch thick (6.36 mm) and with joints tack welded and overlapped a minimum of 3 inches (76.2 mm). The pipe shall be not less than 4 inches (101.6 mm) below the protective steel plate.",
+  "previewText" : "Underground piping systems shall be installed a minimum depth of 24 inches (609.",
+  "schemaVersion" : 2,
+  "sectionID" : 8248
+}

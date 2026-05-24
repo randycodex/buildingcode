@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198293\"><\/AnnotationDrawer><div>Where appliances are equipped with casters or are otherwise subject to periodic movement or relocation for purposes such as routine cleaning and maintenance, such appliances shall be connected to the supply system piping by means of an appliance connector listed as complying with ANSI Z21.69\/CSA 6.16 or by means of Item 1 of Section 411.1 of this code. Such flexible connectors shall be installed and protected against physical damage in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8356-html-1",
+      "kind" : "html",
+      "plainText" : "Where appliances are equipped with casters or are otherwise subject to periodic movement or relocation for purposes such as routine cleaning and maintenance, such appliances shall be connected to the supply system piping by means of an appliance connector listed as complying with ANSI Z21.69\/CSA 6.16 or by means of Item 1 of Section 411.1 of this code. Such flexible connectors shall be installed and protected against physical damage in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where appliances are equipped with casters or are otherwise subject to periodic movement or relocation for purposes such as routine cleaning and maintenance, such appliances shall be connected to the supply system piping by means of an appliance connector listed as complying with ANSI Z21.69\/CSA 6.16 or by means of Item 1 of Section 411.1 of this code. Such flexible connectors shall be installed and protected against physical damage in accordance with the manufacturer's instructions.",
+  "previewText" : "Where appliances are equipped with casters or are otherwise subject to periodic movement or relocation for purposes such as routine cleaning and maintenance, such appliances shall be connected to the supply system piping by means of an appliance connector listed as complying with ANSI Z21.",
+  "schemaVersion" : 2,
+  "sectionID" : 8356
+}

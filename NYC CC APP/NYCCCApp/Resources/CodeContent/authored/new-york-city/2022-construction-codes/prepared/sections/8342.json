@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198245\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198245\"><\/AnnotationDrawer><div>A line pressure regulator shall be installed where the appliance is designed to operate at a lower pressure than the supply pressure. Line gas pressure regulators shall be listed as complying with ANSI Z21.80\/CSA 6.22. Access shall be provided to pressure regulators. Pressure regulators shall be protected from physical damage. Regulators installed on the exterior of the building shall be approved for outdoor installation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8342-html-1",
+      "kind" : "html",
+      "plainText" : "A line pressure regulator shall be installed where the appliance is designed to operate at a lower pressure than the supply pressure. Line gas pressure regulators shall be listed as complying with ANSI Z21.80\/CSA 6.22. Access shall be provided to pressure regulators. Pressure regulators shall be protected from physical damage. Regulators installed on the exterior of the building shall be approved for outdoor installation."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A line pressure regulator shall be installed where the appliance is designed to operate at a lower pressure than the supply pressure. Line gas pressure regulators shall be listed as complying with ANSI Z21.80\/CSA 6.22. Access shall be provided to pressure regulators. Pressure regulators shall be protected from physical damage. Regulators installed on the exterior of the building shall be approved for outdoor installation.",
+  "previewText" : "A line pressure regulator shall be installed where the appliance is designed to operate at a lower pressure than the supply pressure.",
+  "schemaVersion" : 2,
+  "sectionID" : 8342
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188063\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188063\"><\/AnnotationDrawer><div>No building or space classified in Occupancy Group R-1 or R-2 may be located on a lot containing a building classified in construction Type IIB, VA or VB.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188064\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188064\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188064\"><\/AnnotationDrawer><h6><a name=\"JD_BCD103\" id=\"JD_BCD103\" title=\"BC D103\"><\/a>Section BC D103: Changes to Buildings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6875-html-1",
+      "kind" : "html",
+      "plainText" : "No building or space classified in Occupancy Group R-1 or R-2 may be located on a lot containing a building classified in construction Type IIB, VA or VB.\n\n Section BC D103: Changes to Buildings"
+    }
+  ],
+  "chapterNumber" : "D",
+  "officialText" : "No building or space classified in Occupancy Group R-1 or R-2 may be located on a lot containing a building classified in construction Type IIB, VA or VB.",
+  "previewText" : "No building or space classified in Occupancy Group R-1 or R-2 may be located on a lot containing a building classified in construction Type IIB, VA or VB.",
+  "schemaVersion" : 2,
+  "sectionID" : 6875
+}

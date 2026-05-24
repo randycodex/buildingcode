@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187056\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187056\"><\/AnnotationDrawer><div>The inspection required by Section 3314.4.3.4 shall be performed by, and the checklist required by Section 3314.4.3.4.2 shall be signed and dated by the licensee, suspended scaffold foreman, or competent person who is onsite and responsible for supervising the scaffold under the provisions of Section 3314.4.2.4. Such individual shall have completed the training required by Section 3314.4.5.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6586-html-1",
+      "kind" : "html",
+      "plainText" : "The inspection required by Section 3314.4.3.4 shall be performed by, and the checklist required by Section 3314.4.3.4.2 shall be signed and dated by the licensee, suspended scaffold foreman, or competent person who is onsite and responsible for supervising the scaffold under the provisions of Section 3314.4.2.4. Such individual shall have completed the training required by Section 3314.4.5.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The inspection required by Section 3314.4.3.4 shall be performed by, and the checklist required by Section 3314.4.3.4.2 shall be signed and dated by the licensee, suspended scaffold foreman, or competent person who is onsite and responsible for supervising the scaffold under the provisions of Section 3314.4.2.4. Such individual shall have completed the training required by Section 3314.4.5.3.",
+  "previewText" : "The inspection required by Section 3314.",
+  "schemaVersion" : 2,
+  "sectionID" : 6586
+}

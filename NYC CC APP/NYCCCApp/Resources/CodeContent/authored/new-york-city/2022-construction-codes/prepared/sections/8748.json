@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199400\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199400\"><\/AnnotationDrawer><div>Air-conditioning appliances shall be installed in accordance with the manufacturer's instructions. Unless the appliance is listed for installation on a combustible surface such as a floor or roof, or unless the surface is protected in an approved manner, the appliance shall be installed on a surface of noncombustible construction with noncombustible material and surface finish and with no combustible material against the underside thereof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8748-html-1",
+      "kind" : "html",
+      "plainText" : "Air-conditioning appliances shall be installed in accordance with the manufacturer's instructions. Unless the appliance is listed for installation on a combustible surface such as a floor or roof, or unless the surface is protected in an approved manner, the appliance shall be installed on a surface of noncombustible construction with noncombustible material and surface finish and with no combustible material against the underside thereof."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Air-conditioning appliances shall be installed in accordance with the manufacturer's instructions. Unless the appliance is listed for installation on a combustible surface such as a floor or roof, or unless the surface is protected in an approved manner, the appliance shall be installed on a surface of noncombustible construction with noncombustible material and surface finish and with no combustible material against the underside thereof.",
+  "previewText" : "Air-conditioning appliances shall be installed in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 8748
+}

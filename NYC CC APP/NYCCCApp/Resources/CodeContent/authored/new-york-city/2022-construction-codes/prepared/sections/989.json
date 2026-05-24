@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169026\"><\/AnnotationDrawer><div>Where the fire protective covering of a structural member is subject to impact damage from moving vehicles, the handling of merchandise or other activity, the fire protective covering shall be protected by corner guards or by a substantial jacket of metal or other noncombustible material to a height adequate to provide full protection, but not less than 5 feet (1524 mm) from the finished floor.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169027\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169027\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Corner protection is not required on concrete columns in open or enclosed parking garages.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "989-html-1",
+      "kind" : "html",
+      "plainText" : "Where the fire protective covering of a structural member is subject to impact damage from moving vehicles, the handling of merchandise or other activity, the fire protective covering shall be protected by corner guards or by a substantial jacket of metal or other noncombustible material to a height adequate to provide full protection, but not less than 5 feet (1524 mm) from the finished floor.\n\n Exception: Corner protection is not required on concrete columns in open or enclosed parking garages."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where the fire protective covering of a structural member is subject to impact damage from moving vehicles, the handling of merchandise or other activity, the fire protective covering shall be protected by corner guards or by a substantial jacket of metal or other noncombustible material to a height adequate to provide full protection, but not less than 5 feet (1524 mm) from the finished floor.\n\nException: Corner protection is not required on concrete columns in open or enclosed parking garages.",
+  "previewText" : "Where the fire protective covering of a structural member is subject to impact damage from moving vehicles, the handling of merchandise or other activity, the fire protective covering shall be protected by corner guards or by a substantial jacket of metal or other noncombustible material to a height adequate to provide full protection, but not less than 5 feet (1524 mm) from the finished floor.",
+  "schemaVersion" : 2,
+  "sectionID" : 989
+}

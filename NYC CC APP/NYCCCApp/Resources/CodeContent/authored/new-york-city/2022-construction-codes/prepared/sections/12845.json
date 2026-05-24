@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163901\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163901\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Conveyance piping shall conform to the standards and requirements specified in Section 1301.6.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12845-html-1",
+      "kind" : "html",
+      "plainText" : "Conveyance piping shall conform to the standards and requirements specified in Section 1301.6."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Conveyance piping shall conform to the standards and requirements specified in Section 1301.6.",
+  "previewText" : "Conveyance piping shall conform to the standards and requirements specified in Section 1301.",
+  "schemaVersion" : 2,
+  "sectionID" : 12845
+}

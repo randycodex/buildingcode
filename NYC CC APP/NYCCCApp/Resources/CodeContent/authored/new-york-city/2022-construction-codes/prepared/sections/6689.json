@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187378\"><\/AnnotationDrawer><div>Ledgers shall not be spliced between poles but shall overlap the poles at each end by at least 4 inches (102 mm). Where ledgers lap each other, bearing-blocks attached to the pole shall be provided to support the ledger.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6689-html-1",
+      "kind" : "html",
+      "plainText" : "Ledgers shall not be spliced between poles but shall overlap the poles at each end by at least 4 inches (102 mm). Where ledgers lap each other, bearing-blocks attached to the pole shall be provided to support the ledger."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Ledgers shall not be spliced between poles but shall overlap the poles at each end by at least 4 inches (102 mm). Where ledgers lap each other, bearing-blocks attached to the pole shall be provided to support the ledger.",
+  "previewText" : "Ledgers shall not be spliced between poles but shall overlap the poles at each end by at least 4 inches (102 mm).",
+  "schemaVersion" : 2,
+  "sectionID" : 6689
+}

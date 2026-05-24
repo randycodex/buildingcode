@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174096\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174096\"><\/AnnotationDrawer><div>Exterior exit doors shall comply with the applicable requirements of Section 1010.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2430-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior exit doors shall comply with the applicable requirements of Section 1010.1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Exterior exit doors shall comply with the applicable requirements of Section 1010.1.",
+  "previewText" : "Exterior exit doors shall comply with the applicable requirements of Section 1010.",
+  "schemaVersion" : 2,
+  "sectionID" : 2430
+}

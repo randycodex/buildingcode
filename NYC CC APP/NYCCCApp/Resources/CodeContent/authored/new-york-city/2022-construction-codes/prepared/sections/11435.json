@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196132\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196132\"><\/AnnotationDrawer><div>Joints between different piping materials shall be made with transition fittings compatible with both materials and the fluid contained within the system. Transition fittings must be used in accordance with manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11435-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between different piping materials shall be made with transition fittings compatible with both materials and the fluid contained within the system. Transition fittings must be used in accordance with manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Joints between different piping materials shall be made with transition fittings compatible with both materials and the fluid contained within the system. Transition fittings must be used in accordance with manufacturer's instructions.",
+  "previewText" : "Joints between different piping materials shall be made with transition fittings compatible with both materials and the fluid contained within the system.",
+  "schemaVersion" : 2,
+  "sectionID" : 11435
+}

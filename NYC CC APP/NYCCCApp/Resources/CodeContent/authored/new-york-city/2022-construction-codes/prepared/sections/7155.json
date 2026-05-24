@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188900\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188900\"><\/AnnotationDrawer><div>The owner of a building required to comply with the provisions of Section G312.2 shall file with the department, by January 1, 2033, a report prepared by a registered design professional or licensed master electrician (i) certifying that the requirements of Section G312.2 have been satisfied and detailing how such requirements were satisfied or (ii) certifying that the building met or was altered to meet the provisions of any applicable exception in Sections G304.5.1 or G304.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7155-html-1",
+      "kind" : "html",
+      "plainText" : "The owner of a building required to comply with the provisions of Section G312.2 shall file with the department, by January 1, 2033, a report prepared by a registered design professional or licensed master electrician (i) certifying that the requirements of Section G312.2 have been satisfied and detailing how such requirements were satisfied or (ii) certifying that the building met or was altered to meet the provisions of any applicable exception in Sections G304.5.1 or G304.5.2."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "The owner of a building required to comply with the provisions of Section G312.2 shall file with the department, by January 1, 2033, a report prepared by a registered design professional or licensed master electrician (i) certifying that the requirements of Section G312.2 have been satisfied and detailing how such requirements were satisfied or (ii) certifying that the building met or was altered to meet the provisions of any applicable exception in Sections G304.5.1 or G304.5.2.",
+  "previewText" : "The owner of a building required to comply with the provisions of Section G312.",
+  "schemaVersion" : 2,
+  "sectionID" : 7155
+}

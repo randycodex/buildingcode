@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167992\"><\/AnnotationDrawer><div>Hazardous production materials piping and tubing shall comply with this section and ASME B31.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "697-html-1",
+      "kind" : "html",
+      "plainText" : "Hazardous production materials piping and tubing shall comply with this section and ASME B31.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Hazardous production materials piping and tubing shall comply with this section and ASME B31.3.",
+  "previewText" : "Hazardous production materials piping and tubing shall comply with this section and ASME B31.",
+  "schemaVersion" : 2,
+  "sectionID" : 697
+}

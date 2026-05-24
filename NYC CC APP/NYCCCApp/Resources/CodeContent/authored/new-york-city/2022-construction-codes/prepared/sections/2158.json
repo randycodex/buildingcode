@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173001\"><\/AnnotationDrawer><div>Where a building contains two or more occupancies, the means of egress requirements shall apply to each portion of the building based on the occupancy of that space. Where two or more occupancies utilize portions of the same means of egress system, those egress components shall meet the more stringent requirements of all occupancies that are served.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-173002\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-173002\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-173002\"><\/AnnotationDrawer><h6><a name=\"JD_BC1005\" id=\"JD_BC1005\" title=\"BC 1005\"><\/a>Section BC 1005: Means of Egress Sizing<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2158-html-1",
+      "kind" : "html",
+      "plainText" : "Where a building contains two or more occupancies, the means of egress requirements shall apply to each portion of the building based on the occupancy of that space. Where two or more occupancies utilize portions of the same means of egress system, those egress components shall meet the more stringent requirements of all occupancies that are served.\n\n Section BC 1005: Means of Egress Sizing"
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Where a building contains two or more occupancies, the means of egress requirements shall apply to each portion of the building based on the occupancy of that space. Where two or more occupancies utilize portions of the same means of egress system, those egress components shall meet the more stringent requirements of all occupancies that are served.",
+  "previewText" : "Where a building contains two or more occupancies, the means of egress requirements shall apply to each portion of the building based on the occupancy of that space.",
+  "schemaVersion" : 2,
+  "sectionID" : 2158
+}

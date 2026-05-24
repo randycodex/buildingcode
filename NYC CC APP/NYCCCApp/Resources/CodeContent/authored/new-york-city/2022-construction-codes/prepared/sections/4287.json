@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180019\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180019\"><\/AnnotationDrawer><div>Pit-pier excavation shall be subject to the requirements of Section 1817.7.1.1 through 1817.7.1.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4287-html-1",
+      "kind" : "html",
+      "plainText" : "Pit-pier excavation shall be subject to the requirements of Section 1817.7.1.1 through 1817.7.1.8."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Pit-pier excavation shall be subject to the requirements of Section 1817.7.1.1 through 1817.7.1.8.",
+  "previewText" : "Pit-pier excavation shall be subject to the requirements of Section 1817.",
+  "schemaVersion" : 2,
+  "sectionID" : 4287
+}

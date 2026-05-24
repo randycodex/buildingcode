@@ -1,0 +1,39 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170384\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170384\"><\/AnnotationDrawer><div>The fire-resistance ratings of roofs that consist of a base slab of concrete with a topping (overlay) of an insulating concrete or with an insulating board and built-up roofing shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170383', hash: '#JD_BCFigure722.2.2.3(1)' }}\">Figures 722.2.2.3(1)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170383', hash: '#JD_BCFigure722.2.2.3(2)' }}\">722.2.2.3(2)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170385\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170385\"><\/AnnotationDrawer><div>",
+      "id" : "1396-html-1",
+      "kind" : "html",
+      "plainText" : "The fire-resistance ratings of roofs that consist of a base slab of concrete with a topping (overlay) of an insulating concrete or with an insulating board and built-up roofing shall comply with Figures 722.2.2.3(1) and 722.2.2.3(2) ."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/86c6ae98e4d28f9416c20a99e85ea49b67e44844.png\" width=\"576\" height=\"716.666666666667\"><\/img><\/span>",
+      "id" : "1396-image-2",
+      "imageID" : "86c6ae98e4d28f9416c20a99e85ea49b67e44844.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170386\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170386\"><\/AnnotationDrawer><div class=\"Small\">For SI: 1 inch = 25.4 mm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170387\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170387\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure722.2.2.3(1)\" id=\"JD_BCFigure722.2.2.3(1)\" title=\"BC Figure 722.2.2.3(1)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 722.2.2.3(1)<br><\/br>Fire-resistance Ratings for Concrete Roof Assemblies<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170388\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170388\"><\/AnnotationDrawer><div>",
+      "id" : "1396-html-3",
+      "kind" : "html",
+      "plainText" : "For SI: 1 inch = 25.4 mm.\n\n Figure 722.2.2.3(1)\n Fire-resistance Ratings for Concrete Roof Assemblies"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/70dfb474275b82dcee054bc1059f7f75c46022fb.png\" width=\"576\" height=\"721.933333333333\"><\/img><\/span>",
+      "id" : "1396-image-4",
+      "imageID" : "70dfb474275b82dcee054bc1059f7f75c46022fb.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170389\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170389\"><\/AnnotationDrawer><div class=\"Small\">For SI: 1 inch = 25.4 mm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170390\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170390\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure722.2.2.3(2)\" id=\"JD_BCFigure722.2.2.3(2)\" title=\"BC Figure 722.2.2.3(2)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 722.2.2.3(2)<br><\/br>Fire-Resistance Ratings for Concrete Roof Assemblies<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1396-html-5",
+      "kind" : "html",
+      "plainText" : "For SI: 1 inch = 25.4 mm.\n\n Figure 722.2.2.3(2)\n Fire-Resistance Ratings for Concrete Roof Assemblies"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire-resistance ratings of roofs that consist of a base slab of concrete with a topping (overlay) of an insulating concrete or with an insulating board and built-up roofing shall comply with Figures 722.2.2.3(1) and 722.2.2.3(2).\n\nFor SI: 1 inch = 25.4 mm.\n\nFigure 722.2.2.3(1) Fire-resistance Ratings for Concrete Roof Assemblies\n\nFor SI: 1 inch = 25.4 mm.\n\nFigure 722.2.2.3(2) Fire-Resistance Ratings for Concrete Roof Assemblies",
+  "previewText" : "The fire-resistance ratings of roofs that consist of a base slab of concrete with a topping (overlay) of an insulating concrete or with an insulating board and built-up roofing shall comply with Figures 722.",
+  "schemaVersion" : 2,
+  "sectionID" : 1396
+}

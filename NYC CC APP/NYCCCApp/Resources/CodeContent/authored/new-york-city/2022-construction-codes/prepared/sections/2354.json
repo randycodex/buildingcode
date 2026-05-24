@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173768\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173768\"><\/AnnotationDrawer><div>Where doorways are located adjacent to a ramp landing, maneuvering clearances required by ICC A117.1 are permitted to overlap the required landing area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2354-html-1",
+      "kind" : "html",
+      "plainText" : "Where doorways are located adjacent to a ramp landing, maneuvering clearances required by ICC A117.1 are permitted to overlap the required landing area."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Where doorways are located adjacent to a ramp landing, maneuvering clearances required by ICC A117.1 are permitted to overlap the required landing area.",
+  "previewText" : "Where doorways are located adjacent to a ramp landing, maneuvering clearances required by ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2354
+}

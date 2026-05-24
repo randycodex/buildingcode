@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197897\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197897\"><\/AnnotationDrawer><div>Flanges and flange gaskets shall comply with Sections 403.12.1 through 403.12.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8209-html-1",
+      "kind" : "html",
+      "plainText" : "Flanges and flange gaskets shall comply with Sections 403.12.1 through 403.12.7."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Flanges and flange gaskets shall comply with Sections 403.12.1 through 403.12.7.",
+  "previewText" : "Flanges and flange gaskets shall comply with Sections 403.",
+  "schemaVersion" : 2,
+  "sectionID" : 8209
+}

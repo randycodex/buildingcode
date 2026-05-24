@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193052\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193052\"><\/AnnotationDrawer><div>A receptacle outlet shall be provided at or near the equipment location in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193053\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193053\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193053\"><\/AnnotationDrawer><h6><a name=\"JD_MC307\" id=\"JD_MC307\" title=\"MC 307\"><\/a>Section MC 307: Condensate Disposal<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10354-html-1",
+      "kind" : "html",
+      "plainText" : "A receptacle outlet shall be provided at or near the equipment location in accordance with the New York City Electrical Code. \n\n Section MC 307: Condensate Disposal"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "A receptacle outlet shall be provided at or near the equipment location in accordance with the New York City Electrical Code.\n\nSection MC 307: Condensate Disposal",
+  "previewText" : "A receptacle outlet shall be provided at or near the equipment location in accordance with the New York City Electrical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10354
+}

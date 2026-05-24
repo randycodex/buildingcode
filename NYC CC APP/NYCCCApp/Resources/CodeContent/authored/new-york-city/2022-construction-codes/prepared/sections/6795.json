@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187705\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187705\"><\/AnnotationDrawer><div>Lift directors shall be designated, and perform the duties assigned to them, in accordance with rules promulgated by the commissioner. Such duties shall include, but not be limited to, ensuring compliance with approved plans, traffic and pedestrian controls, and weather restrictions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187706\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187706\"><\/AnnotationDrawer><div>(Am. L.L. 2018\/014, 12\/31\/2017, eff. 12\/31\/2017) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187707\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187707\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-128693', hash: '#JD_L.L.2018\/014' }}\">L.L. 2018\/014<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6795-html-1",
+      "kind" : "html",
+      "plainText" : "Lift directors shall be designated, and perform the duties assigned to them, in accordance with rules promulgated by the commissioner. Such duties shall include, but not be limited to, ensuring compliance with approved plans, traffic and pedestrian controls, and weather restrictions.\n\n (Am. L.L. 2018\/014, 12\/31\/2017, eff. 12\/31\/2017) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018\/014 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Lift directors shall be designated, and perform the duties assigned to them, in accordance with rules promulgated by the commissioner. Such duties shall include, but not be limited to, ensuring compliance with approved plans, traffic and pedestrian controls, and weather restrictions.\n\n(Am. L.L. 2018\/014, 12\/31\/2017, eff. 12\/31\/2017)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018\/014.",
+  "previewText" : "Lift directors shall be designated, and perform the duties assigned to them, in accordance with rules promulgated by the commissioner.",
+  "schemaVersion" : 2,
+  "sectionID" : 6795
+}

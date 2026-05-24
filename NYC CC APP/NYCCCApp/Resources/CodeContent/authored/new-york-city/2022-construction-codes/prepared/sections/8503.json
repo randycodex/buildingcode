@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198694\"><\/AnnotationDrawer><div>Type B and L vents sized in accordance with Item 2 or 3 of Section 503.6.9.1 shall extend in a generally vertical direction with offsets not exceeding 45 degrees (0.79 rad), except that a vent system having not more than one 60-degree (1.04 rad) offset shall be permitted. Any angle greater than 45 degrees (0.79 rad) from the vertical is considered horizontal. The total horizontal distance of a vent plus the horizontal vent connector serving draft-hood-equipped appliances shall be not greater than 75 percent of the vertical height of the vent.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8503-html-1",
+      "kind" : "html",
+      "plainText" : "Type B and L vents sized in accordance with Item 2 or 3 of Section 503.6.9.1 shall extend in a generally vertical direction with offsets not exceeding 45 degrees (0.79 rad), except that a vent system having not more than one 60-degree (1.04 rad) offset shall be permitted. Any angle greater than 45 degrees (0.79 rad) from the vertical is considered horizontal. The total horizontal distance of a vent plus the horizontal vent connector serving draft-hood-equipped appliances shall be not greater than 75 percent of the vertical height of the vent."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Type B and L vents sized in accordance with Item 2 or 3 of Section 503.6.9.1 shall extend in a generally vertical direction with offsets not exceeding 45 degrees (0.79 rad), except that a vent system having not more than one 60-degree (1.04 rad) offset shall be permitted. Any angle greater than 45 degrees (0.79 rad) from the vertical is considered horizontal. The total horizontal distance of a vent plus the horizontal vent connector serving draft-hood-equipped appliances shall be not greater than 75 percent of the vertical height of the vent.",
+  "previewText" : "Type B and L vents sized in accordance with Item 2 or 3 of Section 503.",
+  "schemaVersion" : 2,
+  "sectionID" : 8503
+}

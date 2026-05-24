@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196067\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196067\"><\/AnnotationDrawer><div>The potable water system shall be protected from backflow in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11407-html-1",
+      "kind" : "html",
+      "plainText" : "The potable water system shall be protected from backflow in accordance with the New York City Plumbing Code."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "The potable water system shall be protected from backflow in accordance with the New York City Plumbing Code.",
+  "previewText" : "The potable water system shall be protected from backflow in accordance with the New York City Plumbing Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11407
+}

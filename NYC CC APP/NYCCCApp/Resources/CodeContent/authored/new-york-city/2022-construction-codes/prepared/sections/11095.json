@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195233\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195233\"><\/AnnotationDrawer><div>Cooling towers and evaporative condensers shall include controls that automate system bleed based on conductivity, fraction of metered makeup volume, metered bleed volume, recirculating pump run time or bleed time.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11095-html-1",
+      "kind" : "html",
+      "plainText" : "Cooling towers and evaporative condensers shall include controls that automate system bleed based on conductivity, fraction of metered makeup volume, metered bleed volume, recirculating pump run time or bleed time."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Cooling towers and evaporative condensers shall include controls that automate system bleed based on conductivity, fraction of metered makeup volume, metered bleed volume, recirculating pump run time or bleed time.",
+  "previewText" : "Cooling towers and evaporative condensers shall include controls that automate system bleed based on conductivity, fraction of metered makeup volume, metered bleed volume, recirculating pump run time or bleed time.",
+  "schemaVersion" : 2,
+  "sectionID" : 11095
+}

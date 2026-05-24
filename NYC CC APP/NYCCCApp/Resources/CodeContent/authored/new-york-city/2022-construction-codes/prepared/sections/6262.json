@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186007\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186007\"><\/AnnotationDrawer><div>Prior to the commencement of demolition operations, all glass located in the area authorized to be demolished by the work permit, including but not limited to glass in windows, doors, skylights, and fixtures, shall be removed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186008\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186008\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Demolition operations relating to the alteration, maintenance, or repair of a facade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6262-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the commencement of demolition operations, all glass located in the area authorized to be demolished by the work permit, including but not limited to glass in windows, doors, skylights, and fixtures, shall be removed.\n\n Exception: Demolition operations relating to the alteration, maintenance, or repair of a facade."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Prior to the commencement of demolition operations, all glass located in the area authorized to be demolished by the work permit, including but not limited to glass in windows, doors, skylights, and fixtures, shall be removed.\n\nException: Demolition operations relating to the alteration, maintenance, or repair of a facade.",
+  "previewText" : "Prior to the commencement of demolition operations, all glass located in the area authorized to be demolished by the work permit, including but not limited to glass in windows, doors, skylights, and fixtures, shall be removed.",
+  "schemaVersion" : 2,
+  "sectionID" : 6262
+}

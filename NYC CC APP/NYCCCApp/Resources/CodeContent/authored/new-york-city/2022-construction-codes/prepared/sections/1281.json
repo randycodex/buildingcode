@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169885\"><\/AnnotationDrawer><div>Fire dampers, smoke dampers, combination fire\/smoke dampers and ceiling radiation dampers located within air distribution and smoke control systems shall be installed in accordance with the requirements of this section, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code,<\/span> the manufacturer's instructions and the damper's listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1281-html-1",
+      "kind" : "html",
+      "plainText" : "Fire dampers, smoke dampers, combination fire\/smoke dampers and ceiling radiation dampers located within air distribution and smoke control systems shall be installed in accordance with the requirements of this section, the New York City Mechanical Code, the manufacturer's instructions and the damper's listing."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire dampers, smoke dampers, combination fire\/smoke dampers and ceiling radiation dampers located within air distribution and smoke control systems shall be installed in accordance with the requirements of this section, the New York City Mechanical Code, the manufacturer's instructions and the damper's listing.",
+  "previewText" : "Fire dampers, smoke dampers, combination fire\/smoke dampers and ceiling radiation dampers located within air distribution and smoke control systems shall be installed in accordance with the requirements of this section, the New York City Mechanical Code, the manufacturer's instructions and the damper's listing.",
+  "schemaVersion" : 2,
+  "sectionID" : 1281
+}

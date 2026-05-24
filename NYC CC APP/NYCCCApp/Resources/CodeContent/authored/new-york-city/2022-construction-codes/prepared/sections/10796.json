@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194345\"><\/AnnotationDrawer><div>Ducts shall be supported in accordance with SMACNA\/ANSI HVAC Duct Construction Standards &#8211; Metal and Flexible. Flexible and other factory-made ducts shall be supported in accordance with the manufacturer's instructions. Ducts shall not be hung from or supported by suspended ceilings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10796-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts shall be supported in accordance with SMACNA\/ANSI HVAC Duct Construction Standards - Metal and Flexible. Flexible and other factory-made ducts shall be supported in accordance with the manufacturer's instructions. Ducts shall not be hung from or supported by suspended ceilings."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Ducts shall be supported in accordance with SMACNA\/ANSI HVAC Duct Construction Standards – Metal and Flexible. Flexible and other factory-made ducts shall be supported in accordance with the manufacturer's instructions. Ducts shall not be hung from or supported by suspended ceilings.",
+  "previewText" : "Ducts shall be supported in accordance with SMACNA\/ANSI HVAC Duct Construction Standards – Metal and Flexible.",
+  "schemaVersion" : 2,
+  "sectionID" : 10796
+}

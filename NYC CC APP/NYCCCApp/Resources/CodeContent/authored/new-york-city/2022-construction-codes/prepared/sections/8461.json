@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198562\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198562\"><\/AnnotationDrawer><div>Plastic piping used for venting appliances listed for use with such venting materials shall be listed and installed in accordance with the terms of its listing and the manufacturers' instructions. Installation shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span> PVC shall not be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8461-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic piping used for venting appliances listed for use with such venting materials shall be listed and installed in accordance with the terms of its listing and the manufacturers' instructions. Installation shall be in accordance with the New York City Building Code. PVC shall not be permitted."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Plastic piping used for venting appliances listed for use with such venting materials shall be listed and installed in accordance with the terms of its listing and the manufacturers' instructions. Installation shall be in accordance with the New York City Building Code. PVC shall not be permitted.",
+  "previewText" : "Plastic piping used for venting appliances listed for use with such venting materials shall be listed and installed in accordance with the terms of its listing and the manufacturers' instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 8461
+}

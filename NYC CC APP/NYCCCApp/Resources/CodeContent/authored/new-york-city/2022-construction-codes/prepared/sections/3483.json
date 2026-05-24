@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177385\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177385\"><\/AnnotationDrawer><div>Floors and other surfaces that are intended to support vehicle loads greater than a 10,000 pound (4535.9 kg) gross vehicle weight rating shall comply with Sections 1607.7.1 through 1607.7.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177386\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177386\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224338\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224338\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3483-html-1",
+      "kind" : "html",
+      "plainText" : "Floors and other surfaces that are intended to support vehicle loads greater than a 10,000 pound (4535.9 kg) gross vehicle weight rating shall comply with Sections 1607.7.1 through 1607.7.5.\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Floors and other surfaces that are intended to support vehicle loads greater than a 10,000 pound (4535.9 kg) gross vehicle weight rating shall comply with Sections 1607.7.1 through 1607.7.5.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "Floors and other surfaces that are intended to support vehicle loads greater than a 10,000 pound (4535.",
+  "schemaVersion" : 2,
+  "sectionID" : 3483
+}

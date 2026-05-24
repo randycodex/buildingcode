@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185592\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185592\"><\/AnnotationDrawer><div>Open web steel joists shall be attached to the support structure, at least at one end on both sides of the seat, immediately upon placement in the final erection position and before additional joists are placed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185593\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185593\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Open web steel joists that have been pre-assembled into panels with bridging shall be attached to the structure at each panel corner with sufficient bolted or welded connections before the hoisting cables are released.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6102-html-1",
+      "kind" : "html",
+      "plainText" : "Open web steel joists shall be attached to the support structure, at least at one end on both sides of the seat, immediately upon placement in the final erection position and before additional joists are placed.\n\n Exception: Open web steel joists that have been pre-assembled into panels with bridging shall be attached to the structure at each panel corner with sufficient bolted or welded connections before the hoisting cables are released."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Open web steel joists shall be attached to the support structure, at least at one end on both sides of the seat, immediately upon placement in the final erection position and before additional joists are placed.\n\nException: Open web steel joists that have been pre-assembled into panels with bridging shall be attached to the structure at each panel corner with sufficient bolted or welded connections before the hoisting cables are released.",
+  "previewText" : "Open web steel joists shall be attached to the support structure, at least at one end on both sides of the seat, immediately upon placement in the final erection position and before additional joists are placed.",
+  "schemaVersion" : 2,
+  "sectionID" : 6102
+}

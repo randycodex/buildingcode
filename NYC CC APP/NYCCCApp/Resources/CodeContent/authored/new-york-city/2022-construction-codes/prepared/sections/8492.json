@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198654\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198654\"><\/AnnotationDrawer><div>A Type B-W gas vent shall have a listed capacity not less than that of the listed vented wall furnace to which it is connected.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8492-html-1",
+      "kind" : "html",
+      "plainText" : "A Type B-W gas vent shall have a listed capacity not less than that of the listed vented wall furnace to which it is connected."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "A Type B-W gas vent shall have a listed capacity not less than that of the listed vented wall furnace to which it is connected.",
+  "previewText" : "A Type B-W gas vent shall have a listed capacity not less than that of the listed vented wall furnace to which it is connected.",
+  "schemaVersion" : 2,
+  "sectionID" : 8492
+}

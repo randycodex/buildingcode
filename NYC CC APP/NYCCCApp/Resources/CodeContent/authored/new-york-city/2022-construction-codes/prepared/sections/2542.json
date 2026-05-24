@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174495\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174495\"><\/AnnotationDrawer><div>Where one of the two paths of travel is across the aisle through a row of seats to another aisle, there shall be not more than 24 seats between the two aisles, and the minimum clear width between rows for the row between the two aisles shall be 12 inches (304.8 mm) plus 0.6 inch (15.2 mm) for each additional seat above seven in the row between aisles.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174496\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174496\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> For smoke-protected assembly seating there shall be not more than 40 seats between the two aisles and the minimum clear width shall be 12 inches (304.8 mm) plus 0.3 inch (7.6 mm) for each additional seat.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2542-html-1",
+      "kind" : "html",
+      "plainText" : "Where one of the two paths of travel is across the aisle through a row of seats to another aisle, there shall be not more than 24 seats between the two aisles, and the minimum clear width between rows for the row between the two aisles shall be 12 inches (304.8 mm) plus 0.6 inch (15.2 mm) for each additional seat above seven in the row between aisles.\n\n Exception: For smoke-protected assembly seating there shall be not more than 40 seats between the two aisles and the minimum clear width shall be 12 inches (304.8 mm) plus 0.3 inch (7.6 mm) for each additional seat."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Where one of the two paths of travel is across the aisle through a row of seats to another aisle, there shall be not more than 24 seats between the two aisles, and the minimum clear width between rows for the row between the two aisles shall be 12 inches (304.8 mm) plus 0.6 inch (15.2 mm) for each additional seat above seven in the row between aisles.\n\nException: For smoke-protected assembly seating there shall be not more than 40 seats between the two aisles and the minimum clear width shall be 12 inches (304.8 mm) plus 0.3 inch (7.6 mm) for each additional seat.",
+  "previewText" : "Where one of the two paths of travel is across the aisle through a row of seats to another aisle, there shall be not more than 24 seats between the two aisles, and the minimum clear width between rows for the row between the two aisles shall be 12 inches (304.",
+  "schemaVersion" : 2,
+  "sectionID" : 2542
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177448\"><\/AnnotationDrawer><div>The tributary area, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">A<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">T<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t, for use in Equation 16-23 for one-way slabs shall not exceed an area defined by the slab span times a width normal to the span of 1.5 times the slab span.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3506-html-1",
+      "kind" : "html",
+      "plainText" : "The tributary area, A T \n\n , for use in Equation 16-23 for one-way slabs shall not exceed an area defined by the slab span times a width normal to the span of 1.5 times the slab span."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "The tributary area, AT , for use in Equation 16-23 for one-way slabs shall not exceed an area defined by the slab span times a width normal to the span of 1.5 times the slab span.",
+  "previewText" : "The tributary area, AT , for use in Equation 16-23 for one-way slabs shall not exceed an area defined by the slab span times a width normal to the span of 1.",
+  "schemaVersion" : 2,
+  "sectionID" : 3506
+}

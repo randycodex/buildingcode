@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170466\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170466\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">T<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">e<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t shall be the value obtained for the concrete masonry unit determined in accordance with ASTM C 140.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1415-html-1",
+      "kind" : "html",
+      "plainText" : "T e \n\n shall be the value obtained for the concrete masonry unit determined in accordance with ASTM C 140."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Te shall be the value obtained for the concrete masonry unit determined in accordance with ASTM C 140.",
+  "previewText" : "Te shall be the value obtained for the concrete masonry unit determined in accordance with ASTM C 140.",
+  "schemaVersion" : 2,
+  "sectionID" : 1415
+}

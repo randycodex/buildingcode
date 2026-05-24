@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195997\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195997\"><\/AnnotationDrawer><div>Push-fit joints shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11374-html-1",
+      "kind" : "html",
+      "plainText" : "Push-fit joints shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Push-fit joints shall be installed in accordance with the manufacturer's instructions.",
+  "previewText" : "Push-fit joints shall be installed in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 11374
+}

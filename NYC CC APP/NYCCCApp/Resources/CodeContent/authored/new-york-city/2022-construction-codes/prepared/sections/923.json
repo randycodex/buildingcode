@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168713\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168713\"><\/AnnotationDrawer><div>Separated occupancies shall be individually classified in accordance with Section 302.1. Each separated space shall comply with this code based on the occupancy classification of that portion of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "923-html-1",
+      "kind" : "html",
+      "plainText" : "Separated occupancies shall be individually classified in accordance with Section 302.1. Each separated space shall comply with this code based on the occupancy classification of that portion of the building."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Separated occupancies shall be individually classified in accordance with Section 302.1. Each separated space shall comply with this code based on the occupancy classification of that portion of the building.",
+  "previewText" : "Separated occupancies shall be individually classified in accordance with Section 302.",
+  "schemaVersion" : 2,
+  "sectionID" : 923
+}

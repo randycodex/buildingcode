@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185263\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185263\"><\/AnnotationDrawer><div>In addition to the fire prevention and fire protection requirements imposed by this code, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>, and other applicable law, the following provisions shall also apply during new building construction of structures categorized as Type IV construction by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168791', hash: '#JD_BCCh.6' }}\">Chapter 6<\/Link> of this code. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185264\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185264\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224517\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224517\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5978-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the fire prevention and fire protection requirements imposed by this code, the New York City Fire Code , and other applicable law, the following provisions shall also apply during new building construction of structures categorized as Type IV construction by Chapter 6 of this code. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "In addition to the fire prevention and fire protection requirements imposed by this code, the New York City Fire Code, and other applicable law, the following provisions shall also apply during new building construction of structures categorized as Type IV construction by Chapter 6 of this code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "In addition to the fire prevention and fire protection requirements imposed by this code, the New York City Fire Code, and other applicable law, the following provisions shall also apply during new building construction of structures categorized as Type IV construction by Chapter 6 of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 5978
+}

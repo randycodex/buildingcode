@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193690\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193690\"><\/AnnotationDrawer><div>Clothes dryers shall be exhausted in accordance with the manufacturer's instructions. Dryer exhaust systems shall be independent of all other systems and shall convey the moisture and any products of combustion to the outside of the building. For the installation of gas dryers, refer to the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193691\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193691\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> This section shall not apply to listed and labeled condensing (ductless) electric clothes dryers. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10584-html-1",
+      "kind" : "html",
+      "plainText" : "Clothes dryers shall be exhausted in accordance with the manufacturer's instructions. Dryer exhaust systems shall be independent of all other systems and shall convey the moisture and any products of combustion to the outside of the building. For the installation of gas dryers, refer to the New York City Fuel Gas Code. \n\n Exception: This section shall not apply to listed and labeled condensing (ductless) electric clothes dryers."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Clothes dryers shall be exhausted in accordance with the manufacturer's instructions. Dryer exhaust systems shall be independent of all other systems and shall convey the moisture and any products of combustion to the outside of the building. For the installation of gas dryers, refer to the New York City Fuel Gas Code.\n\nException: This section shall not apply to listed and labeled condensing (ductless) electric clothes dryers.",
+  "previewText" : "Clothes dryers shall be exhausted in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 10584
+}

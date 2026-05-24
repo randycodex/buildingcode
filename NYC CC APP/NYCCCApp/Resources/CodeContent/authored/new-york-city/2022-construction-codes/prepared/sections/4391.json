@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180312\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180312\"><\/AnnotationDrawer><div>If either of the requirements of Section 1905.6.3.4 is not met, steps shall be taken to increase the average of subsequent strength test results. The requirements of Section 1905.6.5 shall govern if the requirement of Section 1905.6.3.4, Item 2 is not met.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4391-html-1",
+      "kind" : "html",
+      "plainText" : "If either of the requirements of Section 1905.6.3.4 is not met, steps shall be taken to increase the average of subsequent strength test results. The requirements of Section 1905.6.5 shall govern if the requirement of Section 1905.6.3.4, Item 2 is not met."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "If either of the requirements of Section 1905.6.3.4 is not met, steps shall be taken to increase the average of subsequent strength test results. The requirements of Section 1905.6.5 shall govern if the requirement of Section 1905.6.3.4, Item 2 is not met.",
+  "previewText" : "If either of the requirements of Section 1905.",
+  "schemaVersion" : 2,
+  "sectionID" : 4391
+}

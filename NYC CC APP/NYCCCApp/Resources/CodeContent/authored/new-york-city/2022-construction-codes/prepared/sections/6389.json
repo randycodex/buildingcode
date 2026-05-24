@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186389\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186389\"><\/AnnotationDrawer><div>Unenclosed perimeter protection shall be designed and provided with documentation in accordance with Sections 3308.3.1 through 3308.3.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186390\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186390\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The requirements of Sections 3308.3.1, and 3308.3.3 through 3308.3.5, shall not apply to guardrail systems. The requirements of Section 3308.7 shall apply to guardrail systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6389-html-1",
+      "kind" : "html",
+      "plainText" : "Unenclosed perimeter protection shall be designed and provided with documentation in accordance with Sections 3308.3.1 through 3308.3.5.\n\n Exception: The requirements of Sections 3308.3.1, and 3308.3.3 through 3308.3.5, shall not apply to guardrail systems. The requirements of Section 3308.7 shall apply to guardrail systems."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Unenclosed perimeter protection shall be designed and provided with documentation in accordance with Sections 3308.3.1 through 3308.3.5.\n\nException: The requirements of Sections 3308.3.1, and 3308.3.3 through 3308.3.5, shall not apply to guardrail systems. The requirements of Section 3308.7 shall apply to guardrail systems.",
+  "previewText" : "Unenclosed perimeter protection shall be designed and provided with documentation in accordance with Sections 3308.",
+  "schemaVersion" : 2,
+  "sectionID" : 6389
+}

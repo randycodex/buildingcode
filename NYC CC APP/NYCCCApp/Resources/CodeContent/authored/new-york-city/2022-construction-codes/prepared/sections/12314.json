@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162464\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162464\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Exposed soil or waste piping shall not be installed above any working, storage or eating surfaces in food service establishments.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12314-html-1",
+      "kind" : "html",
+      "plainText" : "Exposed soil or waste piping shall not be installed above any working, storage or eating surfaces in food service establishments."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Exposed soil or waste piping shall not be installed above any working, storage or eating surfaces in food service establishments.",
+  "previewText" : "Exposed soil or waste piping shall not be installed above any working, storage or eating surfaces in food service establishments.",
+  "schemaVersion" : 2,
+  "sectionID" : 12314
+}

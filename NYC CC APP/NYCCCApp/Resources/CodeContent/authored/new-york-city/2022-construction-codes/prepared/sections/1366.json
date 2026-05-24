@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170250\"><\/AnnotationDrawer><div>Where required, metal ties shall be embedded inbed joints of unit masonry for protection of steel columns. Such ties shall be as set forth in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170185', hash: '#JD_BCTable721.1(1)' }}\">Table 721.1(1)<\/Link> or be equivalent thereto.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1366-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, metal ties shall be embedded inbed joints of unit masonry for protection of steel columns. Such ties shall be as set forth in Table 721.1(1) or be equivalent thereto."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where required, metal ties shall be embedded inbed joints of unit masonry for protection of steel columns. Such ties shall be as set forth in Table 721.1(1) or be equivalent thereto.",
+  "previewText" : "Where required, metal ties shall be embedded inbed joints of unit masonry for protection of steel columns.",
+  "schemaVersion" : 2,
+  "sectionID" : 1366
+}

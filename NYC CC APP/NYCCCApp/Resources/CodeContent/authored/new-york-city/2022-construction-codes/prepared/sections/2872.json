@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175479\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175479\"><\/AnnotationDrawer><div>Where seating or standing space at fixed or built-in tables, counters or work surfaces is provided in accessible spaces, at least 10 percent of the total number of seating and standing spaces, but not less than one of each type, shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175480\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Check-writing surfaces at check-out aisles not required to comply with Section 1109.12.2 are not required to be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2872-html-1",
+      "kind" : "html",
+      "plainText" : "Where seating or standing space at fixed or built-in tables, counters or work surfaces is provided in accessible spaces, at least 10 percent of the total number of seating and standing spaces, but not less than one of each type, shall be accessible.\n\n Exception: Check-writing surfaces at check-out aisles not required to comply with Section 1109.12.2 are not required to be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where seating or standing space at fixed or built-in tables, counters or work surfaces is provided in accessible spaces, at least 10 percent of the total number of seating and standing spaces, but not less than one of each type, shall be accessible.\n\nException: Check-writing surfaces at check-out aisles not required to comply with Section 1109.12.2 are not required to be accessible.",
+  "previewText" : "Where seating or standing space at fixed or built-in tables, counters or work surfaces is provided in accessible spaces, at least 10 percent of the total number of seating and standing spaces, but not less than one of each type, shall be accessible.",
+  "schemaVersion" : 2,
+  "sectionID" : 2872
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184392\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184392\"><\/AnnotationDrawer><div>A large wind turbine shall be designed to comply with the sound level limit of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-135570', hash: '#JD_24-232.1' }}\">24-232.1<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184393\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184393\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224468\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224468\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5698-html-1",
+      "kind" : "html",
+      "plainText" : "A large wind turbine shall be designed to comply with the sound level limit of Section 24-232.1 of the Administrative Code .\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "A large wind turbine shall be designed to comply with the sound level limit of Section 24-232.1 of the Administrative Code.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "A large wind turbine shall be designed to comply with the sound level limit of Section 24-232.",
+  "schemaVersion" : 2,
+  "sectionID" : 5698
+}

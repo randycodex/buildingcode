@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161828\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161828\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water heaters utilized for both potable water-heating and space-heating applications shall be sized to prevent the space-heating load from diminishing the required potable water-heating capacity.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12063-html-1",
+      "kind" : "html",
+      "plainText" : "Water heaters utilized for both potable water-heating and space-heating applications shall be sized to prevent the space-heating load from diminishing the required potable water-heating capacity."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Water heaters utilized for both potable water-heating and space-heating applications shall be sized to prevent the space-heating load from diminishing the required potable water-heating capacity.",
+  "previewText" : "Water heaters utilized for both potable water-heating and space-heating applications shall be sized to prevent the space-heating load from diminishing the required potable water-heating capacity.",
+  "schemaVersion" : 2,
+  "sectionID" : 12063
+}

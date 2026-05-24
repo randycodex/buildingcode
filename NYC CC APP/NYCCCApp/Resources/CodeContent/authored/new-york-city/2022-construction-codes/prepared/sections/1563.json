@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171082\"><\/AnnotationDrawer><div>The determination as to whether seismic requirements apply to an alteration shall be made in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">1968 Building Code<\/span> and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link> of this code or the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">1968 Building Code<\/span> and Reference Standard RS 9-6 of such code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-171083\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-171083\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-171083\"><\/AnnotationDrawer><h6><a name=\"JD_BC902\" id=\"JD_BC902\" title=\"BC 902\"><\/a>Section BC 902: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1563-html-1",
+      "kind" : "html",
+      "plainText" : "The determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with Chapter 16 of this code or the 1968 Building Code and Reference Standard RS 9-6 of such code.\n\n Section BC 902: Definitions"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with Chapter 16 of this code or the 1968 Building Code and Reference Standard RS 9-6 of such code.",
+  "previewText" : "The determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations.",
+  "schemaVersion" : 2,
+  "sectionID" : 1563
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175300\"><\/AnnotationDrawer><div>Central holding cells and court-floor holding cells shall comply with Sections 1108.4.2.1 and 1108.4.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2803-html-1",
+      "kind" : "html",
+      "plainText" : "Central holding cells and court-floor holding cells shall comply with Sections 1108.4.2.1 and 1108.4.2.2."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Central holding cells and court-floor holding cells shall comply with Sections 1108.4.2.1 and 1108.4.2.2.",
+  "previewText" : "Central holding cells and court-floor holding cells shall comply with Sections 1108.",
+  "schemaVersion" : 2,
+  "sectionID" : 2803
+}

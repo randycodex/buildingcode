@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193664\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193664\"><\/AnnotationDrawer><div>Each room where rubber cement is used or mixed, or where flammable or combustible solvents are applied, shall be ventilated in accordance with the applicable provisions of NFPA 91.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10572-html-1",
+      "kind" : "html",
+      "plainText" : "Each room where rubber cement is used or mixed, or where flammable or combustible solvents are applied, shall be ventilated in accordance with the applicable provisions of NFPA 91."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Each room where rubber cement is used or mixed, or where flammable or combustible solvents are applied, shall be ventilated in accordance with the applicable provisions of NFPA 91.",
+  "previewText" : "Each room where rubber cement is used or mixed, or where flammable or combustible solvents are applied, shall be ventilated in accordance with the applicable provisions of NFPA 91.",
+  "schemaVersion" : 2,
+  "sectionID" : 10572
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170751\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170751\"><\/AnnotationDrawer><div>The weight-to-heated-perimeter ratios <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">(W\/D),<\/span> for both contour and box fire-resistant protection profiles, for the wide flange shapes most often used as beams or girders are given in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170586', hash: '#JD_BCTable722.5.1(4)' }}\">Table 722.5.1(4)<\/Link>. For different shapes, the weight-to-heated-perimeter ratios <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">(W\/D)<\/span> shall be determined in accordance with the definitions given in this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1461-html-1",
+      "kind" : "html",
+      "plainText" : "The weight-to-heated-perimeter ratios (W\/D), for both contour and box fire-resistant protection profiles, for the wide flange shapes most often used as beams or girders are given in Table 722.5.1(4) . For different shapes, the weight-to-heated-perimeter ratios (W\/D) shall be determined in accordance with the definitions given in this section."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The weight-to-heated-perimeter ratios (W\/D), for both contour and box fire-resistant protection profiles, for the wide flange shapes most often used as beams or girders are given in Table 722.5.1(4). For different shapes, the weight-to-heated-perimeter ratios (W\/D) shall be determined in accordance with the definitions given in this section.",
+  "previewText" : "The weight-to-heated-perimeter ratios (W\/D), for both contour and box fire-resistant protection profiles, for the wide flange shapes most often used as beams or girders are given in Table 722.",
+  "schemaVersion" : 2,
+  "sectionID" : 1461
+}

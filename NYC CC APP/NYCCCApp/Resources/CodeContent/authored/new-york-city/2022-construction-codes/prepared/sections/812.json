@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168320\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168320\"><\/AnnotationDrawer><div>Nonproduction laboratories shall be ventilated in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193361', hash: '#JD_MC408' }}\">408<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168321\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168321\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168321\"><\/AnnotationDrawer><h6><a name=\"JD_BC428\" id=\"JD_BC428\" title=\"BC 428\"><\/a>Section BC 428: Uses and Occupancies Involving Radioactive Materials and Radiation-Producing Equipment<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "812-html-1",
+      "kind" : "html",
+      "plainText" : "Nonproduction laboratories shall be ventilated in accordance with Section 408 of the New York City Mechanical Code. \n\n Section BC 428: Uses and Occupancies Involving Radioactive Materials and Radiation-Producing Equipment"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Nonproduction laboratories shall be ventilated in accordance with Section 408 of the New York City Mechanical Code.",
+  "previewText" : "Nonproduction laboratories shall be ventilated in accordance with Section 408 of the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 812
+}

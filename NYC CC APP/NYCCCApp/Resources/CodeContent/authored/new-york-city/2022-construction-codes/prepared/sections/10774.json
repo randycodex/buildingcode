@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194281\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194281\"><\/AnnotationDrawer><div>For structures located in flood hazard areas, plenum spaces shall comply with the additional requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10774-html-1",
+      "kind" : "html",
+      "plainText" : "For structures located in flood hazard areas, plenum spaces shall comply with the additional requirements of Appendix G of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "For structures located in flood hazard areas, plenum spaces shall comply with the additional requirements of Appendix G of the New York City Building Code.",
+  "previewText" : "For structures located in flood hazard areas, plenum spaces shall comply with the additional requirements of Appendix G of the New York City Building Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10774
+}

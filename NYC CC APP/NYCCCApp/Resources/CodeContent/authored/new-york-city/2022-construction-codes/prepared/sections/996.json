@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169046\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169046\"><\/AnnotationDrawer><div>The SFRM shall be applied to a substrate in compliance with Sections 704.13.3.1 through 704.13.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "996-html-1",
+      "kind" : "html",
+      "plainText" : "The SFRM shall be applied to a substrate in compliance with Sections 704.13.3.1 through 704.13.3.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The SFRM shall be applied to a substrate in compliance with Sections 704.13.3.1 through 704.13.3.2.",
+  "previewText" : "The SFRM shall be applied to a substrate in compliance with Sections 704.",
+  "schemaVersion" : 2,
+  "sectionID" : 996
+}

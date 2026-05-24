@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196308\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196308\"><\/AnnotationDrawer><div>Pumps that are not part of an appliance shall be of a positive-displacement type. The pump shall automatically shut off the supply when not in operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11513-html-1",
+      "kind" : "html",
+      "plainText" : "Pumps that are not part of an appliance shall be of a positive-displacement type. The pump shall automatically shut off the supply when not in operation."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Pumps that are not part of an appliance shall be of a positive-displacement type. The pump shall automatically shut off the supply when not in operation.",
+  "previewText" : "Pumps that are not part of an appliance shall be of a positive-displacement type.",
+  "schemaVersion" : 2,
+  "sectionID" : 11513
+}

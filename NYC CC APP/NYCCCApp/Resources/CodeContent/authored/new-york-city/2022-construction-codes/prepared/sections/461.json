@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167271\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167271\"><\/AnnotationDrawer><div>Ship ladders shall be permitted for egress from control rooms or elevated facility observation rooms in accordance with Section 1011.15.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "461-html-1",
+      "kind" : "html",
+      "plainText" : "Ship ladders shall be permitted for egress from control rooms or elevated facility observation rooms in accordance with Section 1011.15."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Ship ladders shall be permitted for egress from control rooms or elevated facility observation rooms in accordance with Section 1011.15.",
+  "previewText" : "Ship ladders shall be permitted for egress from control rooms or elevated facility observation rooms in accordance with Section 1011.",
+  "schemaVersion" : 2,
+  "sectionID" : 461
+}

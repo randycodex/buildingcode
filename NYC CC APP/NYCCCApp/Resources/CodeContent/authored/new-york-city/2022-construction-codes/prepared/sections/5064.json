@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182417\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182417\"><\/AnnotationDrawer><div>Fastening of braced wall panel sheathing shall be not less than that prescribed in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182293', hash: '#JD_BCTable2308.6.1' }}\">Tables 2308.6.1<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-181845', hash: '#JD_BCTable2304.10.1' }}\">2304.10.1<\/Link>. Wall sheathing shall not be attached to framing members by adhesives.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5064-html-1",
+      "kind" : "html",
+      "plainText" : "Fastening of braced wall panel sheathing shall be not less than that prescribed in Tables 2308.6.1 and 2304.10.1 . Wall sheathing shall not be attached to framing members by adhesives."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Fastening of braced wall panel sheathing shall be not less than that prescribed in Tables 2308.6.1 and 2304.10.1. Wall sheathing shall not be attached to framing members by adhesives.",
+  "previewText" : "Fastening of braced wall panel sheathing shall be not less than that prescribed in Tables 2308.",
+  "schemaVersion" : 2,
+  "sectionID" : 5064
+}

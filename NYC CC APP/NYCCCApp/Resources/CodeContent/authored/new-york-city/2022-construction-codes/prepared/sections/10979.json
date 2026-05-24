@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194894\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194894\"><\/AnnotationDrawer><div>The flue gas passageway shall be free of obstructions and combustible deposits and shall be cleaned if previously used for venting a solid or liquid fuel-burning appliance or fireplace. The flue liner, chimney inner wall or vent inner wall shall be continuous and shall be free of cracks, gaps, perforations or other damage or deterioration which would allow the escape of combustion products, including gases, moisture and creosote. Where an oil-fired appliance is connected to an existing masonry chimney, such chimney flue shall be repaired or relined in accordance with NFPA 31. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10979-html-1",
+      "kind" : "html",
+      "plainText" : "The flue gas passageway shall be free of obstructions and combustible deposits and shall be cleaned if previously used for venting a solid or liquid fuel-burning appliance or fireplace. The flue liner, chimney inner wall or vent inner wall shall be continuous and shall be free of cracks, gaps, perforations or other damage or deterioration which would allow the escape of combustion products, including gases, moisture and creosote. Where an oil-fired appliance is connected to an existing masonry chimney, such chimney flue shall be repaired or relined in accordance with NFPA 31."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "The flue gas passageway shall be free of obstructions and combustible deposits and shall be cleaned if previously used for venting a solid or liquid fuel-burning appliance or fireplace. The flue liner, chimney inner wall or vent inner wall shall be continuous and shall be free of cracks, gaps, perforations or other damage or deterioration which would allow the escape of combustion products, including gases, moisture and creosote. Where an oil-fired appliance is connected to an existing masonry chimney, such chimney flue shall be repaired or relined in accordance with NFPA 31.",
+  "previewText" : "The flue gas passageway shall be free of obstructions and combustible deposits and shall be cleaned if previously used for venting a solid or liquid fuel-burning appliance or fireplace.",
+  "schemaVersion" : 2,
+  "sectionID" : 10979
+}

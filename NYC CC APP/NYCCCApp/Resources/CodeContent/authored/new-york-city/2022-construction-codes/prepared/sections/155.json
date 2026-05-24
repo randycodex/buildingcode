@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166248\"><\/AnnotationDrawer><div>Buildings and structures containing materials that are health hazards shall be classified as Group H-4. Such materials shall include, but not be limited to, the following: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166249\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166249\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Corrosives <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166250\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Highly toxic materials <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166251\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166251\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Toxic materials <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "155-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings and structures containing materials that are health hazards shall be classified as Group H-4. Such materials shall include, but not be limited to, the following: \n\n Corrosives \n\n Highly toxic materials \n\n Toxic materials"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Buildings and structures containing materials that are health hazards shall be classified as Group H-4. Such materials shall include, but not be limited to, the following:\n\nCorrosives\n\nHighly toxic materials\n\nToxic materials",
+  "previewText" : "Buildings and structures containing materials that are health hazards shall be classified as Group H-4.",
+  "schemaVersion" : 2,
+  "sectionID" : 155
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182741\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182741\"><\/AnnotationDrawer><div>Except as provided in Sections 2406.1.2 through 2406.1.4, all glazing shall pass the impact test requirements of Section 2406.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5123-html-1",
+      "kind" : "html",
+      "plainText" : "Except as provided in Sections 2406.1.2 through 2406.1.4, all glazing shall pass the impact test requirements of Section 2406.2."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "Except as provided in Sections 2406.1.2 through 2406.1.4, all glazing shall pass the impact test requirements of Section 2406.2.",
+  "previewText" : "Except as provided in Sections 2406.",
+  "schemaVersion" : 2,
+  "sectionID" : 5123
+}

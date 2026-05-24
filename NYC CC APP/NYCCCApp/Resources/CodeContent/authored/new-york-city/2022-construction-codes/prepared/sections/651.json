@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167867\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167867\"><\/AnnotationDrawer><div>Storage tank areas storing Class I, II or IIIA liquids shall be provided with mechanical ventilation. The mechanical ventilation system shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> and the New York City Fire Code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "651-html-1",
+      "kind" : "html",
+      "plainText" : "Storage tank areas storing Class I, II or IIIA liquids shall be provided with mechanical ventilation. The mechanical ventilation system shall be in accordance with the New York City Mechanical Code and the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Storage tank areas storing Class I, II or IIIA liquids shall be provided with mechanical ventilation. The mechanical ventilation system shall be in accordance with the New York City Mechanical Code and the New York City Fire Code.",
+  "previewText" : "Storage tank areas storing Class I, II or IIIA liquids shall be provided with mechanical ventilation.",
+  "schemaVersion" : 2,
+  "sectionID" : 651
+}

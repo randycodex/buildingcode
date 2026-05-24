@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176750\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176750\"><\/AnnotationDrawer><div>Metal roof shingle roof coverings shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176723', hash: '#JD_BCTable1507.4.3(1)' }}\">Table 1507.4.3(1)<\/Link>. The materials used for metal-roof shingle roof coverings shall be naturally corrosion resistant or provided with corrosion resistance in accordance with the standards and minimum thicknesses specified in the standards listed in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176723', hash: '#JD_BCTable1507.4.3(2)' }}\">Table 1507.4.3(2)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3294-html-1",
+      "kind" : "html",
+      "plainText" : "Metal roof shingle roof coverings shall comply with Table 1507.4.3(1) . The materials used for metal-roof shingle roof coverings shall be naturally corrosion resistant or provided with corrosion resistance in accordance with the standards and minimum thicknesses specified in the standards listed in Table 1507.4.3(2) ."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Metal roof shingle roof coverings shall comply with Table 1507.4.3(1). The materials used for metal-roof shingle roof coverings shall be naturally corrosion resistant or provided with corrosion resistance in accordance with the standards and minimum thicknesses specified in the standards listed in Table 1507.4.3(2).",
+  "previewText" : "Metal roof shingle roof coverings shall comply with Table 1507.",
+  "schemaVersion" : 2,
+  "sectionID" : 3294
+}

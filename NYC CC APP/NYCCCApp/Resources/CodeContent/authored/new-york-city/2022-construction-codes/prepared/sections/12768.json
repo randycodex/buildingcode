@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163716\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163716\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where access to a storage tank is provided from within a building, the tank access opening shall be gasketed and gas-tight.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12768-html-1",
+      "kind" : "html",
+      "plainText" : "Where access to a storage tank is provided from within a building, the tank access opening shall be gasketed and gas-tight."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Where access to a storage tank is provided from within a building, the tank access opening shall be gasketed and gas-tight.",
+  "previewText" : "Where access to a storage tank is provided from within a building, the tank access opening shall be gasketed and gas-tight.",
+  "schemaVersion" : 2,
+  "sectionID" : 12768
+}

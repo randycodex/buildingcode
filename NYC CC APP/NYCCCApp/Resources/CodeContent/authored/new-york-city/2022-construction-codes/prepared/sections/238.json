@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166620\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166620\"><\/AnnotationDrawer><div>The occupant load of anchor buildings opening into the mall shall not be included in computing the total number of occupants for the covered mall building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "238-html-1",
+      "kind" : "html",
+      "plainText" : "The occupant load of anchor buildings opening into the mall shall not be included in computing the total number of occupants for the covered mall building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The occupant load of anchor buildings opening into the mall shall not be included in computing the total number of occupants for the covered mall building.",
+  "previewText" : "The occupant load of anchor buildings opening into the mall shall not be included in computing the total number of occupants for the covered mall building.",
+  "schemaVersion" : 2,
+  "sectionID" : 238
+}

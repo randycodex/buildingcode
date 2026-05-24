@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184003\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184003\"><\/AnnotationDrawer><div>Inspection and testing of amusement devices shall comply with rules of the department. Refer to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-231478', hash: '#JD_T28C003' }}\">Chapter 3 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> for additional requirements. Installation of amusement devices shall be subject to the requirements for special and progress inspections.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "5552-html-1",
+      "kind" : "html",
+      "plainText" : "Inspection and testing of amusement devices shall comply with rules of the department. Refer to Chapter 3 of Title 28 of the Administrative Code for additional requirements. Installation of amusement devices shall be subject to the requirements for special and progress inspections."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Inspection and testing of amusement devices shall comply with rules of the department. Refer to Chapter 3 of Title 28 of the Administrative Code for additional requirements. Installation of amusement devices shall be subject to the requirements for special and progress inspections.",
+  "previewText" : "Inspection and testing of amusement devices shall comply with rules of the department.",
+  "schemaVersion" : 2,
+  "sectionID" : 5552
+}

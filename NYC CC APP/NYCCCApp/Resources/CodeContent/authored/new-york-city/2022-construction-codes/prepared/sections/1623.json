@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171370\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171370\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be installed throughout all steel-plated or similarly reinforced or secured vault-like occupancies regardless of area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1623-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be installed throughout all steel-plated or similarly reinforced or secured vault-like occupancies regardless of area."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "An automatic sprinkler system shall be installed throughout all steel-plated or similarly reinforced or secured vault-like occupancies regardless of area.",
+  "previewText" : "An automatic sprinkler system shall be installed throughout all steel-plated or similarly reinforced or secured vault-like occupancies regardless of area.",
+  "schemaVersion" : 2,
+  "sectionID" : 1623
+}

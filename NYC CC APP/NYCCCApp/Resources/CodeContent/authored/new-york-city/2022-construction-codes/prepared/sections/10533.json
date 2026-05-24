@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193558\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193558\"><\/AnnotationDrawer><div>Exhaust ventilation systems shall be provided as required by Sections 502.9.5.1 through 502.9.5.5 for the storage, use, dispensing, mixing and handling of flammable and combustible liquids. Unless otherwise specified, this section shall apply to any quantity of flammable and combustible liquids.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193559\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> This section shall not apply to flammable and combustible liquids that are exempt from the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10533-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust ventilation systems shall be provided as required by Sections 502.9.5.1 through 502.9.5.5 for the storage, use, dispensing, mixing and handling of flammable and combustible liquids. Unless otherwise specified, this section shall apply to any quantity of flammable and combustible liquids.\n\n Exception: This section shall not apply to flammable and combustible liquids that are exempt from the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Exhaust ventilation systems shall be provided as required by Sections 502.9.5.1 through 502.9.5.5 for the storage, use, dispensing, mixing and handling of flammable and combustible liquids. Unless otherwise specified, this section shall apply to any quantity of flammable and combustible liquids.\n\nException: This section shall not apply to flammable and combustible liquids that are exempt from the New York City Fire Code.",
+  "previewText" : "Exhaust ventilation systems shall be provided as required by Sections 502.",
+  "schemaVersion" : 2,
+  "sectionID" : 10533
+}

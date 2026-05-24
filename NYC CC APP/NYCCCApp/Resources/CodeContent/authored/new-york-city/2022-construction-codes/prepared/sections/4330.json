@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180141\"><\/AnnotationDrawer><div>Glass fiber-reinforced concrete (GFRC) and the materials used in such concrete shall be in accordance with the PCI MNL 128 standard.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4330-html-1",
+      "kind" : "html",
+      "plainText" : "Glass fiber-reinforced concrete (GFRC) and the materials used in such concrete shall be in accordance with the PCI MNL 128 standard."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Glass fiber-reinforced concrete (GFRC) and the materials used in such concrete shall be in accordance with the PCI MNL 128 standard.",
+  "previewText" : "Glass fiber-reinforced concrete (GFRC) and the materials used in such concrete shall be in accordance with the PCI MNL 128 standard.",
+  "schemaVersion" : 2,
+  "sectionID" : 4330
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193456\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193456\"><\/AnnotationDrawer><div>Type II and III dry cleaning systems shall be provided with a mechanical ventilation system that is designed to exhaust 1 cubic foot of air per minute for each square foot of floor area (1 cfm\/ft\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t) (0.00508 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/(s &#8226; m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t)) in dry cleaning rooms and in drying rooms. The ventilation system shall operate automatically when the dry cleaning equipment is in operation and shall have manual controls at an approved location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10493-html-1",
+      "kind" : "html",
+      "plainText" : "Type II and III dry cleaning systems shall be provided with a mechanical ventilation system that is designed to exhaust 1 cubic foot of air per minute for each square foot of floor area (1 cfm\/ft\n 2 \n ) (0.00508 m\n 3 \n \/(s &#8226; m\n 2 \n )) in dry cleaning rooms and in drying rooms. The ventilation system shall operate automatically when the dry cleaning equipment is in operation and shall have manual controls at an approved location."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Type II and III dry cleaning systems shall be provided with a mechanical ventilation system that is designed to exhaust 1 cubic foot of air per minute for each square foot of floor area (1 cfm\/ft 2 ) (0.00508 m 3 \/(s • m 2 )) in dry cleaning rooms and in drying rooms. The ventilation system shall operate automatically when the dry cleaning equipment is in operation and shall have manual controls at an approved location.",
+  "previewText" : "Type II and III dry cleaning systems shall be provided with a mechanical ventilation system that is designed to exhaust 1 cubic foot of air per minute for each square foot of floor area (1 cfm\/ft 2 ) (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 10493
+}

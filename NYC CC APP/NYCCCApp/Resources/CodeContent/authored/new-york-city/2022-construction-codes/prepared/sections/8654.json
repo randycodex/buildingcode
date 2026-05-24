@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199166\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199166\"><\/AnnotationDrawer><div>Ducts shall not be attached to wall furnaces. Casing extension boots shall not be installed unless listed as part of the appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8654-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts shall not be attached to wall furnaces. Casing extension boots shall not be installed unless listed as part of the appliance."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Ducts shall not be attached to wall furnaces. Casing extension boots shall not be installed unless listed as part of the appliance.",
+  "previewText" : "Ducts shall not be attached to wall furnaces.",
+  "schemaVersion" : 2,
+  "sectionID" : 8654
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186338\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186338\"><\/AnnotationDrawer><div>Temporary protective structures covered by this section include (i) sidewalk sheds, (ii) construction fences, and (iii) supported scaffolds when such temporary protective structures have been installed for at least 90 days. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186339\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186339\"><\/AnnotationDrawer><div>(L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6374-html-1",
+      "kind" : "html",
+      "plainText" : "Temporary protective structures covered by this section include (i) sidewalk sheds, (ii) construction fences, and (iii) supported scaffolds when such temporary protective structures have been installed for at least 90 days. \n\n (L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Temporary protective structures covered by this section include (i) sidewalk sheds, (ii) construction fences, and (iii) supported scaffolds when such temporary protective structures have been installed for at least 90 days.\n\n(L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023)",
+  "previewText" : "Temporary protective structures covered by this section include (i) sidewalk sheds, (ii) construction fences, and (iii) supported scaffolds when such temporary protective structures have been installed for at least 90 days.",
+  "schemaVersion" : 2,
+  "sectionID" : 6374
+}

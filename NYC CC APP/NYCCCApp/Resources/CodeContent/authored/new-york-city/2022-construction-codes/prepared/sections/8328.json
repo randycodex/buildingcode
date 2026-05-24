@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198215\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198215\"><\/AnnotationDrawer><div>Shutoff valves shall be located in places so as to provide access for operation and shall be installed so as to be protected from damage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8328-html-1",
+      "kind" : "html",
+      "plainText" : "Shutoff valves shall be located in places so as to provide access for operation and shall be installed so as to be protected from damage."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Shutoff valves shall be located in places so as to provide access for operation and shall be installed so as to be protected from damage.",
+  "previewText" : "Shutoff valves shall be located in places so as to provide access for operation and shall be installed so as to be protected from damage.",
+  "schemaVersion" : 2,
+  "sectionID" : 8328
+}

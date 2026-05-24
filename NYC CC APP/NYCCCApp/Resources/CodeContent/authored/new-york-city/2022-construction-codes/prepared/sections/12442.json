@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162819\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162819\"><\/AnnotationDrawer><div>Bedpan washers and clinical sinks shall connect to the drainage and vent system in accordance with the requirements for a water closet. Bedpan washers shall also connect to a local vent.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12442-html-1",
+      "kind" : "html",
+      "plainText" : "Bedpan washers and clinical sinks shall connect to the drainage and vent system in accordance with the requirements for a water closet. Bedpan washers shall also connect to a local vent."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Bedpan washers and clinical sinks shall connect to the drainage and vent system in accordance with the requirements for a water closet. Bedpan washers shall also connect to a local vent.",
+  "previewText" : "Bedpan washers and clinical sinks shall connect to the drainage and vent system in accordance with the requirements for a water closet.",
+  "schemaVersion" : 2,
+  "sectionID" : 12442
+}

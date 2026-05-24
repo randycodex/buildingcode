@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193638\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193638\"><\/AnnotationDrawer><div>Projectors without an exhaust connection shall have contaminants exhausted through a mechanical exhaust system. The exhaust rate for electric arc projectors shall be not less than 200 cubic feet per minute (cfm) (0.09 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s) per lamp. The exhaust rate for xenon projectors shall be not less than 300 cfm (0.14 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s) per lamp. Xenon projector exhaust shall be at a rate such that the exterior temperature of the lamp housing does not exceed 130&#176;F (54.4&#176;C). The lamp and projection room exhaust systems, whether combined or independent, shall not be interconnected with any other exhaust or return system within the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10564-html-1",
+      "kind" : "html",
+      "plainText" : "Projectors without an exhaust connection shall have contaminants exhausted through a mechanical exhaust system. The exhaust rate for electric arc projectors shall be not less than 200 cubic feet per minute (cfm) (0.09 m\n\n 3 \n\n \/s) per lamp. The exhaust rate for xenon projectors shall be not less than 300 cfm (0.14 m\n\n 3 \n\n \/s) per lamp. Xenon projector exhaust shall be at a rate such that the exterior temperature of the lamp housing does not exceed 130°F (54.4°C). The lamp and projection room exhaust systems, whether combined or independent, shall not be interconnected with any other exhaust or return system within the building."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Projectors without an exhaust connection shall have contaminants exhausted through a mechanical exhaust system. The exhaust rate for electric arc projectors shall be not less than 200 cubic feet per minute (cfm) (0.09 m 3 \/s) per lamp. The exhaust rate for xenon projectors shall be not less than 300 cfm (0.14 m 3 \/s) per lamp. Xenon projector exhaust shall be at a rate such that the exterior temperature of the lamp housing does not exceed 130°F (54.4°C). The lamp and projection room exhaust systems, whether combined or independent, shall not be interconnected with any other exhaust or return system within the building.",
+  "previewText" : "Projectors without an exhaust connection shall have contaminants exhausted through a mechanical exhaust system.",
+  "schemaVersion" : 2,
+  "sectionID" : 10564
+}

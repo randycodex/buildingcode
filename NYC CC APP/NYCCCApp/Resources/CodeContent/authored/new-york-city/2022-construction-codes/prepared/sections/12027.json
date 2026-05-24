@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161741\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161741\"><\/AnnotationDrawer><div>Steam condensate returns from sterilizers shall be a gravity return system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12027-html-1",
+      "kind" : "html",
+      "plainText" : "Steam condensate returns from sterilizers shall be a gravity return system."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Steam condensate returns from sterilizers shall be a gravity return system.",
+  "previewText" : "Steam condensate returns from sterilizers shall be a gravity return system.",
+  "schemaVersion" : 2,
+  "sectionID" : 12027
+}

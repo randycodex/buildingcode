@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194425\"><\/AnnotationDrawer><div>All air filters shall be kept free of excess dust and combustible material. Unit filters shall be renewed or cleaned when the resistance to airflow has increased to two times the original resistance or when the resistance has reached a value of recommended replacement by the manufacturer. A permanently installed draft gauge or differential pressure transmitter shall be provided for all systems equal to or greater than 4000 cfm (1.89 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194426\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194426\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194426\"><\/AnnotationDrawer><h6><a name=\"JD_MC606\" id=\"JD_MC606\" title=\"MC 606\"><\/a>Section MC 606: Smoke Detection Systems Control<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10827-html-1",
+      "kind" : "html",
+      "plainText" : "All air filters shall be kept free of excess dust and combustible material. Unit filters shall be renewed or cleaned when the resistance to airflow has increased to two times the original resistance or when the resistance has reached a value of recommended replacement by the manufacturer. A permanently installed draft gauge or differential pressure transmitter shall be provided for all systems equal to or greater than 4000 cfm (1.89 m\n 3 \n \/s).\n\n Section MC 606: Smoke Detection Systems Control"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "All air filters shall be kept free of excess dust and combustible material. Unit filters shall be renewed or cleaned when the resistance to airflow has increased to two times the original resistance or when the resistance has reached a value of recommended replacement by the manufacturer. A permanently installed draft gauge or differential pressure transmitter shall be provided for all systems equal to or greater than 4000 cfm (1.89 m 3 \/s).\n\nSection MC 606: Smoke Detection Systems Control",
+  "previewText" : "All air filters shall be kept free of excess dust and combustible material.",
+  "schemaVersion" : 2,
+  "sectionID" : 10827
+}

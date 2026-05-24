@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196036\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196036\"><\/AnnotationDrawer><div>Solder joints in a metal pipe shall not occur within 18 inches (457.2 mm) of a transition from such metal pipe to PEX-AL-PEX pipe.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196037\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196037\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196037\"><\/AnnotationDrawer><h6><a name=\"JD_MC1204\" id=\"JD_MC1204\" title=\"MC 1204\"><\/a>Section MC 1204: Pipe Insulation<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11394-html-1",
+      "kind" : "html",
+      "plainText" : "Solder joints in a metal pipe shall not occur within 18 inches (457.2 mm) of a transition from such metal pipe to PEX-AL-PEX pipe.\n\n Section MC 1204: Pipe Insulation"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Solder joints in a metal pipe shall not occur within 18 inches (457.2 mm) of a transition from such metal pipe to PEX-AL-PEX pipe.\n\nSection MC 1204: Pipe Insulation",
+  "previewText" : "Solder joints in a metal pipe shall not occur within 18 inches (457.",
+  "schemaVersion" : 2,
+  "sectionID" : 11394
+}

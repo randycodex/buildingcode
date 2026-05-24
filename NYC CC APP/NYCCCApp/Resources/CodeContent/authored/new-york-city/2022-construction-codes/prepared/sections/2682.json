@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174953\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174953\"><\/AnnotationDrawer><div>Passenger loading zones shall be designed and constructed in accordance with ICC A117.1 including Section 503 (Passenger Loading Zones).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2682-html-1",
+      "kind" : "html",
+      "plainText" : "Passenger loading zones shall be designed and constructed in accordance with ICC A117.1 including Section 503 (Passenger Loading Zones)."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Passenger loading zones shall be designed and constructed in accordance with ICC A117.1 including Section 503 (Passenger Loading Zones).",
+  "previewText" : "Passenger loading zones shall be designed and constructed in accordance with ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2682
+}

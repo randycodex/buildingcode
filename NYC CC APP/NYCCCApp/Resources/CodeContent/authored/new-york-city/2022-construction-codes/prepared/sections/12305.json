@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162446\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162446\"><\/AnnotationDrawer><div>The determination as to whether a public sanitary or combined sewer is available shall be made in accordance with the applicable standards of the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12305-html-1",
+      "kind" : "html",
+      "plainText" : "The determination as to whether a public sanitary or combined sewer is available shall be made in accordance with the applicable standards of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The determination as to whether a public sanitary or combined sewer is available shall be made in accordance with the applicable standards of the Department of Environmental Protection.",
+  "previewText" : "The determination as to whether a public sanitary or combined sewer is available shall be made in accordance with the applicable standards of the Department of Environmental Protection.",
+  "schemaVersion" : 2,
+  "sectionID" : 12305
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179408\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179408\"><\/AnnotationDrawer><div>The connection between deep foundations that are battered and grade beams or pile caps shall be designed to resist the nominal strength of the deep foundation acting as a short column. Battered deep foundations and their connections shall be capable of resisting forces and moments from the load combinations of Section 12.4 of ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-179409\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-179409\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-179409\"><\/AnnotationDrawer><h6><a name=\"JD_BC1811\" id=\"JD_BC1811\" title=\"BC 1811\"><\/a>Section BC 1811: Driven Deep Foundations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4084-html-1",
+      "kind" : "html",
+      "plainText" : "The connection between deep foundations that are battered and grade beams or pile caps shall be designed to resist the nominal strength of the deep foundation acting as a short column. Battered deep foundations and their connections shall be capable of resisting forces and moments from the load combinations of Section 12.4 of ASCE 7.\n\n Section BC 1811: Driven Deep Foundations"
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The connection between deep foundations that are battered and grade beams or pile caps shall be designed to resist the nominal strength of the deep foundation acting as a short column. Battered deep foundations and their connections shall be capable of resisting forces and moments from the load combinations of Section 12.4 of ASCE 7.",
+  "previewText" : "The connection between deep foundations that are battered and grade beams or pile caps shall be designed to resist the nominal strength of the deep foundation acting as a short column.",
+  "schemaVersion" : 2,
+  "sectionID" : 4084
+}

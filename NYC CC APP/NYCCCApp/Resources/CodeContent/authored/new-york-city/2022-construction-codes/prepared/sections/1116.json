@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169421\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169421\"><\/AnnotationDrawer><div>Joints shall be filled with an approved material to limit the free passage of smoke.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1116-html-1",
+      "kind" : "html",
+      "plainText" : "Joints shall be filled with an approved material to limit the free passage of smoke."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Joints shall be filled with an approved material to limit the free passage of smoke.",
+  "previewText" : "Joints shall be filled with an approved material to limit the free passage of smoke.",
+  "schemaVersion" : 2,
+  "sectionID" : 1116
+}

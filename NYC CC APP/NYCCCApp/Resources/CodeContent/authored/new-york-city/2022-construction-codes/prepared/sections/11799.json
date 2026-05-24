@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160846\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160846\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Plumbing work and systems shall be tested as required in Section 312 and in accordance with Sections 108.4.1 through 108.4.3. Tests shall be made by the permit holder and witnessed by the department.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11799-html-1",
+      "kind" : "html",
+      "plainText" : "Plumbing work and systems shall be tested as required in Section 312 and in accordance with Sections 108.4.1 through 108.4.3. Tests shall be made by the permit holder and witnessed by the department."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Plumbing work and systems shall be tested as required in Section 312 and in accordance with Sections 108.4.1 through 108.4.3. Tests shall be made by the permit holder and witnessed by the department.",
+  "previewText" : "Plumbing work and systems shall be tested as required in Section 312 and in accordance with Sections 108.",
+  "schemaVersion" : 2,
+  "sectionID" : 11799
+}

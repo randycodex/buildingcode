@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184409\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184409\"><\/AnnotationDrawer><div>A small wind turbine shall be designed in accordance with standards adopted by rules of the commissioner. Such standards shall include but need not be limited to standards relating to the design of small wind turbines that are developed by the American Wind Energy Association, the New York State Energy Research and Development Authority, the California Energy Commission, the Small Wind Certification Council, the British Wind Energy Association, the International Electrotechnical Commission, the National Renewable Energy Laboratory, or the Underwriters Laboratory.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5704-html-1",
+      "kind" : "html",
+      "plainText" : "A small wind turbine shall be designed in accordance with standards adopted by rules of the commissioner. Such standards shall include but need not be limited to standards relating to the design of small wind turbines that are developed by the American Wind Energy Association, the New York State Energy Research and Development Authority, the California Energy Commission, the Small Wind Certification Council, the British Wind Energy Association, the International Electrotechnical Commission, the National Renewable Energy Laboratory, or the Underwriters Laboratory."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "A small wind turbine shall be designed in accordance with standards adopted by rules of the commissioner. Such standards shall include but need not be limited to standards relating to the design of small wind turbines that are developed by the American Wind Energy Association, the New York State Energy Research and Development Authority, the California Energy Commission, the Small Wind Certification Council, the British Wind Energy Association, the International Electrotechnical Commission, the National Renewable Energy Laboratory, or the Underwriters Laboratory.",
+  "previewText" : "A small wind turbine shall be designed in accordance with standards adopted by rules of the commissioner.",
+  "schemaVersion" : 2,
+  "sectionID" : 5704
+}

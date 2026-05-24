@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198831\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198831\"><\/AnnotationDrawer><div>The maximum horizontal length of a single-wall connector shall be 75 percent of the height of the chimney or vent except for engineered systems. The maximum horizontal length of a Type B double-wall connector shall be 100 percent of the height of the chimney or vent except for engineered systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8555-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum horizontal length of a single-wall connector shall be 75 percent of the height of the chimney or vent except for engineered systems. The maximum horizontal length of a Type B double-wall connector shall be 100 percent of the height of the chimney or vent except for engineered systems."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "The maximum horizontal length of a single-wall connector shall be 75 percent of the height of the chimney or vent except for engineered systems. The maximum horizontal length of a Type B double-wall connector shall be 100 percent of the height of the chimney or vent except for engineered systems.",
+  "previewText" : "The maximum horizontal length of a single-wall connector shall be 75 percent of the height of the chimney or vent except for engineered systems.",
+  "schemaVersion" : 2,
+  "sectionID" : 8555
+}

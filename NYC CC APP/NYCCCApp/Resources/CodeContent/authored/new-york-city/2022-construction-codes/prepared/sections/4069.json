@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179357\"><\/AnnotationDrawer><div>Lateral support for deep foundation elements shall be in accordance with the requirements of Sections 1810.7.1 through 1810.7.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4069-html-1",
+      "kind" : "html",
+      "plainText" : "Lateral support for deep foundation elements shall be in accordance with the requirements of Sections 1810.7.1 through 1810.7.4."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Lateral support for deep foundation elements shall be in accordance with the requirements of Sections 1810.7.1 through 1810.7.4.",
+  "previewText" : "Lateral support for deep foundation elements shall be in accordance with the requirements of Sections 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4069
+}

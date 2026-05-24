@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166856\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166856\"><\/AnnotationDrawer><div>Compartmentation shall be in accordance with Sections 405.4.1 through 405.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "324-html-1",
+      "kind" : "html",
+      "plainText" : "Compartmentation shall be in accordance with Sections 405.4.1 through 405.4.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Compartmentation shall be in accordance with Sections 405.4.1 through 405.4.3.",
+  "previewText" : "Compartmentation shall be in accordance with Sections 405.",
+  "schemaVersion" : 2,
+  "sectionID" : 324
+}

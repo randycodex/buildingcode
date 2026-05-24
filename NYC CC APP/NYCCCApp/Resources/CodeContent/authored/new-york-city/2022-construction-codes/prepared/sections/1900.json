@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172239\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172239\"><\/AnnotationDrawer><div>In Group I-2 and Group B ambulatory care facilities, where doors are installed across a corridor, the doors shall be automatic closing by smoke detection in accordance with Section 716.5.9.3 and shall have a vision panel with fire protection-rated glazing materials in fire protection-rated frames, the area of which shall not exceed that tested.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1900-html-1",
+      "kind" : "html",
+      "plainText" : "In Group I-2 and Group B ambulatory care facilities, where doors are installed across a corridor, the doors shall be automatic closing by smoke detection in accordance with Section 716.5.9.3 and shall have a vision panel with fire protection-rated glazing materials in fire protection-rated frames, the area of which shall not exceed that tested."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "In Group I-2 and Group B ambulatory care facilities, where doors are installed across a corridor, the doors shall be automatic closing by smoke detection in accordance with Section 716.5.9.3 and shall have a vision panel with fire protection-rated glazing materials in fire protection-rated frames, the area of which shall not exceed that tested.",
+  "previewText" : "In Group I-2 and Group B ambulatory care facilities, where doors are installed across a corridor, the doors shall be automatic closing by smoke detection in accordance with Section 716.",
+  "schemaVersion" : 2,
+  "sectionID" : 1900
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178725\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178725\"><\/AnnotationDrawer><div>When a new heating system appliance is installed, the special inspector shall verify the condition of the existing chimney lining and breaching. Deficiencies shall be reported as required by Section 1704.1.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3865-html-1",
+      "kind" : "html",
+      "plainText" : "When a new heating system appliance is installed, the special inspector shall verify the condition of the existing chimney lining and breaching. Deficiencies shall be reported as required by Section 1704.1.1.2."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "When a new heating system appliance is installed, the special inspector shall verify the condition of the existing chimney lining and breaching. Deficiencies shall be reported as required by Section 1704.1.1.2.",
+  "previewText" : "When a new heating system appliance is installed, the special inspector shall verify the condition of the existing chimney lining and breaching.",
+  "schemaVersion" : 2,
+  "sectionID" : 3865
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174356\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174356\"><\/AnnotationDrawer><div>Fire towers shall terminate at grade level and shall exit directly to the street independently of corridors serving other stairways, except when the fire tower terminates in the ground floor corridor outside of the inner vestibule and within 10 feet (3048 mm) of the building line.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-174357\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-174357\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-174357\"><\/AnnotationDrawer><h6><a name=\"JD_BC1028\" id=\"JD_BC1028\" title=\"BC 1028\"><\/a>Section BC 1028: Exit Discharge<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2510-html-1",
+      "kind" : "html",
+      "plainText" : "Fire towers shall terminate at grade level and shall exit directly to the street independently of corridors serving other stairways, except when the fire tower terminates in the ground floor corridor outside of the inner vestibule and within 10 feet (3048 mm) of the building line.\n\n Section BC 1028: Exit Discharge"
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Fire towers shall terminate at grade level and shall exit directly to the street independently of corridors serving other stairways, except when the fire tower terminates in the ground floor corridor outside of the inner vestibule and within 10 feet (3048 mm) of the building line.",
+  "previewText" : "Fire towers shall terminate at grade level and shall exit directly to the street independently of corridors serving other stairways, except when the fire tower terminates in the ground floor corridor outside of the inner vestibule and within 10 feet (3048 mm) of the building line.",
+  "schemaVersion" : 2,
+  "sectionID" : 2510
+}

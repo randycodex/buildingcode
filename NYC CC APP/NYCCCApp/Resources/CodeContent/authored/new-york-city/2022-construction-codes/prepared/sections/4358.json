@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180221\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180221\"><\/AnnotationDrawer><div>Concrete proportioning determined on the basis of field experience or trial mixtures shall be done in accordance with ACI 318, Sections 26.4.3 and 26.4.4, and Sections 1905.3.1 through 1905.3.5 of this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4358-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete proportioning determined on the basis of field experience or trial mixtures shall be done in accordance with ACI 318, Sections 26.4.3 and 26.4.4, and Sections 1905.3.1 through 1905.3.5 of this chapter."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Concrete proportioning determined on the basis of field experience or trial mixtures shall be done in accordance with ACI 318, Sections 26.4.3 and 26.4.4, and Sections 1905.3.1 through 1905.3.5 of this chapter.",
+  "previewText" : "Concrete proportioning determined on the basis of field experience or trial mixtures shall be done in accordance with ACI 318, Sections 26.",
+  "schemaVersion" : 2,
+  "sectionID" : 4358
+}

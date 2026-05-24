@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169333\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169333\"><\/AnnotationDrawer><div>The voids created at the intersection of a fire barrier and a nonfire-resistance-rated roof assembly or a nonfire-resistance-rated exterior wall assembly shall be filled. An approved material or system, or a material consistent with the construction requirements of the fire barrier, shall be used to fill the void, and shall be securely installed in or on the intersection for its entire length so as not to dislodge, loosen or otherwise impair its ability to accommodate expected building movements and to retard the passage of fire and hot gases.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1081-html-1",
+      "kind" : "html",
+      "plainText" : "The voids created at the intersection of a fire barrier and a nonfire-resistance-rated roof assembly or a nonfire-resistance-rated exterior wall assembly shall be filled. An approved material or system, or a material consistent with the construction requirements of the fire barrier, shall be used to fill the void, and shall be securely installed in or on the intersection for its entire length so as not to dislodge, loosen or otherwise impair its ability to accommodate expected building movements and to retard the passage of fire and hot gases."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The voids created at the intersection of a fire barrier and a nonfire-resistance-rated roof assembly or a nonfire-resistance-rated exterior wall assembly shall be filled. An approved material or system, or a material consistent with the construction requirements of the fire barrier, shall be used to fill the void, and shall be securely installed in or on the intersection for its entire length so as not to dislodge, loosen or otherwise impair its ability to accommodate expected building movements and to retard the passage of fire and hot gases.",
+  "previewText" : "The voids created at the intersection of a fire barrier and a nonfire-resistance-rated roof assembly or a nonfire-resistance-rated exterior wall assembly shall be filled.",
+  "schemaVersion" : 2,
+  "sectionID" : 1081
+}

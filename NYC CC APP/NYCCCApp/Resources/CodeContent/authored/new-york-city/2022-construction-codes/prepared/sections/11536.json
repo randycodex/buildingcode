@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196352\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196352\"><\/AnnotationDrawer><div>Joints between nonmetallic pipe or fittings shall be installed in accordance with the manufacturer's instructions for the labeled pipe and fittings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11536-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between nonmetallic pipe or fittings shall be installed in accordance with the manufacturer's instructions for the labeled pipe and fittings."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Joints between nonmetallic pipe or fittings shall be installed in accordance with the manufacturer's instructions for the labeled pipe and fittings.",
+  "previewText" : "Joints between nonmetallic pipe or fittings shall be installed in accordance with the manufacturer's instructions for the labeled pipe and fittings.",
+  "schemaVersion" : 2,
+  "sectionID" : 11536
+}

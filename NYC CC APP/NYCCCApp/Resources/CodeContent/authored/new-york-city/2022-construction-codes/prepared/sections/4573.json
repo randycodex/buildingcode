@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180822\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180822\"><\/AnnotationDrawer><div>Mortar for use in masonry construction shall conform to Articles 2.1 and 2.6A of TMS 602.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4573-html-1",
+      "kind" : "html",
+      "plainText" : "Mortar for use in masonry construction shall conform to Articles 2.1 and 2.6A of TMS 602."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Mortar for use in masonry construction shall conform to Articles 2.1 and 2.6A of TMS 602.",
+  "previewText" : "Mortar for use in masonry construction shall conform to Articles 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 4573
+}

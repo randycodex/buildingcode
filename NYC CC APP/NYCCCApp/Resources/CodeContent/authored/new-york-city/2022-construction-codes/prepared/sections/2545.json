@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174511\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174511\"><\/AnnotationDrawer><div>The aisle shall provide sufficient capacity for the number of persons accommodated by the catchment area served by the aisle. The catchment area served by an aisle is that portion of the total space served by that section of the aisle. In establishing catchment areas, the assumption shall be made that there is a balanced use of all means of egress, with the number of persons in proportion to egress capacity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2545-html-1",
+      "kind" : "html",
+      "plainText" : "The aisle shall provide sufficient capacity for the number of persons accommodated by the catchment area served by the aisle. The catchment area served by an aisle is that portion of the total space served by that section of the aisle. In establishing catchment areas, the assumption shall be made that there is a balanced use of all means of egress, with the number of persons in proportion to egress capacity."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The aisle shall provide sufficient capacity for the number of persons accommodated by the catchment area served by the aisle. The catchment area served by an aisle is that portion of the total space served by that section of the aisle. In establishing catchment areas, the assumption shall be made that there is a balanced use of all means of egress, with the number of persons in proportion to egress capacity.",
+  "previewText" : "The aisle shall provide sufficient capacity for the number of persons accommodated by the catchment area served by the aisle.",
+  "schemaVersion" : 2,
+  "sectionID" : 2545
+}

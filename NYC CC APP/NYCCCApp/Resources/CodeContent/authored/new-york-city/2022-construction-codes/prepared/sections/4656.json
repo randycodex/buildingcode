@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181021\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181021\"><\/AnnotationDrawer><div>The inside height of the smoke chamber from the fireplace throat to the beginning of the flue shall be not greater than the inside width of the fireplace opening. The inside surface of the smoke chamber shall not be inclined more than 45 degrees (0.76 rad) from vertical when prefabricated smoke chamber linings are used or when the smoke chamber walls are rolled or sloped rather than corbeled. When the inside surface of the smoke chamber is formed by corbeled masonry, the walls shall not be corbeled more than 30 degrees (0.52 rad) from vertical.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4656-html-1",
+      "kind" : "html",
+      "plainText" : "The inside height of the smoke chamber from the fireplace throat to the beginning of the flue shall be not greater than the inside width of the fireplace opening. The inside surface of the smoke chamber shall not be inclined more than 45 degrees (0.76 rad) from vertical when prefabricated smoke chamber linings are used or when the smoke chamber walls are rolled or sloped rather than corbeled. When the inside surface of the smoke chamber is formed by corbeled masonry, the walls shall not be corbeled more than 30 degrees (0.52 rad) from vertical."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "The inside height of the smoke chamber from the fireplace throat to the beginning of the flue shall be not greater than the inside width of the fireplace opening. The inside surface of the smoke chamber shall not be inclined more than 45 degrees (0.76 rad) from vertical when prefabricated smoke chamber linings are used or when the smoke chamber walls are rolled or sloped rather than corbeled. When the inside surface of the smoke chamber is formed by corbeled masonry, the walls shall not be corbeled more than 30 degrees (0.52 rad) from vertical.",
+  "previewText" : "The inside height of the smoke chamber from the fireplace throat to the beginning of the flue shall be not greater than the inside width of the fireplace opening.",
+  "schemaVersion" : 2,
+  "sectionID" : 4656
+}

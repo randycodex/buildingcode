@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197813\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197813\"><\/AnnotationDrawer><div>The pipe size of each section of gas piping shall be determined using the longest length of piping from the point of delivery to the most remote outlet and the load of the section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8177-html-1",
+      "kind" : "html",
+      "plainText" : "The pipe size of each section of gas piping shall be determined using the longest length of piping from the point of delivery to the most remote outlet and the load of the section."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The pipe size of each section of gas piping shall be determined using the longest length of piping from the point of delivery to the most remote outlet and the load of the section.",
+  "previewText" : "The pipe size of each section of gas piping shall be determined using the longest length of piping from the point of delivery to the most remote outlet and the load of the section.",
+  "schemaVersion" : 2,
+  "sectionID" : 8177
+}

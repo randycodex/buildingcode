@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188475\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188475\"><\/AnnotationDrawer><div>For any floodway encroachment, including fill, new construction, substantial improvements and other development or land-disturbing activity, the applicant shall submit a certification, along with supporting technical data, demonstrating that such development will not cause any increase of the level of the base flood in accordance with the requirements of Section G103.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7010-html-1",
+      "kind" : "html",
+      "plainText" : "For any floodway encroachment, including fill, new construction, substantial improvements and other development or land-disturbing activity, the applicant shall submit a certification, along with supporting technical data, demonstrating that such development will not cause any increase of the level of the base flood in accordance with the requirements of Section G103.5."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "For any floodway encroachment, including fill, new construction, substantial improvements and other development or land-disturbing activity, the applicant shall submit a certification, along with supporting technical data, demonstrating that such development will not cause any increase of the level of the base flood in accordance with the requirements of Section G103.5.",
+  "previewText" : "For any floodway encroachment, including fill, new construction, substantial improvements and other development or land-disturbing activity, the applicant shall submit a certification, along with supporting technical data, demonstrating that such development will not cause any increase of the level of the base flood in accordance with the requirements of Section G103.",
+  "schemaVersion" : 2,
+  "sectionID" : 7010
+}

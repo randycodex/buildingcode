@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177698\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177698\"><\/AnnotationDrawer><div>Roof coverings shall comply with Section 1609.5.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177699\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177699\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177700\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177700\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Rigid tile roof coverings that are air permeable and installed over a roof deck complying with Section 1609.5.1 are permitted to be designed in accordance with Section 1609.5.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177701\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177701\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Asphalt shingles installed over a roof deck complying with Section 1609.5.1 shall comply with the wind-resistance requirements of Section 1504.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3567-html-1",
+      "kind" : "html",
+      "plainText" : "Roof coverings shall comply with Section 1609.5.1.\n\n Exceptions: \n\n 1. Rigid tile roof coverings that are air permeable and installed over a roof deck complying with Section 1609.5.1 are permitted to be designed in accordance with Section 1609.5.3.\n\n 2. Asphalt shingles installed over a roof deck complying with Section 1609.5.1 shall comply with the wind-resistance requirements of Section 1504.1.1."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Roof coverings shall comply with Section 1609.5.1.\n\nExceptions:\n\n1. Rigid tile roof coverings that are air permeable and installed over a roof deck complying with Section 1609.5.1 are permitted to be designed in accordance with Section 1609.5.3.\n\n2. Asphalt shingles installed over a roof deck complying with Section 1609.5.1 shall comply with the wind-resistance requirements of Section 1504.1.1.",
+  "previewText" : "Roof coverings shall comply with Section 1609.",
+  "schemaVersion" : 2,
+  "sectionID" : 3567
+}

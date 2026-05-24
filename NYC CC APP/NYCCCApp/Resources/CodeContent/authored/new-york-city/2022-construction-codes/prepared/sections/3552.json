@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177611\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177611\"><\/AnnotationDrawer><div>Lateral-force-resisting systems shall meet seismic detailing requirements and limitations prescribed in this code, even when wind code prescribed load effects are greater than seismic load effects.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3552-html-1",
+      "kind" : "html",
+      "plainText" : "Lateral-force-resisting systems shall meet seismic detailing requirements and limitations prescribed in this code, even when wind code prescribed load effects are greater than seismic load effects."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Lateral-force-resisting systems shall meet seismic detailing requirements and limitations prescribed in this code, even when wind code prescribed load effects are greater than seismic load effects.",
+  "previewText" : "Lateral-force-resisting systems shall meet seismic detailing requirements and limitations prescribed in this code, even when wind code prescribed load effects are greater than seismic load effects.",
+  "schemaVersion" : 2,
+  "sectionID" : 3552
+}

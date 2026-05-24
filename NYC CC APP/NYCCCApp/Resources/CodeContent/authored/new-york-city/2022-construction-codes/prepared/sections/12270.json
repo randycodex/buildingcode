@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162355\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162355\"><\/AnnotationDrawer><div>Where the portable cleaning equipment connects to the water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.13.1, 608.13.2, 608.13.3, 608.13.7 or 608.13.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12270-html-1",
+      "kind" : "html",
+      "plainText" : "Where the portable cleaning equipment connects to the water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.13.1, 608.13.2, 608.13.3, 608.13.7 or 608.13.8."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Where the portable cleaning equipment connects to the water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.13.1, 608.13.2, 608.13.3, 608.13.7 or 608.13.8.",
+  "previewText" : "Where the portable cleaning equipment connects to the water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.",
+  "schemaVersion" : 2,
+  "sectionID" : 12270
+}

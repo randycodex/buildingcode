@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197839\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197839\"><\/AnnotationDrawer><div>Used pipe, fittings, valves and other materials shall not be re-used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8184-html-1",
+      "kind" : "html",
+      "plainText" : "Used pipe, fittings, valves and other materials shall not be re-used."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Used pipe, fittings, valves and other materials shall not be re-used.",
+  "previewText" : "Used pipe, fittings, valves and other materials shall not be re-used.",
+  "schemaVersion" : 2,
+  "sectionID" : 8184
+}

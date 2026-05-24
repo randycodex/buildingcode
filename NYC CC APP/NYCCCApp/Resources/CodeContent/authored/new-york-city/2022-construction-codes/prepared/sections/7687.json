@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "K2",
+  "officialText" : "(b) The conveyor housing shall be equipped with doors or an equivalent means at each manual landing and unloading station, arranged so that they can be opened only when the carrier is present and stopped at that level and such that the carrier cannot be actuated until they are closed. This requirement is typically satisfied by use of a mechanical locking device, which is actuated by the motion of the carrier, and an electrical switch indicating that the door is closed and locked.\n\n(1) The unlocking mechanism must be mounted on the carrier.\n\n(2) This requirement shall be satisfied by the use of an interlock as required by ASME A17.1, Section 2.12.2.\n\n(c) Vertical reciprocating conveyors designed to automatically receive and discharge material shall have interlocked doors as in (b) or, as an alternative, be guarded by a suitable enclosure extending from the path of the moving carrier.\n\n(d) Where the application requires that personnel walk onto the carrier to load or unload material, the carriers shall be provided with a conveyor enclosure securely fastened to the conveyor platform. The enclosure walls shall be of solid, grille or perforated construction; and shall be of such strength and support that when subjected to a leaning or falling rated load on the conveyor, the enclosure walls will not deflect or deform in a way that reduces running clearances to less than 13 mm (0.5 in.). Enclosure entrance(s) shall be provided with solid doors or gates; and shall guard the full width opening with a minimum height of 2030 mm (80 in.). Grille or perforated portions of conveyor enclosures and entrance gates shall reject a ball 38 mm (1.5 in.) in diameter.\n\nAdd new Section 6.21.3 to read as follows:",
+  "previewText" : "(b) The conveyor housing shall be equipped with doors or an equivalent means at each manual landing and unloading station, arranged so that they can be opened only when the carrier is present and stopped at that level and such that the carrier cannot be actuated until they are closed.",
+  "schemaVersion" : 2,
+  "sectionID" : 7687
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196055\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196055\"><\/AnnotationDrawer><div>Shutoff valves shall be installed on connections to mechanical equipment and appliances. This requirement does not apply to components of a hydronic system such as pumps, air separators, metering devices and similar equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11402-html-1",
+      "kind" : "html",
+      "plainText" : "Shutoff valves shall be installed on connections to mechanical equipment and appliances. This requirement does not apply to components of a hydronic system such as pumps, air separators, metering devices and similar equipment."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Shutoff valves shall be installed on connections to mechanical equipment and appliances. This requirement does not apply to components of a hydronic system such as pumps, air separators, metering devices and similar equipment.",
+  "previewText" : "Shutoff valves shall be installed on connections to mechanical equipment and appliances.",
+  "schemaVersion" : 2,
+  "sectionID" : 11402
+}

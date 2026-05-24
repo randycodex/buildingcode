@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167627\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167627\"><\/AnnotationDrawer><div>The means of egress from heliports and helistops shall comply with the provisions of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link>. Landing areas located on buildings or structures shall have two or more means of egress. For landing areas less than 60 feet (18 288 mm) in length, or less than 2,000 square feet (186 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area, the second means of egress is permitted to be a fire escape, alternating tread device or ladder leading to the floor below.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "584-html-1",
+      "kind" : "html",
+      "plainText" : "The means of egress from heliports and helistops shall comply with the provisions of Chapter 10 . Landing areas located on buildings or structures shall have two or more means of egress. For landing areas less than 60 feet (18 288 mm) in length, or less than 2,000 square feet (186 m\n\n 2 \n\n ) in area, the second means of egress is permitted to be a fire escape, alternating tread device or ladder leading to the floor below."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The means of egress from heliports and helistops shall comply with the provisions of Chapter 10. Landing areas located on buildings or structures shall have two or more means of egress. For landing areas less than 60 feet (18 288 mm) in length, or less than 2,000 square feet (186 m 2 ) in area, the second means of egress is permitted to be a fire escape, alternating tread device or ladder leading to the floor below.",
+  "previewText" : "The means of egress from heliports and helistops shall comply with the provisions of Chapter 10.",
+  "schemaVersion" : 2,
+  "sectionID" : 584
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193577\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193577\"><\/AnnotationDrawer><div>Ventilation exhaust shall be provided for highly toxic and toxic liquids as required by Sections 502.9.6.1 and 502.9.6.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10542-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation exhaust shall be provided for highly toxic and toxic liquids as required by Sections 502.9.6.1 and 502.9.6.2."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Ventilation exhaust shall be provided for highly toxic and toxic liquids as required by Sections 502.9.6.1 and 502.9.6.2.",
+  "previewText" : "Ventilation exhaust shall be provided for highly toxic and toxic liquids as required by Sections 502.",
+  "schemaVersion" : 2,
+  "sectionID" : 10542
+}

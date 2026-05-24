@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183635\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183635\"><\/AnnotationDrawer><div>The following devices shall be prohibited:<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5416-html-1",
+      "kind" : "html",
+      "plainText" : "The following devices shall be prohibited:"
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "The following devices shall be prohibited:",
+  "previewText" : "The following devices shall be prohibited:",
+  "schemaVersion" : 2,
+  "sectionID" : 5416
+}

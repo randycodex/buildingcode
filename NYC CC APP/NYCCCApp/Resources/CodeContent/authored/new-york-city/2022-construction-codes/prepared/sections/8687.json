@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199240\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199240\"><\/AnnotationDrawer><div>Recirculating direct-fired air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199241\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199241\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199241\"><\/AnnotationDrawer><h6><a name=\"JD_FGC613\" id=\"JD_FGC613\" title=\"FGC 613\"><\/a>Section FGC 613: Clothes Dryers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8687-html-1",
+      "kind" : "html",
+      "plainText" : "Recirculating direct-fired air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.\n\n Section FGC 613: Clothes Dryers"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Recirculating direct-fired air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.\n\nSection FGC 613: Clothes Dryers",
+  "previewText" : "Recirculating direct-fired air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.",
+  "schemaVersion" : 2,
+  "sectionID" : 8687
+}

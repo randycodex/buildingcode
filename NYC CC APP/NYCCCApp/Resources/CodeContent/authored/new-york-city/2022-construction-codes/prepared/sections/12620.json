@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163280\"><\/AnnotationDrawer><div>The size, type and location of each interceptor and of each separator shall be designed and installed in accordance with the manufacturer's instructions and the requirements of this section based on the anticipated conditions of use. Wastes that do not require treatment or separation shall not be discharged into any interceptor or separator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12620-html-1",
+      "kind" : "html",
+      "plainText" : "The size, type and location of each interceptor and of each separator shall be designed and installed in accordance with the manufacturer's instructions and the requirements of this section based on the anticipated conditions of use. Wastes that do not require treatment or separation shall not be discharged into any interceptor or separator."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The size, type and location of each interceptor and of each separator shall be designed and installed in accordance with the manufacturer's instructions and the requirements of this section based on the anticipated conditions of use. Wastes that do not require treatment or separation shall not be discharged into any interceptor or separator.",
+  "previewText" : "The size, type and location of each interceptor and of each separator shall be designed and installed in accordance with the manufacturer's instructions and the requirements of this section based on the anticipated conditions of use.",
+  "schemaVersion" : 2,
+  "sectionID" : 12620
+}

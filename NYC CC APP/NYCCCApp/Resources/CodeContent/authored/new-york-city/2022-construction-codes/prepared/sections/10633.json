@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193861\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193861\"><\/AnnotationDrawer><div>Grease ducts shall not be installed underground or in raised floor cavities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10633-html-1",
+      "kind" : "html",
+      "plainText" : "Grease ducts shall not be installed underground or in raised floor cavities."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Grease ducts shall not be installed underground or in raised floor cavities.",
+  "previewText" : "Grease ducts shall not be installed underground or in raised floor cavities.",
+  "schemaVersion" : 2,
+  "sectionID" : 10633
+}

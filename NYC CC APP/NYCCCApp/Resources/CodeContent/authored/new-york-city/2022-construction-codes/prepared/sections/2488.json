@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174286\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174286\"><\/AnnotationDrawer><div>A registered design professional shall verify by visual inspection that all components have been installed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174198', hash: '#JD_BC1025' }}\">1025<\/Link>, both with the normal lighting turned on and with the normal and emergency lighting turned off.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2488-html-1",
+      "kind" : "html",
+      "plainText" : "A registered design professional shall verify by visual inspection that all components have been installed in accordance with Section 1025 , both with the normal lighting turned on and with the normal and emergency lighting turned off."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "A registered design professional shall verify by visual inspection that all components have been installed in accordance with Section 1025, both with the normal lighting turned on and with the normal and emergency lighting turned off.",
+  "previewText" : "A registered design professional shall verify by visual inspection that all components have been installed in accordance with Section 1025, both with the normal lighting turned on and with the normal and emergency lighting turned off.",
+  "schemaVersion" : 2,
+  "sectionID" : 2488
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161357\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Upon completion of a section of or the entire water supply system, the system, or portion completed, shall be tested and proved tight under a water pressure of 50 psi (344 kPa) above its normal working pressure but not less than 150 psi (1033 kPa). This pressure shall be held for not less than 15 minutes. The water utilized for tests shall be obtained from a potable source of supply. The required tests shall be performed in accordance with this section and Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224144', hash: '#JD_PC108' }}\">108<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11878-html-1",
+      "kind" : "html",
+      "plainText" : "Upon completion of a section of or the entire water supply system, the system, or portion completed, shall be tested and proved tight under a water pressure of 50 psi (344 kPa) above its normal working pressure but not less than 150 psi (1033 kPa). This pressure shall be held for not less than 15 minutes. The water utilized for tests shall be obtained from a potable source of supply. The required tests shall be performed in accordance with this section and Section 108 ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Upon completion of a section of or the entire water supply system, the system, or portion completed, shall be tested and proved tight under a water pressure of 50 psi (344 kPa) above its normal working pressure but not less than 150 psi (1033 kPa). This pressure shall be held for not less than 15 minutes. The water utilized for tests shall be obtained from a potable source of supply. The required tests shall be performed in accordance with this section and Section 108.",
+  "previewText" : "Upon completion of a section of or the entire water supply system, the system, or portion completed, shall be tested and proved tight under a water pressure of 50 psi (344 kPa) above its normal working pressure but not less than 150 psi (1033 kPa).",
+  "schemaVersion" : 2,
+  "sectionID" : 11878
+}

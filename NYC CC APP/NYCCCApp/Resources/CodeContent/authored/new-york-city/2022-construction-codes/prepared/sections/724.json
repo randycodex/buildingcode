@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168081\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168081\"><\/AnnotationDrawer><div>Automatic fire sprinkler system protection shall be provided in combustible nonmetallic exhaust ducts where the largest cross-sectional diameter of the duct is equal to or greater than 10 inches (254 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168082\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Ducts need not be provided with automatic sprinkler protection as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168083\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168083\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Ducts listed or approved for applications without automatic sprinkler system protection.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168084\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Ducts not more than 12 feet (3658 mm) in length installed below ceiling level.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "724-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic fire sprinkler system protection shall be provided in combustible nonmetallic exhaust ducts where the largest cross-sectional diameter of the duct is equal to or greater than 10 inches (254 mm).\n\n Exception: Ducts need not be provided with automatic sprinkler protection as follows:\n\n 1. Ducts listed or approved for applications without automatic sprinkler system protection.\n\n 2. Ducts not more than 12 feet (3658 mm) in length installed below ceiling level."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Automatic fire sprinkler system protection shall be provided in combustible nonmetallic exhaust ducts where the largest cross-sectional diameter of the duct is equal to or greater than 10 inches (254 mm).\n\nException: Ducts need not be provided with automatic sprinkler protection as follows:\n\n1. Ducts listed or approved for applications without automatic sprinkler system protection.\n\n2. Ducts not more than 12 feet (3658 mm) in length installed below ceiling level.",
+  "previewText" : "Automatic fire sprinkler system protection shall be provided in combustible nonmetallic exhaust ducts where the largest cross-sectional diameter of the duct is equal to or greater than 10 inches (254 mm).",
+  "schemaVersion" : 2,
+  "sectionID" : 724
+}

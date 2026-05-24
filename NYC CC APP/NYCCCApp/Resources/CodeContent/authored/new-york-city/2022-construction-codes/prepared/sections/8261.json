@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198026\"><\/AnnotationDrawer><div>Gas work shall be performed by individuals possessing the qualifications set forth in Article <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-160270', hash: '#JD_28-423' }}\">28-423<\/Link> of the Administrative Code. Welders must be qualified in accordance with Section 404.21.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8261-html-1",
+      "kind" : "html",
+      "plainText" : "Gas work shall be performed by individuals possessing the qualifications set forth in Article 28-423 of the Administrative Code. Welders must be qualified in accordance with Section 404.21.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Gas work shall be performed by individuals possessing the qualifications set forth in Article 28-423 of the Administrative Code. Welders must be qualified in accordance with Section 404.21.1.",
+  "previewText" : "Gas work shall be performed by individuals possessing the qualifications set forth in Article 28-423 of the Administrative Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 8261
+}

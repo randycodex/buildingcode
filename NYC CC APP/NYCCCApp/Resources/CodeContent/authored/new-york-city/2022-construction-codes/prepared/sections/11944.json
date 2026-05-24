@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161552\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161552\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The overflow from any fixture shall discharge into the drainage system on the inlet or fixture side of the trap.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161553\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161553\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception: <\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The overflow from a flush tank serving a water closet or urinal shall discharge into the fixture served.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11944-html-1",
+      "kind" : "html",
+      "plainText" : "The overflow from any fixture shall discharge into the drainage system on the inlet or fixture side of the trap. \n\n Exception: The overflow from a flush tank serving a water closet or urinal shall discharge into the fixture served."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The overflow from any fixture shall discharge into the drainage system on the inlet or fixture side of the trap.\n\nException: The overflow from a flush tank serving a water closet or urinal shall discharge into the fixture served.",
+  "previewText" : "The overflow from any fixture shall discharge into the drainage system on the inlet or fixture side of the trap.",
+  "schemaVersion" : 2,
+  "sectionID" : 11944
+}

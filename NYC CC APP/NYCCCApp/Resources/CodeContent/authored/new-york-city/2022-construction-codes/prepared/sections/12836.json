@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163882\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Storage tank inlets shall be designed to introduce collected rainwater into the tank with minimum turbulence, and shall be located and designed to avoid agitating the contents of the storage tank.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12836-html-1",
+      "kind" : "html",
+      "plainText" : "Storage tank inlets shall be designed to introduce collected rainwater into the tank with minimum turbulence, and shall be located and designed to avoid agitating the contents of the storage tank."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Storage tank inlets shall be designed to introduce collected rainwater into the tank with minimum turbulence, and shall be located and designed to avoid agitating the contents of the storage tank.",
+  "previewText" : "Storage tank inlets shall be designed to introduce collected rainwater into the tank with minimum turbulence, and shall be located and designed to avoid agitating the contents of the storage tank.",
+  "schemaVersion" : 2,
+  "sectionID" : 12836
+}

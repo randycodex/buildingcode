@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179879\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179879\"><\/AnnotationDrawer><div>The installation and testing of prestressed rock and soil anchors shall be subject to special inspection in accordance with the requirements of Section 1705.19.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-179880\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-179880\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-179880\"><\/AnnotationDrawer><h6><a name=\"JD_BC1816\" id=\"JD_BC1816\" title=\"BC 1816\"><\/a>Section BC 1816: Liquefaction Analysis<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4250-html-1",
+      "kind" : "html",
+      "plainText" : "The installation and testing of prestressed rock and soil anchors shall be subject to special inspection in accordance with the requirements of Section 1705.19.\n\n Section BC 1816: Liquefaction Analysis"
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The installation and testing of prestressed rock and soil anchors shall be subject to special inspection in accordance with the requirements of Section 1705.19.",
+  "previewText" : "The installation and testing of prestressed rock and soil anchors shall be subject to special inspection in accordance with the requirements of Section 1705.",
+  "schemaVersion" : 2,
+  "sectionID" : 4250
+}

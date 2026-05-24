@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199145\"><\/AnnotationDrawer><div>Vented gas fireplace heaters shall be installed in accordance with the manufacturer's instructions, shall be tested in accordance with ANSI Z21.88\/CSA 2.33 and shall be designed and equipped as specified in Section 602.2. The installation of unvented gas fired space heaters, gas stoves, gas logs, gas fireplaces and gas fireplace inserts is prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8645-html-1",
+      "kind" : "html",
+      "plainText" : "Vented gas fireplace heaters shall be installed in accordance with the manufacturer's instructions, shall be tested in accordance with ANSI Z21.88\/CSA 2.33 and shall be designed and equipped as specified in Section 602.2. The installation of unvented gas fired space heaters, gas stoves, gas logs, gas fireplaces and gas fireplace inserts is prohibited."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Vented gas fireplace heaters shall be installed in accordance with the manufacturer's instructions, shall be tested in accordance with ANSI Z21.88\/CSA 2.33 and shall be designed and equipped as specified in Section 602.2. The installation of unvented gas fired space heaters, gas stoves, gas logs, gas fireplaces and gas fireplace inserts is prohibited.",
+  "previewText" : "Vented gas fireplace heaters shall be installed in accordance with the manufacturer's instructions, shall be tested in accordance with ANSI Z21.",
+  "schemaVersion" : 2,
+  "sectionID" : 8645
+}

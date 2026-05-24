@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178209\"><\/AnnotationDrawer><div>Where fabrication of structural members, and other regulated products is performed on the premises of a fabricator's shop, special inspection and progress inspection of the fabricated items shall be required by this section, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Construction Codes<\/span>, and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-237170', hash: '#JD_T28C001' }}\">Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3688-html-1",
+      "kind" : "html",
+      "plainText" : "Where fabrication of structural members, and other regulated products is performed on the premises of a fabricator's shop, special inspection and progress inspection of the fabricated items shall be required by this section, the New York City Construction Codes , and Chapter 1 of Title 28 of the Administrative Code ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Where fabrication of structural members, and other regulated products is performed on the premises of a fabricator's shop, special inspection and progress inspection of the fabricated items shall be required by this section, the New York City Construction Codes, and Chapter 1 of Title 28 of the Administrative Code.",
+  "previewText" : "Where fabrication of structural members, and other regulated products is performed on the premises of a fabricator's shop, special inspection and progress inspection of the fabricated items shall be required by this section, the New York City Construction Codes, and Chapter 1 of Title 28 of the Administrative Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 3688
+}

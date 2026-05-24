@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176257\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176257\"><\/AnnotationDrawer><div>Adhered units shall not exceed 5\/8 inch (15.8 mm) thickness and 24 inches (609.6 mm) in any face dimension nor more than 3 square feet (0.28 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in total face area and shall not weigh more than 9 pounds psf (0.43 kN\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t). Porcelain tile shall be adhered to an approved backing system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3127-html-1",
+      "kind" : "html",
+      "plainText" : "Adhered units shall not exceed 5\/8 inch (15.8 mm) thickness and 24 inches (609.6 mm) in any face dimension nor more than 3 square feet (0.28 m\n\n 2 \n\n ) in total face area and shall not weigh more than 9 pounds psf (0.43 kN\/m\n\n 2 \n\n ). Porcelain tile shall be adhered to an approved backing system."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Adhered units shall not exceed 5\/8 inch (15.8 mm) thickness and 24 inches (609.6 mm) in any face dimension nor more than 3 square feet (0.28 m 2 ) in total face area and shall not weigh more than 9 pounds psf (0.43 kN\/m 2 ). Porcelain tile shall be adhered to an approved backing system.",
+  "previewText" : "Adhered units shall not exceed 5\/8 inch (15.",
+  "schemaVersion" : 2,
+  "sectionID" : 3127
+}

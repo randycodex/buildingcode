@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194922\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194922\"><\/AnnotationDrawer><div>The installation of draft controls shall comply with Sections 801.23.1 through 801.23.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10987-html-1",
+      "kind" : "html",
+      "plainText" : "The installation of draft controls shall comply with Sections 801.23.1 through 801.23.5."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "The installation of draft controls shall comply with Sections 801.23.1 through 801.23.5.",
+  "previewText" : "The installation of draft controls shall comply with Sections 801.",
+  "schemaVersion" : 2,
+  "sectionID" : 10987
+}

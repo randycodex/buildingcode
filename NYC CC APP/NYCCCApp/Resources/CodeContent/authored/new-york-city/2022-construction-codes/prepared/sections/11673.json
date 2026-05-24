@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196736\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196736\"><\/AnnotationDrawer><div>Solar equipment exposed to vehicular traffic shall be installed not less than 6 feet (1828.8 mm) above the finished floor.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196737\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196737\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> This section shall not apply where the equipment is protected from motor vehicle impact.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11673-html-1",
+      "kind" : "html",
+      "plainText" : "Solar equipment exposed to vehicular traffic shall be installed not less than 6 feet (1828.8 mm) above the finished floor.\n\n Exception: This section shall not apply where the equipment is protected from motor vehicle impact."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Solar equipment exposed to vehicular traffic shall be installed not less than 6 feet (1828.8 mm) above the finished floor.\n\nException: This section shall not apply where the equipment is protected from motor vehicle impact.",
+  "previewText" : "Solar equipment exposed to vehicular traffic shall be installed not less than 6 feet (1828.",
+  "schemaVersion" : 2,
+  "sectionID" : 11673
+}

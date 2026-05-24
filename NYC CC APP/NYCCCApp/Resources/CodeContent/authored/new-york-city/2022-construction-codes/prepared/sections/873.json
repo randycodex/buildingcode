@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168548\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168548\"><\/AnnotationDrawer><div>To qualify for an area factor increase based on frontage, a building shall have not less than 25 percent of its perimeter on a public way or open space. Such open space shall be either on the same zoning lot or dedicated for public use and shall be accessed from a street or approved fire lane.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "873-html-1",
+      "kind" : "html",
+      "plainText" : "To qualify for an area factor increase based on frontage, a building shall have not less than 25 percent of its perimeter on a public way or open space. Such open space shall be either on the same zoning lot or dedicated for public use and shall be accessed from a street or approved fire lane."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "To qualify for an area factor increase based on frontage, a building shall have not less than 25 percent of its perimeter on a public way or open space. Such open space shall be either on the same zoning lot or dedicated for public use and shall be accessed from a street or approved fire lane.",
+  "previewText" : "To qualify for an area factor increase based on frontage, a building shall have not less than 25 percent of its perimeter on a public way or open space.",
+  "schemaVersion" : 2,
+  "sectionID" : 873
+}

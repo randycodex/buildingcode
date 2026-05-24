@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181699\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181699\"><\/AnnotationDrawer><div>The truss manufacturer shall provide a truss placement diagram that identifies the proposed location for each individually designated truss and references the corresponding truss design drawing. The truss placement diagram shall be provided as part of the truss submittal package, and with the shipment of trusses delivered to the job site. Truss placement diagrams that serve only as a guide for installation and do not deviate from the the Truss Designer's approved construction drawings shall not be required to bear the seal or signature of the truss designer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4881-html-1",
+      "kind" : "html",
+      "plainText" : "The truss manufacturer shall provide a truss placement diagram that identifies the proposed location for each individually designated truss and references the corresponding truss design drawing. The truss placement diagram shall be provided as part of the truss submittal package, and with the shipment of trusses delivered to the job site. Truss placement diagrams that serve only as a guide for installation and do not deviate from the the Truss Designer's approved construction drawings shall not be required to bear the seal or signature of the truss designer."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "The truss manufacturer shall provide a truss placement diagram that identifies the proposed location for each individually designated truss and references the corresponding truss design drawing. The truss placement diagram shall be provided as part of the truss submittal package, and with the shipment of trusses delivered to the job site. Truss placement diagrams that serve only as a guide for installation and do not deviate from the the Truss Designer's approved construction drawings shall not be required to bear the seal or signature of the truss designer.",
+  "previewText" : "The truss manufacturer shall provide a truss placement diagram that identifies the proposed location for each individually designated truss and references the corresponding truss design drawing.",
+  "schemaVersion" : 2,
+  "sectionID" : 4881
+}

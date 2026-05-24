@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169531\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169531\"><\/AnnotationDrawer><div>Vertical openings shall be permitted where allowed by other sections of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-169532\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-169532\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-169532\"><\/AnnotationDrawer><h6><a name=\"JD_BC713\" id=\"JD_BC713\" title=\"BC 713\"><\/a>Section BC 713: Shaft Enclosures<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1162-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical openings shall be permitted where allowed by other sections of this code.\n\n Section BC 713: Shaft Enclosures"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Vertical openings shall be permitted where allowed by other sections of this code.",
+  "previewText" : "Vertical openings shall be permitted where allowed by other sections of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 1162
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230018\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230018\"><\/AnnotationDrawer><div>Notwithstanding Section D105.1, an ADU completely or partially located inside the fire districts, as established in Section D101.2, is permitted to be constructed as Type V in accordance with Section U103.8. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7930-html-1",
+      "kind" : "html",
+      "plainText" : "Notwithstanding Section D105.1, an ADU completely or partially located inside the fire districts, as established in Section D101.2, is permitted to be constructed as Type V in accordance with Section U103.8."
+    }
+  ],
+  "chapterNumber" : "U",
+  "officialText" : "Notwithstanding Section D105.1, an ADU completely or partially located inside the fire districts, as established in Section D101.2, is permitted to be constructed as Type V in accordance with Section U103.8.",
+  "previewText" : "Notwithstanding Section D105.",
+  "schemaVersion" : 2,
+  "sectionID" : 7930
+}

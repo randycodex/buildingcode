@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163079\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163079\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The developed length of individual, branch, circuit and relief vents shall be measured from the farthest point of vent connection to the drainage system to the point of connection to the vent stack, stack vent or termination outside of the building.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12555-html-1",
+      "kind" : "html",
+      "plainText" : "The developed length of individual, branch, circuit and relief vents shall be measured from the farthest point of vent connection to the drainage system to the point of connection to the vent stack, stack vent or termination outside of the building."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The developed length of individual, branch, circuit and relief vents shall be measured from the farthest point of vent connection to the drainage system to the point of connection to the vent stack, stack vent or termination outside of the building.",
+  "previewText" : "The developed length of individual, branch, circuit and relief vents shall be measured from the farthest point of vent connection to the drainage system to the point of connection to the vent stack, stack vent or termination outside of the building.",
+  "schemaVersion" : 2,
+  "sectionID" : 12555
+}

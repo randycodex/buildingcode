@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186970\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186970\"><\/AnnotationDrawer><div>Scaffolds shall be installed and removed in accordance with the requirements of Section 3314.4.1.1 through 3314.4.1.5. Where modifications to the base structure are required to support the scaffold, the scaffold shall not be installed until such modifications have been completed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6566-html-1",
+      "kind" : "html",
+      "plainText" : "Scaffolds shall be installed and removed in accordance with the requirements of Section 3314.4.1.1 through 3314.4.1.5. Where modifications to the base structure are required to support the scaffold, the scaffold shall not be installed until such modifications have been completed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Scaffolds shall be installed and removed in accordance with the requirements of Section 3314.4.1.1 through 3314.4.1.5. Where modifications to the base structure are required to support the scaffold, the scaffold shall not be installed until such modifications have been completed.",
+  "previewText" : "Scaffolds shall be installed and removed in accordance with the requirements of Section 3314.",
+  "schemaVersion" : 2,
+  "sectionID" : 6566
+}

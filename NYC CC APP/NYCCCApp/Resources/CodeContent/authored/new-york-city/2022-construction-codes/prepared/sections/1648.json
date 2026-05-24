@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171434\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171434\"><\/AnnotationDrawer><div>Where a limited area sprinkler system is installed in a building with an automatic wet standpipe system, sprinklers shall be supplied by the standpipe system. Where a limited area sprinkler system is installed in a building without an automatic wet standpipe system, water shall be permitted to be supplied by the plumbing system provided that the plumbing system is capable of simultaneously supplying domestic and sprinkler demands.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1648-html-1",
+      "kind" : "html",
+      "plainText" : "Where a limited area sprinkler system is installed in a building with an automatic wet standpipe system, sprinklers shall be supplied by the standpipe system. Where a limited area sprinkler system is installed in a building without an automatic wet standpipe system, water shall be permitted to be supplied by the plumbing system provided that the plumbing system is capable of simultaneously supplying domestic and sprinkler demands."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Where a limited area sprinkler system is installed in a building with an automatic wet standpipe system, sprinklers shall be supplied by the standpipe system. Where a limited area sprinkler system is installed in a building without an automatic wet standpipe system, water shall be permitted to be supplied by the plumbing system provided that the plumbing system is capable of simultaneously supplying domestic and sprinkler demands.",
+  "previewText" : "Where a limited area sprinkler system is installed in a building with an automatic wet standpipe system, sprinklers shall be supplied by the standpipe system.",
+  "schemaVersion" : 2,
+  "sectionID" : 1648
+}

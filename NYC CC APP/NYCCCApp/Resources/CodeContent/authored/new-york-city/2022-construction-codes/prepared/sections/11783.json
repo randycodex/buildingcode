@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160812\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160812\"><\/AnnotationDrawer><div>If private sewers are to be constructed pursuant to subdivision b of Section <InterCodeLink infobasePath=\"L:\\NY\\New York City\\Folio\\Working\\Charter.NFO\" destinationId=\"JD_1403\" styleName=\"Jump\" linkPrefix=\"\/codes\/newyorkcity\/latest\/\" doc=\"{{ origDocIdx }}\">1403<\/InterCodeLink> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Charter<\/span>, a copy of the sewer plan shall be submitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11783-html-1",
+      "kind" : "html",
+      "plainText" : "If private sewers are to be constructed pursuant to subdivision b of Section 1403 of the New York City Charter , a copy of the sewer plan shall be submitted."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "If private sewers are to be constructed pursuant to subdivision b of Section 1403 of the New York City Charter, a copy of the sewer plan shall be submitted.",
+  "previewText" : "If private sewers are to be constructed pursuant to subdivision b of Section 1403 of the New York City Charter, a copy of the sewer plan shall be submitted.",
+  "schemaVersion" : 2,
+  "sectionID" : 11783
+}

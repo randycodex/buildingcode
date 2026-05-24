@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197647\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197647\"><\/AnnotationDrawer><div>Equipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-197648\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-197648\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-197648\"><\/AnnotationDrawer><h6><a name=\"JD_FGC307\" id=\"JD_FGC307\" title=\"FGC 307\"><\/a>Section FGC 307: Condensate Disposal<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8136-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the New York City Fire Code regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.\n\n Section FGC 307: Condensate Disposal"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Equipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the New York City Fire Code regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.\n\nSection FGC 307: Condensate Disposal",
+  "previewText" : "Equipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the New York City Fire Code regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.",
+  "schemaVersion" : 2,
+  "sectionID" : 8136
+}

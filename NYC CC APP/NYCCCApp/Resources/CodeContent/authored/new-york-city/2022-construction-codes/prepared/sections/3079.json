@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176141\"><\/AnnotationDrawer><div>Exterior walls of wood construction shall be designed and constructed in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-181504', hash: '#JD_BCCh.23' }}\">Chapter 23<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3079-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior walls of wood construction shall be designed and constructed in accordance with Chapter 23 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Exterior walls of wood construction shall be designed and constructed in accordance with Chapter 23.",
+  "previewText" : "Exterior walls of wood construction shall be designed and constructed in accordance with Chapter 23.",
+  "schemaVersion" : 2,
+  "sectionID" : 3079
+}

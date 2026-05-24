@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173298\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173298\"><\/AnnotationDrawer><div>Directional signage indicating the location of all other means of egress and which of those are accessible means of egress shall be provided at the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173299\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173299\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;At exits serving a required accessible space but not providing an approved accessible means of egress.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173300\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;At elevator landings.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173301\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Within areas of rescue assistance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2242-html-1",
+      "kind" : "html",
+      "plainText" : "Directional signage indicating the location of all other means of egress and which of those are accessible means of egress shall be provided at the following:\n\n 1. At exits serving a required accessible space but not providing an approved accessible means of egress.\n\n 2. At elevator landings.\n\n 3. Within areas of rescue assistance."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Directional signage indicating the location of all other means of egress and which of those are accessible means of egress shall be provided at the following:\n\n1. At exits serving a required accessible space but not providing an approved accessible means of egress.\n\n2. At elevator landings.\n\n3. Within areas of rescue assistance.",
+  "previewText" : "Directional signage indicating the location of all other means of egress and which of those are accessible means of egress shall be provided at the following:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 2242
+}

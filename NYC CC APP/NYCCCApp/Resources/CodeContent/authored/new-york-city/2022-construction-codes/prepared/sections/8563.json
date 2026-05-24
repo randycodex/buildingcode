@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198847\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198847\"><\/AnnotationDrawer><div>The installation of draft hoods and draft controls shall comply with Sections 503.12.1 through 503.12.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8563-html-1",
+      "kind" : "html",
+      "plainText" : "The installation of draft hoods and draft controls shall comply with Sections 503.12.1 through 503.12.7."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "The installation of draft hoods and draft controls shall comply with Sections 503.12.1 through 503.12.7.",
+  "previewText" : "The installation of draft hoods and draft controls shall comply with Sections 503.",
+  "schemaVersion" : 2,
+  "sectionID" : 8563
+}

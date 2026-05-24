@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177785\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177785\"><\/AnnotationDrawer><div>Susceptible bays of roofs shall be evaluated for ponding instability in accordance with Section 8.4 ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3583-html-1",
+      "kind" : "html",
+      "plainText" : "Susceptible bays of roofs shall be evaluated for ponding instability in accordance with Section 8.4 ASCE 7."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Susceptible bays of roofs shall be evaluated for ponding instability in accordance with Section 8.4 ASCE 7.",
+  "previewText" : "Susceptible bays of roofs shall be evaluated for ponding instability in accordance with Section 8.",
+  "schemaVersion" : 2,
+  "sectionID" : 3583
+}

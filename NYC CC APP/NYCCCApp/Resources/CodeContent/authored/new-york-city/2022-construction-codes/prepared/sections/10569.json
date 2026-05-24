@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193652\"><\/AnnotationDrawer><div>Repair garages used for the repair of natural gas- or hydrogen-fueled vehicles shall be provided with an approved mechanical ventilation system. The mechanical ventilation system shall be in accordance with Sections 502.16.1 and 502.16.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193653\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193653\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where approved by the commissioner, natural ventilation shall be permitted in lieu of mechanical ventilation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10569-html-1",
+      "kind" : "html",
+      "plainText" : "Repair garages used for the repair of natural gas- or hydrogen-fueled vehicles shall be provided with an approved mechanical ventilation system. The mechanical ventilation system shall be in accordance with Sections 502.16.1 and 502.16.2.\n\n Exception: Where approved by the commissioner, natural ventilation shall be permitted in lieu of mechanical ventilation."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Repair garages used for the repair of natural gas- or hydrogen-fueled vehicles shall be provided with an approved mechanical ventilation system. The mechanical ventilation system shall be in accordance with Sections 502.16.1 and 502.16.2.\n\nException: Where approved by the commissioner, natural ventilation shall be permitted in lieu of mechanical ventilation.",
+  "previewText" : "Repair garages used for the repair of natural gas- or hydrogen-fueled vehicles shall be provided with an approved mechanical ventilation system.",
+  "schemaVersion" : 2,
+  "sectionID" : 10569
+}

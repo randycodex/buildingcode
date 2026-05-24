@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178553\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178553\"><\/AnnotationDrawer><div>Mechanical systems that require a certificate of compliance in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156919', hash: '#JD_28-116.4.1' }}\">28-116.4.1<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> shall be inspected for conformance with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3798-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical systems that require a certificate of compliance in accordance with Section 28-116.4.1 of the Administrative Code shall be inspected for conformance with the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Mechanical systems that require a certificate of compliance in accordance with Section 28-116.4.1 of the Administrative Code shall be inspected for conformance with the approved construction documents.",
+  "previewText" : "Mechanical systems that require a certificate of compliance in accordance with Section 28-116.",
+  "schemaVersion" : 2,
+  "sectionID" : 3798
+}

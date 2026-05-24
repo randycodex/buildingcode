@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194336\"><\/AnnotationDrawer><div>Ducts shall have a minimum slope of 1\/8 inch per foot (10.4 mm\/m) to allow drainage to a point provided with access.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10792-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts shall have a minimum slope of 1\/8 inch per foot (10.4 mm\/m) to allow drainage to a point provided with access."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Ducts shall have a minimum slope of 1\/8 inch per foot (10.4 mm\/m) to allow drainage to a point provided with access.",
+  "previewText" : "Ducts shall have a minimum slope of 1\/8 inch per foot (10.",
+  "schemaVersion" : 2,
+  "sectionID" : 10792
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199278\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199278\"><\/AnnotationDrawer><div>Pool and spa heaters shall be tested in accordance with ANSI Z21.56\/CSA 4.7 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199279\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199279\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199279\"><\/AnnotationDrawer><h6><a name=\"JD_FGC618\" id=\"JD_FGC618\" title=\"FGC 618\"><\/a>Section FGC 618: Forced-Air Warm-Air Furnaces<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8702-html-1",
+      "kind" : "html",
+      "plainText" : "Pool and spa heaters shall be tested in accordance with ANSI Z21.56\/CSA 4.7 and shall be installed in accordance with the manufacturer's instructions.\n\n Section FGC 618: Forced-Air Warm-Air Furnaces"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Pool and spa heaters shall be tested in accordance with ANSI Z21.56\/CSA 4.7 and shall be installed in accordance with the manufacturer's instructions.\n\nSection FGC 618: Forced-Air Warm-Air Furnaces",
+  "previewText" : "Pool and spa heaters shall be tested in accordance with ANSI Z21.",
+  "schemaVersion" : 2,
+  "sectionID" : 8702
+}

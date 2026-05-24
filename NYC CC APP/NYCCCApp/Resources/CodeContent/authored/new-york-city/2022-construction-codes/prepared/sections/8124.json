@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197601\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197601\"><\/AnnotationDrawer><div>Heaters in aircraft hangars shall be installed in accordance with NFPA 409.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8124-html-1",
+      "kind" : "html",
+      "plainText" : "Heaters in aircraft hangars shall be installed in accordance with NFPA 409."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Heaters in aircraft hangars shall be installed in accordance with NFPA 409.",
+  "previewText" : "Heaters in aircraft hangars shall be installed in accordance with NFPA 409.",
+  "schemaVersion" : 2,
+  "sectionID" : 8124
+}

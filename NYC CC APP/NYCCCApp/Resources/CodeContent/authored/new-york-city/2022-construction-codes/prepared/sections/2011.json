@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172532\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172532\"><\/AnnotationDrawer><div>The mechanical smoke removal system shall be sized to exhaust the building at a minimum rate of two air changes per hour based upon the volume of the building or portion thereof without contents. The capacity of each exhaust fan shall not exceed 30,000 cubic feet per minute (14.2 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/sec).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2011-html-1",
+      "kind" : "html",
+      "plainText" : "The mechanical smoke removal system shall be sized to exhaust the building at a minimum rate of two air changes per hour based upon the volume of the building or portion thereof without contents. The capacity of each exhaust fan shall not exceed 30,000 cubic feet per minute (14.2 m\n\n 3 \n\n \/sec)."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The mechanical smoke removal system shall be sized to exhaust the building at a minimum rate of two air changes per hour based upon the volume of the building or portion thereof without contents. The capacity of each exhaust fan shall not exceed 30,000 cubic feet per minute (14.2 m 3 \/sec).",
+  "previewText" : "The mechanical smoke removal system shall be sized to exhaust the building at a minimum rate of two air changes per hour based upon the volume of the building or portion thereof without contents.",
+  "schemaVersion" : 2,
+  "sectionID" : 2011
+}

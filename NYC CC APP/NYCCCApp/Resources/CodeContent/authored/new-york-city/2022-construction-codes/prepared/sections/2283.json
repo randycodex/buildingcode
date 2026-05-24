@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173548\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173548\"><\/AnnotationDrawer><div>Where panic or fire exit hardware is installed, it shall comply with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173549\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173549\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Panic hardware shall be listed in accordance with UL 305.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173550\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173550\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Fire exit hardware shall be listed in accordance with UL 10C and UL 305.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173551\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173551\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The actuating portion of the releasing device shall extend not less than one-half of the door leaf width.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173552\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173552\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;The maximum unlatching force shall not exceed 15 pounds (66.7 N).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2283-html-1",
+      "kind" : "html",
+      "plainText" : "Where panic or fire exit hardware is installed, it shall comply with the following:\n\n 1. Panic hardware shall be listed in accordance with UL 305.\n\n 2. Fire exit hardware shall be listed in accordance with UL 10C and UL 305.\n\n 3. The actuating portion of the releasing device shall extend not less than one-half of the door leaf width.\n\n 4. The maximum unlatching force shall not exceed 15 pounds (66.7 N)."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Where panic or fire exit hardware is installed, it shall comply with the following:\n\n1. Panic hardware shall be listed in accordance with UL 305.\n\n2. Fire exit hardware shall be listed in accordance with UL 10C and UL 305.\n\n3. The actuating portion of the releasing device shall extend not less than one-half of the door leaf width.\n\n4. The maximum unlatching force shall not exceed 15 pounds (66.7 N).",
+  "previewText" : "Where panic or fire exit hardware is installed, it shall comply with the following:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 2283
+}

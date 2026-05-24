@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181289\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181289\"><\/AnnotationDrawer><div>Load-bearing masonry structures shall be reinforced to obtain a continuous system of vertical and horizontal ties. Continuity of all ties shall be ensured by providing lap, welded or mechanical tension splices. The following requirements shall be met for walls, columns and piers: <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4745-html-1",
+      "kind" : "html",
+      "plainText" : "Load-bearing masonry structures shall be reinforced to obtain a continuous system of vertical and horizontal ties. Continuity of all ties shall be ensured by providing lap, welded or mechanical tension splices. The following requirements shall be met for walls, columns and piers:"
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Load-bearing masonry structures shall be reinforced to obtain a continuous system of vertical and horizontal ties. Continuity of all ties shall be ensured by providing lap, welded or mechanical tension splices. The following requirements shall be met for walls, columns and piers:",
+  "previewText" : "Load-bearing masonry structures shall be reinforced to obtain a continuous system of vertical and horizontal ties.",
+  "schemaVersion" : 2,
+  "sectionID" : 4745
+}

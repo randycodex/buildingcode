@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192305\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192305\"><\/AnnotationDrawer><div>This code shall be known and may be cited as the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">\"New York City Mechanical Code,\"<\/span> \"NYCMC\" or \"MC\". All section numbers in this code shall be deemed to be preceded by the designation \"MC\".<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10211-html-1",
+      "kind" : "html",
+      "plainText" : "This code shall be known and may be cited as the \"New York City Mechanical Code,\" \"NYCMC\" or \"MC\". All section numbers in this code shall be deemed to be preceded by the designation \"MC\"."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "This code shall be known and may be cited as the \"New York City Mechanical Code,\" \"NYCMC\" or \"MC\". All section numbers in this code shall be deemed to be preceded by the designation \"MC\".",
+  "previewText" : "This code shall be known and may be cited as the \"New York City Mechanical Code,\" \"NYCMC\" or \"MC\".",
+  "schemaVersion" : 2,
+  "sectionID" : 10211
+}

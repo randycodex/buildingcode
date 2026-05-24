@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198079\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198079\"><\/AnnotationDrawer><div>Where the piping system is connected to appliances or equipment designed for operating pressures of less than the test pressure, such appliances or equipment shall be isolated from the piping system by disconnecting them and capping the outlet(s). The affected piping and joints shall be checked with a noncorrosive leak-detecting fluid or other approved leak-detecting methods when gas is energized.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8281-html-1",
+      "kind" : "html",
+      "plainText" : "Where the piping system is connected to appliances or equipment designed for operating pressures of less than the test pressure, such appliances or equipment shall be isolated from the piping system by disconnecting them and capping the outlet(s). The affected piping and joints shall be checked with a noncorrosive leak-detecting fluid or other approved leak-detecting methods when gas is energized."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where the piping system is connected to appliances or equipment designed for operating pressures of less than the test pressure, such appliances or equipment shall be isolated from the piping system by disconnecting them and capping the outlet(s). The affected piping and joints shall be checked with a noncorrosive leak-detecting fluid or other approved leak-detecting methods when gas is energized.",
+  "previewText" : "Where the piping system is connected to appliances or equipment designed for operating pressures of less than the test pressure, such appliances or equipment shall be isolated from the piping system by disconnecting them and capping the outlet(s).",
+  "schemaVersion" : 2,
+  "sectionID" : 8281
+}

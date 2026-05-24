@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166799\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166799\"><\/AnnotationDrawer><div>The use of open web steel joists shall be prohibited in high-rise buildings until the commissioner promulgates rules establishing minimum acceptable fireproofing methods.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-166800\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-166800\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-166800\"><\/AnnotationDrawer><h6><a name=\"JD_BC404\" id=\"JD_BC404\" title=\"BC 404\"><\/a>Section BC 404: Atriums<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "306-html-1",
+      "kind" : "html",
+      "plainText" : "The use of open web steel joists shall be prohibited in high-rise buildings until the commissioner promulgates rules establishing minimum acceptable fireproofing methods.\n\n Section BC 404: Atriums"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The use of open web steel joists shall be prohibited in high-rise buildings until the commissioner promulgates rules establishing minimum acceptable fireproofing methods.",
+  "previewText" : "The use of open web steel joists shall be prohibited in high-rise buildings until the commissioner promulgates rules establishing minimum acceptable fireproofing methods.",
+  "schemaVersion" : 2,
+  "sectionID" : 306
+}

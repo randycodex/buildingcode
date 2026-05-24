@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176878\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176878\"><\/AnnotationDrawer><div>Ballasted thermoplastic low-slope roofs (roof slope &lt; 2:12) shall be installed in accordance with this section and Section 1504.4, and subject to the limitations of Section 1504.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3345-html-1",
+      "kind" : "html",
+      "plainText" : "Ballasted thermoplastic low-slope roofs (roof slope < 2:12) shall be installed in accordance with this section and Section 1504.4, and subject to the limitations of Section 1504.8."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Ballasted thermoplastic low-slope roofs (roof slope < 2:12) shall be installed in accordance with this section and Section 1504.4, and subject to the limitations of Section 1504.8.",
+  "previewText" : "Ballasted thermoplastic low-slope roofs (roof slope < 2:12) shall be installed in accordance with this section and Section 1504.",
+  "schemaVersion" : 2,
+  "sectionID" : 3345
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174236\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174236\"><\/AnnotationDrawer><div>The doors shall be identified by a low-location luminous emergency exit symbol complying with Section 1025.6.1. The exit symbol shall be not less than 4 inches (101.6 mm) in height and shall be mounted on the door itself in accordance with Section 1025.2.6.1.1. Such signs shall be no higher than 18 inches (457.2 mm) above the finished floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2469-html-1",
+      "kind" : "html",
+      "plainText" : "The doors shall be identified by a low-location luminous emergency exit symbol complying with Section 1025.6.1. The exit symbol shall be not less than 4 inches (101.6 mm) in height and shall be mounted on the door itself in accordance with Section 1025.2.6.1.1. Such signs shall be no higher than 18 inches (457.2 mm) above the finished floor."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The doors shall be identified by a low-location luminous emergency exit symbol complying with Section 1025.6.1. The exit symbol shall be not less than 4 inches (101.6 mm) in height and shall be mounted on the door itself in accordance with Section 1025.2.6.1.1. Such signs shall be no higher than 18 inches (457.2 mm) above the finished floor.",
+  "previewText" : "The doors shall be identified by a low-location luminous emergency exit symbol complying with Section 1025.",
+  "schemaVersion" : 2,
+  "sectionID" : 2469
+}

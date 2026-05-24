@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169195\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169195\"><\/AnnotationDrawer><div>A fire protection peer review of the analysis required by Sections 705.12.1 and 705.12.1.1 shall be submitted to the department for each such analysis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1034-html-1",
+      "kind" : "html",
+      "plainText" : "A fire protection peer review of the analysis required by Sections 705.12.1 and 705.12.1.1 shall be submitted to the department for each such analysis."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "A fire protection peer review of the analysis required by Sections 705.12.1 and 705.12.1.1 shall be submitted to the department for each such analysis.",
+  "previewText" : "A fire protection peer review of the analysis required by Sections 705.",
+  "schemaVersion" : 2,
+  "sectionID" : 1034
+}

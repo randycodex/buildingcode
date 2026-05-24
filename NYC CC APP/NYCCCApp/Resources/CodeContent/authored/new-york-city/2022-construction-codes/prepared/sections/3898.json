@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178805\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178805\"><\/AnnotationDrawer><div>Exterior windows and doors shall be tested and labeled as conforming to AAMA\/WDMA\/CSA 101\/I.S.2\/A440. The label shall state the name of the manufacturer, the approved labeling agency and the product designation as specified in AAMA\/WDMA\/CSA 101\/I.S.2\/A440. Products tested and labeled as conforming to AAMA\/WDMA\/CSA 101\/I.S.2\/A440 shall not be subject to the requirements of Sections 2403.2 and 2403.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3898-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior windows and doors shall be tested and labeled as conforming to AAMA\/WDMA\/CSA 101\/I.S.2\/A440. The label shall state the name of the manufacturer, the approved labeling agency and the product designation as specified in AAMA\/WDMA\/CSA 101\/I.S.2\/A440. Products tested and labeled as conforming to AAMA\/WDMA\/CSA 101\/I.S.2\/A440 shall not be subject to the requirements of Sections 2403.2 and 2403.3."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Exterior windows and doors shall be tested and labeled as conforming to AAMA\/WDMA\/CSA 101\/I.S.2\/A440. The label shall state the name of the manufacturer, the approved labeling agency and the product designation as specified in AAMA\/WDMA\/CSA 101\/I.S.2\/A440. Products tested and labeled as conforming to AAMA\/WDMA\/CSA 101\/I.S.2\/A440 shall not be subject to the requirements of Sections 2403.2 and 2403.3.",
+  "previewText" : "Exterior windows and doors shall be tested and labeled as conforming to AAMA\/WDMA\/CSA 101\/I.",
+  "schemaVersion" : 2,
+  "sectionID" : 3898
+}

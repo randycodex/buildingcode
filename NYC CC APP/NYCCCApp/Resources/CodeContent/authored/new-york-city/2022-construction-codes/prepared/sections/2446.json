@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174158\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174158\"><\/AnnotationDrawer><div>Where doors serving interior exit stairways are locked on the stair side, signage shall be posted in compliance with Sections 1031.4.1, 1031.4.2 and 1031.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2446-html-1",
+      "kind" : "html",
+      "plainText" : "Where doors serving interior exit stairways are locked on the stair side, signage shall be posted in compliance with Sections 1031.4.1, 1031.4.2 and 1031.4.3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Where doors serving interior exit stairways are locked on the stair side, signage shall be posted in compliance with Sections 1031.4.1, 1031.4.2 and 1031.4.3.",
+  "previewText" : "Where doors serving interior exit stairways are locked on the stair side, signage shall be posted in compliance with Sections 1031.",
+  "schemaVersion" : 2,
+  "sectionID" : 2446
+}

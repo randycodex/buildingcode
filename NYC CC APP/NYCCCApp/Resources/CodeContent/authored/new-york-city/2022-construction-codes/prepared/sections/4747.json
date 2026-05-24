@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181293\"><\/AnnotationDrawer><div>Ties shall be located within the thickness of walls or beams, where they occur, or within 1 foot (305 mm) of the edge of slab, where walls or beams do not occur.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4747-html-1",
+      "kind" : "html",
+      "plainText" : "Ties shall be located within the thickness of walls or beams, where they occur, or within 1 foot (305 mm) of the edge of slab, where walls or beams do not occur."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Ties shall be located within the thickness of walls or beams, where they occur, or within 1 foot (305 mm) of the edge of slab, where walls or beams do not occur.",
+  "previewText" : "Ties shall be located within the thickness of walls or beams, where they occur, or within 1 foot (305 mm) of the edge of slab, where walls or beams do not occur.",
+  "schemaVersion" : 2,
+  "sectionID" : 4747
+}

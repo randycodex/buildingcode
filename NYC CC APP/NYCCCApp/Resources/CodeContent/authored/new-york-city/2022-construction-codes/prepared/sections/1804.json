@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171941\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171941\"><\/AnnotationDrawer><div>Aerosol storage rooms and general-purpose warehouses containing aerosols shall be provided with an approved manual fire alarm system where required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1804-html-1",
+      "kind" : "html",
+      "plainText" : "Aerosol storage rooms and general-purpose warehouses containing aerosols shall be provided with an approved manual fire alarm system where required by the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Aerosol storage rooms and general-purpose warehouses containing aerosols shall be provided with an approved manual fire alarm system where required by the New York City Fire Code.",
+  "previewText" : "Aerosol storage rooms and general-purpose warehouses containing aerosols shall be provided with an approved manual fire alarm system where required by the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 1804
+}

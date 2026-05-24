@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171899\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171899\"><\/AnnotationDrawer><div>An automatic smoke detection system shall be provided in special amusement buildings in accordance with Sections 907.2.12.1 through 907.2.12.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171900\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171900\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> In areas where ambient conditions will cause a smoke detection system to alarm, an approved alternative type of automatic detector shall be installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1792-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic smoke detection system shall be provided in special amusement buildings in accordance with Sections 907.2.12.1 through 907.2.12.3.\n\n Exception: In areas where ambient conditions will cause a smoke detection system to alarm, an approved alternative type of automatic detector shall be installed."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "An automatic smoke detection system shall be provided in special amusement buildings in accordance with Sections 907.2.12.1 through 907.2.12.3.\n\nException: In areas where ambient conditions will cause a smoke detection system to alarm, an approved alternative type of automatic detector shall be installed.",
+  "previewText" : "An automatic smoke detection system shall be provided in special amusement buildings in accordance with Sections 907.",
+  "schemaVersion" : 2,
+  "sectionID" : 1792
+}

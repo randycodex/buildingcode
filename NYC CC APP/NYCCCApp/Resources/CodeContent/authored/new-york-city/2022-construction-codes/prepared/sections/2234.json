@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173272\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173272\"><\/AnnotationDrawer><div>Each exterior area for assisted rescue shall be sized to accommodate wheelchair spaces in accordance with Section 1009.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2234-html-1",
+      "kind" : "html",
+      "plainText" : "Each exterior area for assisted rescue shall be sized to accommodate wheelchair spaces in accordance with Section 1009.6.3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Each exterior area for assisted rescue shall be sized to accommodate wheelchair spaces in accordance with Section 1009.6.3.",
+  "previewText" : "Each exterior area for assisted rescue shall be sized to accommodate wheelchair spaces in accordance with Section 1009.",
+  "schemaVersion" : 2,
+  "sectionID" : 2234
+}

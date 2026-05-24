@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162695\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162695\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The junction of the building drain and the building sewer shall be served by a cleanout that is located at the junction or within 10 feet (3048 mm) of the developed length of piping upstream of the junction. For the requirements of this section, the cleanout access shall not be provided by water closet removal.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12403-html-1",
+      "kind" : "html",
+      "plainText" : "The junction of the building drain and the building sewer shall be served by a cleanout that is located at the junction or within 10 feet (3048 mm) of the developed length of piping upstream of the junction. For the requirements of this section, the cleanout access shall not be provided by water closet removal."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The junction of the building drain and the building sewer shall be served by a cleanout that is located at the junction or within 10 feet (3048 mm) of the developed length of piping upstream of the junction. For the requirements of this section, the cleanout access shall not be provided by water closet removal.",
+  "previewText" : "The junction of the building drain and the building sewer shall be served by a cleanout that is located at the junction or within 10 feet (3048 mm) of the developed length of piping upstream of the junction.",
+  "schemaVersion" : 2,
+  "sectionID" : 12403
+}

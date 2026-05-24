@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193630\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193630\"><\/AnnotationDrawer><div>Exhaust ducts penetrating fire barrier assemblies constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169272', hash: '#JD_BC707' }}\">707<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> or horizontal assemblies constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169425', hash: '#JD_BC711' }}\">711<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> shall be contained in a shaft of equivalent fire-resistance-rated construction. Exhaust ducts shall not penetrate fire walls. Fire dampers shall not be installed in exhaust ducts.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10560-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust ducts penetrating fire barrier assemblies constructed in accordance with Section 707 of the New York City Building Code or horizontal assemblies constructed in accordance with Section 711 of the New York City Building Code shall be contained in a shaft of equivalent fire-resistance-rated construction. Exhaust ducts shall not penetrate fire walls. Fire dampers shall not be installed in exhaust ducts."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Exhaust ducts penetrating fire barrier assemblies constructed in accordance with Section 707 of the New York City Building Code or horizontal assemblies constructed in accordance with Section 711 of the New York City Building Code shall be contained in a shaft of equivalent fire-resistance-rated construction. Exhaust ducts shall not penetrate fire walls. Fire dampers shall not be installed in exhaust ducts.",
+  "previewText" : "Exhaust ducts penetrating fire barrier assemblies constructed in accordance with Section 707 of the New York City Building Code or horizontal assemblies constructed in accordance with Section 711 of the New York City Building Code shall be contained in a shaft of equivalent fire-resistance-rated construction.",
+  "schemaVersion" : 2,
+  "sectionID" : 10560
+}

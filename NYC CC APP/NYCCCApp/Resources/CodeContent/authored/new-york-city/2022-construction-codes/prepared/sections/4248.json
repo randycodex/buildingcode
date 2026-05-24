@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179873\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179873\"><\/AnnotationDrawer><div>Installation procedures shall comply with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179874\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179874\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Anchors shall be installed through fully cased boreholes. Open hole drilling shall only be permitted through stable bedrock.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179875\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179875\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Anchors having bond zones formed in soil shall be pressure grouted to at least 1.5 times the total stress at the midpoint of the bond zone.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4248-html-1",
+      "kind" : "html",
+      "plainText" : "Installation procedures shall comply with the following:\n\n 1. Anchors shall be installed through fully cased boreholes. Open hole drilling shall only be permitted through stable bedrock.\n\n 2. Anchors having bond zones formed in soil shall be pressure grouted to at least 1.5 times the total stress at the midpoint of the bond zone."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Installation procedures shall comply with the following:\n\n1. Anchors shall be installed through fully cased boreholes. Open hole drilling shall only be permitted through stable bedrock.\n\n2. Anchors having bond zones formed in soil shall be pressure grouted to at least 1.5 times the total stress at the midpoint of the bond zone.",
+  "previewText" : "Installation procedures shall comply with the following:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 4248
+}

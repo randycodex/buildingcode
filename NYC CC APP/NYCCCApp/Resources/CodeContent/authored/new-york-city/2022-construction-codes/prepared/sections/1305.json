@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169975\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169975\"><\/AnnotationDrawer><div>Shafts that constitute air ducts shall be limited in accordance with Section 607.5.5.2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1305-html-1",
+      "kind" : "html",
+      "plainText" : "Shafts that constitute air ducts shall be limited in accordance with Section 607.5.5.2 of the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Shafts that constitute air ducts shall be limited in accordance with Section 607.5.5.2 of the New York City Mechanical Code.",
+  "previewText" : "Shafts that constitute air ducts shall be limited in accordance with Section 607.",
+  "schemaVersion" : 2,
+  "sectionID" : 1305
+}

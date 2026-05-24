@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196536\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196536\"><\/AnnotationDrawer><div>Fuel-oil above the lowest floor inside of a building shall be limited to 330 gallons (1249.1 L) per story. The maximum quantity shall include oversized piping as described in 1305.9.12. Piping installations shall comply with the requirements of Section 1305.9.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196537\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196537\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Fuel-oil storage capacity in special flood hazard areas and shaded X-Zones, as defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>, shall comply with Section G307.4 of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11602-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-oil above the lowest floor inside of a building shall be limited to 330 gallons (1249.1 L) per story. The maximum quantity shall include oversized piping as described in 1305.9.12. Piping installations shall comply with the requirements of Section 1305.9.\n\n Exception: Fuel-oil storage capacity in special flood hazard areas and shaded X-Zones, as defined in Chapter 2 of the New York City Building Code , shall comply with Section G307.4 of Appendix G of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Fuel-oil above the lowest floor inside of a building shall be limited to 330 gallons (1249.1 L) per story. The maximum quantity shall include oversized piping as described in 1305.9.12. Piping installations shall comply with the requirements of Section 1305.9.\n\nException: Fuel-oil storage capacity in special flood hazard areas and shaded X-Zones, as defined in Chapter 2 of the New York City Building Code, shall comply with Section G307.4 of Appendix G of the New York City Building Code.",
+  "previewText" : "Fuel-oil above the lowest floor inside of a building shall be limited to 330 gallons (1249.",
+  "schemaVersion" : 2,
+  "sectionID" : 11602
+}

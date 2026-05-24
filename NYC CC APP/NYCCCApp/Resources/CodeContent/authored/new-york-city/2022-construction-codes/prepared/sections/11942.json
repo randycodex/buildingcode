@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161547\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161547\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">In mental health centers, pipes or traps shall not be exposed, and fixtures shall be bolted through walls.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11942-html-1",
+      "kind" : "html",
+      "plainText" : "In mental health centers, pipes or traps shall not be exposed, and fixtures shall be bolted through walls."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "In mental health centers, pipes or traps shall not be exposed, and fixtures shall be bolted through walls.",
+  "previewText" : "In mental health centers, pipes or traps shall not be exposed, and fixtures shall be bolted through walls.",
+  "schemaVersion" : 2,
+  "sectionID" : 11942
+}

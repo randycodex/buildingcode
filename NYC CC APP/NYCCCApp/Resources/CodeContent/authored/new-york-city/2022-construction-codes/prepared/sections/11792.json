@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160832\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160832\"><\/AnnotationDrawer><div>Refer to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156835', hash: '#JD_28-114' }}\">Articles 114<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156858', hash: '#JD_28-115' }}\">115 of Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11792-html-1",
+      "kind" : "html",
+      "plainText" : "Refer to Articles 114 and 115 of Chapter 1 of Title 28 of the Administrative Code ."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Refer to Articles 114 and 115 of Chapter 1 of Title 28 of the Administrative Code.",
+  "previewText" : "Refer to Articles 114 and 115 of Chapter 1 of Title 28 of the Administrative Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11792
+}

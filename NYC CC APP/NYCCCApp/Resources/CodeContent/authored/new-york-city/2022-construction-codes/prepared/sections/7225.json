@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189098\"><\/AnnotationDrawer><div>Lighting reflectors may project beyond the top or face of all signs provided that every part of such reflector is at least 10 feet (3048 mm) above the ground or sidewalk level. Reflectors shall be constructed, attached, and maintained so that they shall not be, or become, a hazard to the public.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-189099\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-189099\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-189099\"><\/AnnotationDrawer><h6><a name=\"JD_BCH107\" id=\"JD_BCH107\" title=\"BC H107\"><\/a>Section BC H107: Material Limitations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7225-html-1",
+      "kind" : "html",
+      "plainText" : "Lighting reflectors may project beyond the top or face of all signs provided that every part of such reflector is at least 10 feet (3048 mm) above the ground or sidewalk level. Reflectors shall be constructed, attached, and maintained so that they shall not be, or become, a hazard to the public.\n\n Section BC H107: Material Limitations"
+    }
+  ],
+  "chapterNumber" : "H",
+  "officialText" : "Lighting reflectors may project beyond the top or face of all signs provided that every part of such reflector is at least 10 feet (3048 mm) above the ground or sidewalk level. Reflectors shall be constructed, attached, and maintained so that they shall not be, or become, a hazard to the public.",
+  "previewText" : "Lighting reflectors may project beyond the top or face of all signs provided that every part of such reflector is at least 10 feet (3048 mm) above the ground or sidewalk level.",
+  "schemaVersion" : 2,
+  "sectionID" : 7225
+}

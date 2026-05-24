@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167084\"><\/AnnotationDrawer><div>Parking lot offices, attendant shelters, storage facilities, and similar structures used in conjunction with open parking lots may be provided as an accessory use and shall comply with the applicable code provisions. Such accessory structures may be constructed of combustible materials subject to the limitations of Section D105.1 of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188034', hash: '#JD_BCAppD' }}\">Appendix D<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "406-html-1",
+      "kind" : "html",
+      "plainText" : "Parking lot offices, attendant shelters, storage facilities, and similar structures used in conjunction with open parking lots may be provided as an accessory use and shall comply with the applicable code provisions. Such accessory structures may be constructed of combustible materials subject to the limitations of Section D105.1 of Appendix D ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Parking lot offices, attendant shelters, storage facilities, and similar structures used in conjunction with open parking lots may be provided as an accessory use and shall comply with the applicable code provisions. Such accessory structures may be constructed of combustible materials subject to the limitations of Section D105.1 of Appendix D.",
+  "previewText" : "Parking lot offices, attendant shelters, storage facilities, and similar structures used in conjunction with open parking lots may be provided as an accessory use and shall comply with the applicable code provisions.",
+  "schemaVersion" : 2,
+  "sectionID" : 406
+}

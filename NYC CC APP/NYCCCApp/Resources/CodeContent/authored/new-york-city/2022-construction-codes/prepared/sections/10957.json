@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194845\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194845\"><\/AnnotationDrawer><div>Gas fired appliances shall be vented in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10957-html-1",
+      "kind" : "html",
+      "plainText" : "Gas fired appliances shall be vented in accordance with the New York City Fuel Gas Code."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Gas fired appliances shall be vented in accordance with the New York City Fuel Gas Code.",
+  "previewText" : "Gas fired appliances shall be vented in accordance with the New York City Fuel Gas Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10957
+}

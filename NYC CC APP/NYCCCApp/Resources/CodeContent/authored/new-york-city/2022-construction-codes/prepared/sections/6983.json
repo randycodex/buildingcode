@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188395\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188395\"><\/AnnotationDrawer><div>Certificates of occupancy shall indicate that the structure or tax lot is subject to a letter of map amendment (LOMA) or letter of map revision based on fill (LOMR-F) as per Section G106.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188396\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188396\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188396\"><\/AnnotationDrawer><h6><a name=\"JD_BCG103\" id=\"JD_BCG103\" title=\"BC G103\"><\/a>Section BC G103: Administration<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6983-html-1",
+      "kind" : "html",
+      "plainText" : "Certificates of occupancy shall indicate that the structure or tax lot is subject to a letter of map amendment (LOMA) or letter of map revision based on fill (LOMR-F) as per Section G106.5.\n\n Section BC G103: Administration"
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Certificates of occupancy shall indicate that the structure or tax lot is subject to a letter of map amendment (LOMA) or letter of map revision based on fill (LOMR-F) as per Section G106.5.",
+  "previewText" : "Certificates of occupancy shall indicate that the structure or tax lot is subject to a letter of map amendment (LOMA) or letter of map revision based on fill (LOMR-F) as per Section G106.",
+  "schemaVersion" : 2,
+  "sectionID" : 6983
+}

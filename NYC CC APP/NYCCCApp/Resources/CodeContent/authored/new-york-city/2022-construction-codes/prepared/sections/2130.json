@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172917\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172917\"><\/AnnotationDrawer><div>A free-standing object mounted on a post or pylon shall not overhang that post or pylon more than 4 inches (101.6 mm) where the lowest point of the leading edge is more than 27 inches (685 mm) and less than 80 inches (2032 mm) above the walking surface. Where a sign or other obstruction is mounted between posts or pylons and the clear distance between the posts or pylons is greater than 12 inches (304.8 mm), the lowest edge of such sign or obstruction shall be 27 inches (685 mm) maximum or 80 inches (2032 mm) minimum above the finished floor or ground.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172918\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172918\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> These requirements shall not apply to sloping portions of handrails between the top and bottom riser of stairs and above the ramp run.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2130-html-1",
+      "kind" : "html",
+      "plainText" : "A free-standing object mounted on a post or pylon shall not overhang that post or pylon more than 4 inches (101.6 mm) where the lowest point of the leading edge is more than 27 inches (685 mm) and less than 80 inches (2032 mm) above the walking surface. Where a sign or other obstruction is mounted between posts or pylons and the clear distance between the posts or pylons is greater than 12 inches (304.8 mm), the lowest edge of such sign or obstruction shall be 27 inches (685 mm) maximum or 80 inches (2032 mm) minimum above the finished floor or ground.\n\n Exception: These requirements shall not apply to sloping portions of handrails between the top and bottom riser of stairs and above the ramp run."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "A free-standing object mounted on a post or pylon shall not overhang that post or pylon more than 4 inches (101.6 mm) where the lowest point of the leading edge is more than 27 inches (685 mm) and less than 80 inches (2032 mm) above the walking surface. Where a sign or other obstruction is mounted between posts or pylons and the clear distance between the posts or pylons is greater than 12 inches (304.8 mm), the lowest edge of such sign or obstruction shall be 27 inches (685 mm) maximum or 80 inches (2032 mm) minimum above the finished floor or ground.\n\nException: These requirements shall not apply to sloping portions of handrails between the top and bottom riser of stairs and above the ramp run.",
+  "previewText" : "A free-standing object mounted on a post or pylon shall not overhang that post or pylon more than 4 inches (101.",
+  "schemaVersion" : 2,
+  "sectionID" : 2130
+}

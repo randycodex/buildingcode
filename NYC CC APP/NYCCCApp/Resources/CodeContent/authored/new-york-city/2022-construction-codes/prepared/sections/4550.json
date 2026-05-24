@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180681\"><\/AnnotationDrawer><div>The structural integrity requirements of ACI 318, Section 4.10, shall apply. In precast and composite structures, ties within precast structural elements shall be continuous and shall be anchored to the supporting structure. In addition to Sections 1912.2.2 and 1912.2.4, the following requirements shall be met.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4550-html-1",
+      "kind" : "html",
+      "plainText" : "The structural integrity requirements of ACI 318, Section 4.10, shall apply. In precast and composite structures, ties within precast structural elements shall be continuous and shall be anchored to the supporting structure. In addition to Sections 1912.2.2 and 1912.2.4, the following requirements shall be met."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "The structural integrity requirements of ACI 318, Section 4.10, shall apply. In precast and composite structures, ties within precast structural elements shall be continuous and shall be anchored to the supporting structure. In addition to Sections 1912.2.2 and 1912.2.4, the following requirements shall be met.",
+  "previewText" : "The structural integrity requirements of ACI 318, Section 4.",
+  "schemaVersion" : 2,
+  "sectionID" : 4550
+}

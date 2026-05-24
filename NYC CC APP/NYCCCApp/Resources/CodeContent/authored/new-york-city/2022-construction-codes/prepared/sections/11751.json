@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160704\"><\/AnnotationDrawer><div>Reference to chapter or section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-160705\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-160705\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-160705\"><\/AnnotationDrawer><h6><a name=\"JD_PC103\" id=\"JD_PC103\" title=\"PC 103\"><\/a>Section PC 103: Department of Buildings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11751-html-1",
+      "kind" : "html",
+      "plainText" : "Reference to chapter or section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code.\n\n Section PC 103: Department of Buildings"
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Reference to chapter or section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code.\n\nSection PC 103: Department of Buildings",
+  "previewText" : "Reference to chapter or section numbers, or to provisions not specifically identified by number, shall be construed to refer to such chapter, section or provision of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11751
+}

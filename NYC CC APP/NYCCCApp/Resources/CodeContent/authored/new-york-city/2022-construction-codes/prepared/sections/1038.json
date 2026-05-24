@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169203\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169203\"><\/AnnotationDrawer><div>The responsibility for the fire engineering analysis shall comply with Sections 705.12.3.4.1 and 705.12.3.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1038-html-1",
+      "kind" : "html",
+      "plainText" : "The responsibility for the fire engineering analysis shall comply with Sections 705.12.3.4.1 and 705.12.3.4.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The responsibility for the fire engineering analysis shall comply with Sections 705.12.3.4.1 and 705.12.3.4.2.",
+  "previewText" : "The responsibility for the fire engineering analysis shall comply with Sections 705.",
+  "schemaVersion" : 2,
+  "sectionID" : 1038
+}

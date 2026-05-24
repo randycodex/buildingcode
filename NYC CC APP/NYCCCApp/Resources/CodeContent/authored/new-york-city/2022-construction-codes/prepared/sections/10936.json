@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194778\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194778\"><\/AnnotationDrawer><div>A sign stating, \"Louvers, dampers and\/or ventilation openings must not be blocked or disabled.\" shall be permanently affixed, in clear view, and adjacent to the opening(s) within the room containing the equipment. The letters used on the sign shall be at least 1 inch (25.4 mm) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194779\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194779\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194779\"><\/AnnotationDrawer><h6><a name=\"JD_MC710\" id=\"JD_MC710\" title=\"MC 710\"><\/a>Section MC 710: Opening Location and Protection<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10936-html-1",
+      "kind" : "html",
+      "plainText" : "A sign stating, \"Louvers, dampers and\/or ventilation openings must not be blocked or disabled.\" shall be permanently affixed, in clear view, and adjacent to the opening(s) within the room containing the equipment. The letters used on the sign shall be at least 1 inch (25.4 mm) in height.\n\n Section MC 710: Opening Location and Protection"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "A sign stating, \"Louvers, dampers and\/or ventilation openings must not be blocked or disabled.\" shall be permanently affixed, in clear view, and adjacent to the opening(s) within the room containing the equipment. The letters used on the sign shall be at least 1 inch (25.4 mm) in height.\n\nSection MC 710: Opening Location and Protection",
+  "previewText" : "A sign stating, \"Louvers, dampers and\/or ventilation openings must not be blocked or disabled.",
+  "schemaVersion" : 2,
+  "sectionID" : 10936
+}

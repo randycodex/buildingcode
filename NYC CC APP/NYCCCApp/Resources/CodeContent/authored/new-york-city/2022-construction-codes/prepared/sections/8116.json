@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197579\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197579\"><\/AnnotationDrawer><div>Connection of a parking garage with any room in which there is a fuel-fired appliance shall be by means of a vestibule providing a two-doorway separation, except that a single door is permitted where the sources of ignition in the appliance are elevated in accordance with Section 305.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197580\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197580\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> This section shall not apply to appliance installations complying with Section 305.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8116-html-1",
+      "kind" : "html",
+      "plainText" : "Connection of a parking garage with any room in which there is a fuel-fired appliance shall be by means of a vestibule providing a two-doorway separation, except that a single door is permitted where the sources of ignition in the appliance are elevated in accordance with Section 305.3.\n\n Exception: This section shall not apply to appliance installations complying with Section 305.4."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Connection of a parking garage with any room in which there is a fuel-fired appliance shall be by means of a vestibule providing a two-doorway separation, except that a single door is permitted where the sources of ignition in the appliance are elevated in accordance with Section 305.3.\n\nException: This section shall not apply to appliance installations complying with Section 305.4.",
+  "previewText" : "Connection of a parking garage with any room in which there is a fuel-fired appliance shall be by means of a vestibule providing a two-doorway separation, except that a single door is permitted where the sources of ignition in the appliance are elevated in accordance with Section 305.",
+  "schemaVersion" : 2,
+  "sectionID" : 8116
+}

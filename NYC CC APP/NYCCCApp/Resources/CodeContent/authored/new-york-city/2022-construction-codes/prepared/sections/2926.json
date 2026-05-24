@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175662\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175662\"><\/AnnotationDrawer><div>Where provided in buildings that are designated as emergency shelters, variable message signs conveying emergency-related information shall comply with Section 1111.4 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175663\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175663\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where equivalent information is provided in an audible manner, variable message signs are not required to comply with ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "2926-html-1",
+      "kind" : "html",
+      "plainText" : "Where provided in buildings that are designated as emergency shelters, variable message signs conveying emergency-related information shall comply with Section 1111.4 of this code.\n\n Exception: Where equivalent information is provided in an audible manner, variable message signs are not required to comply with ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where provided in buildings that are designated as emergency shelters, variable message signs conveying emergency-related information shall comply with Section 1111.4 of this code.\n\nException: Where equivalent information is provided in an audible manner, variable message signs are not required to comply with ICC A117.1.",
+  "previewText" : "Where provided in buildings that are designated as emergency shelters, variable message signs conveying emergency-related information shall comply with Section 1111.",
+  "schemaVersion" : 2,
+  "sectionID" : 2926
+}

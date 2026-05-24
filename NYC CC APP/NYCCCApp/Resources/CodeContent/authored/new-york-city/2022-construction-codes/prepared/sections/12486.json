@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162927\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162927\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">An air break shall be provided between the indirect waste pipe and the trap seal of the waste receptor.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12486-html-1",
+      "kind" : "html",
+      "plainText" : "An air break shall be provided between the indirect waste pipe and the trap seal of the waste receptor."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "An air break shall be provided between the indirect waste pipe and the trap seal of the waste receptor.",
+  "previewText" : "An air break shall be provided between the indirect waste pipe and the trap seal of the waste receptor.",
+  "schemaVersion" : 2,
+  "sectionID" : 12486
+}

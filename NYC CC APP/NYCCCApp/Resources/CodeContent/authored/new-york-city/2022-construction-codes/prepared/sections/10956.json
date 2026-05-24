@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194843\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194843\"><\/AnnotationDrawer><div>Oil-fired appliances shall be vented in accordance with this code and NFPA 31.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10956-html-1",
+      "kind" : "html",
+      "plainText" : "Oil-fired appliances shall be vented in accordance with this code and NFPA 31."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Oil-fired appliances shall be vented in accordance with this code and NFPA 31.",
+  "previewText" : "Oil-fired appliances shall be vented in accordance with this code and NFPA 31.",
+  "schemaVersion" : 2,
+  "sectionID" : 10956
+}

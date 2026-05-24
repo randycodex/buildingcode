@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172826\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172826\"><\/AnnotationDrawer><div>This section contains terms defined elsewhere in the code, and terms with definitions that are specific to this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2123-html-1",
+      "kind" : "html",
+      "plainText" : "This section contains terms defined elsewhere in the code, and terms with definitions that are specific to this section."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "This section contains terms defined elsewhere in the code, and terms with definitions that are specific to this section.",
+  "previewText" : "This section contains terms defined elsewhere in the code, and terms with definitions that are specific to this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 2123
+}

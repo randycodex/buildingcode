@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196928\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196928\"><\/AnnotationDrawer><div>The issuance or granting of a permit shall not be construed to be a permit for, or an approval of, any violation of any of the provisions of this code or of any other law. Permits presuming to give authority to violate or cancel the provisions of this code or other law shall not be valid. The issuance of a permit based on construction documents and other data shall not prevent the commissioner from requiring the correction of errors in the construction documents and other data. The commissioner is also authorized to prevent occupancy or use of a structure where in violation of this code or of any other law.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7981-html-1",
+      "kind" : "html",
+      "plainText" : "The issuance or granting of a permit shall not be construed to be a permit for, or an approval of, any violation of any of the provisions of this code or of any other law. Permits presuming to give authority to violate or cancel the provisions of this code or other law shall not be valid. The issuance of a permit based on construction documents and other data shall not prevent the commissioner from requiring the correction of errors in the construction documents and other data. The commissioner is also authorized to prevent occupancy or use of a structure where in violation of this code or of any other law."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "The issuance or granting of a permit shall not be construed to be a permit for, or an approval of, any violation of any of the provisions of this code or of any other law. Permits presuming to give authority to violate or cancel the provisions of this code or other law shall not be valid. The issuance of a permit based on construction documents and other data shall not prevent the commissioner from requiring the correction of errors in the construction documents and other data. The commissioner is also authorized to prevent occupancy or use of a structure where in violation of this code or of any other law.",
+  "previewText" : "The issuance or granting of a permit shall not be construed to be a permit for, or an approval of, any violation of any of the provisions of this code or of any other law.",
+  "schemaVersion" : 2,
+  "sectionID" : 7981
+}

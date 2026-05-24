@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171556\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171556\"><\/AnnotationDrawer><div>Where a secondary water supply is required for an automatic sprinkler system, an automatic water mist system shall be provided with an approved secondary water supply in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1692-html-1",
+      "kind" : "html",
+      "plainText" : "Where a secondary water supply is required for an automatic sprinkler system, an automatic water mist system shall be provided with an approved secondary water supply in accordance with the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Where a secondary water supply is required for an automatic sprinkler system, an automatic water mist system shall be provided with an approved secondary water supply in accordance with the New York City Fire Code.",
+  "previewText" : "Where a secondary water supply is required for an automatic sprinkler system, an automatic water mist system shall be provided with an approved secondary water supply in accordance with the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 1692
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185240\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185240\"><\/AnnotationDrawer><div>Smoking shall be prohibited at all construction and demolition sites. No smoking signs shall be posted at the site in accordance with the provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5968-html-1",
+      "kind" : "html",
+      "plainText" : "Smoking shall be prohibited at all construction and demolition sites. No smoking signs shall be posted at the site in accordance with the provisions of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Smoking shall be prohibited at all construction and demolition sites. No smoking signs shall be posted at the site in accordance with the provisions of the New York City Fire Code.",
+  "previewText" : "Smoking shall be prohibited at all construction and demolition sites.",
+  "schemaVersion" : 2,
+  "sectionID" : 5968
+}

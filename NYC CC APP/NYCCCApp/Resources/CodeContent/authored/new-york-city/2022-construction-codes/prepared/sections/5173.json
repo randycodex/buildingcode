@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182920\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182920\"><\/AnnotationDrawer><div>Metal suspension systems for acoustical and lay-in panel ceilings shall conform with Section 808.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5173-html-1",
+      "kind" : "html",
+      "plainText" : "Metal suspension systems for acoustical and lay-in panel ceilings shall conform with Section 808.1."
+    }
+  ],
+  "chapterNumber" : "25",
+  "officialText" : "Metal suspension systems for acoustical and lay-in panel ceilings shall conform with Section 808.1.",
+  "previewText" : "Metal suspension systems for acoustical and lay-in panel ceilings shall conform with Section 808.",
+  "schemaVersion" : 2,
+  "sectionID" : 5173
+}

@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Exception: Connections for temporary external generators shall not be required for buildings with emergency or standby power systems that are permanently installed above the design flood elevation specified in Table 7-1 of ASCE 24 and capable of providing power for at least 72 hours to the systems identified in Item 1 of Section G304.5.1. Natural gas shall be a permitted fuel supply.\n\n2. Flood protection for temporary external generator connections. Electrical connections installed in accordance with Item 1 of Section G304.5.1 shall be located at or above the design flood elevation specified in Table 7-1 of ASCE 24.\n\n3. Emergency connection plan. Prior to sign-off of work by the department, a plan shall be submitted to the department that identifies how the temporary external generators will be connected and capable of providing power for the occupancy in accordance with Item 1 of Section G304.5.1 within 72 hours after failure of the normal power supply.",
+  "previewText" : "Exception: Connections for temporary external generators shall not be required for buildings with emergency or standby power systems that are permanently installed above the design flood elevation specified in Table 7-1 of ASCE 24 and capable of providing power for at least 72 hours to the systems identified in Item 1 of Section G304.",
+  "schemaVersion" : 2,
+  "sectionID" : 7107
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169411\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169411\"><\/AnnotationDrawer><div>Doors in smoke partitions shall not include louvers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1111-html-1",
+      "kind" : "html",
+      "plainText" : "Doors in smoke partitions shall not include louvers."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Doors in smoke partitions shall not include louvers.",
+  "previewText" : "Doors in smoke partitions shall not include louvers.",
+  "schemaVersion" : 2,
+  "sectionID" : 1111
+}

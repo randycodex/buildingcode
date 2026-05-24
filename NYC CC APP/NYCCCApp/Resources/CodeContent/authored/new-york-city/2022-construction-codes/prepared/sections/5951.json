@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185185\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185185\"><\/AnnotationDrawer><div>Combustible debris shall not be permitted to accumulate, and shall be removed from the site at reasonable intervals in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5951-html-1",
+      "kind" : "html",
+      "plainText" : "Combustible debris shall not be permitted to accumulate, and shall be removed from the site at reasonable intervals in accordance with the requirements of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Combustible debris shall not be permitted to accumulate, and shall be removed from the site at reasonable intervals in accordance with the requirements of the New York City Fire Code.",
+  "previewText" : "Combustible debris shall not be permitted to accumulate, and shall be removed from the site at reasonable intervals in accordance with the requirements of the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 5951
+}

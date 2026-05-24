@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172042\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172042\"><\/AnnotationDrawer><div>The audible alarm notification appliances shall provide a sound pressure level of 15 decibels (dBA) above the average ambient sound level or 5 dBA above the maximum sound level having a duration of not less than 60 seconds, whichever is greater, in every occupiable space within the building. The minimum sound pressure levels shall be: 75 dBA in occupancies in Groups R and I-1; 90 dBA in mechanical equipment rooms and 60 dBA in other occupancies. For one-way voice communication system in Group R-2 occupancies, the minimum sound pressure level of the alert tone shall be 75 dBA throughout the dwelling unit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1838-html-1",
+      "kind" : "html",
+      "plainText" : "The audible alarm notification appliances shall provide a sound pressure level of 15 decibels (dBA) above the average ambient sound level or 5 dBA above the maximum sound level having a duration of not less than 60 seconds, whichever is greater, in every occupiable space within the building. The minimum sound pressure levels shall be: 75 dBA in occupancies in Groups R and I-1; 90 dBA in mechanical equipment rooms and 60 dBA in other occupancies. For one-way voice communication system in Group R-2 occupancies, the minimum sound pressure level of the alert tone shall be 75 dBA throughout the dwelling unit."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The audible alarm notification appliances shall provide a sound pressure level of 15 decibels (dBA) above the average ambient sound level or 5 dBA above the maximum sound level having a duration of not less than 60 seconds, whichever is greater, in every occupiable space within the building. The minimum sound pressure levels shall be: 75 dBA in occupancies in Groups R and I-1; 90 dBA in mechanical equipment rooms and 60 dBA in other occupancies. For one-way voice communication system in Group R-2 occupancies, the minimum sound pressure level of the alert tone shall be 75 dBA throughout the dwelling unit.",
+  "previewText" : "The audible alarm notification appliances shall provide a sound pressure level of 15 decibels (dBA) above the average ambient sound level or 5 dBA above the maximum sound level having a duration of not less than 60 seconds, whichever is greater, in every occupiable space within the building.",
+  "schemaVersion" : 2,
+  "sectionID" : 1838
+}

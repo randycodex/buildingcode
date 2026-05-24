@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177539\"><\/AnnotationDrawer><div>The maximum wheel loads shall be the wheel loads produced by the weight of the bridge, as applicable, plus the sum of the rated capacity and the weight of the trolley with the trolley positioned on its runway at the location where the resulting load effect is maximum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3528-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum wheel loads shall be the wheel loads produced by the weight of the bridge, as applicable, plus the sum of the rated capacity and the weight of the trolley with the trolley positioned on its runway at the location where the resulting load effect is maximum."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "The maximum wheel loads shall be the wheel loads produced by the weight of the bridge, as applicable, plus the sum of the rated capacity and the weight of the trolley with the trolley positioned on its runway at the location where the resulting load effect is maximum.",
+  "previewText" : "The maximum wheel loads shall be the wheel loads produced by the weight of the bridge, as applicable, plus the sum of the rated capacity and the weight of the trolley with the trolley positioned on its runway at the location where the resulting load effect is maximum.",
+  "schemaVersion" : 2,
+  "sectionID" : 3528
+}

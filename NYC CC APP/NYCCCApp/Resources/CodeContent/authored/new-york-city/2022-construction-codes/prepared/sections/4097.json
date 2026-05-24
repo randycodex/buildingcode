@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179460\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179460\"><\/AnnotationDrawer><div>Round timber piles shall conform to ASTM D 25. Sawn timber piles shall conform to DOC PS-20.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4097-html-1",
+      "kind" : "html",
+      "plainText" : "Round timber piles shall conform to ASTM D 25. Sawn timber piles shall conform to DOC PS-20."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Round timber piles shall conform to ASTM D 25. Sawn timber piles shall conform to DOC PS-20.",
+  "previewText" : "Round timber piles shall conform to ASTM D 25.",
+  "schemaVersion" : 2,
+  "sectionID" : 4097
+}

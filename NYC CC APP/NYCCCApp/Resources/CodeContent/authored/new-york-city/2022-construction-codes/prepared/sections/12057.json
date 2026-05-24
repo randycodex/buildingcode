@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161809\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161809\"><\/AnnotationDrawer><div>Potable water shall not be permitted for those uses prohibited by this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12057-html-1",
+      "kind" : "html",
+      "plainText" : "Potable water shall not be permitted for those uses prohibited by this section."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Potable water shall not be permitted for those uses prohibited by this section.",
+  "previewText" : "Potable water shall not be permitted for those uses prohibited by this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 12057
+}

@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170291\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170291\"><\/AnnotationDrawer><div>The equivalent thickness of panels with ribbed or undulating surfaces shall be determined by one of the following expressions: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170292\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170292\"><\/AnnotationDrawer><div>&#160;&#160;&#160;For s <span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;\">&#8805;<\/span> 4t, the thickness to be used shall be t <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170293\"><\/AnnotationDrawer><div>&#160;&#160;&#160;For s <span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;\">&#8804;<\/span> 2t, the thickness to be used shall be t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">e<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170294\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170294\"><\/AnnotationDrawer><div>&#160;&#160;&#160;For 4t &gt; s &gt; 2t, the thickness to be used shall be <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170295\"><\/AnnotationDrawer><div>&#160;&#160;&#160;",
+      "id" : "1378-html-1",
+      "kind" : "html",
+      "plainText" : "The equivalent thickness of panels with ribbed or undulating surfaces shall be determined by one of the following expressions: \n\n For s &#8805; 4t, the thickness to be used shall be t \n\n For s &#8804; 2t, the thickness to be used shall be t\n e \n\n For 4t > s > 2t, the thickness to be used shall be"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/4f7fd0d11e168f61e343cbdaf21a4168a5666091.png\" width=\"192\" height=\"45.3333333333333\"><\/img><\/span>",
+      "id" : "1378-image-2",
+      "imageID" : "4f7fd0d11e168f61e343cbdaf21a4168a5666091.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">(Equation 7-3)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170296\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170296\"><\/AnnotationDrawer><div>&#160;&#160;&#160;where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170297\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170297\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;&#160;&#160;&#160;s&#160;&#160;&#160;=&#160;&#160;&#160;Spacing of ribs or undulations.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170298\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170298\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;&#160;&#160;&#160;t&#160;&#160;&#160;=&#160;&#160;&#160;Minimum thickness.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170299\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170299\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;&#160;&#160;&#160;t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">e<\/span>&#160;&#160;&#160;=&#160;&#160;&#160;Equivalent thickness of the panel calculated as the net cross-sectional area of the panel divided by the width, in which the maximum thickness used in the calculation shall not exceed 2t.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1378-html-3",
+      "kind" : "html",
+      "plainText" : "(Equation 7-3) \n\n where:\n\n s = Spacing of ribs or undulations.\n\n t = Minimum thickness.\n\n t\n e = Equivalent thickness of the panel calculated as the net cross-sectional area of the panel divided by the width, in which the maximum thickness used in the calculation shall not exceed 2t."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The equivalent thickness of panels with ribbed or undulating surfaces shall be determined by one of the following expressions:\n\nFor s ≥ 4t, the thickness to be used shall be t\n\nFor s ≤ 2t, the thickness to be used shall be t e\n\nFor 4t > s > 2t, the thickness to be used shall be\n\n(Equation 7-3)\n\nwhere:\n\ns = Spacing of ribs or undulations.\n\nt = Minimum thickness.\n\nt e = Equivalent thickness of the panel calculated as the net cross-sectional area of the panel divided by the width, in which the maximum thickness used in the calculation shall not exceed 2t.",
+  "previewText" : "The equivalent thickness of panels with ribbed or undulating surfaces shall be determined by one of the following expressions:\n\nFor s ≥ 4t, the thickness to be used shall be t\n\nFor s ≤ 2t, the thickness to be used shall be t e\n\nFor 4t > s > 2t, the thickness to be used shall be\n\n(Equation 7-3)\n\nwhere:\n\ns = Spacing of ribs or undulations.",
+  "schemaVersion" : 2,
+  "sectionID" : 1378
+}

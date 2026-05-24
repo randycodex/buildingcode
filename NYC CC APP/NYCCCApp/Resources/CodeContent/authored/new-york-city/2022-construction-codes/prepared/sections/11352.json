@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195948\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195948\"><\/AnnotationDrawer><div>Flexible connectors, expansion and vibration control devices and fittings, when used, shall protect the components of the hydronic system from damage caused by expansion, contraction, transverse movement, angular deflection and vibration, shall be rated for the temperatures and pressures of the systems in which the devices are installed, and shall be compatible with the fluid and all materials provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195949\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195949\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195949\"><\/AnnotationDrawer><h6><a name=\"JD_MC1203\" id=\"JD_MC1203\" title=\"MC 1203\"><\/a>Section MC 1203: Joints and Connections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11352-html-1",
+      "kind" : "html",
+      "plainText" : "Flexible connectors, expansion and vibration control devices and fittings, when used, shall protect the components of the hydronic system from damage caused by expansion, contraction, transverse movement, angular deflection and vibration, shall be rated for the temperatures and pressures of the systems in which the devices are installed, and shall be compatible with the fluid and all materials provided.\n\n Section MC 1203: Joints and Connections"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Flexible connectors, expansion and vibration control devices and fittings, when used, shall protect the components of the hydronic system from damage caused by expansion, contraction, transverse movement, angular deflection and vibration, shall be rated for the temperatures and pressures of the systems in which the devices are installed, and shall be compatible with the fluid and all materials provided.\n\nSection MC 1203: Joints and Connections",
+  "previewText" : "Flexible connectors, expansion and vibration control devices and fittings, when used, shall protect the components of the hydronic system from damage caused by expansion, contraction, transverse movement, angular deflection and vibration, shall be rated for the temperatures and pressures of the systems in which the devices are installed, and shall be compatible with the fluid and all materials provided.",
+  "schemaVersion" : 2,
+  "sectionID" : 11352
+}

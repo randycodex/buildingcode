@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192956\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192956\"><\/AnnotationDrawer><div>Appliances installed in pits or excavations shall not come in direct contact with the surrounding soil. The sides of the pit or excavation shall be held back not less than 12 inches (304.8 mm) from the appliance. Where the depth exceeds 12 inches (304.8 mm) below adjoining grade, the walls of the pit or excavation shall be lined with concrete or masonry. Such concrete or masonry shall extend not less than 4 inches (101.6 mm) above adjoining grade and shall have sufficient lateral load-bearing capacity to resist collapse. The appliance shall be protected from flooding.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10324-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances installed in pits or excavations shall not come in direct contact with the surrounding soil. The sides of the pit or excavation shall be held back not less than 12 inches (304.8 mm) from the appliance. Where the depth exceeds 12 inches (304.8 mm) below adjoining grade, the walls of the pit or excavation shall be lined with concrete or masonry. Such concrete or masonry shall extend not less than 4 inches (101.6 mm) above adjoining grade and shall have sufficient lateral load-bearing capacity to resist collapse. The appliance shall be protected from flooding."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Appliances installed in pits or excavations shall not come in direct contact with the surrounding soil. The sides of the pit or excavation shall be held back not less than 12 inches (304.8 mm) from the appliance. Where the depth exceeds 12 inches (304.8 mm) below adjoining grade, the walls of the pit or excavation shall be lined with concrete or masonry. Such concrete or masonry shall extend not less than 4 inches (101.6 mm) above adjoining grade and shall have sufficient lateral load-bearing capacity to resist collapse. The appliance shall be protected from flooding.",
+  "previewText" : "Appliances installed in pits or excavations shall not come in direct contact with the surrounding soil.",
+  "schemaVersion" : 2,
+  "sectionID" : 10324
+}

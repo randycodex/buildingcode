@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176007\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176007\"><\/AnnotationDrawer><div>Toilet rooms shall not open directly into a room used for the preparation of food for service to the public. In multiple dwellings no toilet room or bathroom shall open onto any kitchen or kitchenette.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-176008\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-176008\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-176008\"><\/AnnotationDrawer><h6><a name=\"JD_BC1211\" id=\"JD_BC1211\" title=\"BC 1211\"><\/a>Section BC 1211: Kitchens and Kitchenettes<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3041-html-1",
+      "kind" : "html",
+      "plainText" : "Toilet rooms shall not open directly into a room used for the preparation of food for service to the public. In multiple dwellings no toilet room or bathroom shall open onto any kitchen or kitchenette.\n\n Section BC 1211: Kitchens and Kitchenettes"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Toilet rooms shall not open directly into a room used for the preparation of food for service to the public. In multiple dwellings no toilet room or bathroom shall open onto any kitchen or kitchenette.",
+  "previewText" : "Toilet rooms shall not open directly into a room used for the preparation of food for service to the public.",
+  "schemaVersion" : 2,
+  "sectionID" : 3041
+}

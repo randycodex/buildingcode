@@ -1,0 +1,51 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184721\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184721\"><\/AnnotationDrawer><div>Project information panels shall be 6 feet (1829 mm) wide and 4 feet (1219 mm) high, with the content required by Section 3301.9.1.1 arranged in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184720', hash: '#JD_BCFigure3301.9.1.4(1)' }}\">Figures 3301.9.1.4(1)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184720', hash: '#JD_BCFigure3301.9.1.4(2)' }}\">3301.9.1.4(2)<\/Link>. The content required by Section 3301.9.1.1, items number 2 through 7 shall be written in the Calibri font or similar sans serif font style, with letters a minimum of 1 inch (25 mm) high, as measured by the upper case character. Such letters shall be white, on a blue background, with such blue color of a shade matching Pantone 296M, RGB 15, 43, 84, or CMYK 100, 88, 38, 35.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184722\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184722\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184723\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184723\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The dimensions for a project information panel posted in conjunction with a demolition project shall be 2 feet 4 inches (711 mm) wide and 4 feet (1219 mm) high, in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184720', hash: '#JD_BCFigure3301.9.1.4(1)' }}\">Figure 3301.9.1.4(1)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184724\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184724\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;For construction sites with a street frontage less than 60 feet (18 288 mm), the dimensions for a project information panel, other than that posted in conjunction with a demolition project, shall be 55 inches (1397 mm) wide and 36.5 inches (927 mm) high, in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184720', hash: '#JD_BCFigure3301.9.1.4(3)' }}\">Figure 3301.9.1.4(3)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184725\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184725\"><\/AnnotationDrawer><div>",
+      "id" : "5857-html-1",
+      "kind" : "html",
+      "plainText" : "Project information panels shall be 6 feet (1829 mm) wide and 4 feet (1219 mm) high, with the content required by Section 3301.9.1.1 arranged in accordance with Figures 3301.9.1.4(1) and 3301.9.1.4(2) . The content required by Section 3301.9.1.1, items number 2 through 7 shall be written in the Calibri font or similar sans serif font style, with letters a minimum of 1 inch (25 mm) high, as measured by the upper case character. Such letters shall be white, on a blue background, with such blue color of a shade matching Pantone 296M, RGB 15, 43, 84, or CMYK 100, 88, 38, 35.\n\n Exceptions: \n\n 1. The dimensions for a project information panel posted in conjunction with a demolition project shall be 2 feet 4 inches (711 mm) wide and 4 feet (1219 mm) high, in accordance with Figure 3301.9.1.4(1) .\n\n 2. For construction sites with a street frontage less than 60 feet (18 288 mm), the dimensions for a project information panel, other than that posted in conjunction with a demolition project, shall be 55 inches (1397 mm) wide and 36.5 inches (927 mm) high, in accordance with Figure 3301.9.1.4(3) ."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/3621672759322be5a03657c25c08e30f9d06e81f.png\" width=\"672\" height=\"581\"><\/img><\/span>",
+      "id" : "5857-image-2",
+      "imageID" : "3621672759322be5a03657c25c08e30f9d06e81f.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184726\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184726\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\"><a name=\"JD_BCFigure3301.9.1.4(1)\" id=\"JD_BCFigure3301.9.1.4(1)\" title=\"BC Figure 3301.9.1.4(1)\"><\/a>Figure 3301.9.1.4(1)<br><\/br>Fence Project Information Panel Text Detail<br><\/br>For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184727\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184727\"><\/AnnotationDrawer><div>",
+      "id" : "5857-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 3301.9.1.4(1)\n Fence Project Information Panel Text Detail\n For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/b22b92325784e21773a3992ea0af92e12859ccf9.png\" width=\"720\" height=\"509.266666666667\"><\/img><\/span>",
+      "id" : "5857-image-4",
+      "imageID" : "b22b92325784e21773a3992ea0af92e12859ccf9.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184728\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184728\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\"><a name=\"JD_BCFigure3301.9.1.4(2)\" id=\"JD_BCFigure3301.9.1.4(2)\" title=\"BC Figure 3301.9.1.4(2)\"><\/a>Figure 3301.9.1.4(2)<br><\/br>Fence Project Information Panel Layout<br><\/br>For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.<\/span>&#160;\n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184729\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184729\"><\/AnnotationDrawer><div>",
+      "id" : "5857-html-5",
+      "kind" : "html",
+      "plainText" : "Figure 3301.9.1.4(2)\n Fence Project Information Panel Layout\n For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/59b616e65b1393af7403592d54cf8db905b0e3ec.png\" width=\"720\" height=\"466.2\"><\/img><\/span>",
+      "id" : "5857-image-6",
+      "imageID" : "59b616e65b1393af7403592d54cf8db905b0e3ec.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184730\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184730\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\"><a name=\"JD_BCFigure3301.9.1.4(3)\" id=\"JD_BCFigure3301.9.1.4(3)\" title=\"BC Figure 3301.9.1.4(3)\"><\/a>Figure 3301.9.1.4(3)<br><\/br>Fence Project Information Panel Layout for Small Lots<br><\/br>For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.<\/span>&#160;\n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184731\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184731\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224500\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224500\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5857-html-7",
+      "kind" : "html",
+      "plainText" : "Figure 3301.9.1.4(3)\n Fence Project Information Panel Layout for Small Lots\n For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Project information panels shall be 6 feet (1829 mm) wide and 4 feet (1219 mm) high, with the content required by Section 3301.9.1.1 arranged in accordance with Figures 3301.9.1.4(1) and 3301.9.1.4(2). The content required by Section 3301.9.1.1, items number 2 through 7 shall be written in the Calibri font or similar sans serif font style, with letters a minimum of 1 inch (25 mm) high, as measured by the upper case character. Such letters shall be white, on a blue background, with such blue color of a shade matching Pantone 296M, RGB 15, 43, 84, or CMYK 100, 88, 38, 35.\n\nExceptions:\n\n1. The dimensions for a project information panel posted in conjunction with a demolition project shall be 2 feet 4 inches (711 mm) wide and 4 feet (1219 mm) high, in accordance with Figure 3301.9.1.4(1).\n\n2. For construction sites with a street frontage less than 60 feet (18 288 mm), the dimensions for a project information panel, other than that posted in conjunction with a demolition project, shall be 55 inches (1397 mm) wide and 36.5 inches (927 mm) high, in accordance with Figure 3301.9.1.4(3).\n\nFigure 3301.9.1.4(1) Fence Project Information Panel Text Detail For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\nFigure 3301.9.1.4(2) Fence Project Information Panel Layout For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\nFigure 3301.9.1.4(3) Fence Project Information Panel Layout for Small Lots For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "Project information panels shall be 6 feet (1829 mm) wide and 4 feet (1219 mm) high, with the content required by Section 3301.",
+  "schemaVersion" : 2,
+  "sectionID" : 5857
+}

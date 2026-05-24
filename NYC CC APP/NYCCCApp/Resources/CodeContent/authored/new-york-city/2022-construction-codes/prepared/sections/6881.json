@@ -1,0 +1,267 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188091\"><\/AnnotationDrawer><div>Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the \"fire district maps\" as per <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188090', hash: '#JD_BCFigureD106.1(1)' }}\">Figures D106.1(1)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188090', hash: '#JD_BCFigureD106.1(2)' }}\">D106.1(2)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188092\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188092\"><\/AnnotationDrawer><div><a name=\"JD_BCFigureD106.1(1)\" id=\"JD_BCFigureD106.1(1)\" title=\"BC Figure D106.1(1)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure D106.1(1)<br><\/br>Fire District Maps<br><\/br>Borough of Staten Island (Richmond County)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188093\"><\/AnnotationDrawer><div>",
+      "id" : "6881-html-1",
+      "kind" : "html",
+      "plainText" : "Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the \"fire district maps\" as per Figures D106.1(1) and D106.1(2) .\n\n Figure D106.1(1)\n Fire District Maps\n Borough of Staten Island (Richmond County)"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/116a8657e72e195bec2eb20898337a9827461b48.png\" width=\"768\" height=\"581\"><\/img><\/span>",
+      "id" : "6881-image-2",
+      "imageID" : "116a8657e72e195bec2eb20898337a9827461b48.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/f518cb083b1f54b29b442679a1606532428e6524.png\" width=\"672\" height=\"1064.8\"><\/img><\/span>",
+      "id" : "6881-image-3",
+      "imageID" : "f518cb083b1f54b29b442679a1606532428e6524.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/67da41eef6985d8ad4afd07d55dd1efb0fece1b1.png\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6881-image-4",
+      "imageID" : "67da41eef6985d8ad4afd07d55dd1efb0fece1b1.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/0dcc329bb3fd7ec7ce71e72658d9ffa2c8fc510f.png\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6881-image-5",
+      "imageID" : "0dcc329bb3fd7ec7ce71e72658d9ffa2c8fc510f.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/4b54d497101e996251671dc4286ac101b28e54f7.png\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6881-image-6",
+      "imageID" : "4b54d497101e996251671dc4286ac101b28e54f7.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/f441e1937ee86b343a6466740cb6be332fc45900.png\" width=\"672\" height=\"991.8\"><\/img><\/span>",
+      "id" : "6881-image-7",
+      "imageID" : "f441e1937ee86b343a6466740cb6be332fc45900.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/34a0e586c270777ae95df793a09d95d0566cb2be.png\" width=\"672\" height=\"839.4\"><\/img><\/span>",
+      "id" : "6881-image-8",
+      "imageID" : "34a0e586c270777ae95df793a09d95d0566cb2be.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/b5b1a71684a965776a78f572daa308912f05c3ed.png\" width=\"672\" height=\"827.333333333333\"><\/img><\/span>",
+      "id" : "6881-image-9",
+      "imageID" : "b5b1a71684a965776a78f572daa308912f05c3ed.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/5b14e79e016e08a5d3c1dc6c7f02b6dc6c16beeb.png\" width=\"672\" height=\"883.4\"><\/img><\/span>",
+      "id" : "6881-image-10",
+      "imageID" : "5b14e79e016e08a5d3c1dc6c7f02b6dc6c16beeb.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/34263d2e8861f553aa7ab15277752ae6cc5e829a.png\" width=\"672\" height=\"1191.06666666667\"><\/img><\/span>",
+      "id" : "6881-image-11",
+      "imageID" : "34263d2e8861f553aa7ab15277752ae6cc5e829a.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/df3e98aa7da53e7425c2e75924a5fd0e7224b740.png\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6881-image-12",
+      "imageID" : "df3e98aa7da53e7425c2e75924a5fd0e7224b740.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/010a51ffd9aaa7c02a0954ecfe382363a1bec4d4.png\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6881-image-13",
+      "imageID" : "010a51ffd9aaa7c02a0954ecfe382363a1bec4d4.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/4c1adbf318155cfcbace742700c9c7c293a98e7d.png\" width=\"672\" height=\"879.666666666667\"><\/img><\/span>",
+      "id" : "6881-image-14",
+      "imageID" : "4c1adbf318155cfcbace742700c9c7c293a98e7d.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/57001cdd4cd7e1b6793d5f1942f482d2940227fb.png\" width=\"672\" height=\"871.266666666667\"><\/img><\/span>",
+      "id" : "6881-image-15",
+      "imageID" : "57001cdd4cd7e1b6793d5f1942f482d2940227fb.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/d4be5f5567cebeebfcc10d99d5ece2d6166b44bd.png\" width=\"672\" height=\"880.866666666667\"><\/img><\/span>",
+      "id" : "6881-image-16",
+      "imageID" : "d4be5f5567cebeebfcc10d99d5ece2d6166b44bd.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188108\" class=\"Normal-Level\"><div style=\"margin-bottom=10pt\">&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188109\"><\/AnnotationDrawer><div><a name=\"JD_BCFigureD106.1(2)\" id=\"JD_BCFigureD106.1(2)\" title=\"BC Figure D106.1(2)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure D106.1(2)<br><\/br>Fire District Maps<br><\/br>Borough of Queens<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188110\"><\/AnnotationDrawer><div>",
+      "id" : "6881-html-17",
+      "kind" : "html",
+      "plainText" : "Figure D106.1(2)\n Fire District Maps\n Borough of Queens"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/4ee753e70302d842061176394f713f1ae53ff4d5.png\" width=\"768\" height=\"743.6\"><\/img><\/span>",
+      "id" : "6881-image-18",
+      "imageID" : "4ee753e70302d842061176394f713f1ae53ff4d5.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/a62f4e11baf671b3951753311203321080959fd3.png\" width=\"672\" height=\"910.866666666667\"><\/img><\/span>",
+      "id" : "6881-image-19",
+      "imageID" : "a62f4e11baf671b3951753311203321080959fd3.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/243001aa16fb1e792ea19483f5c99a6e0816baac.png\" width=\"672\" height=\"929.6\"><\/img><\/span>",
+      "id" : "6881-image-20",
+      "imageID" : "243001aa16fb1e792ea19483f5c99a6e0816baac.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/624c77b92d8aa9d72f0d97f22adb420d0df0e53d.png\" width=\"672\" height=\"856.866666666667\"><\/img><\/span>",
+      "id" : "6881-image-21",
+      "imageID" : "624c77b92d8aa9d72f0d97f22adb420d0df0e53d.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/4c6bfd4288be8e39c15fe66fa3f615153282bf05.png\" width=\"672\" height=\"864.933333333333\"><\/img><\/span>",
+      "id" : "6881-image-22",
+      "imageID" : "4c6bfd4288be8e39c15fe66fa3f615153282bf05.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/afe775555ac0d33aa35df77b47f36cc4feb0de3b.png\" width=\"672\" height=\"876.8\"><\/img><\/span>",
+      "id" : "6881-image-23",
+      "imageID" : "afe775555ac0d33aa35df77b47f36cc4feb0de3b.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/67ca7e0c834377d42cdf3af8ae082dab3e38ee23.png\" width=\"672\" height=\"868.533333333333\"><\/img><\/span>",
+      "id" : "6881-image-24",
+      "imageID" : "67ca7e0c834377d42cdf3af8ae082dab3e38ee23.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/9f61040a24b207d7a711e6af080d3d05e99f9ae1.png\" width=\"672\" height=\"861.4\"><\/img><\/span>",
+      "id" : "6881-image-25",
+      "imageID" : "9f61040a24b207d7a711e6af080d3d05e99f9ae1.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/d66d83e9ab2c84e139ac25b1089a7e43c8d6d105.png\" width=\"672\" height=\"813.6\"><\/img><\/span>",
+      "id" : "6881-image-26",
+      "imageID" : "d66d83e9ab2c84e139ac25b1089a7e43c8d6d105.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/9e32e87bd5cbfe955edb0199bb42aa8d341d85b9.png\" width=\"672\" height=\"924.6\"><\/img><\/span>",
+      "id" : "6881-image-27",
+      "imageID" : "9e32e87bd5cbfe955edb0199bb42aa8d341d85b9.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/a3d9afcaf5a6a2d06b0a208680bf203ed281039e.png\" width=\"672\" height=\"853.466666666667\"><\/img><\/span>",
+      "id" : "6881-image-28",
+      "imageID" : "a3d9afcaf5a6a2d06b0a208680bf203ed281039e.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/66414d6d95dc292498ca7b661dd3de3cc0f1bb72.png\" width=\"672\" height=\"869.866666666667\"><\/img><\/span>",
+      "id" : "6881-image-29",
+      "imageID" : "66414d6d95dc292498ca7b661dd3de3cc0f1bb72.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/17d94bf75f3453dfe4ba81033bca94400aa509f1.png\" width=\"672\" height=\"854.8\"><\/img><\/span>",
+      "id" : "6881-image-30",
+      "imageID" : "17d94bf75f3453dfe4ba81033bca94400aa509f1.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/46c1c7c9b231538e03c7d55dd48e218266a091f9.png\" width=\"672\" height=\"870.533333333333\"><\/img><\/span>",
+      "id" : "6881-image-31",
+      "imageID" : "46c1c7c9b231538e03c7d55dd48e218266a091f9.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/5636cd41712e64ce9906494ae3a29d84032e3248.png\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6881-image-32",
+      "imageID" : "5636cd41712e64ce9906494ae3a29d84032e3248.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/629fd2822e4f04fbb5da44ccc618bbfeac84d920.png\" width=\"672\" height=\"849.333333333333\"><\/img><\/span>",
+      "id" : "6881-image-33",
+      "imageID" : "629fd2822e4f04fbb5da44ccc618bbfeac84d920.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/516e01e39d507241acbf37eedda12d422ee2d324.png\" width=\"672\" height=\"850.533333333333\"><\/img><\/span>",
+      "id" : "6881-image-34",
+      "imageID" : "516e01e39d507241acbf37eedda12d422ee2d324.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/014d2ec6f68e57ea84b5fc07d287e8fa7da252e4.png\" width=\"672\" height=\"854.333333333333\"><\/img><\/span>",
+      "id" : "6881-image-35",
+      "imageID" : "014d2ec6f68e57ea84b5fc07d287e8fa7da252e4.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/966651db3bafa3db04920c3ffa0a6774089bedc1.png\" width=\"672\" height=\"857.666666666667\"><\/img><\/span>",
+      "id" : "6881-image-36",
+      "imageID" : "966651db3bafa3db04920c3ffa0a6774089bedc1.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/080103d3ff6095c2c280d9a46bef0c7394565814.png\" width=\"576\" height=\"926.666666666667\"><\/img><\/span>",
+      "id" : "6881-image-37",
+      "imageID" : "080103d3ff6095c2c280d9a46bef0c7394565814.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/ec8cb9187d63dc45e955be4b19d1e23663259acb.png\" width=\"576\" height=\"746\"><\/img><\/span>",
+      "id" : "6881-image-38",
+      "imageID" : "ec8cb9187d63dc45e955be4b19d1e23663259acb.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/f4664ea974ec47582d7b3f2d914d08f35dc9ea51.png\" width=\"672\" height=\"874.666666666667\"><\/img><\/span>",
+      "id" : "6881-image-39",
+      "imageID" : "f4664ea974ec47582d7b3f2d914d08f35dc9ea51.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/17edcab925a039efe273729c78d2b0bf55e177cb.png\" width=\"480\" height=\"954.933333333333\"><\/img><\/span>",
+      "id" : "6881-image-40",
+      "imageID" : "17edcab925a039efe273729c78d2b0bf55e177cb.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/f877a02d34f4ad0bf689cd96c5168749fd639647.png\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6881-image-41",
+      "imageID" : "f877a02d34f4ad0bf689cd96c5168749fd639647.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/e51decd907273bc2a967f7d91b37ffe0a4ac2a44.png\" width=\"672\" height=\"898.866666666667\"><\/img><\/span>",
+      "id" : "6881-image-42",
+      "imageID" : "e51decd907273bc2a967f7d91b37ffe0a4ac2a44.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/9c2ec46ca28bfdf2c5a071c7e855499eafd25178.png\" width=\"672\" height=\"866.4\"><\/img><\/span>",
+      "id" : "6881-image-43",
+      "imageID" : "9c2ec46ca28bfdf2c5a071c7e855499eafd25178.png",
+      "kind" : "image"
+    }
+  ],
+  "chapterNumber" : "D",
+  "officialText" : "Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the \"fire district maps\" as per Figures D106.1(1) and D106.1(2).\n\nFigure D106.1(1) Fire District Maps Borough of Staten Island (Richmond County)\n\nFigure D106.1(2) Fire District Maps Borough of Queens",
+  "previewText" : "Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the \"fire district maps\" as per Figures D106.",
+  "schemaVersion" : 2,
+  "sectionID" : 6881
+}

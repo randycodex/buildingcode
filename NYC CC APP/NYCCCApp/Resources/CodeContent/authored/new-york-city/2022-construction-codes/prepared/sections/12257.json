@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162319\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162319\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Openings and outlets shall be protected by a backflow preventer with an intermediate atmospheric vent.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12257-html-1",
+      "kind" : "html",
+      "plainText" : "Openings and outlets shall be protected by a backflow preventer with an intermediate atmospheric vent."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Openings and outlets shall be protected by a backflow preventer with an intermediate atmospheric vent.",
+  "previewText" : "Openings and outlets shall be protected by a backflow preventer with an intermediate atmospheric vent.",
+  "schemaVersion" : 2,
+  "sectionID" : 12257
+}

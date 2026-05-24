@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185580\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185580\"><\/AnnotationDrawer><div>The requirements of Section 3316.9 and rules promulgated by the commissioner shall apply to the conduct of all rigging operations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6096-html-1",
+      "kind" : "html",
+      "plainText" : "The requirements of Section 3316.9 and rules promulgated by the commissioner shall apply to the conduct of all rigging operations."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The requirements of Section 3316.9 and rules promulgated by the commissioner shall apply to the conduct of all rigging operations.",
+  "previewText" : "The requirements of Section 3316.",
+  "schemaVersion" : 2,
+  "sectionID" : 6096
+}

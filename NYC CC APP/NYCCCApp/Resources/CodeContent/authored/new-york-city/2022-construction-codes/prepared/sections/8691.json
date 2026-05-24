@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199251\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199251\"><\/AnnotationDrawer><div>Sauna heaters shall be located so as to minimize the possibility of accidental contact by a person in the room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8691-html-1",
+      "kind" : "html",
+      "plainText" : "Sauna heaters shall be located so as to minimize the possibility of accidental contact by a person in the room."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Sauna heaters shall be located so as to minimize the possibility of accidental contact by a person in the room.",
+  "previewText" : "Sauna heaters shall be located so as to minimize the possibility of accidental contact by a person in the room.",
+  "schemaVersion" : 2,
+  "sectionID" : 8691
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163066\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163066\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A connection between a vent pipe and a vent stack or stack vent shall be made at not less than 6 inches (152 mm) above the flood level rim of the highest fixture served by the vent. Horizontal vent pipes forming branch vents, relief vents or loop vents shall be located not less than 6 inches (152 mm) above the flood level rim of the highest fixture served<\/span><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12551-html-1",
+      "kind" : "html",
+      "plainText" : "A connection between a vent pipe and a vent stack or stack vent shall be made at not less than 6 inches (152 mm) above the flood level rim of the highest fixture served by the vent. Horizontal vent pipes forming branch vents, relief vents or loop vents shall be located not less than 6 inches (152 mm) above the flood level rim of the highest fixture served ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "A connection between a vent pipe and a vent stack or stack vent shall be made at not less than 6 inches (152 mm) above the flood level rim of the highest fixture served by the vent. Horizontal vent pipes forming branch vents, relief vents or loop vents shall be located not less than 6 inches (152 mm) above the flood level rim of the highest fixture served.",
+  "previewText" : "A connection between a vent pipe and a vent stack or stack vent shall be made at not less than 6 inches (152 mm) above the flood level rim of the highest fixture served by the vent.",
+  "schemaVersion" : 2,
+  "sectionID" : 12551
+}

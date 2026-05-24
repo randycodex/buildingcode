@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180488\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180488\"><\/AnnotationDrawer><div>Connections between concrete framing members shall comply with the provisions of ACI 318, Chapters 15 and 16.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4466-html-1",
+      "kind" : "html",
+      "plainText" : "Connections between concrete framing members shall comply with the provisions of ACI 318, Chapters 15 and 16."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Connections between concrete framing members shall comply with the provisions of ACI 318, Chapters 15 and 16.",
+  "previewText" : "Connections between concrete framing members shall comply with the provisions of ACI 318, Chapters 15 and 16.",
+  "schemaVersion" : 2,
+  "sectionID" : 4466
+}

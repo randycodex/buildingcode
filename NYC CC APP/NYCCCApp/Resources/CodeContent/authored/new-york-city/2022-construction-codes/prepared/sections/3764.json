@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178449\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178449\"><\/AnnotationDrawer><div>The special inspections shall include the following tests and observations to demonstrate compliance with the listing and the fire-resistance rating:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178450\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178450\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Condition of substrates.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178451\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178451\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Thickness of application.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178452\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Density in pounds per cubic foot (kg\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178453\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178453\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Bond strength adhesion\/cohesion.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178454\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178454\"><\/AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Condition of finished application.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3764-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspections shall include the following tests and observations to demonstrate compliance with the listing and the fire-resistance rating:\n\n 1. Condition of substrates.\n\n 2. Thickness of application.\n\n 3. Density in pounds per cubic foot (kg\/m\n 3 \n ).\n\n 4. Bond strength adhesion\/cohesion.\n\n 5. Condition of finished application."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "The special inspections shall include the following tests and observations to demonstrate compliance with the listing and the fire-resistance rating:\n\n1. Condition of substrates.\n\n2. Thickness of application.\n\n3. Density in pounds per cubic foot (kg\/m 3 ).\n\n4. Bond strength adhesion\/cohesion.\n\n5. Condition of finished application.",
+  "previewText" : "The special inspections shall include the following tests and observations to demonstrate compliance with the listing and the fire-resistance rating:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 3764
+}

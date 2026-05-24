@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175261\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175261\"><\/AnnotationDrawer><div>Where electronic signs are provided and have the capability to display real-time messages containing information that is the same, or substantially equivalent, to information that is provided audibly, signs shall display text that is equivalent to audible announcements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2789-html-1",
+      "kind" : "html",
+      "plainText" : "Where electronic signs are provided and have the capability to display real-time messages containing information that is the same, or substantially equivalent, to information that is provided audibly, signs shall display text that is equivalent to audible announcements."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where electronic signs are provided and have the capability to display real-time messages containing information that is the same, or substantially equivalent, to information that is provided audibly, signs shall display text that is equivalent to audible announcements.",
+  "previewText" : "Where electronic signs are provided and have the capability to display real-time messages containing information that is the same, or substantially equivalent, to information that is provided audibly, signs shall display text that is equivalent to audible announcements.",
+  "schemaVersion" : 2,
+  "sectionID" : 2789
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188653\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188653\"><\/AnnotationDrawer><div>All new or replacement water facilities shall be designed in accordance with the provisions of Chapter 7, ASCE 24, to minimize or eliminate infiltration of floodwaters into the systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7048-html-1",
+      "kind" : "html",
+      "plainText" : "All new or replacement water facilities shall be designed in accordance with the provisions of Chapter 7, ASCE 24, to minimize or eliminate infiltration of floodwaters into the systems."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "All new or replacement water facilities shall be designed in accordance with the provisions of Chapter 7, ASCE 24, to minimize or eliminate infiltration of floodwaters into the systems.",
+  "previewText" : "All new or replacement water facilities shall be designed in accordance with the provisions of Chapter 7, ASCE 24, to minimize or eliminate infiltration of floodwaters into the systems.",
+  "schemaVersion" : 2,
+  "sectionID" : 7048
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198767\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198767\"><\/AnnotationDrawer><div>A vent connector shall be made of noncombustible corrosion-resistant material capable of withstanding the vent gas temperature produced by the appliance and of sufficient thickness to withstand physical damage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8538-html-1",
+      "kind" : "html",
+      "plainText" : "A vent connector shall be made of noncombustible corrosion-resistant material capable of withstanding the vent gas temperature produced by the appliance and of sufficient thickness to withstand physical damage."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "A vent connector shall be made of noncombustible corrosion-resistant material capable of withstanding the vent gas temperature produced by the appliance and of sufficient thickness to withstand physical damage.",
+  "previewText" : "A vent connector shall be made of noncombustible corrosion-resistant material capable of withstanding the vent gas temperature produced by the appliance and of sufficient thickness to withstand physical damage.",
+  "schemaVersion" : 2,
+  "sectionID" : 8538
+}

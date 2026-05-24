@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185328\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185328\"><\/AnnotationDrawer><div>In buildings containing any occupied dwelling units, including newly constructed buildings that are partially occupied where work is still ongoing within the building, all alteration, construction, or partial demolition work shall be performed in accordance with a tenant protection plan as required by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-219894', hash: '#JD_8-120' }}\">Article 120 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185329\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185329\"><\/AnnotationDrawer><div>(Am. L.L. 2019\/106, 6\/8\/2019, eff. 3\/8\/2020)<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6012-html-1",
+      "kind" : "html",
+      "plainText" : "In buildings containing any occupied dwelling units, including newly constructed buildings that are partially occupied where work is still ongoing within the building, all alteration, construction, or partial demolition work shall be performed in accordance with a tenant protection plan as required by Article 120 of Title 28 of the Administrative Code .\n\n (Am. L.L. 2019\/106, 6\/8\/2019, eff. 3\/8\/2020)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "In buildings containing any occupied dwelling units, including newly constructed buildings that are partially occupied where work is still ongoing within the building, all alteration, construction, or partial demolition work shall be performed in accordance with a tenant protection plan as required by Article 120 of Title 28 of the Administrative Code.\n\n(Am. L.L. 2019\/106, 6\/8\/2019, eff. 3\/8\/2020)",
+  "previewText" : "In buildings containing any occupied dwelling units, including newly constructed buildings that are partially occupied where work is still ongoing within the building, all alteration, construction, or partial demolition work shall be performed in accordance with a tenant protection plan as required by Article 120 of Title 28 of the Administrative Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 6012
+}

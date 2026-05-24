@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177430\"><\/AnnotationDrawer><div>Minimum loads (including vertical, lateral, longitudinal, and impact) and the distribution thereof shall meet the applicable requirements of Chapter 15 of the AREMA Manual for Railway Engineering.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3502-html-1",
+      "kind" : "html",
+      "plainText" : "Minimum loads (including vertical, lateral, longitudinal, and impact) and the distribution thereof shall meet the applicable requirements of Chapter 15 of the AREMA Manual for Railway Engineering."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Minimum loads (including vertical, lateral, longitudinal, and impact) and the distribution thereof shall meet the applicable requirements of Chapter 15 of the AREMA Manual for Railway Engineering.",
+  "previewText" : "Minimum loads (including vertical, lateral, longitudinal, and impact) and the distribution thereof shall meet the applicable requirements of Chapter 15 of the AREMA Manual for Railway Engineering.",
+  "schemaVersion" : 2,
+  "sectionID" : 3502
+}

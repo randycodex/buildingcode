@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197730\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197730\"><\/AnnotationDrawer><div>Each above-ground portion of a gas piping system that is likely to become energized shall be continuously bonded electrically to an effective ground-fault current path. Gas piping shall be considered to be bonded where it is connected to appliances that are connected to the equipment grounding conductor of the circuit supplying that appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "8160-html-1",
+      "kind" : "html",
+      "plainText" : "Each above-ground portion of a gas piping system that is likely to become energized shall be continuously bonded electrically to an effective ground-fault current path. Gas piping shall be considered to be bonded where it is connected to appliances that are connected to the equipment grounding conductor of the circuit supplying that appliance."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Each above-ground portion of a gas piping system that is likely to become energized shall be continuously bonded electrically to an effective ground-fault current path. Gas piping shall be considered to be bonded where it is connected to appliances that are connected to the equipment grounding conductor of the circuit supplying that appliance.",
+  "previewText" : "Each above-ground portion of a gas piping system that is likely to become energized shall be continuously bonded electrically to an effective ground-fault current path.",
+  "schemaVersion" : 2,
+  "sectionID" : 8160
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182814\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182814\"><\/AnnotationDrawer><div>Support and framing of glass used in handrails and guards shall comply with the requirements of Sections 2403.2 and 2403.3. In glass structural balustrade systems, each handrail or guard section shall be supported by no fewer than three glass balusters or shall be otherwise supported to remain in place should one baluster panel fail. Glass balusters shall not be installed without an attached handrail or guard.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182815\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> An attached top rail or handrail is not required when panels are tested to remain in place as a barrier following impact or glass breakage in accordance with ASTM E2353, and designed to withstand the loads specified in Section 1607.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5141-html-1",
+      "kind" : "html",
+      "plainText" : "Support and framing of glass used in handrails and guards shall comply with the requirements of Sections 2403.2 and 2403.3. In glass structural balustrade systems, each handrail or guard section shall be supported by no fewer than three glass balusters or shall be otherwise supported to remain in place should one baluster panel fail. Glass balusters shall not be installed without an attached handrail or guard.\n\n Exception: An attached top rail or handrail is not required when panels are tested to remain in place as a barrier following impact or glass breakage in accordance with ASTM E2353, and designed to withstand the loads specified in Section 1607.8."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "Support and framing of glass used in handrails and guards shall comply with the requirements of Sections 2403.2 and 2403.3. In glass structural balustrade systems, each handrail or guard section shall be supported by no fewer than three glass balusters or shall be otherwise supported to remain in place should one baluster panel fail. Glass balusters shall not be installed without an attached handrail or guard.\n\nException: An attached top rail or handrail is not required when panels are tested to remain in place as a barrier following impact or glass breakage in accordance with ASTM E2353, and designed to withstand the loads specified in Section 1607.8.",
+  "previewText" : "Support and framing of glass used in handrails and guards shall comply with the requirements of Sections 2403.",
+  "schemaVersion" : 2,
+  "sectionID" : 5141
+}

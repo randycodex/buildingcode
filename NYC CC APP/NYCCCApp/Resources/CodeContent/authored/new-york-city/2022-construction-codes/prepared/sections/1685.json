@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171542\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171542\"><\/AnnotationDrawer><div>Halogenated extinguishing systems shall not be permitted. However, existing systems shall be maintained, periodically inspected and tested in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1685-html-1",
+      "kind" : "html",
+      "plainText" : "Halogenated extinguishing systems shall not be permitted. However, existing systems shall be maintained, periodically inspected and tested in accordance with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Halogenated extinguishing systems shall not be permitted. However, existing systems shall be maintained, periodically inspected and tested in accordance with the New York City Fire Code.",
+  "previewText" : "Halogenated extinguishing systems shall not be permitted.",
+  "schemaVersion" : 2,
+  "sectionID" : 1685
+}

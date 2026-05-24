@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188277\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188277\"><\/AnnotationDrawer><div>Where clocks are provided for use by the general public, the clock face shall be uncluttered so that its elements are clearly visible. Hands, numerals and digits shall contrast with the background either light-on-dark or dark-on-light. Where clocks are mounted overhead, numerals and digits shall comply with ICC A117.1, Section 703.2 (Visual Characters).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188278\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188278\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188278\"><\/AnnotationDrawer><h6><a name=\"JD_BCE110\" id=\"JD_BCE110\" title=\"BC E110\"><\/a>Section BC E110: Reserved<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188279\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188279\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188279\"><\/AnnotationDrawer><h6><a name=\"JD_BCE111\" id=\"JD_BCE111\" title=\"BC E111\"><\/a>Section BC E111: Referenced Standards<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6933-html-1",
+      "kind" : "html",
+      "plainText" : "Where clocks are provided for use by the general public, the clock face shall be uncluttered so that its elements are clearly visible. Hands, numerals and digits shall contrast with the background either light-on-dark or dark-on-light. Where clocks are mounted overhead, numerals and digits shall comply with ICC A117.1, Section 703.2 (Visual Characters).\n\n Section BC E110: Reserved\n\n Section BC E111: Referenced Standards"
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "Where clocks are provided for use by the general public, the clock face shall be uncluttered so that its elements are clearly visible. Hands, numerals and digits shall contrast with the background either light-on-dark or dark-on-light. Where clocks are mounted overhead, numerals and digits shall comply with ICC A117.1, Section 703.2 (Visual Characters).",
+  "previewText" : "Where clocks are provided for use by the general public, the clock face shall be uncluttered so that its elements are clearly visible.",
+  "schemaVersion" : 2,
+  "sectionID" : 6933
+}

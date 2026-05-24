@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166794\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166794\"><\/AnnotationDrawer><div>Elevator lobbies shall be provided in accordance with Sections 3006.1.1 and 3006.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "304-html-1",
+      "kind" : "html",
+      "plainText" : "Elevator lobbies shall be provided in accordance with Sections 3006.1.1 and 3006.1.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Elevator lobbies shall be provided in accordance with Sections 3006.1.1 and 3006.1.2.",
+  "previewText" : "Elevator lobbies shall be provided in accordance with Sections 3006.",
+  "schemaVersion" : 2,
+  "sectionID" : 304
+}

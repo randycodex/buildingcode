@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162019\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162019\"><\/AnnotationDrawer><div>The installation of a water service or water distribution pipe shall be prohibited in soil and groundwater contaminated with solvents, fuels, organic compounds or other detrimental materials causing permeation, corrosion, degradation or structural failure of the piping material. Where detrimental conditions are suspected, a chemical analysis of the soil and ground water conditions shall be required to ascertain the acceptability of the water service or water distribution piping material for the specific installation. Where detrimental conditions exist, approved alternative materials or routing shall be required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12133-html-1",
+      "kind" : "html",
+      "plainText" : "The installation of a water service or water distribution pipe shall be prohibited in soil and groundwater contaminated with solvents, fuels, organic compounds or other detrimental materials causing permeation, corrosion, degradation or structural failure of the piping material. Where detrimental conditions are suspected, a chemical analysis of the soil and ground water conditions shall be required to ascertain the acceptability of the water service or water distribution piping material for the specific installation. Where detrimental conditions exist, approved alternative materials or routing shall be required."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "The installation of a water service or water distribution pipe shall be prohibited in soil and groundwater contaminated with solvents, fuels, organic compounds or other detrimental materials causing permeation, corrosion, degradation or structural failure of the piping material. Where detrimental conditions are suspected, a chemical analysis of the soil and ground water conditions shall be required to ascertain the acceptability of the water service or water distribution piping material for the specific installation. Where detrimental conditions exist, approved alternative materials or routing shall be required.",
+  "previewText" : "The installation of a water service or water distribution pipe shall be prohibited in soil and groundwater contaminated with solvents, fuels, organic compounds or other detrimental materials causing permeation, corrosion, degradation or structural failure of the piping material.",
+  "schemaVersion" : 2,
+  "sectionID" : 12133
+}

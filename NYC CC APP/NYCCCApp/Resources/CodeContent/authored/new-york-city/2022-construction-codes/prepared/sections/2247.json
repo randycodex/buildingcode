@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173324\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173324\"><\/AnnotationDrawer><div>There shall not be projections into the required clear width lower than 34 inches (863.4 mm) above the floor or ground. Projections into the clear opening width between 34 inches (863.4 mm) and 80 inches (2032 mm) above the floor or ground shall not exceed 4 inches (101.6 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173325\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173325\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Door closers and door stops shall be permitted to be 78 inches (1980 mm) minimum above the floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2247-html-1",
+      "kind" : "html",
+      "plainText" : "There shall not be projections into the required clear width lower than 34 inches (863.4 mm) above the floor or ground. Projections into the clear opening width between 34 inches (863.4 mm) and 80 inches (2032 mm) above the floor or ground shall not exceed 4 inches (101.6 mm).\n\n Exception: Door closers and door stops shall be permitted to be 78 inches (1980 mm) minimum above the floor."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "There shall not be projections into the required clear width lower than 34 inches (863.4 mm) above the floor or ground. Projections into the clear opening width between 34 inches (863.4 mm) and 80 inches (2032 mm) above the floor or ground shall not exceed 4 inches (101.6 mm).\n\nException: Door closers and door stops shall be permitted to be 78 inches (1980 mm) minimum above the floor.",
+  "previewText" : "There shall not be projections into the required clear width lower than 34 inches (863.",
+  "schemaVersion" : 2,
+  "sectionID" : 2247
+}

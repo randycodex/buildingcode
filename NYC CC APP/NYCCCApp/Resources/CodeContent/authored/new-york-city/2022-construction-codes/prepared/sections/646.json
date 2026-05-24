@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167856\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167856\"><\/AnnotationDrawer><div>Storage tanks shall be approved tanks conforming to the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "646-html-1",
+      "kind" : "html",
+      "plainText" : "Storage tanks shall be approved tanks conforming to the requirements of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Storage tanks shall be approved tanks conforming to the requirements of the New York City Fire Code.",
+  "previewText" : "Storage tanks shall be approved tanks conforming to the requirements of the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 646
+}

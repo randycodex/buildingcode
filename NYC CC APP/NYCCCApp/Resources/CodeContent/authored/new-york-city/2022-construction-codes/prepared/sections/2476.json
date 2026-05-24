@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174250\"><\/AnnotationDrawer><div>Luminous signs shall be placed on doors along the egress path that lead to dead ends (mechanical rooms, storage closets, etc.). Such signs shall contain sans serif lettering at least 1 inch (25.4 mm) high reading \"NO EXIT\", with the \"NO\" centered above the \"EXIT\". The \"NO\" may be a larger size than the \"EXIT\" for clarity. The nonluminous portion of such signs shall not be green. No-exit signs shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192262', hash: '#JD_BCFigureS101.1(10)' }}\">Figure S101.1(10)<\/Link> in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192260', hash: '#JD_BCAppS' }}\">Appendix S<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2476-html-1",
+      "kind" : "html",
+      "plainText" : "Luminous signs shall be placed on doors along the egress path that lead to dead ends (mechanical rooms, storage closets, etc.). Such signs shall contain sans serif lettering at least 1 inch (25.4 mm) high reading \"NO EXIT\", with the \"NO\" centered above the \"EXIT\". The \"NO\" may be a larger size than the \"EXIT\" for clarity. The nonluminous portion of such signs shall not be green. No-exit signs shall comply with Figure S101.1(10) in Appendix S ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Luminous signs shall be placed on doors along the egress path that lead to dead ends (mechanical rooms, storage closets, etc.). Such signs shall contain sans serif lettering at least 1 inch (25.4 mm) high reading \"NO EXIT\", with the \"NO\" centered above the \"EXIT\". The \"NO\" may be a larger size than the \"EXIT\" for clarity. The nonluminous portion of such signs shall not be green. No-exit signs shall comply with Figure S101.1(10) in Appendix S.",
+  "previewText" : "Luminous signs shall be placed on doors along the egress path that lead to dead ends (mechanical rooms, storage closets, etc.",
+  "schemaVersion" : 2,
+  "sectionID" : 2476
+}

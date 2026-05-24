@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172647\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172647\"><\/AnnotationDrawer><div>Fire protection equipment shall be identified in an approved manner. Rooms containing controls for air-conditioning systems, sprinkler risers and valves or other fire detection, suppression or control elements shall be identified for the use of the Fire Department. Approved signs required to identify fire protection equipment and equipment location shall be constructed of durable materials, permanently installed and readily visible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-172648\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-172648\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-172648\"><\/AnnotationDrawer><h6><a name=\"JD_BC915\" id=\"JD_BC915\" title=\"BC 915\"><\/a>Section BC 915: Carbon Monoxide Detection<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2062-html-1",
+      "kind" : "html",
+      "plainText" : "Fire protection equipment shall be identified in an approved manner. Rooms containing controls for air-conditioning systems, sprinkler risers and valves or other fire detection, suppression or control elements shall be identified for the use of the Fire Department. Approved signs required to identify fire protection equipment and equipment location shall be constructed of durable materials, permanently installed and readily visible.\n\n Section BC 915: Carbon Monoxide Detection"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fire protection equipment shall be identified in an approved manner. Rooms containing controls for air-conditioning systems, sprinkler risers and valves or other fire detection, suppression or control elements shall be identified for the use of the Fire Department. Approved signs required to identify fire protection equipment and equipment location shall be constructed of durable materials, permanently installed and readily visible.",
+  "previewText" : "Fire protection equipment shall be identified in an approved manner.",
+  "schemaVersion" : 2,
+  "sectionID" : 2062
+}

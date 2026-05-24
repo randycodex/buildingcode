@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181895\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181895\"><\/AnnotationDrawer><div>Cross-laminated timber shall be used only when engineered by a registered design professional. The design shall take into account the effects of openings cut into the panels. Cross-laminated timber shall not be used as individual columns or beams.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4945-html-1",
+      "kind" : "html",
+      "plainText" : "Cross-laminated timber shall be used only when engineered by a registered design professional. The design shall take into account the effects of openings cut into the panels. Cross-laminated timber shall not be used as individual columns or beams."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Cross-laminated timber shall be used only when engineered by a registered design professional. The design shall take into account the effects of openings cut into the panels. Cross-laminated timber shall not be used as individual columns or beams.",
+  "previewText" : "Cross-laminated timber shall be used only when engineered by a registered design professional.",
+  "schemaVersion" : 2,
+  "sectionID" : 4945
+}

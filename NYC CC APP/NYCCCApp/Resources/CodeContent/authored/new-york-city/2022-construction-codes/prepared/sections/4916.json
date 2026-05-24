@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181811\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181811\"><\/AnnotationDrawer><div>Nailing of adjacent laminations and fastening to supports shall conform to the requirements of Section 2304.9.3.2.1 through 2304.9.3.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4916-html-1",
+      "kind" : "html",
+      "plainText" : "Nailing of adjacent laminations and fastening to supports shall conform to the requirements of Section 2304.9.3.2.1 through 2304.9.3.2.2."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Nailing of adjacent laminations and fastening to supports shall conform to the requirements of Section 2304.9.3.2.1 through 2304.9.3.2.2.",
+  "previewText" : "Nailing of adjacent laminations and fastening to supports shall conform to the requirements of Section 2304.",
+  "schemaVersion" : 2,
+  "sectionID" : 4916
+}

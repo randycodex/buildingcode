@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-191103\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-191103\"><\/AnnotationDrawer><div>The provisions of this appendix shall control the performance standards of assistive listening systems (ALS).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-191104\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-191104\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-191104\"><\/AnnotationDrawer><h6><a name=\"JD_BCN102\" id=\"JD_BCN102\" title=\"BC N102\"><\/a>Section BC N102: Induction Loop System<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7811-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this appendix shall control the performance standards of assistive listening systems (ALS).\n\n Section BC N102: Induction Loop System"
+    }
+  ],
+  "chapterNumber" : "N",
+  "officialText" : "The provisions of this appendix shall control the performance standards of assistive listening systems (ALS).",
+  "previewText" : "The provisions of this appendix shall control the performance standards of assistive listening systems (ALS).",
+  "schemaVersion" : 2,
+  "sectionID" : 7811
+}

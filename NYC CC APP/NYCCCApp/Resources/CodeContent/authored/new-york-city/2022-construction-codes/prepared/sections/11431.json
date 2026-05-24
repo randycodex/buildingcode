@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196120\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196120\"><\/AnnotationDrawer><div>Pipe and tubing shall be rated for the operating temperature and pressure of the ground-source heat pump loop system. Fittings shall be suitable for the pressure applications and recommended by the manufacturer for installation with the pipe and tubing material installed. Where used underground, materials shall be suitable for burial.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11431-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe and tubing shall be rated for the operating temperature and pressure of the ground-source heat pump loop system. Fittings shall be suitable for the pressure applications and recommended by the manufacturer for installation with the pipe and tubing material installed. Where used underground, materials shall be suitable for burial."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Pipe and tubing shall be rated for the operating temperature and pressure of the ground-source heat pump loop system. Fittings shall be suitable for the pressure applications and recommended by the manufacturer for installation with the pipe and tubing material installed. Where used underground, materials shall be suitable for burial.",
+  "previewText" : "Pipe and tubing shall be rated for the operating temperature and pressure of the ground-source heat pump loop system.",
+  "schemaVersion" : 2,
+  "sectionID" : 11431
+}

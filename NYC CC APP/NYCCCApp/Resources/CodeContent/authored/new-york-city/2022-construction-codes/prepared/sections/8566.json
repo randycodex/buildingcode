@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198854\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198854\"><\/AnnotationDrawer><div>If a draft hood is not supplied by the appliance manufacturer where one is required, a draft hood shall be installed, shall be of a listed or approved type and, in the absence of other instructions, shall be of the same size as the appliance flue collar. Where a draft hood is required with a conversion burner, it shall be of a listed or approved type.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8566-html-1",
+      "kind" : "html",
+      "plainText" : "If a draft hood is not supplied by the appliance manufacturer where one is required, a draft hood shall be installed, shall be of a listed or approved type and, in the absence of other instructions, shall be of the same size as the appliance flue collar. Where a draft hood is required with a conversion burner, it shall be of a listed or approved type."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "If a draft hood is not supplied by the appliance manufacturer where one is required, a draft hood shall be installed, shall be of a listed or approved type and, in the absence of other instructions, shall be of the same size as the appliance flue collar. Where a draft hood is required with a conversion burner, it shall be of a listed or approved type.",
+  "previewText" : "If a draft hood is not supplied by the appliance manufacturer where one is required, a draft hood shall be installed, shall be of a listed or approved type and, in the absence of other instructions, shall be of the same size as the appliance flue collar.",
+  "schemaVersion" : 2,
+  "sectionID" : 8566
+}

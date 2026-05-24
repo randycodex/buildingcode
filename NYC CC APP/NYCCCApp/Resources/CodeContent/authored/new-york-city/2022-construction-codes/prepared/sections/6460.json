@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186605\"><\/AnnotationDrawer><div>No excavation work to a depth of 5 feet to 10 feet (1524 mm to 3048 mm) within 10 feet (3048 mm) of an adjacent building, or an excavation over 10 feet (3048 mm) anywhere on the site shall commence until the person causing an excavation to be made has documented the existing conditions of all adjacent buildings in a preconstruction survey. In addition to the preconstruction survey, a geotechnical report in accordance with Section 1803.6, and an evaluation analysis in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179904', hash: '#JD_BC1817' }}\">1817<\/Link>, shall be prepared when required by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178838', hash: '#JD_BCCh.18' }}\">Chapter 18<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6460-html-1",
+      "kind" : "html",
+      "plainText" : "No excavation work to a depth of 5 feet to 10 feet (1524 mm to 3048 mm) within 10 feet (3048 mm) of an adjacent building, or an excavation over 10 feet (3048 mm) anywhere on the site shall commence until the person causing an excavation to be made has documented the existing conditions of all adjacent buildings in a preconstruction survey. In addition to the preconstruction survey, a geotechnical report in accordance with Section 1803.6, and an evaluation analysis in accordance with Section 1817 , shall be prepared when required by Chapter 18 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "No excavation work to a depth of 5 feet to 10 feet (1524 mm to 3048 mm) within 10 feet (3048 mm) of an adjacent building, or an excavation over 10 feet (3048 mm) anywhere on the site shall commence until the person causing an excavation to be made has documented the existing conditions of all adjacent buildings in a preconstruction survey. In addition to the preconstruction survey, a geotechnical report in accordance with Section 1803.6, and an evaluation analysis in accordance with Section 1817, shall be prepared when required by Chapter 18.",
+  "previewText" : "No excavation work to a depth of 5 feet to 10 feet (1524 mm to 3048 mm) within 10 feet (3048 mm) of an adjacent building, or an excavation over 10 feet (3048 mm) anywhere on the site shall commence until the person causing an excavation to be made has documented the existing conditions of all adjacent buildings in a preconstruction survey.",
+  "schemaVersion" : 2,
+  "sectionID" : 6460
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196483\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196483\"><\/AnnotationDrawer><div>Provision shall be made for expansion in piping without the use of expansion joints.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11589-html-1",
+      "kind" : "html",
+      "plainText" : "Provision shall be made for expansion in piping without the use of expansion joints."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Provision shall be made for expansion in piping without the use of expansion joints.",
+  "previewText" : "Provision shall be made for expansion in piping without the use of expansion joints.",
+  "schemaVersion" : 2,
+  "sectionID" : 11589
+}

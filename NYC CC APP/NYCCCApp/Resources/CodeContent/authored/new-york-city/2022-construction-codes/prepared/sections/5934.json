@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185151\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185151\"><\/AnnotationDrawer><div>Material and equipment located at a site during construction or demolition operations shall comply with Sections 3303.4.5.1 and 3303.4.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5934-html-1",
+      "kind" : "html",
+      "plainText" : "Material and equipment located at a site during construction or demolition operations shall comply with Sections 3303.4.5.1 and 3303.4.5.2."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Material and equipment located at a site during construction or demolition operations shall comply with Sections 3303.4.5.1 and 3303.4.5.2.",
+  "previewText" : "Material and equipment located at a site during construction or demolition operations shall comply with Sections 3303.",
+  "schemaVersion" : 2,
+  "sectionID" : 5934
+}

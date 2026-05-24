@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175765\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175765\"><\/AnnotationDrawer><div>No part of any room shall be more than 30 feet (9144 mm) from a window opening onto a street or yard unless such room also opens onto a court complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175887', hash: '#JD_BC1206' }}\">1206<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175766\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175766\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> In dwelling units containing more than three habitable rooms in Group R-1 or R-2 occupancies in buildings of Type I or II construction, rooms may be greater than 30 feet (9144 mm) in depth provided that all other requirements of Section 1203.5.1.2 are met and that the required windows are so located as to properly light all portions of the room in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175822', hash: '#JD_BC1205' }}\">1205<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2964-html-1",
+      "kind" : "html",
+      "plainText" : "No part of any room shall be more than 30 feet (9144 mm) from a window opening onto a street or yard unless such room also opens onto a court complying with Section 1206 .\n\n Exception: In dwelling units containing more than three habitable rooms in Group R-1 or R-2 occupancies in buildings of Type I or II construction, rooms may be greater than 30 feet (9144 mm) in depth provided that all other requirements of Section 1203.5.1.2 are met and that the required windows are so located as to properly light all portions of the room in accordance with Section 1205 ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "No part of any room shall be more than 30 feet (9144 mm) from a window opening onto a street or yard unless such room also opens onto a court complying with Section 1206.\n\nException: In dwelling units containing more than three habitable rooms in Group R-1 or R-2 occupancies in buildings of Type I or II construction, rooms may be greater than 30 feet (9144 mm) in depth provided that all other requirements of Section 1203.5.1.2 are met and that the required windows are so located as to properly light all portions of the room in accordance with Section 1205.",
+  "previewText" : "No part of any room shall be more than 30 feet (9144 mm) from a window opening onto a street or yard unless such room also opens onto a court complying with Section 1206.",
+  "schemaVersion" : 2,
+  "sectionID" : 2964
+}

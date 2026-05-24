@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196642\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196642\"><\/AnnotationDrawer><div>Connections between bracing members and the sides of the tank shall be designed so that the connection will not fail before the member will fail.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11637-html-1",
+      "kind" : "html",
+      "plainText" : "Connections between bracing members and the sides of the tank shall be designed so that the connection will not fail before the member will fail."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Connections between bracing members and the sides of the tank shall be designed so that the connection will not fail before the member will fail.",
+  "previewText" : "Connections between bracing members and the sides of the tank shall be designed so that the connection will not fail before the member will fail.",
+  "schemaVersion" : 2,
+  "sectionID" : 11637
+}

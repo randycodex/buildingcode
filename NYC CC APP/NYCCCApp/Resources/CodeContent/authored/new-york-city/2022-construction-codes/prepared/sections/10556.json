@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193612\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193612\"><\/AnnotationDrawer><div>LP-gas distribution facilities shall conform to the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10556-html-1",
+      "kind" : "html",
+      "plainText" : "LP-gas distribution facilities shall conform to the requirements of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "LP-gas distribution facilities shall conform to the requirements of the New York City Fire Code.",
+  "previewText" : "LP-gas distribution facilities shall conform to the requirements of the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10556
+}

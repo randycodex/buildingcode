@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185285\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185285\"><\/AnnotationDrawer><div>Sawdust shall be vacuumed as operations proceed. Combustible debris, including but not limited to sawdust and scrap lumber, shall be removed from the site as required by Section 3303.5.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5989-html-1",
+      "kind" : "html",
+      "plainText" : "Sawdust shall be vacuumed as operations proceed. Combustible debris, including but not limited to sawdust and scrap lumber, shall be removed from the site as required by Section 3303.5.1."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Sawdust shall be vacuumed as operations proceed. Combustible debris, including but not limited to sawdust and scrap lumber, shall be removed from the site as required by Section 3303.5.1.",
+  "previewText" : "Sawdust shall be vacuumed as operations proceed.",
+  "schemaVersion" : 2,
+  "sectionID" : 5989
+}

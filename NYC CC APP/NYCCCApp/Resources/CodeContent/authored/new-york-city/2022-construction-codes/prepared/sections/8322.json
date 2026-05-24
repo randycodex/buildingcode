@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198195\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198195\"><\/AnnotationDrawer><div>Drips are not permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8322-html-1",
+      "kind" : "html",
+      "plainText" : "Drips are not permitted."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Drips are not permitted.",
+  "previewText" : "Drips are not permitted.",
+  "schemaVersion" : 2,
+  "sectionID" : 8322
+}

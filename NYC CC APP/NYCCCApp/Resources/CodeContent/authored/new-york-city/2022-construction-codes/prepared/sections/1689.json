@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171550\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171550\"><\/AnnotationDrawer><div>Automatic water mist systems shall be designed and installed in accordance with the manufacturer's instructions and the<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\"> New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1689-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic water mist systems shall be designed and installed in accordance with the manufacturer's instructions and the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Automatic water mist systems shall be designed and installed in accordance with the manufacturer's instructions and the New York City Fire Code.",
+  "previewText" : "Automatic water mist systems shall be designed and installed in accordance with the manufacturer's instructions and the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 1689
+}

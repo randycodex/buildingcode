@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198539\"><\/AnnotationDrawer><div>Appliances required to be vented shall be connected to a venting system designed and installed in accordance with the provisions of Sections 503.4 through 503.16.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8455-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances required to be vented shall be connected to a venting system designed and installed in accordance with the provisions of Sections 503.4 through 503.16."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Appliances required to be vented shall be connected to a venting system designed and installed in accordance with the provisions of Sections 503.4 through 503.16.",
+  "previewText" : "Appliances required to be vented shall be connected to a venting system designed and installed in accordance with the provisions of Sections 503.",
+  "schemaVersion" : 2,
+  "sectionID" : 8455
+}

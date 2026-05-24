@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181903\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181903\"><\/AnnotationDrawer><div>Floors shall be without concealed spaces. Wood floors shall be constructed in accordance with Section 2304.11.3.1 or 2304.11.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4949-html-1",
+      "kind" : "html",
+      "plainText" : "Floors shall be without concealed spaces. Wood floors shall be constructed in accordance with Section 2304.11.3.1 or 2304.11.3.2."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Floors shall be without concealed spaces. Wood floors shall be constructed in accordance with Section 2304.11.3.1 or 2304.11.3.2.",
+  "previewText" : "Floors shall be without concealed spaces.",
+  "schemaVersion" : 2,
+  "sectionID" : 4949
+}

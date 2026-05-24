@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166403\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166403\"><\/AnnotationDrawer><div>Storage Group S occupancy includes, among others, the use of a building or structure, or a portion thereof, for storage, such as for warehouses, storage rooms, freight depots and distribution centers, when not classified as a hazardous occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "181-html-1",
+      "kind" : "html",
+      "plainText" : "Storage Group S occupancy includes, among others, the use of a building or structure, or a portion thereof, for storage, such as for warehouses, storage rooms, freight depots and distribution centers, when not classified as a hazardous occupancy."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Storage Group S occupancy includes, among others, the use of a building or structure, or a portion thereof, for storage, such as for warehouses, storage rooms, freight depots and distribution centers, when not classified as a hazardous occupancy.",
+  "previewText" : "Storage Group S occupancy includes, among others, the use of a building or structure, or a portion thereof, for storage, such as for warehouses, storage rooms, freight depots and distribution centers, when not classified as a hazardous occupancy.",
+  "schemaVersion" : 2,
+  "sectionID" : 181
+}

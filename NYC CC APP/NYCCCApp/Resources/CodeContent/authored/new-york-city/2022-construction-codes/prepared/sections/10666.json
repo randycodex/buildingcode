@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193961\"><\/AnnotationDrawer><div>Type I hoods shall bear a label indicating the minimum exhaust flow rate in cfm per linear foot (L\/s per linear meter) of hood that provides for capture and containment of the exhaust effluent for the cooking appliances served by the hood, based on the cooking appliance duty classifications defined in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10666-html-1",
+      "kind" : "html",
+      "plainText" : "Type I hoods shall bear a label indicating the minimum exhaust flow rate in cfm per linear foot (L\/s per linear meter) of hood that provides for capture and containment of the exhaust effluent for the cooking appliances served by the hood, based on the cooking appliance duty classifications defined in this code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Type I hoods shall bear a label indicating the minimum exhaust flow rate in cfm per linear foot (L\/s per linear meter) of hood that provides for capture and containment of the exhaust effluent for the cooking appliances served by the hood, based on the cooking appliance duty classifications defined in this code.",
+  "previewText" : "Type I hoods shall bear a label indicating the minimum exhaust flow rate in cfm per linear foot (L\/s per linear meter) of hood that provides for capture and containment of the exhaust effluent for the cooking appliances served by the hood, based on the cooking appliance duty classifications defined in this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10666
+}

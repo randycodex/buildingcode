@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161800\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161800\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Flush pipes and fittings shall be of nonferrous material and shall conform to ASME A112.19.5\/CSA B45.15.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161801\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161801\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161801\"><\/AnnotationDrawer><h6><a name=\"JD_PC426\" id=\"JD_PC426\" title=\"PC 426\"><\/a>Section PC 426: Manual Food and Beverage Dispensing Equipment<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12054-html-1",
+      "kind" : "html",
+      "plainText" : "Flush pipes and fittings shall be of nonferrous material and shall conform to ASME A112.19.5\/CSA B45.15. \n\n Section PC 426: Manual Food and Beverage Dispensing Equipment"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Flush pipes and fittings shall be of nonferrous material and shall conform to ASME A112.19.5\/CSA B45.15.\n\nSection PC 426: Manual Food and Beverage Dispensing Equipment",
+  "previewText" : "Flush pipes and fittings shall be of nonferrous material and shall conform to ASME A112.",
+  "schemaVersion" : 2,
+  "sectionID" : 12054
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187674\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187674\"><\/AnnotationDrawer><div>No person shall at any time make any required safety device or electrical protective device inoperative except when necessary during tests, inspections and maintenance.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187675\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187675\"><\/AnnotationDrawer><div>Immediately upon completion of the tests, inspections and maintenance, such devices shall be restored to their normal operating condition in conformance with the applicable requirements of this section. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-187676\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-187676\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-187676\"><\/AnnotationDrawer><h6><a name=\"JD_BC3319\" id=\"JD_BC3319\" title=\"BC 3319\"><\/a>Section BC 3319: Cranes and Derricks<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6790-html-1",
+      "kind" : "html",
+      "plainText" : "No person shall at any time make any required safety device or electrical protective device inoperative except when necessary during tests, inspections and maintenance.\n\n Immediately upon completion of the tests, inspections and maintenance, such devices shall be restored to their normal operating condition in conformance with the applicable requirements of this section. \n\n Section BC 3319: Cranes and Derricks"
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "No person shall at any time make any required safety device or electrical protective device inoperative except when necessary during tests, inspections and maintenance.\n\nImmediately upon completion of the tests, inspections and maintenance, such devices shall be restored to their normal operating condition in conformance with the applicable requirements of this section.",
+  "previewText" : "No person shall at any time make any required safety device or electrical protective device inoperative except when necessary during tests, inspections and maintenance.",
+  "schemaVersion" : 2,
+  "sectionID" : 6790
+}

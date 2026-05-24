@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187925\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187925\"><\/AnnotationDrawer><div>No lift or fork truck shall be loaded beyond its capacity rating. No hand-operated pallet truck loaded so that any point on the load is at a greater height than 4 feet 6 inches (114 mm) above the floor shall be moved by pushing unless handled by two persons.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6847-html-1",
+      "kind" : "html",
+      "plainText" : "No lift or fork truck shall be loaded beyond its capacity rating. No hand-operated pallet truck loaded so that any point on the load is at a greater height than 4 feet 6 inches (114 mm) above the floor shall be moved by pushing unless handled by two persons."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "No lift or fork truck shall be loaded beyond its capacity rating. No hand-operated pallet truck loaded so that any point on the load is at a greater height than 4 feet 6 inches (114 mm) above the floor shall be moved by pushing unless handled by two persons.",
+  "previewText" : "No lift or fork truck shall be loaded beyond its capacity rating.",
+  "schemaVersion" : 2,
+  "sectionID" : 6847
+}

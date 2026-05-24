@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163437\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163437\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Roof drains shall be installed in accordance with the manufacturer's instructions. The inside opening for the roof drain shall not be obstructed by the roofing membrane material.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12680-html-1",
+      "kind" : "html",
+      "plainText" : "Roof drains shall be installed in accordance with the manufacturer's instructions. The inside opening for the roof drain shall not be obstructed by the roofing membrane material."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Roof drains shall be installed in accordance with the manufacturer's instructions. The inside opening for the roof drain shall not be obstructed by the roofing membrane material.",
+  "previewText" : "Roof drains shall be installed in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 12680
+}

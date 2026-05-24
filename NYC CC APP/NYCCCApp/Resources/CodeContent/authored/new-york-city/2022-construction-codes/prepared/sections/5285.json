@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183276\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183276\"><\/AnnotationDrawer><div>The interior trim shall not constitute more than 10 percent of the specific wall or ceiling area to which it is attached.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5285-html-1",
+      "kind" : "html",
+      "plainText" : "The interior trim shall not constitute more than 10 percent of the specific wall or ceiling area to which it is attached."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "The interior trim shall not constitute more than 10 percent of the specific wall or ceiling area to which it is attached.",
+  "previewText" : "The interior trim shall not constitute more than 10 percent of the specific wall or ceiling area to which it is attached.",
+  "schemaVersion" : 2,
+  "sectionID" : 5285
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172920\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172920\"><\/AnnotationDrawer><div>Objects with leading edges more than 27 inches (685 mm) and not more than 80 inches (2032 mm) above the floor shall not project horizontally more than 4 inches (101.6 mm) into the circulation path. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172921\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172921\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Handrails are permitted to protrude 4 1\/2 inches (114.3 mm) from the wall.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172922\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172922\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224280\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2131-html-1",
+      "kind" : "html",
+      "plainText" : "Objects with leading edges more than 27 inches (685 mm) and not more than 80 inches (2032 mm) above the floor shall not project horizontally more than 4 inches (101.6 mm) into the circulation path. \n\n Exception: Handrails are permitted to protrude 4 1\/2 inches (114.3 mm) from the wall.\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Objects with leading edges more than 27 inches (685 mm) and not more than 80 inches (2032 mm) above the floor shall not project horizontally more than 4 inches (101.6 mm) into the circulation path.\n\nException: Handrails are permitted to protrude 4 1\/2 inches (114.3 mm) from the wall.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "Objects with leading edges more than 27 inches (685 mm) and not more than 80 inches (2032 mm) above the floor shall not project horizontally more than 4 inches (101.",
+  "schemaVersion" : 2,
+  "sectionID" : 2131
+}

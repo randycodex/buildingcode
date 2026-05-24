@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196659\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196659\"><\/AnnotationDrawer><div>Roof plates shall have welded water-tight seams, and the roof shall be built to shed water. Bottom plates shall have welded seams. Shell plate seams shall be designed to develop the full strength of the plate.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11642-html-1",
+      "kind" : "html",
+      "plainText" : "Roof plates shall have welded water-tight seams, and the roof shall be built to shed water. Bottom plates shall have welded seams. Shell plate seams shall be designed to develop the full strength of the plate."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Roof plates shall have welded water-tight seams, and the roof shall be built to shed water. Bottom plates shall have welded seams. Shell plate seams shall be designed to develop the full strength of the plate.",
+  "previewText" : "Roof plates shall have welded water-tight seams, and the roof shall be built to shed water.",
+  "schemaVersion" : 2,
+  "sectionID" : 11642
+}

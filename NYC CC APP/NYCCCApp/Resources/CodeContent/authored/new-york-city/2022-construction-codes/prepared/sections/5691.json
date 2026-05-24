@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184372\"><\/AnnotationDrawer><div>Large wind turbines shall be designed and constructed in accordance with this section. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5691-html-1",
+      "kind" : "html",
+      "plainText" : "Large wind turbines shall be designed and constructed in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Large wind turbines shall be designed and constructed in accordance with this section.",
+  "previewText" : "Large wind turbines shall be designed and constructed in accordance with this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 5691
+}

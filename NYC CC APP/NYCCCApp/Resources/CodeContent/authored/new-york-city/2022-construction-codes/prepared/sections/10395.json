@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193166\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193166\"><\/AnnotationDrawer><div>All pumps of 3 horsepower (2.24 kW) or more located on any floor other than a floor on grade shall be supported on vibration isolators having a minimum isolation efficiency of 90 percent at the lowest disturbing frequency. Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10395-html-1",
+      "kind" : "html",
+      "plainText" : "All pumps of 3 horsepower (2.24 kW) or more located on any floor other than a floor on grade shall be supported on vibration isolators having a minimum isolation efficiency of 90 percent at the lowest disturbing frequency. Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm)."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "All pumps of 3 horsepower (2.24 kW) or more located on any floor other than a floor on grade shall be supported on vibration isolators having a minimum isolation efficiency of 90 percent at the lowest disturbing frequency. Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm).",
+  "previewText" : "All pumps of 3 horsepower (2.",
+  "schemaVersion" : 2,
+  "sectionID" : 10395
+}

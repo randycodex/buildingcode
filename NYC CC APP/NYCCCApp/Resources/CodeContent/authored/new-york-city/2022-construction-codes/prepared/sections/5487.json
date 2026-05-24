@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183831\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183831\"><\/AnnotationDrawer><div>Control diagrams shall be provided in accordance with Section 909.15.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5487-html-1",
+      "kind" : "html",
+      "plainText" : "Control diagrams shall be provided in accordance with Section 909.15."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Control diagrams shall be provided in accordance with Section 909.15.",
+  "previewText" : "Control diagrams shall be provided in accordance with Section 909.",
+  "schemaVersion" : 2,
+  "sectionID" : 5487
+}

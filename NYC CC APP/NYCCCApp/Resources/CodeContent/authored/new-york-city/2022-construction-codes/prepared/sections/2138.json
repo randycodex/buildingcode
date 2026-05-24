@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172944\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172944\"><\/AnnotationDrawer><div>Cumulative occupant loads shall be determined in accordance with Sections 1004.1.1.1 and 1004.1.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2138-html-1",
+      "kind" : "html",
+      "plainText" : "Cumulative occupant loads shall be determined in accordance with Sections 1004.1.1.1 and 1004.1.1.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Cumulative occupant loads shall be determined in accordance with Sections 1004.1.1.1 and 1004.1.1.2.",
+  "previewText" : "Cumulative occupant loads shall be determined in accordance with Sections 1004.",
+  "schemaVersion" : 2,
+  "sectionID" : 2138
+}

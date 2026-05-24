@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188647\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188647\"><\/AnnotationDrawer><div>In coastal high-hazard areas and coastal A-Zones:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188648\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188648\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;New buildings, not including substantial improvements, shall only be authorized landward of the reach of mean high tide.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188649\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188649\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The use of fill for structural support of buildings is prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7046-html-1",
+      "kind" : "html",
+      "plainText" : "In coastal high-hazard areas and coastal A-Zones:\n\n 1. New buildings, not including substantial improvements, shall only be authorized landward of the reach of mean high tide.\n\n 2. The use of fill for structural support of buildings is prohibited."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "In coastal high-hazard areas and coastal A-Zones:\n\n1. New buildings, not including substantial improvements, shall only be authorized landward of the reach of mean high tide.\n\n2. The use of fill for structural support of buildings is prohibited.",
+  "previewText" : "In coastal high-hazard areas and coastal A-Zones:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 7046
+}

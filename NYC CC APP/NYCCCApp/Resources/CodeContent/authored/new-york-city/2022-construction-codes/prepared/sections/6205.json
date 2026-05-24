@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185846\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185846\"><\/AnnotationDrawer><div>Loads shall be placed on cold-formed steel in accordance with section 3305.8.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6205-html-1",
+      "kind" : "html",
+      "plainText" : "Loads shall be placed on cold-formed steel in accordance with section 3305.8.7."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Loads shall be placed on cold-formed steel in accordance with section 3305.8.7.",
+  "previewText" : "Loads shall be placed on cold-formed steel in accordance with section 3305.",
+  "schemaVersion" : 2,
+  "sectionID" : 6205
+}

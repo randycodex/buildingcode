@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198356\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198356\"><\/AnnotationDrawer><div>Pressure-relieving and pressure-limiting devices shall be constructed of materials so that the operation of the devices will not be impaired by corrosion of external parts by the atmosphere or of internal parts by the gas. Pressure-relieving and pressure-limiting devices shall be designed and installed so that they can be operated to determine whether the valve is free. The devices shall be designed and installed so that they can be tested to determine the pressure at which they will operate and examined for leakage when in the closed position. The devices shall be maintained and inspected in accordance with Section 416.3.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8386-html-1",
+      "kind" : "html",
+      "plainText" : "Pressure-relieving and pressure-limiting devices shall be constructed of materials so that the operation of the devices will not be impaired by corrosion of external parts by the atmosphere or of internal parts by the gas. Pressure-relieving and pressure-limiting devices shall be designed and installed so that they can be operated to determine whether the valve is free. The devices shall be designed and installed so that they can be tested to determine the pressure at which they will operate and examined for leakage when in the closed position. The devices shall be maintained and inspected in accordance with Section 416.3.7."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Pressure-relieving and pressure-limiting devices shall be constructed of materials so that the operation of the devices will not be impaired by corrosion of external parts by the atmosphere or of internal parts by the gas. Pressure-relieving and pressure-limiting devices shall be designed and installed so that they can be operated to determine whether the valve is free. The devices shall be designed and installed so that they can be tested to determine the pressure at which they will operate and examined for leakage when in the closed position. The devices shall be maintained and inspected in accordance with Section 416.3.7.",
+  "previewText" : "Pressure-relieving and pressure-limiting devices shall be constructed of materials so that the operation of the devices will not be impaired by corrosion of external parts by the atmosphere or of internal parts by the gas.",
+  "schemaVersion" : 2,
+  "sectionID" : 8386
+}

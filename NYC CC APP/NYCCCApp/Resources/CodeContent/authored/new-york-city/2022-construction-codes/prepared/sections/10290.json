@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192882\"><\/AnnotationDrawer><div>Electrical wiring, controls and connections to equipment and appliances regulated by this code shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10290-html-1",
+      "kind" : "html",
+      "plainText" : "Electrical wiring, controls and connections to equipment and appliances regulated by this code shall be in accordance with the New York City Electrical Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Electrical wiring, controls and connections to equipment and appliances regulated by this code shall be in accordance with the New York City Electrical Code.",
+  "previewText" : "Electrical wiring, controls and connections to equipment and appliances regulated by this code shall be in accordance with the New York City Electrical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10290
+}

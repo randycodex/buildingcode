@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183726\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183726\"><\/AnnotationDrawer><div>Where only one elevator is installed, the elevator shall automatically transfer to standby power within 60 seconds after failure of normal power.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5444-html-1",
+      "kind" : "html",
+      "plainText" : "Where only one elevator is installed, the elevator shall automatically transfer to standby power within 60 seconds after failure of normal power."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Where only one elevator is installed, the elevator shall automatically transfer to standby power within 60 seconds after failure of normal power.",
+  "previewText" : "Where only one elevator is installed, the elevator shall automatically transfer to standby power within 60 seconds after failure of normal power.",
+  "schemaVersion" : 2,
+  "sectionID" : 5444
+}

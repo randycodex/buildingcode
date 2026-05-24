@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166575\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166575\"><\/AnnotationDrawer><div>Plastics other than foam plastics used in signs shall be light-transmitting plastics complying with Section 2606.4 or shall have a self-ignition temperature of 650&#176;F (343&#176;C) or greater when tested in accordance with ASTM D 1929, and a flame spread index not greater than 75 and smoke-developed index not greater than 450 when tested in the manner intended for use in accordance with ASTM E 84 or UL 723 or meet the acceptance criteria of Section 803.1.2.1 when tested in accordance with NFPA 286.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "218-html-1",
+      "kind" : "html",
+      "plainText" : "Plastics other than foam plastics used in signs shall be light-transmitting plastics complying with Section 2606.4 or shall have a self-ignition temperature of 650°F (343°C) or greater when tested in accordance with ASTM D 1929, and a flame spread index not greater than 75 and smoke-developed index not greater than 450 when tested in the manner intended for use in accordance with ASTM E 84 or UL 723 or meet the acceptance criteria of Section 803.1.2.1 when tested in accordance with NFPA 286."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Plastics other than foam plastics used in signs shall be light-transmitting plastics complying with Section 2606.4 or shall have a self-ignition temperature of 650°F (343°C) or greater when tested in accordance with ASTM D 1929, and a flame spread index not greater than 75 and smoke-developed index not greater than 450 when tested in the manner intended for use in accordance with ASTM E 84 or UL 723 or meet the acceptance criteria of Section 803.1.2.1 when tested in accordance with NFPA 286.",
+  "previewText" : "Plastics other than foam plastics used in signs shall be light-transmitting plastics complying with Section 2606.",
+  "schemaVersion" : 2,
+  "sectionID" : 218
+}

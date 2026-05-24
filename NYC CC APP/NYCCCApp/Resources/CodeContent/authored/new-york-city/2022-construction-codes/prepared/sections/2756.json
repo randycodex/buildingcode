@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175167\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175167\"><\/AnnotationDrawer><div>In all units, including those not required to be Accessible units, Type B+NYC units, or Type B units, entrances, doors, and doorways providing user passage into and within units shall comply with Section 404.2.2 (Clear Width) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2756-html-1",
+      "kind" : "html",
+      "plainText" : "In all units, including those not required to be Accessible units, Type B+NYC units, or Type B units, entrances, doors, and doorways providing user passage into and within units shall comply with Section 404.2.2 (Clear Width) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "In all units, including those not required to be Accessible units, Type B+NYC units, or Type B units, entrances, doors, and doorways providing user passage into and within units shall comply with Section 404.2.2 (Clear Width) of ICC A117.1.",
+  "previewText" : "In all units, including those not required to be Accessible units, Type B+NYC units, or Type B units, entrances, doors, and doorways providing user passage into and within units shall comply with Section 404.",
+  "schemaVersion" : 2,
+  "sectionID" : 2756
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180327\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180327\"><\/AnnotationDrawer><div>Field-cured specimens shall comply with the provisions of Sections 1905.6.4.1 through 1905.6.4.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4396-html-1",
+      "kind" : "html",
+      "plainText" : "Field-cured specimens shall comply with the provisions of Sections 1905.6.4.1 through 1905.6.4.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Field-cured specimens shall comply with the provisions of Sections 1905.6.4.1 through 1905.6.4.4.",
+  "previewText" : "Field-cured specimens shall comply with the provisions of Sections 1905.",
+  "schemaVersion" : 2,
+  "sectionID" : 4396
+}

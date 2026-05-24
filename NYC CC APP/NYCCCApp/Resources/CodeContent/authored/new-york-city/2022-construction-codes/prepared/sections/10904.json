@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194692\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194692\"><\/AnnotationDrawer><div>The provisions of this chapter shall govern the requirements for combustion, ventilation, and dilution air for fuel-burning appliances other than gas-fired appliances. The requirements for combustion, ventilation, and dilution air for gas-fired appliances shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10904-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this chapter shall govern the requirements for combustion, ventilation, and dilution air for fuel-burning appliances other than gas-fired appliances. The requirements for combustion, ventilation, and dilution air for gas-fired appliances shall be in accordance with the New York City Fuel Gas Code."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The provisions of this chapter shall govern the requirements for combustion, ventilation, and dilution air for fuel-burning appliances other than gas-fired appliances. The requirements for combustion, ventilation, and dilution air for gas-fired appliances shall be in accordance with the New York City Fuel Gas Code.",
+  "previewText" : "The provisions of this chapter shall govern the requirements for combustion, ventilation, and dilution air for fuel-burning appliances other than gas-fired appliances.",
+  "schemaVersion" : 2,
+  "sectionID" : 10904
+}

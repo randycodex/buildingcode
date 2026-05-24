@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184701\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184701\"><\/AnnotationDrawer><div>Signs shall be posted at a construction or demolition site in accordance with Sections 3301.9.1 through 3301.9.8. It is the responsibility of the permit holder for the underlying construction or demolition work, or where there are no active permits, the building owner, to ensure such signs are posted and maintained at the site in accordance with Sections 3301.9.1 through 3301.9.8, and to ensure that such signs are updated in a timely fashion to reflect any revised information.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5852-html-1",
+      "kind" : "html",
+      "plainText" : "Signs shall be posted at a construction or demolition site in accordance with Sections 3301.9.1 through 3301.9.8. It is the responsibility of the permit holder for the underlying construction or demolition work, or where there are no active permits, the building owner, to ensure such signs are posted and maintained at the site in accordance with Sections 3301.9.1 through 3301.9.8, and to ensure that such signs are updated in a timely fashion to reflect any revised information."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Signs shall be posted at a construction or demolition site in accordance with Sections 3301.9.1 through 3301.9.8. It is the responsibility of the permit holder for the underlying construction or demolition work, or where there are no active permits, the building owner, to ensure such signs are posted and maintained at the site in accordance with Sections 3301.9.1 through 3301.9.8, and to ensure that such signs are updated in a timely fashion to reflect any revised information.",
+  "previewText" : "Signs shall be posted at a construction or demolition site in accordance with Sections 3301.",
+  "schemaVersion" : 2,
+  "sectionID" : 5852
+}

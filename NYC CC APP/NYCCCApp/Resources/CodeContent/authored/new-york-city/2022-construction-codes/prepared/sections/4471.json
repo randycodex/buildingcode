@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180499\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180499\"><\/AnnotationDrawer><div>The text of ACI 318 shall be modified as indicated in Sections 1908.1.1 through 1908.1.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4471-html-1",
+      "kind" : "html",
+      "plainText" : "The text of ACI 318 shall be modified as indicated in Sections 1908.1.1 through 1908.1.10."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "The text of ACI 318 shall be modified as indicated in Sections 1908.1.1 through 1908.1.10.",
+  "previewText" : "The text of ACI 318 shall be modified as indicated in Sections 1908.",
+  "schemaVersion" : 2,
+  "sectionID" : 4471
+}

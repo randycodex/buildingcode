@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194939\"><\/AnnotationDrawer><div>Vent systems shall be listed and labeled or field fabricated in accordance with NFPA 211. Type L vents shall be tested in accordance with UL 641.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10995-html-1",
+      "kind" : "html",
+      "plainText" : "Vent systems shall be listed and labeled or field fabricated in accordance with NFPA 211. Type L vents shall be tested in accordance with UL 641."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Vent systems shall be listed and labeled or field fabricated in accordance with NFPA 211. Type L vents shall be tested in accordance with UL 641.",
+  "previewText" : "Vent systems shall be listed and labeled or field fabricated in accordance with NFPA 211.",
+  "schemaVersion" : 2,
+  "sectionID" : 10995
+}

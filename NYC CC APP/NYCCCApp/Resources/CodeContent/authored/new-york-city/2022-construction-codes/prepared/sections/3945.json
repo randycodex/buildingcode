@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178992\"><\/AnnotationDrawer><div>Construction documents shall be prepared in accordance with Section 107.7.1. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178993\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178993\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224376\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224376\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-224377\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-224377\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-224377\"><\/AnnotationDrawer><h6><a name=\"JD_BC1804\" id=\"JD_BC1804\" title=\"BC 1804\"><\/a>Section BC 1804: Excavation, Grading and Fill<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3945-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents shall be prepared in accordance with Section 107.7.1. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 . \n\n Section BC 1804: Excavation, Grading and Fill"
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Construction documents shall be prepared in accordance with Section 107.7.1.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "Construction documents shall be prepared in accordance with Section 107.",
+  "schemaVersion" : 2,
+  "sectionID" : 3945
+}

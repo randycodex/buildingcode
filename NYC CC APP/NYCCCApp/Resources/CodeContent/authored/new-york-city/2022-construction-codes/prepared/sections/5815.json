@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184614\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184614\"><\/AnnotationDrawer><div>Bridges connecting buildings, and projecting beyond street lines may be permitted in accordance with applicable law. Such bridges shall be of a construction class that is at least equal to the higher class of the two buildings connected, and shall otherwise comply with the provisions of this code and other applicable laws and rules.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5815-html-1",
+      "kind" : "html",
+      "plainText" : "Bridges connecting buildings, and projecting beyond street lines may be permitted in accordance with applicable law. Such bridges shall be of a construction class that is at least equal to the higher class of the two buildings connected, and shall otherwise comply with the provisions of this code and other applicable laws and rules."
+    }
+  ],
+  "chapterNumber" : "32",
+  "officialText" : "Bridges connecting buildings, and projecting beyond street lines may be permitted in accordance with applicable law. Such bridges shall be of a construction class that is at least equal to the higher class of the two buildings connected, and shall otherwise comply with the provisions of this code and other applicable laws and rules.",
+  "previewText" : "Bridges connecting buildings, and projecting beyond street lines may be permitted in accordance with applicable law.",
+  "schemaVersion" : 2,
+  "sectionID" : 5815
+}

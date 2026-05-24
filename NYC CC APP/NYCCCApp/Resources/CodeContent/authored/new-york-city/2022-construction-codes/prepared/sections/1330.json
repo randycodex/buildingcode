@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170061\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170061\"><\/AnnotationDrawer><div>Fireblocking shall be provided in concealed spaces between stair stringers at the top and bottom of the run. Enclosed spaces under stairways shall also comply with Section 1011.7.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1330-html-1",
+      "kind" : "html",
+      "plainText" : "Fireblocking shall be provided in concealed spaces between stair stringers at the top and bottom of the run. Enclosed spaces under stairways shall also comply with Section 1011.7.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fireblocking shall be provided in concealed spaces between stair stringers at the top and bottom of the run. Enclosed spaces under stairways shall also comply with Section 1011.7.3.",
+  "previewText" : "Fireblocking shall be provided in concealed spaces between stair stringers at the top and bottom of the run.",
+  "schemaVersion" : 2,
+  "sectionID" : 1330
+}

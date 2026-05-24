@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179862\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179862\"><\/AnnotationDrawer><div>Group capacity of anchors shall be determined by a generally accepted means of analysis and shall:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179863\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179863\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Ignore any contribution from soil or rock materials located beyond the property limits of the proposed structure.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179864\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179864\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Not exceed that of the sum of all individual anchor loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4245-html-1",
+      "kind" : "html",
+      "plainText" : "Group capacity of anchors shall be determined by a generally accepted means of analysis and shall:\n\n 1. Ignore any contribution from soil or rock materials located beyond the property limits of the proposed structure.\n\n 2. Not exceed that of the sum of all individual anchor loads."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Group capacity of anchors shall be determined by a generally accepted means of analysis and shall:\n\n1. Ignore any contribution from soil or rock materials located beyond the property limits of the proposed structure.\n\n2. Not exceed that of the sum of all individual anchor loads.",
+  "previewText" : "Group capacity of anchors shall be determined by a generally accepted means of analysis and shall:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 4245
+}

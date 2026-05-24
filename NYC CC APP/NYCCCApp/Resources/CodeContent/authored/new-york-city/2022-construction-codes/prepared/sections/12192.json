@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162156\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162156\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water tanks shall be cleaned and painted in accordance with the following:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12192-html-1",
+      "kind" : "html",
+      "plainText" : "Water tanks shall be cleaned and painted in accordance with the following:"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Water tanks shall be cleaned and painted in accordance with the following:",
+  "previewText" : "Water tanks shall be cleaned and painted in accordance with the following:",
+  "schemaVersion" : 2,
+  "sectionID" : 12192
+}

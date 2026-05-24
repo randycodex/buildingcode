@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180149\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180149\"><\/AnnotationDrawer><div>Steel reinforcement used in concrete construction shall comply with ACI 318, Chapter 20.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4334-html-1",
+      "kind" : "html",
+      "plainText" : "Steel reinforcement used in concrete construction shall comply with ACI 318, Chapter 20."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Steel reinforcement used in concrete construction shall comply with ACI 318, Chapter 20.",
+  "previewText" : "Steel reinforcement used in concrete construction shall comply with ACI 318, Chapter 20.",
+  "schemaVersion" : 2,
+  "sectionID" : 4334
+}

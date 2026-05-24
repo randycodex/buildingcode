@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181336\"><\/AnnotationDrawer><div>Where required, a building's seismic design, detailing, material, fabrication and erection shall be in accordance with Section 2205.2.1 or 2205.2.2, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4762-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, a building's seismic design, detailing, material, fabrication and erection shall be in accordance with Section 2205.2.1 or 2205.2.2, as applicable."
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "Where required, a building's seismic design, detailing, material, fabrication and erection shall be in accordance with Section 2205.2.1 or 2205.2.2, as applicable.",
+  "previewText" : "Where required, a building's seismic design, detailing, material, fabrication and erection shall be in accordance with Section 2205.",
+  "schemaVersion" : 2,
+  "sectionID" : 4762
+}

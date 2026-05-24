@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "All structures shall be assigned a seismic design category based on their risk category and the design spectral response acceleration parameters, S DS and S D1 , determined in accordance with Section 1613.3.4 of this code or the site- specific procedures of ASCE 7. Each building and structure shall be assigned to the seismic design category in accordance with Table 1613.3.5 of this code, irrespective of the fundamental period of vibration of the structure, T.\n\nException: When electronic values of mapped acceleration parameters are used as per Section 1613.3.1, the seismic design category for Risk Category IV structures shall not differ from the values in Table 1613.3.5.\n\nTable 1613.3.5 Seismic Design Category",
+  "previewText" : "All structures shall be assigned a seismic design category based on their risk category and the design spectral response acceleration parameters, S DS and S D1 , determined in accordance with Section 1613.",
+  "schemaVersion" : 2,
+  "sectionID" : 3602
+}

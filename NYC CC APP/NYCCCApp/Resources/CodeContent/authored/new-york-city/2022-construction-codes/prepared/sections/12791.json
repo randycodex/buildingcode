@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163786\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163786\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Outlets shall be located not less than 4 inches (102 mm) above the bottom of the storage tank and shall not skim water from the surface.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12791-html-1",
+      "kind" : "html",
+      "plainText" : "Outlets shall be located not less than 4 inches (102 mm) above the bottom of the storage tank and shall not skim water from the surface."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Outlets shall be located not less than 4 inches (102 mm) above the bottom of the storage tank and shall not skim water from the surface.",
+  "previewText" : "Outlets shall be located not less than 4 inches (102 mm) above the bottom of the storage tank and shall not skim water from the surface.",
+  "schemaVersion" : 2,
+  "sectionID" : 12791
+}

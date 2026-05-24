@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166666\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166666\"><\/AnnotationDrawer><div>The following modifications to the minimum fire-resistance rating of the building elements in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable602' }}\">Table 601<\/Link> shall be as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166667\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;High rise buildings 420 feet (128 m) or greater in building height shall be constructed of Type IA construction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166668\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166668\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;For high rise buildings not greater than 420 feet (128 m) in building height, and constructed to meet the fire-resistance rating requirements of Type IB or IIA construction, the required fire-resistance rating of columns supporting floors shall be constructed to meet Type IA construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "256-html-1",
+      "kind" : "html",
+      "plainText" : "The following modifications to the minimum fire-resistance rating of the building elements in Table 601 shall be as follows:\n\n 1. High rise buildings 420 feet (128 m) or greater in building height shall be constructed of Type IA construction.\n\n 2. For high rise buildings not greater than 420 feet (128 m) in building height, and constructed to meet the fire-resistance rating requirements of Type IB or IIA construction, the required fire-resistance rating of columns supporting floors shall be constructed to meet Type IA construction."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The following modifications to the minimum fire-resistance rating of the building elements in Table 601 shall be as follows:\n\n1. High rise buildings 420 feet (128 m) or greater in building height shall be constructed of Type IA construction.\n\n2. For high rise buildings not greater than 420 feet (128 m) in building height, and constructed to meet the fire-resistance rating requirements of Type IB or IIA construction, the required fire-resistance rating of columns supporting floors shall be constructed to meet Type IA construction.",
+  "previewText" : "The following modifications to the minimum fire-resistance rating of the building elements in Table 601 shall be as follows:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 256
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173675\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173675\"><\/AnnotationDrawer><div>There shall not be enclosed usable space under exterior exit stairways unless the space is completely enclosed in 1-hour fire-resistance-rated construction. The open space under exterior stairways shall not be used for any purpose.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2325-html-1",
+      "kind" : "html",
+      "plainText" : "There shall not be enclosed usable space under exterior exit stairways unless the space is completely enclosed in 1-hour fire-resistance-rated construction. The open space under exterior stairways shall not be used for any purpose."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "There shall not be enclosed usable space under exterior exit stairways unless the space is completely enclosed in 1-hour fire-resistance-rated construction. The open space under exterior stairways shall not be used for any purpose.",
+  "previewText" : "There shall not be enclosed usable space under exterior exit stairways unless the space is completely enclosed in 1-hour fire-resistance-rated construction.",
+  "schemaVersion" : 2,
+  "sectionID" : 2325
+}

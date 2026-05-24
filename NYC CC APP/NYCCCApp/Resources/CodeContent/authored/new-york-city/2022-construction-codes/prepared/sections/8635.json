@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199117\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199117\"><\/AnnotationDrawer><div>This chapter shall govern the approval, design, installation, construction, maintenance, alteration and repair of the appliances and equipment specifically identified herein. The approval, design, installation, construction, maintenance, alteration and repair of non gas-fired appliances shall be regulated by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8635-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern the approval, design, installation, construction, maintenance, alteration and repair of the appliances and equipment specifically identified herein. The approval, design, installation, construction, maintenance, alteration and repair of non gas-fired appliances shall be regulated by the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "This chapter shall govern the approval, design, installation, construction, maintenance, alteration and repair of the appliances and equipment specifically identified herein. The approval, design, installation, construction, maintenance, alteration and repair of non gas-fired appliances shall be regulated by the New York City Mechanical Code.",
+  "previewText" : "This chapter shall govern the approval, design, installation, construction, maintenance, alteration and repair of the appliances and equipment specifically identified herein.",
+  "schemaVersion" : 2,
+  "sectionID" : 8635
+}

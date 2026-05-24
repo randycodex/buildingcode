@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199312\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199312\"><\/AnnotationDrawer><div>Where a furnace is installed so that supply ducts carry air circulated by the furnace to areas outside of the space containing the furnace, the return air shall be handled by a duct(s) sealed to the furnace casing and terminating outside of the space containing the furnace.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199313\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199313\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199313\"><\/AnnotationDrawer><h6><a name=\"JD_FGC619\" id=\"JD_FGC619\" title=\"FGC 619\"><\/a>Section FGC 619: Conversion Burners<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8712-html-1",
+      "kind" : "html",
+      "plainText" : "Where a furnace is installed so that supply ducts carry air circulated by the furnace to areas outside of the space containing the furnace, the return air shall be handled by a duct(s) sealed to the furnace casing and terminating outside of the space containing the furnace.\n\n Section FGC 619: Conversion Burners"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Where a furnace is installed so that supply ducts carry air circulated by the furnace to areas outside of the space containing the furnace, the return air shall be handled by a duct(s) sealed to the furnace casing and terminating outside of the space containing the furnace.\n\nSection FGC 619: Conversion Burners",
+  "previewText" : "Where a furnace is installed so that supply ducts carry air circulated by the furnace to areas outside of the space containing the furnace, the return air shall be handled by a duct(s) sealed to the furnace casing and terminating outside of the space containing the furnace.",
+  "schemaVersion" : 2,
+  "sectionID" : 8712
+}

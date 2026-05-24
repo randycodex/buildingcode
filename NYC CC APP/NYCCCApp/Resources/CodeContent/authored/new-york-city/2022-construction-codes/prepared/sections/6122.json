@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185634\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185634\"><\/AnnotationDrawer><div>Concrete formwork shall be designed in accordance with Section 3305.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6122-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete formwork shall be designed in accordance with Section 3305.3.2."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Concrete formwork shall be designed in accordance with Section 3305.3.2.",
+  "previewText" : "Concrete formwork shall be designed in accordance with Section 3305.",
+  "schemaVersion" : 2,
+  "sectionID" : 6122
+}

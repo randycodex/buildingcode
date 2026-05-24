@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183599\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183599\"><\/AnnotationDrawer><div>Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall comply with the UL 2200 listing and NFPA 110.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5405-html-1",
+      "kind" : "html",
+      "plainText" : "Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall comply with the UL 2200 listing and NFPA 110."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall comply with the UL 2200 listing and NFPA 110.",
+  "previewText" : "Where an optional standby power system is required to supply emergency or required standby power loads, such power system shall comply with the UL 2200 listing and NFPA 110.",
+  "schemaVersion" : 2,
+  "sectionID" : 5405
+}

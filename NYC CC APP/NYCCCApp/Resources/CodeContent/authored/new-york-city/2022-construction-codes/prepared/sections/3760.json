@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178441\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178441\"><\/AnnotationDrawer><div>For structures assigned to Seismic Design Category B, C, or D where the requirements of Section 13.2.1 of ASCE 7 for nonstructural components, supports or attachments are met by seismic qualification as specified in Item 2 therein, the registered design professional shall specify on the approved construction documents the requirements for seismic qualification by analysis, testing or experience data. Certificates of compliance for the seismic qualification shall be submitted to the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3760-html-1",
+      "kind" : "html",
+      "plainText" : "For structures assigned to Seismic Design Category B, C, or D where the requirements of Section 13.2.1 of ASCE 7 for nonstructural components, supports or attachments are met by seismic qualification as specified in Item 2 therein, the registered design professional shall specify on the approved construction documents the requirements for seismic qualification by analysis, testing or experience data. Certificates of compliance for the seismic qualification shall be submitted to the commissioner."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "For structures assigned to Seismic Design Category B, C, or D where the requirements of Section 13.2.1 of ASCE 7 for nonstructural components, supports or attachments are met by seismic qualification as specified in Item 2 therein, the registered design professional shall specify on the approved construction documents the requirements for seismic qualification by analysis, testing or experience data. Certificates of compliance for the seismic qualification shall be submitted to the commissioner.",
+  "previewText" : "For structures assigned to Seismic Design Category B, C, or D where the requirements of Section 13.",
+  "schemaVersion" : 2,
+  "sectionID" : 3760
+}

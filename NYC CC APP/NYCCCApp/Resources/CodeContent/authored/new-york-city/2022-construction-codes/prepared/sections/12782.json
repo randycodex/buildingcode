@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163765\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163765\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Collection piping conveying untreated water for reuse shall be sized in accordance with drainage sizing requirements specified in Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162750', hash: '#JD_PC710' }}\">710<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12782-html-1",
+      "kind" : "html",
+      "plainText" : "Collection piping conveying untreated water for reuse shall be sized in accordance with drainage sizing requirements specified in Section 710 ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Collection piping conveying untreated water for reuse shall be sized in accordance with drainage sizing requirements specified in Section 710.",
+  "previewText" : "Collection piping conveying untreated water for reuse shall be sized in accordance with drainage sizing requirements specified in Section 710.",
+  "schemaVersion" : 2,
+  "sectionID" : 12782
+}

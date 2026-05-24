@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179049\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179049\"><\/AnnotationDrawer><div>A drainage course shall consist of washed gravel, crushed natural stone or other suitable drainage medium acceptable to the engineer. Recycled concrete aggregate is not acceptable for use in a drainage course where a subsoil drainage system is used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3964-html-1",
+      "kind" : "html",
+      "plainText" : "A drainage course shall consist of washed gravel, crushed natural stone or other suitable drainage medium acceptable to the engineer. Recycled concrete aggregate is not acceptable for use in a drainage course where a subsoil drainage system is used."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "A drainage course shall consist of washed gravel, crushed natural stone or other suitable drainage medium acceptable to the engineer. Recycled concrete aggregate is not acceptable for use in a drainage course where a subsoil drainage system is used.",
+  "previewText" : "A drainage course shall consist of washed gravel, crushed natural stone or other suitable drainage medium acceptable to the engineer.",
+  "schemaVersion" : 2,
+  "sectionID" : 3964
+}

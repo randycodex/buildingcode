@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181176\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181176\"><\/AnnotationDrawer><div>Termination caps shall not be permitted and a 3-inch (76 mm) minimum drain shall be installed to receive collected water. A positive means shall be provided to prevent water from entering the appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181177\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181177\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Termination caps shall be permitted on listed factory-built chimneys.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4706-html-1",
+      "kind" : "html",
+      "plainText" : "Termination caps shall not be permitted and a 3-inch (76 mm) minimum drain shall be installed to receive collected water. A positive means shall be provided to prevent water from entering the appliance.\n\n Exception: Termination caps shall be permitted on listed factory-built chimneys."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Termination caps shall not be permitted and a 3-inch (76 mm) minimum drain shall be installed to receive collected water. A positive means shall be provided to prevent water from entering the appliance.\n\nException: Termination caps shall be permitted on listed factory-built chimneys.",
+  "previewText" : "Termination caps shall not be permitted and a 3-inch (76 mm) minimum drain shall be installed to receive collected water.",
+  "schemaVersion" : 2,
+  "sectionID" : 4706
+}

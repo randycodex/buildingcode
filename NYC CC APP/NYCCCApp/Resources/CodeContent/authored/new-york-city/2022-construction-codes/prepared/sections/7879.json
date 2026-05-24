@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230157\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230157\"><\/AnnotationDrawer><div>An ADU shall be provided with a heating, ventilation, and air-conditioning system, electrical system, and gas piping in accordance with Section U103.5.1 through U103.5.4, provided that an ADU on a tax lot where the total number of dwelling units exceeds 2, other than an ADU constructed in accordance with section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-230210', hash: '#JD_BCU202' }}\">U202<\/Link>, shall be provided with a heating, ventilation, and air-conditioning system, electrical system, and gas piping that is separate from the primary dwelling. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7879-html-1",
+      "kind" : "html",
+      "plainText" : "An ADU shall be provided with a heating, ventilation, and air-conditioning system, electrical system, and gas piping in accordance with Section U103.5.1 through U103.5.4, provided that an ADU on a tax lot where the total number of dwelling units exceeds 2, other than an ADU constructed in accordance with section U202 , shall be provided with a heating, ventilation, and air-conditioning system, electrical system, and gas piping that is separate from the primary dwelling."
+    }
+  ],
+  "chapterNumber" : "U",
+  "officialText" : "An ADU shall be provided with a heating, ventilation, and air-conditioning system, electrical system, and gas piping in accordance with Section U103.5.1 through U103.5.4, provided that an ADU on a tax lot where the total number of dwelling units exceeds 2, other than an ADU constructed in accordance with section U202, shall be provided with a heating, ventilation, and air-conditioning system, electrical system, and gas piping that is separate from the primary dwelling.",
+  "previewText" : "An ADU shall be provided with a heating, ventilation, and air-conditioning system, electrical system, and gas piping in accordance with Section U103.",
+  "schemaVersion" : 2,
+  "sectionID" : 7879
+}

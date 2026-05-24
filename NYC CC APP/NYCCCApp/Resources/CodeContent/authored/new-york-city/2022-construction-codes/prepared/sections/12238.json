@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162277\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162277\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water pumps, filters, softeners, tanks and other devices that handle or treat potable water shall be protected against contamination.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12238-html-1",
+      "kind" : "html",
+      "plainText" : "Water pumps, filters, softeners, tanks and other devices that handle or treat potable water shall be protected against contamination."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Water pumps, filters, softeners, tanks and other devices that handle or treat potable water shall be protected against contamination.",
+  "previewText" : "Water pumps, filters, softeners, tanks and other devices that handle or treat potable water shall be protected against contamination.",
+  "schemaVersion" : 2,
+  "sectionID" : 12238
+}

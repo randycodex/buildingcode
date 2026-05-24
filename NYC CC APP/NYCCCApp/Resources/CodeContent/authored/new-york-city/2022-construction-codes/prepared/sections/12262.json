@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162332\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162332\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The water supply connection to beverage dispensers shall be protected against backflow by a backflow preventer conforming to ASSE 1022 or by an air gap. The portion of the backflow preventer device downstream from the second check valve and the piping downstream therefrom shall not be affected by carbon dioxide gas.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12262-html-1",
+      "kind" : "html",
+      "plainText" : "The water supply connection to beverage dispensers shall be protected against backflow by a backflow preventer conforming to ASSE 1022 or by an air gap. The portion of the backflow preventer device downstream from the second check valve and the piping downstream therefrom shall not be affected by carbon dioxide gas."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "The water supply connection to beverage dispensers shall be protected against backflow by a backflow preventer conforming to ASSE 1022 or by an air gap. The portion of the backflow preventer device downstream from the second check valve and the piping downstream therefrom shall not be affected by carbon dioxide gas.",
+  "previewText" : "The water supply connection to beverage dispensers shall be protected against backflow by a backflow preventer conforming to ASSE 1022 or by an air gap.",
+  "schemaVersion" : 2,
+  "sectionID" : 12262
+}

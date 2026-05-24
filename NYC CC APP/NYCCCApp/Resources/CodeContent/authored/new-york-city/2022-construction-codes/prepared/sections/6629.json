@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187178\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187178\"><\/AnnotationDrawer><div>Unstable objects shall not be used as working platforms.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6629-html-1",
+      "kind" : "html",
+      "plainText" : "Unstable objects shall not be used as working platforms."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Unstable objects shall not be used as working platforms.",
+  "previewText" : "Unstable objects shall not be used as working platforms.",
+  "schemaVersion" : 2,
+  "sectionID" : 6629
+}

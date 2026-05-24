@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175238\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175238\"><\/AnnotationDrawer><div>At least 5 percent, but not less than one, of the total number of aisle seats provided shall be designated aisle seats and shall be the aisle seats located closest to accessible routes, and shall comply with ICC A117.1, including Section 802.8 (Designated Aisle Seats).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175239\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175239\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Designated aisle seats are not required in team or player seating serving areas of sport activity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2782-html-1",
+      "kind" : "html",
+      "plainText" : "At least 5 percent, but not less than one, of the total number of aisle seats provided shall be designated aisle seats and shall be the aisle seats located closest to accessible routes, and shall comply with ICC A117.1, including Section 802.8 (Designated Aisle Seats).\n\n Exception: Designated aisle seats are not required in team or player seating serving areas of sport activity."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "At least 5 percent, but not less than one, of the total number of aisle seats provided shall be designated aisle seats and shall be the aisle seats located closest to accessible routes, and shall comply with ICC A117.1, including Section 802.8 (Designated Aisle Seats).\n\nException: Designated aisle seats are not required in team or player seating serving areas of sport activity.",
+  "previewText" : "At least 5 percent, but not less than one, of the total number of aisle seats provided shall be designated aisle seats and shall be the aisle seats located closest to accessible routes, and shall comply with ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2782
+}

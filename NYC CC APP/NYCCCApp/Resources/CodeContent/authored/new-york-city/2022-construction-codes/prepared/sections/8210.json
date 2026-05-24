@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197899\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197899\"><\/AnnotationDrawer><div>Cast-iron flanges shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8210-html-1",
+      "kind" : "html",
+      "plainText" : "Cast-iron flanges shall not be used."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Cast-iron flanges shall not be used.",
+  "previewText" : "Cast-iron flanges shall not be used.",
+  "schemaVersion" : 2,
+  "sectionID" : 8210
+}

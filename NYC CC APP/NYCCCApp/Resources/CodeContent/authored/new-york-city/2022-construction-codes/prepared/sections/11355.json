@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195955\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195955\"><\/AnnotationDrawer><div>Joints between dissimilar metallic piping materials shall be provided to protect against galvanic corrosion. Such joints shall be made with dielectric fittings conforming to ANSI B16.39 or ASTM F 492, as applicable, shall be rated for the temperatures and pressures of the systems in which the devices are installed and shall be compatible with the fluid and all materials provided.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195956\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195956\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Dielectric fittings shall not be required for joints between dissimilar metal piping used within heat transfer appliances or equipment when such joints are provided by the appliance or equipment manufacturer, and such appliance or equipment is connected with isolation valves that are accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11355-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between dissimilar metallic piping materials shall be provided to protect against galvanic corrosion. Such joints shall be made with dielectric fittings conforming to ANSI B16.39 or ASTM F 492, as applicable, shall be rated for the temperatures and pressures of the systems in which the devices are installed and shall be compatible with the fluid and all materials provided.\n\n Exception: Dielectric fittings shall not be required for joints between dissimilar metal piping used within heat transfer appliances or equipment when such joints are provided by the appliance or equipment manufacturer, and such appliance or equipment is connected with isolation valves that are accessible."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Joints between dissimilar metallic piping materials shall be provided to protect against galvanic corrosion. Such joints shall be made with dielectric fittings conforming to ANSI B16.39 or ASTM F 492, as applicable, shall be rated for the temperatures and pressures of the systems in which the devices are installed and shall be compatible with the fluid and all materials provided.\n\nException: Dielectric fittings shall not be required for joints between dissimilar metal piping used within heat transfer appliances or equipment when such joints are provided by the appliance or equipment manufacturer, and such appliance or equipment is connected with isolation valves that are accessible.",
+  "previewText" : "Joints between dissimilar metallic piping materials shall be provided to protect against galvanic corrosion.",
+  "schemaVersion" : 2,
+  "sectionID" : 11355
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167029\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167029\"><\/AnnotationDrawer><div>Repair garages shall be mechanically ventilated in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span> The ventilation system shall be controlled at the entrance to the garage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "387-html-1",
+      "kind" : "html",
+      "plainText" : "Repair garages shall be mechanically ventilated in accordance with the New York City Mechanical Code. The ventilation system shall be controlled at the entrance to the garage."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Repair garages shall be mechanically ventilated in accordance with the New York City Mechanical Code. The ventilation system shall be controlled at the entrance to the garage.",
+  "previewText" : "Repair garages shall be mechanically ventilated in accordance with the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 387
+}

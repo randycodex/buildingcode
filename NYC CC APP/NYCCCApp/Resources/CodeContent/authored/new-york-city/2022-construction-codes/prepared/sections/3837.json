@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178643\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178643\"><\/AnnotationDrawer><div>The special inspector shall visit the jobsite at agreed intervals, assess the ongoing work and verify that operations conform with the design documents. Deficiencies shall be reported as required by Section 1704.1.1.2. In the event unsafe conditions are discovered, the commissioner and the registered design professional employed by the contractor shall be immediately notified by the special inspector. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178644\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178644\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224370\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224370\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3837-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall visit the jobsite at agreed intervals, assess the ongoing work and verify that operations conform with the design documents. Deficiencies shall be reported as required by Section 1704.1.1.2. In the event unsafe conditions are discovered, the commissioner and the registered design professional employed by the contractor shall be immediately notified by the special inspector. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "The special inspector shall visit the jobsite at agreed intervals, assess the ongoing work and verify that operations conform with the design documents. Deficiencies shall be reported as required by Section 1704.1.1.2. In the event unsafe conditions are discovered, the commissioner and the registered design professional employed by the contractor shall be immediately notified by the special inspector.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "The special inspector shall visit the jobsite at agreed intervals, assess the ongoing work and verify that operations conform with the design documents.",
+  "schemaVersion" : 2,
+  "sectionID" : 3837
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180677\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180677\"><\/AnnotationDrawer><div>Each column and each wall carrying vertical load shall be vertically tied continuously from its lowest to highest level. The vertical ties composed of vertical column reinforcement shall be capable of resisting a tensile force equal to the maximum design dead and live load received by the column or wall from any one story within four floors below. A concrete compression element subjected to load reversal may have a reinforcing bar splice length equal to the tension splice length required by ACI 318 reduced by the ratio of A\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">s<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t required\/A\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">s<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t, provided but not less than the splice required for compression.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4548-html-1",
+      "kind" : "html",
+      "plainText" : "Each column and each wall carrying vertical load shall be vertically tied continuously from its lowest to highest level. The vertical ties composed of vertical column reinforcement shall be capable of resisting a tensile force equal to the maximum design dead and live load received by the column or wall from any one story within four floors below. A concrete compression element subjected to load reversal may have a reinforcing bar splice length equal to the tension splice length required by ACI 318 reduced by the ratio of A\n\n s \n\n required\/A\n\n s \n\n , provided but not less than the splice required for compression."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Each column and each wall carrying vertical load shall be vertically tied continuously from its lowest to highest level. The vertical ties composed of vertical column reinforcement shall be capable of resisting a tensile force equal to the maximum design dead and live load received by the column or wall from any one story within four floors below. A concrete compression element subjected to load reversal may have a reinforcing bar splice length equal to the tension splice length required by ACI 318 reduced by the ratio of A s required\/A s , provided but not less than the splice required for compression.",
+  "previewText" : "Each column and each wall carrying vertical load shall be vertically tied continuously from its lowest to highest level.",
+  "schemaVersion" : 2,
+  "sectionID" : 4548
+}

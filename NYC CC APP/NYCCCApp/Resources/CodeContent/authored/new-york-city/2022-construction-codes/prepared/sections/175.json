@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166345\"><\/AnnotationDrawer><div>The aggregate quantity of nonflammable solid and nonflammable or noncombustible liquid hazardous materials stored or displayed in a single control area of a Group M occupancy shall not exceed the quantities in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-167675', hash: '#JD_BCTable414.2.5(1)' }}\">Table 414.2.5(1)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-166346\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-166346\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-166346\"><\/AnnotationDrawer><h6><a name=\"JD_BC310\" id=\"JD_BC310\" title=\"BC 310\"><\/a>Section BC 310: Residential Group R<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "175-html-1",
+      "kind" : "html",
+      "plainText" : "The aggregate quantity of nonflammable solid and nonflammable or noncombustible liquid hazardous materials stored or displayed in a single control area of a Group M occupancy shall not exceed the quantities in Table 414.2.5(1) .\n\n Section BC 310: Residential Group R"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "The aggregate quantity of nonflammable solid and nonflammable or noncombustible liquid hazardous materials stored or displayed in a single control area of a Group M occupancy shall not exceed the quantities in Table 414.2.5(1).",
+  "previewText" : "The aggregate quantity of nonflammable solid and nonflammable or noncombustible liquid hazardous materials stored or displayed in a single control area of a Group M occupancy shall not exceed the quantities in Table 414.",
+  "schemaVersion" : 2,
+  "sectionID" : 175
+}

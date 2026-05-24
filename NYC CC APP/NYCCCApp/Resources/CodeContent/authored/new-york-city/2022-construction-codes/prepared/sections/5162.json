@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182880\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182880\"><\/AnnotationDrawer><div>Provisions of this chapter shall govern the materials, design, construction and quality of gypsum board, gypsum panel products, lath, gypsum plaster, cement plaster, cement board and reinforced gypsum concrete.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182881\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182881\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-202228', hash: '#JD_L.L.2014\/013' }}\">L.L. 2014\/013<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5162-html-1",
+      "kind" : "html",
+      "plainText" : "Provisions of this chapter shall govern the materials, design, construction and quality of gypsum board, gypsum panel products, lath, gypsum plaster, cement plaster, cement board and reinforced gypsum concrete.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/013 ."
+    }
+  ],
+  "chapterNumber" : "25",
+  "officialText" : "Provisions of this chapter shall govern the materials, design, construction and quality of gypsum board, gypsum panel products, lath, gypsum plaster, cement plaster, cement board and reinforced gypsum concrete.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/013.",
+  "previewText" : "Provisions of this chapter shall govern the materials, design, construction and quality of gypsum board, gypsum panel products, lath, gypsum plaster, cement plaster, cement board and reinforced gypsum concrete.",
+  "schemaVersion" : 2,
+  "sectionID" : 5162
+}

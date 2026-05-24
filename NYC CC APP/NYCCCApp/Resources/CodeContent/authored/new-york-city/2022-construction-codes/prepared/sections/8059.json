@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197411\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197411\"><\/AnnotationDrawer><div>Trenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall. The upper boundary of the bearing plane is a line that extends downward, at an angle of 34 degrees (1:1.5 slope) from horizontal, from the outside bottom edge of the footing or wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8059-html-1",
+      "kind" : "html",
+      "plainText" : "Trenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall. The upper boundary of the bearing plane is a line that extends downward, at an angle of 34 degrees (1:1.5 slope) from horizontal, from the outside bottom edge of the footing or wall."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Trenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall. The upper boundary of the bearing plane is a line that extends downward, at an angle of 34 degrees (1:1.5 slope) from horizontal, from the outside bottom edge of the footing or wall.",
+  "previewText" : "Trenching installed parallel to footings and walls shall not extend into the bearing plane of a footing or wall.",
+  "schemaVersion" : 2,
+  "sectionID" : 8059
+}

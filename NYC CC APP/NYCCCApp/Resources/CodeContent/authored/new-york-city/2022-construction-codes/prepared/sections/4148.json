@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179643\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179643\"><\/AnnotationDrawer><div>For allowable stresses, see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179370', hash: '#JD_BCTable1810.8' }}\">Table 1810.8<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4148-html-1",
+      "kind" : "html",
+      "plainText" : "For allowable stresses, see Table 1810.8 ."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "For allowable stresses, see Table 1810.8.",
+  "previewText" : "For allowable stresses, see Table 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4148
+}

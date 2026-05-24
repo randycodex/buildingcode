@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188827\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188827\"><\/AnnotationDrawer><div>Fuel-oil storage shall be protected with an alternative automatic fire-extinguishing system complying with Section 904.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7127-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-oil storage shall be protected with an alternative automatic fire-extinguishing system complying with Section 904."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Fuel-oil storage shall be protected with an alternative automatic fire-extinguishing system complying with Section 904.",
+  "previewText" : "Fuel-oil storage shall be protected with an alternative automatic fire-extinguishing system complying with Section 904.",
+  "schemaVersion" : 2,
+  "sectionID" : 7127
+}

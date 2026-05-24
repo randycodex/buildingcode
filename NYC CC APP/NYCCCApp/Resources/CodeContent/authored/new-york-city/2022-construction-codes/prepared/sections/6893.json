@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188169\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188169\"><\/AnnotationDrawer><div>A clear floor space complying with Section 305 (Clear Floor Space) of ICC A117.1 shall be provided on both sides of the accessible bed. The clear floor space shall be positioned for parallel approach to the side of the bed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188170\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188170\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> This requirement shall not apply where a single clear floor space complying with Section 305 (Clear Floor Space) of ICC A117.1 positioned for parallel approach is provided between two beds.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6893-html-1",
+      "kind" : "html",
+      "plainText" : "A clear floor space complying with Section 305 (Clear Floor Space) of ICC A117.1 shall be provided on both sides of the accessible bed. The clear floor space shall be positioned for parallel approach to the side of the bed.\n\n Exception: This requirement shall not apply where a single clear floor space complying with Section 305 (Clear Floor Space) of ICC A117.1 positioned for parallel approach is provided between two beds."
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "A clear floor space complying with Section 305 (Clear Floor Space) of ICC A117.1 shall be provided on both sides of the accessible bed. The clear floor space shall be positioned for parallel approach to the side of the bed.\n\nException: This requirement shall not apply where a single clear floor space complying with Section 305 (Clear Floor Space) of ICC A117.1 positioned for parallel approach is provided between two beds.",
+  "previewText" : "A clear floor space complying with Section 305 (Clear Floor Space) of ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 6893
+}

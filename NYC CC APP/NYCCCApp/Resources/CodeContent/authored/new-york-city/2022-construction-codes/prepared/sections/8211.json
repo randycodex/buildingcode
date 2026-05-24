@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197901\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197901\"><\/AnnotationDrawer><div>Steel flanges shall be in accordance with ASME B16.5 or ASME B16.47.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8211-html-1",
+      "kind" : "html",
+      "plainText" : "Steel flanges shall be in accordance with ASME B16.5 or ASME B16.47."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Steel flanges shall be in accordance with ASME B16.5 or ASME B16.47.",
+  "previewText" : "Steel flanges shall be in accordance with ASME B16.",
+  "schemaVersion" : 2,
+  "sectionID" : 8211
+}

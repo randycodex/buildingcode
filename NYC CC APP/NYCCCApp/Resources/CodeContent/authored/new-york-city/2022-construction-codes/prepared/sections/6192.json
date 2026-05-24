@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185802\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185802\"><\/AnnotationDrawer><div>A uniform bearing surface shall be provided under cold-formed steel structural members. In no case shall the gap between the bottom track and the uniform bearing surface exceed 1\/4 of an inch (6.4 mm). Leveling shall be subject to the approval of a registered design professional and shall be achieved through the use of either load bearing shims or grout.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6192-html-1",
+      "kind" : "html",
+      "plainText" : "A uniform bearing surface shall be provided under cold-formed steel structural members. In no case shall the gap between the bottom track and the uniform bearing surface exceed 1\/4 of an inch (6.4 mm). Leveling shall be subject to the approval of a registered design professional and shall be achieved through the use of either load bearing shims or grout."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "A uniform bearing surface shall be provided under cold-formed steel structural members. In no case shall the gap between the bottom track and the uniform bearing surface exceed 1\/4 of an inch (6.4 mm). Leveling shall be subject to the approval of a registered design professional and shall be achieved through the use of either load bearing shims or grout.",
+  "previewText" : "A uniform bearing surface shall be provided under cold-formed steel structural members.",
+  "schemaVersion" : 2,
+  "sectionID" : 6192
+}

@@ -1,0 +1,20 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169905\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169905\"><\/AnnotationDrawer><div>Fire dampers shall have the minimum fire protection rating specified in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169904', hash: '#JD_BCTable717.3.2.1' }}\">Table 717.3.2.1<\/Link> for the type of penetration.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169906\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169906\"><\/AnnotationDrawer><div><a name=\"JD_BCTable717.3.2.1\" id=\"JD_BCTable717.3.2.1\" title=\"BC Table 717.3.2.1\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Table 717.3.2.1<br><\/br>Fire Damper Rating<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169907\"><\/AnnotationDrawer><div style=\"margin-bottom=10pt\">&#160;<div class=\"xsl-table\">",
+      "id" : "1289-html-1",
+      "kind" : "html",
+      "plainText" : "Fire dampers shall have the minimum fire protection rating specified in Table 717.3.2.1 for the type of penetration.\n\n Table 717.3.2.1\n Fire Damper Rating"
+    },
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: &#10;                  700px&#10;                ;\"><colgroup><col width=\"48%&#10;              \"><\/col><col width=\"34.286%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Type of Penetration <\/span><\/div><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Minimum Damper Rating (hour)<\/span><\/div><\/div><\/td><\/tr><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div>Less than 3-hour fire-resistance-rated assemblies<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\">1.5 <\/div><\/div><\/td><\/tr><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div>3-hour or greater fire-resistance-rated assemblies<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\">3 <\/div><\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "1289-table-2",
+      "kind" : "table"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire dampers shall have the minimum fire protection rating specified in Table 717.3.2.1 for the type of penetration.\n\nTable 717.3.2.1 Fire Damper Rating",
+  "previewText" : "Fire dampers shall have the minimum fire protection rating specified in Table 717.",
+  "schemaVersion" : 2,
+  "sectionID" : 1289
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230141\"><\/AnnotationDrawer><div>ADUs shall be provided with a fire protection system in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-171003', hash: '#JD_BCCh.9' }}\">Chapter 9<\/Link> unless otherwise prescribed in Section U103.6.1 through U103.6.3. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7884-html-1",
+      "kind" : "html",
+      "plainText" : "ADUs shall be provided with a fire protection system in accordance with Chapter 9 unless otherwise prescribed in Section U103.6.1 through U103.6.3."
+    }
+  ],
+  "chapterNumber" : "U",
+  "officialText" : "ADUs shall be provided with a fire protection system in accordance with Chapter 9 unless otherwise prescribed in Section U103.6.1 through U103.6.3.",
+  "previewText" : "ADUs shall be provided with a fire protection system in accordance with Chapter 9 unless otherwise prescribed in Section U103.",
+  "schemaVersion" : 2,
+  "sectionID" : 7884
+}

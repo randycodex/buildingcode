@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172090\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172090\"><\/AnnotationDrawer><div>In high-rise buildings constructed in accordance with Section 403, a separate zone by floor shall be provided for each of the following types of alarm-initiating devices where provided:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172091\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Smoke detectors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172092\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172092\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Sprinkler waterflow devices.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172093\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Manual fire alarm boxes.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172094\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172094\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Other approved types of automatic fire detection devices or suppression systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1855-html-1",
+      "kind" : "html",
+      "plainText" : "In high-rise buildings constructed in accordance with Section 403, a separate zone by floor shall be provided for each of the following types of alarm-initiating devices where provided:\n\n 1. Smoke detectors.\n\n 2. Sprinkler waterflow devices.\n\n 3. Manual fire alarm boxes.\n\n 4. Other approved types of automatic fire detection devices or suppression systems."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "In high-rise buildings constructed in accordance with Section 403, a separate zone by floor shall be provided for each of the following types of alarm-initiating devices where provided:\n\n1. Smoke detectors.\n\n2. Sprinkler waterflow devices.\n\n3. Manual fire alarm boxes.\n\n4. Other approved types of automatic fire detection devices or suppression systems.",
+  "previewText" : "In high-rise buildings constructed in accordance with Section 403, a separate zone by floor shall be provided for each of the following types of alarm-initiating devices where provided:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 1855
+}

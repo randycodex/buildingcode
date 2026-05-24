@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194605\"><\/AnnotationDrawer><div>Ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings in accordance with Section 705.10 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> shall be protected with listed fire dampers installed in accordance with their listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10882-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings in accordance with Section 705.10 of the New York City Building Code shall be protected with listed fire dampers installed in accordance with their listing."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings in accordance with Section 705.10 of the New York City Building Code shall be protected with listed fire dampers installed in accordance with their listing.",
+  "previewText" : "Ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings in accordance with Section 705.",
+  "schemaVersion" : 2,
+  "sectionID" : 10882
+}

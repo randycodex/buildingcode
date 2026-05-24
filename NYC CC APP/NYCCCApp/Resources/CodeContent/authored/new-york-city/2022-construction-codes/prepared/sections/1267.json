@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169856\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169856\"><\/AnnotationDrawer><div>NFPA 257 shall evaluate fire-protection-rated glazing under positive pressure. Within the first 10 minutes of a test, the pressure in the furnace shall be adjusted so not less than two-thirds of the test specimen is above the neutral pressure plane, and the neutral pressure plane shall be maintained at that height for the balance of the test.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1267-html-1",
+      "kind" : "html",
+      "plainText" : "NFPA 257 shall evaluate fire-protection-rated glazing under positive pressure. Within the first 10 minutes of a test, the pressure in the furnace shall be adjusted so not less than two-thirds of the test specimen is above the neutral pressure plane, and the neutral pressure plane shall be maintained at that height for the balance of the test."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "NFPA 257 shall evaluate fire-protection-rated glazing under positive pressure. Within the first 10 minutes of a test, the pressure in the furnace shall be adjusted so not less than two-thirds of the test specimen is above the neutral pressure plane, and the neutral pressure plane shall be maintained at that height for the balance of the test.",
+  "previewText" : "NFPA 257 shall evaluate fire-protection-rated glazing under positive pressure.",
+  "schemaVersion" : 2,
+  "sectionID" : 1267
+}

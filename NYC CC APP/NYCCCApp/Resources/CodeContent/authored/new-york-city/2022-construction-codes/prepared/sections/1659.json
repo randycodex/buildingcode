@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171473\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171473\"><\/AnnotationDrawer><div>Notwithstanding any other provision of law, all exposed risers and cross connections of completed buildings in existence on March 2, 2010, shall be painted red and all handles of valves serving such sprinkler system shall be painted green.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171474\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171474\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where a standpipe system is used as a combination standpipe and sprinkler system, the sprinkler risers and cross connections that are also used for the standpipe system shall be painted red and the handles of valves serving such combination system shall be painted yellow.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1659-html-1",
+      "kind" : "html",
+      "plainText" : "Notwithstanding any other provision of law, all exposed risers and cross connections of completed buildings in existence on March 2, 2010, shall be painted red and all handles of valves serving such sprinkler system shall be painted green.\n\n Exception: Where a standpipe system is used as a combination standpipe and sprinkler system, the sprinkler risers and cross connections that are also used for the standpipe system shall be painted red and the handles of valves serving such combination system shall be painted yellow."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Notwithstanding any other provision of law, all exposed risers and cross connections of completed buildings in existence on March 2, 2010, shall be painted red and all handles of valves serving such sprinkler system shall be painted green.\n\nException: Where a standpipe system is used as a combination standpipe and sprinkler system, the sprinkler risers and cross connections that are also used for the standpipe system shall be painted red and the handles of valves serving such combination system shall be painted yellow.",
+  "previewText" : "Notwithstanding any other provision of law, all exposed risers and cross connections of completed buildings in existence on March 2, 2010, shall be painted red and all handles of valves serving such sprinkler system shall be painted green.",
+  "schemaVersion" : 2,
+  "sectionID" : 1659
+}

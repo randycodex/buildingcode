@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196113\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196113\"><\/AnnotationDrawer><div>Insulating materials utilized in thermal barriers shall be installed such that the manufacturer's <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">R<\/span>-value mark is readily observable upon inspection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196114\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196114\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196114\"><\/AnnotationDrawer><h6><a name=\"JD_MC1210\" id=\"JD_MC1210\" title=\"MC 1210\"><\/a>Section MC 1210: Plastic Pipe Ground-Source Heat Pump Loop Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11428-html-1",
+      "kind" : "html",
+      "plainText" : "Insulating materials utilized in thermal barriers shall be installed such that the manufacturer's R -value mark is readily observable upon inspection.\n\n Section MC 1210: Plastic Pipe Ground-Source Heat Pump Loop Systems"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Insulating materials utilized in thermal barriers shall be installed such that the manufacturer's R-value mark is readily observable upon inspection.\n\nSection MC 1210: Plastic Pipe Ground-Source Heat Pump Loop Systems",
+  "previewText" : "Insulating materials utilized in thermal barriers shall be installed such that the manufacturer's R-value mark is readily observable upon inspection.",
+  "schemaVersion" : 2,
+  "sectionID" : 11428
+}

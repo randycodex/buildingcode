@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194080\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194080\"><\/AnnotationDrawer><div>The velocity and circulation of air in work areas shall be such that contaminants are captured by an airstream at the area where the emissions are generated and conveyed into a product-conveying duct system. Contaminated air from work areas where hazardous contaminants are generated shall be diluted below the thresholds specified in Section 510.2 with air that does not contain other hazardous contaminants.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10709-html-1",
+      "kind" : "html",
+      "plainText" : "The velocity and circulation of air in work areas shall be such that contaminants are captured by an airstream at the area where the emissions are generated and conveyed into a product-conveying duct system. Contaminated air from work areas where hazardous contaminants are generated shall be diluted below the thresholds specified in Section 510.2 with air that does not contain other hazardous contaminants."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "The velocity and circulation of air in work areas shall be such that contaminants are captured by an airstream at the area where the emissions are generated and conveyed into a product-conveying duct system. Contaminated air from work areas where hazardous contaminants are generated shall be diluted below the thresholds specified in Section 510.2 with air that does not contain other hazardous contaminants.",
+  "previewText" : "The velocity and circulation of air in work areas shall be such that contaminants are captured by an airstream at the area where the emissions are generated and conveyed into a product-conveying duct system.",
+  "schemaVersion" : 2,
+  "sectionID" : 10709
+}

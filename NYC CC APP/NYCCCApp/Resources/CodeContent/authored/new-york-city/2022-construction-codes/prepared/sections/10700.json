@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194055\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194055\"><\/AnnotationDrawer><div>The design and operation of the exhaust system shall be such that flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust flow below 25 percent of the contaminant's lower flammability limit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10700-html-1",
+      "kind" : "html",
+      "plainText" : "The design and operation of the exhaust system shall be such that flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust flow below 25 percent of the contaminant's lower flammability limit."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "The design and operation of the exhaust system shall be such that flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust flow below 25 percent of the contaminant's lower flammability limit.",
+  "previewText" : "The design and operation of the exhaust system shall be such that flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust flow below 25 percent of the contaminant's lower flammability limit.",
+  "schemaVersion" : 2,
+  "sectionID" : 10700
+}

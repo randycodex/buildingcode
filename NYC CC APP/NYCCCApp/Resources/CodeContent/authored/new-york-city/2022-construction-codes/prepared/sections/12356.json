@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162580\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162580\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints between copper or copper-alloy pipe or fittings shall comply with Sections 705.6.1 through 705.6.5.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12356-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between copper or copper-alloy pipe or fittings shall comply with Sections 705.6.1 through 705.6.5."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Joints between copper or copper-alloy pipe or fittings shall comply with Sections 705.6.1 through 705.6.5.",
+  "previewText" : "Joints between copper or copper-alloy pipe or fittings shall comply with Sections 705.",
+  "schemaVersion" : 2,
+  "sectionID" : 12356
+}

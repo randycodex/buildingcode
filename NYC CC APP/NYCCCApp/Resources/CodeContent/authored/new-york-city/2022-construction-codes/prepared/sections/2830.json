@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175374\"><\/AnnotationDrawer><div>All passenger elevators on an accessible route shall be accessible and comply with ICC A117.1 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183610', hash: '#JD_BCCh.30' }}\">Chapter 30<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175375\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175375\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Section 407.4.6.2.2 (Arrangement) of ICC A117.1 shall not apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2830-html-1",
+      "kind" : "html",
+      "plainText" : "All passenger elevators on an accessible route shall be accessible and comply with ICC A117.1 and Chapter 30 of this code.\n\n Exception: Section 407.4.6.2.2 (Arrangement) of ICC A117.1 shall not apply."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "All passenger elevators on an accessible route shall be accessible and comply with ICC A117.1 and Chapter 30 of this code.\n\nException: Section 407.4.6.2.2 (Arrangement) of ICC A117.1 shall not apply.",
+  "previewText" : "All passenger elevators on an accessible route shall be accessible and comply with ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2830
+}

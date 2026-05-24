@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183913\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183913\"><\/AnnotationDrawer><div>Occupant evacuation elevator hoistway enclosures shall comply with Sections 403.2.3.1 through 403.2.3.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5520-html-1",
+      "kind" : "html",
+      "plainText" : "Occupant evacuation elevator hoistway enclosures shall comply with Sections 403.2.3.1 through 403.2.3.4."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Occupant evacuation elevator hoistway enclosures shall comply with Sections 403.2.3.1 through 403.2.3.4.",
+  "previewText" : "Occupant evacuation elevator hoistway enclosures shall comply with Sections 403.",
+  "schemaVersion" : 2,
+  "sectionID" : 5520
+}

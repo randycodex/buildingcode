@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164484\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164484\"><\/annotationdrawer><div>In flood hazard areas, upon placement of the lowest floor, including the basement (for flood zone purposes), and prior to further vertical construction, the elevation inspection report required in Item 1 of Section G107.3 of <link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G shall be submitted to the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "91-html-1",
+      "kind" : "html",
+      "plainText" : "In flood hazard areas, upon placement of the lowest floor, including the basement (for flood zone purposes), and prior to further vertical construction, the elevation inspection report required in Item 1 of Section G107.3 of Appendix G shall be submitted to the department."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "In flood hazard areas, upon placement of the lowest floor, including the basement (for flood zone purposes), and prior to further vertical construction, the elevation inspection report required in Item 1 of Section G107.3 of Appendix G shall be submitted to the department.",
+  "previewText" : "In flood hazard areas, upon placement of the lowest floor, including the basement (for flood zone purposes), and prior to further vertical construction, the elevation inspection report required in Item 1 of Section G107.",
+  "schemaVersion" : 2,
+  "sectionID" : 91
+}

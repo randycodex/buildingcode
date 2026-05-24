@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176408\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176408\"><\/AnnotationDrawer><div>MCM shall be subject to special inspection in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3185-html-1",
+      "kind" : "html",
+      "plainText" : "MCM shall be subject to special inspection in accordance with Chapter 17 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "MCM shall be subject to special inspection in accordance with Chapter 17.",
+  "previewText" : "MCM shall be subject to special inspection in accordance with Chapter 17.",
+  "schemaVersion" : 2,
+  "sectionID" : 3185
+}

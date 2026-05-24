@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187102\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187102\"><\/AnnotationDrawer><div>The use of shore or lean-to scaffolds is prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6604-html-1",
+      "kind" : "html",
+      "plainText" : "The use of shore or lean-to scaffolds is prohibited."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The use of shore or lean-to scaffolds is prohibited.",
+  "previewText" : "The use of shore or lean-to scaffolds is prohibited.",
+  "schemaVersion" : 2,
+  "sectionID" : 6604
+}

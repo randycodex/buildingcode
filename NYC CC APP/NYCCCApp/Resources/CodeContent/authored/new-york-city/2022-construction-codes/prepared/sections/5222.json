@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183064\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183064\"><\/AnnotationDrawer><div>Cement plaster finish coats shall be applied over base coats that have been in place for the time periods set forth in ASTM C 926. The third or finish coat shall be applied with sufficient material and pressure to bond and to cover the brown coat and shall be of sufficient thickness to conceal the brown coat.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183065\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183065\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183065\"><\/AnnotationDrawer><h6><a name=\"JD_BC2513\" id=\"JD_BC2513\" title=\"BC 2513\"><\/a>Section BC 2513: Exposed Aggregate Plaster<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5222-html-1",
+      "kind" : "html",
+      "plainText" : "Cement plaster finish coats shall be applied over base coats that have been in place for the time periods set forth in ASTM C 926. The third or finish coat shall be applied with sufficient material and pressure to bond and to cover the brown coat and shall be of sufficient thickness to conceal the brown coat.\n\n Section BC 2513: Exposed Aggregate Plaster"
+    }
+  ],
+  "chapterNumber" : "25",
+  "officialText" : "Cement plaster finish coats shall be applied over base coats that have been in place for the time periods set forth in ASTM C 926. The third or finish coat shall be applied with sufficient material and pressure to bond and to cover the brown coat and shall be of sufficient thickness to conceal the brown coat.",
+  "previewText" : "Cement plaster finish coats shall be applied over base coats that have been in place for the time periods set forth in ASTM C 926.",
+  "schemaVersion" : 2,
+  "sectionID" : 5222
+}

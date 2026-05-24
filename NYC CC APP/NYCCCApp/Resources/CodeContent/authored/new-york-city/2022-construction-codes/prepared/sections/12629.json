@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163297\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163297\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The discharge piping from a grease interceptor shall be directly connected to the sanitary drainage system.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12629-html-1",
+      "kind" : "html",
+      "plainText" : "The discharge piping from a grease interceptor shall be directly connected to the sanitary drainage system."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The discharge piping from a grease interceptor shall be directly connected to the sanitary drainage system.",
+  "previewText" : "The discharge piping from a grease interceptor shall be directly connected to the sanitary drainage system.",
+  "schemaVersion" : 2,
+  "sectionID" : 12629
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185724\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185724\"><\/AnnotationDrawer><div>No construction loads shall be supported on, nor any shoring removed from, any part of the structure under construction except when that portion of the structure in combination with the remaining forming and shoring system has sufficient strength to support safely its weight and the loads placed thereon.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6153-html-1",
+      "kind" : "html",
+      "plainText" : "No construction loads shall be supported on, nor any shoring removed from, any part of the structure under construction except when that portion of the structure in combination with the remaining forming and shoring system has sufficient strength to support safely its weight and the loads placed thereon."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "No construction loads shall be supported on, nor any shoring removed from, any part of the structure under construction except when that portion of the structure in combination with the remaining forming and shoring system has sufficient strength to support safely its weight and the loads placed thereon.",
+  "previewText" : "No construction loads shall be supported on, nor any shoring removed from, any part of the structure under construction except when that portion of the structure in combination with the remaining forming and shoring system has sufficient strength to support safely its weight and the loads placed thereon.",
+  "schemaVersion" : 2,
+  "sectionID" : 6153
+}

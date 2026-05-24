@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199476\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199476\"><\/AnnotationDrawer><div>Gaseous hydrogen systems shall be located in hydrogen fuel gas rooms constructed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and NFPA 2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8774-html-1",
+      "kind" : "html",
+      "plainText" : "Gaseous hydrogen systems shall be located in hydrogen fuel gas rooms constructed in accordance with the New York City Building Code , the New York City Mechanical Code , the New York City Fire Code and NFPA 2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Gaseous hydrogen systems shall be located in hydrogen fuel gas rooms constructed in accordance with the New York City Building Code, the New York City Mechanical Code, the New York City Fire Code and NFPA 2.",
+  "previewText" : "Gaseous hydrogen systems shall be located in hydrogen fuel gas rooms constructed in accordance with the New York City Building Code, the New York City Mechanical Code, the New York City Fire Code and NFPA 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 8774
+}

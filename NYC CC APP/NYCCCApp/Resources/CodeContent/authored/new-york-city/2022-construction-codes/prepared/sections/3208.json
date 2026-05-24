@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176461\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176461\"><\/AnnotationDrawer><div>HPL shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in the minimum and maximum thicknesses intended for use in accordance with ASTM E 84 or UL 723.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3208-html-1",
+      "kind" : "html",
+      "plainText" : "HPL shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in the minimum and maximum thicknesses intended for use in accordance with ASTM E 84 or UL 723."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "HPL shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in the minimum and maximum thicknesses intended for use in accordance with ASTM E 84 or UL 723.",
+  "previewText" : "HPL shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in the minimum and maximum thicknesses intended for use in accordance with ASTM E 84 or UL 723.",
+  "schemaVersion" : 2,
+  "sectionID" : 3208
+}

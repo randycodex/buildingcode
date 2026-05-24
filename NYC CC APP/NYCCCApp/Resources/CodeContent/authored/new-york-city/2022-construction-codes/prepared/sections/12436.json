@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162799\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162799\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Pipe and fittings shall be rated for the maximum system operating pressure and temperature. Pipe fitting materials shall be compatible with the pipe material. Where pipe and fittings are buried in the earth, they shall be suitable for burial.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12436-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe and fittings shall be rated for the maximum system operating pressure and temperature. Pipe fitting materials shall be compatible with the pipe material. Where pipe and fittings are buried in the earth, they shall be suitable for burial."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Pipe and fittings shall be rated for the maximum system operating pressure and temperature. Pipe fitting materials shall be compatible with the pipe material. Where pipe and fittings are buried in the earth, they shall be suitable for burial.",
+  "previewText" : "Pipe and fittings shall be rated for the maximum system operating pressure and temperature.",
+  "schemaVersion" : 2,
+  "sectionID" : 12436
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195489\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195489\"><\/AnnotationDrawer><div>Steam boilers shall be protected with a safety valve in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> or ASME CSD-1<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11191-html-1",
+      "kind" : "html",
+      "plainText" : "Steam boilers shall be protected with a safety valve in accordance with the ASME Boiler and Pressure Vessel Code or ASME CSD-1"
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Steam boilers shall be protected with a safety valve in accordance with the ASME Boiler and Pressure Vessel Code or ASME CSD-1",
+  "previewText" : "Steam boilers shall be protected with a safety valve in accordance with the ASME Boiler and Pressure Vessel Code or ASME CSD-1",
+  "schemaVersion" : 2,
+  "sectionID" : 11191
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173004\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173004\"><\/AnnotationDrawer><div>All portions of the means of egress system shall be sized in accordance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173005\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173005\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Aisles and aisle accessways in rooms or spaces used for assembly purposes complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174405', hash: '#JD_BC1029' }}\">1029<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2159-html-1",
+      "kind" : "html",
+      "plainText" : "All portions of the means of egress system shall be sized in accordance with this section.\n\n Exception: Aisles and aisle accessways in rooms or spaces used for assembly purposes complying with Section 1029 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "All portions of the means of egress system shall be sized in accordance with this section.\n\nException: Aisles and aisle accessways in rooms or spaces used for assembly purposes complying with Section 1029.",
+  "previewText" : "All portions of the means of egress system shall be sized in accordance with this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 2159
+}

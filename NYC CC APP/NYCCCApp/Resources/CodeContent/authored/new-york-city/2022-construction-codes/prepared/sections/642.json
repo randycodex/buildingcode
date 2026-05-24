@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167848\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167848\"><\/AnnotationDrawer><div>The storage, handling, processing and transporting of flammable and combustible liquids in Group H-2 and H-3 occupancies shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code,<\/span> the New York City Fire Code, and Sections 415.9.1.1 through 415.9.1.9 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "642-html-1",
+      "kind" : "html",
+      "plainText" : "The storage, handling, processing and transporting of flammable and combustible liquids in Group H-2 and H-3 occupancies shall be in accordance with the New York City Mechanical Code, the New York City Fire Code, and Sections 415.9.1.1 through 415.9.1.9 of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The storage, handling, processing and transporting of flammable and combustible liquids in Group H-2 and H-3 occupancies shall be in accordance with the New York City Mechanical Code, the New York City Fire Code, and Sections 415.9.1.1 through 415.9.1.9 of this code.",
+  "previewText" : "The storage, handling, processing and transporting of flammable and combustible liquids in Group H-2 and H-3 occupancies shall be in accordance with the New York City Mechanical Code, the New York City Fire Code, and Sections 415.",
+  "schemaVersion" : 2,
+  "sectionID" : 642
+}

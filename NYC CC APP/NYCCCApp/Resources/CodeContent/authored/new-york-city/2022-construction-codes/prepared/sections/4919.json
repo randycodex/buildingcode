@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181826\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181826\"><\/AnnotationDrawer><div>There shall be a minimum distance of 24 inches (610 mm) between end joints in adjacent courses. The pieces in the first and second courses shall bear on at least two supports with end joints in these two courses occurring on alternate supports. A maximum of seven intervening courses shall be permitted before this pattern is repeated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4919-html-1",
+      "kind" : "html",
+      "plainText" : "There shall be a minimum distance of 24 inches (610 mm) between end joints in adjacent courses. The pieces in the first and second courses shall bear on at least two supports with end joints in these two courses occurring on alternate supports. A maximum of seven intervening courses shall be permitted before this pattern is repeated."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "There shall be a minimum distance of 24 inches (610 mm) between end joints in adjacent courses. The pieces in the first and second courses shall bear on at least two supports with end joints in these two courses occurring on alternate supports. A maximum of seven intervening courses shall be permitted before this pattern is repeated.",
+  "previewText" : "There shall be a minimum distance of 24 inches (610 mm) between end joints in adjacent courses.",
+  "schemaVersion" : 2,
+  "sectionID" : 4919
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173586\"><\/AnnotationDrawer><div>Building entrance doors and other exterior exit doors shall be equipped with heavy duty lock sets with auxiliary latch bolts to prevent the latch from being manipulated by means other than a key. Latch sets shall have stop-work in the inside cylinder controlled by a master key only. Outside cylinders of main entrance door locks shall be operated by the tenants' key, which shall not be keyed to also open the tenants' apartment door. A light or lights shall be provided at or near the outside of the front entranceway of the building providing not less than 5-footcandles (53.82 lux) intensity measured at the floor level for the full width of the entranceway.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2301-html-1",
+      "kind" : "html",
+      "plainText" : "Building entrance doors and other exterior exit doors shall be equipped with heavy duty lock sets with auxiliary latch bolts to prevent the latch from being manipulated by means other than a key. Latch sets shall have stop-work in the inside cylinder controlled by a master key only. Outside cylinders of main entrance door locks shall be operated by the tenants' key, which shall not be keyed to also open the tenants' apartment door. A light or lights shall be provided at or near the outside of the front entranceway of the building providing not less than 5-footcandles (53.82 lux) intensity measured at the floor level for the full width of the entranceway."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Building entrance doors and other exterior exit doors shall be equipped with heavy duty lock sets with auxiliary latch bolts to prevent the latch from being manipulated by means other than a key. Latch sets shall have stop-work in the inside cylinder controlled by a master key only. Outside cylinders of main entrance door locks shall be operated by the tenants' key, which shall not be keyed to also open the tenants' apartment door. A light or lights shall be provided at or near the outside of the front entranceway of the building providing not less than 5-footcandles (53.82 lux) intensity measured at the floor level for the full width of the entranceway.",
+  "previewText" : "Building entrance doors and other exterior exit doors shall be equipped with heavy duty lock sets with auxiliary latch bolts to prevent the latch from being manipulated by means other than a key.",
+  "schemaVersion" : 2,
+  "sectionID" : 2301
+}

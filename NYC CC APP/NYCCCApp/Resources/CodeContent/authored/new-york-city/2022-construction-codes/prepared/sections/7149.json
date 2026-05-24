@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188879\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188879\"><\/AnnotationDrawer><div>Flood-damage-resistant materials shall be used below the design flood elevation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7149-html-1",
+      "kind" : "html",
+      "plainText" : "Flood-damage-resistant materials shall be used below the design flood elevation."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Flood-damage-resistant materials shall be used below the design flood elevation.",
+  "previewText" : "Flood-damage-resistant materials shall be used below the design flood elevation.",
+  "schemaVersion" : 2,
+  "sectionID" : 7149
+}

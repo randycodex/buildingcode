@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192246\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192246\"><\/AnnotationDrawer><div>Delete Section 2.3.2 and replace as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192247\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192247\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">2.3.2<\/span> Main runners shall be supported from the carrying channels. Direct hung suspension systems where the main runners are supported directly to the existing structure shall not be permitted. Indirect hung or furring bar suspension systems designed and installed in accordance with this code and utilizing carrying channels shall be permitted. <\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7858-html-1",
+      "kind" : "html",
+      "plainText" : "Delete Section 2.3.2 and replace as follows:\n\n 2.3.2 Main runners shall be supported from the carrying channels. Direct hung suspension systems where the main runners are supported directly to the existing structure shall not be permitted. Indirect hung or furring bar suspension systems designed and installed in accordance with this code and utilizing carrying channels shall be permitted."
+    }
+  ],
+  "chapterNumber" : "R",
+  "officialText" : "Delete Section 2.3.2 and replace as follows:",
+  "previewText" : "Delete Section 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 7858
+}

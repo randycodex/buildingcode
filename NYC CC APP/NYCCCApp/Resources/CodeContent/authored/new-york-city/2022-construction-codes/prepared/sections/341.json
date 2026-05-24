@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166907\"><\/AnnotationDrawer><div>Private garages and carports shall comply with Sections 406.3.1 through 406.3.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "341-html-1",
+      "kind" : "html",
+      "plainText" : "Private garages and carports shall comply with Sections 406.3.1 through 406.3.5."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Private garages and carports shall comply with Sections 406.3.1 through 406.3.5.",
+  "previewText" : "Private garages and carports shall comply with Sections 406.",
+  "schemaVersion" : 2,
+  "sectionID" : 341
+}

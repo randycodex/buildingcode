@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188479\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188479\"><\/AnnotationDrawer><div>A permit shall become invalid if the proposed development is not commenced within 180 days after its issuance, or if the work authorized is suspended or abandoned for a period of 180 days after the work commences.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7012-html-1",
+      "kind" : "html",
+      "plainText" : "A permit shall become invalid if the proposed development is not commenced within 180 days after its issuance, or if the work authorized is suspended or abandoned for a period of 180 days after the work commences."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "A permit shall become invalid if the proposed development is not commenced within 180 days after its issuance, or if the work authorized is suspended or abandoned for a period of 180 days after the work commences.",
+  "previewText" : "A permit shall become invalid if the proposed development is not commenced within 180 days after its issuance, or if the work authorized is suspended or abandoned for a period of 180 days after the work commences.",
+  "schemaVersion" : 2,
+  "sectionID" : 7012
+}

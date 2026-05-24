@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175884\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175884\"><\/AnnotationDrawer><div>Places of assembly shall be illuminated in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3001-html-1",
+      "kind" : "html",
+      "plainText" : "Places of assembly shall be illuminated in accordance with Chapter 10 ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Places of assembly shall be illuminated in accordance with Chapter 10.",
+  "previewText" : "Places of assembly shall be illuminated in accordance with Chapter 10.",
+  "schemaVersion" : 2,
+  "sectionID" : 3001
+}

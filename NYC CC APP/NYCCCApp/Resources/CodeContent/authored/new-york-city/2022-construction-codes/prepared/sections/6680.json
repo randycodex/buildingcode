@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187325\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187325\"><\/AnnotationDrawer><div>When U-bolt clips are used, the U-bolt shall be placed over the dead end of the rope and the saddle shall be placed over the live end of the rope.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187326\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187326\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> U-bolt clips shall not be used at the point of suspension.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6680-html-1",
+      "kind" : "html",
+      "plainText" : "When U-bolt clips are used, the U-bolt shall be placed over the dead end of the rope and the saddle shall be placed over the live end of the rope.\n\n Exception: U-bolt clips shall not be used at the point of suspension."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "When U-bolt clips are used, the U-bolt shall be placed over the dead end of the rope and the saddle shall be placed over the live end of the rope.\n\nException: U-bolt clips shall not be used at the point of suspension.",
+  "previewText" : "When U-bolt clips are used, the U-bolt shall be placed over the dead end of the rope and the saddle shall be placed over the live end of the rope.",
+  "schemaVersion" : 2,
+  "sectionID" : 6680
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195578\"><\/AnnotationDrawer><div>Any portion of a refrigeration system that is subject to physical damage shall be protected in an approved manner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11222-html-1",
+      "kind" : "html",
+      "plainText" : "Any portion of a refrigeration system that is subject to physical damage shall be protected in an approved manner."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Any portion of a refrigeration system that is subject to physical damage shall be protected in an approved manner.",
+  "previewText" : "Any portion of a refrigeration system that is subject to physical damage shall be protected in an approved manner.",
+  "schemaVersion" : 2,
+  "sectionID" : 11222
+}

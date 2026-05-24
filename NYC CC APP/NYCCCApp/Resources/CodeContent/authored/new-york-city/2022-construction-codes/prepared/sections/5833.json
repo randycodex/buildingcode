@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184658\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184658\"><\/AnnotationDrawer><div>See Section 3301.6.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5833-html-1",
+      "kind" : "html",
+      "plainText" : "See Section 3301.6.1."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "See Section 3301.6.1.",
+  "previewText" : "See Section 3301.",
+  "schemaVersion" : 2,
+  "sectionID" : 5833
+}

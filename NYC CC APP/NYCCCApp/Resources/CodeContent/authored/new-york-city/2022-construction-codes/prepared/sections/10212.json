@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192307\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192307\"><\/AnnotationDrawer><div>This code shall regulate the design, installation, maintenance, alteration and inspection of mechanical systems that are permanently installed and utilized to provide control of environmental conditions and related processes within buildings. This code shall also regulate those mechanical systems, system components, equipment and appliances specifically addressed herein. The installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be regulated by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10212-html-1",
+      "kind" : "html",
+      "plainText" : "This code shall regulate the design, installation, maintenance, alteration and inspection of mechanical systems that are permanently installed and utilized to provide control of environmental conditions and related processes within buildings. This code shall also regulate those mechanical systems, system components, equipment and appliances specifically addressed herein. The installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be regulated by the New York City Fuel Gas Code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "This code shall regulate the design, installation, maintenance, alteration and inspection of mechanical systems that are permanently installed and utilized to provide control of environmental conditions and related processes within buildings. This code shall also regulate those mechanical systems, system components, equipment and appliances specifically addressed herein. The installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be regulated by the New York City Fuel Gas Code.",
+  "previewText" : "This code shall regulate the design, installation, maintenance, alteration and inspection of mechanical systems that are permanently installed and utilized to provide control of environmental conditions and related processes within buildings.",
+  "schemaVersion" : 2,
+  "sectionID" : 10212
+}

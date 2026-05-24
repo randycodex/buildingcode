@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175164\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175164\"><\/AnnotationDrawer><div>In structures with four or more dwelling units or sleeping units intended to be occupied as a residence, every dwelling unit and sleeping unit intended to be occupied as a residence and not required to be an Accessible unit shall be a Type B+NYC unit unless the number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4. Where no Type B+NYC units are required per Section 1107.7.4, all units not required to be Accessible units shall be Type B units.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175165\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175165\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The number of Type B units is permitted to be reduced in accordance with Section 1107.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2755-html-1",
+      "kind" : "html",
+      "plainText" : "In structures with four or more dwelling units or sleeping units intended to be occupied as a residence, every dwelling unit and sleeping unit intended to be occupied as a residence and not required to be an Accessible unit shall be a Type B+NYC unit unless the number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4. Where no Type B+NYC units are required per Section 1107.7.4, all units not required to be Accessible units shall be Type B units.\n\n Exception: The number of Type B units is permitted to be reduced in accordance with Section 1107.7."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "In structures with four or more dwelling units or sleeping units intended to be occupied as a residence, every dwelling unit and sleeping unit intended to be occupied as a residence and not required to be an Accessible unit shall be a Type B+NYC unit unless the number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4. Where no Type B+NYC units are required per Section 1107.7.4, all units not required to be Accessible units shall be Type B units.\n\nException: The number of Type B units is permitted to be reduced in accordance with Section 1107.7.",
+  "previewText" : "In structures with four or more dwelling units or sleeping units intended to be occupied as a residence, every dwelling unit and sleeping unit intended to be occupied as a residence and not required to be an Accessible unit shall be a Type B+NYC unit unless the number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.",
+  "schemaVersion" : 2,
+  "sectionID" : 2755
+}

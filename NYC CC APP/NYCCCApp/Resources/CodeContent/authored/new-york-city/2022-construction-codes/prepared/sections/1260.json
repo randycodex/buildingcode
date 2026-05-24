@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169824\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169824\"><\/AnnotationDrawer><div>Chute intake doors shall be positive latching, remaining latched and closed in the event of latch spring failure during a fire emergency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1260-html-1",
+      "kind" : "html",
+      "plainText" : "Chute intake doors shall be positive latching, remaining latched and closed in the event of latch spring failure during a fire emergency."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Chute intake doors shall be positive latching, remaining latched and closed in the event of latch spring failure during a fire emergency.",
+  "previewText" : "Chute intake doors shall be positive latching, remaining latched and closed in the event of latch spring failure during a fire emergency.",
+  "schemaVersion" : 2,
+  "sectionID" : 1260
+}

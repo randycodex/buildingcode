@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167598\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167598\"><\/AnnotationDrawer><div>Aircraft paint hangars shall be classified as Group H-2. Aircraft paint hangars shall comply with the applicable requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and this code for such occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "573-html-1",
+      "kind" : "html",
+      "plainText" : "Aircraft paint hangars shall be classified as Group H-2. Aircraft paint hangars shall comply with the applicable requirements of the New York City Fire Code and this code for such occupancy."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Aircraft paint hangars shall be classified as Group H-2. Aircraft paint hangars shall comply with the applicable requirements of the New York City Fire Code and this code for such occupancy.",
+  "previewText" : "Aircraft paint hangars shall be classified as Group H-2.",
+  "schemaVersion" : 2,
+  "sectionID" : 573
+}

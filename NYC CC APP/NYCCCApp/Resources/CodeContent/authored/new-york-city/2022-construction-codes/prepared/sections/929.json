@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168735\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168735\"><\/AnnotationDrawer><div>Incidental uses shall not be individually classified in accordance with Section 302.1. Incidental uses shall be included in the building occupancies within which they are located.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "929-html-1",
+      "kind" : "html",
+      "plainText" : "Incidental uses shall not be individually classified in accordance with Section 302.1. Incidental uses shall be included in the building occupancies within which they are located."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Incidental uses shall not be individually classified in accordance with Section 302.1. Incidental uses shall be included in the building occupancies within which they are located.",
+  "previewText" : "Incidental uses shall not be individually classified in accordance with Section 302.",
+  "schemaVersion" : 2,
+  "sectionID" : 929
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196284\"><\/AnnotationDrawer><div>Where fuel-oil piping systems utilize pumps to transfer fuel oil to equipment at levels above the lowest floor or to storage tanks at levels above the lowest floor in buildings, a qualified employee or contracted general company holding a certificate of fitness from the Fire Department shall maintain the fuel-oil system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196285\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196285\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196285\"><\/AnnotationDrawer><h6><a name=\"JD_MC1302\" id=\"JD_MC1302\" title=\"MC 1302\"><\/a>Section MC 1302: Material<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11504-html-1",
+      "kind" : "html",
+      "plainText" : "Where fuel-oil piping systems utilize pumps to transfer fuel oil to equipment at levels above the lowest floor or to storage tanks at levels above the lowest floor in buildings, a qualified employee or contracted general company holding a certificate of fitness from the Fire Department shall maintain the fuel-oil system.\n\n Section MC 1302: Material"
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Where fuel-oil piping systems utilize pumps to transfer fuel oil to equipment at levels above the lowest floor or to storage tanks at levels above the lowest floor in buildings, a qualified employee or contracted general company holding a certificate of fitness from the Fire Department shall maintain the fuel-oil system.\n\nSection MC 1302: Material",
+  "previewText" : "Where fuel-oil piping systems utilize pumps to transfer fuel oil to equipment at levels above the lowest floor or to storage tanks at levels above the lowest floor in buildings, a qualified employee or contracted general company holding a certificate of fitness from the Fire Department shall maintain the fuel-oil system.",
+  "schemaVersion" : 2,
+  "sectionID" : 11504
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182821\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182821\"><\/AnnotationDrawer><div>Glass installed in exterior railing in-fill panels or balusters shall be laminated glass complying with Category II of CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5144-html-1",
+      "kind" : "html",
+      "plainText" : "Glass installed in exterior railing in-fill panels or balusters shall be laminated glass complying with Category II of CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "Glass installed in exterior railing in-fill panels or balusters shall be laminated glass complying with Category II of CPSC 16 CFR Part 1201 or Class A of ANSI Z97.1.",
+  "previewText" : "Glass installed in exterior railing in-fill panels or balusters shall be laminated glass complying with Category II of CPSC 16 CFR Part 1201 or Class A of ANSI Z97.",
+  "schemaVersion" : 2,
+  "sectionID" : 5144
+}

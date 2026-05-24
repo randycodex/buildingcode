@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183308\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183308\"><\/AnnotationDrawer><div>Fastening shall be adequate to withstand the loads in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link>. Proper allowance shall be made for expansion and contraction of light-transmitting plastic materials in accordance with accepted data on the coefficient of expansion of the material and other material in conjunction with which it is employed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5296-html-1",
+      "kind" : "html",
+      "plainText" : "Fastening shall be adequate to withstand the loads in Chapter 16 . Proper allowance shall be made for expansion and contraction of light-transmitting plastic materials in accordance with accepted data on the coefficient of expansion of the material and other material in conjunction with which it is employed."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "Fastening shall be adequate to withstand the loads in Chapter 16. Proper allowance shall be made for expansion and contraction of light-transmitting plastic materials in accordance with accepted data on the coefficient of expansion of the material and other material in conjunction with which it is employed.",
+  "previewText" : "Fastening shall be adequate to withstand the loads in Chapter 16.",
+  "schemaVersion" : 2,
+  "sectionID" : 5296
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167865\"><\/AnnotationDrawer><div>Storage tank vents for Class I, II or IIIA liquids shall terminate to the outdoor air in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "650-html-1",
+      "kind" : "html",
+      "plainText" : "Storage tank vents for Class I, II or IIIA liquids shall terminate to the outdoor air in accordance with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Storage tank vents for Class I, II or IIIA liquids shall terminate to the outdoor air in accordance with the New York City Fire Code.",
+  "previewText" : "Storage tank vents for Class I, II or IIIA liquids shall terminate to the outdoor air in accordance with the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 650
+}

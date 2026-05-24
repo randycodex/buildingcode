@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179584\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179584\"><\/AnnotationDrawer><div>Grout samples shall be collected and testing shall be performed for the lesser of the following conditions:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179585\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179585\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;each element installed;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179586\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;each batch of site-mixed grout; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179587\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179587\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;each load of ready-mixed grout used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4134-html-1",
+      "kind" : "html",
+      "plainText" : "Grout samples shall be collected and testing shall be performed for the lesser of the following conditions:\n\n 1. each element installed;\n\n 2. each batch of site-mixed grout; or\n\n 3. each load of ready-mixed grout used."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Grout samples shall be collected and testing shall be performed for the lesser of the following conditions:\n\n1. each element installed;\n\n2. each batch of site-mixed grout; or\n\n3. each load of ready-mixed grout used.",
+  "previewText" : "Grout samples shall be collected and testing shall be performed for the lesser of the following conditions:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 4134
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195760\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195760\"><\/AnnotationDrawer><div>Automatic crossover valves shall be arranged to automatically relieve excess system pressure to a lower pressure zone if the pressure in a high- or intermediate-pressure zone rises to within 15 psi (108.4 kPa) of the setpoint for pressure-relief devices.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11274-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic crossover valves shall be arranged to automatically relieve excess system pressure to a lower pressure zone if the pressure in a high- or intermediate-pressure zone rises to within 15 psi (108.4 kPa) of the setpoint for pressure-relief devices."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Automatic crossover valves shall be arranged to automatically relieve excess system pressure to a lower pressure zone if the pressure in a high- or intermediate-pressure zone rises to within 15 psi (108.4 kPa) of the setpoint for pressure-relief devices.",
+  "previewText" : "Automatic crossover valves shall be arranged to automatically relieve excess system pressure to a lower pressure zone if the pressure in a high- or intermediate-pressure zone rises to within 15 psi (108.",
+  "schemaVersion" : 2,
+  "sectionID" : 11274
+}

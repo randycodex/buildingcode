@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198500\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198500\"><\/AnnotationDrawer><div>Type B vents shall not be considered exposed to the outdoors in the following conditions:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198501\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198501\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;A type B vent of a listed chimney system passing through an unused masonry chimney provided with a sealed cap that prevents airflow within the confines of the masonry chimney; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198502\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198502\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;A type B vent passing through an unventilated enclosure or chase insulated to R-8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-198503\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-198503\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-198503\"><\/AnnotationDrawer><h6><a name=\"JD_FGC502\" id=\"JD_FGC502\" title=\"FGC 502\"><\/a>Section FGC 502: Vents<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8437-html-1",
+      "kind" : "html",
+      "plainText" : "Type B vents shall not be considered exposed to the outdoors in the following conditions:\n\n 1. A type B vent of a listed chimney system passing through an unused masonry chimney provided with a sealed cap that prevents airflow within the confines of the masonry chimney; or\n\n 2. A type B vent passing through an unventilated enclosure or chase insulated to R-8.\n\n Section FGC 502: Vents"
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Type B vents shall not be considered exposed to the outdoors in the following conditions:\n\n1. A type B vent of a listed chimney system passing through an unused masonry chimney provided with a sealed cap that prevents airflow within the confines of the masonry chimney; or\n\n2. A type B vent passing through an unventilated enclosure or chase insulated to R-8.\n\nSection FGC 502: Vents",
+  "previewText" : "Type B vents shall not be considered exposed to the outdoors in the following conditions:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 8437
+}

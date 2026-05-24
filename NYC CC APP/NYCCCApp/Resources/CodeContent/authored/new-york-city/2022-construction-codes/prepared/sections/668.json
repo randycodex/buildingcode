@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167913\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167913\"><\/AnnotationDrawer><div>Except for surfacing, floors within fabrication areas shall be of noncombustible construction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167914\"><\/AnnotationDrawer><div>Openings through floors of fabrication areas are permitted to be unprotected where the interconnected levels are used solely for mechanical equipment directly related to such fabrication areas (see also Section 415.11.1.5).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167915\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167915\"><\/AnnotationDrawer><div>Floors forming a part of an occupancy separation shall be liquid tight.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "668-html-1",
+      "kind" : "html",
+      "plainText" : "Except for surfacing, floors within fabrication areas shall be of noncombustible construction.\n\n Openings through floors of fabrication areas are permitted to be unprotected where the interconnected levels are used solely for mechanical equipment directly related to such fabrication areas (see also Section 415.11.1.5).\n\n Floors forming a part of an occupancy separation shall be liquid tight."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Except for surfacing, floors within fabrication areas shall be of noncombustible construction.\n\nOpenings through floors of fabrication areas are permitted to be unprotected where the interconnected levels are used solely for mechanical equipment directly related to such fabrication areas (see also Section 415.11.1.5).\n\nFloors forming a part of an occupancy separation shall be liquid tight.",
+  "previewText" : "Except for surfacing, floors within fabrication areas shall be of noncombustible construction.",
+  "schemaVersion" : 2,
+  "sectionID" : 668
+}

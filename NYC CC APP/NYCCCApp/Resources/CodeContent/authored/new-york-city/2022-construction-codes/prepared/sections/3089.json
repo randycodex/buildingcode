@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176161\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176161\"><\/AnnotationDrawer><div>Plastic panel, apron or spandrel walls as defined in this code shall not be limited in thickness, provided that such plastics and their assemblies conform to the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183091', hash: '#JD_BCCh.26' }}\">Chapter 26<\/Link> and other applicable requirements of this chapter, and are constructed of approved weather-resistant materials of adequate strength to resist the wind loads for cladding specified in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3089-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic panel, apron or spandrel walls as defined in this code shall not be limited in thickness, provided that such plastics and their assemblies conform to the requirements of Chapter 26 and other applicable requirements of this chapter, and are constructed of approved weather-resistant materials of adequate strength to resist the wind loads for cladding specified in Chapter 16 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Plastic panel, apron or spandrel walls as defined in this code shall not be limited in thickness, provided that such plastics and their assemblies conform to the requirements of Chapter 26 and other applicable requirements of this chapter, and are constructed of approved weather-resistant materials of adequate strength to resist the wind loads for cladding specified in Chapter 16.",
+  "previewText" : "Plastic panel, apron or spandrel walls as defined in this code shall not be limited in thickness, provided that such plastics and their assemblies conform to the requirements of Chapter 26 and other applicable requirements of this chapter, and are constructed of approved weather-resistant materials of adequate strength to resist the wind loads for cladding specified in Chapter 16.",
+  "schemaVersion" : 2,
+  "sectionID" : 3089
+}

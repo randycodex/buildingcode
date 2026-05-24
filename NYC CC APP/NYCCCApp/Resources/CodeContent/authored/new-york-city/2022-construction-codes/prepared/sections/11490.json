@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196248\"><\/AnnotationDrawer><div>Hydrostatic testing shall be conducted on the completed installation at 150 percent of the design pressure for all piping pressure. Where the changes in an existing steam system involve less than 30 percent of the piping in the system, the testing may be in accordance with ASME B31.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11490-html-1",
+      "kind" : "html",
+      "plainText" : "Hydrostatic testing shall be conducted on the completed installation at 150 percent of the design pressure for all piping pressure. Where the changes in an existing steam system involve less than 30 percent of the piping in the system, the testing may be in accordance with ASME B31.1."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Hydrostatic testing shall be conducted on the completed installation at 150 percent of the design pressure for all piping pressure. Where the changes in an existing steam system involve less than 30 percent of the piping in the system, the testing may be in accordance with ASME B31.1.",
+  "previewText" : "Hydrostatic testing shall be conducted on the completed installation at 150 percent of the design pressure for all piping pressure.",
+  "schemaVersion" : 2,
+  "sectionID" : 11490
+}

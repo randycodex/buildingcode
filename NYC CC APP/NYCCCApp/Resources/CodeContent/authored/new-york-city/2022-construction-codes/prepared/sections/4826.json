@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181497\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181497\"><\/AnnotationDrawer><div>Column splices shall have an available tensile strength at least equal to the largest design gravity load reaction applied to the column at any floor level located within four floors below the splice.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4826-html-1",
+      "kind" : "html",
+      "plainText" : "Column splices shall have an available tensile strength at least equal to the largest design gravity load reaction applied to the column at any floor level located within four floors below the splice."
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "Column splices shall have an available tensile strength at least equal to the largest design gravity load reaction applied to the column at any floor level located within four floors below the splice.",
+  "previewText" : "Column splices shall have an available tensile strength at least equal to the largest design gravity load reaction applied to the column at any floor level located within four floors below the splice.",
+  "schemaVersion" : 2,
+  "sectionID" : 4826
+}

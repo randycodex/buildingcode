@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172956\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172956\"><\/AnnotationDrawer><div>The occupant load in each individual room, area and space, including those subject to Section 1004.1.1.1.1 where applicable, shall not exceed 74 persons.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2144-html-1",
+      "kind" : "html",
+      "plainText" : "The occupant load in each individual room, area and space, including those subject to Section 1004.1.1.1.1 where applicable, shall not exceed 74 persons."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The occupant load in each individual room, area and space, including those subject to Section 1004.1.1.1.1 where applicable, shall not exceed 74 persons.",
+  "previewText" : "The occupant load in each individual room, area and space, including those subject to Section 1004.",
+  "schemaVersion" : 2,
+  "sectionID" : 2144
+}

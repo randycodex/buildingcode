@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171330\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171330\"><\/AnnotationDrawer><div>Such openings shall have a minimum dimension of not less than 30 inches (762 mm). Such openings shall be accessible to the Fire Department from the exterior and shall not be obstructed in a manner that firefighting or rescue cannot be accomplished from the exterior.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1609-html-1",
+      "kind" : "html",
+      "plainText" : "Such openings shall have a minimum dimension of not less than 30 inches (762 mm). Such openings shall be accessible to the Fire Department from the exterior and shall not be obstructed in a manner that firefighting or rescue cannot be accomplished from the exterior."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Such openings shall have a minimum dimension of not less than 30 inches (762 mm). Such openings shall be accessible to the Fire Department from the exterior and shall not be obstructed in a manner that firefighting or rescue cannot be accomplished from the exterior.",
+  "previewText" : "Such openings shall have a minimum dimension of not less than 30 inches (762 mm).",
+  "schemaVersion" : 2,
+  "sectionID" : 1609
+}

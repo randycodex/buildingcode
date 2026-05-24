@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161963\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161963\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A separate tap and service shall be installed for each building in accordance with the rules of the Department of Environmental Protection.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12117-html-1",
+      "kind" : "html",
+      "plainText" : "A separate tap and service shall be installed for each building in accordance with the rules of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "A separate tap and service shall be installed for each building in accordance with the rules of the Department of Environmental Protection.",
+  "previewText" : "A separate tap and service shall be installed for each building in accordance with the rules of the Department of Environmental Protection.",
+  "schemaVersion" : 2,
+  "sectionID" : 12117
+}

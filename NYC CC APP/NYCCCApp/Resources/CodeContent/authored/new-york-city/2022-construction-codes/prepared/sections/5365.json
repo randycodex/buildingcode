@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183504\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183504\"><\/AnnotationDrawer><div>Multiple generators supplying emergency power system loads only, or supplying emergency power system equipment in combination with optional standby power loads as a common system may be located in the same room. Such generators may also share a common room, fuel supply and other common equipment and systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5365-html-1",
+      "kind" : "html",
+      "plainText" : "Multiple generators supplying emergency power system loads only, or supplying emergency power system equipment in combination with optional standby power loads as a common system may be located in the same room. Such generators may also share a common room, fuel supply and other common equipment and systems."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Multiple generators supplying emergency power system loads only, or supplying emergency power system equipment in combination with optional standby power loads as a common system may be located in the same room. Such generators may also share a common room, fuel supply and other common equipment and systems.",
+  "previewText" : "Multiple generators supplying emergency power system loads only, or supplying emergency power system equipment in combination with optional standby power loads as a common system may be located in the same room.",
+  "schemaVersion" : 2,
+  "sectionID" : 5365
+}

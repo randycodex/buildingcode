@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168546\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168546\"><\/AnnotationDrawer><div>Area factor increase shall be determined in accordance with Sections 506.3.1 through 506.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "872-html-1",
+      "kind" : "html",
+      "plainText" : "Area factor increase shall be determined in accordance with Sections 506.3.1 through 506.3.3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Area factor increase shall be determined in accordance with Sections 506.3.1 through 506.3.3.",
+  "previewText" : "Area factor increase shall be determined in accordance with Sections 506.",
+  "schemaVersion" : 2,
+  "sectionID" : 872
+}

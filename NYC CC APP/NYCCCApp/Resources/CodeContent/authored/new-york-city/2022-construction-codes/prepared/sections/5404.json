@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183597\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183597\"><\/AnnotationDrawer><div>Where a functioning emergency power system or required standby power system is in place and provides power to all required emergency or required standby power loads, any additional optional standby power system need not supply power to such emergency or required standby power loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5404-html-1",
+      "kind" : "html",
+      "plainText" : "Where a functioning emergency power system or required standby power system is in place and provides power to all required emergency or required standby power loads, any additional optional standby power system need not supply power to such emergency or required standby power loads."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Where a functioning emergency power system or required standby power system is in place and provides power to all required emergency or required standby power loads, any additional optional standby power system need not supply power to such emergency or required standby power loads.",
+  "previewText" : "Where a functioning emergency power system or required standby power system is in place and provides power to all required emergency or required standby power loads, any additional optional standby power system need not supply power to such emergency or required standby power loads.",
+  "schemaVersion" : 2,
+  "sectionID" : 5404
+}

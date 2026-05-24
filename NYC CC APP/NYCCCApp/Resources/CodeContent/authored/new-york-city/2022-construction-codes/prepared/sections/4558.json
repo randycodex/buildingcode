@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180708\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180708\"><\/AnnotationDrawer><div>This chapter shall govern the quality, design, fabrication and erection of aluminum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180709\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180709\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180709\"><\/AnnotationDrawer><h6><a name=\"JD_BC2002\" id=\"JD_BC2002\" title=\"BC 2002\"><\/a>Section BC 2002: Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4558-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern the quality, design, fabrication and erection of aluminum.\n\n Section BC 2002: Materials"
+    }
+  ],
+  "chapterNumber" : "20",
+  "officialText" : "This chapter shall govern the quality, design, fabrication and erection of aluminum.",
+  "previewText" : "This chapter shall govern the quality, design, fabrication and erection of aluminum.",
+  "schemaVersion" : 2,
+  "sectionID" : 4558
+}

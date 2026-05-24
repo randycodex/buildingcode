@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180817\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180817\"><\/AnnotationDrawer><div>Second-hand masonry units shall not be reused unless they conform to the requirements of new units. The units shall be of whole, sound materials and free from cracks and other defects that will interfere with proper laying or use. Old mortar shall be cleaned from the unit before reuse.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180818\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180818\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Second-hand masonry units need not conform to the requirements for new units when their reuse is to comply with historic restoration standards or requirements of the New York City Landmarks Preservation Commission or the New York State Historic Preservation Office.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4571-html-1",
+      "kind" : "html",
+      "plainText" : "Second-hand masonry units shall not be reused unless they conform to the requirements of new units. The units shall be of whole, sound materials and free from cracks and other defects that will interfere with proper laying or use. Old mortar shall be cleaned from the unit before reuse.\n\n Exception: Second-hand masonry units need not conform to the requirements for new units when their reuse is to comply with historic restoration standards or requirements of the New York City Landmarks Preservation Commission or the New York State Historic Preservation Office."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Second-hand masonry units shall not be reused unless they conform to the requirements of new units. The units shall be of whole, sound materials and free from cracks and other defects that will interfere with proper laying or use. Old mortar shall be cleaned from the unit before reuse.\n\nException: Second-hand masonry units need not conform to the requirements for new units when their reuse is to comply with historic restoration standards or requirements of the New York City Landmarks Preservation Commission or the New York State Historic Preservation Office.",
+  "previewText" : "Second-hand masonry units shall not be reused unless they conform to the requirements of new units.",
+  "schemaVersion" : 2,
+  "sectionID" : 4571
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179974\"><\/AnnotationDrawer><div>A computation shall be performed to establish the vertical and lateral loads on the elements of the method of support from the existing building. Loads and load combinations shall be computed in accordance with the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link> or where permitted for loads of prior codes for prior code buildings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4274-html-1",
+      "kind" : "html",
+      "plainText" : "A computation shall be performed to establish the vertical and lateral loads on the elements of the method of support from the existing building. Loads and load combinations shall be computed in accordance with the requirements of Chapter 16 or where permitted for loads of prior codes for prior code buildings."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "A computation shall be performed to establish the vertical and lateral loads on the elements of the method of support from the existing building. Loads and load combinations shall be computed in accordance with the requirements of Chapter 16 or where permitted for loads of prior codes for prior code buildings.",
+  "previewText" : "A computation shall be performed to establish the vertical and lateral loads on the elements of the method of support from the existing building.",
+  "schemaVersion" : 2,
+  "sectionID" : 4274
+}

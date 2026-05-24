@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169337\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169337\"><\/AnnotationDrawer><div>Penetrations by ducts and air transfer openings into an enclosure for exit access stairways and ramps shall only be allowed when permitted by Sections 1023.4 and 1023.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-169338\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-169338\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-169338\"><\/AnnotationDrawer><h6><a name=\"JD_BC708\" id=\"JD_BC708\" title=\"BC 708\"><\/a>Section BC 708: Fire Partitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1083-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations by ducts and air transfer openings into an enclosure for exit access stairways and ramps shall only be allowed when permitted by Sections 1023.4 and 1023.6.\n\n Section BC 708: Fire Partitions"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Penetrations by ducts and air transfer openings into an enclosure for exit access stairways and ramps shall only be allowed when permitted by Sections 1023.4 and 1023.6.",
+  "previewText" : "Penetrations by ducts and air transfer openings into an enclosure for exit access stairways and ramps shall only be allowed when permitted by Sections 1023.",
+  "schemaVersion" : 2,
+  "sectionID" : 1083
+}

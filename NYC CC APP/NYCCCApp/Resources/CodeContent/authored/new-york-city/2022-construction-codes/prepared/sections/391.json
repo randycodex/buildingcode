@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167038\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167038\"><\/AnnotationDrawer><div>The flammable gas-detection system shall be listed or approved and shall be calibrated to the types of fuels or gases used by vehicles to be repaired. The gas detection system shall be designed to activate when the level of flammable gas exceeds 25 percent of the lower flammable limit (LFL). Gas detection shall be provided in lubrication or chassis service pits of repair garages used for repairing nonodorized LNG-fueled vehicles.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "391-html-1",
+      "kind" : "html",
+      "plainText" : "The flammable gas-detection system shall be listed or approved and shall be calibrated to the types of fuels or gases used by vehicles to be repaired. The gas detection system shall be designed to activate when the level of flammable gas exceeds 25 percent of the lower flammable limit (LFL). Gas detection shall be provided in lubrication or chassis service pits of repair garages used for repairing nonodorized LNG-fueled vehicles."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The flammable gas-detection system shall be listed or approved and shall be calibrated to the types of fuels or gases used by vehicles to be repaired. The gas detection system shall be designed to activate when the level of flammable gas exceeds 25 percent of the lower flammable limit (LFL). Gas detection shall be provided in lubrication or chassis service pits of repair garages used for repairing nonodorized LNG-fueled vehicles.",
+  "previewText" : "The flammable gas-detection system shall be listed or approved and shall be calibrated to the types of fuels or gases used by vehicles to be repaired.",
+  "schemaVersion" : 2,
+  "sectionID" : 391
+}

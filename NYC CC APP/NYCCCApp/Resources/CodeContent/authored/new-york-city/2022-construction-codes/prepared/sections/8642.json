@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199137\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199137\"><\/AnnotationDrawer><div>Automatic valves or semi-automatic valves shall be provided and shall comply with the applicable provisions of ANSI Z21.21\/CSA 6.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199138\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199138\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199138\"><\/AnnotationDrawer><h6><a name=\"JD_FGC604\" id=\"JD_FGC604\" title=\"FGC 604\"><\/a>Section FGC 604: Vented Gas Fireplaces (Decorative Appliances)<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8642-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic valves or semi-automatic valves shall be provided and shall comply with the applicable provisions of ANSI Z21.21\/CSA 6.5.\n\n Section FGC 604: Vented Gas Fireplaces (Decorative Appliances)"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Automatic valves or semi-automatic valves shall be provided and shall comply with the applicable provisions of ANSI Z21.21\/CSA 6.5.\n\nSection FGC 604: Vented Gas Fireplaces (Decorative Appliances)",
+  "previewText" : "Automatic valves or semi-automatic valves shall be provided and shall comply with the applicable provisions of ANSI Z21.",
+  "schemaVersion" : 2,
+  "sectionID" : 8642
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183728\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183728\"><\/AnnotationDrawer><div>Where two or more elevators are controlled by a common operating system, all elevators shall automatically transfer to standby power within 60 seconds after failure of normal power where the standby power source is of sufficient capacity to operate all elevators at the same time. Where the standby power source is not of sufficient capacity to operate all elevators at the same time, all elevators shall transfer to standby power in sequence, return to the designated landing and disconnect from the standby power source. For buildings with multiple banks of elevators, at least one elevator from each bank shall remain operable from the standby power source.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5445-html-1",
+      "kind" : "html",
+      "plainText" : "Where two or more elevators are controlled by a common operating system, all elevators shall automatically transfer to standby power within 60 seconds after failure of normal power where the standby power source is of sufficient capacity to operate all elevators at the same time. Where the standby power source is not of sufficient capacity to operate all elevators at the same time, all elevators shall transfer to standby power in sequence, return to the designated landing and disconnect from the standby power source. For buildings with multiple banks of elevators, at least one elevator from each bank shall remain operable from the standby power source."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Where two or more elevators are controlled by a common operating system, all elevators shall automatically transfer to standby power within 60 seconds after failure of normal power where the standby power source is of sufficient capacity to operate all elevators at the same time. Where the standby power source is not of sufficient capacity to operate all elevators at the same time, all elevators shall transfer to standby power in sequence, return to the designated landing and disconnect from the standby power source. For buildings with multiple banks of elevators, at least one elevator from each bank shall remain operable from the standby power source.",
+  "previewText" : "Where two or more elevators are controlled by a common operating system, all elevators shall automatically transfer to standby power within 60 seconds after failure of normal power where the standby power source is of sufficient capacity to operate all elevators at the same time.",
+  "schemaVersion" : 2,
+  "sectionID" : 5445
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188492\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188492\"><\/AnnotationDrawer><div>The Board of Standards and Appeals shall:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188493\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188493\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Maintain a record of all variance actions, including justification for their issuance; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188494\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188494\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Report such variances issued in its biennial report submitted to the Federal Emergency Management Agency (FEMA).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7016-html-1",
+      "kind" : "html",
+      "plainText" : "The Board of Standards and Appeals shall:\n\n 1. Maintain a record of all variance actions, including justification for their issuance; and\n\n 2. Report such variances issued in its biennial report submitted to the Federal Emergency Management Agency (FEMA)."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "The Board of Standards and Appeals shall:\n\n1. Maintain a record of all variance actions, including justification for their issuance; and\n\n2. Report such variances issued in its biennial report submitted to the Federal Emergency Management Agency (FEMA).",
+  "previewText" : "The Board of Standards and Appeals shall:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 7016
+}

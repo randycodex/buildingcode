@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169280\"><\/AnnotationDrawer><div>The fire-resistance rating of the fire barrier separating building areas from a shaft shall comply with Section 713.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1063-html-1",
+      "kind" : "html",
+      "plainText" : "The fire-resistance rating of the fire barrier separating building areas from a shaft shall comply with Section 713.4."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire-resistance rating of the fire barrier separating building areas from a shaft shall comply with Section 713.4.",
+  "previewText" : "The fire-resistance rating of the fire barrier separating building areas from a shaft shall comply with Section 713.",
+  "schemaVersion" : 2,
+  "sectionID" : 1063
+}

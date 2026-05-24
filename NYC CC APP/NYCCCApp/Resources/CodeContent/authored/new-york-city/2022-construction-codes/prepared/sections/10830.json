@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194432\"><\/AnnotationDrawer><div>Smoke detectors shall be installed in return air systems with a design capacity greater than 2,000 cfm (0.9 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s), in the return air duct or plenum upstream of any filters, exhaust air connections, outdoor air connections, or decontamination equipment and appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194433\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Smoke detectors are not required in the return air system where all portions of the building served by the air distribution system are protected by area smoke detectors connected to a fire alarm system in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span> The area smoke detection system shall comply with Section 606.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10830-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke detectors shall be installed in return air systems with a design capacity greater than 2,000 cfm (0.9 m\n 3 \n \/s), in the return air duct or plenum upstream of any filters, exhaust air connections, outdoor air connections, or decontamination equipment and appliances.\n\n Exception: Smoke detectors are not required in the return air system where all portions of the building served by the air distribution system are protected by area smoke detectors connected to a fire alarm system in accordance with the New York City Building Code. The area smoke detection system shall comply with Section 606.4."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Smoke detectors shall be installed in return air systems with a design capacity greater than 2,000 cfm (0.9 m 3 \/s), in the return air duct or plenum upstream of any filters, exhaust air connections, outdoor air connections, or decontamination equipment and appliances.\n\nException: Smoke detectors are not required in the return air system where all portions of the building served by the air distribution system are protected by area smoke detectors connected to a fire alarm system in accordance with the New York City Building Code. The area smoke detection system shall comply with Section 606.4.",
+  "previewText" : "Smoke detectors shall be installed in return air systems with a design capacity greater than 2,000 cfm (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 10830
+}

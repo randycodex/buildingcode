@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183934\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183934\"><\/AnnotationDrawer><div>An approved sign indicating elevators are suitable for occupant self-evacuation shall be posted on all floors adjacent to each elevator call station serving occupant evacuation elevators.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5528-html-1",
+      "kind" : "html",
+      "plainText" : "An approved sign indicating elevators are suitable for occupant self-evacuation shall be posted on all floors adjacent to each elevator call station serving occupant evacuation elevators."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "An approved sign indicating elevators are suitable for occupant self-evacuation shall be posted on all floors adjacent to each elevator call station serving occupant evacuation elevators.",
+  "previewText" : "An approved sign indicating elevators are suitable for occupant self-evacuation shall be posted on all floors adjacent to each elevator call station serving occupant evacuation elevators.",
+  "schemaVersion" : 2,
+  "sectionID" : 5528
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185141\"><\/AnnotationDrawer><div>All areas of the construction or demolition site shall be cleaned of debris at least daily.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5931-html-1",
+      "kind" : "html",
+      "plainText" : "All areas of the construction or demolition site shall be cleaned of debris at least daily."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "All areas of the construction or demolition site shall be cleaned of debris at least daily.",
+  "previewText" : "All areas of the construction or demolition site shall be cleaned of debris at least daily.",
+  "schemaVersion" : 2,
+  "sectionID" : 5931
+}

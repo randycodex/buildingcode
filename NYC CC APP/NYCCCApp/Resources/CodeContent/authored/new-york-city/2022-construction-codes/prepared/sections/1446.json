@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170674\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170674\"><\/AnnotationDrawer><div>The fire resistance of structural steel columns with weight-to-heated-perimeter ratios (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">W\/D<\/span>) less than or equal to 3.65 and that are protected with Type X gypsum wallboard shall be permitted to be determined from the following expression:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170675\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170675\"><\/AnnotationDrawer><div>",
+      "id" : "1446-html-1",
+      "kind" : "html",
+      "plainText" : "The fire resistance of structural steel columns with weight-to-heated-perimeter ratios ( W\/D ) less than or equal to 3.65 and that are protected with Type X gypsum wallboard shall be permitted to be determined from the following expression:"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/b45fc87ac408aca9055ee6bf765cd709a68126f4.png\" width=\"240\" height=\"66.1333333333333\"><\/img><\/span>",
+      "id" : "1446-image-2",
+      "imageID" : "b45fc87ac408aca9055ee6bf765cd709a68126f4.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "&#160;&#160;&#160;&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">(Equation 7-12)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170676\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170676\"><\/AnnotationDrawer><div>where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170677\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170677\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;R&#160;&#160;&#160;=&#160;&#160;&#160;Fire resistance (minutes).<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170678\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170678\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;h&#160;&#160;&#160;=&#160;&#160;&#160;Total thickness of gypsum wallboard (inches).<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170679\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170679\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;D&#160;&#160;&#160;=&#160;&#160;&#160;Heated perimeter of the structural steel column (inches).<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170680\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170680\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;W'&#160;&#160;&#160;=&#160;&#160;&#160;Total weight of the structural steel column and gypsum wallboard protection (pounds per linear foot).<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170681\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;W'&#160;&#160;&#160;=&#160;&#160;&#160;W + 50hD\/144.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1446-html-3",
+      "kind" : "html",
+      "plainText" : "(Equation 7-12) \n\n where:\n\n R = Fire resistance (minutes).\n\n h = Total thickness of gypsum wallboard (inches).\n\n D = Heated perimeter of the structural steel column (inches).\n\n W' = Total weight of the structural steel column and gypsum wallboard protection (pounds per linear foot).\n\n W' = W + 50hD\/144."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire resistance of structural steel columns with weight-to-heated-perimeter ratios (W\/D) less than or equal to 3.65 and that are protected with Type X gypsum wallboard shall be permitted to be determined from the following expression:\n\n(Equation 7-12)\n\nwhere:\n\nR = Fire resistance (minutes).\n\nh = Total thickness of gypsum wallboard (inches).\n\nD = Heated perimeter of the structural steel column (inches).\n\nW' = Total weight of the structural steel column and gypsum wallboard protection (pounds per linear foot).\n\nW' = W + 50hD\/144.",
+  "previewText" : "The fire resistance of structural steel columns with weight-to-heated-perimeter ratios (W\/D) less than or equal to 3.",
+  "schemaVersion" : 2,
+  "sectionID" : 1446
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161279\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161279\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Piping materials exposed within plenums shall comply with the provisions of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Mechanical Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161280\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161280\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161280\"><\/AnnotationDrawer><h6><a name=\"JD_PC308\" id=\"JD_PC308\" title=\"PC 308\"><\/a>Section PC 308: Piping Support<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11852-html-1",
+      "kind" : "html",
+      "plainText" : "Piping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code . \n\n Section PC 308: Piping Support"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Piping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code.\n\nSection PC 308: Piping Support",
+  "previewText" : "Piping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11852
+}

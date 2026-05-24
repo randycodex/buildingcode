@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195154\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195154\"><\/AnnotationDrawer><div>Inspections of solid fuel burning heating appliances, chimneys and flues shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195155\"><\/AnnotationDrawer><div>(Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11061-html-1",
+      "kind" : "html",
+      "plainText" : "Inspections of solid fuel burning heating appliances, chimneys and flues shall be in accordance with the New York City Building Code .\n\n (Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Inspections of solid fuel burning heating appliances, chimneys and flues shall be in accordance with the New York City Building Code.\n\n(Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)",
+  "previewText" : "Inspections of solid fuel burning heating appliances, chimneys and flues shall be in accordance with the New York City Building Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11061
+}

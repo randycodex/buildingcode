@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182237\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182237\"><\/AnnotationDrawer><div>Exterior egress balconies, exterior stairways and ramps and similar means of egress components in structures assigned to Seismic Design Category D shall be positively anchored to the primary structure at not more than 8 feet (2438 mm) on center or shall be designed for lateral forces. Such attachment shall not be accomplished by use of toenails or nails subject to withdrawal.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5020-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior egress balconies, exterior stairways and ramps and similar means of egress components in structures assigned to Seismic Design Category D shall be positively anchored to the primary structure at not more than 8 feet (2438 mm) on center or shall be designed for lateral forces. Such attachment shall not be accomplished by use of toenails or nails subject to withdrawal."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Exterior egress balconies, exterior stairways and ramps and similar means of egress components in structures assigned to Seismic Design Category D shall be positively anchored to the primary structure at not more than 8 feet (2438 mm) on center or shall be designed for lateral forces. Such attachment shall not be accomplished by use of toenails or nails subject to withdrawal.",
+  "previewText" : "Exterior egress balconies, exterior stairways and ramps and similar means of egress components in structures assigned to Seismic Design Category D shall be positively anchored to the primary structure at not more than 8 feet (2438 mm) on center or shall be designed for lateral forces.",
+  "schemaVersion" : 2,
+  "sectionID" : 5020
+}

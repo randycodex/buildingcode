@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230020\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230020\"><\/AnnotationDrawer><div>The maximum building height of the ADU shall be determined in accordance with Section U103.8. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7929-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum building height of the ADU shall be determined in accordance with Section U103.8."
+    }
+  ],
+  "chapterNumber" : "U",
+  "officialText" : "The maximum building height of the ADU shall be determined in accordance with Section U103.8.",
+  "previewText" : "The maximum building height of the ADU shall be determined in accordance with Section U103.",
+  "schemaVersion" : 2,
+  "sectionID" : 7929
+}

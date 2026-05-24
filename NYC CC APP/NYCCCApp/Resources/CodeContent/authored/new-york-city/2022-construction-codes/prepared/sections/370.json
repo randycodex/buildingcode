@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166984\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166984\"><\/AnnotationDrawer><div>Open parking garages shall meet the means of egress requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link>. However, where no persons other than parking attendants are permitted, required exit stairways shall not be less than 36 inches (914 mm) wide.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "370-html-1",
+      "kind" : "html",
+      "plainText" : "Open parking garages shall meet the means of egress requirements of Chapter 10 . However, where no persons other than parking attendants are permitted, required exit stairways shall not be less than 36 inches (914 mm) wide."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Open parking garages shall meet the means of egress requirements of Chapter 10. However, where no persons other than parking attendants are permitted, required exit stairways shall not be less than 36 inches (914 mm) wide.",
+  "previewText" : "Open parking garages shall meet the means of egress requirements of Chapter 10.",
+  "schemaVersion" : 2,
+  "sectionID" : 370
+}

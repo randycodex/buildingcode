@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171780\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171780\"><\/AnnotationDrawer><div>A manual and automatic fire alarm system shall be installed in Group H-5 occupancies and in occupancies used for the manufacture of organic coatings. In addition to the automatic fire alarm system requirements of Section 907.2, an automatic smoke detection system shall be installed for highly toxic gases, organic peroxides and oxidizers in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171781\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171781\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where exempt under the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1758-html-1",
+      "kind" : "html",
+      "plainText" : "A manual and automatic fire alarm system shall be installed in Group H-5 occupancies and in occupancies used for the manufacture of organic coatings. In addition to the automatic fire alarm system requirements of Section 907.2, an automatic smoke detection system shall be installed for highly toxic gases, organic peroxides and oxidizers in accordance with the New York City Fire Code \n\n Exception: Where exempt under the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "A manual and automatic fire alarm system shall be installed in Group H-5 occupancies and in occupancies used for the manufacture of organic coatings. In addition to the automatic fire alarm system requirements of Section 907.2, an automatic smoke detection system shall be installed for highly toxic gases, organic peroxides and oxidizers in accordance with the New York City Fire Code\n\nException: Where exempt under the New York City Fire Code.",
+  "previewText" : "A manual and automatic fire alarm system shall be installed in Group H-5 occupancies and in occupancies used for the manufacture of organic coatings.",
+  "schemaVersion" : 2,
+  "sectionID" : 1758
+}

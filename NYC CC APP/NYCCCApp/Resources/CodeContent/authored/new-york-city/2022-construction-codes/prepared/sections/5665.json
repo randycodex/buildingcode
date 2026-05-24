@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184295\"><\/AnnotationDrawer><div>Every swimming pool shall have a walkway not less than 5 feet (1524 mm) wide around its entire perimeter. The walkway shall have a nonslip surface and shall be constructed to drain away from the swimming pool.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5665-html-1",
+      "kind" : "html",
+      "plainText" : "Every swimming pool shall have a walkway not less than 5 feet (1524 mm) wide around its entire perimeter. The walkway shall have a nonslip surface and shall be constructed to drain away from the swimming pool."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Every swimming pool shall have a walkway not less than 5 feet (1524 mm) wide around its entire perimeter. The walkway shall have a nonslip surface and shall be constructed to drain away from the swimming pool.",
+  "previewText" : "Every swimming pool shall have a walkway not less than 5 feet (1524 mm) wide around its entire perimeter.",
+  "schemaVersion" : 2,
+  "sectionID" : 5665
+}

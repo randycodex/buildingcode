@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176442\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176442\"><\/AnnotationDrawer><div>The use of HPL in exterior wall coverings is subject to the following limitations:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176443\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;HPL is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176444\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176444\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;HPL is prohibited in exterior wall coverings at exterior balconies and shall comply with Section 1406.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3200-html-1",
+      "kind" : "html",
+      "plainText" : "The use of HPL in exterior wall coverings is subject to the following limitations:\n\n 1. HPL is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n 2. HPL is prohibited in exterior wall coverings at exterior balconies and shall comply with Section 1406.3."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "The use of HPL in exterior wall coverings is subject to the following limitations:\n\n1. HPL is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n2. HPL is prohibited in exterior wall coverings at exterior balconies and shall comply with Section 1406.3.",
+  "previewText" : "The use of HPL in exterior wall coverings is subject to the following limitations:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 3200
+}

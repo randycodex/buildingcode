@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197413\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197413\"><\/AnnotationDrawer><div>Piping materials exposed within plenums shall comply with the provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-197414\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-197414\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-197414\"><\/AnnotationDrawer><h6><a name=\"JD_FGC303\" id=\"JD_FGC303\" title=\"FGC 303\"><\/a>Section FGC 303: Appliance Location<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8060-html-1",
+      "kind" : "html",
+      "plainText" : "Piping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code .\n\n Section FGC 303: Appliance Location"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Piping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code.\n\nSection FGC 303: Appliance Location",
+  "previewText" : "Piping materials exposed within plenums shall comply with the provisions of the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 8060
+}

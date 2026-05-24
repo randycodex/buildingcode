@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173582\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173582\"><\/AnnotationDrawer><div>Where serving an occupant load greater than 300, each manually-operated turnstile and automatic turnstile that is not portable shall have a side-hinged swinging door that conforms to Section 1010.1 within 50 feet (15 240 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2299-html-1",
+      "kind" : "html",
+      "plainText" : "Where serving an occupant load greater than 300, each manually-operated turnstile and automatic turnstile that is not portable shall have a side-hinged swinging door that conforms to Section 1010.1 within 50 feet (15 240 mm)."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Where serving an occupant load greater than 300, each manually-operated turnstile and automatic turnstile that is not portable shall have a side-hinged swinging door that conforms to Section 1010.1 within 50 feet (15 240 mm).",
+  "previewText" : "Where serving an occupant load greater than 300, each manually-operated turnstile and automatic turnstile that is not portable shall have a side-hinged swinging door that conforms to Section 1010.",
+  "schemaVersion" : 2,
+  "sectionID" : 2299
+}

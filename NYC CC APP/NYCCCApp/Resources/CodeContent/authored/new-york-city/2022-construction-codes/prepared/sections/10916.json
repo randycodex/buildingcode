@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194717\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194717\"><\/AnnotationDrawer><div>Two openings shall be provided, one within 1 foot (305 mm) of the ceiling of the room and one within 1 foot (304.8 mm) of the floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10916-html-1",
+      "kind" : "html",
+      "plainText" : "Two openings shall be provided, one within 1 foot (305 mm) of the ceiling of the room and one within 1 foot (304.8 mm) of the floor."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Two openings shall be provided, one within 1 foot (305 mm) of the ceiling of the room and one within 1 foot (304.8 mm) of the floor.",
+  "previewText" : "Two openings shall be provided, one within 1 foot (305 mm) of the ceiling of the room and one within 1 foot (304.",
+  "schemaVersion" : 2,
+  "sectionID" : 10916
+}

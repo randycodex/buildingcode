@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179139\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179139\"><\/AnnotationDrawer><div>Where shallow foundations are supported at different levels, or are at different levels from the shallow foundations of adjacent structures, the influence of the pressures under the higher foundation on the stability of the lower foundations shall be considered in the design. The design shall consider the requirements for lateral support of the material supporting the higher foundation, the additional load imposed on the lower foundations, and assessment of the effects of dragdown on deep foundations supporting adjacent buildings or compression of soils supporting adjacent buildings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3985-html-1",
+      "kind" : "html",
+      "plainText" : "Where shallow foundations are supported at different levels, or are at different levels from the shallow foundations of adjacent structures, the influence of the pressures under the higher foundation on the stability of the lower foundations shall be considered in the design. The design shall consider the requirements for lateral support of the material supporting the higher foundation, the additional load imposed on the lower foundations, and assessment of the effects of dragdown on deep foundations supporting adjacent buildings or compression of soils supporting adjacent buildings."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Where shallow foundations are supported at different levels, or are at different levels from the shallow foundations of adjacent structures, the influence of the pressures under the higher foundation on the stability of the lower foundations shall be considered in the design. The design shall consider the requirements for lateral support of the material supporting the higher foundation, the additional load imposed on the lower foundations, and assessment of the effects of dragdown on deep foundations supporting adjacent buildings or compression of soils supporting adjacent buildings.",
+  "previewText" : "Where shallow foundations are supported at different levels, or are at different levels from the shallow foundations of adjacent structures, the influence of the pressures under the higher foundation on the stability of the lower foundations shall be considered in the design.",
+  "schemaVersion" : 2,
+  "sectionID" : 3985
+}

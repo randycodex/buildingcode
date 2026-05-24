@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180101\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180101\"><\/AnnotationDrawer><div>The peer reviewer cannot be changed without the express consent of the department. The current peer reviewer must submit both a written letter to the borough commissioner detailing the reason for the withdrawal request and a report of the geotechnical peer review findings to date. If a change of peer reviewer is approved, a revised PW1 must be submitted indicating the replacement peer reviewer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "4319-html-1",
+      "kind" : "html",
+      "plainText" : "The peer reviewer cannot be changed without the express consent of the department. The current peer reviewer must submit both a written letter to the borough commissioner detailing the reason for the withdrawal request and a report of the geotechnical peer review findings to date. If a change of peer reviewer is approved, a revised PW1 must be submitted indicating the replacement peer reviewer."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The peer reviewer cannot be changed without the express consent of the department. The current peer reviewer must submit both a written letter to the borough commissioner detailing the reason for the withdrawal request and a report of the geotechnical peer review findings to date. If a change of peer reviewer is approved, a revised PW1 must be submitted indicating the replacement peer reviewer.",
+  "previewText" : "The peer reviewer cannot be changed without the express consent of the department.",
+  "schemaVersion" : 2,
+  "sectionID" : 4319
+}

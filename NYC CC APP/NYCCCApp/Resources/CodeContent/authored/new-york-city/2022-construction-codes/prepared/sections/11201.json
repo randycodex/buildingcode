@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195511\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195511\"><\/AnnotationDrawer><div>Steam and hot water boilers shall be protected with dual low-water cutoff control, with each control independently piped to the pressure vessel in accordance with ASME CSD-1. For hydronic boilers, the low-water cut out may be located in the supply piping above the boiler before any intervening valve. A flow-sensing control installed in accordance with ASME CSD-1 shall be considered a low-water cutoff for the purposes of this section. <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195512\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195512\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Hot water boilers located within a dwelling unit supplying only that unit and having a total heat input of less than 400,000 Btu\/h (117.2 kW) may be protected by only one low-water cutoff control.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11201-html-1",
+      "kind" : "html",
+      "plainText" : "Steam and hot water boilers shall be protected with dual low-water cutoff control, with each control independently piped to the pressure vessel in accordance with ASME CSD-1. For hydronic boilers, the low-water cut out may be located in the supply piping above the boiler before any intervening valve. A flow-sensing control installed in accordance with ASME CSD-1 shall be considered a low-water cutoff for the purposes of this section. \n\n Exception: Hot water boilers located within a dwelling unit supplying only that unit and having a total heat input of less than 400,000 Btu\/h (117.2 kW) may be protected by only one low-water cutoff control."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Steam and hot water boilers shall be protected with dual low-water cutoff control, with each control independently piped to the pressure vessel in accordance with ASME CSD-1. For hydronic boilers, the low-water cut out may be located in the supply piping above the boiler before any intervening valve. A flow-sensing control installed in accordance with ASME CSD-1 shall be considered a low-water cutoff for the purposes of this section.\n\nException: Hot water boilers located within a dwelling unit supplying only that unit and having a total heat input of less than 400,000 Btu\/h (117.2 kW) may be protected by only one low-water cutoff control.",
+  "previewText" : "Steam and hot water boilers shall be protected with dual low-water cutoff control, with each control independently piped to the pressure vessel in accordance with ASME CSD-1.",
+  "schemaVersion" : 2,
+  "sectionID" : 11201
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182745\"><\/AnnotationDrawer><div>Glass-block walls shall comply with Section 2101.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5125-html-1",
+      "kind" : "html",
+      "plainText" : "Glass-block walls shall comply with Section 2101.2.5."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "Glass-block walls shall comply with Section 2101.2.5.",
+  "previewText" : "Glass-block walls shall comply with Section 2101.",
+  "schemaVersion" : 2,
+  "sectionID" : 5125
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194252\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194252\"><\/AnnotationDrawer><div>Combustible pneumatic tubing exposed within a plenum shall have a peak optical density of 0.50 or less, an average optical density of 0.15 or less, and a flame spread of 5 feet (1524 mm) or less when tested in accordance with UL 1820. Combustible pneumatic tubing shall be listed and labeled.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10763-html-1",
+      "kind" : "html",
+      "plainText" : "Combustible pneumatic tubing exposed within a plenum shall have a peak optical density of 0.50 or less, an average optical density of 0.15 or less, and a flame spread of 5 feet (1524 mm) or less when tested in accordance with UL 1820. Combustible pneumatic tubing shall be listed and labeled."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Combustible pneumatic tubing exposed within a plenum shall have a peak optical density of 0.50 or less, an average optical density of 0.15 or less, and a flame spread of 5 feet (1524 mm) or less when tested in accordance with UL 1820. Combustible pneumatic tubing shall be listed and labeled.",
+  "previewText" : "Combustible pneumatic tubing exposed within a plenum shall have a peak optical density of 0.",
+  "schemaVersion" : 2,
+  "sectionID" : 10763
+}

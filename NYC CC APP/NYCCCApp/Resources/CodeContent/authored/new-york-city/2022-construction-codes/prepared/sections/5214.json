@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183043\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183043\"><\/AnnotationDrawer><div>Gypsum plaster shall not be used on exterior surfaces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5214-html-1",
+      "kind" : "html",
+      "plainText" : "Gypsum plaster shall not be used on exterior surfaces."
+    }
+  ],
+  "chapterNumber" : "25",
+  "officialText" : "Gypsum plaster shall not be used on exterior surfaces.",
+  "previewText" : "Gypsum plaster shall not be used on exterior surfaces.",
+  "schemaVersion" : 2,
+  "sectionID" : 5214
+}

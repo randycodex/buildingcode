@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164066\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164066\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Flanges and lips of load-bearing, cold-formed steel framing members shall not be cut or notched. Holes in webs of load-bearing, cold-formed steel framing members shall be permitted along the centerline of the web of the framing member and shall not exceed the dimensional limitations, penetration spacing or minimum hole edge distance as prescribed by the registered design professional.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11702-html-1",
+      "kind" : "html",
+      "plainText" : "Flanges and lips of load-bearing, cold-formed steel framing members shall not be cut or notched. Holes in webs of load-bearing, cold-formed steel framing members shall be permitted along the centerline of the web of the framing member and shall not exceed the dimensional limitations, penetration spacing or minimum hole edge distance as prescribed by the registered design professional."
+    }
+  ],
+  "chapterNumber" : "C",
+  "officialText" : "Flanges and lips of load-bearing, cold-formed steel framing members shall not be cut or notched. Holes in webs of load-bearing, cold-formed steel framing members shall be permitted along the centerline of the web of the framing member and shall not exceed the dimensional limitations, penetration spacing or minimum hole edge distance as prescribed by the registered design professional.",
+  "previewText" : "Flanges and lips of load-bearing, cold-formed steel framing members shall not be cut or notched.",
+  "schemaVersion" : 2,
+  "sectionID" : 11702
+}

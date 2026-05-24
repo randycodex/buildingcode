@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197749\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197749\"><\/AnnotationDrawer><div>Piping from multiple meter installations shall be marked with an approved permanent identification by the installer so that the piping system supplied by each meter is readily identifiable. Such marking shall be in accordance with ASME A13.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8169-html-1",
+      "kind" : "html",
+      "plainText" : "Piping from multiple meter installations shall be marked with an approved permanent identification by the installer so that the piping system supplied by each meter is readily identifiable. Such marking shall be in accordance with ASME A13.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Piping from multiple meter installations shall be marked with an approved permanent identification by the installer so that the piping system supplied by each meter is readily identifiable. Such marking shall be in accordance with ASME A13.1.",
+  "previewText" : "Piping from multiple meter installations shall be marked with an approved permanent identification by the installer so that the piping system supplied by each meter is readily identifiable.",
+  "schemaVersion" : 2,
+  "sectionID" : 8169
+}

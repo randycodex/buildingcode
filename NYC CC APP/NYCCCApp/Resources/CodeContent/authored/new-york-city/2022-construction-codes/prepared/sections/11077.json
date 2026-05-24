@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195195\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195195\"><\/AnnotationDrawer><div>Separate flues and independent combustion air source shall be provided for every fireplace stove and room heater. Combustion air shall be provided in accordance with the manufacturer's recommendations and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-194689', hash: '#JD_MCCh.7' }}\">Chapter 7<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195196\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195196\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195196\"><\/AnnotationDrawer><h6><a name=\"JD_MC906\" id=\"JD_MC906\" title=\"MC 906\"><\/a>Section MC 906: Factory-Built Barbecue Appliances<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11077-html-1",
+      "kind" : "html",
+      "plainText" : "Separate flues and independent combustion air source shall be provided for every fireplace stove and room heater. Combustion air shall be provided in accordance with the manufacturer's recommendations and Chapter 7 .\n\n Section MC 906: Factory-Built Barbecue Appliances"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Separate flues and independent combustion air source shall be provided for every fireplace stove and room heater. Combustion air shall be provided in accordance with the manufacturer's recommendations and Chapter 7.\n\nSection MC 906: Factory-Built Barbecue Appliances",
+  "previewText" : "Separate flues and independent combustion air source shall be provided for every fireplace stove and room heater.",
+  "schemaVersion" : 2,
+  "sectionID" : 11077
+}

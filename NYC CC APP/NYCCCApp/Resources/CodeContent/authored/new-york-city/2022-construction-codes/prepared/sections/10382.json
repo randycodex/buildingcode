@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193132\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193132\"><\/AnnotationDrawer><div>Interior and exterior mechanical equipment and systems shall comply with the provisions of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10382-html-1",
+      "kind" : "html",
+      "plainText" : "Interior and exterior mechanical equipment and systems shall comply with the provisions of this section."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Interior and exterior mechanical equipment and systems shall comply with the provisions of this section.",
+  "previewText" : "Interior and exterior mechanical equipment and systems shall comply with the provisions of this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 10382
+}

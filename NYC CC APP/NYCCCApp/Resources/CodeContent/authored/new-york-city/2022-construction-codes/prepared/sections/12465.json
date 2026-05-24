@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162876\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162876\"><\/AnnotationDrawer><div>Pipe shall be sized to prevent full-bore flow.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12465-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe shall be sized to prevent full-bore flow."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Pipe shall be sized to prevent full-bore flow.",
+  "previewText" : "Pipe shall be sized to prevent full-bore flow.",
+  "schemaVersion" : 2,
+  "sectionID" : 12465
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180683\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180683\"><\/AnnotationDrawer><div>End connections of all precast slabs, beams and girders shall have an axial tension capacity equal to the larger of the vertical shear capacity of the connection at either end, or at least 2 percent of the maximum factored vertical dead and live load in the precast compression element, whichever is larger, but not less than 20 kips or 2,500 pounds per linear foot of slab (36.48 kN\/m). Where more than one element frames in one direction, none of the elements or connections shall have an axial tension capacity of less than 1 percent of the column load but not less than 20 kips.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4551-html-1",
+      "kind" : "html",
+      "plainText" : "End connections of all precast slabs, beams and girders shall have an axial tension capacity equal to the larger of the vertical shear capacity of the connection at either end, or at least 2 percent of the maximum factored vertical dead and live load in the precast compression element, whichever is larger, but not less than 20 kips or 2,500 pounds per linear foot of slab (36.48 kN\/m). Where more than one element frames in one direction, none of the elements or connections shall have an axial tension capacity of less than 1 percent of the column load but not less than 20 kips."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "End connections of all precast slabs, beams and girders shall have an axial tension capacity equal to the larger of the vertical shear capacity of the connection at either end, or at least 2 percent of the maximum factored vertical dead and live load in the precast compression element, whichever is larger, but not less than 20 kips or 2,500 pounds per linear foot of slab (36.48 kN\/m). Where more than one element frames in one direction, none of the elements or connections shall have an axial tension capacity of less than 1 percent of the column load but not less than 20 kips.",
+  "previewText" : "End connections of all precast slabs, beams and girders shall have an axial tension capacity equal to the larger of the vertical shear capacity of the connection at either end, or at least 2 percent of the maximum factored vertical dead and live load in the precast compression element, whichever is larger, but not less than 20 kips or 2,500 pounds per linear foot of slab (36.",
+  "schemaVersion" : 2,
+  "sectionID" : 4551
+}

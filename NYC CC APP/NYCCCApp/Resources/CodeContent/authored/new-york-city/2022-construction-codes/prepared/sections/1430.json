@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170547\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170547\"><\/AnnotationDrawer><div>The equivalent thickness, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">T<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">e<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t, shall be the value obtained for hollow clay units as determined in accordance with Equation 7-8. The net volume, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">V<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">n<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t, of the units shall be determined using the gross volume and percentage of void area determined in accordance with ASTM C 67.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1430-html-1",
+      "kind" : "html",
+      "plainText" : "The equivalent thickness, T e \n\n , shall be the value obtained for hollow clay units as determined in accordance with Equation 7-8. The net volume, V n \n\n , of the units shall be determined using the gross volume and percentage of void area determined in accordance with ASTM C 67."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The equivalent thickness, Te , shall be the value obtained for hollow clay units as determined in accordance with Equation 7-8. The net volume, Vn , of the units shall be determined using the gross volume and percentage of void area determined in accordance with ASTM C 67.",
+  "previewText" : "The equivalent thickness, Te , shall be the value obtained for hollow clay units as determined in accordance with Equation 7-8.",
+  "schemaVersion" : 2,
+  "sectionID" : 1430
+}

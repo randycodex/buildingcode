@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162980\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162980\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Heat-fusion joints for polypropylene pipe and tubing joints shall be installed with socket-type heat-fused polypropylene fittings, butt-fusion polypropylene fittings or electrofusion polypropylene fittings. Joint surfaces shall be clean and free from moisture. The joint shall be undisturbed until cool. Joints shall be made in accordance with ASTM F 1412.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12510-html-1",
+      "kind" : "html",
+      "plainText" : "Heat-fusion joints for polypropylene pipe and tubing joints shall be installed with socket-type heat-fused polypropylene fittings, butt-fusion polypropylene fittings or electrofusion polypropylene fittings. Joint surfaces shall be clean and free from moisture. The joint shall be undisturbed until cool. Joints shall be made in accordance with ASTM F 1412."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Heat-fusion joints for polypropylene pipe and tubing joints shall be installed with socket-type heat-fused polypropylene fittings, butt-fusion polypropylene fittings or electrofusion polypropylene fittings. Joint surfaces shall be clean and free from moisture. The joint shall be undisturbed until cool. Joints shall be made in accordance with ASTM F 1412.",
+  "previewText" : "Heat-fusion joints for polypropylene pipe and tubing joints shall be installed with socket-type heat-fused polypropylene fittings, butt-fusion polypropylene fittings or electrofusion polypropylene fittings.",
+  "schemaVersion" : 2,
+  "sectionID" : 12510
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161783\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161783\"><\/AnnotationDrawer><div>A flushing device shall not serve more than one fixture.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12046-html-1",
+      "kind" : "html",
+      "plainText" : "A flushing device shall not serve more than one fixture."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A flushing device shall not serve more than one fixture.",
+  "previewText" : "A flushing device shall not serve more than one fixture.",
+  "schemaVersion" : 2,
+  "sectionID" : 12046
+}

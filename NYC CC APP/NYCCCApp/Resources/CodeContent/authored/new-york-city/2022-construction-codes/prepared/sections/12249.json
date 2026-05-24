@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162299\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162299\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Dual check backflow preventers shall conform to ASSE 1024 or CSA B64.6.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12249-html-1",
+      "kind" : "html",
+      "plainText" : "Dual check backflow preventers shall conform to ASSE 1024 or CSA B64.6."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Dual check backflow preventers shall conform to ASSE 1024 or CSA B64.6.",
+  "previewText" : "Dual check backflow preventers shall conform to ASSE 1024 or CSA B64.",
+  "schemaVersion" : 2,
+  "sectionID" : 12249
+}

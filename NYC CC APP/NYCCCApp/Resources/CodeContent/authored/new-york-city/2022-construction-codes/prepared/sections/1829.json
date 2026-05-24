@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172016\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172016\"><\/AnnotationDrawer><div>The Fire Department is authorized to require the installation of listed manual fire alarm box protective covers to prevent malicious false alarms or provide the manual fire alarm box with protection from physical damage. The protective cover shall be transparent or red in color with a transparent face to permit visibility of the manual fire alarm box. Each cover shall include proper operating instructions. A protective cover that emits a local alarm signal shall not be installed unless approved. Protective covers shall not project more than that permitted by Section 1003.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1829-html-1",
+      "kind" : "html",
+      "plainText" : "The Fire Department is authorized to require the installation of listed manual fire alarm box protective covers to prevent malicious false alarms or provide the manual fire alarm box with protection from physical damage. The protective cover shall be transparent or red in color with a transparent face to permit visibility of the manual fire alarm box. Each cover shall include proper operating instructions. A protective cover that emits a local alarm signal shall not be installed unless approved. Protective covers shall not project more than that permitted by Section 1003.3.3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The Fire Department is authorized to require the installation of listed manual fire alarm box protective covers to prevent malicious false alarms or provide the manual fire alarm box with protection from physical damage. The protective cover shall be transparent or red in color with a transparent face to permit visibility of the manual fire alarm box. Each cover shall include proper operating instructions. A protective cover that emits a local alarm signal shall not be installed unless approved. Protective covers shall not project more than that permitted by Section 1003.3.3.",
+  "previewText" : "The Fire Department is authorized to require the installation of listed manual fire alarm box protective covers to prevent malicious false alarms or provide the manual fire alarm box with protection from physical damage.",
+  "schemaVersion" : 2,
+  "sectionID" : 1829
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160855\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160855\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">All apparatus, material and labor required for testing a plumbing system or part thereof shall be furnished by the permit holder.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11801-html-1",
+      "kind" : "html",
+      "plainText" : "All apparatus, material and labor required for testing a plumbing system or part thereof shall be furnished by the permit holder."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "All apparatus, material and labor required for testing a plumbing system or part thereof shall be furnished by the permit holder.",
+  "previewText" : "All apparatus, material and labor required for testing a plumbing system or part thereof shall be furnished by the permit holder.",
+  "schemaVersion" : 2,
+  "sectionID" : 11801
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163141\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The dry-vent connection for a horizontal wet-vent system shall be an individual vent or a common vent for any bathroom group fixture, except an emergency floor drain. Where the dry-vent connects to a water closet fixture drain, the drain shall connect horizontally to the horizontal wet-vent system. Not more than one wet-vented fixture drain shall discharge upstream of the dry-vented fixture drain connection.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12576-html-1",
+      "kind" : "html",
+      "plainText" : "The dry-vent connection for a horizontal wet-vent system shall be an individual vent or a common vent for any bathroom group fixture, except an emergency floor drain. Where the dry-vent connects to a water closet fixture drain, the drain shall connect horizontally to the horizontal wet-vent system. Not more than one wet-vented fixture drain shall discharge upstream of the dry-vented fixture drain connection."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The dry-vent connection for a horizontal wet-vent system shall be an individual vent or a common vent for any bathroom group fixture, except an emergency floor drain. Where the dry-vent connects to a water closet fixture drain, the drain shall connect horizontally to the horizontal wet-vent system. Not more than one wet-vented fixture drain shall discharge upstream of the dry-vented fixture drain connection.",
+  "previewText" : "The dry-vent connection for a horizontal wet-vent system shall be an individual vent or a common vent for any bathroom group fixture, except an emergency floor drain.",
+  "schemaVersion" : 2,
+  "sectionID" : 12576
+}

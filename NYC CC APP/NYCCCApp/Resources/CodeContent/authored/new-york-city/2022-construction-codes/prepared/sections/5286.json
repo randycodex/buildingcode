@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183278\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183278\"><\/AnnotationDrawer><div>The flame spread index shall not exceed 75 where tested in accordance with ASTM E 84 or UL 723. The smoke-developed index shall not be limited.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183279\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183279\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> When the interior trim material has been tested as an interior finish in accordance with NFPA 286 and complies with the acceptance criteria in Section 803.1.2.1 of this code, it shall not be required to be tested for flame spread index in accordance with ASTM E 84 or UL 723.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183280\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183280\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183280\"><\/AnnotationDrawer><h6><a name=\"JD_BC2605\" id=\"JD_BC2605\" title=\"BC 2605\"><\/a>Section BC 2605: Plastic Veneer<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5286-html-1",
+      "kind" : "html",
+      "plainText" : "The flame spread index shall not exceed 75 where tested in accordance with ASTM E 84 or UL 723. The smoke-developed index shall not be limited.\n\n Exception: When the interior trim material has been tested as an interior finish in accordance with NFPA 286 and complies with the acceptance criteria in Section 803.1.2.1 of this code, it shall not be required to be tested for flame spread index in accordance with ASTM E 84 or UL 723.\n\n Section BC 2605: Plastic Veneer"
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "The flame spread index shall not exceed 75 where tested in accordance with ASTM E 84 or UL 723. The smoke-developed index shall not be limited.\n\nException: When the interior trim material has been tested as an interior finish in accordance with NFPA 286 and complies with the acceptance criteria in Section 803.1.2.1 of this code, it shall not be required to be tested for flame spread index in accordance with ASTM E 84 or UL 723.",
+  "previewText" : "The flame spread index shall not exceed 75 where tested in accordance with ASTM E 84 or UL 723.",
+  "schemaVersion" : 2,
+  "sectionID" : 5286
+}

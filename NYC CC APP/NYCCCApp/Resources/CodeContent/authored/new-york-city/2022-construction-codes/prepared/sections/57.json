@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164385\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164385\"><\/annotationdrawer><div>Construction documents for fire protection systems shall include a plot plan to scale indicating the location of the system in relation to the rest of the building and shall comply with Sections 107.9.1 through 107.9.4. Such plans shall not be required in connection with applications for limited standpipe alterations and limited sprinkler alterations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "57-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents for fire protection systems shall include a plot plan to scale indicating the location of the system in relation to the rest of the building and shall comply with Sections 107.9.1 through 107.9.4. Such plans shall not be required in connection with applications for limited standpipe alterations and limited sprinkler alterations."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Construction documents for fire protection systems shall include a plot plan to scale indicating the location of the system in relation to the rest of the building and shall comply with Sections 107.9.1 through 107.9.4. Such plans shall not be required in connection with applications for limited standpipe alterations and limited sprinkler alterations.",
+  "previewText" : "Construction documents for fire protection systems shall include a plot plan to scale indicating the location of the system in relation to the rest of the building and shall comply with Sections 107.",
+  "schemaVersion" : 2,
+  "sectionID" : 57
+}

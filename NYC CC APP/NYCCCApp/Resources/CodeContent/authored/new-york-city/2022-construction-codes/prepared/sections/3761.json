@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178443\"><\/AnnotationDrawer><div>For structures assigned to Seismic Design Category C or D and with designated seismic systems that are subject to the requirements of Section 13.2.2 of ASCE 7 for certification, the registered design professional shall specify on the approved construction documents the requirements to be met by analysis, testing or experience data as specified therein. Certificates of compliance documenting that the requirements are met shall be submitted to the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3761-html-1",
+      "kind" : "html",
+      "plainText" : "For structures assigned to Seismic Design Category C or D and with designated seismic systems that are subject to the requirements of Section 13.2.2 of ASCE 7 for certification, the registered design professional shall specify on the approved construction documents the requirements to be met by analysis, testing or experience data as specified therein. Certificates of compliance documenting that the requirements are met shall be submitted to the commissioner."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "For structures assigned to Seismic Design Category C or D and with designated seismic systems that are subject to the requirements of Section 13.2.2 of ASCE 7 for certification, the registered design professional shall specify on the approved construction documents the requirements to be met by analysis, testing or experience data as specified therein. Certificates of compliance documenting that the requirements are met shall be submitted to the commissioner.",
+  "previewText" : "For structures assigned to Seismic Design Category C or D and with designated seismic systems that are subject to the requirements of Section 13.",
+  "schemaVersion" : 2,
+  "sectionID" : 3761
+}

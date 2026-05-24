@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199387\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199387\"><\/AnnotationDrawer><div>Gas-fired air-conditioning appliances shall be tested in accordance with ANSI Z21.40.1\/CGA 2.91 or ANSI Z21.40.2\/CGA 2.92 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8743-html-1",
+      "kind" : "html",
+      "plainText" : "Gas-fired air-conditioning appliances shall be tested in accordance with ANSI Z21.40.1\/CGA 2.91 or ANSI Z21.40.2\/CGA 2.92 and shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Gas-fired air-conditioning appliances shall be tested in accordance with ANSI Z21.40.1\/CGA 2.91 or ANSI Z21.40.2\/CGA 2.92 and shall be installed in accordance with the manufacturer's instructions.",
+  "previewText" : "Gas-fired air-conditioning appliances shall be tested in accordance with ANSI Z21.",
+  "schemaVersion" : 2,
+  "sectionID" : 8743
+}

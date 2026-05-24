@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169805\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169805\"><\/AnnotationDrawer><div>Fire-rated glazing shall be prohibited in fire walls and fire barriers except as provided in Sections 716.5.8.1.2.1 and 716.5.8.1.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1252-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-rated glazing shall be prohibited in fire walls and fire barriers except as provided in Sections 716.5.8.1.2.1 and 716.5.8.1.2.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire-rated glazing shall be prohibited in fire walls and fire barriers except as provided in Sections 716.5.8.1.2.1 and 716.5.8.1.2.2.",
+  "previewText" : "Fire-rated glazing shall be prohibited in fire walls and fire barriers except as provided in Sections 716.",
+  "schemaVersion" : 2,
+  "sectionID" : 1252
+}

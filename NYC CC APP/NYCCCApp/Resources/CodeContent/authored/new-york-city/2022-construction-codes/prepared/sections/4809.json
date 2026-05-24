@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181439\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181439\"><\/AnnotationDrawer><div>Steel roof decks shall be permitted to be designed and constructed in accordance with ANSI\/SDI-RD.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4809-html-1",
+      "kind" : "html",
+      "plainText" : "Steel roof decks shall be permitted to be designed and constructed in accordance with ANSI\/SDI-RD."
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "Steel roof decks shall be permitted to be designed and constructed in accordance with ANSI\/SDI-RD.",
+  "previewText" : "Steel roof decks shall be permitted to be designed and constructed in accordance with ANSI\/SDI-RD.",
+  "schemaVersion" : 2,
+  "sectionID" : 4809
+}

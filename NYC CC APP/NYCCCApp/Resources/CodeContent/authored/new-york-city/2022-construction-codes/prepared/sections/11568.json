@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196431\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196431\"><\/AnnotationDrawer><div>The tank shall be designed for the maximum static head that will be imposed with the normal vent piping filled with oil.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11568-html-1",
+      "kind" : "html",
+      "plainText" : "The tank shall be designed for the maximum static head that will be imposed with the normal vent piping filled with oil."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "The tank shall be designed for the maximum static head that will be imposed with the normal vent piping filled with oil.",
+  "previewText" : "The tank shall be designed for the maximum static head that will be imposed with the normal vent piping filled with oil.",
+  "schemaVersion" : 2,
+  "sectionID" : 11568
+}

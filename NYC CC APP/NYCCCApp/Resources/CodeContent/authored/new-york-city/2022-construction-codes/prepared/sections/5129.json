@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182764\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182764\"><\/AnnotationDrawer><div>Multi-pane glazed assemblies having individual panes not exceeding 1 square foot (0.09 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in exposed areas shall have at least one pane in the assembly marked as indicated in Section 2406.3. Other panes in the assembly shall be marked \"CPSC 16 CFR Part 1201\" or \"ANSI Z97.1\", as appropriate.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5129-html-1",
+      "kind" : "html",
+      "plainText" : "Multi-pane glazed assemblies having individual panes not exceeding 1 square foot (0.09 m\n\n 2 \n\n ) in exposed areas shall have at least one pane in the assembly marked as indicated in Section 2406.3. Other panes in the assembly shall be marked \"CPSC 16 CFR Part 1201\" or \"ANSI Z97.1\", as appropriate."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "Multi-pane glazed assemblies having individual panes not exceeding 1 square foot (0.09 m 2 ) in exposed areas shall have at least one pane in the assembly marked as indicated in Section 2406.3. Other panes in the assembly shall be marked \"CPSC 16 CFR Part 1201\" or \"ANSI Z97.1\", as appropriate.",
+  "previewText" : "Multi-pane glazed assemblies having individual panes not exceeding 1 square foot (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 5129
+}

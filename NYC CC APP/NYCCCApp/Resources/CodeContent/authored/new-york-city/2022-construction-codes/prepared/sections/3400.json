@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177013\"><\/AnnotationDrawer><div>Rooftop mounted photovoltaic panels and modules shall have the fire classification in accordance with Section 1505.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3400-html-1",
+      "kind" : "html",
+      "plainText" : "Rooftop mounted photovoltaic panels and modules shall have the fire classification in accordance with Section 1505.9."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Rooftop mounted photovoltaic panels and modules shall have the fire classification in accordance with Section 1505.9.",
+  "previewText" : "Rooftop mounted photovoltaic panels and modules shall have the fire classification in accordance with Section 1505.",
+  "schemaVersion" : 2,
+  "sectionID" : 3400
+}

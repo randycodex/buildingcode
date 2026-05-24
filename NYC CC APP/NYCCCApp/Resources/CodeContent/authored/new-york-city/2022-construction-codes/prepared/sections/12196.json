@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162168\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162168\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A low-pressure cutoff shall be installed on all house pumps filling a water tank, and booster pumps in a water pressure booster system to prevent creation of a vacuum or negative pressure on the suction side of the pump when a positive pressure of 10 psi (68.94 kPa) or less occurs on the suction side of the pump.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12196-html-1",
+      "kind" : "html",
+      "plainText" : "A low-pressure cutoff shall be installed on all house pumps filling a water tank, and booster pumps in a water pressure booster system to prevent creation of a vacuum or negative pressure on the suction side of the pump when a positive pressure of 10 psi (68.94 kPa) or less occurs on the suction side of the pump."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "A low-pressure cutoff shall be installed on all house pumps filling a water tank, and booster pumps in a water pressure booster system to prevent creation of a vacuum or negative pressure on the suction side of the pump when a positive pressure of 10 psi (68.94 kPa) or less occurs on the suction side of the pump.",
+  "previewText" : "A low-pressure cutoff shall be installed on all house pumps filling a water tank, and booster pumps in a water pressure booster system to prevent creation of a vacuum or negative pressure on the suction side of the pump when a positive pressure of 10 psi (68.",
+  "schemaVersion" : 2,
+  "sectionID" : 12196
+}

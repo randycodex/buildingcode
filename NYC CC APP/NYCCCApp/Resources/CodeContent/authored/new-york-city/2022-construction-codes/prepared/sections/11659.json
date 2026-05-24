@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196703\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196703\"><\/AnnotationDrawer><div>For outside or below ground tanks, a shutoff valve shall be installed on the fuel-oil supply line at the entrance to the building. Inside or above-ground tanks shall have valves installed at the tank. The valve shall be capable of stopping the flow of fuel oil to the building or to the appliance served where the valve is installed at a tank inside the building. Valves shall comply with UL 842.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11659-html-1",
+      "kind" : "html",
+      "plainText" : "For outside or below ground tanks, a shutoff valve shall be installed on the fuel-oil supply line at the entrance to the building. Inside or above-ground tanks shall have valves installed at the tank. The valve shall be capable of stopping the flow of fuel oil to the building or to the appliance served where the valve is installed at a tank inside the building. Valves shall comply with UL 842."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "For outside or below ground tanks, a shutoff valve shall be installed on the fuel-oil supply line at the entrance to the building. Inside or above-ground tanks shall have valves installed at the tank. The valve shall be capable of stopping the flow of fuel oil to the building or to the appliance served where the valve is installed at a tank inside the building. Valves shall comply with UL 842.",
+  "previewText" : "For outside or below ground tanks, a shutoff valve shall be installed on the fuel-oil supply line at the entrance to the building.",
+  "schemaVersion" : 2,
+  "sectionID" : 11659
+}

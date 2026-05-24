@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176645\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176645\"><\/AnnotationDrawer><div>Asphalt shingles shall only be used on roof slopes of two units vertical in 12 units horizontal (17-percent slope) or greater. For roof slopes from two units vertical in 12 units horizontal (17-percent slope) up to four units vertical in 12 units horizontal (33-percent slope), double underlayment application is required in accordance with Section 1507.2.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3260-html-1",
+      "kind" : "html",
+      "plainText" : "Asphalt shingles shall only be used on roof slopes of two units vertical in 12 units horizontal (17-percent slope) or greater. For roof slopes from two units vertical in 12 units horizontal (17-percent slope) up to four units vertical in 12 units horizontal (33-percent slope), double underlayment application is required in accordance with Section 1507.2.8."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Asphalt shingles shall only be used on roof slopes of two units vertical in 12 units horizontal (17-percent slope) or greater. For roof slopes from two units vertical in 12 units horizontal (17-percent slope) up to four units vertical in 12 units horizontal (33-percent slope), double underlayment application is required in accordance with Section 1507.2.8.",
+  "previewText" : "Asphalt shingles shall only be used on roof slopes of two units vertical in 12 units horizontal (17-percent slope) or greater.",
+  "schemaVersion" : 2,
+  "sectionID" : 3260
+}

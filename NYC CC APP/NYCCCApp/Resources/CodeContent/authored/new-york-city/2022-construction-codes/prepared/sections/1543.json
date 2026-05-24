@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171022\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171022\"><\/AnnotationDrawer><div>Where required, fire protection systems shall be monitored by a central supervising station in accordance with NFPA 72.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1543-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, fire protection systems shall be monitored by a central supervising station in accordance with NFPA 72."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Where required, fire protection systems shall be monitored by a central supervising station in accordance with NFPA 72.",
+  "previewText" : "Where required, fire protection systems shall be monitored by a central supervising station in accordance with NFPA 72.",
+  "schemaVersion" : 2,
+  "sectionID" : 1543
+}

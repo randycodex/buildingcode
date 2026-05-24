@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195701\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195701\"><\/AnnotationDrawer><div>Where an evaporator or condenser is located in an air duct system, the volume of the smallest, enclosed occupied space served by the duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195702\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195702\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> If airflow to any enclosed space cannot be reduced below one-quarter of its maximum, the entire space served by the air duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11255-html-1",
+      "kind" : "html",
+      "plainText" : "Where an evaporator or condenser is located in an air duct system, the volume of the smallest, enclosed occupied space served by the duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.\n\n Exception: If airflow to any enclosed space cannot be reduced below one-quarter of its maximum, the entire space served by the air duct system shall be used to determine the maximum allowable quantity of refrigerant in the system."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where an evaporator or condenser is located in an air duct system, the volume of the smallest, enclosed occupied space served by the duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.\n\nException: If airflow to any enclosed space cannot be reduced below one-quarter of its maximum, the entire space served by the air duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.",
+  "previewText" : "Where an evaporator or condenser is located in an air duct system, the volume of the smallest, enclosed occupied space served by the duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.",
+  "schemaVersion" : 2,
+  "sectionID" : 11255
+}

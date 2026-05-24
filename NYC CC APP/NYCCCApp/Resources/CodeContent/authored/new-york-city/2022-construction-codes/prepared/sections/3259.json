@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176643\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176643\"><\/AnnotationDrawer><div>Asphalt shingles shall be fastened to solidly sheathed decks.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3259-html-1",
+      "kind" : "html",
+      "plainText" : "Asphalt shingles shall be fastened to solidly sheathed decks."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Asphalt shingles shall be fastened to solidly sheathed decks.",
+  "previewText" : "Asphalt shingles shall be fastened to solidly sheathed decks.",
+  "schemaVersion" : 2,
+  "sectionID" : 3259
+}

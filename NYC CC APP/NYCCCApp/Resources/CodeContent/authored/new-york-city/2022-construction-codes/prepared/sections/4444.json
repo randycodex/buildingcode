@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180442\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180442\"><\/AnnotationDrawer><div>The surface conditions of reinforcement shall comply with the provisions of Sections 1907.4.1 through 1907.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4444-html-1",
+      "kind" : "html",
+      "plainText" : "The surface conditions of reinforcement shall comply with the provisions of Sections 1907.4.1 through 1907.4.3."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "The surface conditions of reinforcement shall comply with the provisions of Sections 1907.4.1 through 1907.4.3.",
+  "previewText" : "The surface conditions of reinforcement shall comply with the provisions of Sections 1907.",
+  "schemaVersion" : 2,
+  "sectionID" : 4444
+}

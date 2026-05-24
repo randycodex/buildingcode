@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195667\"><\/AnnotationDrawer><div>The amounts shown in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195633', hash: '#JD_MCTable1103.1' }}\">Table 1103.1<\/Link> shall be reduced by 50 percent for all areas of institutional occupancies except kitchens, laboratories and mortuaries. The total of all Group A2, B2, A3 and B3 refrigerants shall not exceed 550 pounds (249.4 kg) in occupied areas or machinery rooms. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11247-html-1",
+      "kind" : "html",
+      "plainText" : "The amounts shown in Table 1103.1 shall be reduced by 50 percent for all areas of institutional occupancies except kitchens, laboratories and mortuaries. The total of all Group A2, B2, A3 and B3 refrigerants shall not exceed 550 pounds (249.4 kg) in occupied areas or machinery rooms. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "The amounts shown in Table 1103.1 shall be reduced by 50 percent for all areas of institutional occupancies except kitchens, laboratories and mortuaries. The total of all Group A2, B2, A3 and B3 refrigerants shall not exceed 550 pounds (249.4 kg) in occupied areas or machinery rooms. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.",
+  "previewText" : "The amounts shown in Table 1103.",
+  "schemaVersion" : 2,
+  "sectionID" : 11247
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179093\"><\/AnnotationDrawer><div>Provided the capacity of the underlying soil is not exceeded, the allowable bearing pressure of controlled fill shall be limited to:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179094\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179094\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;6 tons per square foot ((574.6 kPa) for gravel and crushed rock.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179095\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179095\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;3 tons per square foot (287.3 kPa) for recycled concrete aggregate and well-graded sand.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3972-html-1",
+      "kind" : "html",
+      "plainText" : "Provided the capacity of the underlying soil is not exceeded, the allowable bearing pressure of controlled fill shall be limited to:\n\n 1. 6 tons per square foot ((574.6 kPa) for gravel and crushed rock.\n\n 2. 3 tons per square foot (287.3 kPa) for recycled concrete aggregate and well-graded sand."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Provided the capacity of the underlying soil is not exceeded, the allowable bearing pressure of controlled fill shall be limited to:\n\n1. 6 tons per square foot ((574.6 kPa) for gravel and crushed rock.\n\n2. 3 tons per square foot (287.3 kPa) for recycled concrete aggregate and well-graded sand.",
+  "previewText" : "Provided the capacity of the underlying soil is not exceeded, the allowable bearing pressure of controlled fill shall be limited to:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 3972
+}

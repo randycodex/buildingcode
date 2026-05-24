@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194360\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194360\"><\/AnnotationDrawer><div>Ducts installed in locations where they are exposed to mechanical damage by vehicles or from other causes shall be protected by approved vehicle barriers as required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10802-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts installed in locations where they are exposed to mechanical damage by vehicles or from other causes shall be protected by approved vehicle barriers as required by the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Ducts installed in locations where they are exposed to mechanical damage by vehicles or from other causes shall be protected by approved vehicle barriers as required by the New York City Building Code.",
+  "previewText" : "Ducts installed in locations where they are exposed to mechanical damage by vehicles or from other causes shall be protected by approved vehicle barriers as required by the New York City Building Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10802
+}

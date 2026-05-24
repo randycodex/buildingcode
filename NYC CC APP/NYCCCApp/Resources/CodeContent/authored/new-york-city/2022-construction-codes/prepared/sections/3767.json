@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178460\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178460\"><\/AnnotationDrawer><div>No more than 10 percent of the thickness measurements of the sprayed fire-resistant materials applied to floor, roof and wall assemblies and structural members shall be less than the thickness required by the approved fire-resistance design, but in no case less than the minimum allowable thickness required by Section 1705.14.4.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3767-html-1",
+      "kind" : "html",
+      "plainText" : "No more than 10 percent of the thickness measurements of the sprayed fire-resistant materials applied to floor, roof and wall assemblies and structural members shall be less than the thickness required by the approved fire-resistance design, but in no case less than the minimum allowable thickness required by Section 1705.14.4.1."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "No more than 10 percent of the thickness measurements of the sprayed fire-resistant materials applied to floor, roof and wall assemblies and structural members shall be less than the thickness required by the approved fire-resistance design, but in no case less than the minimum allowable thickness required by Section 1705.14.4.1.",
+  "previewText" : "No more than 10 percent of the thickness measurements of the sprayed fire-resistant materials applied to floor, roof and wall assemblies and structural members shall be less than the thickness required by the approved fire-resistance design, but in no case less than the minimum allowable thickness required by Section 1705.",
+  "schemaVersion" : 2,
+  "sectionID" : 3767
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166937\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166937\"><\/AnnotationDrawer><div>Parking surfaces shall be of concrete or similar noncombustible and nonabsorbent materials. The area of floor used for parking of vehicles shall be sloped to facilitate the movement of liquids to a drain.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166938\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166938\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166939\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Asphalt parking surfaces shall be permitted at ground level.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166940\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166940\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Floors of Group S-2 parking garages shall not be required to have a sloped surface. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "353-html-1",
+      "kind" : "html",
+      "plainText" : "Parking surfaces shall be of concrete or similar noncombustible and nonabsorbent materials. The area of floor used for parking of vehicles shall be sloped to facilitate the movement of liquids to a drain.\n\n Exceptions: \n\n 1. Asphalt parking surfaces shall be permitted at ground level.\n\n 2. Floors of Group S-2 parking garages shall not be required to have a sloped surface."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Parking surfaces shall be of concrete or similar noncombustible and nonabsorbent materials. The area of floor used for parking of vehicles shall be sloped to facilitate the movement of liquids to a drain.\n\nExceptions:\n\n1. Asphalt parking surfaces shall be permitted at ground level.\n\n2. Floors of Group S-2 parking garages shall not be required to have a sloped surface.",
+  "previewText" : "Parking surfaces shall be of concrete or similar noncombustible and nonabsorbent materials.",
+  "schemaVersion" : 2,
+  "sectionID" : 353
+}

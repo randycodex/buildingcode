@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178339\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178339\"><\/AnnotationDrawer><div>High-load diaphragms designed in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182065', hash: '#JD_BCTable2306.2(2)' }}\">Table 2306.2(2)<\/Link> shall be subject to special inspections as indicated in Section 1704.1. The special inspector shall inspect the wood structural panel sheathing to ascertain whether it is of the grade and thickness shown on the approved construction documents. Additionally, the special inspector must verify the nominal size of framing members at adjoining panel edges, the nail or staple diameter and length, the number of fastener lines and that the spacing between fasteners in each line and at edge margins agrees with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3729-html-1",
+      "kind" : "html",
+      "plainText" : "High-load diaphragms designed in accordance with Table 2306.2(2) shall be subject to special inspections as indicated in Section 1704.1. The special inspector shall inspect the wood structural panel sheathing to ascertain whether it is of the grade and thickness shown on the approved construction documents. Additionally, the special inspector must verify the nominal size of framing members at adjoining panel edges, the nail or staple diameter and length, the number of fastener lines and that the spacing between fasteners in each line and at edge margins agrees with the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "High-load diaphragms designed in accordance with Table 2306.2(2) shall be subject to special inspections as indicated in Section 1704.1. The special inspector shall inspect the wood structural panel sheathing to ascertain whether it is of the grade and thickness shown on the approved construction documents. Additionally, the special inspector must verify the nominal size of framing members at adjoining panel edges, the nail or staple diameter and length, the number of fastener lines and that the spacing between fasteners in each line and at edge margins agrees with the approved construction documents.",
+  "previewText" : "High-load diaphragms designed in accordance with Table 2306.",
+  "schemaVersion" : 2,
+  "sectionID" : 3729
+}

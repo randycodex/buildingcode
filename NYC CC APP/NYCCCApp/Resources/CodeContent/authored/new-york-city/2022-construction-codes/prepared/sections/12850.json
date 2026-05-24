@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163910\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163910\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Roofwashers shall be tested by introducing water into the gutters. Proper diversion of the first quantity of water in accordance with the requirements of Section 1303.4 shall be verified.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12850-html-1",
+      "kind" : "html",
+      "plainText" : "Roofwashers shall be tested by introducing water into the gutters. Proper diversion of the first quantity of water in accordance with the requirements of Section 1303.4 shall be verified."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Roofwashers shall be tested by introducing water into the gutters. Proper diversion of the first quantity of water in accordance with the requirements of Section 1303.4 shall be verified.",
+  "previewText" : "Roofwashers shall be tested by introducing water into the gutters.",
+  "schemaVersion" : 2,
+  "sectionID" : 12850
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186553\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186553\"><\/AnnotationDrawer><div>Precautions shall be taken to prevent unenclosed perimeter protection from being damaged by sunlight, abrasion, sand, rust, welding, cutting operations, chemicals, and airborne contaminants, where such systems are susceptible to damage by such.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6444-html-1",
+      "kind" : "html",
+      "plainText" : "Precautions shall be taken to prevent unenclosed perimeter protection from being damaged by sunlight, abrasion, sand, rust, welding, cutting operations, chemicals, and airborne contaminants, where such systems are susceptible to damage by such."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Precautions shall be taken to prevent unenclosed perimeter protection from being damaged by sunlight, abrasion, sand, rust, welding, cutting operations, chemicals, and airborne contaminants, where such systems are susceptible to damage by such.",
+  "previewText" : "Precautions shall be taken to prevent unenclosed perimeter protection from being damaged by sunlight, abrasion, sand, rust, welding, cutting operations, chemicals, and airborne contaminants, where such systems are susceptible to damage by such.",
+  "schemaVersion" : 2,
+  "sectionID" : 6444
+}

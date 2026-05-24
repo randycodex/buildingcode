@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180147\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180147\"><\/AnnotationDrawer><div>Reinforcement and welding of reinforcement to be placed in concrete construction shall conform to the requirements of ACI 318, Chapter 20, and this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4333-html-1",
+      "kind" : "html",
+      "plainText" : "Reinforcement and welding of reinforcement to be placed in concrete construction shall conform to the requirements of ACI 318, Chapter 20, and this section."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Reinforcement and welding of reinforcement to be placed in concrete construction shall conform to the requirements of ACI 318, Chapter 20, and this section.",
+  "previewText" : "Reinforcement and welding of reinforcement to be placed in concrete construction shall conform to the requirements of ACI 318, Chapter 20, and this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 4333
+}

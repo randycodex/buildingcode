@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199222\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199222\"><\/AnnotationDrawer><div>Direct-fired make-up air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199223\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199223\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199223\"><\/AnnotationDrawer><h6><a name=\"JD_FGC612\" id=\"JD_FGC612\" title=\"FGC 612\"><\/a>Section FGC 612: Recirculating Direct-Fired Industrial Air Heaters<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8679-html-1",
+      "kind" : "html",
+      "plainText" : "Direct-fired make-up air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.\n\n Section FGC 612: Recirculating Direct-Fired Industrial Air Heaters"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Direct-fired make-up air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.\n\nSection FGC 612: Recirculating Direct-Fired Industrial Air Heaters",
+  "previewText" : "Direct-fired make-up air heaters shall be equipped with airflow-sensing devices, safety shutoff devices, operating temperature controls and thermally actuated temperature limit controls in accordance with the terms of their listing.",
+  "schemaVersion" : 2,
+  "sectionID" : 8679
+}

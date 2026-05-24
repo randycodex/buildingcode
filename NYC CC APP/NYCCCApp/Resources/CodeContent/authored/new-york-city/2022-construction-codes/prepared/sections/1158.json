@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169523\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169523\"><\/AnnotationDrawer><div>Horizontal fire door assemblies used to protect openings in fire-resistance-rated horizontal assemblies shall be tested in accordance with NFPA 288, and shall achieve a fire-resistance rating not less than the assembly being penetrated. Horizontal fire door assemblies shall be labeled by an approved agency. The label shall be permanently affixed and shall specify the manufacturer, the test standard and the fire-resistance rating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1158-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal fire door assemblies used to protect openings in fire-resistance-rated horizontal assemblies shall be tested in accordance with NFPA 288, and shall achieve a fire-resistance rating not less than the assembly being penetrated. Horizontal fire door assemblies shall be labeled by an approved agency. The label shall be permanently affixed and shall specify the manufacturer, the test standard and the fire-resistance rating."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Horizontal fire door assemblies used to protect openings in fire-resistance-rated horizontal assemblies shall be tested in accordance with NFPA 288, and shall achieve a fire-resistance rating not less than the assembly being penetrated. Horizontal fire door assemblies shall be labeled by an approved agency. The label shall be permanently affixed and shall specify the manufacturer, the test standard and the fire-resistance rating.",
+  "previewText" : "Horizontal fire door assemblies used to protect openings in fire-resistance-rated horizontal assemblies shall be tested in accordance with NFPA 288, and shall achieve a fire-resistance rating not less than the assembly being penetrated.",
+  "schemaVersion" : 2,
+  "sectionID" : 1158
+}

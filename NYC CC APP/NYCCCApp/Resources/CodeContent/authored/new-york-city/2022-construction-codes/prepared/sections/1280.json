@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169883\"><\/AnnotationDrawer><div>The space around a duct penetrating a nonfire-resistance-rated floor assembly shall comply with Section 717.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1280-html-1",
+      "kind" : "html",
+      "plainText" : "The space around a duct penetrating a nonfire-resistance-rated floor assembly shall comply with Section 717.6.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The space around a duct penetrating a nonfire-resistance-rated floor assembly shall comply with Section 717.6.3.",
+  "previewText" : "The space around a duct penetrating a nonfire-resistance-rated floor assembly shall comply with Section 717.",
+  "schemaVersion" : 2,
+  "sectionID" : 1280
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184238\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184238\"><\/AnnotationDrawer><div>Public swimming pools shall be completely enclosed by a fence, wall, building, or other solid barrier, or any combination thereof, not less than 6 feet (1829 mm) in height. Openings in the enclosure and pedestrian access gates shall not permit the passage of a 4-inch-diameter (102 mm) sphere. The enclosure shall be equipped with self-closing and self-latching gates.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184239\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184239\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Enclosures shall be not less than 4 feet (1219 mm) in height when surrounding wading pools with water less than 24 inches (610 mm) in depth. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5639-html-1",
+      "kind" : "html",
+      "plainText" : "Public swimming pools shall be completely enclosed by a fence, wall, building, or other solid barrier, or any combination thereof, not less than 6 feet (1829 mm) in height. Openings in the enclosure and pedestrian access gates shall not permit the passage of a 4-inch-diameter (102 mm) sphere. The enclosure shall be equipped with self-closing and self-latching gates.\n\n Exception: Enclosures shall be not less than 4 feet (1219 mm) in height when surrounding wading pools with water less than 24 inches (610 mm) in depth."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Public swimming pools shall be completely enclosed by a fence, wall, building, or other solid barrier, or any combination thereof, not less than 6 feet (1829 mm) in height. Openings in the enclosure and pedestrian access gates shall not permit the passage of a 4-inch-diameter (102 mm) sphere. The enclosure shall be equipped with self-closing and self-latching gates.\n\nException: Enclosures shall be not less than 4 feet (1219 mm) in height when surrounding wading pools with water less than 24 inches (610 mm) in depth.",
+  "previewText" : "Public swimming pools shall be completely enclosed by a fence, wall, building, or other solid barrier, or any combination thereof, not less than 6 feet (1829 mm) in height.",
+  "schemaVersion" : 2,
+  "sectionID" : 5639
+}

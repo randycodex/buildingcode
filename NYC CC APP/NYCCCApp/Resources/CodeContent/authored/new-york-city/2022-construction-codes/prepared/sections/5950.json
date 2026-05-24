@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185183\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185183\"><\/AnnotationDrawer><div>Material and debris shall be removed in a manner that prevents injury or damage to the public or property.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5950-html-1",
+      "kind" : "html",
+      "plainText" : "Material and debris shall be removed in a manner that prevents injury or damage to the public or property."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Material and debris shall be removed in a manner that prevents injury or damage to the public or property.",
+  "previewText" : "Material and debris shall be removed in a manner that prevents injury or damage to the public or property.",
+  "schemaVersion" : 2,
+  "sectionID" : 5950
+}

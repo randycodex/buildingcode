@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185872\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185872\"><\/AnnotationDrawer><div>The results of the inspection shall be documented in accordance with the checklist required by Section 3305.8.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6216-html-1",
+      "kind" : "html",
+      "plainText" : "The results of the inspection shall be documented in accordance with the checklist required by Section 3305.8.8."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The results of the inspection shall be documented in accordance with the checklist required by Section 3305.8.8.",
+  "previewText" : "The results of the inspection shall be documented in accordance with the checklist required by Section 3305.",
+  "schemaVersion" : 2,
+  "sectionID" : 6216
+}

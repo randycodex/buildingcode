@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198620\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198620\"><\/AnnotationDrawer><div>Cleanouts shall be examined to determine if they will remain tightly closed when not in use.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8477-html-1",
+      "kind" : "html",
+      "plainText" : "Cleanouts shall be examined to determine if they will remain tightly closed when not in use."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Cleanouts shall be examined to determine if they will remain tightly closed when not in use.",
+  "previewText" : "Cleanouts shall be examined to determine if they will remain tightly closed when not in use.",
+  "schemaVersion" : 2,
+  "sectionID" : 8477
+}

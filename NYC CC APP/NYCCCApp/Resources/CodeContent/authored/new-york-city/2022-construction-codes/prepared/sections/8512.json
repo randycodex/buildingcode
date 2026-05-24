@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198713\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198713\"><\/AnnotationDrawer><div>Uninsulated single-wall metal pipe shall not be used outdoors for venting appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8512-html-1",
+      "kind" : "html",
+      "plainText" : "Uninsulated single-wall metal pipe shall not be used outdoors for venting appliances."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Uninsulated single-wall metal pipe shall not be used outdoors for venting appliances.",
+  "previewText" : "Uninsulated single-wall metal pipe shall not be used outdoors for venting appliances.",
+  "schemaVersion" : 2,
+  "sectionID" : 8512
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188302\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188302\"><\/AnnotationDrawer><div>Unless otherwise specified in this code, floors on grade, including but not limited to cellar floors and crawl space floors, shall be constructed of a minimum 2 inch (51 mm) thick continuous concrete slab. Gaps shall not be permitted between the slab and the abutting foundation walls or columns, except where expansion joints, thermal breaks, and control joints are located. All openings including but not limited to annular spaces around pipes, electric cables, and conduits in the slab shall be protected by closing such openings with cement mortar, concrete masonry, metal plates or screening designed to prevent the passage of rodents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6945-html-1",
+      "kind" : "html",
+      "plainText" : "Unless otherwise specified in this code, floors on grade, including but not limited to cellar floors and crawl space floors, shall be constructed of a minimum 2 inch (51 mm) thick continuous concrete slab. Gaps shall not be permitted between the slab and the abutting foundation walls or columns, except where expansion joints, thermal breaks, and control joints are located. All openings including but not limited to annular spaces around pipes, electric cables, and conduits in the slab shall be protected by closing such openings with cement mortar, concrete masonry, metal plates or screening designed to prevent the passage of rodents."
+    }
+  ],
+  "chapterNumber" : "F",
+  "officialText" : "Unless otherwise specified in this code, floors on grade, including but not limited to cellar floors and crawl space floors, shall be constructed of a minimum 2 inch (51 mm) thick continuous concrete slab. Gaps shall not be permitted between the slab and the abutting foundation walls or columns, except where expansion joints, thermal breaks, and control joints are located. All openings including but not limited to annular spaces around pipes, electric cables, and conduits in the slab shall be protected by closing such openings with cement mortar, concrete masonry, metal plates or screening designed to prevent the passage of rodents.",
+  "previewText" : "Unless otherwise specified in this code, floors on grade, including but not limited to cellar floors and crawl space floors, shall be constructed of a minimum 2 inch (51 mm) thick continuous concrete slab.",
+  "schemaVersion" : 2,
+  "sectionID" : 6945
+}

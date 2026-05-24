@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161329\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161329\"><\/AnnotationDrawer><div>Washrooms and toilet rooms shall be illuminated and ventilated in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York city building code<\/span> and <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York city mechanical code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11868-html-1",
+      "kind" : "html",
+      "plainText" : "Washrooms and toilet rooms shall be illuminated and ventilated in accordance with the New York city building code and New York city mechanical code ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Washrooms and toilet rooms shall be illuminated and ventilated in accordance with the New York city building code and New York city mechanical code.",
+  "previewText" : "Washrooms and toilet rooms shall be illuminated and ventilated in accordance with the New York city building code and New York city mechanical code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11868
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180588\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180588\"><\/AnnotationDrawer><div>Add the following to Section 24.2.3.5:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180589\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180589\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">When calculating M\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">a<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t, consideration shall be given to loads imposed during construction.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180590\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180590\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180590\"><\/AnnotationDrawer><h6><a name=\"JD_BC1909\" id=\"JD_BC1909\" title=\"BC 1909\"><\/a>Section BC 1909: Structural Plain Concrete<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4513-html-1",
+      "kind" : "html",
+      "plainText" : "Add the following to Section 24.2.3.5:\n\n When calculating M\n\n a \n\n , consideration shall be given to loads imposed during construction.\n\n Section BC 1909: Structural Plain Concrete"
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Add the following to Section 24.2.3.5:\n\nWhen calculating M a , consideration shall be given to loads imposed during construction.",
+  "previewText" : "Add the following to Section 24.",
+  "schemaVersion" : 2,
+  "sectionID" : 4513
+}

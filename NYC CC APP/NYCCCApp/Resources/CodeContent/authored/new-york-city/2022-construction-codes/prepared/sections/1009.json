@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169091\"><\/AnnotationDrawer><div>Exterior walls shall be fire-resistance-rated in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable601' }}\">Tables 601<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable602' }}\">602<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188034', hash: '#JD_BCAppD' }}\">Appendix D<\/Link> where applicable. The required fire-resistance rating of exterior walls with a fire separation distance of greater than 10 feet (3048 mm) shall be rated for exposure to fire from the inside. The required fire-resistance rating of exterior walls with a fire separation distance of less than or equal to 10 feet (3048 mm) shall be rated for exposure to fire from both sides.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1009-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior walls shall be fire-resistance-rated in accordance with Tables 601 and 602 and Appendix D where applicable. The required fire-resistance rating of exterior walls with a fire separation distance of greater than 10 feet (3048 mm) shall be rated for exposure to fire from the inside. The required fire-resistance rating of exterior walls with a fire separation distance of less than or equal to 10 feet (3048 mm) shall be rated for exposure to fire from both sides."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Exterior walls shall be fire-resistance-rated in accordance with Tables 601 and 602 and Appendix D where applicable. The required fire-resistance rating of exterior walls with a fire separation distance of greater than 10 feet (3048 mm) shall be rated for exposure to fire from the inside. The required fire-resistance rating of exterior walls with a fire separation distance of less than or equal to 10 feet (3048 mm) shall be rated for exposure to fire from both sides.",
+  "previewText" : "Exterior walls shall be fire-resistance-rated in accordance with Tables 601 and 602 and Appendix D where applicable.",
+  "schemaVersion" : 2,
+  "sectionID" : 1009
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172058\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172058\"><\/AnnotationDrawer><div>The emergency voice\/alarm communication system shall have multi-channel capability to broadcast live voice messages by paging zones on a selective and all-call basis without automatic interruption of the alarm tones on the floor of incidence, floor above or floor below.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1843-html-1",
+      "kind" : "html",
+      "plainText" : "The emergency voice\/alarm communication system shall have multi-channel capability to broadcast live voice messages by paging zones on a selective and all-call basis without automatic interruption of the alarm tones on the floor of incidence, floor above or floor below."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The emergency voice\/alarm communication system shall have multi-channel capability to broadcast live voice messages by paging zones on a selective and all-call basis without automatic interruption of the alarm tones on the floor of incidence, floor above or floor below.",
+  "previewText" : "The emergency voice\/alarm communication system shall have multi-channel capability to broadcast live voice messages by paging zones on a selective and all-call basis without automatic interruption of the alarm tones on the floor of incidence, floor above or floor below.",
+  "schemaVersion" : 2,
+  "sectionID" : 1843
+}

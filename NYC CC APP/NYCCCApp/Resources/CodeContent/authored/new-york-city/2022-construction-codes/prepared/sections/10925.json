@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194739\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194739\"><\/AnnotationDrawer><div>Where openings connected to the outdoors through vertical ducts are provided in accordance with Section 703.1, the ratio of vertical openings shall be the sum of the net free areas of both such openings, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10925-html-1",
+      "kind" : "html",
+      "plainText" : "Where openings connected to the outdoors through vertical ducts are provided in accordance with Section 703.1, the ratio of vertical openings shall be the sum of the net free areas of both such openings, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.4."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where openings connected to the outdoors through vertical ducts are provided in accordance with Section 703.1, the ratio of vertical openings shall be the sum of the net free areas of both such openings, divided by the sum of the required areas for both such openings as determined in accordance with Section 703.1.4.",
+  "previewText" : "Where openings connected to the outdoors through vertical ducts are provided in accordance with Section 703.",
+  "schemaVersion" : 2,
+  "sectionID" : 10925
+}

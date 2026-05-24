@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175042\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175042\"><\/AnnotationDrawer><div>Fixed side wall grab bars shall be 42 inches (1066.8 mm) minimum in length, located 12 inches (304.8 mm) maximum from the rear wall and extending 54 inches (1371.6 mm) minimum from the rear wall. In addition, a vertical grab bar 18 inches (457.2 mm) minimum in length shall be mounted with the bottom of the bar located between 39 inches (990.6 mm) and 41 inches (1041.4 mm) above the floor, and with the center of the bar located at 30 inches (762 mm) from the rear wall.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175043\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175043\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where a side wall is not available for a 42-inch (1066.8 mm) grab bar, the sidewall grab bar shall be permitted to be 24 inches (609.2 mm) minimum in length, located 12 inches (304.8 mm) maximum from the rear wall.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175044\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175044\"><\/AnnotationDrawer><div>",
+      "id" : "2716-html-1",
+      "kind" : "html",
+      "plainText" : "Fixed side wall grab bars shall be 42 inches (1066.8 mm) minimum in length, located 12 inches (304.8 mm) maximum from the rear wall and extending 54 inches (1371.6 mm) minimum from the rear wall. In addition, a vertical grab bar 18 inches (457.2 mm) minimum in length shall be mounted with the bottom of the bar located between 39 inches (990.6 mm) and 41 inches (1041.4 mm) above the floor, and with the center of the bar located at 30 inches (762 mm) from the rear wall.\n\n Exception: Where a side wall is not available for a 42-inch (1066.8 mm) grab bar, the sidewall grab bar shall be permitted to be 24 inches (609.2 mm) minimum in length, located 12 inches (304.8 mm) maximum from the rear wall."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/1ea98bee08e3e965bdb91e6bb3848f71c788d39b.png\" width=\"576\" height=\"615.066666666667\"><\/img><\/span>",
+      "id" : "2716-image-2",
+      "imageID" : "1ea98bee08e3e965bdb91e6bb3848f71c788d39b.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175045\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175045\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure1107.2.2.7.3.1\" id=\"JD_BCFigure1107.2.2.7.3.1\" title=\"BC Figure 1107.2.2.7.3.1\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1107.2.2.7.3.1<br><\/br>Sidewall Grab Bar Location<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2716-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 1107.2.2.7.3.1\n Sidewall Grab Bar Location"
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Fixed side wall grab bars shall be 42 inches (1066.8 mm) minimum in length, located 12 inches (304.8 mm) maximum from the rear wall and extending 54 inches (1371.6 mm) minimum from the rear wall. In addition, a vertical grab bar 18 inches (457.2 mm) minimum in length shall be mounted with the bottom of the bar located between 39 inches (990.6 mm) and 41 inches (1041.4 mm) above the floor, and with the center of the bar located at 30 inches (762 mm) from the rear wall.\n\nException: Where a side wall is not available for a 42-inch (1066.8 mm) grab bar, the sidewall grab bar shall be permitted to be 24 inches (609.2 mm) minimum in length, located 12 inches (304.8 mm) maximum from the rear wall.\n\nFigure 1107.2.2.7.3.1 Sidewall Grab Bar Location",
+  "previewText" : "Fixed side wall grab bars shall be 42 inches (1066.",
+  "schemaVersion" : 2,
+  "sectionID" : 2716
+}

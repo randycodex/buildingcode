@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180585\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180585\"><\/AnnotationDrawer><div>Modify ACI 318, Section 18.13.1.1, to read as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180586\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">18.13.1.1 &#8211; Foundations resisting earthquake-induced forces or transferring earthquake-induced forces between a structure and ground shall comply with the requirements of Section 18.13 and other applicable provisions of ACI 318 unless modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178838', hash: '#JD_BCCh.18' }}\">Chapter 18<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4511-html-1",
+      "kind" : "html",
+      "plainText" : "Modify ACI 318, Section 18.13.1.1, to read as follows:\n\n 18.13.1.1 - Foundations resisting earthquake-induced forces or transferring earthquake-induced forces between a structure and ground shall comply with the requirements of Section 18.13 and other applicable provisions of ACI 318 unless modified by Chapter 18 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Modify ACI 318, Section 18.13.1.1, to read as follows:",
+  "previewText" : "Modify ACI 318, Section 18.",
+  "schemaVersion" : 2,
+  "sectionID" : 4511
+}

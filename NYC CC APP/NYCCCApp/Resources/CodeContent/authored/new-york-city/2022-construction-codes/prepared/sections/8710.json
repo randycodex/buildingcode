@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199308\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199308\"><\/AnnotationDrawer><div>Required outdoor air inlets for residential portions of a building shall be covered with a screen having 1\/4-inch (6.4 mm) openings. Required outdoor air inlets serving a nonresidential portion of a building shall be covered with screen having openings larger than 1\/4 inch (6.4 mm) and not larger than 1 inch (25.4 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8710-html-1",
+      "kind" : "html",
+      "plainText" : "Required outdoor air inlets for residential portions of a building shall be covered with a screen having 1\/4-inch (6.4 mm) openings. Required outdoor air inlets serving a nonresidential portion of a building shall be covered with screen having openings larger than 1\/4 inch (6.4 mm) and not larger than 1 inch (25.4 mm)."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Required outdoor air inlets for residential portions of a building shall be covered with a screen having 1\/4-inch (6.4 mm) openings. Required outdoor air inlets serving a nonresidential portion of a building shall be covered with screen having openings larger than 1\/4 inch (6.4 mm) and not larger than 1 inch (25.4 mm).",
+  "previewText" : "Required outdoor air inlets for residential portions of a building shall be covered with a screen having 1\/4-inch (6.",
+  "schemaVersion" : 2,
+  "sectionID" : 8710
+}

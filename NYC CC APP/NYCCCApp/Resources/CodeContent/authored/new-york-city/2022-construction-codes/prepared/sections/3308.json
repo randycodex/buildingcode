@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176780\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176780\"><\/AnnotationDrawer><div>Slate shingles shall comply with ASTM C 406.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3308-html-1",
+      "kind" : "html",
+      "plainText" : "Slate shingles shall comply with ASTM C 406."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Slate shingles shall comply with ASTM C 406.",
+  "previewText" : "Slate shingles shall comply with ASTM C 406.",
+  "schemaVersion" : 2,
+  "sectionID" : 3308
+}

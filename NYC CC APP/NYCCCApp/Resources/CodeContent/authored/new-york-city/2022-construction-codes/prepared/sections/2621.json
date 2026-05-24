@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174745\"><\/AnnotationDrawer><div>Luminous egress path markings in high-rise buildings subject to Section 403.5.5 shall be provided in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174198', hash: '#JD_BC1025' }}\">1025<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192260', hash: '#JD_BCAppS' }}\">Appendix S<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2621-html-1",
+      "kind" : "html",
+      "plainText" : "Luminous egress path markings in high-rise buildings subject to Section 403.5.5 shall be provided in accordance with Section 1025 and Appendix S ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Luminous egress path markings in high-rise buildings subject to Section 403.5.5 shall be provided in accordance with Section 1025 and Appendix S.",
+  "previewText" : "Luminous egress path markings in high-rise buildings subject to Section 403.",
+  "schemaVersion" : 2,
+  "sectionID" : 2621
+}

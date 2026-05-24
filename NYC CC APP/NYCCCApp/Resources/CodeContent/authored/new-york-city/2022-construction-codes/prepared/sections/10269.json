@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192459\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192459\"><\/AnnotationDrawer><div>Mechanical systems shall be tested as required in this code and in accordance with Sections 108.3.1 through 108.3.3. Tests shall be made by the permit holder and witnessed by the department or an approved agency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10269-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical systems shall be tested as required in this code and in accordance with Sections 108.3.1 through 108.3.3. Tests shall be made by the permit holder and witnessed by the department or an approved agency."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Mechanical systems shall be tested as required in this code and in accordance with Sections 108.3.1 through 108.3.3. Tests shall be made by the permit holder and witnessed by the department or an approved agency.",
+  "previewText" : "Mechanical systems shall be tested as required in this code and in accordance with Sections 108.",
+  "schemaVersion" : 2,
+  "sectionID" : 10269
+}

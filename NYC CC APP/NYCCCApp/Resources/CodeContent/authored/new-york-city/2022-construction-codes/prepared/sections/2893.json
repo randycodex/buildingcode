@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175541\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175541\"><\/AnnotationDrawer><div>Recreational facilities that serve Group R-2 and R-3 occupancies shall comply with Sections 1110.2.1 through 1110.2.3, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2893-html-1",
+      "kind" : "html",
+      "plainText" : "Recreational facilities that serve Group R-2 and R-3 occupancies shall comply with Sections 1110.2.1 through 1110.2.3, as applicable."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Recreational facilities that serve Group R-2 and R-3 occupancies shall comply with Sections 1110.2.1 through 1110.2.3, as applicable.",
+  "previewText" : "Recreational facilities that serve Group R-2 and R-3 occupancies shall comply with Sections 1110.",
+  "schemaVersion" : 2,
+  "sectionID" : 2893
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181230\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181230\"><\/AnnotationDrawer><div>The space surrounding a chimney lining system or vent installed within a masonry chimney shall not be used to vent any other appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181231\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> This shall not prevent the installation of a separate flue lining in accordance with the manufacturer's instructions. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4730-html-1",
+      "kind" : "html",
+      "plainText" : "The space surrounding a chimney lining system or vent installed within a masonry chimney shall not be used to vent any other appliance.\n\n Exception: This shall not prevent the installation of a separate flue lining in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "The space surrounding a chimney lining system or vent installed within a masonry chimney shall not be used to vent any other appliance.\n\nException: This shall not prevent the installation of a separate flue lining in accordance with the manufacturer's instructions.",
+  "previewText" : "The space surrounding a chimney lining system or vent installed within a masonry chimney shall not be used to vent any other appliance.",
+  "schemaVersion" : 2,
+  "sectionID" : 4730
+}

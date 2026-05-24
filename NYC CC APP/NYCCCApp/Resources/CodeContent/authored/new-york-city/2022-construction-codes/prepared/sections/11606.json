@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196545\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196545\"><\/AnnotationDrawer><div>Tanks shall be designed and constructed in compliance with Sections 1305.12.1 and 1305.12.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11606-html-1",
+      "kind" : "html",
+      "plainText" : "Tanks shall be designed and constructed in compliance with Sections 1305.12.1 and 1305.12.2."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Tanks shall be designed and constructed in compliance with Sections 1305.12.1 and 1305.12.2.",
+  "previewText" : "Tanks shall be designed and constructed in compliance with Sections 1305.",
+  "schemaVersion" : 2,
+  "sectionID" : 11606
+}

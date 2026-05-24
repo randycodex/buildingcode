@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187888\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187888\"><\/AnnotationDrawer><div>Conveyors shall meet the requirements of Sections 3320.5.1 through 3320.5.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6830-html-1",
+      "kind" : "html",
+      "plainText" : "Conveyors shall meet the requirements of Sections 3320.5.1 through 3320.5.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Conveyors shall meet the requirements of Sections 3320.5.1 through 3320.5.3.",
+  "previewText" : "Conveyors shall meet the requirements of Sections 3320.",
+  "schemaVersion" : 2,
+  "sectionID" : 6830
+}

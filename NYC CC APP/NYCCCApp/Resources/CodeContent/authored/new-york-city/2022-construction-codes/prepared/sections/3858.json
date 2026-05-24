@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178709\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178709\"><\/AnnotationDrawer><div>Where there is an enlargement that triggers a new standpipe system or there is an addition to an existing standpipe system, hydrostatic pressure tests of the entire system shall be performed for every 75 feet (22 860 mm) of additional height added to the system. The permit holder shall perform a final acceptance test of the completed system in accordance with the requirements of Section 901.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178710\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178710\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205798', hash: '#JD_L.L.2009\/063' }}\">L.L. 2009\/063<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3858-html-1",
+      "kind" : "html",
+      "plainText" : "Where there is an enlargement that triggers a new standpipe system or there is an addition to an existing standpipe system, hydrostatic pressure tests of the entire system shall be performed for every 75 feet (22 860 mm) of additional height added to the system. The permit holder shall perform a final acceptance test of the completed system in accordance with the requirements of Section 901.5.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/063 ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Where there is an enlargement that triggers a new standpipe system or there is an addition to an existing standpipe system, hydrostatic pressure tests of the entire system shall be performed for every 75 feet (22 860 mm) of additional height added to the system. The permit holder shall perform a final acceptance test of the completed system in accordance with the requirements of Section 901.5.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/063.",
+  "previewText" : "Where there is an enlargement that triggers a new standpipe system or there is an addition to an existing standpipe system, hydrostatic pressure tests of the entire system shall be performed for every 75 feet (22 860 mm) of additional height added to the system.",
+  "schemaVersion" : 2,
+  "sectionID" : 3858
+}

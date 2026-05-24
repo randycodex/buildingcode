@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178837\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178837\"><\/AnnotationDrawer><div>When roof tiles do not satisfy the limitations in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link> for rigid tile, a wind tunnel test shall be used to determine the wind characteristics of the concrete or clay tile roof covering in accordance with ICC SBCCI SSTD 11 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176478', hash: '#JD_BCCh.15' }}\">Chapter 15<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "3910-html-1",
+      "kind" : "html",
+      "plainText" : "When roof tiles do not satisfy the limitations in Chapter 16 for rigid tile, a wind tunnel test shall be used to determine the wind characteristics of the concrete or clay tile roof covering in accordance with ICC SBCCI SSTD 11 and Chapter 15 ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "When roof tiles do not satisfy the limitations in Chapter 16 for rigid tile, a wind tunnel test shall be used to determine the wind characteristics of the concrete or clay tile roof covering in accordance with ICC SBCCI SSTD 11 and Chapter 15.",
+  "previewText" : "When roof tiles do not satisfy the limitations in Chapter 16 for rigid tile, a wind tunnel test shall be used to determine the wind characteristics of the concrete or clay tile roof covering in accordance with ICC SBCCI SSTD 11 and Chapter 15.",
+  "schemaVersion" : 2,
+  "sectionID" : 3910
+}

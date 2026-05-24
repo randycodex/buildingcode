@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172763\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172763\"><\/AnnotationDrawer><div>The building owner shall maintain post-fire smoke exhaust systems in good operational condition. Records of testing shall be maintained on the premises for inspection by the department and Fire Department personnel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-172764\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-172764\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-172764\"><\/AnnotationDrawer><h6><a name=\"JD_BC918\" id=\"JD_BC918\" title=\"BC 918\"><\/a>Section BC 918: Gas Detection Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2101-html-1",
+      "kind" : "html",
+      "plainText" : "The building owner shall maintain post-fire smoke exhaust systems in good operational condition. Records of testing shall be maintained on the premises for inspection by the department and Fire Department personnel.\n\n Section BC 918: Gas Detection Systems"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The building owner shall maintain post-fire smoke exhaust systems in good operational condition. Records of testing shall be maintained on the premises for inspection by the department and Fire Department personnel.",
+  "previewText" : "The building owner shall maintain post-fire smoke exhaust systems in good operational condition.",
+  "schemaVersion" : 2,
+  "sectionID" : 2101
+}

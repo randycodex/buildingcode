@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198494\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198494\"><\/AnnotationDrawer><div>Testing of existing chimneys shall be in accordance with Section 1705.32 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8434-html-1",
+      "kind" : "html",
+      "plainText" : "Testing of existing chimneys shall be in accordance with Section 1705.32 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Testing of existing chimneys shall be in accordance with Section 1705.32 of the New York City Building Code.",
+  "previewText" : "Testing of existing chimneys shall be in accordance with Section 1705.",
+  "schemaVersion" : 2,
+  "sectionID" : 8434
+}

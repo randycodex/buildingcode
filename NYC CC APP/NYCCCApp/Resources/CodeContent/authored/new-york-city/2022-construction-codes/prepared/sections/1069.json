@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169292\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169292\"><\/AnnotationDrawer><div>The fire barrier separating incidental uses from other spaces in the building shall have a fire-resistance rating of not less than that indicated in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168725', hash: '#JD_BCTable509' }}\">Table 509<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1069-html-1",
+      "kind" : "html",
+      "plainText" : "The fire barrier separating incidental uses from other spaces in the building shall have a fire-resistance rating of not less than that indicated in Table 509 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire barrier separating incidental uses from other spaces in the building shall have a fire-resistance rating of not less than that indicated in Table 509.",
+  "previewText" : "The fire barrier separating incidental uses from other spaces in the building shall have a fire-resistance rating of not less than that indicated in Table 509.",
+  "schemaVersion" : 2,
+  "sectionID" : 1069
+}

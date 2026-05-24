@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198240\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198240\"><\/AnnotationDrawer><div>Risers shall be equipped with an approved lockable shutoff valve. There shall be a test port installed downstream of the valve.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8340-html-1",
+      "kind" : "html",
+      "plainText" : "Risers shall be equipped with an approved lockable shutoff valve. There shall be a test port installed downstream of the valve."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Risers shall be equipped with an approved lockable shutoff valve. There shall be a test port installed downstream of the valve.",
+  "previewText" : "Risers shall be equipped with an approved lockable shutoff valve.",
+  "schemaVersion" : 2,
+  "sectionID" : 8340
+}

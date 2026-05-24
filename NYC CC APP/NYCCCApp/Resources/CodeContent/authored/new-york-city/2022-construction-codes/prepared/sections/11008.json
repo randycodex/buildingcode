@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194972\"><\/AnnotationDrawer><div>Manual dampers shall not be installed in connectors except in chimney connectors serving solid fuel-burning appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11008-html-1",
+      "kind" : "html",
+      "plainText" : "Manual dampers shall not be installed in connectors except in chimney connectors serving solid fuel-burning appliances."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Manual dampers shall not be installed in connectors except in chimney connectors serving solid fuel-burning appliances.",
+  "previewText" : "Manual dampers shall not be installed in connectors except in chimney connectors serving solid fuel-burning appliances.",
+  "schemaVersion" : 2,
+  "sectionID" : 11008
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198742\"><\/AnnotationDrawer><div>Single-wall metal pipe shall comply with the marking provisions of Section 503.6.12.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8523-html-1",
+      "kind" : "html",
+      "plainText" : "Single-wall metal pipe shall comply with the marking provisions of Section 503.6.12."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Single-wall metal pipe shall comply with the marking provisions of Section 503.6.12.",
+  "previewText" : "Single-wall metal pipe shall comply with the marking provisions of Section 503.",
+  "schemaVersion" : 2,
+  "sectionID" : 8523
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199273\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199273\"><\/AnnotationDrawer><div>Permanently installed equipment powered by internal combustion engines and turbines shall be installed in accordance with the manufacturer's instructions and NFPA 37. Stationary engine generator assemblies shall meet the requirements of UL 2200.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8700-html-1",
+      "kind" : "html",
+      "plainText" : "Permanently installed equipment powered by internal combustion engines and turbines shall be installed in accordance with the manufacturer's instructions and NFPA 37. Stationary engine generator assemblies shall meet the requirements of UL 2200."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Permanently installed equipment powered by internal combustion engines and turbines shall be installed in accordance with the manufacturer's instructions and NFPA 37. Stationary engine generator assemblies shall meet the requirements of UL 2200.",
+  "previewText" : "Permanently installed equipment powered by internal combustion engines and turbines shall be installed in accordance with the manufacturer's instructions and NFPA 37.",
+  "schemaVersion" : 2,
+  "sectionID" : 8700
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179325\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179325\"><\/AnnotationDrawer><div>Lateral load tests shall be conducted in accordance with ASTM D 3966 standard procedures. In addition, dial extensometer gages shall provide readings to the nearest 0.001 inch (0.025 mm). Electrical transducers may be used to make deflection observations, provided that backup measurements are made utilizing dial extensometers as described herein at sufficient times to validate the transducer readings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4053-html-1",
+      "kind" : "html",
+      "plainText" : "Lateral load tests shall be conducted in accordance with ASTM D 3966 standard procedures. In addition, dial extensometer gages shall provide readings to the nearest 0.001 inch (0.025 mm). Electrical transducers may be used to make deflection observations, provided that backup measurements are made utilizing dial extensometers as described herein at sufficient times to validate the transducer readings."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Lateral load tests shall be conducted in accordance with ASTM D 3966 standard procedures. In addition, dial extensometer gages shall provide readings to the nearest 0.001 inch (0.025 mm). Electrical transducers may be used to make deflection observations, provided that backup measurements are made utilizing dial extensometers as described herein at sufficient times to validate the transducer readings.",
+  "previewText" : "Lateral load tests shall be conducted in accordance with ASTM D 3966 standard procedures.",
+  "schemaVersion" : 2,
+  "sectionID" : 4053
+}

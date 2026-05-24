@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178082\"><\/AnnotationDrawer><div>Design loads, including location and intensity of live loads, shall be indicated on the design drawings for temporary construction installations. Drawings for multilevel temporary construction installations shall indicate the maximum number of levels to be loaded simultaneously and the maximum design loads. Any temporary construction installation utilizing authorized exemptions and load reductions in the structural design shall be indicated on drawings as temporary, and all reduced loads shall be indicated on the drawings. The environmental load mitigations shall be indicated on the design drawings. The design drawings shall be maintained at the site of the temporary construction installation and be made available to the department upon request.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3654-html-1",
+      "kind" : "html",
+      "plainText" : "Design loads, including location and intensity of live loads, shall be indicated on the design drawings for temporary construction installations. Drawings for multilevel temporary construction installations shall indicate the maximum number of levels to be loaded simultaneously and the maximum design loads. Any temporary construction installation utilizing authorized exemptions and load reductions in the structural design shall be indicated on drawings as temporary, and all reduced loads shall be indicated on the drawings. The environmental load mitigations shall be indicated on the design drawings. The design drawings shall be maintained at the site of the temporary construction installation and be made available to the department upon request."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Design loads, including location and intensity of live loads, shall be indicated on the design drawings for temporary construction installations. Drawings for multilevel temporary construction installations shall indicate the maximum number of levels to be loaded simultaneously and the maximum design loads. Any temporary construction installation utilizing authorized exemptions and load reductions in the structural design shall be indicated on drawings as temporary, and all reduced loads shall be indicated on the drawings. The environmental load mitigations shall be indicated on the design drawings. The design drawings shall be maintained at the site of the temporary construction installation and be made available to the department upon request.",
+  "previewText" : "Design loads, including location and intensity of live loads, shall be indicated on the design drawings for temporary construction installations.",
+  "schemaVersion" : 2,
+  "sectionID" : 3654
+}

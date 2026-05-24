@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176401\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176401\"><\/AnnotationDrawer><div>All MCM systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285. Such testing shall be performed on the MCM system with the MCM in the maximum thickness intended for use, including any required fireblocking. Approved NFPA 285 tested assembly design documentation of the MCM system shall be included on the submitted construction documents complying with Section 1401.2 of this code. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3181-html-1",
+      "kind" : "html",
+      "plainText" : "All MCM systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285. Such testing shall be performed on the MCM system with the MCM in the maximum thickness intended for use, including any required fireblocking. Approved NFPA 285 tested assembly design documentation of the MCM system shall be included on the submitted construction documents complying with Section 1401.2 of this code. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "All MCM systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285. Such testing shall be performed on the MCM system with the MCM in the maximum thickness intended for use, including any required fireblocking. Approved NFPA 285 tested assembly design documentation of the MCM system shall be included on the submitted construction documents complying with Section 1401.2 of this code. Deviation from the NFPA 285 tested design shall be approved by the registered design professional and additional documentation shall be provided if requested by the department.",
+  "previewText" : "All MCM systems shall be tested in accordance with, and comply with, the acceptance criteria of NFPA 285.",
+  "schemaVersion" : 2,
+  "sectionID" : 3181
+}

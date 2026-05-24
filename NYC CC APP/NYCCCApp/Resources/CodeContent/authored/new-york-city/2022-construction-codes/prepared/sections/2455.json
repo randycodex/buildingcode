@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174184\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174184\"><\/AnnotationDrawer><div>Exit passageway opening protectives shall be in accordance with the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169727', hash: '#JD_BC716' }}\">716<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174185\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174185\"><\/AnnotationDrawer><div>Except as permitted in Section 402.8.7, openings in exit passageways other than unprotected exterior openings shall be limited to those necessary for exit access to the exit passageway from normally occupied spaces and for egress from the exit passageway.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174186\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174186\"><\/AnnotationDrawer><div>Where an interior exit stairway or ramp is extended to an exit discharge or a public way by an exit passageway, the exit passageway shall comply with Section 1023.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174187\"><\/AnnotationDrawer><div>Elevators shall not open into an exit passageway.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2455-html-1",
+      "kind" : "html",
+      "plainText" : "Exit passageway opening protectives shall be in accordance with the requirements of Section 716 .\n\n Except as permitted in Section 402.8.7, openings in exit passageways other than unprotected exterior openings shall be limited to those necessary for exit access to the exit passageway from normally occupied spaces and for egress from the exit passageway.\n\n Where an interior exit stairway or ramp is extended to an exit discharge or a public way by an exit passageway, the exit passageway shall comply with Section 1023.3.1.\n\n Elevators shall not open into an exit passageway."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Exit passageway opening protectives shall be in accordance with the requirements of Section 716.\n\nExcept as permitted in Section 402.8.7, openings in exit passageways other than unprotected exterior openings shall be limited to those necessary for exit access to the exit passageway from normally occupied spaces and for egress from the exit passageway.\n\nWhere an interior exit stairway or ramp is extended to an exit discharge or a public way by an exit passageway, the exit passageway shall comply with Section 1023.3.1.\n\nElevators shall not open into an exit passageway.",
+  "previewText" : "Exit passageway opening protectives shall be in accordance with the requirements of Section 716.",
+  "schemaVersion" : 2,
+  "sectionID" : 2455
+}

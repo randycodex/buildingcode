@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175169\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175169\"><\/AnnotationDrawer><div>Accessible units and Type B+NYC units shall be provided in boarding houses, dormitories, fraternity houses and sorority houses in Group R-1 occupancies in accordance with Sections 1107.6.1.4.1 and 1107.6.1.4.2. Where the building or part thereof contains sleeping units where residents share bathroom or kitchen facilities, or both, bedrooms shall be counted as sleeping units for the purpose of determining the number of units. Where the sleeping units are grouped in suites, only one sleeping unit in each suite shall be permitted to count towards the number of required Accessible units.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2757-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible units and Type B+NYC units shall be provided in boarding houses, dormitories, fraternity houses and sorority houses in Group R-1 occupancies in accordance with Sections 1107.6.1.4.1 and 1107.6.1.4.2. Where the building or part thereof contains sleeping units where residents share bathroom or kitchen facilities, or both, bedrooms shall be counted as sleeping units for the purpose of determining the number of units. Where the sleeping units are grouped in suites, only one sleeping unit in each suite shall be permitted to count towards the number of required Accessible units."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Accessible units and Type B+NYC units shall be provided in boarding houses, dormitories, fraternity houses and sorority houses in Group R-1 occupancies in accordance with Sections 1107.6.1.4.1 and 1107.6.1.4.2. Where the building or part thereof contains sleeping units where residents share bathroom or kitchen facilities, or both, bedrooms shall be counted as sleeping units for the purpose of determining the number of units. Where the sleeping units are grouped in suites, only one sleeping unit in each suite shall be permitted to count towards the number of required Accessible units.",
+  "previewText" : "Accessible units and Type B+NYC units shall be provided in boarding houses, dormitories, fraternity houses and sorority houses in Group R-1 occupancies in accordance with Sections 1107.",
+  "schemaVersion" : 2,
+  "sectionID" : 2757
+}

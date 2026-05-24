@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177450\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177450\"><\/AnnotationDrawer><div>Live loads that exceed 100 psf (4.79 kN\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) shall not be reduced.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177451\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177451\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177452\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The live loads for members supporting two or more floors are permitted to be reduced by a maximum of 20 percent, but the live load shall be not less than <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">L<\/span> as calculated in Section 1607.11.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177453\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177453\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;For uses other than storage, where approved, additional live load reductions shall be permitted where shown by the registered design professional that a rational approach has been used and that such reductions are warranted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3507-html-1",
+      "kind" : "html",
+      "plainText" : "Live loads that exceed 100 psf (4.79 kN\/m\n\n 2 \n\n ) shall not be reduced.\n\n Exceptions: \n\n 1. The live loads for members supporting two or more floors are permitted to be reduced by a maximum of 20 percent, but the live load shall be not less than L as calculated in Section 1607.11.1.\n\n 2. For uses other than storage, where approved, additional live load reductions shall be permitted where shown by the registered design professional that a rational approach has been used and that such reductions are warranted."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Live loads that exceed 100 psf (4.79 kN\/m 2 ) shall not be reduced.\n\nExceptions:\n\n1. The live loads for members supporting two or more floors are permitted to be reduced by a maximum of 20 percent, but the live load shall be not less than L as calculated in Section 1607.11.1.\n\n2. For uses other than storage, where approved, additional live load reductions shall be permitted where shown by the registered design professional that a rational approach has been used and that such reductions are warranted.",
+  "previewText" : "Live loads that exceed 100 psf (4.",
+  "schemaVersion" : 2,
+  "sectionID" : 3507
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161365\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161365\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Forced drain tests shall consist of plugging the end of the<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">pump discharge at the point of connection with the building drain and applying a pressure of 5 psi (34.5 kPa) greater than the shut off pump rating, and maintaining such pressure for 15 minutes.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11881-html-1",
+      "kind" : "html",
+      "plainText" : "Forced drain tests shall consist of plugging the end of the pump discharge at the point of connection with the building drain and applying a pressure of 5 psi (34.5 kPa) greater than the shut off pump rating, and maintaining such pressure for 15 minutes."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Forced drain tests shall consist of plugging the end of the pump discharge at the point of connection with the building drain and applying a pressure of 5 psi (34.5 kPa) greater than the shut off pump rating, and maintaining such pressure for 15 minutes.",
+  "previewText" : "Forced drain tests shall consist of plugging the end of the pump discharge at the point of connection with the building drain and applying a pressure of 5 psi (34.",
+  "schemaVersion" : 2,
+  "sectionID" : 11881
+}

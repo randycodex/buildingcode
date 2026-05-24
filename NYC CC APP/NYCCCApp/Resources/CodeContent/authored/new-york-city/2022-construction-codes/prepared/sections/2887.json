@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175525\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175525\"><\/AnnotationDrawer><div>Stairways located alongside accessible routes connecting floor levels that are not connected by an elevator shall be designed and constructed to comply with ICC A117.1 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2887-html-1",
+      "kind" : "html",
+      "plainText" : "Stairways located alongside accessible routes connecting floor levels that are not connected by an elevator shall be designed and constructed to comply with ICC A117.1 and Chapter 10 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Stairways located alongside accessible routes connecting floor levels that are not connected by an elevator shall be designed and constructed to comply with ICC A117.1 and Chapter 10 of this code.",
+  "previewText" : "Stairways located alongside accessible routes connecting floor levels that are not connected by an elevator shall be designed and constructed to comply with ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2887
+}

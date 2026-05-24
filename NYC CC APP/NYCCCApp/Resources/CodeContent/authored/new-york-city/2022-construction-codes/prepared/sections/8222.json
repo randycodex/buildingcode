@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197924\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197924\"><\/AnnotationDrawer><div>Flammable or combustible gas piping systems shall be designed to account for pipe movement resulting from thermal changes or seismic forces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8222-html-1",
+      "kind" : "html",
+      "plainText" : "Flammable or combustible gas piping systems shall be designed to account for pipe movement resulting from thermal changes or seismic forces."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Flammable or combustible gas piping systems shall be designed to account for pipe movement resulting from thermal changes or seismic forces.",
+  "previewText" : "Flammable or combustible gas piping systems shall be designed to account for pipe movement resulting from thermal changes or seismic forces.",
+  "schemaVersion" : 2,
+  "sectionID" : 8222
+}

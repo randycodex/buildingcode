@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195201\"><\/AnnotationDrawer><div>Incinerators and crematories shall be listed and labeled in accordance with UL 791 and NFPA 82 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11079-html-1",
+      "kind" : "html",
+      "plainText" : "Incinerators and crematories shall be listed and labeled in accordance with UL 791 and NFPA 82 and shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Incinerators and crematories shall be listed and labeled in accordance with UL 791 and NFPA 82 and shall be installed in accordance with the manufacturer's instructions.",
+  "previewText" : "Incinerators and crematories shall be listed and labeled in accordance with UL 791 and NFPA 82 and shall be installed in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 11079
+}

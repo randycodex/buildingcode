@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199346\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199346\"><\/AnnotationDrawer><div>Except as may be permitted by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code,<\/span> cooking appliances using LPG are prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8728-html-1",
+      "kind" : "html",
+      "plainText" : "Except as may be permitted by the New York City Fire Code, cooking appliances using LPG are prohibited."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Except as may be permitted by the New York City Fire Code, cooking appliances using LPG are prohibited.",
+  "previewText" : "Except as may be permitted by the New York City Fire Code, cooking appliances using LPG are prohibited.",
+  "schemaVersion" : 2,
+  "sectionID" : 8728
+}

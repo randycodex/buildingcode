@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198199\"><\/AnnotationDrawer><div>Where a sediment trap is not incorporated as part of the appliance, a sediment trap shall be installed downstream of the appliance shutoff valve as close to the inlet of the appliance as practical. The sediment trap shall be either a tee fitting having a capped nipple of any length installed vertically in the bottom most opening of the tee as illustrated in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198198', hash: '#JD_FGCFigure408.4' }}\">Figure 408.4<\/Link> or other device approved as an effective sediment trap. Illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces and outdoor grills need not be so equipped.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198200\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198200\"><\/AnnotationDrawer><div>",
+      "id" : "8324-html-1",
+      "kind" : "html",
+      "plainText" : "Where a sediment trap is not incorporated as part of the appliance, a sediment trap shall be installed downstream of the appliance shutoff valve as close to the inlet of the appliance as practical. The sediment trap shall be either a tee fitting having a capped nipple of any length installed vertically in the bottom most opening of the tee as illustrated in Figure 408.4 or other device approved as an effective sediment trap. Illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces and outdoor grills need not be so equipped."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/3ebebc5aedafc52118a5ec3f7ffadf5d913cb071.jpg\" width=\"384\" height=\"489.8\"><\/img><\/span>",
+      "id" : "8324-image-2",
+      "imageID" : "3ebebc5aedafc52118a5ec3f7ffadf5d913cb071.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198201\"><\/AnnotationDrawer><div><a name=\"JD_FGCFigure408.4\" id=\"JD_FGCFigure408.4\" title=\"FGC Figure 408.4\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 408.4<br><\/br>Method of Installing a Tee Fitting Sediment Trap<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-198202\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-198202\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-198202\"><\/AnnotationDrawer><h6><a name=\"JD_FGC409\" id=\"JD_FGC409\" title=\"FGC 409\"><\/a>Section FGC 409: Shutoff Valves<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8324-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 408.4\n Method of Installing a Tee Fitting Sediment Trap \n\n Section FGC 409: Shutoff Valves"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where a sediment trap is not incorporated as part of the appliance, a sediment trap shall be installed downstream of the appliance shutoff valve as close to the inlet of the appliance as practical. The sediment trap shall be either a tee fitting having a capped nipple of any length installed vertically in the bottom most opening of the tee as illustrated in Figure 408.4 or other device approved as an effective sediment trap. Illuminating appliances, ranges, clothes dryers, decorative vented appliances for installation in vented fireplaces, gas fireplaces and outdoor grills need not be so equipped.\n\nFigure 408.4 Method of Installing a Tee Fitting Sediment Trap\n\nSection FGC 409: Shutoff Valves",
+  "previewText" : "Where a sediment trap is not incorporated as part of the appliance, a sediment trap shall be installed downstream of the appliance shutoff valve as close to the inlet of the appliance as practical.",
+  "schemaVersion" : 2,
+  "sectionID" : 8324
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180306\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180306\"><\/AnnotationDrawer><div>The cylinders shall be tested in accordance with ASTM C 39.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4389-html-1",
+      "kind" : "html",
+      "plainText" : "The cylinders shall be tested in accordance with ASTM C 39."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "The cylinders shall be tested in accordance with ASTM C 39.",
+  "previewText" : "The cylinders shall be tested in accordance with ASTM C 39.",
+  "schemaVersion" : 2,
+  "sectionID" : 4389
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184367\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184367\"><\/AnnotationDrawer><div>Photovoltaic panels and modules shall comply with the requirements of this code, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Zoning Resolution<\/span> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5689-html-1",
+      "kind" : "html",
+      "plainText" : "Photovoltaic panels and modules shall comply with the requirements of this code, the New York City Electrical Code , the Zoning Resolution and the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Photovoltaic panels and modules shall comply with the requirements of this code, the New York City Electrical Code, the Zoning Resolution and the New York City Fire Code.",
+  "previewText" : "Photovoltaic panels and modules shall comply with the requirements of this code, the New York City Electrical Code, the Zoning Resolution and the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 5689
+}

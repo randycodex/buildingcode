@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180958\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180958\"><\/AnnotationDrawer><div>The minimum thickness of masonry bearing walls more than one story high shall be 8 inches (203 mm) where the height floor to floor does not exceed 12 feet (3658 mm), the floor live load does not exceed 60 pounds per square foot (psf) (0.156 kg\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t), and the roof is designed so that the dead load imparts no lateral thrust to the wall. Bearing walls of one-story buildings shall not be less than 6 inches (152 mm) thick. However, the overall thickness of cavity or masonry-bonded hollow walls shall not be less than 8 inches (203 mm), including cavity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4633-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum thickness of masonry bearing walls more than one story high shall be 8 inches (203 mm) where the height floor to floor does not exceed 12 feet (3658 mm), the floor live load does not exceed 60 pounds per square foot (psf) (0.156 kg\/m\n\n 2 \n\n ), and the roof is designed so that the dead load imparts no lateral thrust to the wall. Bearing walls of one-story buildings shall not be less than 6 inches (152 mm) thick. However, the overall thickness of cavity or masonry-bonded hollow walls shall not be less than 8 inches (203 mm), including cavity."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "The minimum thickness of masonry bearing walls more than one story high shall be 8 inches (203 mm) where the height floor to floor does not exceed 12 feet (3658 mm), the floor live load does not exceed 60 pounds per square foot (psf) (0.156 kg\/m 2 ), and the roof is designed so that the dead load imparts no lateral thrust to the wall. Bearing walls of one-story buildings shall not be less than 6 inches (152 mm) thick. However, the overall thickness of cavity or masonry-bonded hollow walls shall not be less than 8 inches (203 mm), including cavity.",
+  "previewText" : "The minimum thickness of masonry bearing walls more than one story high shall be 8 inches (203 mm) where the height floor to floor does not exceed 12 feet (3658 mm), the floor live load does not exceed 60 pounds per square foot (psf) (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 4633
+}

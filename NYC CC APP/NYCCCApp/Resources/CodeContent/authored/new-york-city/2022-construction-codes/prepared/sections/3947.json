@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178997\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178997\"><\/AnnotationDrawer><div>The excavation outside the foundation shall be backfilled with soil that is free of organic material, construction debris, or boulders. A controlled low-strength material (CLSM) can be used as backfill in lieu of soil. Soil backfill shall be placed in lifts and compacted in a manner that does not damage the foundation or the waterproofing or dampproofing material.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178998\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178998\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Controlled low-strength material need not be compacted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3947-html-1",
+      "kind" : "html",
+      "plainText" : "The excavation outside the foundation shall be backfilled with soil that is free of organic material, construction debris, or boulders. A controlled low-strength material (CLSM) can be used as backfill in lieu of soil. Soil backfill shall be placed in lifts and compacted in a manner that does not damage the foundation or the waterproofing or dampproofing material.\n\n Exception: Controlled low-strength material need not be compacted."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The excavation outside the foundation shall be backfilled with soil that is free of organic material, construction debris, or boulders. A controlled low-strength material (CLSM) can be used as backfill in lieu of soil. Soil backfill shall be placed in lifts and compacted in a manner that does not damage the foundation or the waterproofing or dampproofing material.\n\nException: Controlled low-strength material need not be compacted.",
+  "previewText" : "The excavation outside the foundation shall be backfilled with soil that is free of organic material, construction debris, or boulders.",
+  "schemaVersion" : 2,
+  "sectionID" : 3947
+}

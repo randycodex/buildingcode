@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194961\"><\/AnnotationDrawer><div>Appliance and equipment vent terminals shall be located such that doors cannot swing within 12 inches (304.8 mm) horizontally of the vent terminals. Doorstops or closers shall not be installed to obtain this clearance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194962\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194962\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194962\"><\/AnnotationDrawer><h6><a name=\"JD_MC803\" id=\"JD_MC803\" title=\"MC 803\"><\/a>Section MC 803: Connectors<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11003-html-1",
+      "kind" : "html",
+      "plainText" : "Appliance and equipment vent terminals shall be located such that doors cannot swing within 12 inches (304.8 mm) horizontally of the vent terminals. Doorstops or closers shall not be installed to obtain this clearance.\n\n Section MC 803: Connectors"
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Appliance and equipment vent terminals shall be located such that doors cannot swing within 12 inches (304.8 mm) horizontally of the vent terminals. Doorstops or closers shall not be installed to obtain this clearance.\n\nSection MC 803: Connectors",
+  "previewText" : "Appliance and equipment vent terminals shall be located such that doors cannot swing within 12 inches (304.",
+  "schemaVersion" : 2,
+  "sectionID" : 11003
+}

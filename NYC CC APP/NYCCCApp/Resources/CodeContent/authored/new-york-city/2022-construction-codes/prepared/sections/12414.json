@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162724\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162724\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A cleanout shall be provided at the base of each waste or soil stack.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162725\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162725\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162725\"><\/AnnotationDrawer><h6><a name=\"JD_PC709\" id=\"JD_PC709\" title=\"PC 709\"><\/a>Section PC 709: Fixture Units<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12414-html-1",
+      "kind" : "html",
+      "plainText" : "A cleanout shall be provided at the base of each waste or soil stack. \n\n Section PC 709: Fixture Units"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "A cleanout shall be provided at the base of each waste or soil stack.\n\nSection PC 709: Fixture Units",
+  "previewText" : "A cleanout shall be provided at the base of each waste or soil stack.",
+  "schemaVersion" : 2,
+  "sectionID" : 12414
+}

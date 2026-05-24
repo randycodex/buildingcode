@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161498\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161498\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where a toilet room is provided for the use of multiple occupants, the egress door for the room shall not be lockable from the inside of the room. This section does not apply to family or assisted-use toilet rooms.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11922-html-1",
+      "kind" : "html",
+      "plainText" : "Where a toilet room is provided for the use of multiple occupants, the egress door for the room shall not be lockable from the inside of the room. This section does not apply to family or assisted-use toilet rooms."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where a toilet room is provided for the use of multiple occupants, the egress door for the room shall not be lockable from the inside of the room. This section does not apply to family or assisted-use toilet rooms.",
+  "previewText" : "Where a toilet room is provided for the use of multiple occupants, the egress door for the room shall not be lockable from the inside of the room.",
+  "schemaVersion" : 2,
+  "sectionID" : 11922
+}

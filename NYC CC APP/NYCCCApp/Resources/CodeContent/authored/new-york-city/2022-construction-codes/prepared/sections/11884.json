@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161372\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Inspection and testing of secondary backflow prevention assemblies shall comply with Sections 312.10.1 and 312.10.2.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11884-html-1",
+      "kind" : "html",
+      "plainText" : "Inspection and testing of secondary backflow prevention assemblies shall comply with Sections 312.10.1 and 312.10.2."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Inspection and testing of secondary backflow prevention assemblies shall comply with Sections 312.10.1 and 312.10.2.",
+  "previewText" : "Inspection and testing of secondary backflow prevention assemblies shall comply with Sections 312.",
+  "schemaVersion" : 2,
+  "sectionID" : 11884
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186898\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186898\"><\/AnnotationDrawer><div>The transportation, handling, storage, installation, connection, ventilation, and use of all volatile flammable oils, flammable and combustible mixtures, compressed gases, and other hazardous materials shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code,<\/span> and shall also be safeguarded in accordance with the requirements of Section 3307.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-186899\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-186899\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-186899\"><\/AnnotationDrawer><h6><a name=\"JD_BC3314\" id=\"JD_BC3314\" title=\"BC 3314\"><\/a>Section BC 3314: Scaffolds<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6551-html-1",
+      "kind" : "html",
+      "plainText" : "The transportation, handling, storage, installation, connection, ventilation, and use of all volatile flammable oils, flammable and combustible mixtures, compressed gases, and other hazardous materials shall comply with the New York City Fire Code, and shall also be safeguarded in accordance with the requirements of Section 3307.4.2.\n\n Section BC 3314: Scaffolds"
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The transportation, handling, storage, installation, connection, ventilation, and use of all volatile flammable oils, flammable and combustible mixtures, compressed gases, and other hazardous materials shall comply with the New York City Fire Code, and shall also be safeguarded in accordance with the requirements of Section 3307.4.2.",
+  "previewText" : "The transportation, handling, storage, installation, connection, ventilation, and use of all volatile flammable oils, flammable and combustible mixtures, compressed gases, and other hazardous materials shall comply with the New York City Fire Code, and shall also be safeguarded in accordance with the requirements of Section 3307.",
+  "schemaVersion" : 2,
+  "sectionID" : 6551
+}

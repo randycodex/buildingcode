@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187315\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187315\"><\/AnnotationDrawer><div>An active welding rod or uninsulated welding lead shall not be allowed to make contact with the scaffold or its suspension system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6675-html-1",
+      "kind" : "html",
+      "plainText" : "An active welding rod or uninsulated welding lead shall not be allowed to make contact with the scaffold or its suspension system."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "An active welding rod or uninsulated welding lead shall not be allowed to make contact with the scaffold or its suspension system.",
+  "previewText" : "An active welding rod or uninsulated welding lead shall not be allowed to make contact with the scaffold or its suspension system.",
+  "schemaVersion" : 2,
+  "sectionID" : 6675
+}

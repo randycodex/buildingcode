@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195689\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195689\"><\/AnnotationDrawer><div>The total of all Group A2, B2, A3 and B3 refrigerants other than R-717, ammonia, shall not exceed 1,100 pounds (499 kg) except where approved. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11251-html-1",
+      "kind" : "html",
+      "plainText" : "The total of all Group A2, B2, A3 and B3 refrigerants other than R-717, ammonia, shall not exceed 1,100 pounds (499 kg) except where approved. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "The total of all Group A2, B2, A3 and B3 refrigerants other than R-717, ammonia, shall not exceed 1,100 pounds (499 kg) except where approved. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.",
+  "previewText" : "The total of all Group A2, B2, A3 and B3 refrigerants other than R-717, ammonia, shall not exceed 1,100 pounds (499 kg) except where approved.",
+  "schemaVersion" : 2,
+  "sectionID" : 11251
+}

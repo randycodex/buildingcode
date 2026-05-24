@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169063\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169063\"><\/AnnotationDrawer><div>Exterior walls shall comply with this section. Exterior wall construction shall comply with the provisions of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205704', hash: '#JD_BCCh.14' }}\">Chapter 14<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188034', hash: '#JD_BCAppD' }}\">Appendix D<\/Link> where applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1002-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior walls shall comply with this section. Exterior wall construction shall comply with the provisions of Chapter 14 and Appendix D where applicable."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Exterior walls shall comply with this section. Exterior wall construction shall comply with the provisions of Chapter 14 and Appendix D where applicable.",
+  "previewText" : "Exterior walls shall comply with this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 1002
+}

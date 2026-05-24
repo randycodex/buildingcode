@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172913\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172913\"><\/AnnotationDrawer><div>Protruding objects are permitted to extend below the minimum ceiling height required by Section 1003.2 where a minimum headroom of 84 inches (2133.6 mm) is provided over any walking surface, including walks, corridors, aisles and passageways. Not more than 50 percent of the ceiling area of a means of egress shall be reduced in height by protruding objects.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172914\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Door closers and stops shall not reduce headroom to less than 78 inches (1981.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172915\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172915\"><\/AnnotationDrawer><div>A barrier shall be provided where the vertical clearance is less than 80 inches (2032 mm) high. The leading edge of such a barrier shall be located 27 inches (685 mm) maximum above the floor. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2129-html-1",
+      "kind" : "html",
+      "plainText" : "Protruding objects are permitted to extend below the minimum ceiling height required by Section 1003.2 where a minimum headroom of 84 inches (2133.6 mm) is provided over any walking surface, including walks, corridors, aisles and passageways. Not more than 50 percent of the ceiling area of a means of egress shall be reduced in height by protruding objects.\n\n Exception: Door closers and stops shall not reduce headroom to less than 78 inches (1981.2 mm).\n\n A barrier shall be provided where the vertical clearance is less than 80 inches (2032 mm) high. The leading edge of such a barrier shall be located 27 inches (685 mm) maximum above the floor."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Protruding objects are permitted to extend below the minimum ceiling height required by Section 1003.2 where a minimum headroom of 84 inches (2133.6 mm) is provided over any walking surface, including walks, corridors, aisles and passageways. Not more than 50 percent of the ceiling area of a means of egress shall be reduced in height by protruding objects.\n\nException: Door closers and stops shall not reduce headroom to less than 78 inches (1981.2 mm).\n\nA barrier shall be provided where the vertical clearance is less than 80 inches (2032 mm) high. The leading edge of such a barrier shall be located 27 inches (685 mm) maximum above the floor.",
+  "previewText" : "Protruding objects are permitted to extend below the minimum ceiling height required by Section 1003.",
+  "schemaVersion" : 2,
+  "sectionID" : 2129
+}

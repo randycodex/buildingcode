@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180909\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180909\"><\/AnnotationDrawer><div>As an alternative to Section 6.1.6.1.1, it shall be permitted to design lap splices in accordance with Section 2107.2.1 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4613-html-1",
+      "kind" : "html",
+      "plainText" : "As an alternative to Section 6.1.6.1.1, it shall be permitted to design lap splices in accordance with Section 2107.2.1 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "As an alternative to Section 6.1.6.1.1, it shall be permitted to design lap splices in accordance with Section 2107.2.1 of the New York City Building Code.",
+  "previewText" : "As an alternative to Section 6.",
+  "schemaVersion" : 2,
+  "sectionID" : 4613
+}

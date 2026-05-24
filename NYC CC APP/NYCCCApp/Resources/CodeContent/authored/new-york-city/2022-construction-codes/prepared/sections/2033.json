@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172581\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172581\"><\/AnnotationDrawer><div>Fire Department connections shall be installed in accordance with the NFPA standard applicable to the system design and shall comply with Sections 912.2 through 912.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2033-html-1",
+      "kind" : "html",
+      "plainText" : "Fire Department connections shall be installed in accordance with the NFPA standard applicable to the system design and shall comply with Sections 912.2 through 912.6."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fire Department connections shall be installed in accordance with the NFPA standard applicable to the system design and shall comply with Sections 912.2 through 912.6.",
+  "previewText" : "Fire Department connections shall be installed in accordance with the NFPA standard applicable to the system design and shall comply with Sections 912.",
+  "schemaVersion" : 2,
+  "sectionID" : 2033
+}

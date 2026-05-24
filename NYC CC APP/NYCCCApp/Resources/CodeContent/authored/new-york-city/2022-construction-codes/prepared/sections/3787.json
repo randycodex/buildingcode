@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178506\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178506\"><\/AnnotationDrawer><div>The special inspector shall confirm the installation of the thermal barrier is in accordance with the approved construction documents, manufacturer's installation instructions, and NFPA 285 tested assembly design documentation.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178507\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178507\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Foam plastic insulation installation on one-story buildings not required to have thermal barrier complying with Section 2603.4.1.4 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3787-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall confirm the installation of the thermal barrier is in accordance with the approved construction documents, manufacturer's installation instructions, and NFPA 285 tested assembly design documentation.\n\n Exception: Foam plastic insulation installation on one-story buildings not required to have thermal barrier complying with Section 2603.4.1.4 of this code."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "The special inspector shall confirm the installation of the thermal barrier is in accordance with the approved construction documents, manufacturer's installation instructions, and NFPA 285 tested assembly design documentation.\n\nException: Foam plastic insulation installation on one-story buildings not required to have thermal barrier complying with Section 2603.4.1.4 of this code.",
+  "previewText" : "The special inspector shall confirm the installation of the thermal barrier is in accordance with the approved construction documents, manufacturer's installation instructions, and NFPA 285 tested assembly design documentation.",
+  "schemaVersion" : 2,
+  "sectionID" : 3787
+}

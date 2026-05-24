@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195436\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195436\"><\/AnnotationDrawer><div>Water heaters utilized for both potable hot water and hot water for space-heating applications shall have separate heating sections and connections for distribution systems and shall not be cross-connected. The potability of the domestic water shall be maintained throughout the system in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11171-html-1",
+      "kind" : "html",
+      "plainText" : "Water heaters utilized for both potable hot water and hot water for space-heating applications shall have separate heating sections and connections for distribution systems and shall not be cross-connected. The potability of the domestic water shall be maintained throughout the system in accordance with the New York City Plumbing Code ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Water heaters utilized for both potable hot water and hot water for space-heating applications shall have separate heating sections and connections for distribution systems and shall not be cross-connected. The potability of the domestic water shall be maintained throughout the system in accordance with the New York City Plumbing Code.",
+  "previewText" : "Water heaters utilized for both potable hot water and hot water for space-heating applications shall have separate heating sections and connections for distribution systems and shall not be cross-connected.",
+  "schemaVersion" : 2,
+  "sectionID" : 11171
+}

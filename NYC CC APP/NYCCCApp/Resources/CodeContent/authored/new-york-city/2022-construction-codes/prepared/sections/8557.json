@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198835\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198835\"><\/AnnotationDrawer><div>Where entering a flue in a masonry or metal chimney, the vent connector shall be installed above the extreme bottom to avoid stoppage. Where a thimble or slip joint is used to facilitate removal of the connector, the connector shall be firmly attached to or inserted into the thimble or slip joint to prevent the connector from falling out. Means shall be employed to prevent the connector from entering so far as to restrict the space between its end and the opposite wall of the chimney flue (see Section 501.9).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8557-html-1",
+      "kind" : "html",
+      "plainText" : "Where entering a flue in a masonry or metal chimney, the vent connector shall be installed above the extreme bottom to avoid stoppage. Where a thimble or slip joint is used to facilitate removal of the connector, the connector shall be firmly attached to or inserted into the thimble or slip joint to prevent the connector from falling out. Means shall be employed to prevent the connector from entering so far as to restrict the space between its end and the opposite wall of the chimney flue (see Section 501.9)."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Where entering a flue in a masonry or metal chimney, the vent connector shall be installed above the extreme bottom to avoid stoppage. Where a thimble or slip joint is used to facilitate removal of the connector, the connector shall be firmly attached to or inserted into the thimble or slip joint to prevent the connector from falling out. Means shall be employed to prevent the connector from entering so far as to restrict the space between its end and the opposite wall of the chimney flue (see Section 501.9).",
+  "previewText" : "Where entering a flue in a masonry or metal chimney, the vent connector shall be installed above the extreme bottom to avoid stoppage.",
+  "schemaVersion" : 2,
+  "sectionID" : 8557
+}

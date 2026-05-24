@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193600\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193600\"><\/AnnotationDrawer><div>A means of local exhaust shall be provided to capture leakage from indoor and outdoor portable tanks. The local exhaust shall consist of portable ducts or collection systems designed to be applied to the site of a leak in a valve or fitting on the tank. The local exhaust system shall be located in a gas room. Exhaust shall be directed to a treatment system where required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10550-html-1",
+      "kind" : "html",
+      "plainText" : "A means of local exhaust shall be provided to capture leakage from indoor and outdoor portable tanks. The local exhaust shall consist of portable ducts or collection systems designed to be applied to the site of a leak in a valve or fitting on the tank. The local exhaust system shall be located in a gas room. Exhaust shall be directed to a treatment system where required by the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "A means of local exhaust shall be provided to capture leakage from indoor and outdoor portable tanks. The local exhaust shall consist of portable ducts or collection systems designed to be applied to the site of a leak in a valve or fitting on the tank. The local exhaust system shall be located in a gas room. Exhaust shall be directed to a treatment system where required by the New York City Fire Code.",
+  "previewText" : "A means of local exhaust shall be provided to capture leakage from indoor and outdoor portable tanks.",
+  "schemaVersion" : 2,
+  "sectionID" : 10550
+}

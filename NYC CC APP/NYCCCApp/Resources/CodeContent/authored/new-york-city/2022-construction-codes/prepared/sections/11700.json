@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164062\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164062\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The cutting, notching and boring of steel members shall comply with Sections C101.2.1 through C101.2.4.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11700-html-1",
+      "kind" : "html",
+      "plainText" : "The cutting, notching and boring of steel members shall comply with Sections C101.2.1 through C101.2.4."
+    }
+  ],
+  "chapterNumber" : "C",
+  "officialText" : "The cutting, notching and boring of steel members shall comply with Sections C101.2.1 through C101.2.4.",
+  "previewText" : "The cutting, notching and boring of steel members shall comply with Sections C101.",
+  "schemaVersion" : 2,
+  "sectionID" : 11700
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162745\"><\/AnnotationDrawer><div>Drainage fixture unit values for continuous and semicontinuous flow into a drainage system shall be computed on the basis that 1 gpm (0.06 L\/s) of flow is equivalent to two fixture units.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12417-html-1",
+      "kind" : "html",
+      "plainText" : "Drainage fixture unit values for continuous and semicontinuous flow into a drainage system shall be computed on the basis that 1 gpm (0.06 L\/s) of flow is equivalent to two fixture units."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Drainage fixture unit values for continuous and semicontinuous flow into a drainage system shall be computed on the basis that 1 gpm (0.06 L\/s) of flow is equivalent to two fixture units.",
+  "previewText" : "Drainage fixture unit values for continuous and semicontinuous flow into a drainage system shall be computed on the basis that 1 gpm (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 12417
+}

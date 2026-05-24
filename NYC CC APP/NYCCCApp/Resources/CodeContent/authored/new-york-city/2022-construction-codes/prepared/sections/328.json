@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166865\"><\/AnnotationDrawer><div>A smoke control system shall be provided in accordance with Sections 405.5.1 and 405.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "328-html-1",
+      "kind" : "html",
+      "plainText" : "A smoke control system shall be provided in accordance with Sections 405.5.1 and 405.5.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A smoke control system shall be provided in accordance with Sections 405.5.1 and 405.5.2.",
+  "previewText" : "A smoke control system shall be provided in accordance with Sections 405.",
+  "schemaVersion" : 2,
+  "sectionID" : 328
+}

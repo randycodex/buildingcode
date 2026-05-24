@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162442\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162442\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Buildings in which plumbing fixtures are installed and premises having drainage piping shall be connected to a public sewer, where available and where connection thereto is feasible. Where neither a sanitary nor a combined sewer is available to which connection is feasible, a private sewer or private sewage disposal system shall be provided. See Section 107.6.1 for required construction documents relating to provisions for discharge for sanitary sewage.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12303-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings in which plumbing fixtures are installed and premises having drainage piping shall be connected to a public sewer, where available and where connection thereto is feasible. Where neither a sanitary nor a combined sewer is available to which connection is feasible, a private sewer or private sewage disposal system shall be provided. See Section 107.6.1 for required construction documents relating to provisions for discharge for sanitary sewage."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Buildings in which plumbing fixtures are installed and premises having drainage piping shall be connected to a public sewer, where available and where connection thereto is feasible. Where neither a sanitary nor a combined sewer is available to which connection is feasible, a private sewer or private sewage disposal system shall be provided. See Section 107.6.1 for required construction documents relating to provisions for discharge for sanitary sewage.",
+  "previewText" : "Buildings in which plumbing fixtures are installed and premises having drainage piping shall be connected to a public sewer, where available and where connection thereto is feasible.",
+  "schemaVersion" : 2,
+  "sectionID" : 12303
+}

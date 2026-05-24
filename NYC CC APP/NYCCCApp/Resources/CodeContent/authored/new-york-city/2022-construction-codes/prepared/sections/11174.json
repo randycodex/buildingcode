@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195443\"><\/AnnotationDrawer><div>All piping materials, fittings, joints, connections and devices associated with systems utilized in conjunction with pressure vessels shall be designed for the specific application and shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> and this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11174-html-1",
+      "kind" : "html",
+      "plainText" : "All piping materials, fittings, joints, connections and devices associated with systems utilized in conjunction with pressure vessels shall be designed for the specific application and shall comply with the ASME Boiler and Pressure Vessel Code and this code."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "All piping materials, fittings, joints, connections and devices associated with systems utilized in conjunction with pressure vessels shall be designed for the specific application and shall comply with the ASME Boiler and Pressure Vessel Code and this code.",
+  "previewText" : "All piping materials, fittings, joints, connections and devices associated with systems utilized in conjunction with pressure vessels shall be designed for the specific application and shall comply with the ASME Boiler and Pressure Vessel Code and this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11174
+}

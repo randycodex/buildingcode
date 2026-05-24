@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186840\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186840\"><\/AnnotationDrawer><div>Every projectile tool shall be properly maintained. No such tool shall be used if any part necessary to retain internal pressures or to prevent accidental discharge of a projectile is not in sound and operable condition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6521-html-1",
+      "kind" : "html",
+      "plainText" : "Every projectile tool shall be properly maintained. No such tool shall be used if any part necessary to retain internal pressures or to prevent accidental discharge of a projectile is not in sound and operable condition."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Every projectile tool shall be properly maintained. No such tool shall be used if any part necessary to retain internal pressures or to prevent accidental discharge of a projectile is not in sound and operable condition.",
+  "previewText" : "Every projectile tool shall be properly maintained.",
+  "schemaVersion" : 2,
+  "sectionID" : 6521
+}

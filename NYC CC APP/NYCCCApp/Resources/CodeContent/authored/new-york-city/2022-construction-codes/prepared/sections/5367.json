@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183508\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183508\"><\/AnnotationDrawer><div>Where electrically powered fire pumps are connected to the emergency power system, overcurrent protection and feeder conductors shall be provided in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span> Automatic transfer switches shall be located in the same room as the fire pump as an integral part of the pump controller.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5367-html-1",
+      "kind" : "html",
+      "plainText" : "Where electrically powered fire pumps are connected to the emergency power system, overcurrent protection and feeder conductors shall be provided in accordance with the New York City Electrical Code. Automatic transfer switches shall be located in the same room as the fire pump as an integral part of the pump controller."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Where electrically powered fire pumps are connected to the emergency power system, overcurrent protection and feeder conductors shall be provided in accordance with the New York City Electrical Code. Automatic transfer switches shall be located in the same room as the fire pump as an integral part of the pump controller.",
+  "previewText" : "Where electrically powered fire pumps are connected to the emergency power system, overcurrent protection and feeder conductors shall be provided in accordance with the New York City Electrical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 5367
+}

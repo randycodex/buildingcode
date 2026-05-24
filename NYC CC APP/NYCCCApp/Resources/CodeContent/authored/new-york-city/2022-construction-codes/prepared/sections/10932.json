@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194756\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194756\"><\/AnnotationDrawer><div>Fuel-burning appliances that are listed and labeled for direct combustion air connection to the outdoors shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194757\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194757\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194757\"><\/AnnotationDrawer><h6><a name=\"JD_MC708\" id=\"JD_MC708\" title=\"MC 708\"><\/a>Section MC 708: Combustion Air Ducts<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10932-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-burning appliances that are listed and labeled for direct combustion air connection to the outdoors shall be installed in accordance with the manufacturer's instructions.\n\n Section MC 708: Combustion Air Ducts"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fuel-burning appliances that are listed and labeled for direct combustion air connection to the outdoors shall be installed in accordance with the manufacturer's instructions.\n\nSection MC 708: Combustion Air Ducts",
+  "previewText" : "Fuel-burning appliances that are listed and labeled for direct combustion air connection to the outdoors shall be installed in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 10932
+}

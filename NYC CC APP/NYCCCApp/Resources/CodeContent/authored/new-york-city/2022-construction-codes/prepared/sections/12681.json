@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163439\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163439\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The published roof drain flow rate, based on the head of water above the roof drain, shall be used to size the storm drainage system in accordance with Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163440', hash: '#JD_PC1106' }}\">1106<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">. The flow rate used for sizing the storm drainage piping shall be based on the maximum anticipated ponding at the roof drain.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163440\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163440\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163440\"><\/AnnotationDrawer><h6><a name=\"JD_PC1106\" id=\"JD_PC1106\" title=\"PC 1106\"><\/a>Section PC 1106: Size of Conductors, Leaders and Storm Drains<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12681-html-1",
+      "kind" : "html",
+      "plainText" : "The published roof drain flow rate, based on the head of water above the roof drain, shall be used to size the storm drainage system in accordance with Section 1106 . The flow rate used for sizing the storm drainage piping shall be based on the maximum anticipated ponding at the roof drain. \n\n Section PC 1106: Size of Conductors, Leaders and Storm Drains"
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "The published roof drain flow rate, based on the head of water above the roof drain, shall be used to size the storm drainage system in accordance with Section 1106. The flow rate used for sizing the storm drainage piping shall be based on the maximum anticipated ponding at the roof drain.\n\nSection PC 1106: Size of Conductors, Leaders and Storm Drains",
+  "previewText" : "The published roof drain flow rate, based on the head of water above the roof drain, shall be used to size the storm drainage system in accordance with Section 1106.",
+  "schemaVersion" : 2,
+  "sectionID" : 12681
+}

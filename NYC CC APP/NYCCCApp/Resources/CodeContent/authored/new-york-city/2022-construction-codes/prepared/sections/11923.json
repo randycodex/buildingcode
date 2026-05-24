@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161500\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161500\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Required public facilities shall be designated by a legible sign for each sex or, for a single- occupant toilet room, for all sexes. Signs shall be readily visible and located near the entrance to each toilet facility. Existing single-occupant toilet rooms shall comply with this requirement.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11923-html-1",
+      "kind" : "html",
+      "plainText" : "Required public facilities shall be designated by a legible sign for each sex or, for a single- occupant toilet room, for all sexes. Signs shall be readily visible and located near the entrance to each toilet facility. Existing single-occupant toilet rooms shall comply with this requirement."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Required public facilities shall be designated by a legible sign for each sex or, for a single- occupant toilet room, for all sexes. Signs shall be readily visible and located near the entrance to each toilet facility. Existing single-occupant toilet rooms shall comply with this requirement.",
+  "previewText" : "Required public facilities shall be designated by a legible sign for each sex or, for a single- occupant toilet room, for all sexes.",
+  "schemaVersion" : 2,
+  "sectionID" : 11923
+}

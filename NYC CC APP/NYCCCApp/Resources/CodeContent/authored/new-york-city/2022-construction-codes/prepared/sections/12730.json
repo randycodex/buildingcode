@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163618\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">When an on-site stormwater disposal system installation requires an excavation deeper than 5 feet (1524 mm), the sides of the excavation shall be protected and maintained in accordance with Section 3304.4 of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Building Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12730-html-1",
+      "kind" : "html",
+      "plainText" : "When an on-site stormwater disposal system installation requires an excavation deeper than 5 feet (1524 mm), the sides of the excavation shall be protected and maintained in accordance with Section 3304.4 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "When an on-site stormwater disposal system installation requires an excavation deeper than 5 feet (1524 mm), the sides of the excavation shall be protected and maintained in accordance with Section 3304.4 of the New York City Building Code.",
+  "previewText" : "When an on-site stormwater disposal system installation requires an excavation deeper than 5 feet (1524 mm), the sides of the excavation shall be protected and maintained in accordance with Section 3304.",
+  "schemaVersion" : 2,
+  "sectionID" : 12730
+}

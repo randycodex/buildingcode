@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198197\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198197\"><\/AnnotationDrawer><div>A manufactured test fitting shall be installed where required by the gas supplier. Such fitting shall be downstream of a lockable supply or riser valve in accordance with the requirements of the gas supplier and the manufacturer's instructions. The outlet of the test fitting shall be the smallest commercially available. The installation of manufactured test fittings in other locations shall be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8323-html-1",
+      "kind" : "html",
+      "plainText" : "A manufactured test fitting shall be installed where required by the gas supplier. Such fitting shall be downstream of a lockable supply or riser valve in accordance with the requirements of the gas supplier and the manufacturer's instructions. The outlet of the test fitting shall be the smallest commercially available. The installation of manufactured test fittings in other locations shall be prohibited."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A manufactured test fitting shall be installed where required by the gas supplier. Such fitting shall be downstream of a lockable supply or riser valve in accordance with the requirements of the gas supplier and the manufacturer's instructions. The outlet of the test fitting shall be the smallest commercially available. The installation of manufactured test fittings in other locations shall be prohibited.",
+  "previewText" : "A manufactured test fitting shall be installed where required by the gas supplier.",
+  "schemaVersion" : 2,
+  "sectionID" : 8323
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174980\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174980\"><\/AnnotationDrawer><div>At each electric vehicle charging station required to be accessible, the charging station shall be located along an accessible route. An accessible route shall be provided between the charging station and the charging space. <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174981\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174981\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> In existing facilities with no accessible route, electrical vehicle charging stations are not required to be located along an accessible route.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2694-html-1",
+      "kind" : "html",
+      "plainText" : "At each electric vehicle charging station required to be accessible, the charging station shall be located along an accessible route. An accessible route shall be provided between the charging station and the charging space. \n\n Exception: In existing facilities with no accessible route, electrical vehicle charging stations are not required to be located along an accessible route."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "At each electric vehicle charging station required to be accessible, the charging station shall be located along an accessible route. An accessible route shall be provided between the charging station and the charging space.\n\nException: In existing facilities with no accessible route, electrical vehicle charging stations are not required to be located along an accessible route.",
+  "previewText" : "At each electric vehicle charging station required to be accessible, the charging station shall be located along an accessible route.",
+  "schemaVersion" : 2,
+  "sectionID" : 2694
+}

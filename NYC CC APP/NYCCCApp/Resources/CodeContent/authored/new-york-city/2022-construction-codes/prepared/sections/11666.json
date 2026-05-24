@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196718\"><\/AnnotationDrawer><div>For fuel-oil tanks and fuel-oil-burning equipment located above ground, above the lowest floor inside of buildings, the operation of the float switch shall be tested at least once each week by the holder of the certificate of fitness as provided for in Section 1301.9 and Section 1305.13.3, item 8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "11666-html-1",
+      "kind" : "html",
+      "plainText" : "For fuel-oil tanks and fuel-oil-burning equipment located above ground, above the lowest floor inside of buildings, the operation of the float switch shall be tested at least once each week by the holder of the certificate of fitness as provided for in Section 1301.9 and Section 1305.13.3, item 8."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "For fuel-oil tanks and fuel-oil-burning equipment located above ground, above the lowest floor inside of buildings, the operation of the float switch shall be tested at least once each week by the holder of the certificate of fitness as provided for in Section 1301.9 and Section 1305.13.3, item 8.",
+  "previewText" : "For fuel-oil tanks and fuel-oil-burning equipment located above ground, above the lowest floor inside of buildings, the operation of the float switch shall be tested at least once each week by the holder of the certificate of fitness as provided for in Section 1301.",
+  "schemaVersion" : 2,
+  "sectionID" : 11666
+}

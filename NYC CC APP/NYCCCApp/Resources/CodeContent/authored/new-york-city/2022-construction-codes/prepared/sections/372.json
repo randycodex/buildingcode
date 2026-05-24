@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166988\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166988\"><\/AnnotationDrawer><div>Enclosure shall not be required for vertical openings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "372-html-1",
+      "kind" : "html",
+      "plainText" : "Enclosure shall not be required for vertical openings."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Enclosure shall not be required for vertical openings.",
+  "previewText" : "Enclosure shall not be required for vertical openings.",
+  "schemaVersion" : 2,
+  "sectionID" : 372
+}

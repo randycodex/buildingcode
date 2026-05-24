@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183803\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183803\"><\/AnnotationDrawer><div>Areas of rescue assistance shall be provided as required in Section 1009.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5473-html-1",
+      "kind" : "html",
+      "plainText" : "Areas of rescue assistance shall be provided as required in Section 1009.6."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Areas of rescue assistance shall be provided as required in Section 1009.6.",
+  "previewText" : "Areas of rescue assistance shall be provided as required in Section 1009.",
+  "schemaVersion" : 2,
+  "sectionID" : 5473
+}

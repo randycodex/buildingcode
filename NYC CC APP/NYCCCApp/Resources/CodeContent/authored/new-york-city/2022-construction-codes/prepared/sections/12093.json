@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161907\"><\/AnnotationDrawer><div>Solar energy systems used for heating potable water or using an independent medium for heating potable water shall comply with the applicable requirements of this code. The use of solar energy shall not compromise the requirements for cross connection or protection of the potable water supply system required by this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12093-html-1",
+      "kind" : "html",
+      "plainText" : "Solar energy systems used for heating potable water or using an independent medium for heating potable water shall comply with the applicable requirements of this code. The use of solar energy shall not compromise the requirements for cross connection or protection of the potable water supply system required by this code."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Solar energy systems used for heating potable water or using an independent medium for heating potable water shall comply with the applicable requirements of this code. The use of solar energy shall not compromise the requirements for cross connection or protection of the potable water supply system required by this code.",
+  "previewText" : "Solar energy systems used for heating potable water or using an independent medium for heating potable water shall comply with the applicable requirements of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 12093
+}

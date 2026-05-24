@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161430\"><\/AnnotationDrawer><div>The maximum water flow rates and flush volume for plumbing fixtures and fixture fittings shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-161966', hash: '#JD_PC604' }}\">604<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161431\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161431\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161431\"><\/AnnotationDrawer><h6><a name=\"JD_PC402\" id=\"JD_PC402\" title=\"PC 402\"><\/a>Section PC 402: Fixture Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11904-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum water flow rates and flush volume for plumbing fixtures and fixture fittings shall comply with Section 604 .\n\n Section PC 402: Fixture Materials"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The maximum water flow rates and flush volume for plumbing fixtures and fixture fittings shall comply with Section 604.\n\nSection PC 402: Fixture Materials",
+  "previewText" : "The maximum water flow rates and flush volume for plumbing fixtures and fixture fittings shall comply with Section 604.",
+  "schemaVersion" : 2,
+  "sectionID" : 11904
+}

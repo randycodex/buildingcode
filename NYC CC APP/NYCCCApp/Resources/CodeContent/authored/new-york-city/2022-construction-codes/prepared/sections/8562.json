@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198845\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198845\"><\/AnnotationDrawer><div>Vent connectors for Category II, III and IV appliances shall be as specified for the venting systems in accordance with Section 503.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8562-html-1",
+      "kind" : "html",
+      "plainText" : "Vent connectors for Category II, III and IV appliances shall be as specified for the venting systems in accordance with Section 503.4."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Vent connectors for Category II, III and IV appliances shall be as specified for the venting systems in accordance with Section 503.4.",
+  "previewText" : "Vent connectors for Category II, III and IV appliances shall be as specified for the venting systems in accordance with Section 503.",
+  "schemaVersion" : 2,
+  "sectionID" : 8562
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164527\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164527\"><\/annotationdrawer><div>Refer to <link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-157215', hash: '#JD_T28C002' }}\">Chapter 2 of Title 28 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><codeoptions destid=\"rid-0-0-0-164528\" class=\"Section\"><\/codeoptions><div id=\"rid-0-0-0-164528\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><annotationdrawer recordid=\"0-0-0-164528\"><\/annotationdrawer><h6><a name=\"JD_BC115\" id=\"JD_BC115\" title=\"BC 115\"><\/a>Section BC 115: Stop Work Order<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "105-html-1",
+      "kind" : "html",
+      "plainText" : "Refer to Chapter 2 of Title 28 of the Administrative Code .\n\n Section BC 115: Stop Work Order"
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Refer to Chapter 2 of Title 28 of the Administrative Code.",
+  "previewText" : "Refer to Chapter 2 of Title 28 of the Administrative Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 105
+}

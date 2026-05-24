@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169731\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169731\"><\/AnnotationDrawer><div>Fire-resistance-rated glazing tested as part of a fire-resistance-rated wall or floor\/ceiling assembly in accordance with ASTM E 119 or UL 263 and labeled in accordance with Section 703.6 shall not otherwise be required to comply with this section where used as part of a wall or floor\/ceiling assembly. Fire-resistance-rated glazing shall be permitted in fire door and fire window assemblies where tested and installed in accordance with their listings and where in compliance with the requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1226-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-resistance-rated glazing tested as part of a fire-resistance-rated wall or floor\/ceiling assembly in accordance with ASTM E 119 or UL 263 and labeled in accordance with Section 703.6 shall not otherwise be required to comply with this section where used as part of a wall or floor\/ceiling assembly. Fire-resistance-rated glazing shall be permitted in fire door and fire window assemblies where tested and installed in accordance with their listings and where in compliance with the requirements of this section."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire-resistance-rated glazing tested as part of a fire-resistance-rated wall or floor\/ceiling assembly in accordance with ASTM E 119 or UL 263 and labeled in accordance with Section 703.6 shall not otherwise be required to comply with this section where used as part of a wall or floor\/ceiling assembly. Fire-resistance-rated glazing shall be permitted in fire door and fire window assemblies where tested and installed in accordance with their listings and where in compliance with the requirements of this section.",
+  "previewText" : "Fire-resistance-rated glazing tested as part of a fire-resistance-rated wall or floor\/ceiling assembly in accordance with ASTM E 119 or UL 263 and labeled in accordance with Section 703.",
+  "schemaVersion" : 2,
+  "sectionID" : 1226
+}

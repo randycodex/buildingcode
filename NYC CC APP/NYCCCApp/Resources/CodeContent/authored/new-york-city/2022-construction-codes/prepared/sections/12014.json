@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161714\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161714\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Access shall be provided to circulation pumps in accordance with the fixture or pump manufacturer's installation instructions. Where the manufacturer's instructions do not specify the location and minimum size of field-fabricated access openings, an opening not less than 12 inches by 12 inches (305 mm by 305 mm) shall be installed to provide access to the circulation pump. Where pumps are located more than 2 feet (609 mm) from the access opening, an opening not less than 18 inches by 18 inches (457 mm by 457 mm) shall be installed. A door or panel shall be permitted to close the opening. In all cases, the access opening shall be unobstructed and of the size necessary to permit the removal and replacement of the circulation pump.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12014-html-1",
+      "kind" : "html",
+      "plainText" : "Access shall be provided to circulation pumps in accordance with the fixture or pump manufacturer's installation instructions. Where the manufacturer's instructions do not specify the location and minimum size of field-fabricated access openings, an opening not less than 12 inches by 12 inches (305 mm by 305 mm) shall be installed to provide access to the circulation pump. Where pumps are located more than 2 feet (609 mm) from the access opening, an opening not less than 18 inches by 18 inches (457 mm by 457 mm) shall be installed. A door or panel shall be permitted to close the opening. In all cases, the access opening shall be unobstructed and of the size necessary to permit the removal and replacement of the circulation pump."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Access shall be provided to circulation pumps in accordance with the fixture or pump manufacturer's installation instructions. Where the manufacturer's instructions do not specify the location and minimum size of field-fabricated access openings, an opening not less than 12 inches by 12 inches (305 mm by 305 mm) shall be installed to provide access to the circulation pump. Where pumps are located more than 2 feet (609 mm) from the access opening, an opening not less than 18 inches by 18 inches (457 mm by 457 mm) shall be installed. A door or panel shall be permitted to close the opening. In all cases, the access opening shall be unobstructed and of the size necessary to permit the removal and replacement of the circulation pump.",
+  "previewText" : "Access shall be provided to circulation pumps in accordance with the fixture or pump manufacturer's installation instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 12014
+}

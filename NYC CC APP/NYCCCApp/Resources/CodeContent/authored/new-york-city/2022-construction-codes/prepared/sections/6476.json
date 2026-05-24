@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186671\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186671\"><\/AnnotationDrawer><div>The commissioner may, in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-155667', hash: '#JD_28-103.3' }}\">28-103.3<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>, and based upon a written request from a registered design professional, modify the requirements for adjoining property protection required by this section, including but not limited to authorizing the installation or use of alternative methods of surveying, monitoring, inspection, or protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6476-html-1",
+      "kind" : "html",
+      "plainText" : "The commissioner may, in accordance with Section 28-103.3 of the Administrative Code , and based upon a written request from a registered design professional, modify the requirements for adjoining property protection required by this section, including but not limited to authorizing the installation or use of alternative methods of surveying, monitoring, inspection, or protection."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The commissioner may, in accordance with Section 28-103.3 of the Administrative Code, and based upon a written request from a registered design professional, modify the requirements for adjoining property protection required by this section, including but not limited to authorizing the installation or use of alternative methods of surveying, monitoring, inspection, or protection.",
+  "previewText" : "The commissioner may, in accordance with Section 28-103.",
+  "schemaVersion" : 2,
+  "sectionID" : 6476
+}

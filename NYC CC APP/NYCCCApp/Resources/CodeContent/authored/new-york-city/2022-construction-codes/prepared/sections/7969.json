@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196903\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196903\"><\/AnnotationDrawer><div>References to standards in this code shall be to the editions of those standards provided for in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-199479', hash: '#JD_FGCCh.8' }}\">Chapter 8<\/Link> of this code, or as otherwise provided by rule.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7969-html-1",
+      "kind" : "html",
+      "plainText" : "References to standards in this code shall be to the editions of those standards provided for in Chapter 8 of this code, or as otherwise provided by rule."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "References to standards in this code shall be to the editions of those standards provided for in Chapter 8 of this code, or as otherwise provided by rule.",
+  "previewText" : "References to standards in this code shall be to the editions of those standards provided for in Chapter 8 of this code, or as otherwise provided by rule.",
+  "schemaVersion" : 2,
+  "sectionID" : 7969
+}

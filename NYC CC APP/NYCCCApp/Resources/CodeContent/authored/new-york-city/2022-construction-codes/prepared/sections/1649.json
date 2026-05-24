@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171436\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171436\"><\/AnnotationDrawer><div>Control valves shall not be installed between the water supply and sprinklers unless the valves are of an approved indicating type that are supervised or secured in the open position.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1649-html-1",
+      "kind" : "html",
+      "plainText" : "Control valves shall not be installed between the water supply and sprinklers unless the valves are of an approved indicating type that are supervised or secured in the open position."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Control valves shall not be installed between the water supply and sprinklers unless the valves are of an approved indicating type that are supervised or secured in the open position.",
+  "previewText" : "Control valves shall not be installed between the water supply and sprinklers unless the valves are of an approved indicating type that are supervised or secured in the open position.",
+  "schemaVersion" : 2,
+  "sectionID" : 1649
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193086\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193086\"><\/AnnotationDrawer><div>Where multiple evaporators and\/or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10365-html-1",
+      "kind" : "html",
+      "plainText" : "Where multiple evaporators and\/or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Where multiple evaporators and\/or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.",
+  "previewText" : "Where multiple evaporators and\/or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.",
+  "schemaVersion" : 2,
+  "sectionID" : 10365
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188754\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188754\"><\/AnnotationDrawer><div>Where an existing emergency vehicle garage or fire, rescue, ambulance, or police station building is undergoing substantial improvement or an increase in the degree of noncompliance, the existing subgrade space shall be provided with a sump pump system, designed to be fully submerged and remain operational post-flood-event to remove flood waters after a storm surge has receded. Such pump system shall be designed with the pump controller located above the design flood elevation and all electrical wiring below the design flood elevation shall be listed and marked for use with a submersible pump. The pump system shall be connected to a standby power source, which shall be elevated above the design flood elevation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7104-html-1",
+      "kind" : "html",
+      "plainText" : "Where an existing emergency vehicle garage or fire, rescue, ambulance, or police station building is undergoing substantial improvement or an increase in the degree of noncompliance, the existing subgrade space shall be provided with a sump pump system, designed to be fully submerged and remain operational post-flood-event to remove flood waters after a storm surge has receded. Such pump system shall be designed with the pump controller located above the design flood elevation and all electrical wiring below the design flood elevation shall be listed and marked for use with a submersible pump. The pump system shall be connected to a standby power source, which shall be elevated above the design flood elevation."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Where an existing emergency vehicle garage or fire, rescue, ambulance, or police station building is undergoing substantial improvement or an increase in the degree of noncompliance, the existing subgrade space shall be provided with a sump pump system, designed to be fully submerged and remain operational post-flood-event to remove flood waters after a storm surge has receded. Such pump system shall be designed with the pump controller located above the design flood elevation and all electrical wiring below the design flood elevation shall be listed and marked for use with a submersible pump. The pump system shall be connected to a standby power source, which shall be elevated above the design flood elevation.",
+  "previewText" : "Where an existing emergency vehicle garage or fire, rescue, ambulance, or police station building is undergoing substantial improvement or an increase in the degree of noncompliance, the existing subgrade space shall be provided with a sump pump system, designed to be fully submerged and remain operational post-flood-event to remove flood waters after a storm surge has receded.",
+  "schemaVersion" : 2,
+  "sectionID" : 7104
+}

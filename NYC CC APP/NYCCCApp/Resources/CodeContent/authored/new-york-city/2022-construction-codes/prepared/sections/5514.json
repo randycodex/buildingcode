@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183902\"><\/AnnotationDrawer><div>The building shall be protected throughout by an approved, electrically-supervised automatic sprinkler system in accordance with Section 903.3.1.1, except as otherwise permitted by Section 903.3.1.1.1 and as prohibited by Section 3008.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5514-html-1",
+      "kind" : "html",
+      "plainText" : "The building shall be protected throughout by an approved, electrically-supervised automatic sprinkler system in accordance with Section 903.3.1.1, except as otherwise permitted by Section 903.3.1.1.1 and as prohibited by Section 3008.3.1."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "The building shall be protected throughout by an approved, electrically-supervised automatic sprinkler system in accordance with Section 903.3.1.1, except as otherwise permitted by Section 903.3.1.1.1 and as prohibited by Section 3008.3.1.",
+  "previewText" : "The building shall be protected throughout by an approved, electrically-supervised automatic sprinkler system in accordance with Section 903.",
+  "schemaVersion" : 2,
+  "sectionID" : 5514
+}

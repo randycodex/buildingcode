@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178071\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178071\"><\/AnnotationDrawer><div>The peer reviewer cannot be changed without the express consent of the department. The current peer reviewer must submit both a written letter to the borough commissioner detailing the reason for the withdrawal request and a report of the structural peer review findings to date. If a change of peer reviewer is approved, a revised submission indicating the replacement peer reviewer shall be filed with the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-178072\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-178072\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-178072\"><\/AnnotationDrawer><h6><a name=\"JD_BC1619\" id=\"JD_BC1619\" title=\"BC 1619\"><\/a>Section BC 1619: Temporary Structures and Temporary Construction Installations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3650-html-1",
+      "kind" : "html",
+      "plainText" : "The peer reviewer cannot be changed without the express consent of the department. The current peer reviewer must submit both a written letter to the borough commissioner detailing the reason for the withdrawal request and a report of the structural peer review findings to date. If a change of peer reviewer is approved, a revised submission indicating the replacement peer reviewer shall be filed with the department.\n\n Section BC 1619: Temporary Structures and Temporary Construction Installations"
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "The peer reviewer cannot be changed without the express consent of the department. The current peer reviewer must submit both a written letter to the borough commissioner detailing the reason for the withdrawal request and a report of the structural peer review findings to date. If a change of peer reviewer is approved, a revised submission indicating the replacement peer reviewer shall be filed with the department.",
+  "previewText" : "The peer reviewer cannot be changed without the express consent of the department.",
+  "schemaVersion" : 2,
+  "sectionID" : 3650
+}

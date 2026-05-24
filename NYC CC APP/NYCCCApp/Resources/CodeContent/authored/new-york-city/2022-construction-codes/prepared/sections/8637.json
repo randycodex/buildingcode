@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199125\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199125\"><\/AnnotationDrawer><div>All fuel gas space heating appliances installed or used in a building occupied as a residence shall be equipped with an automatic flame safeguard device that shall shut off the fuel supply to the main burner or group of burners when the flame or pilot light thereof is extinguished.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199126\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199126\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199126\"><\/AnnotationDrawer><h6><a name=\"JD_FGC602\" id=\"JD_FGC602\" title=\"FGC 602\"><\/a>Section FGC 602: Decorative Gas Fired Appliances for Installation In Fireplaces<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8637-html-1",
+      "kind" : "html",
+      "plainText" : "All fuel gas space heating appliances installed or used in a building occupied as a residence shall be equipped with an automatic flame safeguard device that shall shut off the fuel supply to the main burner or group of burners when the flame or pilot light thereof is extinguished.\n\n Section FGC 602: Decorative Gas Fired Appliances for Installation In Fireplaces"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "All fuel gas space heating appliances installed or used in a building occupied as a residence shall be equipped with an automatic flame safeguard device that shall shut off the fuel supply to the main burner or group of burners when the flame or pilot light thereof is extinguished.\n\nSection FGC 602: Decorative Gas Fired Appliances for Installation In Fireplaces",
+  "previewText" : "All fuel gas space heating appliances installed or used in a building occupied as a residence shall be equipped with an automatic flame safeguard device that shall shut off the fuel supply to the main burner or group of burners when the flame or pilot light thereof is extinguished.",
+  "schemaVersion" : 2,
+  "sectionID" : 8637
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194290\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194290\"><\/AnnotationDrawer><div>Ducts installed within a single dwelling unit shall be sized in accordance with ACCA Manual D, the appliance manufacturer's instructions or other approved methods. Ducts installed within all other buildings shall be sized in accordance with the ASHRAE Handbook of Fundamentals or other equivalent computation procedure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10778-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts installed within a single dwelling unit shall be sized in accordance with ACCA Manual D, the appliance manufacturer's instructions or other approved methods. Ducts installed within all other buildings shall be sized in accordance with the ASHRAE Handbook of Fundamentals or other equivalent computation procedure."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Ducts installed within a single dwelling unit shall be sized in accordance with ACCA Manual D, the appliance manufacturer's instructions or other approved methods. Ducts installed within all other buildings shall be sized in accordance with the ASHRAE Handbook of Fundamentals or other equivalent computation procedure.",
+  "previewText" : "Ducts installed within a single dwelling unit shall be sized in accordance with ACCA Manual D, the appliance manufacturer's instructions or other approved methods.",
+  "schemaVersion" : 2,
+  "sectionID" : 10778
+}

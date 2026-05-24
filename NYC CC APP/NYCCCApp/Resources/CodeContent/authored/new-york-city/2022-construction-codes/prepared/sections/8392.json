@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198368\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198368\"><\/AnnotationDrawer><div>The overpressure protection device: (i) shall be properly maintained and inspected every two years by a licensed master plumber; (ii) inspection records shall be maintained by the owner and made available to the department; (iii) inspection procedures shall be in accordance with the commissioner; and (iv) replacements or repairs shall be promptly made.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198369\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198369\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where the gas pressure is 15 psig (103.4 kPa gauge) or above, the overpressure protection device shall be inspected annually.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "8392-html-1",
+      "kind" : "html",
+      "plainText" : "The overpressure protection device: (i) shall be properly maintained and inspected every two years by a licensed master plumber; (ii) inspection records shall be maintained by the owner and made available to the department; (iii) inspection procedures shall be in accordance with the commissioner; and (iv) replacements or repairs shall be promptly made.\n\n Exception: Where the gas pressure is 15 psig (103.4 kPa gauge) or above, the overpressure protection device shall be inspected annually."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The overpressure protection device: (i) shall be properly maintained and inspected every two years by a licensed master plumber; (ii) inspection records shall be maintained by the owner and made available to the department; (iii) inspection procedures shall be in accordance with the commissioner; and (iv) replacements or repairs shall be promptly made.\n\nException: Where the gas pressure is 15 psig (103.4 kPa gauge) or above, the overpressure protection device shall be inspected annually.",
+  "previewText" : "The overpressure protection device: (i) shall be properly maintained and inspected every two years by a licensed master plumber; (ii) inspection records shall be maintained by the owner and made available to the department; (iii) inspection procedures shall be in accordance with the commissioner; and (iv) replacements or repairs shall be promptly made.",
+  "schemaVersion" : 2,
+  "sectionID" : 8392
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198276\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198276\"><\/AnnotationDrawer><div>Connectors and tubing shall be installed so as to be protected against physical damage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8350-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors and tubing shall be installed so as to be protected against physical damage."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Connectors and tubing shall be installed so as to be protected against physical damage.",
+  "previewText" : "Connectors and tubing shall be installed so as to be protected against physical damage.",
+  "schemaVersion" : 2,
+  "sectionID" : 8350
+}

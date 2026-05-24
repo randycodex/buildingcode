@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180814\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180814\"><\/AnnotationDrawer><div>Concrete masonry units, clay or shale masonry units, stone masonry units, glass unit masonry and AAC masonry units shall comply with Article 2.3 of TMS 602. Architectural cast stone shall conform to ASTM C1364 and TMS 504. Adhered manufactured stone masonry veneer units shall conform to ASTM C 1670.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180815\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Structural clay tile for nonstructural use in fireproofing of structural members and in wall furring shall not be required to meet the compressive strength specifications. The fire-resistance rating shall be determined in accordance with ASTM E 119 or UL 263 and shall comply with the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable602' }}\">Table 602<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4570-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete masonry units, clay or shale masonry units, stone masonry units, glass unit masonry and AAC masonry units shall comply with Article 2.3 of TMS 602. Architectural cast stone shall conform to ASTM C1364 and TMS 504. Adhered manufactured stone masonry veneer units shall conform to ASTM C 1670.\n\n Exception: Structural clay tile for nonstructural use in fireproofing of structural members and in wall furring shall not be required to meet the compressive strength specifications. The fire-resistance rating shall be determined in accordance with ASTM E 119 or UL 263 and shall comply with the requirements of Table 602 of this code."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Concrete masonry units, clay or shale masonry units, stone masonry units, glass unit masonry and AAC masonry units shall comply with Article 2.3 of TMS 602. Architectural cast stone shall conform to ASTM C1364 and TMS 504. Adhered manufactured stone masonry veneer units shall conform to ASTM C 1670.\n\nException: Structural clay tile for nonstructural use in fireproofing of structural members and in wall furring shall not be required to meet the compressive strength specifications. The fire-resistance rating shall be determined in accordance with ASTM E 119 or UL 263 and shall comply with the requirements of Table 602 of this code.",
+  "previewText" : "Concrete masonry units, clay or shale masonry units, stone masonry units, glass unit masonry and AAC masonry units shall comply with Article 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 4570
+}

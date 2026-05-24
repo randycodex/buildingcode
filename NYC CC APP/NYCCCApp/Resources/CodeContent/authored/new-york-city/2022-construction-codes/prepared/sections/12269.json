@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162353\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162353\"><\/AnnotationDrawer><div>Where chemical dispensers connect to the potable water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.13.1, 608.13.2, 608.13.5, 608.13.6, 608.13.8 or 608.13.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12269-html-1",
+      "kind" : "html",
+      "plainText" : "Where chemical dispensers connect to the potable water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.13.1, 608.13.2, 608.13.5, 608.13.6, 608.13.8 or 608.13.9."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Where chemical dispensers connect to the potable water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.13.1, 608.13.2, 608.13.5, 608.13.6, 608.13.8 or 608.13.9.",
+  "previewText" : "Where chemical dispensers connect to the potable water distribution system, the water supply system shall be protected against backflow in accordance with Section 608.",
+  "schemaVersion" : 2,
+  "sectionID" : 12269
+}

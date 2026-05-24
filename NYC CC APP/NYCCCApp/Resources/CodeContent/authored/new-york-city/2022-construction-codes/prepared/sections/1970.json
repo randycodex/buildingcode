@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172423\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172423\"><\/AnnotationDrawer><div>The vestibule shall be supplied with not less than one air change per minute and the exhaust shall not be less than 150 percent of supply. Supply air shall enter and exhaust air shall discharge from the vestibule through separate, tightly constructed ducts used only for that purpose. Supply air shall enter the vestibule within 6 inches (152.4 mm) of the floor level. The top of the exhaust register shall be located at the top of the smoke trap but not more than 6 inches (152.4 mm) down from the top of the trap, and shall be entirely within the smoke trap area. Doors in the open position shall not obstruct duct openings. Duct openings with controlling dampers are permitted where necessary to meet the design requirements, but dampers are not otherwise required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1970-html-1",
+      "kind" : "html",
+      "plainText" : "The vestibule shall be supplied with not less than one air change per minute and the exhaust shall not be less than 150 percent of supply. Supply air shall enter and exhaust air shall discharge from the vestibule through separate, tightly constructed ducts used only for that purpose. Supply air shall enter the vestibule within 6 inches (152.4 mm) of the floor level. The top of the exhaust register shall be located at the top of the smoke trap but not more than 6 inches (152.4 mm) down from the top of the trap, and shall be entirely within the smoke trap area. Doors in the open position shall not obstruct duct openings. Duct openings with controlling dampers are permitted where necessary to meet the design requirements, but dampers are not otherwise required."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The vestibule shall be supplied with not less than one air change per minute and the exhaust shall not be less than 150 percent of supply. Supply air shall enter and exhaust air shall discharge from the vestibule through separate, tightly constructed ducts used only for that purpose. Supply air shall enter the vestibule within 6 inches (152.4 mm) of the floor level. The top of the exhaust register shall be located at the top of the smoke trap but not more than 6 inches (152.4 mm) down from the top of the trap, and shall be entirely within the smoke trap area. Doors in the open position shall not obstruct duct openings. Duct openings with controlling dampers are permitted where necessary to meet the design requirements, but dampers are not otherwise required.",
+  "previewText" : "The vestibule shall be supplied with not less than one air change per minute and the exhaust shall not be less than 150 percent of supply.",
+  "schemaVersion" : 2,
+  "sectionID" : 1970
+}

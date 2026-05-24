@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183776\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183776\"><\/AnnotationDrawer><div>The elevator machine room, control rooms or control space with openings into a pressurized elevator hoistway shall be pressurized upon activation of a heat or smoke detector located in the elevator machine room, control room or control space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5466-html-1",
+      "kind" : "html",
+      "plainText" : "The elevator machine room, control rooms or control space with openings into a pressurized elevator hoistway shall be pressurized upon activation of a heat or smoke detector located in the elevator machine room, control room or control space."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "The elevator machine room, control rooms or control space with openings into a pressurized elevator hoistway shall be pressurized upon activation of a heat or smoke detector located in the elevator machine room, control room or control space.",
+  "previewText" : "The elevator machine room, control rooms or control space with openings into a pressurized elevator hoistway shall be pressurized upon activation of a heat or smoke detector located in the elevator machine room, control room or control space.",
+  "schemaVersion" : 2,
+  "sectionID" : 5466
+}

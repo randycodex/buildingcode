@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174453\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174453\"><\/AnnotationDrawer><div>The required capacity of aisles shall be not less than that determined in accordance with Section 1029.6.1 where smoke-protected assembly seating is not provided and with Section 1029.6.2 or 1029.6.3 where smoke-protected assembly seating is provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2533-html-1",
+      "kind" : "html",
+      "plainText" : "The required capacity of aisles shall be not less than that determined in accordance with Section 1029.6.1 where smoke-protected assembly seating is not provided and with Section 1029.6.2 or 1029.6.3 where smoke-protected assembly seating is provided."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The required capacity of aisles shall be not less than that determined in accordance with Section 1029.6.1 where smoke-protected assembly seating is not provided and with Section 1029.6.2 or 1029.6.3 where smoke-protected assembly seating is provided.",
+  "previewText" : "The required capacity of aisles shall be not less than that determined in accordance with Section 1029.",
+  "schemaVersion" : 2,
+  "sectionID" : 2533
+}

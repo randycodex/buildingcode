@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196435\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196435\"><\/AnnotationDrawer><div>Normal vent pipes shall drain toward the tank. The normal vent pipes shall have no sags or traps where liquid can collect.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11570-html-1",
+      "kind" : "html",
+      "plainText" : "Normal vent pipes shall drain toward the tank. The normal vent pipes shall have no sags or traps where liquid can collect."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Normal vent pipes shall drain toward the tank. The normal vent pipes shall have no sags or traps where liquid can collect.",
+  "previewText" : "Normal vent pipes shall drain toward the tank.",
+  "schemaVersion" : 2,
+  "sectionID" : 11570
+}

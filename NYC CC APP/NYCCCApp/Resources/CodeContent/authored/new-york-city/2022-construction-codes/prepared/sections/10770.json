@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194266\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194266\"><\/AnnotationDrawer><div>The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.1.2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> when tested in accordance with NFPA 286.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194267\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194267\"><\/AnnotationDrawer><div>The foam plastic insulation shall be approved based on tests conducted in accordance with Section 2603.9 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10770-html-1",
+      "kind" : "html",
+      "plainText" : "The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.1.2 of the New York City Building Code when tested in accordance with NFPA 286.\n\n The foam plastic insulation shall be approved based on tests conducted in accordance with Section 2603.9 of the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.1.2 of the New York City Building Code when tested in accordance with NFPA 286.\n\nThe foam plastic insulation shall be approved based on tests conducted in accordance with Section 2603.9 of the New York City Building Code.",
+  "previewText" : "The foam plastic insulation shall exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 at the thickness and density intended for use and shall meet the acceptance criteria of Section 803.",
+  "schemaVersion" : 2,
+  "sectionID" : 10770
+}

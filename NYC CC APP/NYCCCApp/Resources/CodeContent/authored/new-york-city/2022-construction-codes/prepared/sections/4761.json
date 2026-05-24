@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181334\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181334\"><\/AnnotationDrawer><div>Material for use as structural steel not listed in AISC 360 may be used in accordance with AISC 360 when approved by the commissioner for such use. Refer to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156795', hash: '#JD_28-113.2.2' }}\">28-113.2.2<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> for provisions relating to approval of alternative materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4761-html-1",
+      "kind" : "html",
+      "plainText" : "Material for use as structural steel not listed in AISC 360 may be used in accordance with AISC 360 when approved by the commissioner for such use. Refer to Section 28-113.2.2 of the Administrative Code for provisions relating to approval of alternative materials."
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "Material for use as structural steel not listed in AISC 360 may be used in accordance with AISC 360 when approved by the commissioner for such use. Refer to Section 28-113.2.2 of the Administrative Code for provisions relating to approval of alternative materials.",
+  "previewText" : "Material for use as structural steel not listed in AISC 360 may be used in accordance with AISC 360 when approved by the commissioner for such use.",
+  "schemaVersion" : 2,
+  "sectionID" : 4761
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193126\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193126\"><\/AnnotationDrawer><div>Approved smoke and heat vents shall be installed in the roofs of one-story buildings where required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span> Smoke and heat vents shall be designed and installed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193127\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193127\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193127\"><\/AnnotationDrawer><h6><a name=\"JD_MC312\" id=\"JD_MC312\" title=\"MC 312\"><\/a>Section MC 312: Heating and Cooling Load Calculations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10380-html-1",
+      "kind" : "html",
+      "plainText" : "Approved smoke and heat vents shall be installed in the roofs of one-story buildings where required by the New York City Fire Code. Smoke and heat vents shall be designed and installed in accordance with the New York City Fire Code. \n\n Section MC 312: Heating and Cooling Load Calculations"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Approved smoke and heat vents shall be installed in the roofs of one-story buildings where required by the New York City Fire Code. Smoke and heat vents shall be designed and installed in accordance with the New York City Fire Code.\n\nSection MC 312: Heating and Cooling Load Calculations",
+  "previewText" : "Approved smoke and heat vents shall be installed in the roofs of one-story buildings where required by the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10380
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196547\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196547\"><\/AnnotationDrawer><div>Tanks located below ground, inside or outside of buildings, shall comply with any one of the following design standards, as appropriate for the specific installation as determined by the engineer. Cathodic protection shall be provided in accordance with subpart 613-2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York State Department of Environmental Conservation's Petroleum Bulk Storage Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196548\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196548\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;UL 58; such tanks shall be listed and labeled;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196549\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196549\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;UL 1316; such tanks shall be listed and labeled; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196550\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196550\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Alternate tank design and construction standards contained in Section 1305.14 <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11607-html-1",
+      "kind" : "html",
+      "plainText" : "Tanks located below ground, inside or outside of buildings, shall comply with any one of the following design standards, as appropriate for the specific installation as determined by the engineer. Cathodic protection shall be provided in accordance with subpart 613-2 of the New York State Department of Environmental Conservation's Petroleum Bulk Storage Code .\n\n 1. UL 58; such tanks shall be listed and labeled;\n\n 2. UL 1316; such tanks shall be listed and labeled; or\n\n 3. Alternate tank design and construction standards contained in Section 1305.14"
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Tanks located below ground, inside or outside of buildings, shall comply with any one of the following design standards, as appropriate for the specific installation as determined by the engineer. Cathodic protection shall be provided in accordance with subpart 613-2 of the New York State Department of Environmental Conservation's Petroleum Bulk Storage Code.\n\n1. UL 58; such tanks shall be listed and labeled;\n\n2. UL 1316; such tanks shall be listed and labeled; or\n\n3. Alternate tank design and construction standards contained in Section 1305.14",
+  "previewText" : "Tanks located below ground, inside or outside of buildings, shall comply with any one of the following design standards, as appropriate for the specific installation as determined by the engineer.",
+  "schemaVersion" : 2,
+  "sectionID" : 11607
+}

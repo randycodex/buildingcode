@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163426\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163426\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Floor drains shall not be connected to a storm drain.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12676-html-1",
+      "kind" : "html",
+      "plainText" : "Floor drains shall not be connected to a storm drain."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Floor drains shall not be connected to a storm drain.",
+  "previewText" : "Floor drains shall not be connected to a storm drain.",
+  "schemaVersion" : 2,
+  "sectionID" : 12676
+}

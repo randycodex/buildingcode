@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230159\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230159\"><\/AnnotationDrawer><div>An ADU shall be provided with a separate entrance from that serving the dwelling units of the primary dwelling, either from the exterior of the primary dwelling or directly from a public corridor within the primary dwelling. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7878-html-1",
+      "kind" : "html",
+      "plainText" : "An ADU shall be provided with a separate entrance from that serving the dwelling units of the primary dwelling, either from the exterior of the primary dwelling or directly from a public corridor within the primary dwelling."
+    }
+  ],
+  "chapterNumber" : "U",
+  "officialText" : "An ADU shall be provided with a separate entrance from that serving the dwelling units of the primary dwelling, either from the exterior of the primary dwelling or directly from a public corridor within the primary dwelling.",
+  "previewText" : "An ADU shall be provided with a separate entrance from that serving the dwelling units of the primary dwelling, either from the exterior of the primary dwelling or directly from a public corridor within the primary dwelling.",
+  "schemaVersion" : 2,
+  "sectionID" : 7878
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174234\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174234\"><\/AnnotationDrawer><div>Doors through which occupants must pass in order to complete the exit path, and doors serving horizontal exits, shall be provided with markings complying with Sections 1025.2.6.1 through 1025.2.6.3 of this chapter and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192262', hash: '#JD_BCFigureS101.1(11)' }}\">Figures S101.1(11)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192262', hash: '#JD_BCFigureS101.1(12)' }}\">S101.1(12)<\/Link> in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192260', hash: '#JD_BCAppS' }}\">Appendix S<\/Link>. Exit discharge doors shall further comply with Section 1025.2.6.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2468-html-1",
+      "kind" : "html",
+      "plainText" : "Doors through which occupants must pass in order to complete the exit path, and doors serving horizontal exits, shall be provided with markings complying with Sections 1025.2.6.1 through 1025.2.6.3 of this chapter and Figures S101.1(11) and S101.1(12) in Appendix S . Exit discharge doors shall further comply with Section 1025.2.6.1.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Doors through which occupants must pass in order to complete the exit path, and doors serving horizontal exits, shall be provided with markings complying with Sections 1025.2.6.1 through 1025.2.6.3 of this chapter and Figures S101.1(11) and S101.1(12) in Appendix S. Exit discharge doors shall further comply with Section 1025.2.6.1.2.",
+  "previewText" : "Doors through which occupants must pass in order to complete the exit path, and doors serving horizontal exits, shall be provided with markings complying with Sections 1025.",
+  "schemaVersion" : 2,
+  "sectionID" : 2468
+}

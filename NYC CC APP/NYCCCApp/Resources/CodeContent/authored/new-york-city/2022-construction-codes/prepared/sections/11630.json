@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196628\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196628\"><\/AnnotationDrawer><div>If flat heads are used, they shall be braced in the same manner as described for the bracing of flat sides of rectangular tanks as provided for in Section 1305.14.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11630-html-1",
+      "kind" : "html",
+      "plainText" : "If flat heads are used, they shall be braced in the same manner as described for the bracing of flat sides of rectangular tanks as provided for in Section 1305.14.3."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "If flat heads are used, they shall be braced in the same manner as described for the bracing of flat sides of rectangular tanks as provided for in Section 1305.14.3.",
+  "previewText" : "If flat heads are used, they shall be braced in the same manner as described for the bracing of flat sides of rectangular tanks as provided for in Section 1305.",
+  "schemaVersion" : 2,
+  "sectionID" : 11630
+}

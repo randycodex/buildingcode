@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198682\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198682\"><\/AnnotationDrawer><div>Gas vents shall terminate not less than 3 feet (914.4 mm) above any forced air inlet located within 10 feet (3048 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8499-html-1",
+      "kind" : "html",
+      "plainText" : "Gas vents shall terminate not less than 3 feet (914.4 mm) above any forced air inlet located within 10 feet (3048 mm)."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Gas vents shall terminate not less than 3 feet (914.4 mm) above any forced air inlet located within 10 feet (3048 mm).",
+  "previewText" : "Gas vents shall terminate not less than 3 feet (914.",
+  "schemaVersion" : 2,
+  "sectionID" : 8499
+}

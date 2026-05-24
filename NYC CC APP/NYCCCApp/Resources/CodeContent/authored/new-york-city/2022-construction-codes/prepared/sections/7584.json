@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "K1",
+  "officialText" : "Fp = ZICp (Wt + Wr )\n\nwhere\n\nCp = horizontal seismic force factor\n\nFp = total horizontal seismic force\n\nI = importance factor\n\nZ = seismic zone factor\n\n= 0.25 for seismic zone 2\n\n= 0.5 for seismic zone 3 or greater\n\nWhere the applicable building code does not make reference to seismic risk zones, the ground motion parameters shown in Section 8.4.13 shall be used.\n\nRevise the first sentence of section Section 8.5.2.1.2 to read as follows:\n\nThe escalator or moving walk is not considered a structural component of the building.\n\nRevise the NOTE following Section 8.5.2.1.3 to read as follows:\n\nNOTE: When any portion of the escalator is more than six stories above grade, other values of Cp may apply and should be determined based upon the fundamental period of the building.\n\nDelete and revise Section 8.5.2.2 to read as follows:",
+  "previewText" : "Fp = ZICp (Wt + Wr )\n\nwhere\n\nCp = horizontal seismic force factor\n\nFp = total horizontal seismic force\n\nI = importance factor\n\nZ = seismic zone factor\n\n= 0.",
+  "schemaVersion" : 2,
+  "sectionID" : 7584
+}

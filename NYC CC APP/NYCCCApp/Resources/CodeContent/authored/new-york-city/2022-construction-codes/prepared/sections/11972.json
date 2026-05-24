@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161618\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Food waste disposers shall be provided with a supply of cold water.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161619\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161619\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161619\"><\/AnnotationDrawer><h6><a name=\"JD_PC414\" id=\"JD_PC414\" title=\"PC 414\"><\/a>Section PC 414: Garbage Can Washers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11972-html-1",
+      "kind" : "html",
+      "plainText" : "Food waste disposers shall be provided with a supply of cold water. \n\n Section PC 414: Garbage Can Washers"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Food waste disposers shall be provided with a supply of cold water.\n\nSection PC 414: Garbage Can Washers",
+  "previewText" : "Food waste disposers shall be provided with a supply of cold water.",
+  "schemaVersion" : 2,
+  "sectionID" : 11972
+}

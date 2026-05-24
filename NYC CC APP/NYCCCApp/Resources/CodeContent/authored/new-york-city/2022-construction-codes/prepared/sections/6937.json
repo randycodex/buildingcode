@@ -1,0 +1,14 @@
+{
+  "blocks" : [
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: 768px&#10;                ;\"><colgroup><col width=\"18.75%&#10;              \"><\/col><col width=\"62.5%&#10;              \"><\/col><col width=\"18.75%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div>DOJ 36CFR Part 1192<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div>Americans with Disabilities Act (ADA) Accessibility Guidelines for Transportation Vehicles (ADAAG). Washington, D.C.: Department of Justice, 1991<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:right;\">E109.2.4<\/div><\/div><\/td><\/tr><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div>ICC A117.1-2009<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div>Accessible and Usable Buildings and Facilities<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:right;\">E101.2, et al.<\/div><\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "6937-table-1",
+      "kind" : "table"
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "",
+  "previewText" : "",
+  "schemaVersion" : 2,
+  "sectionID" : 6937
+}

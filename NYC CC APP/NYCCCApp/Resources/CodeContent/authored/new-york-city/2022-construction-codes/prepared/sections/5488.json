@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183833\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183833\"><\/AnnotationDrawer><div>A fire-fighter's smoke control panel complying with Section 909.16 shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5488-html-1",
+      "kind" : "html",
+      "plainText" : "A fire-fighter's smoke control panel complying with Section 909.16 shall be provided."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "A fire-fighter's smoke control panel complying with Section 909.16 shall be provided.",
+  "previewText" : "A fire-fighter's smoke control panel complying with Section 909.",
+  "schemaVersion" : 2,
+  "sectionID" : 5488
+}

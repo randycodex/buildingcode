@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161672\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Sheet-applied, load-bearing, bonded, waterproof membranes shall meet requirements of ANSI A118.10 and shall be applied in accordance with the manufacturer's installation instructions.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11995-html-1",
+      "kind" : "html",
+      "plainText" : "Sheet-applied, load-bearing, bonded, waterproof membranes shall meet requirements of ANSI A118.10 and shall be applied in accordance with the manufacturer's installation instructions."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Sheet-applied, load-bearing, bonded, waterproof membranes shall meet requirements of ANSI A118.10 and shall be applied in accordance with the manufacturer's installation instructions.",
+  "previewText" : "Sheet-applied, load-bearing, bonded, waterproof membranes shall meet requirements of ANSI A118.",
+  "schemaVersion" : 2,
+  "sectionID" : 11995
+}

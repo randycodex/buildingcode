@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161393\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161393\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 314.2.1 through 314.2.5.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161394\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161394\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11892-html-1",
+      "kind" : "html",
+      "plainText" : "Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 314.2.1 through 314.2.5. \n\n Exception: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils. Condensate drain systems shall be designed, constructed and installed in accordance with Sections 314.2.1 through 314.2.5.\n\nException: Evaporators and cooling coils that are designed to operate in sensible cooling only and not support condensation shall not be required to meet the requirements of this section.",
+  "previewText" : "Condensate drain systems shall be provided for equipment and appliances containing evaporators or cooling coils.",
+  "schemaVersion" : 2,
+  "sectionID" : 11892
+}

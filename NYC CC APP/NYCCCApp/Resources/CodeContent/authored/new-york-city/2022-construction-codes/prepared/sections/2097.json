@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172755\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172755\"><\/AnnotationDrawer><div>Interior exit stairways or ramps or exit passageways shall not be used as a portion of the post-fire smoke purge system in occupancies other than Group R-2. Doors in interior exit stairways or ramps or exit passageways shall not be permitted to be used as a portion of the post-fire smoke purge system. Air transfer and duct openings associated with the post-fire smoke purge system shall not be permitted in the interior exit stairway or ramp or exit passageway.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2097-html-1",
+      "kind" : "html",
+      "plainText" : "Interior exit stairways or ramps or exit passageways shall not be used as a portion of the post-fire smoke purge system in occupancies other than Group R-2. Doors in interior exit stairways or ramps or exit passageways shall not be permitted to be used as a portion of the post-fire smoke purge system. Air transfer and duct openings associated with the post-fire smoke purge system shall not be permitted in the interior exit stairway or ramp or exit passageway."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Interior exit stairways or ramps or exit passageways shall not be used as a portion of the post-fire smoke purge system in occupancies other than Group R-2. Doors in interior exit stairways or ramps or exit passageways shall not be permitted to be used as a portion of the post-fire smoke purge system. Air transfer and duct openings associated with the post-fire smoke purge system shall not be permitted in the interior exit stairway or ramp or exit passageway.",
+  "previewText" : "Interior exit stairways or ramps or exit passageways shall not be used as a portion of the post-fire smoke purge system in occupancies other than Group R-2.",
+  "schemaVersion" : 2,
+  "sectionID" : 2097
+}

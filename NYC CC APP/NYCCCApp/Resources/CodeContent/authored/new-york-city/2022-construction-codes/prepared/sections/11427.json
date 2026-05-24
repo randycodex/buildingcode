@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196111\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196111\"><\/AnnotationDrawer><div>A thermal break shall be provided consisting of asphalt expansion joint materials or similar insulating materials at a point where a heated slab meets a foundation wall or other conductive slab.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11427-html-1",
+      "kind" : "html",
+      "plainText" : "A thermal break shall be provided consisting of asphalt expansion joint materials or similar insulating materials at a point where a heated slab meets a foundation wall or other conductive slab."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "A thermal break shall be provided consisting of asphalt expansion joint materials or similar insulating materials at a point where a heated slab meets a foundation wall or other conductive slab.",
+  "previewText" : "A thermal break shall be provided consisting of asphalt expansion joint materials or similar insulating materials at a point where a heated slab meets a foundation wall or other conductive slab.",
+  "schemaVersion" : 2,
+  "sectionID" : 11427
+}

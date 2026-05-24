@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180726\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180726\"><\/AnnotationDrawer><div>This chapter shall govern the materials, design, construction and quality of masonry.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4564-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern the materials, design, construction and quality of masonry."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "This chapter shall govern the materials, design, construction and quality of masonry.",
+  "previewText" : "This chapter shall govern the materials, design, construction and quality of masonry.",
+  "schemaVersion" : 2,
+  "sectionID" : 4564
+}

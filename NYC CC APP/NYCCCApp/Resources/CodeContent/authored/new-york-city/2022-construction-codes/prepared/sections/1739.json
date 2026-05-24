@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171704\"><\/AnnotationDrawer><div>Existing handles of valves serving existing standpipe systems and existing unpainted standpipe risers that are exposed during alterations, including alterations pursuant to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-155422', hash: '#JD_28-101.4.2' }}\">28-101.4.2<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> shall be painted red. Where the alteration requires a hydrostatic pressure test such painting shall be completed prior to such test.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1739-html-1",
+      "kind" : "html",
+      "plainText" : "Existing handles of valves serving existing standpipe systems and existing unpainted standpipe risers that are exposed during alterations, including alterations pursuant to Section 28-101.4.2 of the Administrative Code shall be painted red. Where the alteration requires a hydrostatic pressure test such painting shall be completed prior to such test."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Existing handles of valves serving existing standpipe systems and existing unpainted standpipe risers that are exposed during alterations, including alterations pursuant to Section 28-101.4.2 of the Administrative Code shall be painted red. Where the alteration requires a hydrostatic pressure test such painting shall be completed prior to such test.",
+  "previewText" : "Existing handles of valves serving existing standpipe systems and existing unpainted standpipe risers that are exposed during alterations, including alterations pursuant to Section 28-101.",
+  "schemaVersion" : 2,
+  "sectionID" : 1739
+}

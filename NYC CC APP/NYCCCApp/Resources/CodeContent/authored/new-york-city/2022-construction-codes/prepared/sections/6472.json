@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186651\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186651\"><\/AnnotationDrawer><div>No deleterious, caustic, or acid materials shall be dumped or mixed within 10 feet (3048 mm) of any tree within the public right-of-way, nor shall salt for the removal of ice or snow be applied when runoff will drain to a tree within the public right-of-way.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186652\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186653\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186653\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Mixing, delivery, or placement of concrete from a concrete mixer or concrete truck.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186654\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186654\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Application of de-icing materials as necessary to prevent slipping and tripping hazards in areas accessible to the public during periods where freezing conditions are to be encountered.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6472-html-1",
+      "kind" : "html",
+      "plainText" : "No deleterious, caustic, or acid materials shall be dumped or mixed within 10 feet (3048 mm) of any tree within the public right-of-way, nor shall salt for the removal of ice or snow be applied when runoff will drain to a tree within the public right-of-way.\n\n Exceptions: \n\n 1. Mixing, delivery, or placement of concrete from a concrete mixer or concrete truck.\n\n 2. Application of de-icing materials as necessary to prevent slipping and tripping hazards in areas accessible to the public during periods where freezing conditions are to be encountered."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "No deleterious, caustic, or acid materials shall be dumped or mixed within 10 feet (3048 mm) of any tree within the public right-of-way, nor shall salt for the removal of ice or snow be applied when runoff will drain to a tree within the public right-of-way.\n\nExceptions:\n\n1. Mixing, delivery, or placement of concrete from a concrete mixer or concrete truck.\n\n2. Application of de-icing materials as necessary to prevent slipping and tripping hazards in areas accessible to the public during periods where freezing conditions are to be encountered.",
+  "previewText" : "No deleterious, caustic, or acid materials shall be dumped or mixed within 10 feet (3048 mm) of any tree within the public right-of-way, nor shall salt for the removal of ice or snow be applied when runoff will drain to a tree within the public right-of-way.",
+  "schemaVersion" : 2,
+  "sectionID" : 6472
+}

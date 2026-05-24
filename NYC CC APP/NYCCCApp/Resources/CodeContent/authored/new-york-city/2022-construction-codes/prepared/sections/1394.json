@@ -1,0 +1,39 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170366\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170366\"><\/AnnotationDrawer><div>The thickness of slabs with ribbed or undulating soffits (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170365', hash: '#JD_BCFigure722.2.2.1.3' }}\">Figure 722.2.2.1.3<\/Link>) shall be determined by one of the following expressions, whichever is applicable:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170367\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170367\"><\/AnnotationDrawer><div>&#160;&#160;&#160;For s <span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;\">&#8805;<\/span> 4t, the thickness to be used shall be t <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170368\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170368\"><\/AnnotationDrawer><div>&#160;&#160;&#160;For s <span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;\">&#8804;<\/span> 2t, the thickness to be used shall be t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">e<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170369\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170369\"><\/AnnotationDrawer><div>&#160;&#160;&#160;For 4t &gt; s &gt; 2t, the thickness to be used shall be<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170370\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170370\"><\/AnnotationDrawer><div>&#160;&#160;&#160;",
+      "id" : "1394-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of slabs with ribbed or undulating soffits (see Figure 722.2.2.1.3 ) shall be determined by one of the following expressions, whichever is applicable:\n\n For s &#8805; 4t, the thickness to be used shall be t \n\n For s &#8804; 2t, the thickness to be used shall be t\n\n e \n\n For 4t > s > 2t, the thickness to be used shall be"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/dd78071efa527e0dd9f0b441adb4d20d382355c0.png\" width=\"168\" height=\"34.4666666666667\"><\/img><\/span>",
+      "id" : "1394-image-2",
+      "imageID" : "dd78071efa527e0dd9f0b441adb4d20d382355c0.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "&#160;&#160;&#160;&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">(Equation 7-5)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170371\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170371\"><\/AnnotationDrawer><div>&#160;&#160;&#160;where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170372\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;&#160;&#160;&#160;s&#160;&#160;&#160;=&#160;&#160;&#160;Spacing of ribs or undulations.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170373\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170373\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;&#160;&#160;&#160;t&#160;&#160;&#160;=&#160;&#160;&#160;Minimum thickness.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170374\"><\/AnnotationDrawer><div><div style=\"\">&#160;&#160;&#160;&#160;&#160;&#160;t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">e&#160;&#160;&#160;<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t=&#160;&#160;&#160;Equivalent thickness of the slab calculated as the net area of the slab divided by the width, in which the maximum thickness used in the calculation shall not exceed 2t.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170375\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170375\"><\/AnnotationDrawer><div>",
+      "id" : "1394-html-3",
+      "kind" : "html",
+      "plainText" : "(Equation 7-5) \n\n where:\n\n s = Spacing of ribs or undulations.\n\n t = Minimum thickness.\n\n t\n\n e \n\n = Equivalent thickness of the slab calculated as the net area of the slab divided by the width, in which the maximum thickness used in the calculation shall not exceed 2t."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/ce66a6d8c2d893ee23e7c8dab86e5722d13c7d47.png\" width=\"576\" height=\"354.066666666667\"><\/img><\/span>",
+      "id" : "1394-image-4",
+      "imageID" : "ce66a6d8c2d893ee23e7c8dab86e5722d13c7d47.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170376\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170376\"><\/AnnotationDrawer><div class=\"Small\">For SI: 1 inch = 25.4 mm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170377\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170377\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure722.2.2.1.3\" id=\"JD_BCFigure722.2.2.1.3\" title=\"BC Figure 722.2.2.1.3\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 722.2.2.1.3<br><\/br>Slabs with Ribbed or Undulating Soffits<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1394-html-5",
+      "kind" : "html",
+      "plainText" : "For SI: 1 inch = 25.4 mm.\n\n Figure 722.2.2.1.3\n Slabs with Ribbed or Undulating Soffits"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The thickness of slabs with ribbed or undulating soffits (see Figure 722.2.2.1.3) shall be determined by one of the following expressions, whichever is applicable:\n\nFor s ≥ 4t, the thickness to be used shall be t\n\nFor s ≤ 2t, the thickness to be used shall be t e\n\nFor 4t > s > 2t, the thickness to be used shall be\n\n(Equation 7-5)\n\nwhere:\n\ns = Spacing of ribs or undulations.\n\nt = Minimum thickness.\n\nt e = Equivalent thickness of the slab calculated as the net area of the slab divided by the width, in which the maximum thickness used in the calculation shall not exceed 2t.\n\nFor SI: 1 inch = 25.4 mm.\n\nFigure 722.2.2.1.3 Slabs with Ribbed or Undulating Soffits",
+  "previewText" : "The thickness of slabs with ribbed or undulating soffits (see Figure 722.",
+  "schemaVersion" : 2,
+  "sectionID" : 1394
+}

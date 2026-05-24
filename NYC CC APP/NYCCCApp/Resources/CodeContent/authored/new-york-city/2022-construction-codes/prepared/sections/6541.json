@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186878\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186878\"><\/AnnotationDrawer><div>Add a new section 11.4.1 to read as follows: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186879\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186879\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">11.4.1 The qualified operator's card shall list the specific models of powder actuated tools that may be used.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6541-html-1",
+      "kind" : "html",
+      "plainText" : "Add a new section 11.4.1 to read as follows: \n\n 11.4.1 The qualified operator's card shall list the specific models of powder actuated tools that may be used."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Add a new section 11.4.1 to read as follows:",
+  "previewText" : "Add a new section 11.",
+  "schemaVersion" : 2,
+  "sectionID" : 6541
+}

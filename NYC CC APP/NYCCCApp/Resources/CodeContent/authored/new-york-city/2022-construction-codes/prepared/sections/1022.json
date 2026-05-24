@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169164\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169164\"><\/AnnotationDrawer><div>The void created at the intersection of a floor\/ceiling assembly and an exterior curtain wall assembly shall be protected in accordance with Section 715.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1022-html-1",
+      "kind" : "html",
+      "plainText" : "The void created at the intersection of a floor\/ceiling assembly and an exterior curtain wall assembly shall be protected in accordance with Section 715.4."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The void created at the intersection of a floor\/ceiling assembly and an exterior curtain wall assembly shall be protected in accordance with Section 715.4.",
+  "previewText" : "The void created at the intersection of a floor\/ceiling assembly and an exterior curtain wall assembly shall be protected in accordance with Section 715.",
+  "schemaVersion" : 2,
+  "sectionID" : 1022
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179744\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179744\"><\/AnnotationDrawer><div>For structures assigned to Seismic Design Category C, a permanent steel casing shall be provided from the top of the micropile down to the point of zero curvature. For structures assigned to Seismic Design Category D, the micropile shall be approved by the commissioner in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156789', hash: '#JD_28-113.2' }}\">28-113.2<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>. The alternative system design, supporting documentation and test data shall be submitted to the commissioner for review and approval.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4196-html-1",
+      "kind" : "html",
+      "plainText" : "For structures assigned to Seismic Design Category C, a permanent steel casing shall be provided from the top of the micropile down to the point of zero curvature. For structures assigned to Seismic Design Category D, the micropile shall be approved by the commissioner in accordance with Section 28-113.2 of the Administrative Code . The alternative system design, supporting documentation and test data shall be submitted to the commissioner for review and approval."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "For structures assigned to Seismic Design Category C, a permanent steel casing shall be provided from the top of the micropile down to the point of zero curvature. For structures assigned to Seismic Design Category D, the micropile shall be approved by the commissioner in accordance with Section 28-113.2 of the Administrative Code. The alternative system design, supporting documentation and test data shall be submitted to the commissioner for review and approval.",
+  "previewText" : "For structures assigned to Seismic Design Category C, a permanent steel casing shall be provided from the top of the micropile down to the point of zero curvature.",
+  "schemaVersion" : 2,
+  "sectionID" : 4196
+}

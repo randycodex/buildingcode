@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180027\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180027\"><\/AnnotationDrawer><div>Backpacking of any voids shall be performed at each excavation lift.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4291-html-1",
+      "kind" : "html",
+      "plainText" : "Backpacking of any voids shall be performed at each excavation lift."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Backpacking of any voids shall be performed at each excavation lift.",
+  "previewText" : "Backpacking of any voids shall be performed at each excavation lift.",
+  "schemaVersion" : 2,
+  "sectionID" : 4291
+}

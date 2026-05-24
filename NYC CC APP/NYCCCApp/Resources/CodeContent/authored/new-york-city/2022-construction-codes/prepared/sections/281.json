@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166726\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166726\"><\/AnnotationDrawer><div>A standby power system complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183487', hash: '#JD_BC2702' }}\">2702<\/Link> shall be provided for standby power loads specified in Sections 403.4.8.3.1 and 403.4.8.3.2. Fuel sources for generators shall be in accordance with Section 2702.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "281-html-1",
+      "kind" : "html",
+      "plainText" : "A standby power system complying with Section 2702 shall be provided for standby power loads specified in Sections 403.4.8.3.1 and 403.4.8.3.2. Fuel sources for generators shall be in accordance with Section 2702.1.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A standby power system complying with Section 2702 shall be provided for standby power loads specified in Sections 403.4.8.3.1 and 403.4.8.3.2. Fuel sources for generators shall be in accordance with Section 2702.1.1.",
+  "previewText" : "A standby power system complying with Section 2702 shall be provided for standby power loads specified in Sections 403.",
+  "schemaVersion" : 2,
+  "sectionID" : 281
+}

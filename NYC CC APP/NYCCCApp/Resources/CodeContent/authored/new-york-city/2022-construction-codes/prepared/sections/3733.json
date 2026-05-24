@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178351\"><\/AnnotationDrawer><div>The fabrication of prefabricated wood I-joists and glued prefabricated parallel chord wood trusses shall be subject to special inspections in accordance with Section 1704.2 and the requirements of Section 2303.1.2. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178352\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178352\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224362\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224362\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3733-html-1",
+      "kind" : "html",
+      "plainText" : "The fabrication of prefabricated wood I-joists and glued prefabricated parallel chord wood trusses shall be subject to special inspections in accordance with Section 1704.2 and the requirements of Section 2303.1.2. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "The fabrication of prefabricated wood I-joists and glued prefabricated parallel chord wood trusses shall be subject to special inspections in accordance with Section 1704.2 and the requirements of Section 2303.1.2.\n\n(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077.",
+  "previewText" : "The fabrication of prefabricated wood I-joists and glued prefabricated parallel chord wood trusses shall be subject to special inspections in accordance with Section 1704.",
+  "schemaVersion" : 2,
+  "sectionID" : 3733
+}

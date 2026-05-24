@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194448\"><\/AnnotationDrawer><div>Upon activation, the smoke detectors shall shut down all operational capabilities of the air distribution systems serving the affected areas in accordance with the listing and labeling of appliances used in the system. Air distribution systems that are part of a smoke control system shall switch to the smoke control mode upon activation of a detector.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10835-html-1",
+      "kind" : "html",
+      "plainText" : "Upon activation, the smoke detectors shall shut down all operational capabilities of the air distribution systems serving the affected areas in accordance with the listing and labeling of appliances used in the system. Air distribution systems that are part of a smoke control system shall switch to the smoke control mode upon activation of a detector."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Upon activation, the smoke detectors shall shut down all operational capabilities of the air distribution systems serving the affected areas in accordance with the listing and labeling of appliances used in the system. Air distribution systems that are part of a smoke control system shall switch to the smoke control mode upon activation of a detector.",
+  "previewText" : "Upon activation, the smoke detectors shall shut down all operational capabilities of the air distribution systems serving the affected areas in accordance with the listing and labeling of appliances used in the system.",
+  "schemaVersion" : 2,
+  "sectionID" : 10835
+}

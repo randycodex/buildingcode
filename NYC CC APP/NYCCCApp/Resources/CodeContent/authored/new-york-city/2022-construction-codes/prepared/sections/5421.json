@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183657\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183657\"><\/AnnotationDrawer><div>Prior code buildings shall be permitted to comply with Section 3001.11.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5421-html-1",
+      "kind" : "html",
+      "plainText" : "Prior code buildings shall be permitted to comply with Section 3001.11.1."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Prior code buildings shall be permitted to comply with Section 3001.11.1.",
+  "previewText" : "Prior code buildings shall be permitted to comply with Section 3001.",
+  "schemaVersion" : 2,
+  "sectionID" : 5421
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194892\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194892\"><\/AnnotationDrawer><div>The chimney or vent shall be resized as necessary to control flue gas condensation in the interior of the chimney or vent and to provide the appliance or appliances served with the required draft. For the venting of oil-fired appliances to masonry chimneys, the resizing shall be in accordance with NFPA 31.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10978-html-1",
+      "kind" : "html",
+      "plainText" : "The chimney or vent shall be resized as necessary to control flue gas condensation in the interior of the chimney or vent and to provide the appliance or appliances served with the required draft. For the venting of oil-fired appliances to masonry chimneys, the resizing shall be in accordance with NFPA 31."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "The chimney or vent shall be resized as necessary to control flue gas condensation in the interior of the chimney or vent and to provide the appliance or appliances served with the required draft. For the venting of oil-fired appliances to masonry chimneys, the resizing shall be in accordance with NFPA 31.",
+  "previewText" : "The chimney or vent shall be resized as necessary to control flue gas condensation in the interior of the chimney or vent and to provide the appliance or appliances served with the required draft.",
+  "schemaVersion" : 2,
+  "sectionID" : 10978
+}

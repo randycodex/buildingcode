@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170819\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170819\"><\/AnnotationDrawer><div>Fastening of wood frame assemblies and the fastening of membranes to the wood framing members shall be done in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-181504', hash: '#JD_BCCh.23' }}\">Chapter 23<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "1476-html-1",
+      "kind" : "html",
+      "plainText" : "Fastening of wood frame assemblies and the fastening of membranes to the wood framing members shall be done in accordance with Chapter 23 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fastening of wood frame assemblies and the fastening of membranes to the wood framing members shall be done in accordance with Chapter 23.",
+  "previewText" : "Fastening of wood frame assemblies and the fastening of membranes to the wood framing members shall be done in accordance with Chapter 23.",
+  "schemaVersion" : 2,
+  "sectionID" : 1476
+}

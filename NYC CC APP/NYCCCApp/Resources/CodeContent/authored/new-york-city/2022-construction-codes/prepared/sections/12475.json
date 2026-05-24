@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162902\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Food-handling equipment, in other than dwelling units, clear-water waste, dishwashing machines and utensils, pots, pans and dishwashing sinks shall discharge through an indirect waste pipe as specified in Sections 802.1.1 through 802.1.8. Health-care related fixtures, devices and equipment shall discharge to the drainage system through an indirect waste pipe by means of an air gap in accordance with this chapter and Section 713.3. Fixtures not required by this section to be indirectly connected shall be directly connected to the plumbing system in accordance with <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162437', hash: '#JD_PCCh.7' }}\">Chapter 7<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12475-html-1",
+      "kind" : "html",
+      "plainText" : "Food-handling equipment, in other than dwelling units, clear-water waste, dishwashing machines and utensils, pots, pans and dishwashing sinks shall discharge through an indirect waste pipe as specified in Sections 802.1.1 through 802.1.8. Health-care related fixtures, devices and equipment shall discharge to the drainage system through an indirect waste pipe by means of an air gap in accordance with this chapter and Section 713.3. Fixtures not required by this section to be indirectly connected shall be directly connected to the plumbing system in accordance with Chapter 7 ."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Food-handling equipment, in other than dwelling units, clear-water waste, dishwashing machines and utensils, pots, pans and dishwashing sinks shall discharge through an indirect waste pipe as specified in Sections 802.1.1 through 802.1.8. Health-care related fixtures, devices and equipment shall discharge to the drainage system through an indirect waste pipe by means of an air gap in accordance with this chapter and Section 713.3. Fixtures not required by this section to be indirectly connected shall be directly connected to the plumbing system in accordance with Chapter 7.",
+  "previewText" : "Food-handling equipment, in other than dwelling units, clear-water waste, dishwashing machines and utensils, pots, pans and dishwashing sinks shall discharge through an indirect waste pipe as specified in Sections 802.",
+  "schemaVersion" : 2,
+  "sectionID" : 12475
+}

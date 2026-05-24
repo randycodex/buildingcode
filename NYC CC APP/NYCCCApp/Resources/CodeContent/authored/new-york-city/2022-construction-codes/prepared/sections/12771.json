@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163722\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163722\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Each nonpotable water storage tank shall be labeled with its rated capacity. The contents of storage tanks shall be identified with the words \"CAUTION: NONPOTABLE WATER &#8211; DO NOT DRINK.\" Where an opening is provided that could allow the entry of personnel, the opening shall be marked with the words, \"DANGER &#8211; CONFINED SPACE.\" Markings shall be indelibly printed on the tank or on a tag or sign constructed of corrosion-resistant waterproof material that is mounted on the tank. The letters of the words shall be not less than 0.5 inch (12.7 mm) in height and shall be of a color in contrast with the background on which they are applied.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12771-html-1",
+      "kind" : "html",
+      "plainText" : "Each nonpotable water storage tank shall be labeled with its rated capacity. The contents of storage tanks shall be identified with the words \"CAUTION: NONPOTABLE WATER - DO NOT DRINK.\" Where an opening is provided that could allow the entry of personnel, the opening shall be marked with the words, \"DANGER - CONFINED SPACE.\" Markings shall be indelibly printed on the tank or on a tag or sign constructed of corrosion-resistant waterproof material that is mounted on the tank. The letters of the words shall be not less than 0.5 inch (12.7 mm) in height and shall be of a color in contrast with the background on which they are applied."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Each nonpotable water storage tank shall be labeled with its rated capacity. The contents of storage tanks shall be identified with the words \"CAUTION: NONPOTABLE WATER – DO NOT DRINK.\" Where an opening is provided that could allow the entry of personnel, the opening shall be marked with the words, \"DANGER – CONFINED SPACE.\" Markings shall be indelibly printed on the tank or on a tag or sign constructed of corrosion-resistant waterproof material that is mounted on the tank. The letters of the words shall be not less than 0.5 inch (12.7 mm) in height and shall be of a color in contrast with the background on which they are applied.",
+  "previewText" : "Each nonpotable water storage tank shall be labeled with its rated capacity.",
+  "schemaVersion" : 2,
+  "sectionID" : 12771
+}

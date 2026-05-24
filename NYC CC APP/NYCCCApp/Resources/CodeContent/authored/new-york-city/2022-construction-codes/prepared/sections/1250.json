@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169801\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169801\"><\/AnnotationDrawer><div>Fire-resistance-rated glazing shall comply with the size limitations in Section 716.5.8.1.1. Fire-protection-rated glazing shall comply with the size limitations of NFPA 80, and as provided in Section 716.5.8.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1250-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-resistance-rated glazing shall comply with the size limitations in Section 716.5.8.1.1. Fire-protection-rated glazing shall comply with the size limitations of NFPA 80, and as provided in Section 716.5.8.1.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire-resistance-rated glazing shall comply with the size limitations in Section 716.5.8.1.1. Fire-protection-rated glazing shall comply with the size limitations of NFPA 80, and as provided in Section 716.5.8.1.2.",
+  "previewText" : "Fire-resistance-rated glazing shall comply with the size limitations in Section 716.",
+  "schemaVersion" : 2,
+  "sectionID" : 1250
+}

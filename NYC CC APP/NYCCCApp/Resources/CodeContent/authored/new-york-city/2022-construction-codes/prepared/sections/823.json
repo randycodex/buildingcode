@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168343\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168343\"><\/AnnotationDrawer><div>Fume hoods shall be exhausted to the outdoors. Controls for hood fans shall be interlocked so that contaminated air cannot be drawn into any space from a hood where the exhaust fan is not in operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "823-html-1",
+      "kind" : "html",
+      "plainText" : "Fume hoods shall be exhausted to the outdoors. Controls for hood fans shall be interlocked so that contaminated air cannot be drawn into any space from a hood where the exhaust fan is not in operation."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Fume hoods shall be exhausted to the outdoors. Controls for hood fans shall be interlocked so that contaminated air cannot be drawn into any space from a hood where the exhaust fan is not in operation.",
+  "previewText" : "Fume hoods shall be exhausted to the outdoors.",
+  "schemaVersion" : 2,
+  "sectionID" : 823
+}

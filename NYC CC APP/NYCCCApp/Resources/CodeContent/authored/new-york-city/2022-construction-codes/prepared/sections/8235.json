@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197955\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197955\"><\/AnnotationDrawer><div>Branches shall be taken off the riser with not less than a two-elbow swing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8235-html-1",
+      "kind" : "html",
+      "plainText" : "Branches shall be taken off the riser with not less than a two-elbow swing."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Branches shall be taken off the riser with not less than a two-elbow swing.",
+  "previewText" : "Branches shall be taken off the riser with not less than a two-elbow swing.",
+  "schemaVersion" : 2,
+  "sectionID" : 8235
+}

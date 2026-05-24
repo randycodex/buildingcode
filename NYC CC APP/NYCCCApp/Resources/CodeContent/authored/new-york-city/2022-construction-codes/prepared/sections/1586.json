@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171256\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171256\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be provided throughout all Group F-1 occupancy fire areas that contain woodworking operations in excess of 2,500 square feet (232.3 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area that generate finely divided combustible waste or use finely divided combustible materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1586-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be provided throughout all Group F-1 occupancy fire areas that contain woodworking operations in excess of 2,500 square feet (232.3 m\n\n 2 \n\n ) in area that generate finely divided combustible waste or use finely divided combustible materials."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "An automatic sprinkler system shall be provided throughout all Group F-1 occupancy fire areas that contain woodworking operations in excess of 2,500 square feet (232.3 m 2 ) in area that generate finely divided combustible waste or use finely divided combustible materials.",
+  "previewText" : "An automatic sprinkler system shall be provided throughout all Group F-1 occupancy fire areas that contain woodworking operations in excess of 2,500 square feet (232.",
+  "schemaVersion" : 2,
+  "sectionID" : 1586
+}

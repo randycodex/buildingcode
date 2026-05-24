@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175974\"><\/AnnotationDrawer><div>Access to mechanical appliances installed in under-floor areas, in attic spaces and on roofs or elevated structures shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-175975\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-175975\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-175975\"><\/AnnotationDrawer><h6><a name=\"JD_BC1210\" id=\"JD_BC1210\" title=\"BC 1210\"><\/a>Section BC 1210: Toilet and Bathroom Requirements<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3031-html-1",
+      "kind" : "html",
+      "plainText" : "Access to mechanical appliances installed in under-floor areas, in attic spaces and on roofs or elevated structures shall be in accordance with the New York City Mechanical Code. \n\n Section BC 1210: Toilet and Bathroom Requirements"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Access to mechanical appliances installed in under-floor areas, in attic spaces and on roofs or elevated structures shall be in accordance with the New York City Mechanical Code.",
+  "previewText" : "Access to mechanical appliances installed in under-floor areas, in attic spaces and on roofs or elevated structures shall be in accordance with the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 3031
+}

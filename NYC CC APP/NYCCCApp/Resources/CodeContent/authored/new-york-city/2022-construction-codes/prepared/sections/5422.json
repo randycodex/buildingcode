@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183659\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183659\"><\/AnnotationDrawer><div>Elevators cabs installed in existing shafts shall be permitted to be smaller than that required by this chapter where necessary to fit in the existing shaft.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183660\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183660\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> An existing elevator shaft shall be enlarged or a new elevator shaft shall be constructed to accommodate an elevator cab in compliance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174748', hash: '#JD_BCCh.11' }}\">Chapter 11<\/Link> where the entire building is required to be accessible pursuant to either Item 1 of Section 1101.3.1, or Section 1101.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183661\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183661\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183661\"><\/AnnotationDrawer><h6><a name=\"JD_BC3002\" id=\"JD_BC3002\" title=\"BC 3002\"><\/a>Section BC 3002: Hoistway Enclosures<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5422-html-1",
+      "kind" : "html",
+      "plainText" : "Elevators cabs installed in existing shafts shall be permitted to be smaller than that required by this chapter where necessary to fit in the existing shaft.\n\n Exception: An existing elevator shaft shall be enlarged or a new elevator shaft shall be constructed to accommodate an elevator cab in compliance with Chapter 11 where the entire building is required to be accessible pursuant to either Item 1 of Section 1101.3.1, or Section 1101.3.2.\n\n Section BC 3002: Hoistway Enclosures"
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Elevators cabs installed in existing shafts shall be permitted to be smaller than that required by this chapter where necessary to fit in the existing shaft.\n\nException: An existing elevator shaft shall be enlarged or a new elevator shaft shall be constructed to accommodate an elevator cab in compliance with Chapter 11 where the entire building is required to be accessible pursuant to either Item 1 of Section 1101.3.1, or Section 1101.3.2.",
+  "previewText" : "Elevators cabs installed in existing shafts shall be permitted to be smaller than that required by this chapter where necessary to fit in the existing shaft.",
+  "schemaVersion" : 2,
+  "sectionID" : 5422
+}

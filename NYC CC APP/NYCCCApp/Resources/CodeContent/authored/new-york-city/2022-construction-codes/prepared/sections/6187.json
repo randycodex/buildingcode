@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185792\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185792\"><\/AnnotationDrawer><div>The structure shall be properly aligned before riveting, permanent bolting, or welding is performed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6187-html-1",
+      "kind" : "html",
+      "plainText" : "The structure shall be properly aligned before riveting, permanent bolting, or welding is performed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The structure shall be properly aligned before riveting, permanent bolting, or welding is performed.",
+  "previewText" : "The structure shall be properly aligned before riveting, permanent bolting, or welding is performed.",
+  "schemaVersion" : 2,
+  "sectionID" : 6187
+}

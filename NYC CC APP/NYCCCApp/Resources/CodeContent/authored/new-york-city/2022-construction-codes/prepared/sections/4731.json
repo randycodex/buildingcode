@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181233\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181233\"><\/AnnotationDrawer><div>When two or more flues are located in the same chimney, masonry wythes shall be built between adjacent flue linings. The masonry wythes shall be at least 4 inches (102 mm) thick and bonded into the walls of the chimney.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181234\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181234\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> When venting only one appliance, two flues are permitted to adjoin each other in the same chimney with only the flue lining separation between them. The joints of the adjacent flue linings shall be staggered not less than 4 inches (102 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4731-html-1",
+      "kind" : "html",
+      "plainText" : "When two or more flues are located in the same chimney, masonry wythes shall be built between adjacent flue linings. The masonry wythes shall be at least 4 inches (102 mm) thick and bonded into the walls of the chimney.\n\n Exception: When venting only one appliance, two flues are permitted to adjoin each other in the same chimney with only the flue lining separation between them. The joints of the adjacent flue linings shall be staggered not less than 4 inches (102 mm)."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "When two or more flues are located in the same chimney, masonry wythes shall be built between adjacent flue linings. The masonry wythes shall be at least 4 inches (102 mm) thick and bonded into the walls of the chimney.\n\nException: When venting only one appliance, two flues are permitted to adjoin each other in the same chimney with only the flue lining separation between them. The joints of the adjacent flue linings shall be staggered not less than 4 inches (102 mm).",
+  "previewText" : "When two or more flues are located in the same chimney, masonry wythes shall be built between adjacent flue linings.",
+  "schemaVersion" : 2,
+  "sectionID" : 4731
+}

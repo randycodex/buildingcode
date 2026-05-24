@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188155\"><\/AnnotationDrawer><div>Accessible communication features complying with Chapter 7 of ICC A117.1 shall be provided in accordance with Sections E104.2.1 through E104.2.4 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6887-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible communication features complying with Chapter 7 of ICC A117.1 shall be provided in accordance with Sections E104.2.1 through E104.2.4 of this code."
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "Accessible communication features complying with Chapter 7 of ICC A117.1 shall be provided in accordance with Sections E104.2.1 through E104.2.4 of this code.",
+  "previewText" : "Accessible communication features complying with Chapter 7 of ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 6887
+}

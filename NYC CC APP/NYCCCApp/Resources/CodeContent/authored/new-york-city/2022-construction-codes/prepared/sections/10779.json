@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194292\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194292\"><\/AnnotationDrawer><div>Ducts shall be classified based on the maximum operating pressure of the duct at pressures of positive or negative 0.5, 1.0, 2.0, 3.0, 4.0, 6.0 or 10.0 inches (1 inch w.c. = 248.7 Pa) of water column. The pressure classification of ducts shall equal or exceed the design pressure of the air distribution in which the ducts are utilized.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10779-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts shall be classified based on the maximum operating pressure of the duct at pressures of positive or negative 0.5, 1.0, 2.0, 3.0, 4.0, 6.0 or 10.0 inches (1 inch w.c. = 248.7 Pa) of water column. The pressure classification of ducts shall equal or exceed the design pressure of the air distribution in which the ducts are utilized."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Ducts shall be classified based on the maximum operating pressure of the duct at pressures of positive or negative 0.5, 1.0, 2.0, 3.0, 4.0, 6.0 or 10.0 inches (1 inch w.c. = 248.7 Pa) of water column. The pressure classification of ducts shall equal or exceed the design pressure of the air distribution in which the ducts are utilized.",
+  "previewText" : "Ducts shall be classified based on the maximum operating pressure of the duct at pressures of positive or negative 0.",
+  "schemaVersion" : 2,
+  "sectionID" : 10779
+}

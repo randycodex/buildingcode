@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161507\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161507\"><\/AnnotationDrawer><div>Accessible plumbing facilities and fixtures shall be provided in accordance with the New York city building code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11926-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible plumbing facilities and fixtures shall be provided in accordance with the New York city building code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Accessible plumbing facilities and fixtures shall be provided in accordance with the New York city building code.",
+  "previewText" : "Accessible plumbing facilities and fixtures shall be provided in accordance with the New York city building code.",
+  "schemaVersion" : 2,
+  "sectionID" : 11926
+}

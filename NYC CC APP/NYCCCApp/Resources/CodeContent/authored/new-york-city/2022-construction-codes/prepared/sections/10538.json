@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193569\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193569\"><\/AnnotationDrawer><div>Ventilation shall be provided for portions of properties where flammable and combustible liquids are received by tank vessels, pipelines, tank cars or tank vehicles and which are stored or blended in bulk for the purpose of distributing such liquids by tank vessels, pipelines, tank cars, tank vehicles or containers as required by Sections 502.9.5.5.1 through 502.9.5.5.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10538-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation shall be provided for portions of properties where flammable and combustible liquids are received by tank vessels, pipelines, tank cars or tank vehicles and which are stored or blended in bulk for the purpose of distributing such liquids by tank vessels, pipelines, tank cars, tank vehicles or containers as required by Sections 502.9.5.5.1 through 502.9.5.5.3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Ventilation shall be provided for portions of properties where flammable and combustible liquids are received by tank vessels, pipelines, tank cars or tank vehicles and which are stored or blended in bulk for the purpose of distributing such liquids by tank vessels, pipelines, tank cars, tank vehicles or containers as required by Sections 502.9.5.5.1 through 502.9.5.5.3.",
+  "previewText" : "Ventilation shall be provided for portions of properties where flammable and combustible liquids are received by tank vessels, pipelines, tank cars or tank vehicles and which are stored or blended in bulk for the purpose of distributing such liquids by tank vessels, pipelines, tank cars, tank vehicles or containers as required by Sections 502.",
+  "schemaVersion" : 2,
+  "sectionID" : 10538
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168097\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168097\"><\/AnnotationDrawer><div>Spraying spaces shall be ventilated with an exhaust system capable of at least six air changes per hour to prevent the accumulation of flammable mist or vapors in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span> Where such spaces are not separately enclosed, noncombustible spray curtains shall be provided to restrict the spread of flammable vapors.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "730-html-1",
+      "kind" : "html",
+      "plainText" : "Spraying spaces shall be ventilated with an exhaust system capable of at least six air changes per hour to prevent the accumulation of flammable mist or vapors in accordance with the New York City Mechanical Code. Where such spaces are not separately enclosed, noncombustible spray curtains shall be provided to restrict the spread of flammable vapors."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Spraying spaces shall be ventilated with an exhaust system capable of at least six air changes per hour to prevent the accumulation of flammable mist or vapors in accordance with the New York City Mechanical Code. Where such spaces are not separately enclosed, noncombustible spray curtains shall be provided to restrict the spread of flammable vapors.",
+  "previewText" : "Spraying spaces shall be ventilated with an exhaust system capable of at least six air changes per hour to prevent the accumulation of flammable mist or vapors in accordance with the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 730
+}

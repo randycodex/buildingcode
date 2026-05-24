@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177661\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177661\"><\/AnnotationDrawer><div>For each selected wind direction at which the wind loads are to be evaluated, the exposure of the building or structure shall be determined for the two upwind sectors extending 45 degrees (0.79 rad) either side of the selected wind direction. The exposures in these two sectors shall be determined in accordance with Sections 1609.4.2 and 1609.4.3 and the exposure resulting in the highest wind loads shall be used to represent winds from that direction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3562-html-1",
+      "kind" : "html",
+      "plainText" : "For each selected wind direction at which the wind loads are to be evaluated, the exposure of the building or structure shall be determined for the two upwind sectors extending 45 degrees (0.79 rad) either side of the selected wind direction. The exposures in these two sectors shall be determined in accordance with Sections 1609.4.2 and 1609.4.3 and the exposure resulting in the highest wind loads shall be used to represent winds from that direction."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "For each selected wind direction at which the wind loads are to be evaluated, the exposure of the building or structure shall be determined for the two upwind sectors extending 45 degrees (0.79 rad) either side of the selected wind direction. The exposures in these two sectors shall be determined in accordance with Sections 1609.4.2 and 1609.4.3 and the exposure resulting in the highest wind loads shall be used to represent winds from that direction.",
+  "previewText" : "For each selected wind direction at which the wind loads are to be evaluated, the exposure of the building or structure shall be determined for the two upwind sectors extending 45 degrees (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 3562
+}

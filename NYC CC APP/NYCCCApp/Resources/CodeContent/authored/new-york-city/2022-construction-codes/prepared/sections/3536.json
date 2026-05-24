@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177559\"><\/AnnotationDrawer><div>The ground snow loads to be used in determining the design snow loads for roofs is 25 psf (1.2 kN\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3536-html-1",
+      "kind" : "html",
+      "plainText" : "The ground snow loads to be used in determining the design snow loads for roofs is 25 psf (1.2 kN\/m\n\n 2 \n\n )."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "The ground snow loads to be used in determining the design snow loads for roofs is 25 psf (1.2 kN\/m 2 ).",
+  "previewText" : "The ground snow loads to be used in determining the design snow loads for roofs is 25 psf (1.",
+  "schemaVersion" : 2,
+  "sectionID" : 3536
+}

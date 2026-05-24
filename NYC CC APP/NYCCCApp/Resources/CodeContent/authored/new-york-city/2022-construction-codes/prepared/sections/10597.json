@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193722\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193722\"><\/AnnotationDrawer><div>The maximum length of the exhaust duct shall be determined by the dryer manufacturer's instructions. The special inspector shall be provided with a copy of the instructions for the make and model of the dryer. Where the exhaust duct is to be concealed, the installation instructions shall be provided to the special inspector prior to the concealment inspection. In the absence of fitting equivalent length calculations from the clothes dryer manufacturer, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193715', hash: '#JD_MCTable504.8.4.1' }}\">Table 504.8.4.1<\/Link> shall be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10597-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum length of the exhaust duct shall be determined by the dryer manufacturer's instructions. The special inspector shall be provided with a copy of the instructions for the make and model of the dryer. Where the exhaust duct is to be concealed, the installation instructions shall be provided to the special inspector prior to the concealment inspection. In the absence of fitting equivalent length calculations from the clothes dryer manufacturer, Table 504.8.4.1 shall be used."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "The maximum length of the exhaust duct shall be determined by the dryer manufacturer's instructions. The special inspector shall be provided with a copy of the instructions for the make and model of the dryer. Where the exhaust duct is to be concealed, the installation instructions shall be provided to the special inspector prior to the concealment inspection. In the absence of fitting equivalent length calculations from the clothes dryer manufacturer, Table 504.8.4.1 shall be used.",
+  "previewText" : "The maximum length of the exhaust duct shall be determined by the dryer manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 10597
+}

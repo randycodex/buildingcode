@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171501\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171501\"><\/AnnotationDrawer><div>Each required commercial kitchen exhaust hood and duct system required by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193364', hash: '#JD_MCCh.5' }}\">Chapter 5<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> to have a Type I hood shall be protected with an automatic fire-extinguishing system installed in accordance with this code and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171502\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171502\"><\/AnnotationDrawer><div>(Am. L.L. 2018\/195, 12\/1\/2018, eff. 5\/30\/2019) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171503\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171503\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-129017', hash: '#JD_L.L.2018\/195' }}\">L.L. 2018\/195<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1669-html-1",
+      "kind" : "html",
+      "plainText" : "Each required commercial kitchen exhaust hood and duct system required by Chapter 5 of the New York City Mechanical Code to have a Type I hood shall be protected with an automatic fire-extinguishing system installed in accordance with this code and the New York City Fire Code . \n\n (Am. L.L. 2018\/195, 12\/1\/2018, eff. 5\/30\/2019) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018\/195 ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Each required commercial kitchen exhaust hood and duct system required by Chapter 5 of the New York City Mechanical Code to have a Type I hood shall be protected with an automatic fire-extinguishing system installed in accordance with this code and the New York City Fire Code.\n\n(Am. L.L. 2018\/195, 12\/1\/2018, eff. 5\/30\/2019)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018\/195.",
+  "previewText" : "Each required commercial kitchen exhaust hood and duct system required by Chapter 5 of the New York City Mechanical Code to have a Type I hood shall be protected with an automatic fire-extinguishing system installed in accordance with this code and the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 1669
+}

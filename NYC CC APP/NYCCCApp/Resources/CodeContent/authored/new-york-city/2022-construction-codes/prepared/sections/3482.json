@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "2. A single concentrated live load, L, of 3,000 pounds (13.35 kN) applied over an area of 4.5 inches by 4.5 inches (114.3 mm by 114.3 mm) and located so as to produce the maximum load effects on the structural elements under consideration. The concentrated load is not required to act concurrently with other uniform or concentrated live loads.\n\n3. Two single concentrated live loads, L, 8 feet (2438.4 mm) apart applied on the landing pad (representing the helicopter's two main landing gear, whether skid type or wheeled type), each having a magnitude of 0.75 times the maximum take-off weight of the helicopter, and located so as to produce the maximum load effects on the structural elements under consideration. The concentrated loads shall be applied over an area of 8 inches by 8 inches (203.2 mm by 203.2 mm) and are not required to act concurrently with other uniform or concentrated live loads.\n\nLanding areas designed for a design basis helicopter with maximum take-off weight of 3,000-pounds (13.35 kN) shall be identified with a 3,000 pound (13.34 kN) weight limitation. The landing area weight limitation shall be indicated by the numeral \"3\" (kips) located in the bottom right corner of the landing area as viewed from the primary approach path. The indication for the landing area weight limitation shall be a minimum 5 feet (1524 mm) in height.",
+  "previewText" : "2.",
+  "schemaVersion" : 2,
+  "sectionID" : 3482
+}

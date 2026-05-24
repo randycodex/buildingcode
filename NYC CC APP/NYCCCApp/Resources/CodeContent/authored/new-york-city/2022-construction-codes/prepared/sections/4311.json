@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180080\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180080\"><\/AnnotationDrawer><div>The reviewing engineer shall submit a report to the department stating whether or not the geotechnical design shown on the plans, reports and specifications generally conforms to the requirements of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4311-html-1",
+      "kind" : "html",
+      "plainText" : "The reviewing engineer shall submit a report to the department stating whether or not the geotechnical design shown on the plans, reports and specifications generally conforms to the requirements of this code."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The reviewing engineer shall submit a report to the department stating whether or not the geotechnical design shown on the plans, reports and specifications generally conforms to the requirements of this code.",
+  "previewText" : "The reviewing engineer shall submit a report to the department stating whether or not the geotechnical design shown on the plans, reports and specifications generally conforms to the requirements of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 4311
+}

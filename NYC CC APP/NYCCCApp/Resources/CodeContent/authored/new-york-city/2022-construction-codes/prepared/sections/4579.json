@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180836\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180836\"><\/AnnotationDrawer><div>Chemical-resistant furan mortar and grout that are used to install ceramic tile shall comply with ANSI A118.5. Tile set and grouted with furan shall be installed in accordance with ANSI A108.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4579-html-1",
+      "kind" : "html",
+      "plainText" : "Chemical-resistant furan mortar and grout that are used to install ceramic tile shall comply with ANSI A118.5. Tile set and grouted with furan shall be installed in accordance with ANSI A108.8."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "Chemical-resistant furan mortar and grout that are used to install ceramic tile shall comply with ANSI A118.5. Tile set and grouted with furan shall be installed in accordance with ANSI A108.8.",
+  "previewText" : "Chemical-resistant furan mortar and grout that are used to install ceramic tile shall comply with ANSI A118.",
+  "schemaVersion" : 2,
+  "sectionID" : 4579
+}

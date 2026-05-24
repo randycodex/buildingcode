@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198769\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198769\"><\/AnnotationDrawer><div>Where the vent connector used for an appliance having a draft hood or a Category I appliance is located in or passes through attics, crawl spaces or other unconditioned spaces, that portion of the vent connector shall be listed Type B, Type L or listed vent material having equivalent insulation properties.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8539-html-1",
+      "kind" : "html",
+      "plainText" : "Where the vent connector used for an appliance having a draft hood or a Category I appliance is located in or passes through attics, crawl spaces or other unconditioned spaces, that portion of the vent connector shall be listed Type B, Type L or listed vent material having equivalent insulation properties."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Where the vent connector used for an appliance having a draft hood or a Category I appliance is located in or passes through attics, crawl spaces or other unconditioned spaces, that portion of the vent connector shall be listed Type B, Type L or listed vent material having equivalent insulation properties.",
+  "previewText" : "Where the vent connector used for an appliance having a draft hood or a Category I appliance is located in or passes through attics, crawl spaces or other unconditioned spaces, that portion of the vent connector shall be listed Type B, Type L or listed vent material having equivalent insulation properties.",
+  "schemaVersion" : 2,
+  "sectionID" : 8539
+}

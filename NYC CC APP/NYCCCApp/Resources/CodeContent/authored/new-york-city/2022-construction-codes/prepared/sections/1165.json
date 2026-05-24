@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169538\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169538\"><\/AnnotationDrawer><div>The shaft enclosure shall be of materials permitted by the building type of construction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169539\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Noncombustible materials shall be used for shaft enclosures in Group I-1, R-1 and R-2 buildings irrespective of the building type of construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1165-html-1",
+      "kind" : "html",
+      "plainText" : "The shaft enclosure shall be of materials permitted by the building type of construction.\n\n Exception: Noncombustible materials shall be used for shaft enclosures in Group I-1, R-1 and R-2 buildings irrespective of the building type of construction."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The shaft enclosure shall be of materials permitted by the building type of construction.\n\nException: Noncombustible materials shall be used for shaft enclosures in Group I-1, R-1 and R-2 buildings irrespective of the building type of construction.",
+  "previewText" : "The shaft enclosure shall be of materials permitted by the building type of construction.",
+  "schemaVersion" : 2,
+  "sectionID" : 1165
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198072\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198072\"><\/AnnotationDrawer><div>Pipe joints and piping including welds, shall be left exposed for examination during the test.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198073\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198073\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Covered or concealed pipe end joints that have been previously inspected in accordance with this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8278-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe joints and piping including welds, shall be left exposed for examination during the test.\n\n Exception: Covered or concealed pipe end joints that have been previously inspected in accordance with this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Pipe joints and piping including welds, shall be left exposed for examination during the test.\n\nException: Covered or concealed pipe end joints that have been previously inspected in accordance with this code.",
+  "previewText" : "Pipe joints and piping including welds, shall be left exposed for examination during the test.",
+  "schemaVersion" : 2,
+  "sectionID" : 8278
+}

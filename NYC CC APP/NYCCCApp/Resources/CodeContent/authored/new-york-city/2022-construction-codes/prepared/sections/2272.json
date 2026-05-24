@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173469\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173469\"><\/AnnotationDrawer><div>The unlatching of any door or leaf shall not require more than one operation.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173470\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173470\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> More than one operation is permitted for unlatching doors in the following locations:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173471\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173471\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Places of detention or restraint.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173472\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173472\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Where manually operated bolt locks are permitted by Section 1010.1.9.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173473\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173473\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;Doors from individual dwelling units and sleeping units of Group R occupancies as permitted by Section 1010.1.9.3, Items 4 and 5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2272-html-1",
+      "kind" : "html",
+      "plainText" : "The unlatching of any door or leaf shall not require more than one operation.\n\n Exception: More than one operation is permitted for unlatching doors in the following locations:\n\n 1. Places of detention or restraint.\n\n 2. Where manually operated bolt locks are permitted by Section 1010.1.9.4.\n\n 3. Doors from individual dwelling units and sleeping units of Group R occupancies as permitted by Section 1010.1.9.3, Items 4 and 5."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The unlatching of any door or leaf shall not require more than one operation.\n\nException: More than one operation is permitted for unlatching doors in the following locations:\n\n1. Places of detention or restraint.\n\n2. Where manually operated bolt locks are permitted by Section 1010.1.9.4.\n\n3. Doors from individual dwelling units and sleeping units of Group R occupancies as permitted by Section 1010.1.9.3, Items 4 and 5.",
+  "previewText" : "The unlatching of any door or leaf shall not require more than one operation.",
+  "schemaVersion" : 2,
+  "sectionID" : 2272
+}

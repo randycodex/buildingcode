@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187030\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187030\"><\/AnnotationDrawer><div>Documentation of the inspection and evaluation required by Section 3314.4.3.1.1 shall be included with the installation inspection report required by Section 3314.4.3.2.1. Such documentation shall be signed, sealed, and dated by the registered design professional that performed the inspection and evaluation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6581-html-1",
+      "kind" : "html",
+      "plainText" : "Documentation of the inspection and evaluation required by Section 3314.4.3.1.1 shall be included with the installation inspection report required by Section 3314.4.3.2.1. Such documentation shall be signed, sealed, and dated by the registered design professional that performed the inspection and evaluation."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Documentation of the inspection and evaluation required by Section 3314.4.3.1.1 shall be included with the installation inspection report required by Section 3314.4.3.2.1. Such documentation shall be signed, sealed, and dated by the registered design professional that performed the inspection and evaluation.",
+  "previewText" : "Documentation of the inspection and evaluation required by Section 3314.",
+  "schemaVersion" : 2,
+  "sectionID" : 6581
+}

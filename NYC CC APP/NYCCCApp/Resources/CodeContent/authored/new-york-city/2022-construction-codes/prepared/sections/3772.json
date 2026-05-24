@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178470\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178470\"><\/AnnotationDrawer><div>The thickness of the sprayed fire-resistant material applied to structural members shall be determined in accordance with ASTM E 605. Thickness testing shall be performed on not less than 25 percent of the structural members on each floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3772-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of the sprayed fire-resistant material applied to structural members shall be determined in accordance with ASTM E 605. Thickness testing shall be performed on not less than 25 percent of the structural members on each floor."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "The thickness of the sprayed fire-resistant material applied to structural members shall be determined in accordance with ASTM E 605. Thickness testing shall be performed on not less than 25 percent of the structural members on each floor.",
+  "previewText" : "The thickness of the sprayed fire-resistant material applied to structural members shall be determined in accordance with ASTM E 605.",
+  "schemaVersion" : 2,
+  "sectionID" : 3772
+}

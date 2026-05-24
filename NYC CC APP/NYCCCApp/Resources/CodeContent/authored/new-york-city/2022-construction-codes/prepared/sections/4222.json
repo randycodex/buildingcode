@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179807\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179807\"><\/AnnotationDrawer><div>Additional axial compression, axial tension and lateral load tests shall be performed for questionable construction as required by Section 1810.4.1.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4222-html-1",
+      "kind" : "html",
+      "plainText" : "Additional axial compression, axial tension and lateral load tests shall be performed for questionable construction as required by Section 1810.4.1.1.1."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Additional axial compression, axial tension and lateral load tests shall be performed for questionable construction as required by Section 1810.4.1.1.1.",
+  "previewText" : "Additional axial compression, axial tension and lateral load tests shall be performed for questionable construction as required by Section 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4222
+}

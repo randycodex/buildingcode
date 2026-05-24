@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183854\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183854\"><\/AnnotationDrawer><div>The fire service access elevator hoistway enclosure shall comply with Sections 403.2.3.1 through 403.2.3.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5497-html-1",
+      "kind" : "html",
+      "plainText" : "The fire service access elevator hoistway enclosure shall comply with Sections 403.2.3.1 through 403.2.3.4."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "The fire service access elevator hoistway enclosure shall comply with Sections 403.2.3.1 through 403.2.3.4.",
+  "previewText" : "The fire service access elevator hoistway enclosure shall comply with Sections 403.",
+  "schemaVersion" : 2,
+  "sectionID" : 5497
+}

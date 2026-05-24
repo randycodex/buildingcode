@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162507\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162507\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where the building drain is installed underground and within 5 feet (1524 mm) of the water service, as provided for in Section 603.2, the building drain pipe shall conform to one of the standards for, cast-iron pipe, copper or copper-alloy tubing, or ductile iron listed in <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162487', hash: '#JD_PCTable702.3' }}\">Table 702.3<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12325-html-1",
+      "kind" : "html",
+      "plainText" : "Where the building drain is installed underground and within 5 feet (1524 mm) of the water service, as provided for in Section 603.2, the building drain pipe shall conform to one of the standards for, cast-iron pipe, copper or copper-alloy tubing, or ductile iron listed in Table 702.3 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where the building drain is installed underground and within 5 feet (1524 mm) of the water service, as provided for in Section 603.2, the building drain pipe shall conform to one of the standards for, cast-iron pipe, copper or copper-alloy tubing, or ductile iron listed in Table 702.3.",
+  "previewText" : "Where the building drain is installed underground and within 5 feet (1524 mm) of the water service, as provided for in Section 603.",
+  "schemaVersion" : 2,
+  "sectionID" : 12325
+}

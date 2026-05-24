@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175352\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175352\"><\/AnnotationDrawer><div>Where sinks are provided, at least 5 percent but not less than one provided in accessible spaces shall comply with ICC A117.1, including Section 606 (Lavatories and Sinks).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175353\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175353\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Mop or service sinks are not required to be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2823-html-1",
+      "kind" : "html",
+      "plainText" : "Where sinks are provided, at least 5 percent but not less than one provided in accessible spaces shall comply with ICC A117.1, including Section 606 (Lavatories and Sinks).\n\n Exception: Mop or service sinks are not required to be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where sinks are provided, at least 5 percent but not less than one provided in accessible spaces shall comply with ICC A117.1, including Section 606 (Lavatories and Sinks).\n\nException: Mop or service sinks are not required to be accessible.",
+  "previewText" : "Where sinks are provided, at least 5 percent but not less than one provided in accessible spaces shall comply with ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2823
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180665\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180665\"><\/AnnotationDrawer><div>In each direction, the bottom mat reinforcement shall be not less than, the steel required for temperature reinforcement. The bottom mat reinforcement shall be anchored at discontinuous edges within the column strip, reentrant corners, elevation changes and anywhere else the continuity of the reinforcing is interrupted.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180666\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180666\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Flat plate middle strip bottom mat reinforcing perpendicular to discontinuous slab edges. In addition, the main bottom mat reinforcement in one-way slabs shall be anchored at discontinuous edges.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4544-html-1",
+      "kind" : "html",
+      "plainText" : "In each direction, the bottom mat reinforcement shall be not less than, the steel required for temperature reinforcement. The bottom mat reinforcement shall be anchored at discontinuous edges within the column strip, reentrant corners, elevation changes and anywhere else the continuity of the reinforcing is interrupted.\n\n Exception: Flat plate middle strip bottom mat reinforcing perpendicular to discontinuous slab edges. In addition, the main bottom mat reinforcement in one-way slabs shall be anchored at discontinuous edges."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "In each direction, the bottom mat reinforcement shall be not less than, the steel required for temperature reinforcement. The bottom mat reinforcement shall be anchored at discontinuous edges within the column strip, reentrant corners, elevation changes and anywhere else the continuity of the reinforcing is interrupted.\n\nException: Flat plate middle strip bottom mat reinforcing perpendicular to discontinuous slab edges. In addition, the main bottom mat reinforcement in one-way slabs shall be anchored at discontinuous edges.",
+  "previewText" : "In each direction, the bottom mat reinforcement shall be not less than, the steel required for temperature reinforcement.",
+  "schemaVersion" : 2,
+  "sectionID" : 4544
+}

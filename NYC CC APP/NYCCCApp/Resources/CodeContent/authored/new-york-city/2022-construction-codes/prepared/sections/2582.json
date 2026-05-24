@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174615\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174615\"><\/AnnotationDrawer><div>Where there is seating on both sides of the aisle, the mid-aisle handrails shall be discontinuous with gaps or breaks at intervals not exceeding five rows to facilitate access to seating and to permit crossing from one side of the aisle to the other. These gaps or breaks shall have a clear width of not less than 22 inches (558.8 mm) and not greater than 36 inches (914.4 mm), measured horizontally, and the mid-aisle handrail shall have rounded terminations or bends.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2582-html-1",
+      "kind" : "html",
+      "plainText" : "Where there is seating on both sides of the aisle, the mid-aisle handrails shall be discontinuous with gaps or breaks at intervals not exceeding five rows to facilitate access to seating and to permit crossing from one side of the aisle to the other. These gaps or breaks shall have a clear width of not less than 22 inches (558.8 mm) and not greater than 36 inches (914.4 mm), measured horizontally, and the mid-aisle handrail shall have rounded terminations or bends."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Where there is seating on both sides of the aisle, the mid-aisle handrails shall be discontinuous with gaps or breaks at intervals not exceeding five rows to facilitate access to seating and to permit crossing from one side of the aisle to the other. These gaps or breaks shall have a clear width of not less than 22 inches (558.8 mm) and not greater than 36 inches (914.4 mm), measured horizontally, and the mid-aisle handrail shall have rounded terminations or bends.",
+  "previewText" : "Where there is seating on both sides of the aisle, the mid-aisle handrails shall be discontinuous with gaps or breaks at intervals not exceeding five rows to facilitate access to seating and to permit crossing from one side of the aisle to the other.",
+  "schemaVersion" : 2,
+  "sectionID" : 2582
+}

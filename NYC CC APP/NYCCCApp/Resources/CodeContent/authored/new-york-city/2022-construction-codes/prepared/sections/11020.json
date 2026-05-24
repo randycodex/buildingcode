@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195023\"><\/AnnotationDrawer><div>Connectors shall rise vertically to the chimney or vent with a minimum pitch equal to one-fourth unit vertical in 12 units horizontal (2-percent slope).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11020-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors shall rise vertically to the chimney or vent with a minimum pitch equal to one-fourth unit vertical in 12 units horizontal (2-percent slope)."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Connectors shall rise vertically to the chimney or vent with a minimum pitch equal to one-fourth unit vertical in 12 units horizontal (2-percent slope).",
+  "previewText" : "Connectors shall rise vertically to the chimney or vent with a minimum pitch equal to one-fourth unit vertical in 12 units horizontal (2-percent slope).",
+  "schemaVersion" : 2,
+  "sectionID" : 11020
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199186\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199186\"><\/AnnotationDrawer><div>Enclosures of floor furnaces shall be constructed entirely of noncombustible materials with a fire-resistance rating of at least 1-hour and the enclosure shall be provided with adequate outdoor air to ensure proper combustion. The enclosure shall be provided with adequate means of access for servicing the furnace.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8662-html-1",
+      "kind" : "html",
+      "plainText" : "Enclosures of floor furnaces shall be constructed entirely of noncombustible materials with a fire-resistance rating of at least 1-hour and the enclosure shall be provided with adequate outdoor air to ensure proper combustion. The enclosure shall be provided with adequate means of access for servicing the furnace."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Enclosures of floor furnaces shall be constructed entirely of noncombustible materials with a fire-resistance rating of at least 1-hour and the enclosure shall be provided with adequate outdoor air to ensure proper combustion. The enclosure shall be provided with adequate means of access for servicing the furnace.",
+  "previewText" : "Enclosures of floor furnaces shall be constructed entirely of noncombustible materials with a fire-resistance rating of at least 1-hour and the enclosure shall be provided with adequate outdoor air to ensure proper combustion.",
+  "schemaVersion" : 2,
+  "sectionID" : 8662
+}

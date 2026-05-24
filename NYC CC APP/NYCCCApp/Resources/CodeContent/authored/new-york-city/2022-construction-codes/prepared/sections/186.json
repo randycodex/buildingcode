@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166483\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166483\"><\/AnnotationDrawer><div>In addition to the occupancy and construction requirements in this code, the provisions of this chapter apply to the special uses and occupancies described herein.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-166484\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-166484\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-166484\"><\/AnnotationDrawer><h6><a name=\"JD_BC402\" id=\"JD_BC402\" title=\"BC 402\"><\/a>Section BC 402: Covered Mall and Open Mall Buildings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "186-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the occupancy and construction requirements in this code, the provisions of this chapter apply to the special uses and occupancies described herein.\n\n Section BC 402: Covered Mall and Open Mall Buildings"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "In addition to the occupancy and construction requirements in this code, the provisions of this chapter apply to the special uses and occupancies described herein.",
+  "previewText" : "In addition to the occupancy and construction requirements in this code, the provisions of this chapter apply to the special uses and occupancies described herein.",
+  "schemaVersion" : 2,
+  "sectionID" : 186
+}

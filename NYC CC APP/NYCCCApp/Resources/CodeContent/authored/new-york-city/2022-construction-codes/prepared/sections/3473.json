@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177360\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177360\"><\/AnnotationDrawer><div>For occupancies or uses not designated in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177332', hash: '#JD_BCTable1607.1' }}\">Table 1607.1<\/Link>, the live load shall be determined in accordance with a method approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3473-html-1",
+      "kind" : "html",
+      "plainText" : "For occupancies or uses not designated in Table 1607.1 , the live load shall be determined in accordance with a method approved by the commissioner."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "For occupancies or uses not designated in Table 1607.1, the live load shall be determined in accordance with a method approved by the commissioner.",
+  "previewText" : "For occupancies or uses not designated in Table 1607.",
+  "schemaVersion" : 2,
+  "sectionID" : 3473
+}

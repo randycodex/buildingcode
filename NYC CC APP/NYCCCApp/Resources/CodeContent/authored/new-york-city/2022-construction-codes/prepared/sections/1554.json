@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171055\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171055\"><\/AnnotationDrawer><div>Fire protection systems shall be provided to buildings and spaces in accordance with the provisions of Sections 901.9.4.1 through 901.9.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1554-html-1",
+      "kind" : "html",
+      "plainText" : "Fire protection systems shall be provided to buildings and spaces in accordance with the provisions of Sections 901.9.4.1 through 901.9.4.3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fire protection systems shall be provided to buildings and spaces in accordance with the provisions of Sections 901.9.4.1 through 901.9.4.3.",
+  "previewText" : "Fire protection systems shall be provided to buildings and spaces in accordance with the provisions of Sections 901.",
+  "schemaVersion" : 2,
+  "sectionID" : 1554
+}

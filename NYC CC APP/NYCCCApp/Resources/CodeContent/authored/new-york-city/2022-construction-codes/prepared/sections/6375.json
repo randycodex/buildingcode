@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186341\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186341\"><\/AnnotationDrawer><div>For purposes of this section, the term \"approved artwork\" means a work of art approved by the department of cultural affairs or other agencies as designated by the department of cultural affairs for display on temporary protective structures pursuant to Section <InterCodeLink infobasePath=\"L:\\NY\\New York City\\Folio\\Working\\Charter.NFO\" destinationId=\"JD_2508\" styleName=\"Jump\" linkPrefix=\"\/codes\/newyorkcity\/latest\/\" doc=\"{{ origDocIdx }}\">2508<\/InterCodeLink> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Charter<\/span>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186342\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186342\"><\/AnnotationDrawer><div>(L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023; Am. L.L. 2024\/111, 11\/9\/2024, eff. 11\/9\/2024) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6375-html-1",
+      "kind" : "html",
+      "plainText" : "For purposes of this section, the term \"approved artwork\" means a work of art approved by the department of cultural affairs or other agencies as designated by the department of cultural affairs for display on temporary protective structures pursuant to Section 2508 of the New York City Charter . \n\n (L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023; Am. L.L. 2024\/111, 11\/9\/2024, eff. 11\/9\/2024)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "For purposes of this section, the term \"approved artwork\" means a work of art approved by the department of cultural affairs or other agencies as designated by the department of cultural affairs for display on temporary protective structures pursuant to Section 2508 of the New York City Charter.\n\n(L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023; Am. L.L. 2024\/111, 11\/9\/2024, eff. 11\/9\/2024)",
+  "previewText" : "For purposes of this section, the term \"approved artwork\" means a work of art approved by the department of cultural affairs or other agencies as designated by the department of cultural affairs for display on temporary protective structures pursuant to Section 2508 of the New York City Charter.",
+  "schemaVersion" : 2,
+  "sectionID" : 6375
+}

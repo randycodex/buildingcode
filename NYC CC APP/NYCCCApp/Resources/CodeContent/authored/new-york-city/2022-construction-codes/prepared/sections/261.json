@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166682\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166682\"><\/AnnotationDrawer><div>Concrete or masonry walls shall be deemed to satisfy the requirements of Sections 403.2.3.1 and 403.2.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "261-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete or masonry walls shall be deemed to satisfy the requirements of Sections 403.2.3.1 and 403.2.3.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Concrete or masonry walls shall be deemed to satisfy the requirements of Sections 403.2.3.1 and 403.2.3.2.",
+  "previewText" : "Concrete or masonry walls shall be deemed to satisfy the requirements of Sections 403.",
+  "schemaVersion" : 2,
+  "sectionID" : 261
+}

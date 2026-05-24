@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161867\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161867\"><\/AnnotationDrawer><div>Bottom fed water heaters and bottom fed tanks connected to water heaters shall have a vacuum relief valve installed. The vacuum relief valve shall comply with ANSI Z21.22.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12081-html-1",
+      "kind" : "html",
+      "plainText" : "Bottom fed water heaters and bottom fed tanks connected to water heaters shall have a vacuum relief valve installed. The vacuum relief valve shall comply with ANSI Z21.22."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Bottom fed water heaters and bottom fed tanks connected to water heaters shall have a vacuum relief valve installed. The vacuum relief valve shall comply with ANSI Z21.22.",
+  "previewText" : "Bottom fed water heaters and bottom fed tanks connected to water heaters shall have a vacuum relief valve installed.",
+  "schemaVersion" : 2,
+  "sectionID" : 12081
+}

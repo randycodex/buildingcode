@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163645\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163645\"><\/AnnotationDrawer><div>Nonmedical oxygen systems shall be designed and installed in accordance with NFPA 55 and NFPA 51.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163646\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163646\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163646\"><\/AnnotationDrawer><h6><a name=\"JD_PC1204\" id=\"JD_PC1204\" title=\"PC 1204\"><\/a>Section PC 1204: Other Cryogenic Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12740-html-1",
+      "kind" : "html",
+      "plainText" : "Nonmedical oxygen systems shall be designed and installed in accordance with NFPA 55 and NFPA 51.\n\n Section PC 1204: Other Cryogenic Systems"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Nonmedical oxygen systems shall be designed and installed in accordance with NFPA 55 and NFPA 51.\n\nSection PC 1204: Other Cryogenic Systems",
+  "previewText" : "Nonmedical oxygen systems shall be designed and installed in accordance with NFPA 55 and NFPA 51.",
+  "schemaVersion" : 2,
+  "sectionID" : 12740
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175737\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175737\"><\/AnnotationDrawer><div>All habitable spaces shall be provided with natural ventilation in accordance with this section. Openings providing required natural ventilation to habitable spaces shall be windows and\/or glazed doors to the outdoors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175738\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Group R-3 occupancies. Openable skylights opening directly to the outer air, transparent or translucent panels, or other natural light-transmitting media may be substituted for window openings in Group R-3 occupancies provided that they meet the minimum dimensional requirements of Section 1203.5.1.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2949-html-1",
+      "kind" : "html",
+      "plainText" : "All habitable spaces shall be provided with natural ventilation in accordance with this section. Openings providing required natural ventilation to habitable spaces shall be windows and\/or glazed doors to the outdoors.\n\n Exception: Group R-3 occupancies. Openable skylights opening directly to the outer air, transparent or translucent panels, or other natural light-transmitting media may be substituted for window openings in Group R-3 occupancies provided that they meet the minimum dimensional requirements of Section 1203.5.1.2.1."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "All habitable spaces shall be provided with natural ventilation in accordance with this section. Openings providing required natural ventilation to habitable spaces shall be windows and\/or glazed doors to the outdoors.\n\nException: Group R-3 occupancies. Openable skylights opening directly to the outer air, transparent or translucent panels, or other natural light-transmitting media may be substituted for window openings in Group R-3 occupancies provided that they meet the minimum dimensional requirements of Section 1203.5.1.2.1.",
+  "previewText" : "All habitable spaces shall be provided with natural ventilation in accordance with this section.",
+  "schemaVersion" : 2,
+  "sectionID" : 2949
+}

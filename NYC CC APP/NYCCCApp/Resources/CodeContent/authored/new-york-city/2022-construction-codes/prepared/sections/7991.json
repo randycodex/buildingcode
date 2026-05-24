@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196966\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196966\"><\/AnnotationDrawer><div>Construction documents for boiler installations shall indicate the output capacity in BTU per hour (W), the operating weight of each boiler, the pressure setting of the relief valves, and such other data and information as required by this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7991-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents for boiler installations shall indicate the output capacity in BTU per hour (W), the operating weight of each boiler, the pressure setting of the relief valves, and such other data and information as required by this code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "Construction documents for boiler installations shall indicate the output capacity in BTU per hour (W), the operating weight of each boiler, the pressure setting of the relief valves, and such other data and information as required by this code.",
+  "previewText" : "Construction documents for boiler installations shall indicate the output capacity in BTU per hour (W), the operating weight of each boiler, the pressure setting of the relief valves, and such other data and information as required by this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 7991
+}

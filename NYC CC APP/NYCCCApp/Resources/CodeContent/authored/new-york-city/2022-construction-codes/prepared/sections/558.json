@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167548\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167548\"><\/AnnotationDrawer><div>Exterior walls located less than 30 feet (9144 mm) from lot lines or a public way shall have a fire-resistance rating not less than 2 hours.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "558-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior walls located less than 30 feet (9144 mm) from lot lines or a public way shall have a fire-resistance rating not less than 2 hours."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Exterior walls located less than 30 feet (9144 mm) from lot lines or a public way shall have a fire-resistance rating not less than 2 hours.",
+  "previewText" : "Exterior walls located less than 30 feet (9144 mm) from lot lines or a public way shall have a fire-resistance rating not less than 2 hours.",
+  "schemaVersion" : 2,
+  "sectionID" : 558
+}

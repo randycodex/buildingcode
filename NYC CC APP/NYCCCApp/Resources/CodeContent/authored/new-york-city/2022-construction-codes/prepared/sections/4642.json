@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180992\"><\/AnnotationDrawer><div>The construction documents shall describe in sufficient detail the location, size and construction of masonry fireplaces. The thickness and characteristics of materials and the clearances from walls, partitions and ceilings shall be indicated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4642-html-1",
+      "kind" : "html",
+      "plainText" : "The construction documents shall describe in sufficient detail the location, size and construction of masonry fireplaces. The thickness and characteristics of materials and the clearances from walls, partitions and ceilings shall be indicated."
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "The construction documents shall describe in sufficient detail the location, size and construction of masonry fireplaces. The thickness and characteristics of materials and the clearances from walls, partitions and ceilings shall be indicated.",
+  "previewText" : "The construction documents shall describe in sufficient detail the location, size and construction of masonry fireplaces.",
+  "schemaVersion" : 2,
+  "sectionID" : 4642
+}

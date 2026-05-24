@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171319\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171319\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be provided throughout buildings classified as enclosed parking garages in accordance with Section 406.4 or where an open or enclosed parking garage is located beneath other occupancy groups.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171320\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171320\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Parking garages located beneath Group R-3 occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1605-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be provided throughout buildings classified as enclosed parking garages in accordance with Section 406.4 or where an open or enclosed parking garage is located beneath other occupancy groups.\n\n Exception: Parking garages located beneath Group R-3 occupancies."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "An automatic sprinkler system shall be provided throughout buildings classified as enclosed parking garages in accordance with Section 406.4 or where an open or enclosed parking garage is located beneath other occupancy groups.\n\nException: Parking garages located beneath Group R-3 occupancies.",
+  "previewText" : "An automatic sprinkler system shall be provided throughout buildings classified as enclosed parking garages in accordance with Section 406.",
+  "schemaVersion" : 2,
+  "sectionID" : 1605
+}

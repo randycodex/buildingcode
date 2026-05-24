@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197375\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197375\"><\/AnnotationDrawer><div>Appliances and equipment regulated by this code must comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205716', hash: '#JD_MC313' }}\">313<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-197376\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-197376\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-197376\"><\/AnnotationDrawer><h6><a name=\"JD_FGC302\" id=\"JD_FGC302\" title=\"FGC 302\"><\/a>Section FGC 302: Structural Safety<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8042-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances and equipment regulated by this code must comply with Section 313 of the New York City Mechanical Code. \n\n Section FGC 302: Structural Safety"
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Appliances and equipment regulated by this code must comply with Section 313 of the New York City Mechanical Code.\n\nSection FGC 302: Structural Safety",
+  "previewText" : "Appliances and equipment regulated by this code must comply with Section 313 of the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 8042
+}

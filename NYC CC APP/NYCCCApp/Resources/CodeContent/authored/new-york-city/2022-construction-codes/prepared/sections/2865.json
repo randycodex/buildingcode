@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175464\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175464\"><\/AnnotationDrawer><div>At least one accessible route shall connect to the accessible cycle storage area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2865-html-1",
+      "kind" : "html",
+      "plainText" : "At least one accessible route shall connect to the accessible cycle storage area."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "At least one accessible route shall connect to the accessible cycle storage area.",
+  "previewText" : "At least one accessible route shall connect to the accessible cycle storage area.",
+  "schemaVersion" : 2,
+  "sectionID" : 2865
+}

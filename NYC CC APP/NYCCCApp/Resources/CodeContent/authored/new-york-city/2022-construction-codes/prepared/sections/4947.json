@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181899\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181899\"><\/AnnotationDrawer><div>Exterior walls shall be of noncombustible materials or other materials as permitted by Section 602.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4947-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior walls shall be of noncombustible materials or other materials as permitted by Section 602.4."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Exterior walls shall be of noncombustible materials or other materials as permitted by Section 602.4.",
+  "previewText" : "Exterior walls shall be of noncombustible materials or other materials as permitted by Section 602.",
+  "schemaVersion" : 2,
+  "sectionID" : 4947
+}

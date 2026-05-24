@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179500\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179500\"><\/AnnotationDrawer><div>Precast prestressed concrete piles shall be designed to resist stresses induced by handling and driving as well as by loads. The effective prestress shall not be less than 400 psi (2.76 MPa) for precast prestressed concrete piles less than 30 feet (9144 mm) in length, 550 psi (3.79 MPa) for precast prestressed concrete piles between 30 and 50 feet (9144 mm and 15 240 mm) in length and 700 psi (4.83 MPa) for precast prestressed concrete piles greater than 50 feet (15 240 mm) in length. Effective prestress shall be based on an assumed loss of 30,000 psi (207 MPa) in the prestressing steel. The tensile stress in the prestressing steel shall not exceed the values specified in ACI 318.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4116-html-1",
+      "kind" : "html",
+      "plainText" : "Precast prestressed concrete piles shall be designed to resist stresses induced by handling and driving as well as by loads. The effective prestress shall not be less than 400 psi (2.76 MPa) for precast prestressed concrete piles less than 30 feet (9144 mm) in length, 550 psi (3.79 MPa) for precast prestressed concrete piles between 30 and 50 feet (9144 mm and 15 240 mm) in length and 700 psi (4.83 MPa) for precast prestressed concrete piles greater than 50 feet (15 240 mm) in length. Effective prestress shall be based on an assumed loss of 30,000 psi (207 MPa) in the prestressing steel. The tensile stress in the prestressing steel shall not exceed the values specified in ACI 318."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Precast prestressed concrete piles shall be designed to resist stresses induced by handling and driving as well as by loads. The effective prestress shall not be less than 400 psi (2.76 MPa) for precast prestressed concrete piles less than 30 feet (9144 mm) in length, 550 psi (3.79 MPa) for precast prestressed concrete piles between 30 and 50 feet (9144 mm and 15 240 mm) in length and 700 psi (4.83 MPa) for precast prestressed concrete piles greater than 50 feet (15 240 mm) in length. Effective prestress shall be based on an assumed loss of 30,000 psi (207 MPa) in the prestressing steel. The tensile stress in the prestressing steel shall not exceed the values specified in ACI 318.",
+  "previewText" : "Precast prestressed concrete piles shall be designed to resist stresses induced by handling and driving as well as by loads.",
+  "schemaVersion" : 2,
+  "sectionID" : 4116
+}

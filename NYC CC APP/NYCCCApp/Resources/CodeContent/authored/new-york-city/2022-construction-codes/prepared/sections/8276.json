@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198068\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198068\"><\/AnnotationDrawer><div>Prior to testing, the interior of the pipe shall be purged with air or an inert gas to clear foreign material, including weld splatter, dirt, rags, and other debris left inside the pipe during welding operations or piping installation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8276-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to testing, the interior of the pipe shall be purged with air or an inert gas to clear foreign material, including weld splatter, dirt, rags, and other debris left inside the pipe during welding operations or piping installation."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Prior to testing, the interior of the pipe shall be purged with air or an inert gas to clear foreign material, including weld splatter, dirt, rags, and other debris left inside the pipe during welding operations or piping installation.",
+  "previewText" : "Prior to testing, the interior of the pipe shall be purged with air or an inert gas to clear foreign material, including weld splatter, dirt, rags, and other debris left inside the pipe during welding operations or piping installation.",
+  "schemaVersion" : 2,
+  "sectionID" : 8276
+}

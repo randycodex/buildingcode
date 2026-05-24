@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173807\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173807\"><\/AnnotationDrawer><div>A sign stating \"EXIT\" in visual characters, raised characters and braille and complying with ICC A117.1 shall be provided adjacent to each door to an area of rescue assistance, an exterior area for assisted rescue, an exit stairway or ramp, an exit passageway, a horizontal exit and the exit discharge.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2366-html-1",
+      "kind" : "html",
+      "plainText" : "A sign stating \"EXIT\" in visual characters, raised characters and braille and complying with ICC A117.1 shall be provided adjacent to each door to an area of rescue assistance, an exterior area for assisted rescue, an exit stairway or ramp, an exit passageway, a horizontal exit and the exit discharge."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "A sign stating \"EXIT\" in visual characters, raised characters and braille and complying with ICC A117.1 shall be provided adjacent to each door to an area of rescue assistance, an exterior area for assisted rescue, an exit stairway or ramp, an exit passageway, a horizontal exit and the exit discharge.",
+  "previewText" : "A sign stating \"EXIT\" in visual characters, raised characters and braille and complying with ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2366
+}

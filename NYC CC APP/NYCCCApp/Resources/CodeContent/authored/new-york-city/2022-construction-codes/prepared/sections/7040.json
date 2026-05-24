@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188626\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188626\"><\/AnnotationDrawer><div>To the extent required by Section G102.1, all developments, including but not limited to utility installation, site improvements, placement of prefabricated buildings and manufactured homes, new building construction, alterations and repairs, shall be designed and constructed to resist the effects of flood hazards and flood loads in accordance with this appendix and ASCE 24.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7040-html-1",
+      "kind" : "html",
+      "plainText" : "To the extent required by Section G102.1, all developments, including but not limited to utility installation, site improvements, placement of prefabricated buildings and manufactured homes, new building construction, alterations and repairs, shall be designed and constructed to resist the effects of flood hazards and flood loads in accordance with this appendix and ASCE 24."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "To the extent required by Section G102.1, all developments, including but not limited to utility installation, site improvements, placement of prefabricated buildings and manufactured homes, new building construction, alterations and repairs, shall be designed and constructed to resist the effects of flood hazards and flood loads in accordance with this appendix and ASCE 24.",
+  "previewText" : "To the extent required by Section G102.",
+  "schemaVersion" : 2,
+  "sectionID" : 7040
+}

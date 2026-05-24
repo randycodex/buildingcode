@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180611\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180611\"><\/AnnotationDrawer><div>Coarse aggregate, if used, shall not exceed 3\/4 inch (19.1 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4519-html-1",
+      "kind" : "html",
+      "plainText" : "Coarse aggregate, if used, shall not exceed 3\/4 inch (19.1 mm)."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Coarse aggregate, if used, shall not exceed 3\/4 inch (19.1 mm).",
+  "previewText" : "Coarse aggregate, if used, shall not exceed 3\/4 inch (19.",
+  "schemaVersion" : 2,
+  "sectionID" : 4519
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179676\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179676\"><\/AnnotationDrawer><div>The thickness of the steel shell shall not be less than manufacturer's standard No. 14 gage (0.068 inch) (1.75 mm) minimum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4162-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of the steel shell shall not be less than manufacturer's standard No. 14 gage (0.068 inch) (1.75 mm) minimum."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The thickness of the steel shell shall not be less than manufacturer's standard No. 14 gage (0.068 inch) (1.75 mm) minimum.",
+  "previewText" : "The thickness of the steel shell shall not be less than manufacturer's standard No.",
+  "schemaVersion" : 2,
+  "sectionID" : 4162
+}

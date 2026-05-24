@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180029\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180029\"><\/AnnotationDrawer><div>Pit excavation shall not proceed below the water table. If the depth of the underpinning requires excavation below the existing water table, a dewatering system shall be installed prior to the start of the excavation. The dewatering system shall be tested via test pit or piezometer to confirm that the water table has been sufficiently drawn down prior to the start of the pit underpinning work.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4292-html-1",
+      "kind" : "html",
+      "plainText" : "Pit excavation shall not proceed below the water table. If the depth of the underpinning requires excavation below the existing water table, a dewatering system shall be installed prior to the start of the excavation. The dewatering system shall be tested via test pit or piezometer to confirm that the water table has been sufficiently drawn down prior to the start of the pit underpinning work."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Pit excavation shall not proceed below the water table. If the depth of the underpinning requires excavation below the existing water table, a dewatering system shall be installed prior to the start of the excavation. The dewatering system shall be tested via test pit or piezometer to confirm that the water table has been sufficiently drawn down prior to the start of the pit underpinning work.",
+  "previewText" : "Pit excavation shall not proceed below the water table.",
+  "schemaVersion" : 2,
+  "sectionID" : 4292
+}

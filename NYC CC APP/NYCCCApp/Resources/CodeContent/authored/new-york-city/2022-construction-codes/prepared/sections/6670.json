@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187305\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187305\"><\/AnnotationDrawer><div>An insulated thimble shall be used to attach each suspension wire rope to its hanging support. Excessive suspension wire rope and any additional independent lines from grounding shall be insulated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6670-html-1",
+      "kind" : "html",
+      "plainText" : "An insulated thimble shall be used to attach each suspension wire rope to its hanging support. Excessive suspension wire rope and any additional independent lines from grounding shall be insulated."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "An insulated thimble shall be used to attach each suspension wire rope to its hanging support. Excessive suspension wire rope and any additional independent lines from grounding shall be insulated.",
+  "previewText" : "An insulated thimble shall be used to attach each suspension wire rope to its hanging support.",
+  "schemaVersion" : 2,
+  "sectionID" : 6670
+}

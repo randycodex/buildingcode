@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183711\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183711\"><\/AnnotationDrawer><div>Elevators shall not be in a common shaft enclosure with a stairway.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183712\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183712\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Elevators within open parking garages need not be separated from stairway enclosures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5439-html-1",
+      "kind" : "html",
+      "plainText" : "Elevators shall not be in a common shaft enclosure with a stairway.\n\n Exception: Elevators within open parking garages need not be separated from stairway enclosures."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "Elevators shall not be in a common shaft enclosure with a stairway.\n\nException: Elevators within open parking garages need not be separated from stairway enclosures.",
+  "previewText" : "Elevators shall not be in a common shaft enclosure with a stairway.",
+  "schemaVersion" : 2,
+  "sectionID" : 5439
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187016\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187016\"><\/AnnotationDrawer><div>The licensee or competent person supervising the use of a scaffold shall be present at the site during all times the scaffold is in use and shall have the ability to communicate with all individuals using the scaffold; however, such supervisor does not need to be on the scaffold.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187017\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187017\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The licensed rigger or sign hanger does not have to be present at the site, provided a suspended scaffold foreman is present at the site during all times the scaffold is in use and provided such suspended scaffold foreman has the ability to communicate with all individuals using the scaffold. Such suspended scaffold foreman does not need to be on the scaffold.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6576-html-1",
+      "kind" : "html",
+      "plainText" : "The licensee or competent person supervising the use of a scaffold shall be present at the site during all times the scaffold is in use and shall have the ability to communicate with all individuals using the scaffold; however, such supervisor does not need to be on the scaffold.\n\n Exception: The licensed rigger or sign hanger does not have to be present at the site, provided a suspended scaffold foreman is present at the site during all times the scaffold is in use and provided such suspended scaffold foreman has the ability to communicate with all individuals using the scaffold. Such suspended scaffold foreman does not need to be on the scaffold."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The licensee or competent person supervising the use of a scaffold shall be present at the site during all times the scaffold is in use and shall have the ability to communicate with all individuals using the scaffold; however, such supervisor does not need to be on the scaffold.\n\nException: The licensed rigger or sign hanger does not have to be present at the site, provided a suspended scaffold foreman is present at the site during all times the scaffold is in use and provided such suspended scaffold foreman has the ability to communicate with all individuals using the scaffold. Such suspended scaffold foreman does not need to be on the scaffold.",
+  "previewText" : "The licensee or competent person supervising the use of a scaffold shall be present at the site during all times the scaffold is in use and shall have the ability to communicate with all individuals using the scaffold; however, such supervisor does not need to be on the scaffold.",
+  "schemaVersion" : 2,
+  "sectionID" : 6576
+}

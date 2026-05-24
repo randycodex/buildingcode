@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163160\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163160\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Each separate circuit-vented horizontal branch that is interconnected shall be sized independently in accordance with Section 914.3. The downstream circuit-vented horizontal branch shall be sized for the total discharge into the branch, including the upstream branches and the fixtures within the branch.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12583-html-1",
+      "kind" : "html",
+      "plainText" : "Each separate circuit-vented horizontal branch that is interconnected shall be sized independently in accordance with Section 914.3. The downstream circuit-vented horizontal branch shall be sized for the total discharge into the branch, including the upstream branches and the fixtures within the branch."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Each separate circuit-vented horizontal branch that is interconnected shall be sized independently in accordance with Section 914.3. The downstream circuit-vented horizontal branch shall be sized for the total discharge into the branch, including the upstream branches and the fixtures within the branch.",
+  "previewText" : "Each separate circuit-vented horizontal branch that is interconnected shall be sized independently in accordance with Section 914.",
+  "schemaVersion" : 2,
+  "sectionID" : 12583
+}

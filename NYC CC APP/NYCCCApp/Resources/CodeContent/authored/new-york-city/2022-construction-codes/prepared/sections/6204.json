@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185844\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185844\"><\/AnnotationDrawer><div>No decking or section of decking shall be placed on a joist until the joist has been fully installed and braced in accordance with Sections 3305.8.5 and 3305.8.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6204-html-1",
+      "kind" : "html",
+      "plainText" : "No decking or section of decking shall be placed on a joist until the joist has been fully installed and braced in accordance with Sections 3305.8.5 and 3305.8.6."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "No decking or section of decking shall be placed on a joist until the joist has been fully installed and braced in accordance with Sections 3305.8.5 and 3305.8.6.",
+  "previewText" : "No decking or section of decking shall be placed on a joist until the joist has been fully installed and braced in accordance with Sections 3305.",
+  "schemaVersion" : 2,
+  "sectionID" : 6204
+}

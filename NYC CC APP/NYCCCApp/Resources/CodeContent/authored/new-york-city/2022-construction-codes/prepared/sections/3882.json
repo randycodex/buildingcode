@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178762\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178762\"><\/AnnotationDrawer><div>The special inspection shall include witnessing the system smoke test performed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195110', hash: '#JD_MC810' }}\">810<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-178763\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-178763\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-178763\"><\/AnnotationDrawer><h6><a name=\"JD_BC1706\" id=\"JD_BC1706\" title=\"BC 1706\"><\/a>Section BC 1706: Design Strengths of Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3882-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspection shall include witnessing the system smoke test performed in accordance with Section 810 of the New York City Mechanical Code .\n\n Section BC 1706: Design Strengths of Materials"
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "The special inspection shall include witnessing the system smoke test performed in accordance with Section 810 of the New York City Mechanical Code.",
+  "previewText" : "The special inspection shall include witnessing the system smoke test performed in accordance with Section 810 of the New York City Mechanical Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 3882
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180113\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180113\"><\/AnnotationDrawer><div>Systems of structural steel acting compositely with reinforced concrete shall be designed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-181356', hash: '#JD_BC2206' }}\">2206<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4324-html-1",
+      "kind" : "html",
+      "plainText" : "Systems of structural steel acting compositely with reinforced concrete shall be designed in accordance with Section 2206 ."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Systems of structural steel acting compositely with reinforced concrete shall be designed in accordance with Section 2206.",
+  "previewText" : "Systems of structural steel acting compositely with reinforced concrete shall be designed in accordance with Section 2206.",
+  "schemaVersion" : 2,
+  "sectionID" : 4324
+}

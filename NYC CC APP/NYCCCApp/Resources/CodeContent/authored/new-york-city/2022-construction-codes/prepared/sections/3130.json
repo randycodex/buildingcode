@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176263\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176263\"><\/AnnotationDrawer><div>Exterior metal veneer shall be securely attached to the supporting masonry or framing members with corrosion-resistant fastenings, metal ties or by other approved devices or methods. The spacing of the fastenings or ties shall not exceed 24 inches (609.6 mm) either vertically or horizontally, but where units exceed 4 square feet (0.4 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area there shall be not less than four attachments per unit. The metal attachments shall have a cross-sectional area not less than provided by W 1.7 wire. Such attachments and their supports shall be designed and constructed to resist the wind loads as specified in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177562', hash: '#JD_BC1609' }}\">1609<\/Link> for components and cladding.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3130-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior metal veneer shall be securely attached to the supporting masonry or framing members with corrosion-resistant fastenings, metal ties or by other approved devices or methods. The spacing of the fastenings or ties shall not exceed 24 inches (609.6 mm) either vertically or horizontally, but where units exceed 4 square feet (0.4 m\n\n 2 \n\n ) in area there shall be not less than four attachments per unit. The metal attachments shall have a cross-sectional area not less than provided by W 1.7 wire. Such attachments and their supports shall be designed and constructed to resist the wind loads as specified in Section 1609 for components and cladding."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Exterior metal veneer shall be securely attached to the supporting masonry or framing members with corrosion-resistant fastenings, metal ties or by other approved devices or methods. The spacing of the fastenings or ties shall not exceed 24 inches (609.6 mm) either vertically or horizontally, but where units exceed 4 square feet (0.4 m 2 ) in area there shall be not less than four attachments per unit. The metal attachments shall have a cross-sectional area not less than provided by W 1.7 wire. Such attachments and their supports shall be designed and constructed to resist the wind loads as specified in Section 1609 for components and cladding.",
+  "previewText" : "Exterior metal veneer shall be securely attached to the supporting masonry or framing members with corrosion-resistant fastenings, metal ties or by other approved devices or methods.",
+  "schemaVersion" : 2,
+  "sectionID" : 3130
+}

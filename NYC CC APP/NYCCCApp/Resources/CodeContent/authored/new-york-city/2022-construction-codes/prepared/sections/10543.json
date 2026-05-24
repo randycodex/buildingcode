@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193579\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193579\"><\/AnnotationDrawer><div>This provision shall apply to indoor and outdoor storage and use of highly toxic and toxic liquids in amounts exceeding the maximum allowable quantities per control area. Exhaust scrubbers or other systems for processing vapors of highly toxic liquids shall be provided where a spill or accidental release of such liquids can be expected to release highly toxic vapors at normal temperature and pressure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10543-html-1",
+      "kind" : "html",
+      "plainText" : "This provision shall apply to indoor and outdoor storage and use of highly toxic and toxic liquids in amounts exceeding the maximum allowable quantities per control area. Exhaust scrubbers or other systems for processing vapors of highly toxic liquids shall be provided where a spill or accidental release of such liquids can be expected to release highly toxic vapors at normal temperature and pressure."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "This provision shall apply to indoor and outdoor storage and use of highly toxic and toxic liquids in amounts exceeding the maximum allowable quantities per control area. Exhaust scrubbers or other systems for processing vapors of highly toxic liquids shall be provided where a spill or accidental release of such liquids can be expected to release highly toxic vapors at normal temperature and pressure.",
+  "previewText" : "This provision shall apply to indoor and outdoor storage and use of highly toxic and toxic liquids in amounts exceeding the maximum allowable quantities per control area.",
+  "schemaVersion" : 2,
+  "sectionID" : 10543
+}

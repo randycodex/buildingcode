@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196187\"><\/AnnotationDrawer><div>Piping, valves, fittings, and connections shall be installed in accordance with the conditions of approval.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11462-html-1",
+      "kind" : "html",
+      "plainText" : "Piping, valves, fittings, and connections shall be installed in accordance with the conditions of approval."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Piping, valves, fittings, and connections shall be installed in accordance with the conditions of approval.",
+  "previewText" : "Piping, valves, fittings, and connections shall be installed in accordance with the conditions of approval.",
+  "schemaVersion" : 2,
+  "sectionID" : 11462
+}

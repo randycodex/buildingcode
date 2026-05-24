@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186025\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186025\"><\/AnnotationDrawer><div>Storage spaces shall not interfere with access to any stairway or passageway, and suitable barricades shall be provided so as to prevent material from sliding or rebounding into any space accessible to the public. All material shall be safely stored or piled in such storage locations in a manner that will not overload any part of the structure or create any hazard.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6270-html-1",
+      "kind" : "html",
+      "plainText" : "Storage spaces shall not interfere with access to any stairway or passageway, and suitable barricades shall be provided so as to prevent material from sliding or rebounding into any space accessible to the public. All material shall be safely stored or piled in such storage locations in a manner that will not overload any part of the structure or create any hazard."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Storage spaces shall not interfere with access to any stairway or passageway, and suitable barricades shall be provided so as to prevent material from sliding or rebounding into any space accessible to the public. All material shall be safely stored or piled in such storage locations in a manner that will not overload any part of the structure or create any hazard.",
+  "previewText" : "Storage spaces shall not interfere with access to any stairway or passageway, and suitable barricades shall be provided so as to prevent material from sliding or rebounding into any space accessible to the public.",
+  "schemaVersion" : 2,
+  "sectionID" : 6270
+}

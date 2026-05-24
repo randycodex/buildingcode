@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192469\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192469\"><\/AnnotationDrawer><div>The commissioner shall have the authority to authorize the temporary connection of a mechanical system to the sources of energy for the purpose of testing mechanical systems or for use under a temporary certificate of occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-192470\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-192470\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-192470\"><\/AnnotationDrawer><h6><a name=\"JD_MC109\" id=\"JD_MC109\" title=\"MC 109\"><\/a>Section MC 109: Violations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10274-html-1",
+      "kind" : "html",
+      "plainText" : "The commissioner shall have the authority to authorize the temporary connection of a mechanical system to the sources of energy for the purpose of testing mechanical systems or for use under a temporary certificate of occupancy.\n\n Section MC 109: Violations"
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "The commissioner shall have the authority to authorize the temporary connection of a mechanical system to the sources of energy for the purpose of testing mechanical systems or for use under a temporary certificate of occupancy.\n\nSection MC 109: Violations",
+  "previewText" : "The commissioner shall have the authority to authorize the temporary connection of a mechanical system to the sources of energy for the purpose of testing mechanical systems or for use under a temporary certificate of occupancy.",
+  "schemaVersion" : 2,
+  "sectionID" : 10274
+}

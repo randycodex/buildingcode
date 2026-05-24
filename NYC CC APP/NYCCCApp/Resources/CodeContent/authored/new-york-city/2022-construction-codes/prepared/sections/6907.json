@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188205\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188205\"><\/AnnotationDrawer><div>Where four or more public pay telephones are provided at a bank of telephones, at least one public TTY shall be provided at that bank.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188206\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> TTYs are not required at banks of telephones located within 200 feet (60 960 mm) of, and on the same floor as, a bank containing a public TTY.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6907-html-1",
+      "kind" : "html",
+      "plainText" : "Where four or more public pay telephones are provided at a bank of telephones, at least one public TTY shall be provided at that bank.\n\n Exception: TTYs are not required at banks of telephones located within 200 feet (60 960 mm) of, and on the same floor as, a bank containing a public TTY."
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "Where four or more public pay telephones are provided at a bank of telephones, at least one public TTY shall be provided at that bank.\n\nException: TTYs are not required at banks of telephones located within 200 feet (60 960 mm) of, and on the same floor as, a bank containing a public TTY.",
+  "previewText" : "Where four or more public pay telephones are provided at a bank of telephones, at least one public TTY shall be provided at that bank.",
+  "schemaVersion" : 2,
+  "sectionID" : 6907
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194976\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194976\"><\/AnnotationDrawer><div>Where two or more connectors enter a common vent or chimney, the smaller connector shall enter at the highest level consistent with available headroom or clearance to combustible material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11010-html-1",
+      "kind" : "html",
+      "plainText" : "Where two or more connectors enter a common vent or chimney, the smaller connector shall enter at the highest level consistent with available headroom or clearance to combustible material."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Where two or more connectors enter a common vent or chimney, the smaller connector shall enter at the highest level consistent with available headroom or clearance to combustible material.",
+  "previewText" : "Where two or more connectors enter a common vent or chimney, the smaller connector shall enter at the highest level consistent with available headroom or clearance to combustible material.",
+  "schemaVersion" : 2,
+  "sectionID" : 11010
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188165\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188165\"><\/AnnotationDrawer><div>Visual notification devices shall be provided to alert room occupants of incoming telephone calls and a door knock or bell. Notification devices shall not be connected to visual alarm signal appliances. Permanently installed telephones shall have volume controls and an electrical outlet complying with ICC A117.1, including Section 309 (Operable Parts), located within 48 inches (1219 mm) of the telephone to facilitate the use of a TTY.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6891-html-1",
+      "kind" : "html",
+      "plainText" : "Visual notification devices shall be provided to alert room occupants of incoming telephone calls and a door knock or bell. Notification devices shall not be connected to visual alarm signal appliances. Permanently installed telephones shall have volume controls and an electrical outlet complying with ICC A117.1, including Section 309 (Operable Parts), located within 48 inches (1219 mm) of the telephone to facilitate the use of a TTY."
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "Visual notification devices shall be provided to alert room occupants of incoming telephone calls and a door knock or bell. Notification devices shall not be connected to visual alarm signal appliances. Permanently installed telephones shall have volume controls and an electrical outlet complying with ICC A117.1, including Section 309 (Operable Parts), located within 48 inches (1219 mm) of the telephone to facilitate the use of a TTY.",
+  "previewText" : "Visual notification devices shall be provided to alert room occupants of incoming telephone calls and a door knock or bell.",
+  "schemaVersion" : 2,
+  "sectionID" : 6891
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198622\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198622\"><\/AnnotationDrawer><div>Where inspection reveals that an existing chimney is not safe for the intended application, it shall be repaired, rebuilt, lined, relined, or replaced with a vent or chimney to conform to NFPA 211 and it shall be suitable for the appliances to be vented.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8478-html-1",
+      "kind" : "html",
+      "plainText" : "Where inspection reveals that an existing chimney is not safe for the intended application, it shall be repaired, rebuilt, lined, relined, or replaced with a vent or chimney to conform to NFPA 211 and it shall be suitable for the appliances to be vented."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Where inspection reveals that an existing chimney is not safe for the intended application, it shall be repaired, rebuilt, lined, relined, or replaced with a vent or chimney to conform to NFPA 211 and it shall be suitable for the appliances to be vented.",
+  "previewText" : "Where inspection reveals that an existing chimney is not safe for the intended application, it shall be repaired, rebuilt, lined, relined, or replaced with a vent or chimney to conform to NFPA 211 and it shall be suitable for the appliances to be vented.",
+  "schemaVersion" : 2,
+  "sectionID" : 8478
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172540\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172540\"><\/AnnotationDrawer><div>Wiring for operation and control of mechanical smoke removal systems shall be connected ahead of the main disconnect in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span> and be protected against interior fire exposure to temperatures in excess of 1,000&#176;F (537.8&#176;C) for a period of not less than 15 minutes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2015-html-1",
+      "kind" : "html",
+      "plainText" : "Wiring for operation and control of mechanical smoke removal systems shall be connected ahead of the main disconnect in accordance with the New York City Electrical Code and be protected against interior fire exposure to temperatures in excess of 1,000°F (537.8°C) for a period of not less than 15 minutes."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Wiring for operation and control of mechanical smoke removal systems shall be connected ahead of the main disconnect in accordance with the New York City Electrical Code and be protected against interior fire exposure to temperatures in excess of 1,000°F (537.8°C) for a period of not less than 15 minutes.",
+  "previewText" : "Wiring for operation and control of mechanical smoke removal systems shall be connected ahead of the main disconnect in accordance with the New York City Electrical Code and be protected against interior fire exposure to temperatures in excess of 1,000°F (537.",
+  "schemaVersion" : 2,
+  "sectionID" : 2015
+}

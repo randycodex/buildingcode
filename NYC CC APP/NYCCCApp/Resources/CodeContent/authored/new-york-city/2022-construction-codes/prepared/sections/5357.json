@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183482\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183482\"><\/AnnotationDrawer><div>Reflective plastic core insulation shall comply with the acceptance criteria of Section 803.1.2.1 of this code when tested in accordance with NFPA 286 or UL 1715 in the manner intended for use and at the maximum thickness intended for use.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "5357-html-1",
+      "kind" : "html",
+      "plainText" : "Reflective plastic core insulation shall comply with the acceptance criteria of Section 803.1.2.1 of this code when tested in accordance with NFPA 286 or UL 1715 in the manner intended for use and at the maximum thickness intended for use."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "Reflective plastic core insulation shall comply with the acceptance criteria of Section 803.1.2.1 of this code when tested in accordance with NFPA 286 or UL 1715 in the manner intended for use and at the maximum thickness intended for use.",
+  "previewText" : "Reflective plastic core insulation shall comply with the acceptance criteria of Section 803.",
+  "schemaVersion" : 2,
+  "sectionID" : 5357
+}

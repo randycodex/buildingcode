@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162502\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162502\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A chemical waste system shall be completely separated from the sanitary drainage system. The chemical waste shall be treated in accordance with Section 803.2 before discharging to the sanitary drainage system. Separate drainage systems for chemical wastes and vent pipes shall be constructed in accordance with Section 803.3.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12323-html-1",
+      "kind" : "html",
+      "plainText" : "A chemical waste system shall be completely separated from the sanitary drainage system. The chemical waste shall be treated in accordance with Section 803.2 before discharging to the sanitary drainage system. Separate drainage systems for chemical wastes and vent pipes shall be constructed in accordance with Section 803.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "A chemical waste system shall be completely separated from the sanitary drainage system. The chemical waste shall be treated in accordance with Section 803.2 before discharging to the sanitary drainage system. Separate drainage systems for chemical wastes and vent pipes shall be constructed in accordance with Section 803.3.",
+  "previewText" : "A chemical waste system shall be completely separated from the sanitary drainage system.",
+  "schemaVersion" : 2,
+  "sectionID" : 12323
+}

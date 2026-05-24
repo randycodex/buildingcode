@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174206\"><\/AnnotationDrawer><div>Egress path markings shall be provided in interior exit stairways, interior exit ramps and exit passageways, in accordance with Sections 1025.2.1 through 1025.2.9. Entrances to interior exit stairways, interior exit ramps and exit passageways shall be provided with exit signs in compliance with Section 1025.2.6.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2459-html-1",
+      "kind" : "html",
+      "plainText" : "Egress path markings shall be provided in interior exit stairways, interior exit ramps and exit passageways, in accordance with Sections 1025.2.1 through 1025.2.9. Entrances to interior exit stairways, interior exit ramps and exit passageways shall be provided with exit signs in compliance with Section 1025.2.6.1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Egress path markings shall be provided in interior exit stairways, interior exit ramps and exit passageways, in accordance with Sections 1025.2.1 through 1025.2.9. Entrances to interior exit stairways, interior exit ramps and exit passageways shall be provided with exit signs in compliance with Section 1025.2.6.1.",
+  "previewText" : "Egress path markings shall be provided in interior exit stairways, interior exit ramps and exit passageways, in accordance with Sections 1025.",
+  "schemaVersion" : 2,
+  "sectionID" : 2459
+}

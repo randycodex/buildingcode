@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162176\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162176\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Potable water gravity tanks or manholes of potable water pressure tanks shall not be located directly under any soil or waste piping or any source of contamination.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12199-html-1",
+      "kind" : "html",
+      "plainText" : "Potable water gravity tanks or manholes of potable water pressure tanks shall not be located directly under any soil or waste piping or any source of contamination."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Potable water gravity tanks or manholes of potable water pressure tanks shall not be located directly under any soil or waste piping or any source of contamination.",
+  "previewText" : "Potable water gravity tanks or manholes of potable water pressure tanks shall not be located directly under any soil or waste piping or any source of contamination.",
+  "schemaVersion" : 2,
+  "sectionID" : 12199
+}

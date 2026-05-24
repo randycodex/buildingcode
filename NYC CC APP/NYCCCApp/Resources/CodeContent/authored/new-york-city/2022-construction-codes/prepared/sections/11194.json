@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195495\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195495\"><\/AnnotationDrawer><div>Safety and safety relief valves shall be listed and labeled, and shall have a minimum rated capacity for the equipment or appliances served. Safety and safety relief valves shall be set at not greater than the nameplate pressure rating of the boiler or pressure vessel and shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> or the ASME CSD-1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11194-html-1",
+      "kind" : "html",
+      "plainText" : "Safety and safety relief valves shall be listed and labeled, and shall have a minimum rated capacity for the equipment or appliances served. Safety and safety relief valves shall be set at not greater than the nameplate pressure rating of the boiler or pressure vessel and shall be in accordance with the ASME Boiler and Pressure Vessel Code or the ASME CSD-1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Safety and safety relief valves shall be listed and labeled, and shall have a minimum rated capacity for the equipment or appliances served. Safety and safety relief valves shall be set at not greater than the nameplate pressure rating of the boiler or pressure vessel and shall be in accordance with the ASME Boiler and Pressure Vessel Code or the ASME CSD-1.",
+  "previewText" : "Safety and safety relief valves shall be listed and labeled, and shall have a minimum rated capacity for the equipment or appliances served.",
+  "schemaVersion" : 2,
+  "sectionID" : 11194
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192961\"><\/AnnotationDrawer><div>Equipment and appliances shall be installed as required by the terms of their approval, in accordance with the conditions of the listing, the manufacturer's instructions and this code. Manufacturer's instructions shall be available on the job site at the time of inspection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10326-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment and appliances shall be installed as required by the terms of their approval, in accordance with the conditions of the listing, the manufacturer's instructions and this code. Manufacturer's instructions shall be available on the job site at the time of inspection."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Equipment and appliances shall be installed as required by the terms of their approval, in accordance with the conditions of the listing, the manufacturer's instructions and this code. Manufacturer's instructions shall be available on the job site at the time of inspection.",
+  "previewText" : "Equipment and appliances shall be installed as required by the terms of their approval, in accordance with the conditions of the listing, the manufacturer's instructions and this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 10326
+}

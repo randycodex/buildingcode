@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163061\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163061\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Vent and branch vent pipes shall be so graded and connected as to drain back to the drainage pipe by gravity.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12548-html-1",
+      "kind" : "html",
+      "plainText" : "Vent and branch vent pipes shall be so graded and connected as to drain back to the drainage pipe by gravity."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Vent and branch vent pipes shall be so graded and connected as to drain back to the drainage pipe by gravity.",
+  "previewText" : "Vent and branch vent pipes shall be so graded and connected as to drain back to the drainage pipe by gravity.",
+  "schemaVersion" : 2,
+  "sectionID" : 12548
+}

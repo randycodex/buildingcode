@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196020\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196020\"><\/AnnotationDrawer><div>Joints between raised temperature polyethylene tubing and fittings shall conform to Sections 1203.16.1 and 1203.16.2. Mechanical joints shall conform to Section 1203.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11386-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between raised temperature polyethylene tubing and fittings shall conform to Sections 1203.16.1 and 1203.16.2. Mechanical joints shall conform to Section 1203.3."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Joints between raised temperature polyethylene tubing and fittings shall conform to Sections 1203.16.1 and 1203.16.2. Mechanical joints shall conform to Section 1203.3.",
+  "previewText" : "Joints between raised temperature polyethylene tubing and fittings shall conform to Sections 1203.",
+  "schemaVersion" : 2,
+  "sectionID" : 11386
+}

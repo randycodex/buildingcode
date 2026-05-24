@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161818\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161818\"><\/AnnotationDrawer><div>Where a connection to an approved water supply is required by Section 318.5 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> for rooftop gardens or landscaping exceeding 250 square feet (23 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t), an approved fixture shall be provided for connection to such water supply in accordance with this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161819\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161819\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-203342', hash: '#JD_L.L.2013\/148' }}\">L.L. 2013\/148<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "12059-html-1",
+      "kind" : "html",
+      "plainText" : "Where a connection to an approved water supply is required by Section 318.5 of the New York City Fire Code for rooftop gardens or landscaping exceeding 250 square feet (23 m\n\n 2 \n\n ), an approved fixture shall be provided for connection to such water supply in accordance with this code.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2013\/148 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where a connection to an approved water supply is required by Section 318.5 of the New York City Fire Code for rooftop gardens or landscaping exceeding 250 square feet (23 m 2 ), an approved fixture shall be provided for connection to such water supply in accordance with this code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2013\/148.",
+  "previewText" : "Where a connection to an approved water supply is required by Section 318.",
+  "schemaVersion" : 2,
+  "sectionID" : 12059
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177724\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177724\"><\/AnnotationDrawer><div>Use of the simplified design procedure shall comply with Sections 1609.6.1 through 1609.6.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3569-html-1",
+      "kind" : "html",
+      "plainText" : "Use of the simplified design procedure shall comply with Sections 1609.6.1 through 1609.6.5."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "Use of the simplified design procedure shall comply with Sections 1609.6.1 through 1609.6.5.",
+  "previewText" : "Use of the simplified design procedure shall comply with Sections 1609.",
+  "schemaVersion" : 2,
+  "sectionID" : 3569
+}

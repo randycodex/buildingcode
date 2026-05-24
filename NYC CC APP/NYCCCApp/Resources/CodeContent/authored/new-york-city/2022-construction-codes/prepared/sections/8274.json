@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198064\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198064\"><\/AnnotationDrawer><div>A piping system shall be permitted to be tested as a complete unit or in sections. Under no circumstances shall a valve in a line be used as a bulkhead between gas in one section of the piping system and test medium in an adjacent section, except where a double block and bleed valve system or flange is installed. A valve shall not be subjected to the test pressure unless the piping system upstream of the valve has been deenergized. The section of piping not subjected to the pressure test shall be checked with a noncorrosive leak-detecting fluid or other approved leak-detecting methods. Sections may be tested at different pressures in accordance with Section 406.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8274-html-1",
+      "kind" : "html",
+      "plainText" : "A piping system shall be permitted to be tested as a complete unit or in sections. Under no circumstances shall a valve in a line be used as a bulkhead between gas in one section of the piping system and test medium in an adjacent section, except where a double block and bleed valve system or flange is installed. A valve shall not be subjected to the test pressure unless the piping system upstream of the valve has been deenergized. The section of piping not subjected to the pressure test shall be checked with a noncorrosive leak-detecting fluid or other approved leak-detecting methods. Sections may be tested at different pressures in accordance with Section 406.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A piping system shall be permitted to be tested as a complete unit or in sections. Under no circumstances shall a valve in a line be used as a bulkhead between gas in one section of the piping system and test medium in an adjacent section, except where a double block and bleed valve system or flange is installed. A valve shall not be subjected to the test pressure unless the piping system upstream of the valve has been deenergized. The section of piping not subjected to the pressure test shall be checked with a noncorrosive leak-detecting fluid or other approved leak-detecting methods. Sections may be tested at different pressures in accordance with Section 406.4.",
+  "previewText" : "A piping system shall be permitted to be tested as a complete unit or in sections.",
+  "schemaVersion" : 2,
+  "sectionID" : 8274
+}

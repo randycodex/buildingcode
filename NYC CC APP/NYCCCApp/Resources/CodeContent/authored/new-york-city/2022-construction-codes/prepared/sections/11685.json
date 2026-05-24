@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196764\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196764\"><\/AnnotationDrawer><div>A flammable liquid or gas shall not be utilized as a heat transfer fluid.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196765\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196765\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196765\"><\/AnnotationDrawer><h6><a name=\"JD_MC1404\" id=\"JD_MC1404\" title=\"MC 1404\"><\/a>Section MC 1404: Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11685-html-1",
+      "kind" : "html",
+      "plainText" : "A flammable liquid or gas shall not be utilized as a heat transfer fluid.\n\n Section MC 1404: Materials"
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "A flammable liquid or gas shall not be utilized as a heat transfer fluid.\n\nSection MC 1404: Materials",
+  "previewText" : "A flammable liquid or gas shall not be utilized as a heat transfer fluid.",
+  "schemaVersion" : 2,
+  "sectionID" : 11685
+}

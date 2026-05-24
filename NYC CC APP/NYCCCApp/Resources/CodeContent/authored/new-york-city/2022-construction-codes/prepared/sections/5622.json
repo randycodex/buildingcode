@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184195\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184195\"><\/AnnotationDrawer><div>Towers shall be provided with adequate foundations and anchorage designed to resist two times the calculated wind load.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5622-html-1",
+      "kind" : "html",
+      "plainText" : "Towers shall be provided with adequate foundations and anchorage designed to resist two times the calculated wind load."
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Towers shall be provided with adequate foundations and anchorage designed to resist two times the calculated wind load.",
+  "previewText" : "Towers shall be provided with adequate foundations and anchorage designed to resist two times the calculated wind load.",
+  "schemaVersion" : 2,
+  "sectionID" : 5622
+}

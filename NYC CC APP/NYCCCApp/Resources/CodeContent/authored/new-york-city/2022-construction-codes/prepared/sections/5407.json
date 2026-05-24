@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183605\"><\/AnnotationDrawer><div>Mechanical appliances, equipment and systems shall be constructed, installed and maintained in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span> Masonry chimneys, fireplaces and barbecues shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180723', hash: '#JD_BCCh.21' }}\">Chapter 21<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "5407-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical appliances, equipment and systems shall be constructed, installed and maintained in accordance with the New York City Mechanical Code and the New York City Fuel Gas Code. Masonry chimneys, fireplaces and barbecues shall comply with the New York City Mechanical Code and Chapter 21 of this code."
+    }
+  ],
+  "chapterNumber" : "28",
+  "officialText" : "Mechanical appliances, equipment and systems shall be constructed, installed and maintained in accordance with the New York City Mechanical Code and the New York City Fuel Gas Code. Masonry chimneys, fireplaces and barbecues shall comply with the New York City Mechanical Code and Chapter 21 of this code.",
+  "previewText" : "Mechanical appliances, equipment and systems shall be constructed, installed and maintained in accordance with the New York City Mechanical Code and the New York City Fuel Gas Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 5407
+}

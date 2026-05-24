@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198799\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198799\"><\/AnnotationDrawer><div>For a single appliance having more than one draft hood outlet or flue collar, the manifold shall be constructed according to the instructions of the appliance manufacturer. Where there are no instructions, the manifold shall be designed and constructed in accordance with approved engineering practices. As an alternate method, the effective area of the manifold shall equal the combined area of the flue collars or draft hood outlets and the vent connectors shall have a minimum 1-foot (304.8 mm) rise.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8546-html-1",
+      "kind" : "html",
+      "plainText" : "For a single appliance having more than one draft hood outlet or flue collar, the manifold shall be constructed according to the instructions of the appliance manufacturer. Where there are no instructions, the manifold shall be designed and constructed in accordance with approved engineering practices. As an alternate method, the effective area of the manifold shall equal the combined area of the flue collars or draft hood outlets and the vent connectors shall have a minimum 1-foot (304.8 mm) rise."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "For a single appliance having more than one draft hood outlet or flue collar, the manifold shall be constructed according to the instructions of the appliance manufacturer. Where there are no instructions, the manifold shall be designed and constructed in accordance with approved engineering practices. As an alternate method, the effective area of the manifold shall equal the combined area of the flue collars or draft hood outlets and the vent connectors shall have a minimum 1-foot (304.8 mm) rise.",
+  "previewText" : "For a single appliance having more than one draft hood outlet or flue collar, the manifold shall be constructed according to the instructions of the appliance manufacturer.",
+  "schemaVersion" : 2,
+  "sectionID" : 8546
+}

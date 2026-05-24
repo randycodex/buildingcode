@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183538\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183538\"><\/AnnotationDrawer><div>Emergency power shall be provided for semiconductor fabrication facilities in accordance with Section 415.11.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5382-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency power shall be provided for semiconductor fabrication facilities in accordance with Section 415.11.10."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Emergency power shall be provided for semiconductor fabrication facilities in accordance with Section 415.11.10.",
+  "previewText" : "Emergency power shall be provided for semiconductor fabrication facilities in accordance with Section 415.",
+  "schemaVersion" : 2,
+  "sectionID" : 5382
+}

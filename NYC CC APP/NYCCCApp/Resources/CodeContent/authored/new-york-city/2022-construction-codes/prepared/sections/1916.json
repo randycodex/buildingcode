@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172280\"><\/AnnotationDrawer><div>Components of exhaust fans shall be rated and certified by the manufacturer for the probable temperature rise to which the components will be exposed. This temperature rise shall be computed in accordance with NFPA 92.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1916-html-1",
+      "kind" : "html",
+      "plainText" : "Components of exhaust fans shall be rated and certified by the manufacturer for the probable temperature rise to which the components will be exposed. This temperature rise shall be computed in accordance with NFPA 92."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Components of exhaust fans shall be rated and certified by the manufacturer for the probable temperature rise to which the components will be exposed. This temperature rise shall be computed in accordance with NFPA 92.",
+  "previewText" : "Components of exhaust fans shall be rated and certified by the manufacturer for the probable temperature rise to which the components will be exposed.",
+  "schemaVersion" : 2,
+  "sectionID" : 1916
+}

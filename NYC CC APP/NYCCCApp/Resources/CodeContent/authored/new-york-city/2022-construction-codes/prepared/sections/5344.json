@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183456\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183456\"><\/AnnotationDrawer><div>Fiber-reinforced polymer used as interior finishes, decorative materials or trim shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170820', hash: '#JD_BCCh.8' }}\">Chapter 8<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5344-html-1",
+      "kind" : "html",
+      "plainText" : "Fiber-reinforced polymer used as interior finishes, decorative materials or trim shall comply with Chapter 8 ."
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "Fiber-reinforced polymer used as interior finishes, decorative materials or trim shall comply with Chapter 8.",
+  "previewText" : "Fiber-reinforced polymer used as interior finishes, decorative materials or trim shall comply with Chapter 8.",
+  "schemaVersion" : 2,
+  "sectionID" : 5344
+}

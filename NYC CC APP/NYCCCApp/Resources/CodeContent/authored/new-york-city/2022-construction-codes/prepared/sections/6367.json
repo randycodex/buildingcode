@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186322\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186322\"><\/AnnotationDrawer><div>The results of the inspection shall be recorded in an inspection report that is prepared, signed, and dated by the person who performed the inspection. In lieu of compliance with the requirements of Section 3301.7, copies of the inspection report shall be maintained at the site by the general contractor, or where there is no general contractor, the contractor causing the work to be performed, or where there is no active work, by the building owner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6367-html-1",
+      "kind" : "html",
+      "plainText" : "The results of the inspection shall be recorded in an inspection report that is prepared, signed, and dated by the person who performed the inspection. In lieu of compliance with the requirements of Section 3301.7, copies of the inspection report shall be maintained at the site by the general contractor, or where there is no general contractor, the contractor causing the work to be performed, or where there is no active work, by the building owner."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The results of the inspection shall be recorded in an inspection report that is prepared, signed, and dated by the person who performed the inspection. In lieu of compliance with the requirements of Section 3301.7, copies of the inspection report shall be maintained at the site by the general contractor, or where there is no general contractor, the contractor causing the work to be performed, or where there is no active work, by the building owner.",
+  "previewText" : "The results of the inspection shall be recorded in an inspection report that is prepared, signed, and dated by the person who performed the inspection.",
+  "schemaVersion" : 2,
+  "sectionID" : 6367
+}

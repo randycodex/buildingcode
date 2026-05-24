@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184756\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184756\"><\/AnnotationDrawer><div>When content required by Section 3301.9.2.1 changes, the sidewalk shed parapet information panel shall be updated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5865-html-1",
+      "kind" : "html",
+      "plainText" : "When content required by Section 3301.9.2.1 changes, the sidewalk shed parapet information panel shall be updated."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "When content required by Section 3301.9.2.1 changes, the sidewalk shed parapet information panel shall be updated.",
+  "previewText" : "When content required by Section 3301.",
+  "schemaVersion" : 2,
+  "sectionID" : 5865
+}

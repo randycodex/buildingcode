@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162626\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162626\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints between polyethylene plastic pipe and fittings shall be underground and shall comply with Section 705.13.1 or 705.13.2.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12378-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between polyethylene plastic pipe and fittings shall be underground and shall comply with Section 705.13.1 or 705.13.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Joints between polyethylene plastic pipe and fittings shall be underground and shall comply with Section 705.13.1 or 705.13.2.",
+  "previewText" : "Joints between polyethylene plastic pipe and fittings shall be underground and shall comply with Section 705.",
+  "schemaVersion" : 2,
+  "sectionID" : 12378
+}

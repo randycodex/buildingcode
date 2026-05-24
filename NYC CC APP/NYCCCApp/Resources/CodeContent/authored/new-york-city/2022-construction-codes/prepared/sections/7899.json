@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230094\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230094\"><\/AnnotationDrawer><div>An ADU shall not be permitted in a basement or cellar of a building in the following locations, except as otherwise provided pursuant to the New York City Zoning Resolution: \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230093\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Within the special flood hazard area in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230092\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230092\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Within the 10-year rainfall flood risk area. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230091\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Within the coastal flood risk area. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7899-html-1",
+      "kind" : "html",
+      "plainText" : "An ADU shall not be permitted in a basement or cellar of a building in the following locations, except as otherwise provided pursuant to the New York City Zoning Resolution: \n\n 1. Within the special flood hazard area in accordance with Appendix G . \n\n 2. Within the 10-year rainfall flood risk area. \n\n 3. Within the coastal flood risk area."
+    }
+  ],
+  "chapterNumber" : "U",
+  "officialText" : "An ADU shall not be permitted in a basement or cellar of a building in the following locations, except as otherwise provided pursuant to the New York City Zoning Resolution:\n\n1. Within the special flood hazard area in accordance with Appendix G.\n\n2. Within the 10-year rainfall flood risk area.\n\n3. Within the coastal flood risk area.",
+  "previewText" : "An ADU shall not be permitted in a basement or cellar of a building in the following locations, except as otherwise provided pursuant to the New York City Zoning Resolution:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 7899
+}

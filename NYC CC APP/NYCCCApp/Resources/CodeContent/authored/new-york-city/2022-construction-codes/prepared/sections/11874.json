@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161349\"><\/AnnotationDrawer><div>Tests in accordance with this code shall be witnessed by department plumbing inspectors or approved agencies. The department shall prescribe qualifications for individuals who are authorized to witness such tests on behalf of approved agencies, including but not limited to the requirement that such individuals shall be licensed master plumbers or registered design professionals with not less than 5 years experience in the inspection and testing of piping systems. Such tests may be conducted without any inspection or tests witnessed by the department, provided that verified statements and supporting inspectorial and test reports are filed with the department within two working days of such tests.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11874-html-1",
+      "kind" : "html",
+      "plainText" : "Tests in accordance with this code shall be witnessed by department plumbing inspectors or approved agencies. The department shall prescribe qualifications for individuals who are authorized to witness such tests on behalf of approved agencies, including but not limited to the requirement that such individuals shall be licensed master plumbers or registered design professionals with not less than 5 years experience in the inspection and testing of piping systems. Such tests may be conducted without any inspection or tests witnessed by the department, provided that verified statements and supporting inspectorial and test reports are filed with the department within two working days of such tests."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Tests in accordance with this code shall be witnessed by department plumbing inspectors or approved agencies. The department shall prescribe qualifications for individuals who are authorized to witness such tests on behalf of approved agencies, including but not limited to the requirement that such individuals shall be licensed master plumbers or registered design professionals with not less than 5 years experience in the inspection and testing of piping systems. Such tests may be conducted without any inspection or tests witnessed by the department, provided that verified statements and supporting inspectorial and test reports are filed with the department within two working days of such tests.",
+  "previewText" : "Tests in accordance with this code shall be witnessed by department plumbing inspectors or approved agencies.",
+  "schemaVersion" : 2,
+  "sectionID" : 11874
+}

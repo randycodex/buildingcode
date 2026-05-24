@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187661\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187661\"><\/AnnotationDrawer><div>Personnel hoists shall meet and be used in accordance with the requirements of this section, Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-187500', hash: '#JD_BC3316' }}\">3316<\/Link>, and rules promulgated by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187662\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187662\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Equipment that is exempted from the requirements of Section 3316.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6785-html-1",
+      "kind" : "html",
+      "plainText" : "Personnel hoists shall meet and be used in accordance with the requirements of this section, Section 3316 , and rules promulgated by the commissioner.\n\n Exception: Equipment that is exempted from the requirements of Section 3316.1."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Personnel hoists shall meet and be used in accordance with the requirements of this section, Section 3316, and rules promulgated by the commissioner.\n\nException: Equipment that is exempted from the requirements of Section 3316.1.",
+  "previewText" : "Personnel hoists shall meet and be used in accordance with the requirements of this section, Section 3316, and rules promulgated by the commissioner.",
+  "schemaVersion" : 2,
+  "sectionID" : 6785
+}

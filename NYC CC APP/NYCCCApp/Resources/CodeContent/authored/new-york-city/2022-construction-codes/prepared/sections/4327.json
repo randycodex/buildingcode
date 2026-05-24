@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180133\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180133\"><\/AnnotationDrawer><div>The following term is defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180134\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180134\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;MASS CONCRETE.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180135\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180135\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180135\"><\/AnnotationDrawer><h6><a name=\"JD_BC1903\" id=\"JD_BC1903\" title=\"BC 1903\"><\/a>Section BC 1903: Specifications for Tests and Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4327-html-1",
+      "kind" : "html",
+      "plainText" : "The following term is defined in Chapter 2 :\n\n MASS CONCRETE. \n\n Section BC 1903: Specifications for Tests and Materials"
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "The following term is defined in Chapter 2:\n\nMASS CONCRETE.",
+  "previewText" : "The following term is defined in Chapter 2:\n\nMASS CONCRETE.",
+  "schemaVersion" : 2,
+  "sectionID" : 4327
+}

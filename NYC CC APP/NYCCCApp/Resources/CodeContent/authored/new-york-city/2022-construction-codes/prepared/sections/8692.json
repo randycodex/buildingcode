@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199253\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199253\"><\/AnnotationDrawer><div>Sauna heaters shall be protected from accidental contact by an approved guard or barrier of material having a low coefficient of thermal conductivity. The guard shall not substantially affect the transfer of heat from the heater to the room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8692-html-1",
+      "kind" : "html",
+      "plainText" : "Sauna heaters shall be protected from accidental contact by an approved guard or barrier of material having a low coefficient of thermal conductivity. The guard shall not substantially affect the transfer of heat from the heater to the room."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Sauna heaters shall be protected from accidental contact by an approved guard or barrier of material having a low coefficient of thermal conductivity. The guard shall not substantially affect the transfer of heat from the heater to the room.",
+  "previewText" : "Sauna heaters shall be protected from accidental contact by an approved guard or barrier of material having a low coefficient of thermal conductivity.",
+  "schemaVersion" : 2,
+  "sectionID" : 8692
+}

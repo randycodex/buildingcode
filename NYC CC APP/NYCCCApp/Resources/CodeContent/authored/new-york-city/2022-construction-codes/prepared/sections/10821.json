@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194408\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194408\"><\/AnnotationDrawer><div>Materials used as internal insulation and exposed to the airstream in ducts shall be shown to be durable when tested in accordance with UL 181. Exposed internal insulation that is not impermeable to water shall not be used to line ducts or plenums from the exit of a cooling coil to the downstream end of the drain pan.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194409\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194409\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194409\"><\/AnnotationDrawer><h6><a name=\"JD_MC605\" id=\"JD_MC605\" title=\"MC 605\"><\/a>Section MC 605: Air Filters<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10821-html-1",
+      "kind" : "html",
+      "plainText" : "Materials used as internal insulation and exposed to the airstream in ducts shall be shown to be durable when tested in accordance with UL 181. Exposed internal insulation that is not impermeable to water shall not be used to line ducts or plenums from the exit of a cooling coil to the downstream end of the drain pan.\n\n Section MC 605: Air Filters"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Materials used as internal insulation and exposed to the airstream in ducts shall be shown to be durable when tested in accordance with UL 181. Exposed internal insulation that is not impermeable to water shall not be used to line ducts or plenums from the exit of a cooling coil to the downstream end of the drain pan.\n\nSection MC 605: Air Filters",
+  "previewText" : "Materials used as internal insulation and exposed to the airstream in ducts shall be shown to be durable when tested in accordance with UL 181.",
+  "schemaVersion" : 2,
+  "sectionID" : 10821
+}

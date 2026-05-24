@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178617\"><\/AnnotationDrawer><div>Demolition operations shall be subject to special inspection in accordance with Sections 1705.25.5.1 and 1705.25.5.2 as applicable to the operations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3826-html-1",
+      "kind" : "html",
+      "plainText" : "Demolition operations shall be subject to special inspection in accordance with Sections 1705.25.5.1 and 1705.25.5.2 as applicable to the operations."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Demolition operations shall be subject to special inspection in accordance with Sections 1705.25.5.1 and 1705.25.5.2 as applicable to the operations.",
+  "previewText" : "Demolition operations shall be subject to special inspection in accordance with Sections 1705.",
+  "schemaVersion" : 2,
+  "sectionID" : 3826
+}

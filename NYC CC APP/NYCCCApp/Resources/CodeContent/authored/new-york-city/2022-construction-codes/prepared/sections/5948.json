@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185179\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185179\"><\/AnnotationDrawer><div>Stairs, hallways, pathways, and other means of egress, including but not limited to ladders used to facilitate access to a working level, shall not be encumbered by debris, material, or equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5948-html-1",
+      "kind" : "html",
+      "plainText" : "Stairs, hallways, pathways, and other means of egress, including but not limited to ladders used to facilitate access to a working level, shall not be encumbered by debris, material, or equipment."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Stairs, hallways, pathways, and other means of egress, including but not limited to ladders used to facilitate access to a working level, shall not be encumbered by debris, material, or equipment.",
+  "previewText" : "Stairs, hallways, pathways, and other means of egress, including but not limited to ladders used to facilitate access to a working level, shall not be encumbered by debris, material, or equipment.",
+  "schemaVersion" : 2,
+  "sectionID" : 5948
+}

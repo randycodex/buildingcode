@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199410\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199410\"><\/AnnotationDrawer><div>Means for interrupting the electrical supply to the air-conditioning appliance and to its associated cooling tower (if supplied and installed in a location remote from the air conditioner) shall be provided within sight of and not over 50 feet (15 240 mm) from the air conditioner and cooling tower.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199411\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199411\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199411\"><\/AnnotationDrawer><h6><a name=\"JD_FGC628\" id=\"JD_FGC628\" title=\"FGC 628\"><\/a>Section FGC 628: Illuminating Appliances<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8752-html-1",
+      "kind" : "html",
+      "plainText" : "Means for interrupting the electrical supply to the air-conditioning appliance and to its associated cooling tower (if supplied and installed in a location remote from the air conditioner) shall be provided within sight of and not over 50 feet (15 240 mm) from the air conditioner and cooling tower.\n\n Section FGC 628: Illuminating Appliances"
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Means for interrupting the electrical supply to the air-conditioning appliance and to its associated cooling tower (if supplied and installed in a location remote from the air conditioner) shall be provided within sight of and not over 50 feet (15 240 mm) from the air conditioner and cooling tower.\n\nSection FGC 628: Illuminating Appliances",
+  "previewText" : "Means for interrupting the electrical supply to the air-conditioning appliance and to its associated cooling tower (if supplied and installed in a location remote from the air conditioner) shall be provided within sight of and not over 50 feet (15 240 mm) from the air conditioner and cooling tower.",
+  "schemaVersion" : 2,
+  "sectionID" : 8752
+}

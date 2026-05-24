@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171864\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171864\"><\/AnnotationDrawer><div>A manual and automatic fire alarm system shall be installed in Group S occupancies where any one of the following conditions exists:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171865\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Group S fire area has an occupant load of 300 occupants or more;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171866\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171866\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The combined occupant load of all Group S fire areas on all floors, including mezzanines, is 300 or more.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1781-html-1",
+      "kind" : "html",
+      "plainText" : "A manual and automatic fire alarm system shall be installed in Group S occupancies where any one of the following conditions exists:\n\n 1. Group S fire area has an occupant load of 300 occupants or more;\n\n 2. The combined occupant load of all Group S fire areas on all floors, including mezzanines, is 300 or more."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "A manual and automatic fire alarm system shall be installed in Group S occupancies where any one of the following conditions exists:\n\n1. Group S fire area has an occupant load of 300 occupants or more;\n\n2. The combined occupant load of all Group S fire areas on all floors, including mezzanines, is 300 or more.",
+  "previewText" : "A manual and automatic fire alarm system shall be installed in Group S occupancies where any one of the following conditions exists:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 1781
+}

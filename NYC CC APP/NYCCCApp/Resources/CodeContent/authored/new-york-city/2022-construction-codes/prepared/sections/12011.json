@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161708\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161708\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Whirlpool bathtubs shall be installed and tested in accordance with the manufacturer's instructions. The pump shall be located above the weir of the fixture trap.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12011-html-1",
+      "kind" : "html",
+      "plainText" : "Whirlpool bathtubs shall be installed and tested in accordance with the manufacturer's instructions. The pump shall be located above the weir of the fixture trap."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Whirlpool bathtubs shall be installed and tested in accordance with the manufacturer's instructions. The pump shall be located above the weir of the fixture trap.",
+  "previewText" : "Whirlpool bathtubs shall be installed and tested in accordance with the manufacturer's instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 12011
+}

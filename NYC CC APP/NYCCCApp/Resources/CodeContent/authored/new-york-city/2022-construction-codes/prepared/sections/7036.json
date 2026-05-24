@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188554\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188554\"><\/AnnotationDrawer><div>A full-scale deployment inspection shall be conducted every three years in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-159272', hash: '#JD_28-324.3' }}\">28-324.3<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188555\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188555\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188555\"><\/AnnotationDrawer><h6><a name=\"JD_BCG201\" id=\"JD_BCG201\" title=\"BC G201\"><\/a>Section BC G201: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7036-html-1",
+      "kind" : "html",
+      "plainText" : "A full-scale deployment inspection shall be conducted every three years in accordance with Section 28-324.3 of the Administrative Code .\n\n Section BC G201: Definitions"
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "A full-scale deployment inspection shall be conducted every three years in accordance with Section 28-324.3 of the Administrative Code.",
+  "previewText" : "A full-scale deployment inspection shall be conducted every three years in accordance with Section 28-324.",
+  "schemaVersion" : 2,
+  "sectionID" : 7036
+}

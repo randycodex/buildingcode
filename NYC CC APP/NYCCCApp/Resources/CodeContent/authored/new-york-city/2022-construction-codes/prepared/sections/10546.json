@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193586\"><\/AnnotationDrawer><div>Gas cabinets containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.8.2 and the following requirements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193587\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193587\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The average ventilation velocity at the face of gas cabinet access ports or windows shall be not less than 200 feet per minute (1.02 m\/s) with a minimum velocity of 150 feet per minute (0.76 m\/s) at any point at the access port or window.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193588\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193588\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Gas cabinets shall be connected to an exhaust system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193589\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193589\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Gas cabinets shall not be used as the sole means of exhaust for any room or area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10546-html-1",
+      "kind" : "html",
+      "plainText" : "Gas cabinets containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.8.2 and the following requirements:\n\n 1. The average ventilation velocity at the face of gas cabinet access ports or windows shall be not less than 200 feet per minute (1.02 m\/s) with a minimum velocity of 150 feet per minute (0.76 m\/s) at any point at the access port or window.\n\n 2. Gas cabinets shall be connected to an exhaust system.\n\n 3. Gas cabinets shall not be used as the sole means of exhaust for any room or area."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Gas cabinets containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.8.2 and the following requirements:\n\n1. The average ventilation velocity at the face of gas cabinet access ports or windows shall be not less than 200 feet per minute (1.02 m\/s) with a minimum velocity of 150 feet per minute (0.76 m\/s) at any point at the access port or window.\n\n2. Gas cabinets shall be connected to an exhaust system.\n\n3. Gas cabinets shall not be used as the sole means of exhaust for any room or area.",
+  "previewText" : "Gas cabinets containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.",
+  "schemaVersion" : 2,
+  "sectionID" : 10546
+}

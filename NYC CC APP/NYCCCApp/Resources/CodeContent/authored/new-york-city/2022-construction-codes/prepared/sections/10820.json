@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194406\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194406\"><\/AnnotationDrawer><div>Insulated exterior ducts shall be protected with an adequate weatherproof barrier.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10820-html-1",
+      "kind" : "html",
+      "plainText" : "Insulated exterior ducts shall be protected with an adequate weatherproof barrier."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Insulated exterior ducts shall be protected with an adequate weatherproof barrier.",
+  "previewText" : "Insulated exterior ducts shall be protected with an adequate weatherproof barrier.",
+  "schemaVersion" : 2,
+  "sectionID" : 10820
+}

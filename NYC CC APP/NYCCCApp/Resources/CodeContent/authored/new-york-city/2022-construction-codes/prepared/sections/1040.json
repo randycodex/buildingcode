@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169207\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169207\"><\/AnnotationDrawer><div>The fire protection peer reviewer's report shall state his or her opinion regarding the fire engineering analysis by the applicant of record.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-169208\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-169208\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-169208\"><\/AnnotationDrawer><h6><a name=\"JD_BC706\" id=\"JD_BC706\" title=\"BC 706\"><\/a>Section BC 706: Fire Walls<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1040-html-1",
+      "kind" : "html",
+      "plainText" : "The fire protection peer reviewer's report shall state his or her opinion regarding the fire engineering analysis by the applicant of record.\n\n Section BC 706: Fire Walls"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire protection peer reviewer's report shall state his or her opinion regarding the fire engineering analysis by the applicant of record.",
+  "previewText" : "The fire protection peer reviewer's report shall state his or her opinion regarding the fire engineering analysis by the applicant of record.",
+  "schemaVersion" : 2,
+  "sectionID" : 1040
+}

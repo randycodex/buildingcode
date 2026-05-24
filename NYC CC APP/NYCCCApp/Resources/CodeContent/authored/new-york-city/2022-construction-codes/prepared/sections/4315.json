@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180093\"><\/AnnotationDrawer><div>The engineer of record for the foundation design shall retain sole responsibility for the geotechnical design. The activities and reports of the geotechnical peer reviewer shall not relieve the engineer of record for the foundation design of this responsibility.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4315-html-1",
+      "kind" : "html",
+      "plainText" : "The engineer of record for the foundation design shall retain sole responsibility for the geotechnical design. The activities and reports of the geotechnical peer reviewer shall not relieve the engineer of record for the foundation design of this responsibility."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The engineer of record for the foundation design shall retain sole responsibility for the geotechnical design. The activities and reports of the geotechnical peer reviewer shall not relieve the engineer of record for the foundation design of this responsibility.",
+  "previewText" : "The engineer of record for the foundation design shall retain sole responsibility for the geotechnical design.",
+  "schemaVersion" : 2,
+  "sectionID" : 4315
+}

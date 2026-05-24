@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168168\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168168\"><\/AnnotationDrawer><div>Explosion control shall be provided where required by Section 414.5.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "762-html-1",
+      "kind" : "html",
+      "plainText" : "Explosion control shall be provided where required by Section 414.5.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Explosion control shall be provided where required by Section 414.5.1.",
+  "previewText" : "Explosion control shall be provided where required by Section 414.",
+  "schemaVersion" : 2,
+  "sectionID" : 762
+}

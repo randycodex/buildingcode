@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182847\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182847\"><\/AnnotationDrawer><div>Glass in vision panels in elevator hoistway doors shall be permitted to be any transparent glazing material not less than 1\/4 inch (6.4 mm) in thickness conforming to Class A in accordance with ANSI Z97.1 or Category II in accordance with CPSC 16 CFR Part 1201. Glass in vision panels in elevator hoistway doors shall also comply with ASME A17.1, Section 2.11.7, as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-189236', hash: '#JD_BCAppK' }}\">Appendix K<\/Link> of this code for additional requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5153-html-1",
+      "kind" : "html",
+      "plainText" : "Glass in vision panels in elevator hoistway doors shall be permitted to be any transparent glazing material not less than 1\/4 inch (6.4 mm) in thickness conforming to Class A in accordance with ANSI Z97.1 or Category II in accordance with CPSC 16 CFR Part 1201. Glass in vision panels in elevator hoistway doors shall also comply with ASME A17.1, Section 2.11.7, as modified by Appendix K of this code for additional requirements."
+    }
+  ],
+  "chapterNumber" : "24",
+  "officialText" : "Glass in vision panels in elevator hoistway doors shall be permitted to be any transparent glazing material not less than 1\/4 inch (6.4 mm) in thickness conforming to Class A in accordance with ANSI Z97.1 or Category II in accordance with CPSC 16 CFR Part 1201. Glass in vision panels in elevator hoistway doors shall also comply with ASME A17.1, Section 2.11.7, as modified by Appendix K of this code for additional requirements.",
+  "previewText" : "Glass in vision panels in elevator hoistway doors shall be permitted to be any transparent glazing material not less than 1\/4 inch (6.",
+  "schemaVersion" : 2,
+  "sectionID" : 5153
+}

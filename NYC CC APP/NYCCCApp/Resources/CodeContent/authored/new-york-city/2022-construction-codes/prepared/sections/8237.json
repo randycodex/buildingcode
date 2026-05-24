@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197959\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197959\"><\/AnnotationDrawer><div>The conduit shall extend into an occupiable portion of the building and, at the point where the conduit terminates in the building, the space between the conduit and the gas piping shall be sealed to prevent the possible entrance of any gas leakage. The conduit shall extend not less than 2 inches (50.8 mm) beyond the point where the pipe emerges from the floor. If the end sealing is capable of withstanding the full pressure of the gas pipe, the conduit shall be designed for the same pressure as the pipe. Such conduit shall extend not less than 4 inches (101.6 mm) outside the building, shall be vented above grade to the outdoors and shall be installed so as to prevent the entrance of water and insects.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8237-html-1",
+      "kind" : "html",
+      "plainText" : "The conduit shall extend into an occupiable portion of the building and, at the point where the conduit terminates in the building, the space between the conduit and the gas piping shall be sealed to prevent the possible entrance of any gas leakage. The conduit shall extend not less than 2 inches (50.8 mm) beyond the point where the pipe emerges from the floor. If the end sealing is capable of withstanding the full pressure of the gas pipe, the conduit shall be designed for the same pressure as the pipe. Such conduit shall extend not less than 4 inches (101.6 mm) outside the building, shall be vented above grade to the outdoors and shall be installed so as to prevent the entrance of water and insects."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The conduit shall extend into an occupiable portion of the building and, at the point where the conduit terminates in the building, the space between the conduit and the gas piping shall be sealed to prevent the possible entrance of any gas leakage. The conduit shall extend not less than 2 inches (50.8 mm) beyond the point where the pipe emerges from the floor. If the end sealing is capable of withstanding the full pressure of the gas pipe, the conduit shall be designed for the same pressure as the pipe. Such conduit shall extend not less than 4 inches (101.6 mm) outside the building, shall be vented above grade to the outdoors and shall be installed so as to prevent the entrance of water and insects.",
+  "previewText" : "The conduit shall extend into an occupiable portion of the building and, at the point where the conduit terminates in the building, the space between the conduit and the gas piping shall be sealed to prevent the possible entrance of any gas leakage.",
+  "schemaVersion" : 2,
+  "sectionID" : 8237
+}

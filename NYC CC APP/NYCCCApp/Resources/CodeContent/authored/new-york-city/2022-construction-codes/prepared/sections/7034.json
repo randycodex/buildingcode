@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188550\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188550\"><\/AnnotationDrawer><div>Covered buildings, as described in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-159244', hash: '#JD_28-324' }}\">28-324<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>, shall be subject to periodic inspections for dry floodproofing systems in accordance with Sections G107.5.1 and G107.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7034-html-1",
+      "kind" : "html",
+      "plainText" : "Covered buildings, as described in Section 28-324 of the Administrative Code , shall be subject to periodic inspections for dry floodproofing systems in accordance with Sections G107.5.1 and G107.5.2."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Covered buildings, as described in Section 28-324 of the Administrative Code, shall be subject to periodic inspections for dry floodproofing systems in accordance with Sections G107.5.1 and G107.5.2.",
+  "previewText" : "Covered buildings, as described in Section 28-324 of the Administrative Code, shall be subject to periodic inspections for dry floodproofing systems in accordance with Sections G107.",
+  "schemaVersion" : 2,
+  "sectionID" : 7034
+}

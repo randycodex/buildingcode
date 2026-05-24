@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196191\"><\/AnnotationDrawer><div>Openings for pipe penetrations in walls, floors and ceilings shall be larger than the penetrating pipe. Openings through concrete or masonry building elements shall be sleeved. The annular space surrounding pipe penetrations shall be protected in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11464-html-1",
+      "kind" : "html",
+      "plainText" : "Openings for pipe penetrations in walls, floors and ceilings shall be larger than the penetrating pipe. Openings through concrete or masonry building elements shall be sleeved. The annular space surrounding pipe penetrations shall be protected in accordance with the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Openings for pipe penetrations in walls, floors and ceilings shall be larger than the penetrating pipe. Openings through concrete or masonry building elements shall be sleeved. The annular space surrounding pipe penetrations shall be protected in accordance with the New York City Building Code.",
+  "previewText" : "Openings for pipe penetrations in walls, floors and ceilings shall be larger than the penetrating pipe.",
+  "schemaVersion" : 2,
+  "sectionID" : 11464
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168292\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168292\"><\/AnnotationDrawer><div>The total quantity of water reactive material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 2.5 pounds (1.1 kg).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168293\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The total quantity of water-reactive material allowed within a laboratory unit that is provided with walls, floors and ceilings that separate the laboratory unit from all adjoining areas by 2-hour fire-rated construction shall not exceed 5 pounds (2.3 kg).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "804-html-1",
+      "kind" : "html",
+      "plainText" : "The total quantity of water reactive material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 2.5 pounds (1.1 kg).\n\n Exception: The total quantity of water-reactive material allowed within a laboratory unit that is provided with walls, floors and ceilings that separate the laboratory unit from all adjoining areas by 2-hour fire-rated construction shall not exceed 5 pounds (2.3 kg)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The total quantity of water reactive material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 2.5 pounds (1.1 kg).\n\nException: The total quantity of water-reactive material allowed within a laboratory unit that is provided with walls, floors and ceilings that separate the laboratory unit from all adjoining areas by 2-hour fire-rated construction shall not exceed 5 pounds (2.3 kg).",
+  "previewText" : "The total quantity of water reactive material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 804
+}

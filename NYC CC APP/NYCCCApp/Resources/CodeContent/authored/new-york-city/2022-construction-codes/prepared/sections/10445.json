@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193344\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193344\"><\/AnnotationDrawer><div>Mechanical ventilation systems shall be provided with manual or automatic controls that will operate such systems whenever the spaces are occupied. Air-conditioning systems that supply required ventilation air shall be provided with controls designed to automatically maintain the required outdoor air supply rate during occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10445-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical ventilation systems shall be provided with manual or automatic controls that will operate such systems whenever the spaces are occupied. Air-conditioning systems that supply required ventilation air shall be provided with controls designed to automatically maintain the required outdoor air supply rate during occupancy."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Mechanical ventilation systems shall be provided with manual or automatic controls that will operate such systems whenever the spaces are occupied. Air-conditioning systems that supply required ventilation air shall be provided with controls designed to automatically maintain the required outdoor air supply rate during occupancy.",
+  "previewText" : "Mechanical ventilation systems shall be provided with manual or automatic controls that will operate such systems whenever the spaces are occupied.",
+  "schemaVersion" : 2,
+  "sectionID" : 10445
+}

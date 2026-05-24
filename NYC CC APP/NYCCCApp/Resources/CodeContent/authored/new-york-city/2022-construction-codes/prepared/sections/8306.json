@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198143\"><\/AnnotationDrawer><div>Immediately after the gas is turned on into a new system or into a system that has been initially restored after an interruption of service, the piping system shall be checked for abnormal operating conditions and leakage. The leakage check shall be performed by means of a combustible gas indicator complying with Section 406.7.1.4, or a noncorrosive leak detection fluid. Where leakage is indicated, or where an abnormal operating condition presents a hazard, the gas supply shall be shut off until the necessary repairs have been made<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8306-html-1",
+      "kind" : "html",
+      "plainText" : "Immediately after the gas is turned on into a new system or into a system that has been initially restored after an interruption of service, the piping system shall be checked for abnormal operating conditions and leakage. The leakage check shall be performed by means of a combustible gas indicator complying with Section 406.7.1.4, or a noncorrosive leak detection fluid. Where leakage is indicated, or where an abnormal operating condition presents a hazard, the gas supply shall be shut off until the necessary repairs have been made"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Immediately after the gas is turned on into a new system or into a system that has been initially restored after an interruption of service, the piping system shall be checked for abnormal operating conditions and leakage. The leakage check shall be performed by means of a combustible gas indicator complying with Section 406.7.1.4, or a noncorrosive leak detection fluid. Where leakage is indicated, or where an abnormal operating condition presents a hazard, the gas supply shall be shut off until the necessary repairs have been made",
+  "previewText" : "Immediately after the gas is turned on into a new system or into a system that has been initially restored after an interruption of service, the piping system shall be checked for abnormal operating conditions and leakage.",
+  "schemaVersion" : 2,
+  "sectionID" : 8306
+}

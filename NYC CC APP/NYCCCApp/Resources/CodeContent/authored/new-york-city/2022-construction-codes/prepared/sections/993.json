@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169040\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169040\"><\/AnnotationDrawer><div>Sprayed fire-resistant materials (SFRM) shall comply with Sections 704.13.1 through 704.13.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "993-html-1",
+      "kind" : "html",
+      "plainText" : "Sprayed fire-resistant materials (SFRM) shall comply with Sections 704.13.1 through 704.13.5."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Sprayed fire-resistant materials (SFRM) shall comply with Sections 704.13.1 through 704.13.5.",
+  "previewText" : "Sprayed fire-resistant materials (SFRM) shall comply with Sections 704.",
+  "schemaVersion" : 2,
+  "sectionID" : 993
+}

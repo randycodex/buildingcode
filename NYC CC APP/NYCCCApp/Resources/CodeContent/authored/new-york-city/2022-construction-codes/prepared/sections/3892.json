@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178789\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178789\"><\/AnnotationDrawer><div>Where specific load test procedures, load factors and acceptance criteria are included in the applicable design standards listed in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-187960', hash: '#JD_BCCh.35' }}\">Chapter 35<\/Link>, such test procedures, load factors and acceptance criteria shall apply. In the absence of specific test procedures, load factors or acceptance criteria, the corresponding provisions in Section 1709.3 shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3892-html-1",
+      "kind" : "html",
+      "plainText" : "Where specific load test procedures, load factors and acceptance criteria are included in the applicable design standards listed in Chapter 35 , such test procedures, load factors and acceptance criteria shall apply. In the absence of specific test procedures, load factors or acceptance criteria, the corresponding provisions in Section 1709.3 shall apply."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Where specific load test procedures, load factors and acceptance criteria are included in the applicable design standards listed in Chapter 35, such test procedures, load factors and acceptance criteria shall apply. In the absence of specific test procedures, load factors or acceptance criteria, the corresponding provisions in Section 1709.3 shall apply.",
+  "previewText" : "Where specific load test procedures, load factors and acceptance criteria are included in the applicable design standards listed in Chapter 35, such test procedures, load factors and acceptance criteria shall apply.",
+  "schemaVersion" : 2,
+  "sectionID" : 3892
+}

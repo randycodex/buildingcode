@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180345\"><\/AnnotationDrawer><div>Concrete in an area represented by core tests shall be considered structurally adequate if the average of three cores is equal to at least 85 percent of <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t and if no single core is less than 75 percent of <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t Additional testing of cores extracted from locations represented by erratic core strength results is permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4405-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete in an area represented by core tests shall be considered structurally adequate if the average of three cores is equal to at least 85 percent of f ' c \n\n and if no single core is less than 75 percent of f ' c \n\n Additional testing of cores extracted from locations represented by erratic core strength results is permitted."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Concrete in an area represented by core tests shall be considered structurally adequate if the average of three cores is equal to at least 85 percent of f 'c and if no single core is less than 75 percent of f 'c Additional testing of cores extracted from locations represented by erratic core strength results is permitted.",
+  "previewText" : "Concrete in an area represented by core tests shall be considered structurally adequate if the average of three cores is equal to at least 85 percent of f 'c and if no single core is less than 75 percent of f 'c Additional testing of cores extracted from locations represented by erratic core strength results is permitted.",
+  "schemaVersion" : 2,
+  "sectionID" : 4405
+}

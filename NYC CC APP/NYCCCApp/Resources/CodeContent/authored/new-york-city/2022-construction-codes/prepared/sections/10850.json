@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194491\"><\/AnnotationDrawer><div>Smoke dampers listed for use in air distribution systems shall be installed both upstream and downstream of filters and ahead of any branch connections in supply air-handling apparatus and systems having a capacity equal to or greater than 15,000 cfm (7.1 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194492\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194492\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194493\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194493\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Where the air-handling unit is located on the floor that it serves and serves only that floor.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194494\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194494\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Where the air-handling unit is located on the roof and serves only the floor immediately below the roof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10850-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke dampers listed for use in air distribution systems shall be installed both upstream and downstream of filters and ahead of any branch connections in supply air-handling apparatus and systems having a capacity equal to or greater than 15,000 cfm (7.1 m\n 3 \n \/s).\n\n Exceptions: \n\n 1. Where the air-handling unit is located on the floor that it serves and serves only that floor.\n\n 2. Where the air-handling unit is located on the roof and serves only the floor immediately below the roof."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Smoke dampers listed for use in air distribution systems shall be installed both upstream and downstream of filters and ahead of any branch connections in supply air-handling apparatus and systems having a capacity equal to or greater than 15,000 cfm (7.1 m 3 \/s).\n\nExceptions:\n\n1. Where the air-handling unit is located on the floor that it serves and serves only that floor.\n\n2. Where the air-handling unit is located on the roof and serves only the floor immediately below the roof.",
+  "previewText" : "Smoke dampers listed for use in air distribution systems shall be installed both upstream and downstream of filters and ahead of any branch connections in supply air-handling apparatus and systems having a capacity equal to or greater than 15,000 cfm (7.",
+  "schemaVersion" : 2,
+  "sectionID" : 10850
+}

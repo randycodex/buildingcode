@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171580\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171580\"><\/AnnotationDrawer><div>Manual actuation and system interconnection for the hood suppression system shall be installed in accordance with Sections 904.12.1 and 904.12.2, respectively.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1702-html-1",
+      "kind" : "html",
+      "plainText" : "Manual actuation and system interconnection for the hood suppression system shall be installed in accordance with Sections 904.12.1 and 904.12.2, respectively."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Manual actuation and system interconnection for the hood suppression system shall be installed in accordance with Sections 904.12.1 and 904.12.2, respectively.",
+  "previewText" : "Manual actuation and system interconnection for the hood suppression system shall be installed in accordance with Sections 904.",
+  "schemaVersion" : 2,
+  "sectionID" : 1702
+}

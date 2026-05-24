@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171467\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171467\"><\/AnnotationDrawer><div>Cross connections and risers in new buildings, including buildings constructed pursuant to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-155422', hash: '#JD_28-101.4.2' }}\">28-101.4.2<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code,<\/span> shall be painted red and the handles of valves serving dedicated sprinklers shall be painted green prior to the hydrostatic pressure test regardless of whether they will be enclosed at a later point in time.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171468\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171468\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where a standpipe system is used as a combination standpipe and sprinkler system, the sprinkler risers and cross connections that are also used for the standpipe system shall be painted red and the handles of valves serving such combination system shall be painted yellow.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1657-html-1",
+      "kind" : "html",
+      "plainText" : "Cross connections and risers in new buildings, including buildings constructed pursuant to Section 28-101.4.2 of the Administrative Code, shall be painted red and the handles of valves serving dedicated sprinklers shall be painted green prior to the hydrostatic pressure test regardless of whether they will be enclosed at a later point in time.\n\n Exception: Where a standpipe system is used as a combination standpipe and sprinkler system, the sprinkler risers and cross connections that are also used for the standpipe system shall be painted red and the handles of valves serving such combination system shall be painted yellow."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Cross connections and risers in new buildings, including buildings constructed pursuant to Section 28-101.4.2 of the Administrative Code, shall be painted red and the handles of valves serving dedicated sprinklers shall be painted green prior to the hydrostatic pressure test regardless of whether they will be enclosed at a later point in time.\n\nException: Where a standpipe system is used as a combination standpipe and sprinkler system, the sprinkler risers and cross connections that are also used for the standpipe system shall be painted red and the handles of valves serving such combination system shall be painted yellow.",
+  "previewText" : "Cross connections and risers in new buildings, including buildings constructed pursuant to Section 28-101.",
+  "schemaVersion" : 2,
+  "sectionID" : 1657
+}

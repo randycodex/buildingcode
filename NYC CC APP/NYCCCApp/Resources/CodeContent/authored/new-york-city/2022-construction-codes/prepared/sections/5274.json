@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183222\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183222\"><\/AnnotationDrawer><div>In areas where the probability of termite infestation is very heavy in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183221', hash: '#JD_BCFigure2603.8' }}\">Figure 2603.8<\/Link>, extruded and expanded polystyrene, polyisocyanurate and other foam plastics shall not be installed on the exterior face or under interior or exterior foundation walls or slab foundations located below grade. The clearance between foam plastics installed above grade and exposed earth shall be not less than 6 inches (152 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183223\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183223\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183224\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183224\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Buildings where the structural members of walls, floors, ceilings and roofs are entirely of noncombustible materials or preservative-treated wood;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183225\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;An approved method of protecting the foam plastic and structure from subterranean termite damage is provided; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183226\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183226\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;On the interior side of basement and cellar walls.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183227\"><\/AnnotationDrawer><div>",
+      "id" : "5274-html-1",
+      "kind" : "html",
+      "plainText" : "In areas where the probability of termite infestation is very heavy in accordance with Figure 2603.8 , extruded and expanded polystyrene, polyisocyanurate and other foam plastics shall not be installed on the exterior face or under interior or exterior foundation walls or slab foundations located below grade. The clearance between foam plastics installed above grade and exposed earth shall be not less than 6 inches (152 mm).\n\n Exceptions: \n\n 1. Buildings where the structural members of walls, floors, ceilings and roofs are entirely of noncombustible materials or preservative-treated wood;\n\n 2. An approved method of protecting the foam plastic and structure from subterranean termite damage is provided; or\n\n 3. On the interior side of basement and cellar walls."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/712b48a0bea85d7a1121382c45c055e2a63627cd.png\" width=\"768\" height=\"470.8\"><\/img><\/span>",
+      "id" : "5274-image-2",
+      "imageID" : "712b48a0bea85d7a1121382c45c055e2a63627cd.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183228\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183228\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure2603.8\" id=\"JD_BCFigure2603.8\" title=\"BC Figure 2603.8\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 2603.8<br><\/br>Termite Infestation Probability Map<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5274-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 2603.8\n Termite Infestation Probability Map"
+    }
+  ],
+  "chapterNumber" : "26",
+  "officialText" : "In areas where the probability of termite infestation is very heavy in accordance with Figure 2603.8, extruded and expanded polystyrene, polyisocyanurate and other foam plastics shall not be installed on the exterior face or under interior or exterior foundation walls or slab foundations located below grade. The clearance between foam plastics installed above grade and exposed earth shall be not less than 6 inches (152 mm).\n\nExceptions:\n\n1. Buildings where the structural members of walls, floors, ceilings and roofs are entirely of noncombustible materials or preservative-treated wood;\n\n2. An approved method of protecting the foam plastic and structure from subterranean termite damage is provided; or\n\n3. On the interior side of basement and cellar walls.\n\nFigure 2603.8 Termite Infestation Probability Map",
+  "previewText" : "In areas where the probability of termite infestation is very heavy in accordance with Figure 2603.",
+  "schemaVersion" : 2,
+  "sectionID" : 5274
+}

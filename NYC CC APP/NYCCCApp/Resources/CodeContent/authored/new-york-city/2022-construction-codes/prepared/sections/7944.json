@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196839\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196839\"><\/AnnotationDrawer><div>This code shall apply to the installation of fuel-gas piping systems, fuel-gas appliances and related accessories in accordance with Sections 101.2.2 through 101.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7944-html-1",
+      "kind" : "html",
+      "plainText" : "This code shall apply to the installation of fuel-gas piping systems, fuel-gas appliances and related accessories in accordance with Sections 101.2.2 through 101.2.5."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "This code shall apply to the installation of fuel-gas piping systems, fuel-gas appliances and related accessories in accordance with Sections 101.2.2 through 101.2.5.",
+  "previewText" : "This code shall apply to the installation of fuel-gas piping systems, fuel-gas appliances and related accessories in accordance with Sections 101.",
+  "schemaVersion" : 2,
+  "sectionID" : 7944
+}

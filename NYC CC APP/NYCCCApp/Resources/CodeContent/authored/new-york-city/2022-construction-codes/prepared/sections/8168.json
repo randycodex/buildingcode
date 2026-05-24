@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197747\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197747\"><\/AnnotationDrawer><div>Where two or more meters are installed on the same premises but supply separate consumers, the piping systems shall not be interconnected on the outlet side of the meters.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8168-html-1",
+      "kind" : "html",
+      "plainText" : "Where two or more meters are installed on the same premises but supply separate consumers, the piping systems shall not be interconnected on the outlet side of the meters."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where two or more meters are installed on the same premises but supply separate consumers, the piping systems shall not be interconnected on the outlet side of the meters.",
+  "previewText" : "Where two or more meters are installed on the same premises but supply separate consumers, the piping systems shall not be interconnected on the outlet side of the meters.",
+  "schemaVersion" : 2,
+  "sectionID" : 8168
+}

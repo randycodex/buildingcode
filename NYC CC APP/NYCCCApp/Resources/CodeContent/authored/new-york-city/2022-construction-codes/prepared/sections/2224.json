@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173248\"><\/AnnotationDrawer><div>Platform (wheelchair) lifts shall be permitted to serve as part of an accessible means of egress where allowed as part of a required accessible route in Section 1109.8, except for Item 10. Platform lifts shall be installed in accordance with ASME A18.1. Standby power for the platform lift shall be provided in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183483', hash: '#JD_BCCh.27' }}\">Chapter 27<\/Link> for platform lifts permitted to serve as part of an accessible means of egress.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2224-html-1",
+      "kind" : "html",
+      "plainText" : "Platform (wheelchair) lifts shall be permitted to serve as part of an accessible means of egress where allowed as part of a required accessible route in Section 1109.8, except for Item 10. Platform lifts shall be installed in accordance with ASME A18.1. Standby power for the platform lift shall be provided in accordance with Chapter 27 for platform lifts permitted to serve as part of an accessible means of egress."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Platform (wheelchair) lifts shall be permitted to serve as part of an accessible means of egress where allowed as part of a required accessible route in Section 1109.8, except for Item 10. Platform lifts shall be installed in accordance with ASME A18.1. Standby power for the platform lift shall be provided in accordance with Chapter 27 for platform lifts permitted to serve as part of an accessible means of egress.",
+  "previewText" : "Platform (wheelchair) lifts shall be permitted to serve as part of an accessible means of egress where allowed as part of a required accessible route in Section 1109.",
+  "schemaVersion" : 2,
+  "sectionID" : 2224
+}

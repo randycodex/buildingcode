@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176289\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176289\"><\/AnnotationDrawer><div>Windows and doors installed in exterior walls shall conform to the testing and performance requirements of Section 1709.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3143-html-1",
+      "kind" : "html",
+      "plainText" : "Windows and doors installed in exterior walls shall conform to the testing and performance requirements of Section 1709.5."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "Windows and doors installed in exterior walls shall conform to the testing and performance requirements of Section 1709.5.",
+  "previewText" : "Windows and doors installed in exterior walls shall conform to the testing and performance requirements of Section 1709.",
+  "schemaVersion" : 2,
+  "sectionID" : 3143
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161955\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161955\"><\/AnnotationDrawer><div>Potable water service pipes shall not be located in, under or above cesspools, septic tanks, septic tank drainage fields or seepage pits (see Section 605.1 for soil and groundwater conditions) and shall be separated by a minimum of 10 feet (3048 mm) and shall meet all Department of Environmental Protection requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12113-html-1",
+      "kind" : "html",
+      "plainText" : "Potable water service pipes shall not be located in, under or above cesspools, septic tanks, septic tank drainage fields or seepage pits (see Section 605.1 for soil and groundwater conditions) and shall be separated by a minimum of 10 feet (3048 mm) and shall meet all Department of Environmental Protection requirements."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Potable water service pipes shall not be located in, under or above cesspools, septic tanks, septic tank drainage fields or seepage pits (see Section 605.1 for soil and groundwater conditions) and shall be separated by a minimum of 10 feet (3048 mm) and shall meet all Department of Environmental Protection requirements.",
+  "previewText" : "Potable water service pipes shall not be located in, under or above cesspools, septic tanks, septic tank drainage fields or seepage pits (see Section 605.",
+  "schemaVersion" : 2,
+  "sectionID" : 12113
+}

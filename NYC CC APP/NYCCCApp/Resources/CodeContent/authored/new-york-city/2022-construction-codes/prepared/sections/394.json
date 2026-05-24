@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167047\"><\/AnnotationDrawer><div>Failure of the gas detection system shall result in the deactivation of the heating system, activation of the mechanical ventilation system where the system is interlocked with the gas detection system and cause a trouble signal to sound in an approved location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "394-html-1",
+      "kind" : "html",
+      "plainText" : "Failure of the gas detection system shall result in the deactivation of the heating system, activation of the mechanical ventilation system where the system is interlocked with the gas detection system and cause a trouble signal to sound in an approved location."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Failure of the gas detection system shall result in the deactivation of the heating system, activation of the mechanical ventilation system where the system is interlocked with the gas detection system and cause a trouble signal to sound in an approved location.",
+  "previewText" : "Failure of the gas detection system shall result in the deactivation of the heating system, activation of the mechanical ventilation system where the system is interlocked with the gas detection system and cause a trouble signal to sound in an approved location.",
+  "schemaVersion" : 2,
+  "sectionID" : 394
+}

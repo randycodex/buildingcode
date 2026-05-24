@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175558\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175558\"><\/AnnotationDrawer><div>An accessible route shall be provided to at least 5 percent, but not less than one, of each type of bowling lane.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2901-html-1",
+      "kind" : "html",
+      "plainText" : "An accessible route shall be provided to at least 5 percent, but not less than one, of each type of bowling lane."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "An accessible route shall be provided to at least 5 percent, but not less than one, of each type of bowling lane.",
+  "previewText" : "An accessible route shall be provided to at least 5 percent, but not less than one, of each type of bowling lane.",
+  "schemaVersion" : 2,
+  "sectionID" : 2901
+}

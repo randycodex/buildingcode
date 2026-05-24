@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197917\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197917\"><\/AnnotationDrawer><div>Nonmetallic flange gaskets shall be in accordance with ASME B16.21.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8219-html-1",
+      "kind" : "html",
+      "plainText" : "Nonmetallic flange gaskets shall be in accordance with ASME B16.21."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Nonmetallic flange gaskets shall be in accordance with ASME B16.21.",
+  "previewText" : "Nonmetallic flange gaskets shall be in accordance with ASME B16.",
+  "schemaVersion" : 2,
+  "sectionID" : 8219
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198002\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198002\"><\/AnnotationDrawer><div>Where the conduit originates indoors in a building and terminates indoors within a different building, the conduit shall comply with Section 404.14.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8254-html-1",
+      "kind" : "html",
+      "plainText" : "Where the conduit originates indoors in a building and terminates indoors within a different building, the conduit shall comply with Section 404.14.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Where the conduit originates indoors in a building and terminates indoors within a different building, the conduit shall comply with Section 404.14.2.",
+  "previewText" : "Where the conduit originates indoors in a building and terminates indoors within a different building, the conduit shall comply with Section 404.",
+  "schemaVersion" : 2,
+  "sectionID" : 8254
+}

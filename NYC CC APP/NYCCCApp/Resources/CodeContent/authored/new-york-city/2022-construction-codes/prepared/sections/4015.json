@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179206\"><\/AnnotationDrawer><div>Deep foundations shall be designed and installed in accordance with the requirements of the geotechnical investigation and report required by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178872', hash: '#JD_BC1803' }}\">1803<\/Link> and Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179201', hash: '#JD_BC1810' }}\">1810<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179768', hash: '#JD_BC1814' }}\">1814<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4015-html-1",
+      "kind" : "html",
+      "plainText" : "Deep foundations shall be designed and installed in accordance with the requirements of the geotechnical investigation and report required by Section 1803 and Sections 1810 through 1814 ."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Deep foundations shall be designed and installed in accordance with the requirements of the geotechnical investigation and report required by Section 1803 and Sections 1810 through 1814.",
+  "previewText" : "Deep foundations shall be designed and installed in accordance with the requirements of the geotechnical investigation and report required by Section 1803 and Sections 1810 through 1814.",
+  "schemaVersion" : 2,
+  "sectionID" : 4015
+}

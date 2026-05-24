@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192258\"><\/AnnotationDrawer><div>Add Section 2.7.5 to read as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192259\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192259\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">2.7.5<\/span> The construction documents shall show the necessary details of the acoustical ceiling to identify the number, size, spacing, location, weights, and types of fixtures and means employed to comply with these requirements.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "7866-html-1",
+      "kind" : "html",
+      "plainText" : "Add Section 2.7.5 to read as follows:\n\n 2.7.5 The construction documents shall show the necessary details of the acoustical ceiling to identify the number, size, spacing, location, weights, and types of fixtures and means employed to comply with these requirements."
+    }
+  ],
+  "chapterNumber" : "R",
+  "officialText" : "Add Section 2.7.5 to read as follows:",
+  "previewText" : "Add Section 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 7866
+}

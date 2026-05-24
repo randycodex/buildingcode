@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198282\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198282\"><\/AnnotationDrawer><div>Connectors shall have the capacity for the total demand of the connected appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8353-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors shall have the capacity for the total demand of the connected appliance."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Connectors shall have the capacity for the total demand of the connected appliance.",
+  "previewText" : "Connectors shall have the capacity for the total demand of the connected appliance.",
+  "schemaVersion" : 2,
+  "sectionID" : 8353
+}

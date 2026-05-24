@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172814\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172814\"><\/AnnotationDrawer><div>It shall be unlawful to alter a building or structure in a manner that will reduce the number of exits or the minimum width or required capacity of the means of egress to less than required by this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2118-html-1",
+      "kind" : "html",
+      "plainText" : "It shall be unlawful to alter a building or structure in a manner that will reduce the number of exits or the minimum width or required capacity of the means of egress to less than required by this code."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "It shall be unlawful to alter a building or structure in a manner that will reduce the number of exits or the minimum width or required capacity of the means of egress to less than required by this code.",
+  "previewText" : "It shall be unlawful to alter a building or structure in a manner that will reduce the number of exits or the minimum width or required capacity of the means of egress to less than required by this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 2118
+}

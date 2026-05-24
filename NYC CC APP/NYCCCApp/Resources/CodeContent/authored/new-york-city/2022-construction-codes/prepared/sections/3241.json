@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176578\"><\/AnnotationDrawer><div>Roof coverings installed on low-slope roofs (roof slope &lt; 2:12) in accordance with Section 1507 shall resist impact damage based on the results of tests conducted in accordance with ASTM D 3746, ASTM D 4272, CGSB 37-GP-52M or the \"Resistance to Foot Traffic Test\" in Section 5.5 of FM 4470.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3241-html-1",
+      "kind" : "html",
+      "plainText" : "Roof coverings installed on low-slope roofs (roof slope < 2:12) in accordance with Section 1507 shall resist impact damage based on the results of tests conducted in accordance with ASTM D 3746, ASTM D 4272, CGSB 37-GP-52M or the \"Resistance to Foot Traffic Test\" in Section 5.5 of FM 4470."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Roof coverings installed on low-slope roofs (roof slope < 2:12) in accordance with Section 1507 shall resist impact damage based on the results of tests conducted in accordance with ASTM D 3746, ASTM D 4272, CGSB 37-GP-52M or the \"Resistance to Foot Traffic Test\" in Section 5.5 of FM 4470.",
+  "previewText" : "Roof coverings installed on low-slope roofs (roof slope < 2:12) in accordance with Section 1507 shall resist impact damage based on the results of tests conducted in accordance with ASTM D 3746, ASTM D 4272, CGSB 37-GP-52M or the \"Resistance to Foot Traffic Test\" in Section 5.",
+  "schemaVersion" : 2,
+  "sectionID" : 3241
+}

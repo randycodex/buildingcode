@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167773\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167773\"><\/AnnotationDrawer><div>Group H occupancies shall be provided with an automatic fire detection system in accordance with Section 907.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "618-html-1",
+      "kind" : "html",
+      "plainText" : "Group H occupancies shall be provided with an automatic fire detection system in accordance with Section 907.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Group H occupancies shall be provided with an automatic fire detection system in accordance with Section 907.2.",
+  "previewText" : "Group H occupancies shall be provided with an automatic fire detection system in accordance with Section 907.",
+  "schemaVersion" : 2,
+  "sectionID" : 618
+}

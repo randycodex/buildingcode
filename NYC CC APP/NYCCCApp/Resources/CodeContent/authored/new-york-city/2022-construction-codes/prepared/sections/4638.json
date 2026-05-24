@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180971\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180971\"><\/AnnotationDrawer><div>The applicant of record shall submit an engineering analysis establishing that proposed building horizontal joints spaced further apart than in 2109.5.1 are sufficient to provide for the effects of vertical shortening of the structural frame.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180972\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180972\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180972\"><\/AnnotationDrawer><h6><a name=\"JD_BC2110\" id=\"JD_BC2110\" title=\"BC 2110\"><\/a>Section BC 2110: Glass Unit Masonry<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4638-html-1",
+      "kind" : "html",
+      "plainText" : "The applicant of record shall submit an engineering analysis establishing that proposed building horizontal joints spaced further apart than in 2109.5.1 are sufficient to provide for the effects of vertical shortening of the structural frame.\n\n Section BC 2110: Glass Unit Masonry"
+    }
+  ],
+  "chapterNumber" : "21",
+  "officialText" : "The applicant of record shall submit an engineering analysis establishing that proposed building horizontal joints spaced further apart than in 2109.5.1 are sufficient to provide for the effects of vertical shortening of the structural frame.",
+  "previewText" : "The applicant of record shall submit an engineering analysis establishing that proposed building horizontal joints spaced further apart than in 2109.",
+  "schemaVersion" : 2,
+  "sectionID" : 4638
+}

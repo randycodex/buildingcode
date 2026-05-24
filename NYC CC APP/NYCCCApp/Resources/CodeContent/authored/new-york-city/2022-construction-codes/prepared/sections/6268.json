@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186021\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186021\"><\/AnnotationDrawer><div>Floor openings used for the removal of debris shall comply with Section 3306.9.12.1. Every opening not used for the removal of debris in any floor shall be clearly marked and solidly planked over by planking not less than 2 inches (51 mm) in thickness, or equivalent solid material, laid close.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6268-html-1",
+      "kind" : "html",
+      "plainText" : "Floor openings used for the removal of debris shall comply with Section 3306.9.12.1. Every opening not used for the removal of debris in any floor shall be clearly marked and solidly planked over by planking not less than 2 inches (51 mm) in thickness, or equivalent solid material, laid close."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Floor openings used for the removal of debris shall comply with Section 3306.9.12.1. Every opening not used for the removal of debris in any floor shall be clearly marked and solidly planked over by planking not less than 2 inches (51 mm) in thickness, or equivalent solid material, laid close.",
+  "previewText" : "Floor openings used for the removal of debris shall comply with Section 3306.",
+  "schemaVersion" : 2,
+  "sectionID" : 6268
+}

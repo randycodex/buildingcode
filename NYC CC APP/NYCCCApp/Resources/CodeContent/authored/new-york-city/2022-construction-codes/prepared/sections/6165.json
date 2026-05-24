@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185748\"><\/AnnotationDrawer><div>In no case shall shores be so located as to alter the pattern of stresses determined in the original structural analysis or to induce tensile stresses where reinforcing bars are not provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6165-html-1",
+      "kind" : "html",
+      "plainText" : "In no case shall shores be so located as to alter the pattern of stresses determined in the original structural analysis or to induce tensile stresses where reinforcing bars are not provided."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "In no case shall shores be so located as to alter the pattern of stresses determined in the original structural analysis or to induce tensile stresses where reinforcing bars are not provided.",
+  "previewText" : "In no case shall shores be so located as to alter the pattern of stresses determined in the original structural analysis or to induce tensile stresses where reinforcing bars are not provided.",
+  "schemaVersion" : 2,
+  "sectionID" : 6165
+}

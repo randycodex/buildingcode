@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169000\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169000\"><\/AnnotationDrawer><div>The fire-resistance ratings of structural members and assemblies shall comply with this section and the requirements for the type of construction as specified in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable601' }}\">Table 601<\/Link>. The fire-resistance ratings shall be not less than the ratings required for the fire-resistance-rated assemblies supported by the structural members.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169001\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Fire barriers, fire partitions, smoke barriers and horizontal assemblies as provided in Sections 707.5, 708.4 and 711.2, respectively.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "979-html-1",
+      "kind" : "html",
+      "plainText" : "The fire-resistance ratings of structural members and assemblies shall comply with this section and the requirements for the type of construction as specified in Table 601 . The fire-resistance ratings shall be not less than the ratings required for the fire-resistance-rated assemblies supported by the structural members.\n\n Exception: Fire barriers, fire partitions, smoke barriers and horizontal assemblies as provided in Sections 707.5, 708.4 and 711.2, respectively."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The fire-resistance ratings of structural members and assemblies shall comply with this section and the requirements for the type of construction as specified in Table 601. The fire-resistance ratings shall be not less than the ratings required for the fire-resistance-rated assemblies supported by the structural members.\n\nException: Fire barriers, fire partitions, smoke barriers and horizontal assemblies as provided in Sections 707.5, 708.4 and 711.2, respectively.",
+  "previewText" : "The fire-resistance ratings of structural members and assemblies shall comply with this section and the requirements for the type of construction as specified in Table 601.",
+  "schemaVersion" : 2,
+  "sectionID" : 979
+}

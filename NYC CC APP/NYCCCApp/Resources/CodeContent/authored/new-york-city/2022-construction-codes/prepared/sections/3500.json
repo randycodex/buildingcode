@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177425\"><\/AnnotationDrawer><div>In addition to any other applicable live loads, structural elements that support hoists for facade access and building maintenance equipment shall be designed for a live load of 2.5 times the rated load of the hoist or the stall load of the hoist, whichever is greater.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177426\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177426\"><\/AnnotationDrawer><div>Equipment installed temporarily to facilitate construction, demolition, alteration, or inspection shall be subject to the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184649', hash: '#JD_BCCh.33' }}\">Chapter 33<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3500-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to any other applicable live loads, structural elements that support hoists for facade access and building maintenance equipment shall be designed for a live load of 2.5 times the rated load of the hoist or the stall load of the hoist, whichever is greater.\n\n Equipment installed temporarily to facilitate construction, demolition, alteration, or inspection shall be subject to the requirements of Chapter 33 ."
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "In addition to any other applicable live loads, structural elements that support hoists for facade access and building maintenance equipment shall be designed for a live load of 2.5 times the rated load of the hoist or the stall load of the hoist, whichever is greater.\n\nEquipment installed temporarily to facilitate construction, demolition, alteration, or inspection shall be subject to the requirements of Chapter 33.",
+  "previewText" : "In addition to any other applicable live loads, structural elements that support hoists for facade access and building maintenance equipment shall be designed for a live load of 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 3500
+}

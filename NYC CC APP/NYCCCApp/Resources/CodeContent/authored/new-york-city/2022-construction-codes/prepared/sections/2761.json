@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175178\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175178\"><\/AnnotationDrawer><div>Every dwelling unit and sleeping unit shall be a Type B+NYC unit.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175179\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175179\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2761-html-1",
+      "kind" : "html",
+      "plainText" : "Every dwelling unit and sleeping unit shall be a Type B+NYC unit.\n\n Exception: The number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Every dwelling unit and sleeping unit shall be a Type B+NYC unit.\n\nException: The number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4.",
+  "previewText" : "Every dwelling unit and sleeping unit shall be a Type B+NYC unit.",
+  "schemaVersion" : 2,
+  "sectionID" : 2761
+}

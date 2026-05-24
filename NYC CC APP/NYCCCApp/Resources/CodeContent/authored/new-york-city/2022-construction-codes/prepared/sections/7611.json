@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "K1",
+  "officialText" : "(a) Car oil buffers shall be tested to determine conformance with the applicable requirements by running the car onto the buffer with rated load at rated speed.\n\n(b) For reduced stroke buffers, this test shall be made at the reduced striking speed permitted (Item 5.9.2.1).\n\n(c) This test is not required where a Type C safety is used (see Section 8.6.4.20.1).\n\n(d) In making these tests, the normal and emergency terminal stopping devices shall be made temporarily inoperative. The final terminal stopping devices shall remain operative and be temporarily relocated, if necessary, to permit compression of the buffer during the test.\n\n(e) After completion of the test, a metal tag, indicating the date of the test, together with the name of the person or firm who performed the test, shall be attached to the buffer [Item 5.3.2(b)].\n\n(f) Counterweight oil buffers shall be tested by running the counterweight onto its buffer at rated speed with no load in the car, except as specified in Subsections 8.6.4.20.3(b) and (c) (Item 5.9.2.1), or at reduced speed if the requirements of Section 8.6.11.10 are met.\n\n(g) A test tag as required in Section 8.6.1.7.2 shall be provided.\n\nDelete Subsection (b) of Section 8.6.4.20.4 in its entirety.\n\nDelete Subsection (b) of Section 8.6.4.20.10 in its entirety.",
+  "previewText" : "(a) Car oil buffers shall be tested to determine conformance with the applicable requirements by running the car onto the buffer with rated load at rated speed.",
+  "schemaVersion" : 2,
+  "sectionID" : 7611
+}

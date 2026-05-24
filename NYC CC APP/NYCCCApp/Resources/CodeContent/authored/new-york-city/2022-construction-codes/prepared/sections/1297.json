@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169936\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169936\"><\/AnnotationDrawer><div>Fire and smoke dampers shall be provided with an approved means of access that is large enough to permit inspection and maintenance of the damper and its operating parts. The access shall not affect the integrity of fire-resistance-rated assemblies. The access openings shall not reduce the fire-resistance rating of the assembly. Access points shall be permanently identified on the exterior by a label having letters not less than 1\/2 inch (12.7 mm) in height reading: FIRE\/SMOKE DAMPER, SMOKE DAMPER or FIRE DAMPER followed by an identification marking that is individual and unique to the damper accessed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1297-html-1",
+      "kind" : "html",
+      "plainText" : "Fire and smoke dampers shall be provided with an approved means of access that is large enough to permit inspection and maintenance of the damper and its operating parts. The access shall not affect the integrity of fire-resistance-rated assemblies. The access openings shall not reduce the fire-resistance rating of the assembly. Access points shall be permanently identified on the exterior by a label having letters not less than 1\/2 inch (12.7 mm) in height reading: FIRE\/SMOKE DAMPER, SMOKE DAMPER or FIRE DAMPER followed by an identification marking that is individual and unique to the damper accessed."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire and smoke dampers shall be provided with an approved means of access that is large enough to permit inspection and maintenance of the damper and its operating parts. The access shall not affect the integrity of fire-resistance-rated assemblies. The access openings shall not reduce the fire-resistance rating of the assembly. Access points shall be permanently identified on the exterior by a label having letters not less than 1\/2 inch (12.7 mm) in height reading: FIRE\/SMOKE DAMPER, SMOKE DAMPER or FIRE DAMPER followed by an identification marking that is individual and unique to the damper accessed.",
+  "previewText" : "Fire and smoke dampers shall be provided with an approved means of access that is large enough to permit inspection and maintenance of the damper and its operating parts.",
+  "schemaVersion" : 2,
+  "sectionID" : 1297
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181722\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181722\"><\/AnnotationDrawer><div>Computations to determine the required sizes of members shall be based on the net dimensions (actual sizes) and not nominal sizes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4892-html-1",
+      "kind" : "html",
+      "plainText" : "Computations to determine the required sizes of members shall be based on the net dimensions (actual sizes) and not nominal sizes."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Computations to determine the required sizes of members shall be based on the net dimensions (actual sizes) and not nominal sizes.",
+  "previewText" : "Computations to determine the required sizes of members shall be based on the net dimensions (actual sizes) and not nominal sizes.",
+  "schemaVersion" : 2,
+  "sectionID" : 4892
+}

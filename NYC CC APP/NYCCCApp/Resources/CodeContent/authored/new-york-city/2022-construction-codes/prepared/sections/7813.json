@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-191110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-191110\"><\/AnnotationDrawer><div>City funded projects shall provide induction-loop systems pursuant to Section <InterCodeLink infobasePath=\"L:\\NY\\New York City\\Folio\\Working\\Charter.NFO\" destinationId=\"JD_224.3\" styleName=\"Jump\" linkPrefix=\"\/codes\/newyorkcity\/latest\/\" doc=\"{{ origDocIdx }}\">224.3<\/InterCodeLink> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Charter<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-191111\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-191111\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-191111\"><\/AnnotationDrawer><h6><a name=\"JD_BCN103\" id=\"JD_BCN103\" title=\"BC N103\"><\/a>Section BC N103: Infra-Red System<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7813-html-1",
+      "kind" : "html",
+      "plainText" : "City funded projects shall provide induction-loop systems pursuant to Section 224.3 of the New York City Charter .\n\n Section BC N103: Infra-Red System"
+    }
+  ],
+  "chapterNumber" : "N",
+  "officialText" : "City funded projects shall provide induction-loop systems pursuant to Section 224.3 of the New York City Charter.",
+  "previewText" : "City funded projects shall provide induction-loop systems pursuant to Section 224.",
+  "schemaVersion" : 2,
+  "sectionID" : 7813
+}

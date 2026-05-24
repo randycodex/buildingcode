@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177764\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177764\"><\/AnnotationDrawer><div>For unenclosed frames and elements, the appropriate drag factors and wind effect on successive elements shall be accounted for per recognized standards and references, or in accordance with suitable wind tunnel testing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-177765\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-177765\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-177765\"><\/AnnotationDrawer><h6><a name=\"JD_BC1610\" id=\"JD_BC1610\" title=\"BC 1610\"><\/a>Section BC 1610: Soil Lateral Loads<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3580-html-1",
+      "kind" : "html",
+      "plainText" : "For unenclosed frames and elements, the appropriate drag factors and wind effect on successive elements shall be accounted for per recognized standards and references, or in accordance with suitable wind tunnel testing.\n\n Section BC 1610: Soil Lateral Loads"
+    }
+  ],
+  "chapterNumber" : "16",
+  "officialText" : "For unenclosed frames and elements, the appropriate drag factors and wind effect on successive elements shall be accounted for per recognized standards and references, or in accordance with suitable wind tunnel testing.",
+  "previewText" : "For unenclosed frames and elements, the appropriate drag factors and wind effect on successive elements shall be accounted for per recognized standards and references, or in accordance with suitable wind tunnel testing.",
+  "schemaVersion" : 2,
+  "sectionID" : 3580
+}

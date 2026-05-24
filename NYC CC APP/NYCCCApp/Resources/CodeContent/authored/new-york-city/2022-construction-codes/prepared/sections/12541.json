@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163046\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163046\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The required vent shall be sized in accordance with Section 906.2 based on the required size of the building drain.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12541-html-1",
+      "kind" : "html",
+      "plainText" : "The required vent shall be sized in accordance with Section 906.2 based on the required size of the building drain."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "The required vent shall be sized in accordance with Section 906.2 based on the required size of the building drain.",
+  "previewText" : "The required vent shall be sized in accordance with Section 906.",
+  "schemaVersion" : 2,
+  "sectionID" : 12541
+}

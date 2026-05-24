@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187457\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187457\"><\/AnnotationDrawer><div>Ramps and runways (including elevated walkways) shall comply with the requirements of Sections 3315.1.1 through 3315.1.7, as well as rules promulgated by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6720-html-1",
+      "kind" : "html",
+      "plainText" : "Ramps and runways (including elevated walkways) shall comply with the requirements of Sections 3315.1.1 through 3315.1.7, as well as rules promulgated by the commissioner."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Ramps and runways (including elevated walkways) shall comply with the requirements of Sections 3315.1.1 through 3315.1.7, as well as rules promulgated by the commissioner.",
+  "previewText" : "Ramps and runways (including elevated walkways) shall comply with the requirements of Sections 3315.",
+  "schemaVersion" : 2,
+  "sectionID" : 6720
+}

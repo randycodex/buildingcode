@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181314\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181314\"><\/AnnotationDrawer><div>The following terms are defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181315\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181315\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;STEEL CONSTRUCTION, COLD-FORMED.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181316\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181316\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;STEEL ELEMENT, STRUCTURAL.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181317\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181317\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;STEEL JOIST.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181318\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181318\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181318\"><\/AnnotationDrawer><h6><a name=\"JD_BC2203\" id=\"JD_BC2203\" title=\"BC 2203\"><\/a>Section BC 2203: Identification and Protection of Steel for Structural Purposes<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4754-html-1",
+      "kind" : "html",
+      "plainText" : "The following terms are defined in Chapter 2 .\n\n STEEL CONSTRUCTION, COLD-FORMED. \n\n STEEL ELEMENT, STRUCTURAL. \n\n STEEL JOIST. \n\n Section BC 2203: Identification and Protection of Steel for Structural Purposes"
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "The following terms are defined in Chapter 2.\n\nSTEEL CONSTRUCTION, COLD-FORMED.\n\nSTEEL ELEMENT, STRUCTURAL.\n\nSTEEL JOIST.",
+  "previewText" : "The following terms are defined in Chapter 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 4754
+}

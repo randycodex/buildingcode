@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198676\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198676\"><\/AnnotationDrawer><div>All gas vents shall terminate in an approved vent or cowl, which shall prevent downdrafts and prevent rain and debris from entering the vent. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8496-html-1",
+      "kind" : "html",
+      "plainText" : "All gas vents shall terminate in an approved vent or cowl, which shall prevent downdrafts and prevent rain and debris from entering the vent."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "All gas vents shall terminate in an approved vent or cowl, which shall prevent downdrafts and prevent rain and debris from entering the vent.",
+  "previewText" : "All gas vents shall terminate in an approved vent or cowl, which shall prevent downdrafts and prevent rain and debris from entering the vent.",
+  "schemaVersion" : 2,
+  "sectionID" : 8496
+}

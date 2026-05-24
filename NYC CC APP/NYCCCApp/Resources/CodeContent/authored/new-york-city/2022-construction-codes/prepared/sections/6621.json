@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187159\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187159\"><\/AnnotationDrawer><div>Each platform unit (e.g., scaffold plank, fabricated plank, fabricated deck, or fabricated platform) shall be installed so that the space between adjacent units and the space between the platform and the uprights is no more than 1 inch (25 mm) wide except where a qualified person can demonstrate that a wider space is necessary.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6621-html-1",
+      "kind" : "html",
+      "plainText" : "Each platform unit (e.g., scaffold plank, fabricated plank, fabricated deck, or fabricated platform) shall be installed so that the space between adjacent units and the space between the platform and the uprights is no more than 1 inch (25 mm) wide except where a qualified person can demonstrate that a wider space is necessary."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Each platform unit (e.g., scaffold plank, fabricated plank, fabricated deck, or fabricated platform) shall be installed so that the space between adjacent units and the space between the platform and the uprights is no more than 1 inch (25 mm) wide except where a qualified person can demonstrate that a wider space is necessary.",
+  "previewText" : "Each platform unit (e.",
+  "schemaVersion" : 2,
+  "sectionID" : 6621
+}

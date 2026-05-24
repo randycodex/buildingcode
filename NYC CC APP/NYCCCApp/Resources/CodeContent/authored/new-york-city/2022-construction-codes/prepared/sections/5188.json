@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182976\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182976\"><\/AnnotationDrawer><div>Gypsum board or gypsum panel products shall not be used in diaphragm ceilings to resist lateral forces imposed by masonry or concrete construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-182977\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-182977\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-182977\"><\/AnnotationDrawer><h6><a name=\"JD_BC2509\" id=\"JD_BC2509\" title=\"BC 2509\"><\/a>Section BC 2509: Showers and Water Closets<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5188-html-1",
+      "kind" : "html",
+      "plainText" : "Gypsum board or gypsum panel products shall not be used in diaphragm ceilings to resist lateral forces imposed by masonry or concrete construction.\n\n Section BC 2509: Showers and Water Closets"
+    }
+  ],
+  "chapterNumber" : "25",
+  "officialText" : "Gypsum board or gypsum panel products shall not be used in diaphragm ceilings to resist lateral forces imposed by masonry or concrete construction.",
+  "previewText" : "Gypsum board or gypsum panel products shall not be used in diaphragm ceilings to resist lateral forces imposed by masonry or concrete construction.",
+  "schemaVersion" : 2,
+  "sectionID" : 5188
+}

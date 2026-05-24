@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185590\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185590\"><\/AnnotationDrawer><div>The placement and installation of open web steel joists shall comply with the requirements of Sections 3305.2.4.1 through 3305.2.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6101-html-1",
+      "kind" : "html",
+      "plainText" : "The placement and installation of open web steel joists shall comply with the requirements of Sections 3305.2.4.1 through 3305.2.4.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The placement and installation of open web steel joists shall comply with the requirements of Sections 3305.2.4.1 through 3305.2.4.3.",
+  "previewText" : "The placement and installation of open web steel joists shall comply with the requirements of Sections 3305.",
+  "schemaVersion" : 2,
+  "sectionID" : 6101
+}

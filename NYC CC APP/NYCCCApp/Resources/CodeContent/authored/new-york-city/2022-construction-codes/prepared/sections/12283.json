@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162385\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162385\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Hospitals shall have two water service pipes installed in such a manner so as to minimize the potential for an interruption of the supply of water in the event of a water main or water service pipe failure.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12283-html-1",
+      "kind" : "html",
+      "plainText" : "Hospitals shall have two water service pipes installed in such a manner so as to minimize the potential for an interruption of the supply of water in the event of a water main or water service pipe failure."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "Hospitals shall have two water service pipes installed in such a manner so as to minimize the potential for an interruption of the supply of water in the event of a water main or water service pipe failure.",
+  "previewText" : "Hospitals shall have two water service pipes installed in such a manner so as to minimize the potential for an interruption of the supply of water in the event of a water main or water service pipe failure.",
+  "schemaVersion" : 2,
+  "sectionID" : 12283
+}

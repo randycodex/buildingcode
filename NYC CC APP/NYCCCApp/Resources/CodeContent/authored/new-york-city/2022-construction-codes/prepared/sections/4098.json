@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179462\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179462\"><\/AnnotationDrawer><div>Timber piles used to support permanent structures shall be treated in accordance with this section unless it is established that the tops of the untreated timber piles will be below the lowest groundwater level assumed to exist during the life of the structure as specified in Section 1810.2.12. Preservative and minimum final retention shall be in accordance with AWPA U1 (Commodity Specification E, Use Category 4C) for round timber piles and AWPA U1 (Commodity Specification A, Use Category 4B) for sawn timber piles. Preservative-treated timber piles shall be subject to a quality control program administered by an approved agency. Cuts to timber piles shall be treated in accordance with AWPA M4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4098-html-1",
+      "kind" : "html",
+      "plainText" : "Timber piles used to support permanent structures shall be treated in accordance with this section unless it is established that the tops of the untreated timber piles will be below the lowest groundwater level assumed to exist during the life of the structure as specified in Section 1810.2.12. Preservative and minimum final retention shall be in accordance with AWPA U1 (Commodity Specification E, Use Category 4C) for round timber piles and AWPA U1 (Commodity Specification A, Use Category 4B) for sawn timber piles. Preservative-treated timber piles shall be subject to a quality control program administered by an approved agency. Cuts to timber piles shall be treated in accordance with AWPA M4."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Timber piles used to support permanent structures shall be treated in accordance with this section unless it is established that the tops of the untreated timber piles will be below the lowest groundwater level assumed to exist during the life of the structure as specified in Section 1810.2.12. Preservative and minimum final retention shall be in accordance with AWPA U1 (Commodity Specification E, Use Category 4C) for round timber piles and AWPA U1 (Commodity Specification A, Use Category 4B) for sawn timber piles. Preservative-treated timber piles shall be subject to a quality control program administered by an approved agency. Cuts to timber piles shall be treated in accordance with AWPA M4.",
+  "previewText" : "Timber piles used to support permanent structures shall be treated in accordance with this section unless it is established that the tops of the untreated timber piles will be below the lowest groundwater level assumed to exist during the life of the structure as specified in Section 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4098
+}

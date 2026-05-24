@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162847\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162847\"><\/AnnotationDrawer><div>The connection between sterilizer vent or exhaust openings and the sterilizer vent stack shall be designed and installed to drain to the funnel or basket-type waste fitting. In multiple installations, the sterilizer vent stack shall be drained separately to the lowest sterilizer funnel or basket-type waste fitting or receptor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12456-html-1",
+      "kind" : "html",
+      "plainText" : "The connection between sterilizer vent or exhaust openings and the sterilizer vent stack shall be designed and installed to drain to the funnel or basket-type waste fitting. In multiple installations, the sterilizer vent stack shall be drained separately to the lowest sterilizer funnel or basket-type waste fitting or receptor."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "The connection between sterilizer vent or exhaust openings and the sterilizer vent stack shall be designed and installed to drain to the funnel or basket-type waste fitting. In multiple installations, the sterilizer vent stack shall be drained separately to the lowest sterilizer funnel or basket-type waste fitting or receptor.",
+  "previewText" : "The connection between sterilizer vent or exhaust openings and the sterilizer vent stack shall be designed and installed to drain to the funnel or basket-type waste fitting.",
+  "schemaVersion" : 2,
+  "sectionID" : 12456
+}

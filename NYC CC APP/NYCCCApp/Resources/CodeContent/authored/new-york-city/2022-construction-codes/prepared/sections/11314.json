@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195845\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195845\"><\/AnnotationDrawer><div>Carbon steel pipe with a wall thickness not less than Schedule 80 shall be used for Group A2, A3, B2 or B3 refrigerant liquid lines for sizes 1.5 inches (38.1 mm) and smaller. Carbon steel pipe with a wall thickness not less than Schedule 40 shall be used for Group A1 or B 1 refrigerant liquid lines 6 inches (152.4 mm) and smaller, Group A2, A3, B2 or B3 refrigerant liquid lines sizes 2 inches (50.8 mm) through 6 inches (152.4 mm) and all refrigerant suction and discharge lines 6 inches (152.4 mm) and smaller. Type F steel pipe shall not be used for refrigerant lines having an operating temperature less than -20&#176;F (-28.9&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11314-html-1",
+      "kind" : "html",
+      "plainText" : "Carbon steel pipe with a wall thickness not less than Schedule 80 shall be used for Group A2, A3, B2 or B3 refrigerant liquid lines for sizes 1.5 inches (38.1 mm) and smaller. Carbon steel pipe with a wall thickness not less than Schedule 40 shall be used for Group A1 or B 1 refrigerant liquid lines 6 inches (152.4 mm) and smaller, Group A2, A3, B2 or B3 refrigerant liquid lines sizes 2 inches (50.8 mm) through 6 inches (152.4 mm) and all refrigerant suction and discharge lines 6 inches (152.4 mm) and smaller. Type F steel pipe shall not be used for refrigerant lines having an operating temperature less than -20°F (-28.9°C)."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Carbon steel pipe with a wall thickness not less than Schedule 80 shall be used for Group A2, A3, B2 or B3 refrigerant liquid lines for sizes 1.5 inches (38.1 mm) and smaller. Carbon steel pipe with a wall thickness not less than Schedule 40 shall be used for Group A1 or B 1 refrigerant liquid lines 6 inches (152.4 mm) and smaller, Group A2, A3, B2 or B3 refrigerant liquid lines sizes 2 inches (50.8 mm) through 6 inches (152.4 mm) and all refrigerant suction and discharge lines 6 inches (152.4 mm) and smaller. Type F steel pipe shall not be used for refrigerant lines having an operating temperature less than -20°F (-28.9°C).",
+  "previewText" : "Carbon steel pipe with a wall thickness not less than Schedule 80 shall be used for Group A2, A3, B2 or B3 refrigerant liquid lines for sizes 1.",
+  "schemaVersion" : 2,
+  "sectionID" : 11314
+}

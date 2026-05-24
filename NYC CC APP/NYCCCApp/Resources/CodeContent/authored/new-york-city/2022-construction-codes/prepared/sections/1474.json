@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170815\"><\/AnnotationDrawer><div>In the case of a floor or roof, the standard test provides only for testing for fire exposure from below. Except as noted in Section 703.3, Item 5, floor or roof assemblies of wood framing shall have an upper membrane consisting of a subfloor and finished floor conforming to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170781', hash: '#JD_BCTable722.6.2(4)' }}\">Table 722.6.2(4)<\/Link> or any other membrane that has a contribution to fire resistance of not less than 15 minutes in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170781', hash: '#JD_BCTable722.6.2(1)' }}\">Table 722.6.2(1)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1474-html-1",
+      "kind" : "html",
+      "plainText" : "In the case of a floor or roof, the standard test provides only for testing for fire exposure from below. Except as noted in Section 703.3, Item 5, floor or roof assemblies of wood framing shall have an upper membrane consisting of a subfloor and finished floor conforming to Table 722.6.2(4) or any other membrane that has a contribution to fire resistance of not less than 15 minutes in Table 722.6.2(1) ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "In the case of a floor or roof, the standard test provides only for testing for fire exposure from below. Except as noted in Section 703.3, Item 5, floor or roof assemblies of wood framing shall have an upper membrane consisting of a subfloor and finished floor conforming to Table 722.6.2(4) or any other membrane that has a contribution to fire resistance of not less than 15 minutes in Table 722.6.2(1).",
+  "previewText" : "In the case of a floor or roof, the standard test provides only for testing for fire exposure from below.",
+  "schemaVersion" : 2,
+  "sectionID" : 1474
+}

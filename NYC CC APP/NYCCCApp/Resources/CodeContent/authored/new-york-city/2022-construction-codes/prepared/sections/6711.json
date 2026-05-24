@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187423\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187423\"><\/AnnotationDrawer><div>Corner and angle scaffolds shall comply with the requirements of Sections 3314.16.1 through 3314.16.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6711-html-1",
+      "kind" : "html",
+      "plainText" : "Corner and angle scaffolds shall comply with the requirements of Sections 3314.16.1 through 3314.16.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Corner and angle scaffolds shall comply with the requirements of Sections 3314.16.1 through 3314.16.4.",
+  "previewText" : "Corner and angle scaffolds shall comply with the requirements of Sections 3314.",
+  "schemaVersion" : 2,
+  "sectionID" : 6711
+}

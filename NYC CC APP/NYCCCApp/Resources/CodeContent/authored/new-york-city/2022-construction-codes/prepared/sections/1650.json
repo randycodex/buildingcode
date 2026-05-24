@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171438\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171438\"><\/AnnotationDrawer><div>Hydraulic calculations in accordance with NFPA 13 shall be provided to demonstrate that the available water flow and pressure are adequate to supply all sprinklers installed in any single fire area with discharge densities corresponding to the hazard classification.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1650-html-1",
+      "kind" : "html",
+      "plainText" : "Hydraulic calculations in accordance with NFPA 13 shall be provided to demonstrate that the available water flow and pressure are adequate to supply all sprinklers installed in any single fire area with discharge densities corresponding to the hazard classification."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Hydraulic calculations in accordance with NFPA 13 shall be provided to demonstrate that the available water flow and pressure are adequate to supply all sprinklers installed in any single fire area with discharge densities corresponding to the hazard classification.",
+  "previewText" : "Hydraulic calculations in accordance with NFPA 13 shall be provided to demonstrate that the available water flow and pressure are adequate to supply all sprinklers installed in any single fire area with discharge densities corresponding to the hazard classification.",
+  "schemaVersion" : 2,
+  "sectionID" : 1650
+}

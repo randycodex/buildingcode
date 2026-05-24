@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170065\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170065\"><\/AnnotationDrawer><div>Factory-built chimneys and fireplaces shall be fireblocked in accordance with UL 103 and UL 127.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1332-html-1",
+      "kind" : "html",
+      "plainText" : "Factory-built chimneys and fireplaces shall be fireblocked in accordance with UL 103 and UL 127."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Factory-built chimneys and fireplaces shall be fireblocked in accordance with UL 103 and UL 127.",
+  "previewText" : "Factory-built chimneys and fireplaces shall be fireblocked in accordance with UL 103 and UL 127.",
+  "schemaVersion" : 2,
+  "sectionID" : 1332
+}

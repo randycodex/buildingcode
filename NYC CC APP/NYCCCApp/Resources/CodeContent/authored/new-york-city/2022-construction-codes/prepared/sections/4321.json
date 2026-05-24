@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180107\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180107\"><\/AnnotationDrawer><div>Where this code makes reference to the nationally recognized standard ACI 318, such standard shall be as modified for New York City in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180497', hash: '#JD_BC1908' }}\">1908<\/Link> of this code. Where sections within ACI 318 are referenced in other chapters and appendices of ACI 318, the provisions of this chapter shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4321-html-1",
+      "kind" : "html",
+      "plainText" : "Where this code makes reference to the nationally recognized standard ACI 318, such standard shall be as modified for New York City in accordance with Section 1908 of this code. Where sections within ACI 318 are referenced in other chapters and appendices of ACI 318, the provisions of this chapter shall apply."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Where this code makes reference to the nationally recognized standard ACI 318, such standard shall be as modified for New York City in accordance with Section 1908 of this code. Where sections within ACI 318 are referenced in other chapters and appendices of ACI 318, the provisions of this chapter shall apply.",
+  "previewText" : "Where this code makes reference to the nationally recognized standard ACI 318, such standard shall be as modified for New York City in accordance with Section 1908 of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 4321
+}

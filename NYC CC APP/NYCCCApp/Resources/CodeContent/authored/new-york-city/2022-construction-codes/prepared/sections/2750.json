@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175150\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175150\"><\/AnnotationDrawer><div>In addition to the Accessible units required by Section 1107.5.5.1, where special holding cells or special housing cells or rooms are provided, at least one serving each purpose shall be an Accessible unit. Cells or rooms subject to this requirement include, but are not limited to, those used for purposes of orientation, protective custody, administrative or disciplinary detention or segregation, detoxification and medical isolation.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175151\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175151\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Cells or rooms specially designed without protrusions and that are used solely for purposes of suicide prevention shall not be required to include grab bars.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2750-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the Accessible units required by Section 1107.5.5.1, where special holding cells or special housing cells or rooms are provided, at least one serving each purpose shall be an Accessible unit. Cells or rooms subject to this requirement include, but are not limited to, those used for purposes of orientation, protective custody, administrative or disciplinary detention or segregation, detoxification and medical isolation.\n\n Exception: Cells or rooms specially designed without protrusions and that are used solely for purposes of suicide prevention shall not be required to include grab bars."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "In addition to the Accessible units required by Section 1107.5.5.1, where special holding cells or special housing cells or rooms are provided, at least one serving each purpose shall be an Accessible unit. Cells or rooms subject to this requirement include, but are not limited to, those used for purposes of orientation, protective custody, administrative or disciplinary detention or segregation, detoxification and medical isolation.\n\nException: Cells or rooms specially designed without protrusions and that are used solely for purposes of suicide prevention shall not be required to include grab bars.",
+  "previewText" : "In addition to the Accessible units required by Section 1107.",
+  "schemaVersion" : 2,
+  "sectionID" : 2750
+}

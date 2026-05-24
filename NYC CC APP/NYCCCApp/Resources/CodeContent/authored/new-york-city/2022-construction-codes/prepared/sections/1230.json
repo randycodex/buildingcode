@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169742\"><\/AnnotationDrawer><div>Fire-rated glazing assemblies marked as complying with hose stream requirements (H) shall be permitted in applications that do not require compliance with hose stream requirements. Fire-rated glazing assemblies marked as complying with temperature rise requirements (T) shall be permitted in applications that do not require compliance with temperature rise requirements. Fire-rated glazing assemblies marked with ratings (XXX) that exceed the ratings required by this code shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1230-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-rated glazing assemblies marked as complying with hose stream requirements (H) shall be permitted in applications that do not require compliance with hose stream requirements. Fire-rated glazing assemblies marked as complying with temperature rise requirements (T) shall be permitted in applications that do not require compliance with temperature rise requirements. Fire-rated glazing assemblies marked with ratings (XXX) that exceed the ratings required by this code shall be permitted."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Fire-rated glazing assemblies marked as complying with hose stream requirements (H) shall be permitted in applications that do not require compliance with hose stream requirements. Fire-rated glazing assemblies marked as complying with temperature rise requirements (T) shall be permitted in applications that do not require compliance with temperature rise requirements. Fire-rated glazing assemblies marked with ratings (XXX) that exceed the ratings required by this code shall be permitted.",
+  "previewText" : "Fire-rated glazing assemblies marked as complying with hose stream requirements (H) shall be permitted in applications that do not require compliance with hose stream requirements.",
+  "schemaVersion" : 2,
+  "sectionID" : 1230
+}

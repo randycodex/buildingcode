@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193998\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193998\"><\/AnnotationDrawer><div>Hoods shall comply with the overhang, setback and height requirements in accordance with Sections 507.4.1 and 507.4.2, based on the type of hood.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10681-html-1",
+      "kind" : "html",
+      "plainText" : "Hoods shall comply with the overhang, setback and height requirements in accordance with Sections 507.4.1 and 507.4.2, based on the type of hood."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Hoods shall comply with the overhang, setback and height requirements in accordance with Sections 507.4.1 and 507.4.2, based on the type of hood.",
+  "previewText" : "Hoods shall comply with the overhang, setback and height requirements in accordance with Sections 507.",
+  "schemaVersion" : 2,
+  "sectionID" : 10681
+}

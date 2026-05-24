@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198280\"><\/AnnotationDrawer><div>Connectors shall have an overall length not to exceed 6 feet (1828.8 mm). Measurement shall be made along the centerline of the connector. Only one connector shall be used for each appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8352-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors shall have an overall length not to exceed 6 feet (1828.8 mm). Measurement shall be made along the centerline of the connector. Only one connector shall be used for each appliance."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Connectors shall have an overall length not to exceed 6 feet (1828.8 mm). Measurement shall be made along the centerline of the connector. Only one connector shall be used for each appliance.",
+  "previewText" : "Connectors shall have an overall length not to exceed 6 feet (1828.",
+  "schemaVersion" : 2,
+  "sectionID" : 8352
+}

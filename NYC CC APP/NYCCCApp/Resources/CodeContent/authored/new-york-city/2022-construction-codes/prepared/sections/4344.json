@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180180\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180180\"><\/AnnotationDrawer><div>Concrete exposed to freezing and thawing while moist shall be air entrained in accordance with ACI 318, Sections 19.3.3.1 and 19.3.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4344-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete exposed to freezing and thawing while moist shall be air entrained in accordance with ACI 318, Sections 19.3.3.1 and 19.3.3.3."
+    }
+  ],
+  "chapterNumber" : "19",
+  "officialText" : "Concrete exposed to freezing and thawing while moist shall be air entrained in accordance with ACI 318, Sections 19.3.3.1 and 19.3.3.3.",
+  "previewText" : "Concrete exposed to freezing and thawing while moist shall be air entrained in accordance with ACI 318, Sections 19.",
+  "schemaVersion" : 2,
+  "sectionID" : 4344
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195151\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195151\"><\/AnnotationDrawer><div>Fireplaces and solid fuel-burning appliances shall not be installed in hazardous locations.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195152\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195152\"><\/AnnotationDrawer><div>(Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11060-html-1",
+      "kind" : "html",
+      "plainText" : "Fireplaces and solid fuel-burning appliances shall not be installed in hazardous locations.\n\n (Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fireplaces and solid fuel-burning appliances shall not be installed in hazardous locations.\n\n(Am. L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)",
+  "previewText" : "Fireplaces and solid fuel-burning appliances shall not be installed in hazardous locations.",
+  "schemaVersion" : 2,
+  "sectionID" : 11060
+}

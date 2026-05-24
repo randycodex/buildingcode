@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178416\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178416\"><\/AnnotationDrawer><div>Grout inspection shall be in accordance with Sections 1705.3 and 1815.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3749-html-1",
+      "kind" : "html",
+      "plainText" : "Grout inspection shall be in accordance with Sections 1705.3 and 1815.8."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Grout inspection shall be in accordance with Sections 1705.3 and 1815.8.",
+  "previewText" : "Grout inspection shall be in accordance with Sections 1705.",
+  "schemaVersion" : 2,
+  "sectionID" : 3749
+}

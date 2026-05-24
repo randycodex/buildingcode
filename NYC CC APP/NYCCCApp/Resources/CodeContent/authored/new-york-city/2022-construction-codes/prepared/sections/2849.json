@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175421\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175421\"><\/AnnotationDrawer><div>Numeric keypads shall be a minimum of 2 3\/4 inches (69.9 mm) wide by 5 inches (127 mm) high and shall be arranged in a 12-key ascending telephone keypad layout. Individual keys shall be tactilely discernible, and the number five key shall be tactilely distinct from the other keys. Where the keypad provides an alphabetic overlay on numeric keys, the relationships between letters and digits shall conform to ITU-T Recommendation E.161.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2849-html-1",
+      "kind" : "html",
+      "plainText" : "Numeric keypads shall be a minimum of 2 3\/4 inches (69.9 mm) wide by 5 inches (127 mm) high and shall be arranged in a 12-key ascending telephone keypad layout. Individual keys shall be tactilely discernible, and the number five key shall be tactilely distinct from the other keys. Where the keypad provides an alphabetic overlay on numeric keys, the relationships between letters and digits shall conform to ITU-T Recommendation E.161."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Numeric keypads shall be a minimum of 2 3\/4 inches (69.9 mm) wide by 5 inches (127 mm) high and shall be arranged in a 12-key ascending telephone keypad layout. Individual keys shall be tactilely discernible, and the number five key shall be tactilely distinct from the other keys. Where the keypad provides an alphabetic overlay on numeric keys, the relationships between letters and digits shall conform to ITU-T Recommendation E.161.",
+  "previewText" : "Numeric keypads shall be a minimum of 2 3\/4 inches (69.",
+  "schemaVersion" : 2,
+  "sectionID" : 2849
+}

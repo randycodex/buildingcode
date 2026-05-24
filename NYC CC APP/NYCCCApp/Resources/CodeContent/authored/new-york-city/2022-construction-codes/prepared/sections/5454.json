@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183750\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183750\"><\/AnnotationDrawer><div>In high rise buildings classified in occupancy groups A, B, E, F, H, I, M and S, in low-rise buildings classified in occupancy group B with a gross area of 200,000 square feet (18 581 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) or more and in buildings classified in occupancy group R-1 or R-2, all other automatically operated cars shall have manual operation capability.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183751\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183751\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183751\"><\/AnnotationDrawer><h6><a name=\"JD_BC3004\" id=\"JD_BC3004\" title=\"BC 3004\"><\/a>Section BC 3004: Conveying Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5454-html-1",
+      "kind" : "html",
+      "plainText" : "In high rise buildings classified in occupancy groups A, B, E, F, H, I, M and S, in low-rise buildings classified in occupancy group B with a gross area of 200,000 square feet (18 581 m\n\n 2 \n\n ) or more and in buildings classified in occupancy group R-1 or R-2, all other automatically operated cars shall have manual operation capability.\n\n Section BC 3004: Conveying Systems"
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "In high rise buildings classified in occupancy groups A, B, E, F, H, I, M and S, in low-rise buildings classified in occupancy group B with a gross area of 200,000 square feet (18 581 m 2 ) or more and in buildings classified in occupancy group R-1 or R-2, all other automatically operated cars shall have manual operation capability.",
+  "previewText" : "In high rise buildings classified in occupancy groups A, B, E, F, H, I, M and S, in low-rise buildings classified in occupancy group B with a gross area of 200,000 square feet (18 581 m 2 ) or more and in buildings classified in occupancy group R-1 or R-2, all other automatically operated cars shall have manual operation capability.",
+  "schemaVersion" : 2,
+  "sectionID" : 5454
+}

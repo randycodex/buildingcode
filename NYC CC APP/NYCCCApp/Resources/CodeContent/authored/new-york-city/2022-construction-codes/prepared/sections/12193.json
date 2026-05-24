@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162158\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162158\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">No water tank of any kind that is part of a building water supply system used for potable purposes shall be cleaned with any material or painted on the inside with any material that will have a toxic or otherwise objectionable effect on the potability of the water supply when the tank is put into service. No lead paint shall be used. The water supply connections to and from a tank shall be disconnected or plugged while the tank is being cleaned or painted to prevent any foreign fluid or substance from entering the distribution piping. Where the air in a tank may be insufficient to sustain human life, or may contain an injurious gas, adequate measures shall be taken for the protection of the workers.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12193-html-1",
+      "kind" : "html",
+      "plainText" : "No water tank of any kind that is part of a building water supply system used for potable purposes shall be cleaned with any material or painted on the inside with any material that will have a toxic or otherwise objectionable effect on the potability of the water supply when the tank is put into service. No lead paint shall be used. The water supply connections to and from a tank shall be disconnected or plugged while the tank is being cleaned or painted to prevent any foreign fluid or substance from entering the distribution piping. Where the air in a tank may be insufficient to sustain human life, or may contain an injurious gas, adequate measures shall be taken for the protection of the workers."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "No water tank of any kind that is part of a building water supply system used for potable purposes shall be cleaned with any material or painted on the inside with any material that will have a toxic or otherwise objectionable effect on the potability of the water supply when the tank is put into service. No lead paint shall be used. The water supply connections to and from a tank shall be disconnected or plugged while the tank is being cleaned or painted to prevent any foreign fluid or substance from entering the distribution piping. Where the air in a tank may be insufficient to sustain human life, or may contain an injurious gas, adequate measures shall be taken for the protection of the workers.",
+  "previewText" : "No water tank of any kind that is part of a building water supply system used for potable purposes shall be cleaned with any material or painted on the inside with any material that will have a toxic or otherwise objectionable effect on the potability of the water supply when the tank is put into service.",
+  "schemaVersion" : 2,
+  "sectionID" : 12193
+}

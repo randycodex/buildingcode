@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185170\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185170\"><\/AnnotationDrawer><div>Storage of combustible material and other material and equipment that may present a fire hazard, shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5944-html-1",
+      "kind" : "html",
+      "plainText" : "Storage of combustible material and other material and equipment that may present a fire hazard, shall comply with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Storage of combustible material and other material and equipment that may present a fire hazard, shall comply with the New York City Fire Code.",
+  "previewText" : "Storage of combustible material and other material and equipment that may present a fire hazard, shall comply with the New York City Fire Code.",
+  "schemaVersion" : 2,
+  "sectionID" : 5944
+}

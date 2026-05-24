@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194731\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194731\"><\/AnnotationDrawer><div>This section shall apply only to appliances located in confined spaces in buildings not of unusually tight construction. Where the volumes of rooms and spaces are combined for the purpose of providing indoor combustion air, such rooms and spaces shall communicate through permanent openings in compliance with Sections 702.3.1 and 702.3.2. The required combustion, ventilation, and dilution air shall be obtained by opening the room to the outdoors using a combination of inside and outdoor air, prorated in accordance with Section 704.1.6. The ratio of interior spaces shall comply with Section 704.1.5. The number, location and ratios of openings connecting the space with the outdoor air shall comply with Sections 704.1.1 through 704.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10921-html-1",
+      "kind" : "html",
+      "plainText" : "This section shall apply only to appliances located in confined spaces in buildings not of unusually tight construction. Where the volumes of rooms and spaces are combined for the purpose of providing indoor combustion air, such rooms and spaces shall communicate through permanent openings in compliance with Sections 702.3.1 and 702.3.2. The required combustion, ventilation, and dilution air shall be obtained by opening the room to the outdoors using a combination of inside and outdoor air, prorated in accordance with Section 704.1.6. The ratio of interior spaces shall comply with Section 704.1.5. The number, location and ratios of openings connecting the space with the outdoor air shall comply with Sections 704.1.1 through 704.1.4."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "This section shall apply only to appliances located in confined spaces in buildings not of unusually tight construction. Where the volumes of rooms and spaces are combined for the purpose of providing indoor combustion air, such rooms and spaces shall communicate through permanent openings in compliance with Sections 702.3.1 and 702.3.2. The required combustion, ventilation, and dilution air shall be obtained by opening the room to the outdoors using a combination of inside and outdoor air, prorated in accordance with Section 704.1.6. The ratio of interior spaces shall comply with Section 704.1.5. The number, location and ratios of openings connecting the space with the outdoor air shall comply with Sections 704.1.1 through 704.1.4.",
+  "previewText" : "This section shall apply only to appliances located in confined spaces in buildings not of unusually tight construction.",
+  "schemaVersion" : 2,
+  "sectionID" : 10921
+}

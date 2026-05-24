@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167552\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167552\"><\/AnnotationDrawer><div>Floors shall be graded and drained to prevent water or fuel from remaining on the floor. Floor drains shall discharge through an oil separator to the sewer or to an outside vented sump.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167553\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167553\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Aircraft hangars with individual lease spaces not exceeding 2,000 square feet (186 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) each in which servicing, repairing or washing is not conducted and fuel is not dispensed shall have floors that are graded toward the door, but shall not require a separator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "560-html-1",
+      "kind" : "html",
+      "plainText" : "Floors shall be graded and drained to prevent water or fuel from remaining on the floor. Floor drains shall discharge through an oil separator to the sewer or to an outside vented sump.\n\n Exception: Aircraft hangars with individual lease spaces not exceeding 2,000 square feet (186 m\n\n 2 \n\n ) each in which servicing, repairing or washing is not conducted and fuel is not dispensed shall have floors that are graded toward the door, but shall not require a separator."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Floors shall be graded and drained to prevent water or fuel from remaining on the floor. Floor drains shall discharge through an oil separator to the sewer or to an outside vented sump.\n\nException: Aircraft hangars with individual lease spaces not exceeding 2,000 square feet (186 m 2 ) each in which servicing, repairing or washing is not conducted and fuel is not dispensed shall have floors that are graded toward the door, but shall not require a separator.",
+  "previewText" : "Floors shall be graded and drained to prevent water or fuel from remaining on the floor.",
+  "schemaVersion" : 2,
+  "sectionID" : 560
+}

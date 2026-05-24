@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163244\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163244\"><\/AnnotationDrawer><div>Fixture traps shall be self-scouring. Fixture traps shall not have interior partitions, except where such traps are integral with the fixture or where such traps are constructed of an approved material that is resistant to corrosion and degradation. Slip joints shall be made with an approved elastomeric gasket and shall be installed only on the trap inlet, trap outlet and within the trap seal.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12606-html-1",
+      "kind" : "html",
+      "plainText" : "Fixture traps shall be self-scouring. Fixture traps shall not have interior partitions, except where such traps are integral with the fixture or where such traps are constructed of an approved material that is resistant to corrosion and degradation. Slip joints shall be made with an approved elastomeric gasket and shall be installed only on the trap inlet, trap outlet and within the trap seal."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Fixture traps shall be self-scouring. Fixture traps shall not have interior partitions, except where such traps are integral with the fixture or where such traps are constructed of an approved material that is resistant to corrosion and degradation. Slip joints shall be made with an approved elastomeric gasket and shall be installed only on the trap inlet, trap outlet and within the trap seal.",
+  "previewText" : "Fixture traps shall be self-scouring.",
+  "schemaVersion" : 2,
+  "sectionID" : 12606
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175829\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175829\"><\/AnnotationDrawer><div>Every opening providing required natural light shall be so located so as to properly light all portions of the room. Openings providing required natural light shall be windows and\/or glazed doors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175830\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175830\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span> Group R-3 occupancies. Skylights, opening directly to the outer air, transparent or translucent panels, or other light-transmitting media, may be substituted for window openings in Group R-3 occupancies provided that they meet the minimum dimensional requirements of Section 1205.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2984-html-1",
+      "kind" : "html",
+      "plainText" : "Every opening providing required natural light shall be so located so as to properly light all portions of the room. Openings providing required natural light shall be windows and\/or glazed doors.\n\n Exceptions: Group R-3 occupancies. Skylights, opening directly to the outer air, transparent or translucent panels, or other light-transmitting media, may be substituted for window openings in Group R-3 occupancies provided that they meet the minimum dimensional requirements of Section 1205.2.1."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Every opening providing required natural light shall be so located so as to properly light all portions of the room. Openings providing required natural light shall be windows and\/or glazed doors.\n\nExceptions: Group R-3 occupancies. Skylights, opening directly to the outer air, transparent or translucent panels, or other light-transmitting media, may be substituted for window openings in Group R-3 occupancies provided that they meet the minimum dimensional requirements of Section 1205.2.1.",
+  "previewText" : "Every opening providing required natural light shall be so located so as to properly light all portions of the room.",
+  "schemaVersion" : 2,
+  "sectionID" : 2984
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172203\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172203\"><\/AnnotationDrawer><div>Buoyancy and expansion caused by the design fire in accordance with Section 909.9 shall be analyzed. The system shall be designed such that these effects do not adversely interfere with the system's capabilities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1890-html-1",
+      "kind" : "html",
+      "plainText" : "Buoyancy and expansion caused by the design fire in accordance with Section 909.9 shall be analyzed. The system shall be designed such that these effects do not adversely interfere with the system's capabilities."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Buoyancy and expansion caused by the design fire in accordance with Section 909.9 shall be analyzed. The system shall be designed such that these effects do not adversely interfere with the system's capabilities.",
+  "previewText" : "Buoyancy and expansion caused by the design fire in accordance with Section 909.",
+  "schemaVersion" : 2,
+  "sectionID" : 1890
+}

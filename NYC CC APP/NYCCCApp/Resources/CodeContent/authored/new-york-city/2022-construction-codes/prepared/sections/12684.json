@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163448\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where there is a continuous or semicontinuous discharge into the building storm drain or building storm sewer, such as from a pump, ejector, air conditioning plant or similar device, each gallon per minute of such discharge shall be computed as being equivalent to 32 square feet (2.97 m<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-family:&quot;Arial&quot;,serif;font-size:8pt;\">2<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">) of roof area, based on a rainfall rate of 3 inches (75 mm) per hour.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12684-html-1",
+      "kind" : "html",
+      "plainText" : "Where there is a continuous or semicontinuous discharge into the building storm drain or building storm sewer, such as from a pump, ejector, air conditioning plant or similar device, each gallon per minute of such discharge shall be computed as being equivalent to 32 square feet (2.97 m 2 ) of roof area, based on a rainfall rate of 3 inches (75 mm) per hour."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where there is a continuous or semicontinuous discharge into the building storm drain or building storm sewer, such as from a pump, ejector, air conditioning plant or similar device, each gallon per minute of such discharge shall be computed as being equivalent to 32 square feet (2.97 m2) of roof area, based on a rainfall rate of 3 inches (75 mm) per hour.",
+  "previewText" : "Where there is a continuous or semicontinuous discharge into the building storm drain or building storm sewer, such as from a pump, ejector, air conditioning plant or similar device, each gallon per minute of such discharge shall be computed as being equivalent to 32 square feet (2.",
+  "schemaVersion" : 2,
+  "sectionID" : 12684
+}

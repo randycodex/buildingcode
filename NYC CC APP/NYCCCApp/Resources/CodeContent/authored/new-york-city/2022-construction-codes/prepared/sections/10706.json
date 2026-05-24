@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194074\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194074\"><\/AnnotationDrawer><div>Systems conveying explosive or radioactive materials shall be prebalanced by duct sizing. Other systems shall be balanced by duct sizing with balancing devices, such as dampers. Dampers provided to balance air flow shall be provided with securely fixed minimum-position blocking devices to prevent restricting flow below the required volume or velocity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10706-html-1",
+      "kind" : "html",
+      "plainText" : "Systems conveying explosive or radioactive materials shall be prebalanced by duct sizing. Other systems shall be balanced by duct sizing with balancing devices, such as dampers. Dampers provided to balance air flow shall be provided with securely fixed minimum-position blocking devices to prevent restricting flow below the required volume or velocity."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Systems conveying explosive or radioactive materials shall be prebalanced by duct sizing. Other systems shall be balanced by duct sizing with balancing devices, such as dampers. Dampers provided to balance air flow shall be provided with securely fixed minimum-position blocking devices to prevent restricting flow below the required volume or velocity.",
+  "previewText" : "Systems conveying explosive or radioactive materials shall be prebalanced by duct sizing.",
+  "schemaVersion" : 2,
+  "sectionID" : 10706
+}

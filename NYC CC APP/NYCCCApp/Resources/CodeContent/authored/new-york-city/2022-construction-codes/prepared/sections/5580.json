@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184081\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184081\"><\/AnnotationDrawer><div>Exit doors in air-supported structures and air-inflated structures shall close automatically against normal operational pressures. Opening force at the edge of such doors shall not exceed 15 pounds (6.80 kg), with the structure at operational pressure. Exit doors shall be located in frames constructed such that they will remain operative and support the weight of the pressurized membrane structure in a state of total collapse.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-184082\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-184082\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-184082\"><\/AnnotationDrawer><h6><a name=\"JD_BC3103\" id=\"JD_BC3103\" title=\"BC 3103\"><\/a>Section BC 3103: Temporary Structures<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5580-html-1",
+      "kind" : "html",
+      "plainText" : "Exit doors in air-supported structures and air-inflated structures shall close automatically against normal operational pressures. Opening force at the edge of such doors shall not exceed 15 pounds (6.80 kg), with the structure at operational pressure. Exit doors shall be located in frames constructed such that they will remain operative and support the weight of the pressurized membrane structure in a state of total collapse.\n\n Section BC 3103: Temporary Structures"
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Exit doors in air-supported structures and air-inflated structures shall close automatically against normal operational pressures. Opening force at the edge of such doors shall not exceed 15 pounds (6.80 kg), with the structure at operational pressure. Exit doors shall be located in frames constructed such that they will remain operative and support the weight of the pressurized membrane structure in a state of total collapse.",
+  "previewText" : "Exit doors in air-supported structures and air-inflated structures shall close automatically against normal operational pressures.",
+  "schemaVersion" : 2,
+  "sectionID" : 5580
+}

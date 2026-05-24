@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194924\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194924\"><\/AnnotationDrawer><div>Where a draft control device is part of the appliance or is supplied by the appliance manufacturer, it shall be installed in accordance with the manufacturers' instructions. In the absence of manufacturers' instructions, the device shall be attached to the flue collar of the appliance or as near to the appliance as practical.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10988-html-1",
+      "kind" : "html",
+      "plainText" : "Where a draft control device is part of the appliance or is supplied by the appliance manufacturer, it shall be installed in accordance with the manufacturers' instructions. In the absence of manufacturers' instructions, the device shall be attached to the flue collar of the appliance or as near to the appliance as practical."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Where a draft control device is part of the appliance or is supplied by the appliance manufacturer, it shall be installed in accordance with the manufacturers' instructions. In the absence of manufacturers' instructions, the device shall be attached to the flue collar of the appliance or as near to the appliance as practical.",
+  "previewText" : "Where a draft control device is part of the appliance or is supplied by the appliance manufacturer, it shall be installed in accordance with the manufacturers' instructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 10988
+}

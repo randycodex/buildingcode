@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187230\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187230\"><\/AnnotationDrawer><div>Supported scaffolds shall meet the requirements of Sections 3314.9.1 through 3314.9.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6643-html-1",
+      "kind" : "html",
+      "plainText" : "Supported scaffolds shall meet the requirements of Sections 3314.9.1 through 3314.9.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Supported scaffolds shall meet the requirements of Sections 3314.9.1 through 3314.9.4.",
+  "previewText" : "Supported scaffolds shall meet the requirements of Sections 3314.",
+  "schemaVersion" : 2,
+  "sectionID" : 6643
+}

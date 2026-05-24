@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169401\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169401\"><\/AnnotationDrawer><div>Unless required elsewhere in the code, smoke partitions are not required to have a fire-resistance rating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1106-html-1",
+      "kind" : "html",
+      "plainText" : "Unless required elsewhere in the code, smoke partitions are not required to have a fire-resistance rating."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Unless required elsewhere in the code, smoke partitions are not required to have a fire-resistance rating.",
+  "previewText" : "Unless required elsewhere in the code, smoke partitions are not required to have a fire-resistance rating.",
+  "schemaVersion" : 2,
+  "sectionID" : 1106
+}

@@ -1,0 +1,27 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182279\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182279\"><\/AnnotationDrawer><div>Stud partitions containing plumbing, heating or other pipes shall be framed and the joists underneath spaced to provide proper clearance for the piping. Where a partition containing piping runs parallel to the floor joists, the joists underneath such partitions shall be doubled and spaced to permit the passage of pipes and shall be bridged. Where plumbing, heating or other pipes are placed in, or partly in, a partition, necessitating the cutting of the soles or plates, a metal tie not less than 0.058 inch (1.47 mm) (16 galvanized gage) and 1 1\/2 inches (38 mm) in width shall be fastened to each plate across and to each side of the opening a minimum of 6 inches (152 mm) with not less than six 16d nails. See <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182278', hash: '#JD_BCFIgure2308.5.8' }}\">Figure 2308.5.8<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182280\"><\/AnnotationDrawer><div>",
+      "id" : "5034-html-1",
+      "kind" : "html",
+      "plainText" : "Stud partitions containing plumbing, heating or other pipes shall be framed and the joists underneath spaced to provide proper clearance for the piping. Where a partition containing piping runs parallel to the floor joists, the joists underneath such partitions shall be doubled and spaced to permit the passage of pipes and shall be bridged. Where plumbing, heating or other pipes are placed in, or partly in, a partition, necessitating the cutting of the soles or plates, a metal tie not less than 0.058 inch (1.47 mm) (16 galvanized gage) and 1 1\/2 inches (38 mm) in width shall be fastened to each plate across and to each side of the opening a minimum of 6 inches (152 mm) with not less than six 16d nails. See Figure 2308.5.8 ."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/1fce0e28e7a8cdaf4aa549fb065d6816c1954994.png\" width=\"624\" height=\"779.733333333333\"><\/img><\/span>",
+      "id" : "5034-image-2",
+      "imageID" : "1fce0e28e7a8cdaf4aa549fb065d6816c1954994.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182281\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182281\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\"><a name=\"JD_BCFIgure2308.5.8\" id=\"JD_BCFIgure2308.5.8\" title=\"BC FIgure 2308.5.8\"><\/a>Figure 2308.5.8<br><\/br>Wall Boring and Notching Limits<br><\/br>Not to Scale<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5034-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 2308.5.8\n Wall Boring and Notching Limits\n Not to Scale"
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Stud partitions containing plumbing, heating or other pipes shall be framed and the joists underneath spaced to provide proper clearance for the piping. Where a partition containing piping runs parallel to the floor joists, the joists underneath such partitions shall be doubled and spaced to permit the passage of pipes and shall be bridged. Where plumbing, heating or other pipes are placed in, or partly in, a partition, necessitating the cutting of the soles or plates, a metal tie not less than 0.058 inch (1.47 mm) (16 galvanized gage) and 1 1\/2 inches (38 mm) in width shall be fastened to each plate across and to each side of the opening a minimum of 6 inches (152 mm) with not less than six 16d nails. See Figure 2308.5.8.\n\nFigure 2308.5.8 Wall Boring and Notching Limits Not to Scale",
+  "previewText" : "Stud partitions containing plumbing, heating or other pipes shall be framed and the joists underneath spaced to provide proper clearance for the piping.",
+  "schemaVersion" : 2,
+  "sectionID" : 5034
+}

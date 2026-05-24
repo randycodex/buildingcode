@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173804\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173804\"><\/AnnotationDrawer><div>Exit signs shall be internally or externally illuminated.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173805\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173805\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Tactile signs required by Section 1013.4 need not be provided with illumination.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2365-html-1",
+      "kind" : "html",
+      "plainText" : "Exit signs shall be internally or externally illuminated.\n\n Exception: Tactile signs required by Section 1013.4 need not be provided with illumination."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "Exit signs shall be internally or externally illuminated.\n\nException: Tactile signs required by Section 1013.4 need not be provided with illumination.",
+  "previewText" : "Exit signs shall be internally or externally illuminated.",
+  "schemaVersion" : 2,
+  "sectionID" : 2365
+}

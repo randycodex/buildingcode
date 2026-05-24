@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166990\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166990\"><\/AnnotationDrawer><div>Openings specified in Section 406.5.2 shall satisfy natural ventilation requirements. Additional mechanical ventilation shall not be required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "373-html-1",
+      "kind" : "html",
+      "plainText" : "Openings specified in Section 406.5.2 shall satisfy natural ventilation requirements. Additional mechanical ventilation shall not be required."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Openings specified in Section 406.5.2 shall satisfy natural ventilation requirements. Additional mechanical ventilation shall not be required.",
+  "previewText" : "Openings specified in Section 406.",
+  "schemaVersion" : 2,
+  "sectionID" : 373
+}

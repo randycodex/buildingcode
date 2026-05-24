@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178275\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178275\"><\/AnnotationDrawer><div>Nondestructive testing for seismic resistance shall be in accordance with Section 1705.2.5.1 or 1705.2.5.2, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3714-html-1",
+      "kind" : "html",
+      "plainText" : "Nondestructive testing for seismic resistance shall be in accordance with Section 1705.2.5.1 or 1705.2.5.2, as applicable."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Nondestructive testing for seismic resistance shall be in accordance with Section 1705.2.5.1 or 1705.2.5.2, as applicable.",
+  "previewText" : "Nondestructive testing for seismic resistance shall be in accordance with Section 1705.",
+  "schemaVersion" : 2,
+  "sectionID" : 3714
+}

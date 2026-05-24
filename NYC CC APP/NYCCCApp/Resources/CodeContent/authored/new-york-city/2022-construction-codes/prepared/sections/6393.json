@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186398\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186398\"><\/AnnotationDrawer><div>Vertical and horizontal safety netting used for unenclosed perimeter protection shall be flame retardant in accordance with NFPA 701. Documentation of such shall be provided by the manufacturer and shall be noted on the drawings by the registered design professional responsible for the design of the safety netting systems in accordance with Section 3308.3.1, or shall be recorded by such registered design professional in the form of a signed, sealed, and dated letter from such registered design professional, with such letter kept with the drawings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6393-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical and horizontal safety netting used for unenclosed perimeter protection shall be flame retardant in accordance with NFPA 701. Documentation of such shall be provided by the manufacturer and shall be noted on the drawings by the registered design professional responsible for the design of the safety netting systems in accordance with Section 3308.3.1, or shall be recorded by such registered design professional in the form of a signed, sealed, and dated letter from such registered design professional, with such letter kept with the drawings."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Vertical and horizontal safety netting used for unenclosed perimeter protection shall be flame retardant in accordance with NFPA 701. Documentation of such shall be provided by the manufacturer and shall be noted on the drawings by the registered design professional responsible for the design of the safety netting systems in accordance with Section 3308.3.1, or shall be recorded by such registered design professional in the form of a signed, sealed, and dated letter from such registered design professional, with such letter kept with the drawings.",
+  "previewText" : "Vertical and horizontal safety netting used for unenclosed perimeter protection shall be flame retardant in accordance with NFPA 701.",
+  "schemaVersion" : 2,
+  "sectionID" : 6393
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179795\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179795\"><\/AnnotationDrawer><div>The allowable load on the helical pile shall be computed in accordance with Section 1810.4.1.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4216-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable load on the helical pile shall be computed in accordance with Section 1810.4.1.5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The allowable load on the helical pile shall be computed in accordance with Section 1810.4.1.5.",
+  "previewText" : "The allowable load on the helical pile shall be computed in accordance with Section 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4216
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179972\"><\/AnnotationDrawer><div>Underpinning, alternate methods of support and any associated lateral support system, shall be designed for the loads and load combinations listed in Sections 1817.5.4.1 and 1817.5.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4273-html-1",
+      "kind" : "html",
+      "plainText" : "Underpinning, alternate methods of support and any associated lateral support system, shall be designed for the loads and load combinations listed in Sections 1817.5.4.1 and 1817.5.4.2."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "Underpinning, alternate methods of support and any associated lateral support system, shall be designed for the loads and load combinations listed in Sections 1817.5.4.1 and 1817.5.4.2.",
+  "previewText" : "Underpinning, alternate methods of support and any associated lateral support system, shall be designed for the loads and load combinations listed in Sections 1817.",
+  "schemaVersion" : 2,
+  "sectionID" : 4273
+}

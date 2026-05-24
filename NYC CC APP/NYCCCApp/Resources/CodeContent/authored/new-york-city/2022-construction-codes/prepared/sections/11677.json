@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196747\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196747\"><\/AnnotationDrawer><div>The solar energy system shall be equipped in accordance with the requirements of Sections 1402.5.1 through 1402.5.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11677-html-1",
+      "kind" : "html",
+      "plainText" : "The solar energy system shall be equipped in accordance with the requirements of Sections 1402.5.1 through 1402.5.4."
+    }
+  ],
+  "chapterNumber" : "14",
+  "officialText" : "The solar energy system shall be equipped in accordance with the requirements of Sections 1402.5.1 through 1402.5.4.",
+  "previewText" : "The solar energy system shall be equipped in accordance with the requirements of Sections 1402.",
+  "schemaVersion" : 2,
+  "sectionID" : 11677
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187168\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187168\"><\/AnnotationDrawer><div>The maximum cantilever shall be as follows.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6624-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum cantilever shall be as follows."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "The maximum cantilever shall be as follows.",
+  "previewText" : "The maximum cantilever shall be as follows.",
+  "schemaVersion" : 2,
+  "sectionID" : 6624
+}

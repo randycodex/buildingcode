@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168745\"><\/AnnotationDrawer><div>Except as specified in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168725', hash: '#JD_BCTable509' }}\">Table 509<\/Link> for certain incidental uses, where an automatic sprinkler system is provided in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168725', hash: '#JD_BCTable509' }}\">Table 509<\/Link>, only the space occupied by the incidental use need be equipped with such a system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168746\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168746\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168746\"><\/AnnotationDrawer><h6><a name=\"JD_BC510\" id=\"JD_BC510\" title=\"BC 510\"><\/a>Section BC 510: Special Provisions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "934-html-1",
+      "kind" : "html",
+      "plainText" : "Except as specified in Table 509 for certain incidental uses, where an automatic sprinkler system is provided in accordance with Table 509 , only the space occupied by the incidental use need be equipped with such a system.\n\n Section BC 510: Special Provisions"
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Except as specified in Table 509 for certain incidental uses, where an automatic sprinkler system is provided in accordance with Table 509, only the space occupied by the incidental use need be equipped with such a system.",
+  "previewText" : "Except as specified in Table 509 for certain incidental uses, where an automatic sprinkler system is provided in accordance with Table 509, only the space occupied by the incidental use need be equipped with such a system.",
+  "schemaVersion" : 2,
+  "sectionID" : 934
+}

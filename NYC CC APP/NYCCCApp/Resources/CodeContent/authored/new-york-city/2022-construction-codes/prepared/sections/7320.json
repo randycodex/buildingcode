@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "K1",
+  "officialText" : "(a) This means shall be independent of the elevator control and shall not be self-resetting.\n\n(b) Heat detectors and sprinkler flow switches used to initiate main line elevator power shutdown shall comply with the requirements of NFPA 72.\n\n(c) The activation of sprinklers outside of such locations shall not disconnect the main line elevator power supply. See also Section 2.27.3.3.6.\n\nDelete and revise the first sentence of Section 2.8.3.3.4 to read as follows:",
+  "previewText" : "(a) This means shall be independent of the elevator control and shall not be self-resetting.",
+  "schemaVersion" : 2,
+  "sectionID" : 7320
+}

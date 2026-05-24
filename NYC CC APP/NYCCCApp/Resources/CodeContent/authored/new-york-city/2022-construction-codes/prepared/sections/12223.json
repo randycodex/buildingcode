@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162241\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162241\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The water supply for hospital fixtures shall be protected against backflow with a reduced pressure principle backflow prevention assembly, an atmospheric or spill-resistant vacuum breaker, assembly or an air gap. Vacuum breakers for bedpan washer hoses shall not be located less than 5 feet (1524 mm) above the floor. Vacuum breakers for hose connections in health care or laboratory areas shall not be less than 6 feet (1829 mm) above the floor.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12223-html-1",
+      "kind" : "html",
+      "plainText" : "The water supply for hospital fixtures shall be protected against backflow with a reduced pressure principle backflow prevention assembly, an atmospheric or spill-resistant vacuum breaker, assembly or an air gap. Vacuum breakers for bedpan washer hoses shall not be located less than 5 feet (1524 mm) above the floor. Vacuum breakers for hose connections in health care or laboratory areas shall not be less than 6 feet (1829 mm) above the floor."
+    }
+  ],
+  "chapterNumber" : "6",
+  "officialText" : "The water supply for hospital fixtures shall be protected against backflow with a reduced pressure principle backflow prevention assembly, an atmospheric or spill-resistant vacuum breaker, assembly or an air gap. Vacuum breakers for bedpan washer hoses shall not be located less than 5 feet (1524 mm) above the floor. Vacuum breakers for hose connections in health care or laboratory areas shall not be less than 6 feet (1829 mm) above the floor.",
+  "previewText" : "The water supply for hospital fixtures shall be protected against backflow with a reduced pressure principle backflow prevention assembly, an atmospheric or spill-resistant vacuum breaker, assembly or an air gap.",
+  "schemaVersion" : 2,
+  "sectionID" : 12223
+}

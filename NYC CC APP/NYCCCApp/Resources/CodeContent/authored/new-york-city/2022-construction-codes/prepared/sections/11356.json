@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195958\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195958\"><\/AnnotationDrawer><div>Pipe shall be cut square, reamed and chamfered, and shall be free of burrs and obstructions. Pipe ends shall have full-bore openings and shall not be undercut.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11356-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe shall be cut square, reamed and chamfered, and shall be free of burrs and obstructions. Pipe ends shall have full-bore openings and shall not be undercut."
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Pipe shall be cut square, reamed and chamfered, and shall be free of burrs and obstructions. Pipe ends shall have full-bore openings and shall not be undercut.",
+  "previewText" : "Pipe shall be cut square, reamed and chamfered, and shall be free of burrs and obstructions.",
+  "schemaVersion" : 2,
+  "sectionID" : 11356
+}

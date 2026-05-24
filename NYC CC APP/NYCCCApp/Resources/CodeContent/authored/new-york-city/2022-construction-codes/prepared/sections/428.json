@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167170\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167170\"><\/AnnotationDrawer><div>Group I-2 occupancies shall be provided with means of egress complying with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link> and Sections 407.4.1 through 407.4.4. The fire and emergency preparedness plans provided in accordance with Section 1001.4 of this code shall identify the building components necessary to support a defend-in-place emergency response in accordance with the<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\"> New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "428-html-1",
+      "kind" : "html",
+      "plainText" : "Group I-2 occupancies shall be provided with means of egress complying with Chapter 10 and Sections 407.4.1 through 407.4.4. The fire and emergency preparedness plans provided in accordance with Section 1001.4 of this code shall identify the building components necessary to support a defend-in-place emergency response in accordance with the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Group I-2 occupancies shall be provided with means of egress complying with Chapter 10 and Sections 407.4.1 through 407.4.4. The fire and emergency preparedness plans provided in accordance with Section 1001.4 of this code shall identify the building components necessary to support a defend-in-place emergency response in accordance with the New York City Fire Code.",
+  "previewText" : "Group I-2 occupancies shall be provided with means of egress complying with Chapter 10 and Sections 407.",
+  "schemaVersion" : 2,
+  "sectionID" : 428
+}

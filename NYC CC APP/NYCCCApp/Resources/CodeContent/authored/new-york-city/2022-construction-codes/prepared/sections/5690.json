@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184369\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184369\"><\/AnnotationDrawer><div>Photovoltaic panels and modules installed on a roof or as an integral part of a roof assembly shall comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176478', hash: '#JD_BCCh.15' }}\">Chapter 15<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-184370\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-184370\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-184370\"><\/AnnotationDrawer><h6><a name=\"JD_BC3114\" id=\"JD_BC3114\" title=\"BC 3114\"><\/a>Section BC 3114: Large Wind Turbines<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5690-html-1",
+      "kind" : "html",
+      "plainText" : "Photovoltaic panels and modules installed on a roof or as an integral part of a roof assembly shall comply with the requirements of the New York City Fire Code and Chapter 15 of this code.\n\n Section BC 3114: Large Wind Turbines"
+    }
+  ],
+  "chapterNumber" : "31",
+  "officialText" : "Photovoltaic panels and modules installed on a roof or as an integral part of a roof assembly shall comply with the requirements of the New York City Fire Code and Chapter 15 of this code.",
+  "previewText" : "Photovoltaic panels and modules installed on a roof or as an integral part of a roof assembly shall comply with the requirements of the New York City Fire Code and Chapter 15 of this code.",
+  "schemaVersion" : 2,
+  "sectionID" : 5690
+}

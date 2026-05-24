@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163171\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163171\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A combination waste and vent system shall not serve fixtures other than floor drains, lavatories and drinking fountains. Combination waste and vent systems shall not receive the discharge from a food waste disposer or clinical sink.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12588-html-1",
+      "kind" : "html",
+      "plainText" : "A combination waste and vent system shall not serve fixtures other than floor drains, lavatories and drinking fountains. Combination waste and vent systems shall not receive the discharge from a food waste disposer or clinical sink."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "A combination waste and vent system shall not serve fixtures other than floor drains, lavatories and drinking fountains. Combination waste and vent systems shall not receive the discharge from a food waste disposer or clinical sink.",
+  "previewText" : "A combination waste and vent system shall not serve fixtures other than floor drains, lavatories and drinking fountains.",
+  "schemaVersion" : 2,
+  "sectionID" : 12588
+}

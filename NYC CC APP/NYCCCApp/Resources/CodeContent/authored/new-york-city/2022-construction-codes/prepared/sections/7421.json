@@ -1,0 +1,10 @@
+{
+  "blocks" : [
+
+  ],
+  "chapterNumber" : "K1",
+  "officialText" : "(c) The activation of a fire alarm initiating device specified in Subsection 2.27.3.2.1(c) shall cause all elevators having any equipment in that hoistway, and any associated elevators of a group automatic operation, to be returned nonstop to the designated level, except that initiating device(s) installed at or below the designated landing shall cause the car to be sent to the alternate level.\n\n(d) The Phase I Emergency Recall Operation to the designated level shall conform to Subsections 2.27.3.1.6(a) through (n).\n\nDelete and revise Section 2.27.3.2.5 to read as follows:",
+  "previewText" : "(c) The activation of a fire alarm initiating device specified in Subsection 2.",
+  "schemaVersion" : 2,
+  "sectionID" : 7421
+}

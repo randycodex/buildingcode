@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185906\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185906\"><\/AnnotationDrawer><div>Adjoining property owners shall be notified of upcoming demolition operations in writing not less than 10 days prior to the scheduled starting date of the demolition. The written notice shall provide a description of the work to be performed, the timeframe and schedule, and contact information of the person causing the demolition work and of the department. Demolition or removal work that is to be done with the use of explosives shall also be subject to the notification requirements set forth in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185907\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\"><span style=\"display: none;\"><\/span>Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-207279', hash: '#JD_L.L.2008\/026' }}\">L.L. 2008\/026<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6228-html-1",
+      "kind" : "html",
+      "plainText" : "Adjoining property owners shall be notified of upcoming demolition operations in writing not less than 10 days prior to the scheduled starting date of the demolition. The written notice shall provide a description of the work to be performed, the timeframe and schedule, and contact information of the person causing the demolition work and of the department. Demolition or removal work that is to be done with the use of explosives shall also be subject to the notification requirements set forth in the New York City Fire Code. \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008\/026 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Adjoining property owners shall be notified of upcoming demolition operations in writing not less than 10 days prior to the scheduled starting date of the demolition. The written notice shall provide a description of the work to be performed, the timeframe and schedule, and contact information of the person causing the demolition work and of the department. Demolition or removal work that is to be done with the use of explosives shall also be subject to the notification requirements set forth in the New York City Fire Code.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008\/026.",
+  "previewText" : "Adjoining property owners shall be notified of upcoming demolition operations in writing not less than 10 days prior to the scheduled starting date of the demolition.",
+  "schemaVersion" : 2,
+  "sectionID" : 6228
+}

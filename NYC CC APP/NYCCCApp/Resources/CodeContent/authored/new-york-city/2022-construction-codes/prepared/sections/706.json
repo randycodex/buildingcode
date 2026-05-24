@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168014\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168014\"><\/AnnotationDrawer><div>A continuous gas detection system shall be provided in the areas identified in Sections 415.11.7.1.1 through 415.11.7.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "706-html-1",
+      "kind" : "html",
+      "plainText" : "A continuous gas detection system shall be provided in the areas identified in Sections 415.11.7.1.1 through 415.11.7.1.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "A continuous gas detection system shall be provided in the areas identified in Sections 415.11.7.1.1 through 415.11.7.1.4.",
+  "previewText" : "A continuous gas detection system shall be provided in the areas identified in Sections 415.",
+  "schemaVersion" : 2,
+  "sectionID" : 706
+}

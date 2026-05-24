@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170342\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170342\"><\/AnnotationDrawer><div>Where gypsum wallboard or plaster is applied to the fire-exposed side of the wall, the contribution of the finish to the total fire-resistance rating shall be determined as follows: The time assigned to the finish as established by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170329', hash: '#JD_BCTable722.2.1.4(2)' }}\">Table 722.2.1.4(2)<\/Link> shall be added to the fire-resistance rating determined from <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170279', hash: '#JD_BCTable722.2.1.1' }}\">Tables 722.2.1.1<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170305', hash: '#JD_BCTable722.2.1.2(1)' }}\">722.2.1.2(1)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170300', hash: '#JD_BCFigure722.2.1.2' }}\">Figure 722.2.1.2<\/Link> for the concrete alone, or to the rating determined in Section 722.2.1.4.1 for the concrete and finish on the nonfire-exposed side.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1386-html-1",
+      "kind" : "html",
+      "plainText" : "Where gypsum wallboard or plaster is applied to the fire-exposed side of the wall, the contribution of the finish to the total fire-resistance rating shall be determined as follows: The time assigned to the finish as established by Table 722.2.1.4(2) shall be added to the fire-resistance rating determined from Tables 722.2.1.1 and 722.2.1.2(1) and Figure 722.2.1.2 for the concrete alone, or to the rating determined in Section 722.2.1.4.1 for the concrete and finish on the nonfire-exposed side."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where gypsum wallboard or plaster is applied to the fire-exposed side of the wall, the contribution of the finish to the total fire-resistance rating shall be determined as follows: The time assigned to the finish as established by Table 722.2.1.4(2) shall be added to the fire-resistance rating determined from Tables 722.2.1.1 and 722.2.1.2(1) and Figure 722.2.1.2 for the concrete alone, or to the rating determined in Section 722.2.1.4.1 for the concrete and finish on the nonfire-exposed side.",
+  "previewText" : "Where gypsum wallboard or plaster is applied to the fire-exposed side of the wall, the contribution of the finish to the total fire-resistance rating shall be determined as follows: The time assigned to the finish as established by Table 722.",
+  "schemaVersion" : 2,
+  "sectionID" : 1386
+}

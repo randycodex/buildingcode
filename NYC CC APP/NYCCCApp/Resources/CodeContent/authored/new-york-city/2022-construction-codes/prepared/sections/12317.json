@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162473\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162473\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Direct connection of a steam exhaust, blowoff or drip pipe shall not be made with the building drainage system. Wastewater when discharged into the building drainage system shall be at a temperature not higher than 150&#176;F (65.6&#176;C). When higher temperatures exist, approved cooling methods shall be provided.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162474\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162474\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162474\"><\/AnnotationDrawer><h6><a name=\"JD_PC702\" id=\"JD_PC702\" title=\"PC 702\"><\/a>Section PC 702: Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12317-html-1",
+      "kind" : "html",
+      "plainText" : "Direct connection of a steam exhaust, blowoff or drip pipe shall not be made with the building drainage system. Wastewater when discharged into the building drainage system shall be at a temperature not higher than 150°F (65.6°C). When higher temperatures exist, approved cooling methods shall be provided. \n\n Section PC 702: Materials"
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Direct connection of a steam exhaust, blowoff or drip pipe shall not be made with the building drainage system. Wastewater when discharged into the building drainage system shall be at a temperature not higher than 150°F (65.6°C). When higher temperatures exist, approved cooling methods shall be provided.\n\nSection PC 702: Materials",
+  "previewText" : "Direct connection of a steam exhaust, blowoff or drip pipe shall not be made with the building drainage system.",
+  "schemaVersion" : 2,
+  "sectionID" : 12317
+}

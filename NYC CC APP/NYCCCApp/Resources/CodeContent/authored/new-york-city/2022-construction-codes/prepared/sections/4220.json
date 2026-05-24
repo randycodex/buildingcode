@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179803\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179803\"><\/AnnotationDrawer><div>The number of lateral load tests shall satisfy Section 1810.4, but shall not be fewer than one test.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4220-html-1",
+      "kind" : "html",
+      "plainText" : "The number of lateral load tests shall satisfy Section 1810.4, but shall not be fewer than one test."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The number of lateral load tests shall satisfy Section 1810.4, but shall not be fewer than one test.",
+  "previewText" : "The number of lateral load tests shall satisfy Section 1810.",
+  "schemaVersion" : 2,
+  "sectionID" : 4220
+}

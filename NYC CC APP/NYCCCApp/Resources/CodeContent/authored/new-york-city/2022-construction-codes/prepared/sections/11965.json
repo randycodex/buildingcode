@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161602\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161602\"><\/AnnotationDrawer><div>Floor drains shall conform to ASME A112.3.1, ASME A112.6.3 or CSA B79. Trench drains shall comply with ASME A112.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11965-html-1",
+      "kind" : "html",
+      "plainText" : "Floor drains shall conform to ASME A112.3.1, ASME A112.6.3 or CSA B79. Trench drains shall comply with ASME A112.6.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Floor drains shall conform to ASME A112.3.1, ASME A112.6.3 or CSA B79. Trench drains shall comply with ASME A112.6.3.",
+  "previewText" : "Floor drains shall conform to ASME A112.",
+  "schemaVersion" : 2,
+  "sectionID" : 11965
+}

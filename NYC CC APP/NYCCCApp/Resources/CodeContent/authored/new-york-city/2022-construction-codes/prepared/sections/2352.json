@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173760\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173760\"><\/AnnotationDrawer><div>The landing length shall be 60 inches (1525 mm) minimum.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173761\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173761\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173762\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173762\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;In Group R-2 and R-3 individual dwelling and sleeping units that are not required to be Accessible units, Type B+NYC units or Type B units in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174986', hash: '#JD_BC1107' }}\">1107<\/Link>, landings are permitted to be 36 inches (914.4 mm) minimum.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173763\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173763\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Where the ramp is not a part of an accessible route, the length of the landing shall not be required to be more than 48 inches (1220 mm) in the direction of travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2352-html-1",
+      "kind" : "html",
+      "plainText" : "The landing length shall be 60 inches (1525 mm) minimum.\n\n Exceptions: \n\n 1. In Group R-2 and R-3 individual dwelling and sleeping units that are not required to be Accessible units, Type B+NYC units or Type B units in accordance with Section 1107 , landings are permitted to be 36 inches (914.4 mm) minimum.\n\n 2. Where the ramp is not a part of an accessible route, the length of the landing shall not be required to be more than 48 inches (1220 mm) in the direction of travel."
+    }
+  ],
+  "chapterNumber" : "10",
+  "officialText" : "The landing length shall be 60 inches (1525 mm) minimum.\n\nExceptions:\n\n1. In Group R-2 and R-3 individual dwelling and sleeping units that are not required to be Accessible units, Type B+NYC units or Type B units in accordance with Section 1107, landings are permitted to be 36 inches (914.4 mm) minimum.\n\n2. Where the ramp is not a part of an accessible route, the length of the landing shall not be required to be more than 48 inches (1220 mm) in the direction of travel.",
+  "previewText" : "The landing length shall be 60 inches (1525 mm) minimum.",
+  "schemaVersion" : 2,
+  "sectionID" : 2352
+}

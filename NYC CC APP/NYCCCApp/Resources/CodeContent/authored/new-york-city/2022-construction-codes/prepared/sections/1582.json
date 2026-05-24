@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171235\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">An automatic sprinkler system shall be installed throughout all fire areas containing a Group B ambulatory health care facility occupancy. In buildings where ambulatory care is provided on levels other than the level of exit discharge, an automatic sprinkler system shall be installed throughout the entire floor where such care is provided as well as all floors below, and all floors between the level of ambulatory care and the nearest level of exit discharge, including the level of exit discharge.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171236\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171236\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">(L.L. 2015\/078, 9\/2\/2015, eff. 12\/31\/2015) \n\t\t\t\t\t\t\t\t\t\t\t\t\t<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1582-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be installed throughout all fire areas containing a Group B ambulatory health care facility occupancy. In buildings where ambulatory care is provided on levels other than the level of exit discharge, an automatic sprinkler system shall be installed throughout the entire floor where such care is provided as well as all floors below, and all floors between the level of ambulatory care and the nearest level of exit discharge, including the level of exit discharge. \n\n (L.L. 2015\/078, 9\/2\/2015, eff. 12\/31\/2015)"
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "An automatic sprinkler system shall be installed throughout all fire areas containing a Group B ambulatory health care facility occupancy. In buildings where ambulatory care is provided on levels other than the level of exit discharge, an automatic sprinkler system shall be installed throughout the entire floor where such care is provided as well as all floors below, and all floors between the level of ambulatory care and the nearest level of exit discharge, including the level of exit discharge.\n\n(L.L. 2015\/078, 9\/2\/2015, eff. 12\/31\/2015)",
+  "previewText" : "An automatic sprinkler system shall be installed throughout all fire areas containing a Group B ambulatory health care facility occupancy.",
+  "schemaVersion" : 2,
+  "sectionID" : 1582
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167854\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167854\"><\/AnnotationDrawer><div>Storage tanks shall be noncombustible and protected from physical damage. Fire barriers or horizontal assemblies or both around the storage tanks shall be permitted as the method of protection from physical damage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "645-html-1",
+      "kind" : "html",
+      "plainText" : "Storage tanks shall be noncombustible and protected from physical damage. Fire barriers or horizontal assemblies or both around the storage tanks shall be permitted as the method of protection from physical damage."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Storage tanks shall be noncombustible and protected from physical damage. Fire barriers or horizontal assemblies or both around the storage tanks shall be permitted as the method of protection from physical damage.",
+  "previewText" : "Storage tanks shall be noncombustible and protected from physical damage.",
+  "schemaVersion" : 2,
+  "sectionID" : 645
+}

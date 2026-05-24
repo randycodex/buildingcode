@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169417\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169417\"><\/AnnotationDrawer><div>Where required elsewhere in the code, doors in smoke partitions shall be self- or automatic-closing by smoke detection in accordance with Section 716.5.9.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1114-html-1",
+      "kind" : "html",
+      "plainText" : "Where required elsewhere in the code, doors in smoke partitions shall be self- or automatic-closing by smoke detection in accordance with Section 716.5.9.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "officialText" : "Where required elsewhere in the code, doors in smoke partitions shall be self- or automatic-closing by smoke detection in accordance with Section 716.5.9.3.",
+  "previewText" : "Where required elsewhere in the code, doors in smoke partitions shall be self- or automatic-closing by smoke detection in accordance with Section 716.",
+  "schemaVersion" : 2,
+  "sectionID" : 1114
+}

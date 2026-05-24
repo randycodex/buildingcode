@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178445\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178445\"><\/AnnotationDrawer><div>Seismic isolation systems in seismically isolated structures assigned to Seismic Design Category B, C, or D shall be tested in accordance with Section 17.8 of ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3762-html-1",
+      "kind" : "html",
+      "plainText" : "Seismic isolation systems in seismically isolated structures assigned to Seismic Design Category B, C, or D shall be tested in accordance with Section 17.8 of ASCE 7."
+    }
+  ],
+  "chapterNumber" : "17",
+  "officialText" : "Seismic isolation systems in seismically isolated structures assigned to Seismic Design Category B, C, or D shall be tested in accordance with Section 17.8 of ASCE 7.",
+  "previewText" : "Seismic isolation systems in seismically isolated structures assigned to Seismic Design Category B, C, or D shall be tested in accordance with Section 17.",
+  "schemaVersion" : 2,
+  "sectionID" : 3762
+}

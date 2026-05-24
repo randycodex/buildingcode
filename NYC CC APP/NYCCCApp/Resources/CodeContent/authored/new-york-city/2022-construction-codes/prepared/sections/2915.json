@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175597\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175597\"><\/AnnotationDrawer><div>Fishing piers and platforms shall be accessible and be located on an accessible route and shall be in compliance with Section 1105 (Fishing Piers and Platforms) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2915-html-1",
+      "kind" : "html",
+      "plainText" : "Fishing piers and platforms shall be accessible and be located on an accessible route and shall be in compliance with Section 1105 (Fishing Piers and Platforms) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Fishing piers and platforms shall be accessible and be located on an accessible route and shall be in compliance with Section 1105 (Fishing Piers and Platforms) of ICC A117.1.",
+  "previewText" : "Fishing piers and platforms shall be accessible and be located on an accessible route and shall be in compliance with Section 1105 (Fishing Piers and Platforms) of ICC A117.",
+  "schemaVersion" : 2,
+  "sectionID" : 2915
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171029\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171029\"><\/AnnotationDrawer><div>Fire alarm systems required by the provisions of Section 907.2 of this code and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> shall be monitored by a central supervising station in accordance with Section 907.6.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171030\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171030\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171031\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171031\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Single- and multiple-station smoke alarms and carbon monoxide alarms required by Section 907.2.11.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171032\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171032\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Smoke detectors in Group I-3 occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171033\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171033\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;Supervisory service is not required for automatic sprinkler systems in one- and two-family dwellings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1545-html-1",
+      "kind" : "html",
+      "plainText" : "Fire alarm systems required by the provisions of Section 907.2 of this code and the New York City Fire Code shall be monitored by a central supervising station in accordance with Section 907.6.5.\n\n Exceptions: \n\n 1. Single- and multiple-station smoke alarms and carbon monoxide alarms required by Section 907.2.11.\n\n 2. Smoke detectors in Group I-3 occupancies.\n\n 3. Supervisory service is not required for automatic sprinkler systems in one- and two-family dwellings."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Fire alarm systems required by the provisions of Section 907.2 of this code and the New York City Fire Code shall be monitored by a central supervising station in accordance with Section 907.6.5.\n\nExceptions:\n\n1. Single- and multiple-station smoke alarms and carbon monoxide alarms required by Section 907.2.11.\n\n2. Smoke detectors in Group I-3 occupancies.\n\n3. Supervisory service is not required for automatic sprinkler systems in one- and two-family dwellings.",
+  "previewText" : "Fire alarm systems required by the provisions of Section 907.",
+  "schemaVersion" : 2,
+  "sectionID" : 1545
+}

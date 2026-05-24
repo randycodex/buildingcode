@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195875\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195875\"><\/AnnotationDrawer><div>Stop valves shall be identified where their intended purpose is not obvious. Numbers shall not be used to label the valves, unless a key to the numbers is located near the valves.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11326-html-1",
+      "kind" : "html",
+      "plainText" : "Stop valves shall be identified where their intended purpose is not obvious. Numbers shall not be used to label the valves, unless a key to the numbers is located near the valves."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Stop valves shall be identified where their intended purpose is not obvious. Numbers shall not be used to label the valves, unless a key to the numbers is located near the valves.",
+  "previewText" : "Stop valves shall be identified where their intended purpose is not obvious.",
+  "schemaVersion" : 2,
+  "sectionID" : 11326
+}

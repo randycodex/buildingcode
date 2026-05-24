@@ -1,0 +1,20 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194941\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194941\"><\/AnnotationDrawer><div>The application of vents shall be in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-194940', hash: '#JD_MCTable802.2' }}\">Table 802.2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194942\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194942\"><\/AnnotationDrawer><div><a name=\"JD_MCTable802.2\" id=\"JD_MCTable802.2\" title=\"MC Table 802.2\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Table 802.2<br><\/br>Vent Application<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194943\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194943\"><\/AnnotationDrawer><div style=\"margin-bottom=10pt\">&#160;<div class=\"xsl-table\">",
+      "id" : "10996-html-1",
+      "kind" : "html",
+      "plainText" : "The application of vents shall be in accordance with Table 802.2 .\n\n Table 802.2\n Vent Application"
+    },
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: &#10;                  700px&#10;                ;\"><colgroup><col width=\"27.429%&#10;              \"><\/col><col width=\"27.429%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Vent Types <\/span><\/div><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Appliance Types<\/span>&#160;<\/div><\/div><\/td><\/tr><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\">Type L oil vents<\/div><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\">Oil-burning appliances listed and labeled for venting with Type L vents; gas appliances listed and labeled for venting with Type B vents.<\/div><\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "10996-table-2",
+      "kind" : "table"
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "The application of vents shall be in accordance with Table 802.2.\n\nTable 802.2 Vent Application",
+  "previewText" : "The application of vents shall be in accordance with Table 802.",
+  "schemaVersion" : 2,
+  "sectionID" : 10996
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185726\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185726\"><\/AnnotationDrawer><div>Sufficient strength shall be demonstrated by structural analysis of the proposed loads, the strength of the forming and shoring system, and concrete strength data. Concrete strength data shall be based on tests of field-cured cylinders. As an alternative, the concrete strength is permitted to be estimated using the maturity method performed in accordance with ASTM C 1074, provided that the strength is at least 500 psi (3447.38 kPa) higher than the specified compressive strength necessary for formwork or shoring removal, as applicable. Other procedures for evaluating concrete strength are also permitted when approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6154-html-1",
+      "kind" : "html",
+      "plainText" : "Sufficient strength shall be demonstrated by structural analysis of the proposed loads, the strength of the forming and shoring system, and concrete strength data. Concrete strength data shall be based on tests of field-cured cylinders. As an alternative, the concrete strength is permitted to be estimated using the maturity method performed in accordance with ASTM C 1074, provided that the strength is at least 500 psi (3447.38 kPa) higher than the specified compressive strength necessary for formwork or shoring removal, as applicable. Other procedures for evaluating concrete strength are also permitted when approved by the commissioner."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "Sufficient strength shall be demonstrated by structural analysis of the proposed loads, the strength of the forming and shoring system, and concrete strength data. Concrete strength data shall be based on tests of field-cured cylinders. As an alternative, the concrete strength is permitted to be estimated using the maturity method performed in accordance with ASTM C 1074, provided that the strength is at least 500 psi (3447.38 kPa) higher than the specified compressive strength necessary for formwork or shoring removal, as applicable. Other procedures for evaluating concrete strength are also permitted when approved by the commissioner.",
+  "previewText" : "Sufficient strength shall be demonstrated by structural analysis of the proposed loads, the strength of the forming and shoring system, and concrete strength data.",
+  "schemaVersion" : 2,
+  "sectionID" : 6154
+}

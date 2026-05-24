@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183946\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183946\"><\/AnnotationDrawer><div>The fire command center or an alternate location approved by the Fire Department shall be provided with the means to manually initiate a Phase I Emergency Recall of the occupant evacuation elevators in accordance with ASME A17.1\/CSA B44 as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-189236', hash: '#JD_BCAppK' }}\">Appendix K<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5531-html-1",
+      "kind" : "html",
+      "plainText" : "The fire command center or an alternate location approved by the Fire Department shall be provided with the means to manually initiate a Phase I Emergency Recall of the occupant evacuation elevators in accordance with ASME A17.1\/CSA B44 as modified by Appendix K of this code."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "The fire command center or an alternate location approved by the Fire Department shall be provided with the means to manually initiate a Phase I Emergency Recall of the occupant evacuation elevators in accordance with ASME A17.1\/CSA B44 as modified by Appendix K of this code.",
+  "previewText" : "The fire command center or an alternate location approved by the Fire Department shall be provided with the means to manually initiate a Phase I Emergency Recall of the occupant evacuation elevators in accordance with ASME A17.",
+  "schemaVersion" : 2,
+  "sectionID" : 5531
+}

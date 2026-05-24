@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167285\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167285\"><\/AnnotationDrawer><div>Egress doors are permitted to be locked in accordance with the applicable use condition. Doors from a refuge area to the outside are permitted to be locked with a key in lieu of locking methods described in Section 408.4.1. The keys to unlock the exterior doors shall be available at all times and the locks shall be operable from both sides of the door.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "465-html-1",
+      "kind" : "html",
+      "plainText" : "Egress doors are permitted to be locked in accordance with the applicable use condition. Doors from a refuge area to the outside are permitted to be locked with a key in lieu of locking methods described in Section 408.4.1. The keys to unlock the exterior doors shall be available at all times and the locks shall be operable from both sides of the door."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Egress doors are permitted to be locked in accordance with the applicable use condition. Doors from a refuge area to the outside are permitted to be locked with a key in lieu of locking methods described in Section 408.4.1. The keys to unlock the exterior doors shall be available at all times and the locks shall be operable from both sides of the door.",
+  "previewText" : "Egress doors are permitted to be locked in accordance with the applicable use condition.",
+  "schemaVersion" : 2,
+  "sectionID" : 465
+}

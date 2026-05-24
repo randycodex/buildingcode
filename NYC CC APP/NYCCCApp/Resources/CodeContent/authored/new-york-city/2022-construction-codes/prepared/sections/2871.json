@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175477\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175477\"><\/AnnotationDrawer><div>A curb ramp shall have a detectable warning. The detectable warning shall extend the full width and a depth of 24 inches (609.2 mm) along the curb ramp. The curb ramp shall comply with Section 406 of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2871-html-1",
+      "kind" : "html",
+      "plainText" : "A curb ramp shall have a detectable warning. The detectable warning shall extend the full width and a depth of 24 inches (609.2 mm) along the curb ramp. The curb ramp shall comply with Section 406 of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "A curb ramp shall have a detectable warning. The detectable warning shall extend the full width and a depth of 24 inches (609.2 mm) along the curb ramp. The curb ramp shall comply with Section 406 of ICC A117.1.",
+  "previewText" : "A curb ramp shall have a detectable warning.",
+  "schemaVersion" : 2,
+  "sectionID" : 2871
+}

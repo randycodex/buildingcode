@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187075\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187075\"><\/AnnotationDrawer><div>At no time shall a scaffold be loaded beyond the capacity of the scaffold or the ground or structure upon which it rests or is supported. Loads shall not be concentrated so as to cause stresses in excess of the allowable values designated for the applicable material described in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6592-html-1",
+      "kind" : "html",
+      "plainText" : "At no time shall a scaffold be loaded beyond the capacity of the scaffold or the ground or structure upon which it rests or is supported. Loads shall not be concentrated so as to cause stresses in excess of the allowable values designated for the applicable material described in this code."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "At no time shall a scaffold be loaded beyond the capacity of the scaffold or the ground or structure upon which it rests or is supported. Loads shall not be concentrated so as to cause stresses in excess of the allowable values designated for the applicable material described in this code.",
+  "previewText" : "At no time shall a scaffold be loaded beyond the capacity of the scaffold or the ground or structure upon which it rests or is supported.",
+  "schemaVersion" : 2,
+  "sectionID" : 6592
+}

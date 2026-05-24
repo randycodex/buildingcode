@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192979\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192979\"><\/AnnotationDrawer><div>Appliances located in private garages and carports shall be installed with a minimum clearance of 6 feet (1828.8 mm) above the floor.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192980\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192980\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with Section 304.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10333-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances located in private garages and carports shall be installed with a minimum clearance of 6 feet (1828.8 mm) above the floor.\n\n Exception: The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with Section 304.3."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Appliances located in private garages and carports shall be installed with a minimum clearance of 6 feet (1828.8 mm) above the floor.\n\nException: The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with Section 304.3.",
+  "previewText" : "Appliances located in private garages and carports shall be installed with a minimum clearance of 6 feet (1828.",
+  "schemaVersion" : 2,
+  "sectionID" : 10333
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168129\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168129\"><\/AnnotationDrawer><div>Occupancies in Groups I-1, R-1, R-2 and R-3 shall comply with the provisions of Sections 420.1 through 420.6 and other applicable provisions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "744-html-1",
+      "kind" : "html",
+      "plainText" : "Occupancies in Groups I-1, R-1, R-2 and R-3 shall comply with the provisions of Sections 420.1 through 420.6 and other applicable provisions of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Occupancies in Groups I-1, R-1, R-2 and R-3 shall comply with the provisions of Sections 420.1 through 420.6 and other applicable provisions of this code.",
+  "previewText" : "Occupancies in Groups I-1, R-1, R-2 and R-3 shall comply with the provisions of Sections 420.",
+  "schemaVersion" : 2,
+  "sectionID" : 744
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188782\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188782\"><\/AnnotationDrawer><div>A Group I-2 occupancy, other than a hospital or a nursing home, shall comply with Section G304.5.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188783\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188783\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188783\"><\/AnnotationDrawer><h6><a name=\"JD_BCG305\" id=\"JD_BCG305\" title=\"BC G305\"><\/a>Section BC G305: Manufactured Homes<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7112-html-1",
+      "kind" : "html",
+      "plainText" : "A Group I-2 occupancy, other than a hospital or a nursing home, shall comply with Section G304.5.1.\n\n Section BC G305: Manufactured Homes"
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "A Group I-2 occupancy, other than a hospital or a nursing home, shall comply with Section G304.5.1.",
+  "previewText" : "A Group I-2 occupancy, other than a hospital or a nursing home, shall comply with Section G304.",
+  "schemaVersion" : 2,
+  "sectionID" : 7112
+}

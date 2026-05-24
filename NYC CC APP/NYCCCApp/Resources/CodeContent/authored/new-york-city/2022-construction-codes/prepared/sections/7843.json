@@ -1,0 +1,39 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192219\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192219\"><\/AnnotationDrawer><div>Delete Figure 1 and replace as follows: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192220\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">",
+      "id" : "7843-html-1",
+      "kind" : "html",
+      "plainText" : "Delete Figure 1 and replace as follows:"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/22013eec66c695dc9d5a09aca53ab59e936666e0.png\" width=\"576\" height=\"767.733333333333\"><\/img><\/span>",
+      "id" : "7843-image-2",
+      "imageID" : "22013eec66c695dc9d5a09aca53ab59e936666e0.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192221\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192221\"><\/AnnotationDrawer><div><a name=\"JD_BCR103Figure1A\" id=\"JD_BCR103Figure1A\" title=\"BC R103 Figure 1A\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1A<br><\/br>Hanger Connection Details for Construction Groups I and I*<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192222\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192222\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">* Editor's note:<\/span> As set forth in L.L. 2021\/126; correct reference should likely be Groups I and II.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192223\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192223\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">",
+      "id" : "7843-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 1A\n Hanger Connection Details for Construction Groups I and I* \n\n * Editor's note: As set forth in L.L. 2021\/126; correct reference should likely be Groups I and II."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/assets\/a6743d50d9b1d80cc2b13162967c8f2819d2aa85.png\" width=\"576\" height=\"645.533333333333\"><\/img><\/span>",
+      "id" : "7843-image-4",
+      "imageID" : "a6743d50d9b1d80cc2b13162967c8f2819d2aa85.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192224\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192224\"><\/AnnotationDrawer><div><a name=\"JD_BCR103Figure1B\" id=\"JD_BCR103Figure1B\" title=\"BC R103 Figure 1B\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1B<br><\/br>Hanger Connection Details for Construction Groups I and II<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7843-html-5",
+      "kind" : "html",
+      "plainText" : "Figure 1B\n Hanger Connection Details for Construction Groups I and II"
+    }
+  ],
+  "chapterNumber" : "R",
+  "officialText" : "Delete Figure 1 and replace as follows:\n\nFigure 1A Hanger Connection Details for Construction Groups I and I*\n\n* Editor's note: As set forth in L.L. 2021\/126; correct reference should likely be Groups I and II.\n\nFigure 1B Hanger Connection Details for Construction Groups I and II",
+  "previewText" : "Delete Figure 1 and replace as follows:\n\nFigure 1A Hanger Connection Details for Construction Groups I and I*\n\n* Editor's note: As set forth in L.",
+  "schemaVersion" : 2,
+  "sectionID" : 7843
+}

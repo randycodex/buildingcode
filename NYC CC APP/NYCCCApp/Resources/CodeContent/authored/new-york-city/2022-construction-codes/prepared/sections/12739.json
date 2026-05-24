@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163639\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Nonflammable medical and nonmedical gas systems shall be designed and installed in accordance with NFPA 99.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163640\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163640\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163641\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163641\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;This section shall not apply to portable systems or cylinder storage.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163642\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163642\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Vacuum system exhaust terminations shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163643\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163643\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163643\"><\/AnnotationDrawer><h6><a name=\"JD_PC1203\" id=\"JD_PC1203\" title=\"PC 1203\"><\/a>Section PC 1203: Nonmedical Oxygen Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12739-html-1",
+      "kind" : "html",
+      "plainText" : "Nonflammable medical and nonmedical gas systems shall be designed and installed in accordance with NFPA 99. \n\n Exceptions: \n\n 1. This section shall not apply to portable systems or cylinder storage.\n\n 2. Vacuum system exhaust terminations shall comply with the New York City Mechanical Code .\n\n Section PC 1203: Nonmedical Oxygen Systems"
+    }
+  ],
+  "chapterNumber" : "12",
+  "officialText" : "Nonflammable medical and nonmedical gas systems shall be designed and installed in accordance with NFPA 99.\n\nExceptions:\n\n1. This section shall not apply to portable systems or cylinder storage.\n\n2. Vacuum system exhaust terminations shall comply with the New York City Mechanical Code.\n\nSection PC 1203: Nonmedical Oxygen Systems",
+  "previewText" : "Nonflammable medical and nonmedical gas systems shall be designed and installed in accordance with NFPA 99.",
+  "schemaVersion" : 2,
+  "sectionID" : 12739
+}

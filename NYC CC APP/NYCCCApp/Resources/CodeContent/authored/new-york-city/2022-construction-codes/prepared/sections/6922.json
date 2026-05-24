@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188250\"><\/AnnotationDrawer><div>New stations in rapid rail, light rail, commuter rail, intercity rail, high speed rail and other fixed guideway systems shall comply with Sections E109.2.1 through E109.2.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6922-html-1",
+      "kind" : "html",
+      "plainText" : "New stations in rapid rail, light rail, commuter rail, intercity rail, high speed rail and other fixed guideway systems shall comply with Sections E109.2.1 through E109.2.8."
+    }
+  ],
+  "chapterNumber" : "E",
+  "officialText" : "New stations in rapid rail, light rail, commuter rail, intercity rail, high speed rail and other fixed guideway systems shall comply with Sections E109.2.1 through E109.2.8.",
+  "previewText" : "New stations in rapid rail, light rail, commuter rail, intercity rail, high speed rail and other fixed guideway systems shall comply with Sections E109.",
+  "schemaVersion" : 2,
+  "sectionID" : 6922
+}

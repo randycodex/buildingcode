@@ -1,0 +1,20 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193284\"><\/AnnotationDrawer><div>The zone outdoor airflow rate (V\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">oz<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t), shall be determined in accordance with Equation 4-2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193285\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193285\"><\/AnnotationDrawer><div style=\"margin-bottom=10pt\">&#160;<div class=\"xsl-table\">",
+      "id" : "10428-html-1",
+      "kind" : "html",
+      "plainText" : "The zone outdoor airflow rate (V\n oz \n ), shall be determined in accordance with Equation 4-2."
+    },
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: &#10;                  700px&#10;                ;\"><colgroup><col width=\"27.429%&#10;              \"><\/col><col width=\"20.571%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div>V\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">oz<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t = V\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">bz <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;\">\/ <\/span>E\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">z<\/span><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">(Equation 4-2) <\/span><\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "10428-table-2",
+      "kind" : "table"
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "The zone outdoor airflow rate (V oz ), shall be determined in accordance with Equation 4-2.",
+  "previewText" : "The zone outdoor airflow rate (V oz ), shall be determined in accordance with Equation 4-2.",
+  "schemaVersion" : 2,
+  "sectionID" : 10428
+}

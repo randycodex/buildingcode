@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181467\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181467\"><\/AnnotationDrawer><div>Trusses not part of a manufacturing process that provides requirements for quality control done under the supervision of a third-party quality control agency in accordance with AISI S240 Chapter D shall be fabricated in compliance with Sections 1704.2.2 and 1705.2, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4820-html-1",
+      "kind" : "html",
+      "plainText" : "Trusses not part of a manufacturing process that provides requirements for quality control done under the supervision of a third-party quality control agency in accordance with AISI S240 Chapter D shall be fabricated in compliance with Sections 1704.2.2 and 1705.2, as applicable."
+    }
+  ],
+  "chapterNumber" : "22",
+  "officialText" : "Trusses not part of a manufacturing process that provides requirements for quality control done under the supervision of a third-party quality control agency in accordance with AISI S240 Chapter D shall be fabricated in compliance with Sections 1704.2.2 and 1705.2, as applicable.",
+  "previewText" : "Trusses not part of a manufacturing process that provides requirements for quality control done under the supervision of a third-party quality control agency in accordance with AISI S240 Chapter D shall be fabricated in compliance with Sections 1704.",
+  "schemaVersion" : 2,
+  "sectionID" : 4820
+}

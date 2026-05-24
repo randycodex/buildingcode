@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197506\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197506\"><\/AnnotationDrawer><div>Each opening shall have a minimum free area of 1 square inch per 1,000 Btu\/h (2200 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/kW) of the total input rating of all appliances in the space, but not less than 100 square inches (0.06 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t). One opening shall commence within 12 inches (304.8 mm) of the top and one opening shall commence within 12 inches (304.8 mm) of the bottom of the enclosure. The minimum dimension of air openings shall be not less than 3 inches (76.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8092-html-1",
+      "kind" : "html",
+      "plainText" : "Each opening shall have a minimum free area of 1 square inch per 1,000 Btu\/h (2200 mm\n\n 2 \n\n \/kW) of the total input rating of all appliances in the space, but not less than 100 square inches (0.06 m\n\n 2 \n\n ). One opening shall commence within 12 inches (304.8 mm) of the top and one opening shall commence within 12 inches (304.8 mm) of the bottom of the enclosure. The minimum dimension of air openings shall be not less than 3 inches (76.2 mm)."
+    }
+  ],
+  "chapterNumber" : "3",
+  "officialText" : "Each opening shall have a minimum free area of 1 square inch per 1,000 Btu\/h (2200 mm 2 \/kW) of the total input rating of all appliances in the space, but not less than 100 square inches (0.06 m 2 ). One opening shall commence within 12 inches (304.8 mm) of the top and one opening shall commence within 12 inches (304.8 mm) of the bottom of the enclosure. The minimum dimension of air openings shall be not less than 3 inches (76.2 mm).",
+  "previewText" : "Each opening shall have a minimum free area of 1 square inch per 1,000 Btu\/h (2200 mm 2 \/kW) of the total input rating of all appliances in the space, but not less than 100 square inches (0.",
+  "schemaVersion" : 2,
+  "sectionID" : 8092
+}

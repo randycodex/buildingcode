@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198586\"><\/AnnotationDrawer><div>Metal chimneys shall be built and installed in accordance with NFPA 211.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8471-html-1",
+      "kind" : "html",
+      "plainText" : "Metal chimneys shall be built and installed in accordance with NFPA 211."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Metal chimneys shall be built and installed in accordance with NFPA 211.",
+  "previewText" : "Metal chimneys shall be built and installed in accordance with NFPA 211.",
+  "schemaVersion" : 2,
+  "sectionID" : 8471
+}

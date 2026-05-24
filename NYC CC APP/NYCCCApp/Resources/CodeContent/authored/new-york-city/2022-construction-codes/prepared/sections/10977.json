@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194890\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194890\"><\/AnnotationDrawer><div>Where an appliance is permanently disconnected from an existing chimney or vent, or where an appliance is connected to an existing chimney or vent during the process of a new installation, the chimney or vent shall comply with Sections 801.18.1 through 801.18.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10977-html-1",
+      "kind" : "html",
+      "plainText" : "Where an appliance is permanently disconnected from an existing chimney or vent, or where an appliance is connected to an existing chimney or vent during the process of a new installation, the chimney or vent shall comply with Sections 801.18.1 through 801.18.4."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "Where an appliance is permanently disconnected from an existing chimney or vent, or where an appliance is connected to an existing chimney or vent during the process of a new installation, the chimney or vent shall comply with Sections 801.18.1 through 801.18.4.",
+  "previewText" : "Where an appliance is permanently disconnected from an existing chimney or vent, or where an appliance is connected to an existing chimney or vent during the process of a new installation, the chimney or vent shall comply with Sections 801.",
+  "schemaVersion" : 2,
+  "sectionID" : 10977
+}

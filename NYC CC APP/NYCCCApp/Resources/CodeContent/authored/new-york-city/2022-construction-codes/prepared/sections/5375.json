@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183524\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183524\"><\/AnnotationDrawer><div>Emergency power shall be provided for voice\/alarm communication systems in Group A occupancies in accordance with Section 907.5.2.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5375-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency power shall be provided for voice\/alarm communication systems in Group A occupancies in accordance with Section 907.5.2.2.5."
+    }
+  ],
+  "chapterNumber" : "27",
+  "officialText" : "Emergency power shall be provided for voice\/alarm communication systems in Group A occupancies in accordance with Section 907.5.2.2.5.",
+  "previewText" : "Emergency power shall be provided for voice\/alarm communication systems in Group A occupancies in accordance with Section 907.",
+  "schemaVersion" : 2,
+  "sectionID" : 5375
+}

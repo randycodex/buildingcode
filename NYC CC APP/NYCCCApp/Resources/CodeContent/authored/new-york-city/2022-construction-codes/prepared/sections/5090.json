@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182574\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182574\"><\/AnnotationDrawer><div>Where a building of otherwise conventional construction contains structural elements exceeding the limits of Section 2308.2, these elements and the supporting load path shall be designed in accordance with accepted engineering practice and the provisions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5090-html-1",
+      "kind" : "html",
+      "plainText" : "Where a building of otherwise conventional construction contains structural elements exceeding the limits of Section 2308.2, these elements and the supporting load path shall be designed in accordance with accepted engineering practice and the provisions of this code."
+    }
+  ],
+  "chapterNumber" : "23",
+  "officialText" : "Where a building of otherwise conventional construction contains structural elements exceeding the limits of Section 2308.2, these elements and the supporting load path shall be designed in accordance with accepted engineering practice and the provisions of this code.",
+  "previewText" : "Where a building of otherwise conventional construction contains structural elements exceeding the limits of Section 2308.",
+  "schemaVersion" : 2,
+  "sectionID" : 5090
+}

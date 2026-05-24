@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183637\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183637\"><\/AnnotationDrawer><div>The installation of manlifts is prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5417-html-1",
+      "kind" : "html",
+      "plainText" : "The installation of manlifts is prohibited."
+    }
+  ],
+  "chapterNumber" : "30",
+  "officialText" : "The installation of manlifts is prohibited.",
+  "previewText" : "The installation of manlifts is prohibited.",
+  "schemaVersion" : 2,
+  "sectionID" : 5417
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196893\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196893\"><\/AnnotationDrawer><div>For prior code buildings, the determination as to whether seismic requirements apply to an alteration shall be made in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">1968 Building Code<\/span> and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> or the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">1968 Building Code<\/span> and Reference Standard RS 9-6 of such code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7963-html-1",
+      "kind" : "html",
+      "plainText" : "For prior code buildings, the determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with Chapter 16 of the New York City Building Code or the 1968 Building Code and Reference Standard RS 9-6 of such code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "officialText" : "For prior code buildings, the determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations. Any applicable seismic loads and requirements shall be permitted to be determined in accordance with Chapter 16 of the New York City Building Code or the 1968 Building Code and Reference Standard RS 9-6 of such code.",
+  "previewText" : "For prior code buildings, the determination as to whether seismic requirements apply to an alteration shall be made in accordance with the 1968 Building Code and interpretations by the department relating to such determinations.",
+  "schemaVersion" : 2,
+  "sectionID" : 7963
+}

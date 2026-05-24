@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163189\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Island fixture venting shall not be permitted for fixtures other than sinks and lavatories. Residential kitchen sinks with a dishwasher waste connection, a food waste disposer, or both, in combination with the kitchen sink waste, shall be permitted to be vented in accordance with this section.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12595-html-1",
+      "kind" : "html",
+      "plainText" : "Island fixture venting shall not be permitted for fixtures other than sinks and lavatories. Residential kitchen sinks with a dishwasher waste connection, a food waste disposer, or both, in combination with the kitchen sink waste, shall be permitted to be vented in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Island fixture venting shall not be permitted for fixtures other than sinks and lavatories. Residential kitchen sinks with a dishwasher waste connection, a food waste disposer, or both, in combination with the kitchen sink waste, shall be permitted to be vented in accordance with this section.",
+  "previewText" : "Island fixture venting shall not be permitted for fixtures other than sinks and lavatories.",
+  "schemaVersion" : 2,
+  "sectionID" : 12595
+}

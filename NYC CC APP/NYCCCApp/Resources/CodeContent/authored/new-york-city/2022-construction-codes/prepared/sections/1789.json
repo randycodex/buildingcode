@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171889\"><\/AnnotationDrawer><div>Where more than one smoke alarm is required to be installed within an individual dwelling unit or sleeping unit in Group R-2 and R-3 occupancies, the smoke alarms shall be interconnected in such a manner that the activation of one alarm will activate all of the alarms in the individual unit. Physical interconnection of smoke alarms shall not be required where listed wireless alarms are installed and all alarms sound upon activation of one alarm. The alarm shall be clearly audible in all bedrooms over background noise levels with all intervening doors closed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1789-html-1",
+      "kind" : "html",
+      "plainText" : "Where more than one smoke alarm is required to be installed within an individual dwelling unit or sleeping unit in Group R-2 and R-3 occupancies, the smoke alarms shall be interconnected in such a manner that the activation of one alarm will activate all of the alarms in the individual unit. Physical interconnection of smoke alarms shall not be required where listed wireless alarms are installed and all alarms sound upon activation of one alarm. The alarm shall be clearly audible in all bedrooms over background noise levels with all intervening doors closed."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Where more than one smoke alarm is required to be installed within an individual dwelling unit or sleeping unit in Group R-2 and R-3 occupancies, the smoke alarms shall be interconnected in such a manner that the activation of one alarm will activate all of the alarms in the individual unit. Physical interconnection of smoke alarms shall not be required where listed wireless alarms are installed and all alarms sound upon activation of one alarm. The alarm shall be clearly audible in all bedrooms over background noise levels with all intervening doors closed.",
+  "previewText" : "Where more than one smoke alarm is required to be installed within an individual dwelling unit or sleeping unit in Group R-2 and R-3 occupancies, the smoke alarms shall be interconnected in such a manner that the activation of one alarm will activate all of the alarms in the individual unit.",
+  "schemaVersion" : 2,
+  "sectionID" : 1789
+}

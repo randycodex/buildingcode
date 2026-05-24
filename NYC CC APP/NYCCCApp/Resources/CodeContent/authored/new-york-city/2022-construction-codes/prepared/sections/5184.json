@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182968\"><\/AnnotationDrawer><div>The maximum allowable diaphragm proportions shall be 1 1\/2:1 between shear resisting elements. Rotation or cantilever conditions shall not be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5184-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum allowable diaphragm proportions shall be 1 1\/2:1 between shear resisting elements. Rotation or cantilever conditions shall not be permitted."
+    }
+  ],
+  "chapterNumber" : "25",
+  "officialText" : "The maximum allowable diaphragm proportions shall be 1 1\/2:1 between shear resisting elements. Rotation or cantilever conditions shall not be permitted.",
+  "previewText" : "The maximum allowable diaphragm proportions shall be 1 1\/2:1 between shear resisting elements.",
+  "schemaVersion" : 2,
+  "sectionID" : 5184
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167072\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167072\"><\/AnnotationDrawer><div>All driveways, parking stalls, and open spaces used for the parking or storage of motor vehicles shall be surfaced with concrete asphalt, or equivalent durable, dustless material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "400-html-1",
+      "kind" : "html",
+      "plainText" : "All driveways, parking stalls, and open spaces used for the parking or storage of motor vehicles shall be surfaced with concrete asphalt, or equivalent durable, dustless material."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "All driveways, parking stalls, and open spaces used for the parking or storage of motor vehicles shall be surfaced with concrete asphalt, or equivalent durable, dustless material.",
+  "previewText" : "All driveways, parking stalls, and open spaces used for the parking or storage of motor vehicles shall be surfaced with concrete asphalt, or equivalent durable, dustless material.",
+  "schemaVersion" : 2,
+  "sectionID" : 400
+}

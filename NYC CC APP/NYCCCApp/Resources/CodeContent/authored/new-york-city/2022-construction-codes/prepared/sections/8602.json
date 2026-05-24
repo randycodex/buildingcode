@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199037\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199037\"><\/AnnotationDrawer><div>Where the common vertical vent is offset, the maximum capacity of the common vent shall be reduced in accordance with Section 504.3.6. The horizontal length of the common vent offset (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">L<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">o<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) shall not exceed 1 1\/2 feet for each inch (18 mm for each mm) of common vent diameter (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">D<\/span>). Where multiple offsets occur in a common vent, the total horizontal length of all offsets combined shall not exceed 1 1\/2 feet for each inch (18 mm for each mm) of common vent diameter (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">D<\/span>).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8602-html-1",
+      "kind" : "html",
+      "plainText" : "Where the common vertical vent is offset, the maximum capacity of the common vent shall be reduced in accordance with Section 504.3.6. The horizontal length of the common vent offset ( L o \n\n ) shall not exceed 1 1\/2 feet for each inch (18 mm for each mm) of common vent diameter ( D ). Where multiple offsets occur in a common vent, the total horizontal length of all offsets combined shall not exceed 1 1\/2 feet for each inch (18 mm for each mm) of common vent diameter ( D )."
+    }
+  ],
+  "chapterNumber" : "5",
+  "officialText" : "Where the common vertical vent is offset, the maximum capacity of the common vent shall be reduced in accordance with Section 504.3.6. The horizontal length of the common vent offset (Lo ) shall not exceed 1 1\/2 feet for each inch (18 mm for each mm) of common vent diameter (D). Where multiple offsets occur in a common vent, the total horizontal length of all offsets combined shall not exceed 1 1\/2 feet for each inch (18 mm for each mm) of common vent diameter (D).",
+  "previewText" : "Where the common vertical vent is offset, the maximum capacity of the common vent shall be reduced in accordance with Section 504.",
+  "schemaVersion" : 2,
+  "sectionID" : 8602
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176907\"><\/AnnotationDrawer><div>Roof covering shall comply with Section 1507.10, 1507.11, 1507.12, 1507.13 or 1507.15.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3357-html-1",
+      "kind" : "html",
+      "plainText" : "Roof covering shall comply with Section 1507.10, 1507.11, 1507.12, 1507.13 or 1507.15."
+    }
+  ],
+  "chapterNumber" : "15",
+  "officialText" : "Roof covering shall comply with Section 1507.10, 1507.11, 1507.12, 1507.13 or 1507.15.",
+  "previewText" : "Roof covering shall comply with Section 1507.",
+  "schemaVersion" : 2,
+  "sectionID" : 3357
+}

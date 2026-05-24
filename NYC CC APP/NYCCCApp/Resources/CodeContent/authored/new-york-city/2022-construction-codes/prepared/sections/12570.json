@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163124\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163124\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">An individual vent is permitted to vent two traps or trapped fixtures as a common vent. The traps or trapped fixtures being common vented shall be located on the same floor level.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12570-html-1",
+      "kind" : "html",
+      "plainText" : "An individual vent is permitted to vent two traps or trapped fixtures as a common vent. The traps or trapped fixtures being common vented shall be located on the same floor level."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "An individual vent is permitted to vent two traps or trapped fixtures as a common vent. The traps or trapped fixtures being common vented shall be located on the same floor level.",
+  "previewText" : "An individual vent is permitted to vent two traps or trapped fixtures as a common vent.",
+  "schemaVersion" : 2,
+  "sectionID" : 12570
+}

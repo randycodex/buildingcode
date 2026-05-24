@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178952\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178952\"><\/AnnotationDrawer><div>In areas containing compressible soils, the geotechnical investigation shall determine the extent of these soils in the plan area of the structure and shall be subject to the requirements of Section 1803.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3938-html-1",
+      "kind" : "html",
+      "plainText" : "In areas containing compressible soils, the geotechnical investigation shall determine the extent of these soils in the plan area of the structure and shall be subject to the requirements of Section 1803.3."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "In areas containing compressible soils, the geotechnical investigation shall determine the extent of these soils in the plan area of the structure and shall be subject to the requirements of Section 1803.3.",
+  "previewText" : "In areas containing compressible soils, the geotechnical investigation shall determine the extent of these soils in the plan area of the structure and shall be subject to the requirements of Section 1803.",
+  "schemaVersion" : 2,
+  "sectionID" : 3938
+}

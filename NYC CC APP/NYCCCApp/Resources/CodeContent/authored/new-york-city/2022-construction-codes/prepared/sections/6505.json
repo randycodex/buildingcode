@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186792\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186792\"><\/AnnotationDrawer><div>A record of all such inspections shall be maintained by such site safety manager or coordinator in the site safety log in accordance with Section 3310.8.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6505-html-1",
+      "kind" : "html",
+      "plainText" : "A record of all such inspections shall be maintained by such site safety manager or coordinator in the site safety log in accordance with Section 3310.8.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "officialText" : "A record of all such inspections shall be maintained by such site safety manager or coordinator in the site safety log in accordance with Section 3310.8.4.",
+  "previewText" : "A record of all such inspections shall be maintained by such site safety manager or coordinator in the site safety log in accordance with Section 3310.",
+  "schemaVersion" : 2,
+  "sectionID" : 6505
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163861\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163861\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Collection piping conveying captured rainwater shall utilize joints approved<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">for use with the piping and appropriate for the intended applications as specified in <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163327', hash: '#JD_PCCh.11' }}\">Chapter 11<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12827-html-1",
+      "kind" : "html",
+      "plainText" : "Collection piping conveying captured rainwater shall utilize joints approved for use with the piping and appropriate for the intended applications as specified in Chapter 11 ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "officialText" : "Collection piping conveying captured rainwater shall utilize joints approved for use with the piping and appropriate for the intended applications as specified in Chapter 11.",
+  "previewText" : "Collection piping conveying captured rainwater shall utilize joints approved for use with the piping and appropriate for the intended applications as specified in Chapter 11.",
+  "schemaVersion" : 2,
+  "sectionID" : 12827
+}

@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195140\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195140\"><\/AnnotationDrawer><div>The exhaust system may be connected to a chimney used for other appliances, provided that the chimney complies with Section 811.1, Item 1 or Section 811.1, Item 2 and the operation of the engine does not adversely affect the operation of the other appliances and is in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Air Pollution Control Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "11056-html-1",
+      "kind" : "html",
+      "plainText" : "The exhaust system may be connected to a chimney used for other appliances, provided that the chimney complies with Section 811.1, Item 1 or Section 811.1, Item 2 and the operation of the engine does not adversely affect the operation of the other appliances and is in accordance with the New York City Air Pollution Control Code ."
+    }
+  ],
+  "chapterNumber" : "8",
+  "officialText" : "The exhaust system may be connected to a chimney used for other appliances, provided that the chimney complies with Section 811.1, Item 1 or Section 811.1, Item 2 and the operation of the engine does not adversely affect the operation of the other appliances and is in accordance with the New York City Air Pollution Control Code.",
+  "previewText" : "The exhaust system may be connected to a chimney used for other appliances, provided that the chimney complies with Section 811.",
+  "schemaVersion" : 2,
+  "sectionID" : 11056
+}

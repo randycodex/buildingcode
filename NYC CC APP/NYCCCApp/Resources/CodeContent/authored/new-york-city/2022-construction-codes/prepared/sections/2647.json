@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174848\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174848\"><\/AnnotationDrawer><div>Spaces frequented only by service personnel for maintenance, repair or occasional monitoring of equipment are not required to comply with this chapter. Such spaces include, but are not limited to, elevator pits, elevator penthouses, mechanical, electrical or communications equipment rooms, piping or equipment catwalks, water or sewerage treatment pump rooms and stations, electrical substations and transformer vaults, and highway and tunnel utility facilities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2647-html-1",
+      "kind" : "html",
+      "plainText" : "Spaces frequented only by service personnel for maintenance, repair or occasional monitoring of equipment are not required to comply with this chapter. Such spaces include, but are not limited to, elevator pits, elevator penthouses, mechanical, electrical or communications equipment rooms, piping or equipment catwalks, water or sewerage treatment pump rooms and stations, electrical substations and transformer vaults, and highway and tunnel utility facilities."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Spaces frequented only by service personnel for maintenance, repair or occasional monitoring of equipment are not required to comply with this chapter. Such spaces include, but are not limited to, elevator pits, elevator penthouses, mechanical, electrical or communications equipment rooms, piping or equipment catwalks, water or sewerage treatment pump rooms and stations, electrical substations and transformer vaults, and highway and tunnel utility facilities.",
+  "previewText" : "Spaces frequented only by service personnel for maintenance, repair or occasional monitoring of equipment are not required to comply with this chapter.",
+  "schemaVersion" : 2,
+  "sectionID" : 2647
+}

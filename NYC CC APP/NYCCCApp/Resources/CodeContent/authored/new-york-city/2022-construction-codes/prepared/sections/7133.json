@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188845\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188845\"><\/AnnotationDrawer><div>Swimming pools shall be designed and constructed in accordance with ASCE 24. Above-ground swimming pools, on-ground swimming pools and in-ground swimming pools that involve placement of fill in floodways shall also meet the requirements of Section G103.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7133-html-1",
+      "kind" : "html",
+      "plainText" : "Swimming pools shall be designed and constructed in accordance with ASCE 24. Above-ground swimming pools, on-ground swimming pools and in-ground swimming pools that involve placement of fill in floodways shall also meet the requirements of Section G103.5."
+    }
+  ],
+  "chapterNumber" : "G",
+  "officialText" : "Swimming pools shall be designed and constructed in accordance with ASCE 24. Above-ground swimming pools, on-ground swimming pools and in-ground swimming pools that involve placement of fill in floodways shall also meet the requirements of Section G103.5.",
+  "previewText" : "Swimming pools shall be designed and constructed in accordance with ASCE 24.",
+  "schemaVersion" : 2,
+  "sectionID" : 7133
+}

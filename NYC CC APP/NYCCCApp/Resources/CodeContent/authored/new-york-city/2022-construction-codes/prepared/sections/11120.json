@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195294\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195294\"><\/AnnotationDrawer><div>Clothes dryers shall be exhausted in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193688', hash: '#JD_MC504' }}\">504<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195295\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Electric clothes dryers provided with a condensate drain. Spaces containing such dryers shall be provided with transfer air openings or other approved means to provide adequate air exchanges with adjacent spaces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11120-html-1",
+      "kind" : "html",
+      "plainText" : "Clothes dryers shall be exhausted in accordance with Section 504 .\n\n Exception: Electric clothes dryers provided with a condensate drain. Spaces containing such dryers shall be provided with transfer air openings or other approved means to provide adequate air exchanges with adjacent spaces."
+    }
+  ],
+  "chapterNumber" : "9",
+  "officialText" : "Clothes dryers shall be exhausted in accordance with Section 504.\n\nException: Electric clothes dryers provided with a condensate drain. Spaces containing such dryers shall be provided with transfer air openings or other approved means to provide adequate air exchanges with adjacent spaces.",
+  "previewText" : "Clothes dryers shall be exhausted in accordance with Section 504.",
+  "schemaVersion" : 2,
+  "sectionID" : 11120
+}

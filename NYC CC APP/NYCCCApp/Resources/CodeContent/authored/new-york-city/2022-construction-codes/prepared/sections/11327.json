@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195877\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195877\"><\/AnnotationDrawer><div>Where refrigerant piping penetrates floors, ceilings, or roofs pursuant to Section 1107.2.3, it shall comply with the alternative safety requirements of Sections 1107.9.1 through 1107.9.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11327-html-1",
+      "kind" : "html",
+      "plainText" : "Where refrigerant piping penetrates floors, ceilings, or roofs pursuant to Section 1107.2.3, it shall comply with the alternative safety requirements of Sections 1107.9.1 through 1107.9.5."
+    }
+  ],
+  "chapterNumber" : "11",
+  "officialText" : "Where refrigerant piping penetrates floors, ceilings, or roofs pursuant to Section 1107.2.3, it shall comply with the alternative safety requirements of Sections 1107.9.1 through 1107.9.5.",
+  "previewText" : "Where refrigerant piping penetrates floors, ceilings, or roofs pursuant to Section 1107.",
+  "schemaVersion" : 2,
+  "sectionID" : 11327
+}

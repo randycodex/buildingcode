@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179781\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179781\"><\/AnnotationDrawer><div>The allowable axial tension and compression load shall not exceed 30 tons (267 kN).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4211-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable axial tension and compression load shall not exceed 30 tons (267 kN)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "officialText" : "The allowable axial tension and compression load shall not exceed 30 tons (267 kN).",
+  "previewText" : "The allowable axial tension and compression load shall not exceed 30 tons (267 kN).",
+  "schemaVersion" : 2,
+  "sectionID" : 4211
+}

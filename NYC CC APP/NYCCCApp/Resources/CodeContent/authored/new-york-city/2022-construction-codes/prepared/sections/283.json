@@ -1,0 +1,15 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166734\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166734\"><\/AnnotationDrawer><div>Group R-2 occupancies in buildings greater than 125 feet (38 100 mm) in height shall be required to provide a standby power system to support the following loads:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166735\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166735\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Power and lighting for fire command center required by Section 403.4.6;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166736\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166736\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Ventilation and automatic fire detection equipment for smokeproof enclosures;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166737\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166737\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;At least one elevator serving all floors, or one elevator per bank where different banks serve different portions of the building; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166738\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Stair pressurization systems when provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "283-html-1",
+      "kind" : "html",
+      "plainText" : "Group R-2 occupancies in buildings greater than 125 feet (38 100 mm) in height shall be required to provide a standby power system to support the following loads:\n\n 1. Power and lighting for fire command center required by Section 403.4.6;\n\n 2. Ventilation and automatic fire detection equipment for smokeproof enclosures;\n\n 3. At least one elevator serving all floors, or one elevator per bank where different banks serve different portions of the building; and\n\n 4. Stair pressurization systems when provided."
+    }
+  ],
+  "chapterNumber" : "4",
+  "officialText" : "Group R-2 occupancies in buildings greater than 125 feet (38 100 mm) in height shall be required to provide a standby power system to support the following loads:\n\n1. Power and lighting for fire command center required by Section 403.4.6;\n\n2. Ventilation and automatic fire detection equipment for smokeproof enclosures;\n\n3. At least one elevator serving all floors, or one elevator per bank where different banks serve different portions of the building; and\n\n4. Stair pressurization systems when provided.",
+  "previewText" : "Group R-2 occupancies in buildings greater than 125 feet (38 100 mm) in height shall be required to provide a standby power system to support the following loads:\n\n1.",
+  "schemaVersion" : 2,
+  "sectionID" : 283
+}
