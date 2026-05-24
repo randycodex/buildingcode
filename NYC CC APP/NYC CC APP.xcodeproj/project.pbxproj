@@ -9,14 +9,10 @@
 /* Begin PBXBuildFile section */
 		A10000000000000000000001 /* NYCCCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* NYCCCApp.swift */; };
 		A10000000000000000000002 /* CodeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* CodeModels.swift */; };
-		A10000000000000000000012 /* ReaderTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* ReaderTheme.swift */; };
 		A10000000000000000000003 /* SQLiteSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* SQLiteSupport.swift */; };
 		A10000000000000000000004 /* BundleDatabaseLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* BundleDatabaseLocator.swift */; };
 		A10000000000000000000005 /* CodeDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* CodeDatabase.swift */; };
-		A10000000000000000000016 /* AuthoredCodeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* AuthoredCodeStore.swift */; };
-		A1000000000000000000001A /* PublishedHTMLContentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001A /* PublishedHTMLContentStore.swift */; };
 		A10000000000000000000006 /* UserDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* UserDataStore.swift */; };
-		A10000000000000000000013 /* ReaderThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* ReaderThemeStore.swift */; };
 		A10000000000000000000007 /* CodeReferenceResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* CodeReferenceResolver.swift */; };
 		A10000000000000000000008 /* FormattingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* FormattingEngine.swift */; };
 		A10000000000000000000009 /* CodeLibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* CodeLibraryViewModel.swift */; };
@@ -25,29 +21,29 @@
 		A1000000000000000000000C /* BookmarksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* BookmarksView.swift */; };
 		A1000000000000000000000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* SettingsView.swift */; };
 		A1000000000000000000000E /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* ReaderView.swift */; };
+		A10000000000000000000012 /* ReaderTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* ReaderTheme.swift */; };
+		A10000000000000000000013 /* ReaderThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* ReaderThemeStore.swift */; };
 		A10000000000000000000015 /* ChapterReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* ChapterReaderView.swift */; };
+		A10000000000000000000016 /* AuthoredCodeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* AuthoredCodeStore.swift */; };
+		A10000000000000000000017 /* nyc_code_authored.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* nyc_code_authored.json */; };
 		A10000000000000000000018 /* AttributedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* AttributedTextView.swift */; };
 		A10000000000000000000019 /* ContentBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* ContentBlockView.swift */; };
+		A1000000000000000000001A /* PublishedHTMLContentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001A /* PublishedHTMLContentStore.swift */; };
 		A1000000000000000000001B /* ChapterHTMLWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001B /* ChapterHTMLWebView.swift */; };
 		A1000000000000000000001C /* ChapterHTMLReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001C /* ChapterHTMLReaderView.swift */; };
+		A1000000000000000000001D /* CodeContent in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* CodeContent */; };
 		A1000000000000000000001E /* CompareWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001E /* CompareWorkspaceView.swift */; };
 		A1000000000000000000001F /* Signposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001F /* Signposts.swift */; };
-		A10000000000000000000017 /* nyc_code_authored.json in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* nyc_code_authored.json */; };
-		A1000000000000000000001D /* CodeContent in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* CodeContent */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A20000000000000000000000 /* NYCCCApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NYCCCApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20000000000000000000001 /* NYCCCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NYCCCApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* CodeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeModels.swift; sourceTree = "<group>"; };
-		A20000000000000000000013 /* ReaderTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderTheme.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* SQLiteSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteSupport.swift; sourceTree = "<group>"; };
 		A20000000000000000000004 /* BundleDatabaseLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleDatabaseLocator.swift; sourceTree = "<group>"; };
 		A20000000000000000000005 /* CodeDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeDatabase.swift; sourceTree = "<group>"; };
-		A20000000000000000000016 /* AuthoredCodeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthoredCodeStore.swift; sourceTree = "<group>"; };
-		A2000000000000000000001A /* PublishedHTMLContentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedHTMLContentStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000006 /* UserDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDataStore.swift; sourceTree = "<group>"; };
-		A20000000000000000000014 /* ReaderThemeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderThemeStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000007 /* CodeReferenceResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeReferenceResolver.swift; sourceTree = "<group>"; };
 		A20000000000000000000008 /* FormattingEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattingEngine.swift; sourceTree = "<group>"; };
 		A20000000000000000000009 /* CodeLibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeLibraryViewModel.swift; sourceTree = "<group>"; };
@@ -56,19 +52,23 @@
 		A2000000000000000000000C /* BookmarksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000E /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderView.swift; sourceTree = "<group>"; };
-		A20000000000000000000015 /* ChapterReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterReaderView.swift; sourceTree = "<group>"; };
-		A20000000000000000000018 /* AttributedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedTextView.swift; sourceTree = "<group>"; };
-		A20000000000000000000019 /* ContentBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockView.swift; sourceTree = "<group>"; };
-		A2000000000000000000001B /* ChapterHTMLWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLWebView.swift; sourceTree = "<group>"; };
-		A2000000000000000000001C /* ChapterHTMLReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLReaderView.swift; sourceTree = "<group>"; };
-		A2000000000000000000001E /* CompareWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareWorkspaceView.swift; sourceTree = "<group>"; };
-		A2000000000000000000001F /* Signposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signposts.swift; sourceTree = "<group>"; };
 		A2000000000000000000000F /* nyc_code_sample.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = nyc_code_sample.sqlite; sourceTree = "<group>"; };
 		A20000000000000000000010 /* Figures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Figures; sourceTree = "<group>"; };
 		A20000000000000000000011 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A20000000000000000000012 /* nyc_code_2022.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = nyc_code_2022.sqlite; sourceTree = "<group>"; };
+		A20000000000000000000013 /* ReaderTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderTheme.swift; sourceTree = "<group>"; };
+		A20000000000000000000014 /* ReaderThemeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderThemeStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000015 /* ChapterReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterReaderView.swift; sourceTree = "<group>"; };
+		A20000000000000000000016 /* AuthoredCodeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthoredCodeStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000017 /* nyc_code_authored.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = nyc_code_authored.json; sourceTree = "<group>"; };
+		A20000000000000000000018 /* AttributedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedTextView.swift; sourceTree = "<group>"; };
+		A20000000000000000000019 /* ContentBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentBlockView.swift; sourceTree = "<group>"; };
+		A2000000000000000000001A /* PublishedHTMLContentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishedHTMLContentStore.swift; sourceTree = "<group>"; };
+		A2000000000000000000001B /* ChapterHTMLWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLWebView.swift; sourceTree = "<group>"; };
+		A2000000000000000000001C /* ChapterHTMLReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLReaderView.swift; sourceTree = "<group>"; };
 		A2000000000000000000001D /* CodeContent */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CodeContent; sourceTree = "<group>"; };
+		A2000000000000000000001E /* CompareWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareWorkspaceView.swift; sourceTree = "<group>"; };
+		A2000000000000000000001F /* Signposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signposts.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,14 +111,6 @@
 				A20000000000000000000000 /* NYCCCApp.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		A4000000000000000000000A /* Diagnostics */ = {
-			isa = PBXGroup;
-			children = (
-				A2000000000000000000001F /* Signposts.swift */,
-			);
-			path = Diagnostics;
 			sourceTree = "<group>";
 		};
 		A40000000000000000000004 /* Models */ = {
@@ -192,6 +184,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		A4000000000000000000000A /* Diagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				A2000000000000000000001F /* Signposts.swift */,
+			);
+			path = Diagnostics;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -220,7 +220,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2650;
 				TargetAttributes = {
 					A50000000000000000000001 = {
 						CreatedOnToolsVersion = 16.2;

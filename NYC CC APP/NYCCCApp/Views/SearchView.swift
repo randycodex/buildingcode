@@ -145,8 +145,7 @@ struct SearchView: View {
     }
 
     private var bottomSearchDock: some View {
-        Rectangle()
-            .fill(.ultraThinMaterial)
+        Color(uiColor: .systemGroupedBackground)
             .ignoresSafeArea(edges: .bottom)
     }
 

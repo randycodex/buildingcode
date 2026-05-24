@@ -76,10 +76,6 @@ struct BookmarksView: View {
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Saved", progress: collapseProgress)
             }
-            .overlay(alignment: .bottom) {
-                CodeBottomContentFade(extraHeight: tabBarClearance)
-            }
-            .modifier(CodeScrollClipDisabledModifier())
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)

@@ -6,12 +6,9 @@ struct BrowseView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Namespace private var chapterTileNamespace
     @State private var scrollOffset: CGFloat = 0
-    @State private var activeBrowseSide: BrowseSide = .left
-    @State private var leftCodeSectionID: Int64?
-    @State private var rightCodeSectionID: Int64?
-    @State private var hasSeededBrowseSides = false
-    private static let leftCodeSectionDefaultsKey = "browseLeftCodeSectionID"
-    private static let rightCodeSectionDefaultsKey = "browseRightCodeSectionID"
+    @State private var browseCodeSectionID: Int64?
+    @State private var hasSeededBrowseSection = false
+    private static let codeSectionDefaultsKey = "browseLeftCodeSectionID"
     private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
@@ -33,35 +30,18 @@ struct BrowseView: View {
                         accent: accentColor
                     )
                     .padding(20)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
                 } else {
-                    TabView(selection: $activeBrowseSide) {
-                        browsePage(for: .left)
-                            .tag(BrowseSide.left)
-
-                        browsePage(for: .right)
-                            .tag(BrowseSide.right)
-                    }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .overlay(alignment: .top) {
-                        CodeTopContentFade(title: activeCodeSectionName, progress: collapseProgress)
-                    }
-                    .overlay(alignment: .bottom) {
-                        CodeBottomContentFade(extraHeight: tabBarClearance)
-                    }
-                    .onChange(of: activeBrowseSide) { _, newValue in
-                        DispatchQueue.main.async {
-                            applyCodeSection(for: newValue)
+                    browseContent
+                        .onAppear {
+                            seedBrowseSectionIfNeeded()
+                            DispatchQueue.main.async {
+                                library.updateSelectedCodeSection(id: browseCodeSectionID)
+                            }
                         }
-                    }
-                    .onAppear {
-                        seedBrowseSidesIfNeeded()
-                        DispatchQueue.main.async {
-                            applyCodeSection(for: activeBrowseSide)
-                        }
-                    }
                 }
             }
-            .background(browseBackdrop.ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -74,8 +54,8 @@ struct BrowseView: View {
         }
     }
 
-    private func browsePage(for side: BrowseSide) -> some View {
-        let sideChapters = library.chapters(for: codeSectionID(for: side))
+    private var browseContent: some View {
+        let chapters = library.chapters(for: browseCodeSectionID)
 
         return ScrollView {
             VStack(alignment: .leading, spacing: 0) {
@@ -85,24 +65,24 @@ struct BrowseView: View {
                 }
                 .frame(height: 0)
 
-                libraryHeader(for: side)
+                libraryHeader
                     .padding(.horizontal, 16)
                     .padding(.top, 18)
                     .padding(.bottom, 12)
 
-                if sideChapters.isEmpty {
+                if chapters.isEmpty {
                     CodeEmptyStateCard(
                         title: "No Chapters",
                         systemImage: "text.book.closed",
                         description: "The selected code section does not have any chapters yet.",
-                        accent: Color(uiColor: library.accentColor(for: codeSectionID(for: side)))
+                        accent: Color(uiColor: library.accentColor(for: browseCodeSectionID))
                     )
                     .padding(.horizontal, 16)
                 } else {
                     let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
-                    let codeSectionName = codeSectionName(for: side)
+                    let codeSectionName = selectedCodeSectionName
                     let chapterGroups = groupedChapterGroups(
-                        from: sideChapters,
+                        from: chapters,
                         selectedCodeSectionName: codeSectionName
                     )
 
@@ -120,13 +100,7 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.chapterItems) { chapter in
                                         NavigationLink {
-                                            ChapterSwipeLaunchView(
-                                                chapter: chapter,
-                                                initialSide: side,
-                                                leftCodeSectionID: leftCodeSectionID,
-                                                rightCodeSectionID: rightCodeSectionID,
-                                                parentActiveSide: $activeBrowseSide
-                                            )
+                                            ChapterLaunchView(chapter: chapter)
                                                 .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
@@ -145,13 +119,7 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         NavigationLink {
-                                            ChapterSwipeLaunchView(
-                                                chapter: chapter,
-                                                initialSide: side,
-                                                leftCodeSectionID: leftCodeSectionID,
-                                                rightCodeSectionID: rightCodeSectionID,
-                                                parentActiveSide: $activeBrowseSide
-                                            )
+                                            ChapterLaunchView(chapter: chapter)
                                                 .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
@@ -171,34 +139,37 @@ struct BrowseView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
-            .padding(.bottom, tabBarClearance)
         }
-        .modifier(CodeScrollClipDisabledModifier())
+        .contentMargins(.bottom, tabBarClearance, for: .scrollContent)
         .scrollIndicators(.hidden)
+        .background(
+            CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
+                .ignoresSafeArea()
+        )
     }
 
-    private func libraryHeader(for side: BrowseSide) -> some View {
+    private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 14) {
             Menu {
                 Button {
-                    updateCodeSection(nil, for: side)
+                    updateCodeSection(nil)
                 } label: {
-                    codeSectionPickerLabel("All Sections", isSelected: codeSectionID(for: side) == nil)
+                    codeSectionPickerLabel("All Sections", isSelected: browseCodeSectionID == nil)
                 }
 
                 ForEach(library.codeSections) { codeSection in
                     Button {
-                        updateCodeSection(codeSection.id, for: side)
+                        updateCodeSection(codeSection.id)
                     } label: {
                         codeSectionPickerLabel(
                             CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                            isSelected: codeSectionID(for: side) == codeSection.id
+                            isSelected: browseCodeSectionID == codeSection.id
                         )
                     }
                 }
             } label: {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(codeSectionName(for: side))
+                    Text(selectedCodeSectionName)
                         .font(.system(size: 32, weight: .bold, design: .default))
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
@@ -207,7 +178,7 @@ struct BrowseView: View {
 
                     Image(systemName: "chevron.up.chevron.down")
                         .font(.headline.weight(.semibold))
-                        .foregroundStyle(Color(uiColor: library.accentColor(for: codeSectionID(for: side))))
+                        .foregroundStyle(Color(uiColor: library.accentColor(for: browseCodeSectionID)))
                 }
                 .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
                 .opacity(1 - (collapseProgress * 0.22))
@@ -272,54 +243,26 @@ struct BrowseView: View {
     }
 
     private var activeCodeSectionID: Int64? {
-        codeSectionID(for: activeBrowseSide)
+        browseCodeSectionID
     }
 
-    private var inactiveCodeSectionID: Int64? {
-        codeSectionID(for: activeBrowseSide == .left ? .right : .left)
+    private var selectedCodeSectionName: String {
+        library.codeSectionName(id: browseCodeSectionID)
     }
 
-    private var activeCodeSectionName: String {
-        library.codeSectionName(id: activeCodeSectionID)
+    private func updateCodeSection(_ id: Int64?) {
+        browseCodeSectionID = id
+        UserDefaults.standard.set(id ?? -1, forKey: Self.codeSectionDefaultsKey)
+        library.updateSelectedCodeSection(id: id)
     }
 
-    private func codeSectionID(for side: BrowseSide) -> Int64? {
-        side == .left ? leftCodeSectionID : rightCodeSectionID
-    }
+    private func seedBrowseSectionIfNeeded() {
+        guard !hasSeededBrowseSection else { return }
+        hasSeededBrowseSection = true
 
-    private func codeSectionName(for side: BrowseSide) -> String {
-        library.codeSectionName(id: codeSectionID(for: side))
-    }
-
-    private func updateCodeSection(_ id: Int64?, for side: BrowseSide) {
-        if side == .left {
-            leftCodeSectionID = id
-            UserDefaults.standard.set(id ?? -1, forKey: Self.leftCodeSectionDefaultsKey)
-        } else {
-            rightCodeSectionID = id
-            UserDefaults.standard.set(id ?? -1, forKey: Self.rightCodeSectionDefaultsKey)
-        }
-
-        if side == activeBrowseSide {
-            library.updateSelectedCodeSection(id: id)
-        }
-    }
-
-    private func applyCodeSection(for side: BrowseSide) {
-        library.updateSelectedCodeSection(id: codeSectionID(for: side))
-    }
-
-    private func seedBrowseSidesIfNeeded() {
-        guard !hasSeededBrowseSides else { return }
-        hasSeededBrowseSides = true
-
-        let storedLeft = storedCodeSectionID(forKey: Self.leftCodeSectionDefaultsKey)
-        let storedRight = storedCodeSectionID(forKey: Self.rightCodeSectionDefaultsKey)
-
-        leftCodeSectionID = storedLeft ?? library.selectedCodeSectionID ?? library.codeSections.first?.id
-        rightCodeSectionID = storedRight
-            ?? library.codeSections.first(where: { $0.id != leftCodeSectionID })?.id
-            ?? leftCodeSectionID
+        browseCodeSectionID = storedCodeSectionID(forKey: Self.codeSectionDefaultsKey)
+            ?? library.selectedCodeSectionID
+            ?? library.codeSections.first?.id
     }
 
     private func storedCodeSectionID(forKey key: String) -> Int64? {
@@ -355,10 +298,6 @@ struct BrowseView: View {
             return nil
         }
         return String(leadingLetters)
-    }
-
-    private var browseBackdrop: some View {
-        Color(uiColor: .systemGroupedBackground)
     }
 
     private var browseHairline: some View {
@@ -462,11 +401,6 @@ struct BrowseView: View {
             .name ?? ""
         return tilePalette(forCodeSectionName: codeSectionName)
     }
-}
-
-private enum BrowseSide: Hashable {
-    case left
-    case right
 }
 
 extension View {
@@ -722,249 +656,6 @@ struct ChapterSectionsView: View {
             } else {
                 expandedGroupIDs.insert(groupID)
             }
-        }
-    }
-}
-
-private struct ChapterSwipeLaunchView: View {
-    let chapter: CodeChapter
-    let initialSide: BrowseSide
-    @Binding var parentActiveSide: BrowseSide
-
-    @EnvironmentObject private var library: CodeLibraryViewModel
-    @State private var activeSide: BrowseSide
-    @State private var leftCodeSectionID: Int64?
-    @State private var rightCodeSectionID: Int64?
-    @State private var leftChapter: CodeChapter?
-    @State private var rightChapter: CodeChapter?
-    @State private var leftRememberedSectionID: Int64?
-    @State private var rightRememberedSectionID: Int64?
-
-    init(
-        chapter: CodeChapter,
-        initialSide: BrowseSide,
-        leftCodeSectionID: Int64?,
-        rightCodeSectionID: Int64?,
-        parentActiveSide: Binding<BrowseSide>
-    ) {
-        self.chapter = chapter
-        self.initialSide = initialSide
-        self._parentActiveSide = parentActiveSide
-        _activeSide = State(initialValue: initialSide)
-        _leftCodeSectionID = State(initialValue: leftCodeSectionID)
-        _rightCodeSectionID = State(initialValue: rightCodeSectionID)
-        _leftChapter = State(initialValue: initialSide == .left ? chapter : nil)
-        _rightChapter = State(initialValue: initialSide == .right ? chapter : nil)
-    }
-
-    var body: some View {
-        TabView(selection: $activeSide) {
-            ChapterSidePage(
-                side: .left,
-                codeSectionID: $leftCodeSectionID,
-                selectedChapter: $leftChapter,
-                rememberedSectionID: $leftRememberedSectionID
-            )
-                .tag(BrowseSide.left)
-
-            ChapterSidePage(
-                side: .right,
-                codeSectionID: $rightCodeSectionID,
-                selectedChapter: $rightChapter,
-                rememberedSectionID: $rightRememberedSectionID
-            )
-                .tag(BrowseSide.right)
-        }
-        .tabViewStyle(.page(indexDisplayMode: .never))
-        .onChange(of: activeSide) { _, newValue in
-            DispatchQueue.main.async {
-                library.updateSelectedCodeSection(id: codeSectionID(for: newValue))
-            }
-        }
-        .onAppear {
-            activeSide = initialSide
-            DispatchQueue.main.async {
-                library.updateSelectedCodeSection(id: codeSectionID(for: initialSide))
-            }
-        }
-        .onDisappear {
-            parentActiveSide = activeSide
-        }
-    }
-
-    private func codeSectionID(for side: BrowseSide) -> Int64? {
-        switch side {
-        case .left:
-            return leftCodeSectionID
-        case .right:
-            return rightCodeSectionID
-        }
-    }
-}
-
-private struct ChapterSidePage: View {
-    let side: BrowseSide
-    @Binding var codeSectionID: Int64?
-    @Binding var selectedChapter: CodeChapter?
-    @Binding var rememberedSectionID: Int64?
-
-    @EnvironmentObject private var library: CodeLibraryViewModel
-
-    private var accentColor: Color {
-        Color(uiColor: library.accentColor(for: codeSectionID))
-    }
-
-    var body: some View {
-        Group {
-            if let selectedChapter {
-                ChapterLaunchView(
-                    chapter: selectedChapter,
-                    rememberedSectionID: $rememberedSectionID
-                )
-            } else {
-                chapterBrowser
-            }
-        }
-        .onChange(of: codeSectionID) { _, newValue in
-            UserDefaults.standard.set(newValue ?? -1, forKey: side == .left ? "browseLeftCodeSectionID" : "browseRightCodeSectionID")
-            if selectedChapter == nil {
-                DispatchQueue.main.async {
-                    library.updateSelectedCodeSection(id: newValue)
-                }
-            }
-        }
-    }
-
-    private var chapterBrowser: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                browserHeader
-                    .padding(.top, 18)
-                    .padding(.bottom, 12)
-
-                let chapters = library.chapters(for: codeSectionID)
-                if chapters.isEmpty {
-                    CodeEmptyStateCard(
-                        title: "No Chapters",
-                        systemImage: "text.book.closed",
-                        description: "The selected code section does not have any chapters yet.",
-                        accent: accentColor
-                    )
-                } else {
-                    let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
-                    LazyVGrid(columns: columns, spacing: 12) {
-                        ForEach(chapters) { chapter in
-                            Button {
-                                rememberedSectionID = nil
-                                selectedChapter = chapter
-                            } label: {
-                                ChapterTile(
-                                    chapter: chapter,
-                                    palette: tilePalette(for: chapter),
-                                    kind: isAppendix(chapter) ? .appendix : .chapter
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 44)
-        }
-        .ignoresSafeArea(.container, edges: .bottom)
-        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private var browserHeader: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Menu {
-                Button {
-                    codeSectionID = nil
-                } label: {
-                    pickerLabel("All Sections", isSelected: codeSectionID == nil)
-                }
-
-                ForEach(library.codeSections) { codeSection in
-                    Button {
-                        codeSectionID = codeSection.id
-                    } label: {
-                        pickerLabel(
-                            CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                            isSelected: codeSectionID == codeSection.id
-                        )
-                    }
-                }
-            } label: {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(library.codeSectionName(id: codeSectionID))
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(2)
-
-                    Image(systemName: "chevron.up.chevron.down")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(accentColor)
-                }
-            }
-            .buttonStyle(.plain)
-
-            Text(side == .left ? "Screen 1" : "Screen 2")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    private func pickerLabel(_ title: String, isSelected: Bool) -> some View {
-        HStack(spacing: 8) {
-            Text(title)
-            if isSelected {
-                Image(systemName: "checkmark")
-            }
-        }
-    }
-
-    private func isAppendix(_ chapter: CodeChapter) -> Bool {
-        let label = chapter.displayLabel.uppercased()
-        let title = chapter.title.uppercased()
-        return label.hasPrefix("APPENDIX") || title.hasPrefix("APPENDIX")
-    }
-
-    private func tilePalette(for chapter: CodeChapter) -> ChapterTilePalette {
-        if library.readerTheme.accentPalette == .monochrome {
-            return .monochrome
-        }
-
-        let codeSectionName = library.codeSections.first(where: { $0.id == chapter.codeSectionID })?.name ?? ""
-        let normalizedName = codeSectionName.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-
-        switch normalizedName {
-        case let name where name.contains("BUILDING"):
-            return .building
-        case let name where name.contains("PLUMBING"):
-            return .plumbing
-        case let name where name.contains("FUEL GAS"):
-            return .fuelGas
-        case let name where name.contains("ELECTRICAL"):
-            return .electrical
-        case let name where name.contains("MECHANICAL"):
-            return .mechanical
-        case let name where name.contains("GENERAL ADMIN"):
-            return .administrative
-        case let name where name.contains("ENERGY"):
-            return .energy
-        case let name where name.contains("FIRE"):
-            return .fire
-        case let name where name.contains("EXISTING"):
-            return .existingBuilding
-        case let name where name.contains("RESIDENTIAL"):
-            return .residential
-        default:
-            return .building
         }
     }
 }
@@ -1228,7 +919,6 @@ struct CodeTopContentFade: View {
                             .lineLimit(1)
                             .padding(.horizontal, 16)
                             .padding(.bottom, 10)
-                            .opacity(collapsedOpacity)
                     }
                 }
                 .frame(height: topInset + 50)
@@ -1236,41 +926,8 @@ struct CodeTopContentFade: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, alignment: .top)
+            .opacity(collapsedOpacity)
             .allowsHitTesting(false)
-        }
-    }
-}
-
-struct CodeBottomContentFade: View {
-    let extraHeight: CGFloat
-
-    init(extraHeight: CGFloat = 88) {
-        self.extraHeight = extraHeight
-    }
-
-    var body: some View {
-        GeometryReader { proxy in
-            let bottomInset = proxy.safeAreaInsets.bottom
-
-            VStack(spacing: 0) {
-                Spacer(minLength: 0)
-
-                Rectangle()
-                    .fill(.ultraThinMaterial)
-                    .frame(height: bottomInset + extraHeight * 0.55)
-            }
-            .frame(maxWidth: .infinity, alignment: .bottom)
-            .allowsHitTesting(false)
-        }
-    }
-}
-
-struct CodeScrollClipDisabledModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 17.4, *) {
-            content.scrollClipDisabled(true)
-        } else {
-            content
         }
     }
 }
