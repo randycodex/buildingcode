@@ -41,9 +41,6 @@ struct BrowseView: View {
                             .tag(BrowseSide.right)
                     }
                     .tabViewStyle(.page(indexDisplayMode: .never))
-                    .overlay(alignment: .top) {
-                        CodeTopContentFade(title: activeCodeSectionName, progress: collapseProgress)
-                    }
                     .onChange(of: activeBrowseSide) { _, newValue in
                         DispatchQueue.main.async {
                             applyCodeSection(for: newValue)
@@ -60,6 +57,7 @@ struct BrowseView: View {
             .background(browseBackdrop.ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
         .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
@@ -118,7 +116,8 @@ struct BrowseView: View {
                                             chapter: chapter,
                                             initialSide: side,
                                             leftCodeSectionID: leftCodeSectionID,
-                                            rightCodeSectionID: rightCodeSectionID
+                                            rightCodeSectionID: rightCodeSectionID,
+                                            parentActiveSide: $activeBrowseSide
                                         )
                                             .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                     } label: {
@@ -142,7 +141,8 @@ struct BrowseView: View {
                                             chapter: chapter,
                                             initialSide: side,
                                             leftCodeSectionID: leftCodeSectionID,
-                                            rightCodeSectionID: rightCodeSectionID
+                                            rightCodeSectionID: rightCodeSectionID,
+                                            parentActiveSide: $activeBrowseSide
                                         )
                                             .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                     } label: {
@@ -162,9 +162,9 @@ struct BrowseView: View {
                 .padding(.horizontal, 16)
             }
 
-            Spacer(minLength: 44)
+            Spacer(minLength: 32)
         }
-        .ignoresSafeArea(.container, edges: .bottom)
+        .scrollIndicators(.hidden)
     }
 
     private func libraryHeader(for side: BrowseSide) -> some View {
@@ -504,27 +504,14 @@ private struct ChapterLaunchView: View {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
-    private var shouldUseNativeAuthoredReader: Bool {
-        guard library.selectedVersion?.contentKind == .authored else { return false }
-        return !library.sectionGroups(for: chapter).isEmpty
-    }
-
     var body: some View {
         Group {
             if let initialSection = initialSection ?? library.firstSection(for: chapter) {
-                if shouldUseNativeAuthoredReader {
-                    ChapterReaderView(
-                        chapter: chapter,
-                        initialSectionID: initialSection.id,
-                        rememberedSectionID: rememberedSectionID
-                    )
-                } else {
-                    ChapterHTMLReaderView(
-                        chapter: chapter,
-                        initialSection: initialSection,
-                        rememberedNativeSectionID: rememberedSectionID
-                    )
-                }
+                ChapterReaderView(
+                    chapter: chapter,
+                    initialSectionID: initialSection.id,
+                    rememberedSectionID: rememberedSectionID
+                )
             } else {
                 VStack(spacing: 12) {
                     ProgressView()
@@ -665,9 +652,9 @@ struct ChapterSectionsView: View {
 
                 ForEach(group.sections, id: \.id) { section in
                     NavigationLink {
-                        ChapterHTMLReaderView(
+                        ChapterReaderView(
                             chapter: chapter,
-                            initialSection: section
+                            initialSectionID: section.id
                         )
                     } label: {
                         sectionBubble(section: section)
@@ -732,6 +719,7 @@ struct ChapterSectionsView: View {
 private struct ChapterSwipeLaunchView: View {
     let chapter: CodeChapter
     let initialSide: BrowseSide
+    @Binding var parentActiveSide: BrowseSide
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var activeSide: BrowseSide
@@ -746,10 +734,12 @@ private struct ChapterSwipeLaunchView: View {
         chapter: CodeChapter,
         initialSide: BrowseSide,
         leftCodeSectionID: Int64?,
-        rightCodeSectionID: Int64?
+        rightCodeSectionID: Int64?,
+        parentActiveSide: Binding<BrowseSide>
     ) {
         self.chapter = chapter
         self.initialSide = initialSide
+        self._parentActiveSide = parentActiveSide
         _activeSide = State(initialValue: initialSide)
         _leftCodeSectionID = State(initialValue: leftCodeSectionID)
         _rightCodeSectionID = State(initialValue: rightCodeSectionID)
@@ -786,6 +776,9 @@ private struct ChapterSwipeLaunchView: View {
             DispatchQueue.main.async {
                 library.updateSelectedCodeSection(id: codeSectionID(for: initialSide))
             }
+        }
+        .onDisappear {
+            parentActiveSide = activeSide
         }
     }
 
@@ -1212,28 +1205,12 @@ struct CodeTopContentFade: View {
         GeometryReader { proxy in
             let topInset = proxy.safeAreaInsets.top
             let collapsedOpacity = min(max((progress - 0.08) / 0.22, 0), 1)
-            let backgroundColor = Color(uiColor: .systemGroupedBackground)
 
             VStack(spacing: 0) {
                 ZStack(alignment: .bottomLeading) {
                     Rectangle()
-                        .fill(backgroundColor)
-                        .opacity(0.98 * collapsedOpacity)
-
-                    Rectangle()
-                        .fill(.regularMaterial)
-                        .opacity(0.55 * collapsedOpacity)
-
-                    LinearGradient(
-                        colors: [
-                            backgroundColor.opacity(0.98 * collapsedOpacity),
-                            backgroundColor.opacity(0.92 * collapsedOpacity),
-                            backgroundColor.opacity(0.55 * collapsedOpacity),
-                            backgroundColor.opacity(0)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+                        .fill(.ultraThinMaterial)
+                        .opacity(0.35 * collapsedOpacity)
 
                     if let title, !title.isEmpty {
                         Text(title)

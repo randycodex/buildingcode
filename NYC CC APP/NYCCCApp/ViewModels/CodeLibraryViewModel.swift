@@ -24,6 +24,15 @@ final class CodeLibraryViewModel: ObservableObject {
         var id: Int64 { detail.id }
     }
 
+    struct ChapterReaderBlockSummary: Identifiable, Hashable {
+        let id: Int64
+        let sectionNumber: String
+        let title: String
+        let displayTitle: String
+        let kind: CodeSectionKind
+        let groupLabel: String?
+    }
+
     @Published private(set) var availableVersions: [BundledCodeVersion] = []
     @Published private(set) var availableJurisdictions: [BundledJurisdiction] = []
     @Published private(set) var codeSections: [CodeSectionCategory] = []
@@ -598,6 +607,39 @@ final class CodeLibraryViewModel: ObservableObject {
         }
         guard let codeDatabase else { return [] }
         return referenceResolver.resolveReferences(in: detail.officialText, database: codeDatabase)
+    }
+
+    func chapterBlockSummaries(for chapter: CodeChapter) async -> [ChapterReaderBlockSummary] {
+        let groups: [CodeSectionGroup]
+        if let authoredCodeStore {
+            groups = authoredCodeStore.sectionGroups(chapterID: chapter.id)
+        } else if let cached = sectionGroupsCache[chapter.id] {
+            groups = cached
+        } else if let sqliteChapterLoader {
+            do {
+                let loaded = try await sqliteChapterLoader.sectionGroups(chapterID: chapter.id)
+                sectionGroupsCache[chapter.id] = loaded
+                groups = loaded
+            } catch {
+                statusMessage = error.localizedDescription
+                return []
+            }
+        } else {
+            groups = []
+        }
+
+        return groups.flatMap { group in
+            group.sections.enumerated().map { index, section in
+                ChapterReaderBlockSummary(
+                    id: section.id,
+                    sectionNumber: section.sectionNumber,
+                    title: section.title,
+                    displayTitle: section.displayTitle,
+                    kind: section.kind,
+                    groupLabel: index == 0 ? group.displayLabel : nil
+                )
+            }
+        }
     }
 
     func chapterBlockDescriptors(for chapter: CodeChapter) async -> [ChapterBlockDescriptor] {
@@ -1320,21 +1362,13 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
-        guard let sqliteChapterLoader else { return }
-        statusMessage = "Preparing chapter navigation..."
-
-        for chapter in chapters {
-            guard !Task.isCancelled else { return }
-            do {
-                let groups = try await sqliteChapterLoader.sectionGroups(chapterID: chapter.id)
-                sectionGroupsCache[chapter.id] = groups
-                sectionsCache[chapter.id] = groups.flatMap(\.sections)
-                await Task.yield()
-            } catch {
-                statusMessage = error.localizedDescription
-                return
-            }
-        }
+        // Section groups are now loaded lazily per chapter on first open.
+        // The previous full-bundle sweep ran every chapter's SQLite query
+        // sequentially at launch, costing CPU + memory for data most users
+        // never reach. Lazy loading keeps the cold launch responsive and
+        // pays for itself the first time a chapter actually opens.
+        _ = sqliteChapterLoader
+        _ = chapters
     }
 
     private func formattedNSAttributedText(for detail: ReaderSectionDetail) -> NSAttributedString {

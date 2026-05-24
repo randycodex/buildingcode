@@ -394,31 +394,27 @@ struct ReaderView: View {
 
         var body: some View {
             Group {
-                if library.selectedVersion?.contentKind == .authored {
-                    if let initialSection = initialSection ?? library.firstSection(for: chapter) {
-                        ChapterHTMLReaderView(
-                            chapter: chapter,
-                            initialSection: initialSection
-                        )
-                    } else {
-                        VStack(spacing: 12) {
-                            ProgressView()
-                            Text("Opening \(chapter.displayLabel)")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-                        .task(id: chapter.id) {
-                            if let cached = library.firstSection(for: chapter) {
-                                initialSection = cached
-                            } else {
-                                initialSection = await library.firstSectionAsync(for: chapter)
-                            }
+                if let initialSection = initialSection ?? library.firstSection(for: chapter) {
+                    ChapterReaderView(
+                        chapter: chapter,
+                        initialSectionID: initialSection.id
+                    )
+                } else {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text("Opening \(chapter.displayLabel)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+                    .task(id: chapter.id) {
+                        if let cached = library.firstSection(for: chapter) {
+                            initialSection = cached
+                        } else {
+                            initialSection = await library.firstSectionAsync(for: chapter)
                         }
                     }
-                } else {
-                    ChapterSectionsView(chapter: chapter)
                 }
             }
             .navigationTitle(chapter.displayLabel)

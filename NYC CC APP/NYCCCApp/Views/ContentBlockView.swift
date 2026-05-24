@@ -90,14 +90,11 @@ struct ContentBlockListView: View {
             return nil
         }
 
-        let candidates = resolvedImageCandidates(for: imageID, relativeTo: readAccessURL)
-        for candidate in candidates {
-            if FileManager.default.fileExists(atPath: candidate.path) {
-                return candidate
-            }
-        }
-
-        return nil
+        return ContentBlockImageURLCache.shared.resolvedURL(
+            imageID: imageID,
+            readAccessURL: readAccessURL,
+            candidates: { resolvedImageCandidates(for: imageID, relativeTo: readAccessURL) }
+        )
     }
 
     private func resolvedImageCandidates(for imageID: String, relativeTo readAccessURL: URL) -> [URL] {
@@ -263,6 +260,42 @@ private final class ImageBlockCache {
 
     func setImage(_ image: UIImage, for url: URL) {
         cache.setObject(image, forKey: url.path as NSString)
+    }
+}
+
+private final class ContentBlockImageURLCache {
+    static let shared = ContentBlockImageURLCache()
+
+    private let cache = NSCache<NSString, NSURL>()
+    private let missingCache = NSCache<NSString, NSString>()
+
+    private init() {
+        cache.countLimit = 512
+        missingCache.countLimit = 512
+    }
+
+    func resolvedURL(
+        imageID: String,
+        readAccessURL: URL,
+        candidates: () -> [URL]
+    ) -> URL? {
+        let key = "\(readAccessURL.path)|\(imageID)" as NSString
+        if let cached = cache.object(forKey: key) {
+            return cached as URL
+        }
+        if missingCache.object(forKey: key) != nil {
+            return nil
+        }
+
+        for candidate in candidates() {
+            if FileManager.default.fileExists(atPath: candidate.path) {
+                cache.setObject(candidate as NSURL, forKey: key)
+                return candidate
+            }
+        }
+
+        missingCache.setObject(key, forKey: key)
+        return nil
     }
 }
 

@@ -25,6 +25,10 @@ struct ChapterHTMLReaderView: View {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
+    private var pageBackgroundColor: Color {
+        colorScheme == .dark ? .black : Color(uiColor: .systemGroupedBackground)
+    }
+
     private var htmlStore: PublishedHTMLContentStore {
         let rootPath = htmlStoreCacheKey
         if let cachedHTMLStore, cachedHTMLStoreRootPath == rootPath {
@@ -141,6 +145,7 @@ struct ChapterHTMLReaderView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .disablesInteractivePopGesture()
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -195,7 +200,7 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var chapterLoadingShell: some View {
-        Color(uiColor: .systemGroupedBackground)
+        pageBackgroundColor
             .ignoresSafeArea()
             .overlay {
                 ProgressView()
@@ -206,7 +211,7 @@ struct ChapterHTMLReaderView: View {
                 jumpBar
                     .redacted(reason: .placeholder)
                     .allowsHitTesting(false)
-                    .background(Color(uiColor: .systemGroupedBackground))
+                    .background(pageBackgroundColor)
             }
     }
 
@@ -254,9 +259,9 @@ struct ChapterHTMLReaderView: View {
         )
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar
-                .background(Color(uiColor: .systemGroupedBackground))
+                .background(pageBackgroundColor)
         }
-        .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
+        .background(pageBackgroundColor.ignoresSafeArea())
     }
 
     private var jumpBar: some View {

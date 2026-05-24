@@ -7,9 +7,7 @@ struct ChapterReaderView: View {
     var rememberedSectionID: Binding<Int64?> = .constant(nil)
 
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @State private var blocks: [CodeLibraryViewModel.ChapterReaderBlockContent] = []
-    @State private var blockOrder: [Int64: Int] = [:]
-    @State private var prewarmedBodyText: [Int64: NSAttributedString] = [:]
+    @State private var blocks: [CodeLibraryViewModel.ChapterReaderBlockSummary] = []
     @State private var selectedJumpSectionID: Int64?
     @State private var pendingScrollSectionID: Int64?
     @State private var expandedInlineImage: UIImage?
@@ -24,6 +22,7 @@ struct ChapterReaderView: View {
     @State private var pendingFocusedSectionID: Int64?
     @State private var scrollPositionSectionID: Int64?
     @State private var focusedSectionUpdateTask: Task<Void, Never>?
+    @State private var backgroundPrefetchTask: Task<Void, Never>?
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
     private let focusedSectionUpdateDelay: Duration = .milliseconds(70)
@@ -37,11 +36,11 @@ struct ChapterReaderView: View {
     private var currentJumpLabel: String {
         let activeSectionID = pendingFocusedSectionID ?? selectedJumpSectionID
         if let activeSectionID,
-           let block = blocks.first(where: { $0.detail.id == activeSectionID }) {
-            return jumpLabel(for: block.detail)
+           let block = blocks.first(where: { $0.id == activeSectionID }) {
+            return jumpLabel(for: block)
         }
         if let first = blocks.first {
-            return jumpLabel(for: first.detail)
+            return jumpLabel(for: first)
         }
         return ""
     }
@@ -98,6 +97,7 @@ struct ChapterReaderView: View {
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .disablesInteractivePopGesture()
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -163,27 +163,29 @@ struct ChapterReaderView: View {
         .onDisappear {
             focusedSectionUpdateTask?.cancel()
             focusedSectionUpdateTask = nil
+            backgroundPrefetchTask?.cancel()
+            backgroundPrefetchTask = nil
         }
     }
 
     @ViewBuilder
-    private func blockSection(for block: CodeLibraryViewModel.ChapterReaderBlockContent) -> some View {
-        if duplicateHeadingSectionIDs.contains(block.detail.id) {
+    private func blockSection(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> some View {
+        if duplicateHeadingSectionIDs.contains(block.id) {
             EmptyView()
         } else {
             visibleBlockSection(for: block)
         }
     }
 
-    private func visibleBlockSection(for block: CodeLibraryViewModel.ChapterReaderBlockContent) -> some View {
-        let hierarchyIndent = CGFloat(block.detail.sectionNumber.hierarchyIndentLevel) * indentStep
-        let normalizedSectionNumber = block.detail.sectionNumber
+    private func visibleBlockSection(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> some View {
+        let hierarchyIndent = CGFloat(block.sectionNumber.hierarchyIndentLevel) * indentStep
+        let normalizedSectionNumber = block.sectionNumber
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
             .uppercased()
-        let isBookmarked = visibleBookmarkedSectionIDs.contains(block.detail.id)
+        let isBookmarked = visibleBookmarkedSectionIDs.contains(block.id)
             || visibleBookmarkedSectionNumbers.contains(normalizedSectionNumber)
-        let hasNote = visibleNotedSectionIDs.contains(block.detail.id)
+        let hasNote = visibleNotedSectionIDs.contains(block.id)
 
         return VStack(alignment: .leading, spacing: 10) {
             if let groupLabel = block.groupLabel {
@@ -196,14 +198,14 @@ struct ChapterReaderView: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    if block.detail.kind == .textBlock {
-                        Text(block.detail.displayTitle)
+                    if block.kind == .textBlock {
+                        Text(block.displayTitle)
                             .font(.title3.weight(.semibold))
                     } else {
-                        Text(block.detail.sectionNumber)
+                        Text(block.sectionNumber)
                             .font(.headline.weight(.semibold))
                             .foregroundStyle(accentColor)
-                        Text(block.detail.displayTitle)
+                        Text(block.displayTitle)
                             .font(.headline.weight(.semibold))
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.leading)
@@ -215,11 +217,10 @@ struct ChapterReaderView: View {
                 }
 
                 ChapterBlockBodyView(
-                    detail: block.detail,
-                    prewarmedText: prewarmedBodyText[block.detail.id],
+                    sectionID: block.id,
                     onOpenImage: { expandedInlineImage = $0 },
-                    onContentTap: {
-                        openNotes(for: block.detail)
+                    onOpenNotes: { detail in
+                        openNotes(for: detail)
                     },
                     onSelectionChange: { hasSelection in
                         hasActiveTextSelection = hasSelection
@@ -232,12 +233,12 @@ struct ChapterReaderView: View {
 
             CodeHairline().padding(.top, 2)
         }
-        .id(block.detail.id)
+        .id(block.id)
         .background(
             GeometryReader { geo in
                 Color.clear.preference(
                     key: ChapterReaderBlockOffsetPreferenceKey.self,
-                    value: [block.detail.id: geo.frame(in: .named(chapterReaderCoordinateSpace)).minY]
+                    value: [block.id: geo.frame(in: .named(chapterReaderCoordinateSpace)).minY]
                 )
             }
         )
@@ -264,11 +265,11 @@ struct ChapterReaderView: View {
         }
     }
 
-    private func isDuplicateSectionHeadingBlock(_ detail: ReaderSectionDetail) -> Bool {
-        let normalizedDisplayTitle = detail.displayTitle
+    private func isDuplicateSectionHeadingBlock(_ block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> Bool {
+        let normalizedDisplayTitle = block.displayTitle
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
-        let normalizedTitle = detail.title
+        let normalizedTitle = block.title
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
         let normalizedChapterTitle = chapter.title
@@ -279,7 +280,7 @@ struct ChapterReaderView: View {
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
         let normalizedAuthoredChapterHeading = "Chapter \(chapter.chapterNumber)"
 
-        if detail.kind == .textBlock {
+        if block.kind == .textBlock {
             if normalizedDisplayTitle.caseInsensitiveCompare(normalizedChapterTitle) == .orderedSame {
                 return true
             }
@@ -294,7 +295,7 @@ struct ChapterReaderView: View {
             }
         }
 
-        guard detail.kind == .textBlock else { return false }
+        guard block.kind == .textBlock else { return false }
         return normalizedDisplayTitle.range(of: #"^Section\s+BC\s+[A-Z]?\d+"#, options: [.regularExpression, .caseInsensitive]) != nil
     }
 
@@ -326,7 +327,7 @@ struct ChapterReaderView: View {
             .disabled(visibleJumpBlocks.isEmpty)
 
             Button {
-                if let firstID = blocks.first?.detail.id {
+                if let firstID = blocks.first?.id {
                     jumpToSection(id: firstID, with: proxy)
                 }
             } label: {
@@ -346,8 +347,8 @@ struct ChapterReaderView: View {
         .padding(.bottom, 8)
     }
 
-    private var visibleJumpBlocks: [CodeLibraryViewModel.ChapterReaderBlockContent] {
-        blocks.filter { !duplicateHeadingSectionIDs.contains($0.detail.id) }
+    private var visibleJumpBlocks: [CodeLibraryViewModel.ChapterReaderBlockSummary] {
+        blocks.filter { !duplicateHeadingSectionIDs.contains($0.id) }
     }
 
     private func jumpPickerSheet(proxy: ScrollViewProxy) -> some View {
@@ -355,16 +356,16 @@ struct ChapterReaderView: View {
             List {
                 ForEach(visibleJumpBlocks) { block in
                     Button {
-                        jumpToSection(id: block.detail.id, with: proxy)
+                        jumpToSection(id: block.id, with: proxy)
                         isJumpPickerPresented = false
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
-                            Text(jumpSheetLabel(for: block.detail))
+                            Text(jumpSheetLabel(for: block))
                                 .font(.body.weight(.semibold))
                                 .foregroundStyle(accentColor)
                                 .lineLimit(2)
 
-                            if selectedJumpSectionID == block.detail.id {
+                            if selectedJumpSectionID == block.id {
                                 Text("Current")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -393,73 +394,67 @@ struct ChapterReaderView: View {
 
     private func loadBlocks(with proxy: ScrollViewProxy) async {
         blocks = []
-        blockOrder = [:]
-        prewarmedBodyText = [:]
         pendingFocusedSectionID = nil
         focusedSectionUpdateTask?.cancel()
         focusedSectionUpdateTask = nil
+        backgroundPrefetchTask?.cancel()
+        backgroundPrefetchTask = nil
 
-        let descriptors = await library.chapterBlockDescriptors(for: chapter)
-        guard !descriptors.isEmpty else { return }
-
-        blockOrder = Dictionary(
-            uniqueKeysWithValues: descriptors.enumerated().map { offset, descriptor in
-                (descriptor.sectionID, offset)
-            }
-        )
+        let summaries = await library.chapterBlockSummaries(for: chapter)
+        guard !summaries.isEmpty else { return }
 
         let restoreSectionID = rememberedSectionID.wrappedValue ?? initialSectionID
-        let initialLoadSectionID = descriptors.contains(where: { $0.sectionID == restoreSectionID })
+        let initialLoadSectionID = summaries.contains(where: { $0.id == restoreSectionID })
             ? restoreSectionID
             : initialSectionID
 
-        if let selectedDescriptor = descriptors.first(where: { $0.sectionID == initialLoadSectionID }),
-           let selectedDetail = await library.loadSectionDetailAsync(sectionID: initialLoadSectionID) {
-            let selectedBlock = library.chapterReaderBlock(
-                detail: selectedDetail,
-                groupLabel: selectedDescriptor.groupLabel
-            )
-            let selectedBodyText = await library.chapterBodyNSTextAsync(for: selectedDetail)
-
-            prewarmedBodyText = [selectedDetail.id: selectedBodyText]
-            blocks = [selectedBlock]
-            selectedJumpSectionID = initialLoadSectionID
-            scrollPositionSectionID = initialLoadSectionID
-            pendingScrollSectionID = initialLoadSectionID
-            scrollIfNeeded(with: proxy, animated: false)
-        }
-
-        await prewarmVisibleSectionBodies(from: descriptors)
-
-        var loadedBlocksByID = Dictionary(uniqueKeysWithValues: blocks.map { ($0.id, $0) })
-        let remainingDescriptors = descriptors.filter { $0.sectionID != initialLoadSectionID }
-
-        for batch in remainingDescriptors.chunked(into: 16) {
-            let details = await library.loadSectionDetailsAsync(sectionIDs: batch.map(\.sectionID))
-            let detailsByID = Dictionary(uniqueKeysWithValues: details.map { ($0.id, $0) })
-
-            for descriptor in batch {
-                guard let detail = detailsByID[descriptor.sectionID] else { continue }
-                loadedBlocksByID[detail.id] = library.chapterReaderBlock(
-                    detail: detail,
-                    groupLabel: descriptor.groupLabel
-                )
-            }
-
-            blocks = orderedBlocks(from: loadedBlocksByID)
-            syncVisibleSavedState()
-            refreshDuplicateHeadingSet()
-            await Task.yield()
-        }
-
-        blocks = orderedBlocks(from: loadedBlocksByID)
+        blocks = summaries
         syncVisibleSavedState()
         refreshDuplicateHeadingSet()
+        selectedJumpSectionID = initialLoadSectionID
+        scrollPositionSectionID = initialLoadSectionID
+        pendingScrollSectionID = initialLoadSectionID
+        scrollIfNeeded(with: proxy, animated: false)
+
+        await prewarmVisibleSectionBodies(from: summaries, around: initialLoadSectionID)
+        startBackgroundPrefetch(for: summaries, anchor: initialLoadSectionID)
+    }
+
+    private func startBackgroundPrefetch(
+        for summaries: [CodeLibraryViewModel.ChapterReaderBlockSummary],
+        anchor: Int64
+    ) {
+        backgroundPrefetchTask?.cancel()
+        let library = library
+        backgroundPrefetchTask = Task { [weak library] in
+            guard let library else { return }
+            let anchorIndex = summaries.firstIndex(where: { $0.id == anchor }) ?? summaries.startIndex
+            // Walk outward from the visible anchor so sections you're likely
+            // to reach next get warmed first.
+            var offset = 1
+            while !Task.isCancelled {
+                let forwardIndex = anchorIndex + offset
+                let backwardIndex = anchorIndex - offset
+                var didTouch = false
+                for candidate in [forwardIndex, backwardIndex] {
+                    guard candidate >= summaries.startIndex, candidate < summaries.endIndex else { continue }
+                    didTouch = true
+                    let id = summaries[candidate].id
+                    if let detail = await library.loadSectionDetailAsync(sectionID: id) {
+                        _ = await library.chapterBodyNSTextAsync(for: detail)
+                    }
+                    if Task.isCancelled { return }
+                    await Task.yield()
+                }
+                if !didTouch { return }
+                offset += 1
+            }
+        }
     }
 
     private func refreshDuplicateHeadingSet() {
         duplicateHeadingSectionIDs = Set(
-            blocks.compactMap { isDuplicateSectionHeadingBlock($0.detail) ? $0.detail.id : nil }
+            blocks.compactMap { isDuplicateSectionHeadingBlock($0) ? $0.id : nil }
         )
     }
 
@@ -505,57 +500,39 @@ struct ChapterReaderView: View {
     }
 
     private func prewarmVisibleSectionBodies(
-        from descriptors: [CodeLibraryViewModel.ChapterBlockDescriptor]
+        from summaries: [CodeLibraryViewModel.ChapterReaderBlockSummary],
+        around initialLoadSectionID: Int64
     ) async {
-        let focusedIndex = descriptors.firstIndex { $0.sectionID == initialSectionID } ?? descriptors.startIndex
-        let startIndex = max(descriptors.startIndex, focusedIndex - 1)
+        let focusedIndex = summaries.firstIndex { $0.id == initialLoadSectionID } ?? summaries.startIndex
+        let startIndex = max(summaries.startIndex, focusedIndex - 1)
         let sectionIDs = Array(
-            descriptors
+            summaries
                 .dropFirst(startIndex)
                 .prefix(prewarmedSectionCount + 2)
-                .map(\.sectionID)
+                .map(\.id)
         )
         guard !sectionIDs.isEmpty else { return }
 
         let details = await library.loadSectionDetailsAsync(sectionIDs: sectionIDs)
-        let detailsByID = Dictionary(uniqueKeysWithValues: details.map { ($0.id, $0) })
-        let orderedDetails = sectionIDs.compactMap { detailsByID[$0] }
-        guard !orderedDetails.isEmpty else { return }
-
-        var prewarmedEntries: [Int64: NSAttributedString] = [:]
-        prewarmedEntries.reserveCapacity(orderedDetails.count)
-
-        for detail in orderedDetails {
-            prewarmedEntries[detail.id] = await library.chapterBodyNSTextAsync(for: detail)
-        }
-
-        guard !prewarmedEntries.isEmpty else { return }
-        prewarmedBodyText.merge(prewarmedEntries) { _, new in new }
-    }
-
-    private func orderedBlocks(
-        from loadedBlocksByID: [Int64: CodeLibraryViewModel.ChapterReaderBlockContent]
-    ) -> [CodeLibraryViewModel.ChapterReaderBlockContent] {
-        loadedBlocksByID.values.sorted { lhs, rhs in
-            let lhsOrder = blockOrder[lhs.id] ?? .max
-            let rhsOrder = blockOrder[rhs.id] ?? .max
-            return lhsOrder < rhsOrder
+        for detail in details {
+            _ = await library.chapterBodyNSTextAsync(for: detail)
+            if Task.isCancelled { return }
         }
     }
 
     private func syncVisibleSavedState() {
         visibleBookmarkedSectionIDs = Set(
-            blocks.map(\.detail.id).filter { library.isBookmarked(sectionID: $0) }
+            blocks.map(\.id).filter { library.isBookmarked(sectionID: $0) }
         )
         visibleNotedSectionIDs = Set(
-            blocks.map(\.detail.id).filter {
+            blocks.map(\.id).filter {
                 !library.noteBody(sectionID: $0).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             }
         )
         visibleBookmarkedSectionNumbers = Set(
             blocks.compactMap { block in
-                guard library.isBookmarked(sectionID: block.detail.id) else { return nil }
-                return block.detail.sectionNumber
+                guard library.isBookmarked(sectionID: block.id) else { return nil }
+                return block.sectionNumber
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                     .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
                     .uppercased()
@@ -563,25 +540,25 @@ struct ChapterReaderView: View {
         )
     }
 
-    private func jumpLabel(for detail: ReaderSectionDetail) -> String {
-        detail.kind == .textBlock ? detail.displayTitle : "\(detail.sectionNumber) \(detail.displayTitle)"
+    private func jumpLabel(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> String {
+        block.kind == .textBlock ? block.displayTitle : "\(block.sectionNumber) \(block.displayTitle)"
     }
 
-    private func jumpSheetLabel(for detail: ReaderSectionDetail) -> String {
-        if detail.kind == .textBlock {
-            return detail.displayTitle
+    private func jumpSheetLabel(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> String {
+        if block.kind == .textBlock {
+            return block.displayTitle
         }
 
-        let normalizedSectionNumber = detail.sectionNumber
+        let normalizedSectionNumber = block.sectionNumber
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
         let isSectionGroup = normalizedSectionNumber.range(of: #"^\d+0\d$"#, options: .regularExpression) != nil
             && normalizedSectionNumber.count >= 3
 
         if isSectionGroup {
-            return "Section BC \(normalizedSectionNumber): \(detail.displayTitle)"
+            return "Section BC \(normalizedSectionNumber): \(block.displayTitle)"
         }
-        return "\(detail.sectionNumber) \(detail.displayTitle)"
+        return "\(block.sectionNumber) \(block.displayTitle)"
     }
 
     private func openNotes(for detail: ReaderSectionDetail) {
@@ -720,47 +697,51 @@ private struct ChapterNoteSheet: View {
 }
 
 private struct ChapterBlockBodyView: View {
-    let detail: ReaderSectionDetail
-    let prewarmedText: NSAttributedString?
+    let sectionID: Int64
     let onOpenImage: (UIImage) -> Void
-    let onContentTap: (() -> Void)?
+    let onOpenNotes: ((ReaderSectionDetail) -> Void)?
     let onSelectionChange: ((Bool) -> Void)?
 
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @State private var detail: ReaderSectionDetail?
     @State private var bodyText: NSAttributedString?
-
-    init(
-        detail: ReaderSectionDetail,
-        prewarmedText: NSAttributedString? = nil,
-        onOpenImage: @escaping (UIImage) -> Void,
-        onContentTap: (() -> Void)? = nil,
-        onSelectionChange: ((Bool) -> Void)? = nil
-    ) {
-        self.detail = detail
-        self.prewarmedText = prewarmedText
-        self.onOpenImage = onOpenImage
-        self.onContentTap = onContentTap
-        self.onSelectionChange = onSelectionChange
-        _bodyText = State(initialValue: prewarmedText)
-    }
 
     var body: some View {
         Group {
-            if let bodyText, !bodyText.string.isEmpty {
+            if let detail, let bodyText, !bodyText.string.isEmpty {
                 ContentBlockListView(
                     detail: detail,
                     fallbackText: bodyText,
                     onOpenImage: onOpenImage,
-                    onContentTap: onContentTap,
+                    onContentTap: {
+                        onOpenNotes?(detail)
+                    },
                     onSelectionChange: onSelectionChange
                 )
-            } else if bodyText == nil {
-                ProgressView()
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                // Reserve a small space so layout doesn't jump when the body
+                // resolves a frame later. No spinner — cache hits should land
+                // before the user notices.
+                Color.clear.frame(maxWidth: .infinity, minHeight: 18, alignment: .leading)
             }
         }
-        .task(id: ChapterBlockBodyTaskID(sectionID: detail.id, theme: library.readerTheme)) {
-            let renderedText = await library.chapterBodyNSTextAsync(for: detail)
+        .task(id: ChapterBlockBodyTaskID(sectionID: sectionID, theme: library.readerTheme)) {
+            let loadedDetail: ReaderSectionDetail?
+            if let existing = detail, existing.id == sectionID {
+                loadedDetail = existing
+            } else {
+                loadedDetail = await library.loadSectionDetailAsync(sectionID: sectionID)
+                if Task.isCancelled { return }
+                if let loadedDetail {
+                    if detail?.id != loadedDetail.id {
+                        detail = loadedDetail
+                    }
+                }
+            }
+
+            guard let resolvedDetail = loadedDetail else { return }
+            let renderedText = await library.chapterBodyNSTextAsync(for: resolvedDetail)
+            if Task.isCancelled { return }
             if bodyText?.isEqual(renderedText) != true {
                 bodyText = renderedText
             }

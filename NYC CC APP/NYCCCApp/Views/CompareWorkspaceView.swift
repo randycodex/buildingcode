@@ -463,14 +463,7 @@ private struct ComparePaneReader: View {
 
     @ViewBuilder
     private func paneRoot(chapter: CodeChapter, initialSection: CodeSectionSummary) -> some View {
-        if shouldUseNativeAuthoredReader(for: chapter) {
-            ChapterReaderView(chapter: chapter, initialSectionID: initialSection.id)
-        } else {
-            ChapterHTMLReaderView(
-                chapter: chapter,
-                initialSection: initialSection
-            )
-        }
+        ChapterReaderView(chapter: chapter, initialSectionID: initialSection.id)
     }
 
     private var selectedChapter: CodeChapter? {
@@ -483,10 +476,6 @@ private struct ComparePaneReader: View {
         return availableSections.first(where: { $0.id == selection.sectionID }) ?? availableSections.first
     }
 
-    private func shouldUseNativeAuthoredReader(for chapter: CodeChapter) -> Bool {
-        guard library.selectedVersion?.contentKind == .authored else { return false }
-        return !library.sectionGroups(for: chapter).isEmpty
-    }
 }
 
 private struct ComparePaneSelection: Hashable {

@@ -13,6 +13,15 @@ struct SettingsView: View {
         min(max(-scrollOffset / 64, 0), 1)
     }
 
+    private static let buildTimestamp: String = {
+        let executableURL = Bundle.main.executableURL
+            ?? Bundle.main.bundleURL.appendingPathComponent("NYCCCApp")
+        let date = (try? FileManager.default.attributesOfItem(atPath: executableURL.path)[.modificationDate] as? Date) ?? Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm"
+        return formatter.string(from: date)
+    }()
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -75,6 +84,12 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 6)
                     }
+
+                    Text("Build: \(Self.buildTimestamp)")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 4)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 18)
