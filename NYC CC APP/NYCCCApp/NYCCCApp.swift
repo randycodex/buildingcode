@@ -4,7 +4,6 @@ import UIKit
 @main
 struct NYCCCApp: App {
     @StateObject private var library = CodeLibraryViewModel()
-    @State private var selectedTab: AppTab = .browse
 
     init() {
         let appearance = UITabBarAppearance()
@@ -33,9 +32,9 @@ struct NYCCCApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TabView(selection: $selectedTab) {
+            TabView(selection: $library.selectedTab) {
                 BrowseView(browserContext: .primary)
-                    .environment(\.isBrowserTabActive, selectedTab == .browse)
+                    .environment(\.isBrowserTabActive, library.selectedTab == .browse)
                     .tabItem {
                         Image(systemName: "text.line.first.and.arrowtriangle.forward")
                         Text("")
@@ -43,10 +42,8 @@ struct NYCCCApp: App {
                     .tag(AppTab.browse)
 
                 if library.comparisonModeEnabled {
-                    DeferredBrowseTabView(
-                        browserContext: .secondary,
-                        isActive: selectedTab == .browseSecondary
-                    )
+                    BrowseView(browserContext: .secondary)
+                        .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
                         .tabItem {
                             Image(systemName: "text.line.last.and.arrowtriangle.forward")
                             Text("")
@@ -63,31 +60,37 @@ struct NYCCCApp: App {
 
                 BookmarksView()
                     .tabItem {
-                        Image(systemName: selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
+                        Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
                         Text("")
                     }
                     .tag(AppTab.bookmarks)
 
                 SettingsView()
                     .tabItem {
-                        Image(systemName: selectedTab == .settings ? "gearshape.fill" : "gearshape")
+                        Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
                         Text("")
                     }
                     .tag(AppTab.settings)
             }
             .environmentObject(library)
-            .tint(Color(uiColor: library.accentColor()))
+            .tint(Color(uiColor: .label))
             .onChange(of: library.comparisonModeEnabled) { _, isEnabled in
-                if !isEnabled, selectedTab == .browseSecondary {
-                    selectedTab = .browse
+                if !isEnabled, library.selectedTab == .browseSecondary {
+                    library.selectedTab = .browse
+                } else if isEnabled {
+                    let preservedTab = library.selectedTab
+                    Task { @MainActor in
+                        await Task.yield()
+                        library.selectedTab = preservedTab
+                    }
                 }
             }
             .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
                 guard let requestedContext else { return }
-                selectedTab = requestedContext == .primary ? .browse : .browseSecondary
+                library.selectedTab = requestedContext == .primary ? .browse : .browseSecondary
                 library.browserTabSwitchRequest = nil
             }
-            .onChange(of: selectedTab) { _, newTab in
+            .onChange(of: library.selectedTab) { _, newTab in
                 switch newTab {
                 case .browse:
                     library.syncSelectedCodeSection(from: .primary)
@@ -98,7 +101,7 @@ struct NYCCCApp: App {
                 }
             }
             .onAppear {
-                switch selectedTab {
+                switch library.selectedTab {
                 case .browse:
                     library.syncSelectedCodeSection(from: .primary)
                 case .browseSecondary:
@@ -106,44 +109,6 @@ struct NYCCCApp: App {
                 default:
                     break
                 }
-            }
-            .id(library.comparisonModeEnabled)
-        }
-    }
-
-    private enum AppTab: Hashable {
-        case browse
-        case browseSecondary
-        case search
-        case bookmarks
-        case settings
-    }
-}
-
-private struct DeferredBrowseTabView: View {
-    let browserContext: BrowserContextID
-    let isActive: Bool
-
-    @State private var hasActivated = false
-
-    var body: some View {
-        Group {
-            if hasActivated || isActive {
-                BrowseView(browserContext: browserContext)
-                    .environment(\.isBrowserTabActive, isActive)
-            } else {
-                Color.clear
-                    .accessibilityHidden(true)
-            }
-        }
-        .onAppear {
-            if isActive {
-                hasActivated = true
-            }
-        }
-        .onChange(of: isActive) { _, newValue in
-            if newValue {
-                hasActivated = true
             }
         }
     }

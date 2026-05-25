@@ -4,11 +4,17 @@ import UIKit
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
-    @State private var savedFilterCodeSectionID: Int64? = nil
-    @State private var savedFilterAllSelected: Bool = true
+    @State private var savedFilterCodeSectionIDs: Set<Int64>
     @State private var selectedTagFilter: String? = nil
 
+    private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private let tabBarClearance: CGFloat = 104
+
+    init() {
+        _savedFilterCodeSectionIDs = State(
+            initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
+        )
+    }
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -82,6 +88,9 @@ struct BookmarksView: View {
             .onAppear {
                 library.refreshBookmarks()
             }
+            .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
+                FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
+            }
         }
         .coordinateSpace(name: "savedScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
@@ -96,8 +105,11 @@ struct BookmarksView: View {
 
     private var filteredBookmarks: [BookmarkedSection] {
         var results = library.bookmarks
-        if !savedFilterAllSelected, let id = savedFilterCodeSectionID {
-            results = results.filter { $0.codeSectionID == id }
+        if !savedFilterCodeSectionIDs.isEmpty {
+            results = results.filter { bookmark in
+                guard let id = bookmark.codeSectionID else { return false }
+                return savedFilterCodeSectionIDs.contains(id)
+            }
         }
         if let tag = selectedTagFilter {
             results = results.filter { bookmark in
@@ -169,51 +181,12 @@ struct BookmarksView: View {
     }
 
     private var savedFilterControl: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                savedFilterChip(
-                    title: "All",
-                    accent: accentColor,
-                    isSelected: savedFilterAllSelected
-                ) {
-                    savedFilterAllSelected = true
-                    savedFilterCodeSectionID = nil
-                }
-
-                ForEach(availableFilterSections) { codeSection in
-                    let isSelected = !savedFilterAllSelected && savedFilterCodeSectionID == codeSection.id
-                    savedFilterChip(
-                        title: CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                        accent: bookmarkAccentColor(for: codeSection.id),
-                        isSelected: isSelected
-                    ) {
-                        savedFilterAllSelected = false
-                        savedFilterCodeSectionID = codeSection.id
-                    }
-                }
-            }
-            .padding(.vertical, 2)
-        }
-    }
-
-    private func savedFilterChip(
-        title: String,
-        accent: Color,
-        isSelected: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(isSelected ? Color.white : accent)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
-                .background(
-                    Capsule(style: .continuous)
-                        .fill(isSelected ? accent : accent.opacity(0.12))
-                )
-        }
-        .buttonStyle(.plain)
+        CodeSectionMultiFilterChips(
+            sections: availableFilterSections,
+            selectedIDs: $savedFilterCodeSectionIDs,
+            defaultAccent: accentColor,
+            accentForSection: { bookmarkAccentColor(for: $0) }
+        )
     }
 
     private var bookmarkGroups: [BookmarkChapterGroup] {

@@ -1,6 +1,29 @@
 import Foundation
 import SwiftUI
 
+enum AppTab: Hashable {
+    case browse
+    case browseSecondary
+    case search
+    case bookmarks
+    case settings
+}
+
+enum AppTabLayout {
+    static func orderedTabs(comparisonModeEnabled: Bool) -> [AppTab] {
+        var tabs: [AppTab] = [.browse]
+        if comparisonModeEnabled {
+            tabs.append(.browseSecondary)
+        }
+        tabs.append(contentsOf: [.search, .bookmarks, .settings])
+        return tabs
+    }
+
+    static func index(for tab: AppTab, comparisonModeEnabled: Bool) -> Int? {
+        orderedTabs(comparisonModeEnabled: comparisonModeEnabled).firstIndex(of: tab)
+    }
+}
+
 enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
     case primary
     case secondary

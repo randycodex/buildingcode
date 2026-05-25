@@ -307,6 +307,9 @@ struct BrowseView: View {
     private func updateCodeSection(_ id: Int64?) {
         browseCodeSectionID = id
         BrowserContextID.persistCodeSectionID(id, for: browserContext)
+        // In comparison mode each browser keeps its own section; updating the
+        // global selection re-tints the tab bar and can desync the selected tab.
+        guard !library.comparisonModeEnabled else { return }
         library.updateSelectedCodeSection(id: id)
     }
 

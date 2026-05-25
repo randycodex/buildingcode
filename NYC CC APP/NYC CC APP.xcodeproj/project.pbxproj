@@ -34,6 +34,8 @@
 		A1000000000000000000001D /* CodeContent in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* CodeContent */; };
 		A1000000000000000000001F /* Signposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001F /* Signposts.swift */; };
 		A10000000000000000000020 /* BrowserContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* BrowserContext.swift */; };
+		A10000000000000000000021 /* CodeSectionMultiFilterChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* CodeSectionMultiFilterChips.swift */; };
+		A10000000000000000000022 /* TabBarReselectListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* TabBarReselectListener.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +71,8 @@
 		A2000000000000000000001D /* CodeContent */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CodeContent; sourceTree = "<group>"; };
 		A2000000000000000000001F /* Signposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signposts.swift; sourceTree = "<group>"; };
 		A20000000000000000000020 /* BrowserContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserContext.swift; sourceTree = "<group>"; };
+		A20000000000000000000021 /* CodeSectionMultiFilterChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeSectionMultiFilterChips.swift; sourceTree = "<group>"; };
+		A20000000000000000000022 /* TabBarReselectListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarReselectListener.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,6 +171,8 @@
 				A2000000000000000000001C /* ChapterHTMLReaderView.swift */,
 				A20000000000000000000018 /* AttributedTextView.swift */,
 				A20000000000000000000019 /* ContentBlockView.swift */,
+				A20000000000000000000021 /* CodeSectionMultiFilterChips.swift */,
+				A20000000000000000000022 /* TabBarReselectListener.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -287,6 +293,8 @@
 				A10000000000000000000019 /* ContentBlockView.swift in Sources */,
 				A1000000000000000000001F /* Signposts.swift in Sources */,
 				A10000000000000000000020 /* BrowserContext.swift in Sources */,
+				A10000000000000000000021 /* CodeSectionMultiFilterChips.swift in Sources */,
+				A10000000000000000000022 /* TabBarReselectListener.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
