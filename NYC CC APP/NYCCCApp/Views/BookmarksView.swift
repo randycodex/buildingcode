@@ -5,19 +5,46 @@ struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
     @State private var savedFilterCodeSectionIDs: Set<Int64>
+    @State private var savedFilterFolderIDs: Set<Int64>
     @State private var selectedTagFilter: String? = nil
+    @State private var folderEditorTarget: FolderEditorTarget?
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
+    private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
     private let tabBarClearance: CGFloat = 104
     private let contentHorizontalInset: CGFloat = 16
-    /// Matches `SearchView.dockContentMinHeight` so the two bottom docks
-    /// look identical above the floating tab bar regardless of filter rows.
+    /// Floor for the dock. With a single filter row the dock matches the
+    /// Search dock at 86pt; when more rows are present (projects + sections
+    /// + tags) the frame grows naturally past the floor.
     private let dockContentMinHeight: CGFloat = 86
 
     init() {
         _savedFilterCodeSectionIDs = State(
             initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
         )
+        _savedFilterFolderIDs = State(
+            initialValue: FilterIDsStorage.load(key: Self.filterFolderIDsDefaultsKey)
+        )
+    }
+
+    /// Sheet routing for the folder editor — `.new` for create, `.edit` to
+    /// modify an existing project. The case carries the model so the sheet
+    /// closure can disambiguate without a separate boolean.
+    enum FolderEditorTarget: Identifiable {
+        case new
+        case edit(CodeFolder)
+
+        var id: String {
+            switch self {
+            case .new: return "new"
+            case .edit(let folder): return "edit-\(folder.id)"
+            }
+        }
+
+        var folder: CodeFolder? {
+            if case .edit(let f) = self { return f }
+            return nil
+        }
     }
 
     private var accentColor: Color {
@@ -79,6 +106,12 @@ struct BookmarksView: View {
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if !library.bookmarks.isEmpty {
                     VStack(spacing: 10) {
+                        // Projects row sits at the top of the dock so it
+                        // reads as the broadest filter dimension. Always
+                        // present (even with zero folders) so the "+ New"
+                        // affordance is always reachable from this screen.
+                        folderFilterControl
+
                         if !availableFilterSections.isEmpty {
                             savedFilterControl
                         }
@@ -103,6 +136,37 @@ struct BookmarksView: View {
             }
             .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
                 FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
+            }
+            .onChange(of: savedFilterFolderIDs) { _, newValue in
+                FilterIDsStorage.persist(newValue, key: Self.filterFolderIDsDefaultsKey)
+            }
+            .onChange(of: library.folders) { _, newFolders in
+                // If a folder was deleted while it was in the active filter
+                // set, prune the now-orphaned ID so the filter pipeline
+                // doesn't keep filtering against a missing folder.
+                let liveIDs = Set(newFolders.map(\.id))
+                let pruned = savedFilterFolderIDs.intersection(liveIDs)
+                if pruned != savedFilterFolderIDs {
+                    savedFilterFolderIDs = pruned
+                }
+            }
+            .sheet(item: $folderEditorTarget) { target in
+                FolderEditorSheet(
+                    existing: target.folder,
+                    onSave: { name, description, colorHex in
+                        if let existing = target.folder {
+                            library.updateFolder(existing, name: name, description: description, colorHex: colorHex)
+                        } else {
+                            _ = library.createFolder(name: name, description: description, colorHex: colorHex)
+                        }
+                    },
+                    onDelete: {
+                        if let existing = target.folder {
+                            savedFilterFolderIDs.remove(existing.id)
+                            library.deleteFolder(id: existing.id)
+                        }
+                    }
+                )
             }
         }
         .coordinateSpace(name: "savedScroll")
@@ -133,12 +197,34 @@ struct BookmarksView: View {
                 return savedFilterCodeSectionIDs.contains(id)
             }
         }
+        if !savedFilterFolderIDs.isEmpty {
+            // A bookmark passes the folder filter if it belongs to ANY
+            // selected folder — OR semantics within the folder dimension,
+            // AND across other dimensions (matches how the section + tag
+            // filters compose).
+            results = results.filter { bookmark in
+                let memberIDs = Set(library.folderMembership[bookmark.id] ?? [])
+                return !memberIDs.isDisjoint(with: savedFilterFolderIDs)
+            }
+        }
         if let tag = selectedTagFilter {
             results = results.filter { bookmark in
                 bookmark.tags.contains { $0.caseInsensitiveCompare(tag) == .orderedSame }
             }
         }
         return results
+    }
+
+    /// Projects row in the bottom dock. Always present so the user can
+    /// create their first project without leaving the screen. Long-press
+    /// on a folder chip opens the editor for that folder.
+    private var folderFilterControl: some View {
+        FolderFilterChipsRow(
+            folders: library.folders,
+            selectedIDs: $savedFilterFolderIDs,
+            onNew: { folderEditorTarget = .new },
+            onEdit: { folder in folderEditorTarget = .edit(folder) }
+        )
     }
 
     /// Distinct tags actually in use across the user's bookmarks, sorted by

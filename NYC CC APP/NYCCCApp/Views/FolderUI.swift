@@ -10,6 +10,10 @@ struct FolderFilterChipsRow: View {
     let folders: [CodeFolder]
     @Binding var selectedIDs: Set<Int64>
     let onNew: () -> Void
+    /// Called when the user long-presses a folder chip and chooses Edit.
+    /// Optional so callers that don't need editing (e.g. a read-only
+    /// display) can omit it.
+    var onEdit: ((CodeFolder) -> Void)? = nil
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -30,6 +34,15 @@ struct FolderFilterChipsRow: View {
                         leadingDot: folder.color
                     ) {
                         toggle(folder.id)
+                    }
+                    .contextMenu {
+                        if let onEdit {
+                            Button {
+                                onEdit(folder)
+                            } label: {
+                                Label("Edit project", systemImage: "pencil")
+                            }
+                        }
                     }
                 }
 
