@@ -2,6 +2,16 @@ import os.signpost
 import SwiftUI
 import WebKit
 
+private enum ContentBlockHTMLAssetResolver {
+    static func normalizeSharedAssetPaths(in html: String) -> String {
+        html.replacingOccurrences(
+            of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+            with: "$1assets/",
+            options: .regularExpression
+        )
+    }
+}
+
 struct ContentBlockListView: View {
     let detail: ReaderSectionDetail
     let fallbackText: NSAttributedString
@@ -10,11 +20,16 @@ struct ContentBlockListView: View {
     var onSelectionChange: ((Bool) -> Void)? = nil
 
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @EnvironmentObject private var expandedMediaTracker: ExpandedMediaTracker
 
     private var htmlStore: PublishedHTMLContentStore {
         ContentBlockHTMLStoreCache.shared.store(
             for: library.selectedVersion?.authoredHTMLBundlePath
         )
+    }
+
+    private var htmlBaseURL: URL? {
+        htmlStore.readAccessURL()
     }
 
     var body: some View {
@@ -41,29 +56,61 @@ struct ContentBlockListView: View {
                             )
                         }
                     case .table:
-                        if let tableID = block.tableID,
-                           let table = detail.tableBlocks.first(where: { $0.id == tableID }) {
-                            TableBlockView(table: table)
-                        } else if let html = block.html, !html.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            RawTableBlockView(htmlFragment: html, tableID: block.id)
-                        } else {
-                            MissingTableBlockView(tableID: block.tableID ?? "")
+                        CollapsibleMediaBlock(
+                            blockID: block.id,
+                            sectionID: detail.id,
+                            label: tablePillLabel(for: block, in: detail)
+                        ) {
+                            if let tableID = block.tableID,
+                               let table = detail.tableBlocks.first(where: { $0.id == tableID }) {
+                                TableBlockView(table: table, baseURL: htmlBaseURL)
+                            } else if let html = block.html, !html.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                RawTableBlockView(htmlFragment: html, tableID: block.id, baseURL: htmlBaseURL)
+                            } else {
+                                MissingTableBlockView(tableID: block.tableID ?? "")
+                            }
                         }
                     case .image:
-                        if let imageURL = imageURL(for: block) {
-                            ImageBlockView(
-                                imageURL: imageURL,
-                                caption: block.caption,
-                                onOpenImage: onOpenImage
-                            )
-                        } else {
-                            ImageBlockPlaceholderView(imageID: block.imageID ?? "", caption: block.caption)
+                        CollapsibleMediaBlock(
+                            blockID: block.id,
+                            sectionID: detail.id,
+                            label: imagePillLabel(for: block)
+                        ) {
+                            if let imageURL = imageURL(for: block) {
+                                ImageBlockView(
+                                    imageURL: imageURL,
+                                    caption: block.caption,
+                                    onOpenImage: onOpenImage
+                                )
+                            } else {
+                                ImageBlockPlaceholderView(imageID: block.imageID ?? "", caption: block.caption)
+                            }
                         }
                     }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+
+    private func tablePillLabel(for block: CodeContentBlock, in detail: ReaderSectionDetail) -> String {
+        if let caption = block.caption?.trimmingCharacters(in: .whitespacesAndNewlines), !caption.isEmpty {
+            return caption
+        }
+        if let tableID = block.tableID,
+           let table = detail.tableBlocks.first(where: { $0.id == tableID }),
+           let caption = table.caption?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !caption.isEmpty {
+            return caption
+        }
+        return "Tap to view table"
+    }
+
+    private func imagePillLabel(for block: CodeContentBlock) -> String {
+        if let caption = block.caption?.trimmingCharacters(in: .whitespacesAndNewlines), !caption.isEmpty {
+            return caption
+        }
+        return "Tap to view image"
     }
 
     private func attributedText(for block: CodeContentBlock) -> NSAttributedString {
@@ -189,6 +236,7 @@ private struct SimpleTableBlockView: View {
 
 private struct TableBlockView: View {
     let table: CodeTableBlock
+    let baseURL: URL?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -202,7 +250,7 @@ private struct TableBlockView: View {
                 if isSimpleTable(table) {
                     SimpleTableBlockView(table: table)
                 } else {
-                    TableHTMLView(html: TableHTMLRenderer.html(for: table), tableID: table.id)
+                    TableHTMLView(html: TableHTMLRenderer.html(for: table), tableID: table.id, baseURL: baseURL)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -234,11 +282,13 @@ private struct TableCaptionTextView: View {
 private struct RawTableBlockView: View {
     let htmlFragment: String
     let tableID: String
+    let baseURL: URL?
 
     var body: some View {
         TableHTMLView(
             html: TableHTMLRenderer.html(forRawFragment: htmlFragment, tableID: tableID),
-            tableID: tableID
+            tableID: tableID,
+            baseURL: baseURL
         )
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -454,20 +504,22 @@ private final class ContentBlockImageURLCache {
 private struct TableHTMLView: View {
     let html: String
     let tableID: String
+    let baseURL: URL?
     @State private var height: CGFloat
     @State private var shouldLoad = false
     @State private var loadTask: Task<Void, Never>?
 
-    init(html: String, tableID: String) {
+    init(html: String, tableID: String, baseURL: URL? = nil) {
         self.html = html
         self.tableID = tableID
+        self.baseURL = baseURL
         _height = State(initialValue: TableHTMLHeightCache.height(for: tableID) ?? 120)
     }
 
     var body: some View {
         Group {
             if shouldLoad {
-                TableWebView(html: html, tableID: tableID, height: $height)
+                TableWebView(html: html, tableID: tableID, baseURL: baseURL, height: $height)
                     .id(tableID)
                     .frame(height: height)
             } else {
@@ -515,6 +567,7 @@ private struct TableHTMLView: View {
 private struct TableWebView: UIViewRepresentable {
     let html: String
     let tableID: String
+    let baseURL: URL?
     @Binding var height: CGFloat
 
     func makeUIView(context: Context) -> WKWebView {
@@ -537,7 +590,10 @@ private struct TableWebView: UIViewRepresentable {
         }
         guard context.coordinator.loadedHTML != html else { return }
         context.coordinator.loadedHTML = html
-        webView.loadHTMLString(html, baseURL: nil)
+        webView.loadHTMLString(
+            ContentBlockHTMLAssetResolver.normalizeSharedAssetPaths(in: html),
+            baseURL: baseURL
+        )
     }
 
     func makeCoordinator() -> Coordinator {
@@ -904,5 +960,55 @@ private struct ImageBlockPlaceholderView: View {
                     .foregroundStyle(.secondary)
             }
         }
+    }
+}
+
+struct CollapsibleMediaBlock<Content: View>: View {
+    let blockID: String
+    let sectionID: Int64
+    let label: String
+    @ViewBuilder var content: () -> Content
+
+    @EnvironmentObject private var expandedMediaTracker: ExpandedMediaTracker
+
+    private var isExpanded: Bool {
+        expandedMediaTracker.isExpanded(blockID: blockID)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                expandedMediaTracker.setExpanded(!isExpanded, blockID: blockID, sectionID: sectionID)
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                    Text(isExpanded ? "Hide" : label)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(Color.secondary.opacity(0.12))
+                )
+                .overlay(
+                    Capsule(style: .continuous)
+                        .strokeBorder(Color.secondary.opacity(0.22), lineWidth: 0.5)
+                )
+                .contentShape(Capsule(style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(isExpanded ? "Hides the expanded media" : "Expands to show \(label)")
+
+            if isExpanded {
+                content()
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .animation(.easeInOut(duration: 0.18), value: isExpanded)
     }
 }

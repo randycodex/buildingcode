@@ -1,6 +1,16 @@
 import SwiftUI
 import WebKit
 
+private enum HTMLAssetPathResolver {
+    static func normalizeSharedAssetPaths(in html: String) -> String {
+        html.replacingOccurrences(
+            of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+            with: "$1assets/",
+            options: .regularExpression
+        )
+    }
+}
+
 struct ChapterHTMLSectionTarget: Hashable {
     let anchorID: String
     let sectionNumber: String?
@@ -54,8 +64,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         if context.coordinator.loadedURL != chapterURL {
             context.coordinator.loadedURL = chapterURL
             context.coordinator.pendingAnchorID = targetAnchorID
-            if let resolvedHTML = context.coordinator.resolvedHTML(for: chapterURL, readAccessURL: readAccessURL) {
-                webView.loadHTMLString(resolvedHTML, baseURL: chapterURL.deletingLastPathComponent())
+            if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
+                webView.loadHTMLString(
+                    HTMLAssetPathResolver.normalizeSharedAssetPaths(in: html),
+                    baseURL: readAccessURL
+                )
             } else {
                 webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
             }
@@ -105,14 +118,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
-
-        func resolvedHTML(for chapterURL: URL, readAccessURL: URL) -> String? {
-            guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
-                return nil
-            }
-            let localizedHTML = rewriteImageSources(in: html, chapterURL: chapterURL, readAccessURL: readAccessURL)
-            return addImageLoadingAttributes(in: localizedHTML)
-        }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             applyReaderScripts(to: webView)
@@ -351,6 +356,194 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
               buildSectionCards();
 
+              function setupImageErrorFallback() {
+                document.querySelectorAll('img').forEach(function(img) {
+                  if (img.dataset.nycccImgReady === 'true') { return; }
+                  img.dataset.nycccImgReady = 'true';
+                  img.loading = 'lazy';
+                  img.decoding = 'async';
+                  var triedExtensions = { '': true };
+                  function tryAlternateExtension() {
+                    var src = img.getAttribute('src') || '';
+                    var lastDot = src.lastIndexOf('.');
+                    var lastSlash = Math.max(src.lastIndexOf('/'), src.lastIndexOf('\\\\'));
+                    if (lastDot < 0 || lastDot < lastSlash) { return; }
+                    var base = src.substring(0, lastDot);
+                    var current = src.substring(lastDot + 1).toLowerCase();
+                    triedExtensions[current] = true;
+                    var candidates = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+                    for (var i = 0; i < candidates.length; i++) {
+                      if (!triedExtensions[candidates[i]]) {
+                        triedExtensions[candidates[i]] = true;
+                        img.src = base + '.' + candidates[i];
+                        return;
+                      }
+                    }
+                  }
+                  img.addEventListener('error', tryAlternateExtension);
+                });
+              }
+              setupImageErrorFallback();
+
+              function depthFromHeading(heading) {
+                if (!heading || !heading.classList) { return 1; }
+                if (heading.classList.contains('Section')) { return 1; }
+                if (!heading.classList.contains('Subsection')) { return 1; }
+                var h6 = heading.querySelector('h6');
+                if (!h6) { return 2; }
+                var text = (h6.textContent || '').replace(/^\\s*#-+\\s*/, '').trim();
+                var match = text.match(/^([A-Z]?\\d+(?:\\.\\d+)*)/);
+                if (!match) { return 2; }
+                return Math.min(match[1].split('.').length, 6);
+              }
+
+              function applyDepthClasses() {
+                document.querySelectorAll('.Section, .Subsection').forEach(function(heading) {
+                  if (heading.dataset.nycccDepthReady === 'true') { return; }
+                  heading.dataset.nycccDepthReady = 'true';
+                  for (var d = 1; d <= 6; d++) {
+                    heading.classList.remove('nyccc-depth-' + d);
+                  }
+                  heading.classList.add('nyccc-depth-' + depthFromHeading(heading));
+                });
+              }
+              applyDepthClasses();
+
+              if (!window.__nycccExpandedMedia) {
+                window.__nycccExpandedMedia = new Set();
+              }
+
+              function nearestSubsectionBefore(node) {
+                var current = node;
+                while (current && current !== document.body) {
+                  var sibling = current.previousElementSibling;
+                  while (sibling) {
+                    if (sibling.classList && sibling.classList.contains('Subsection')) {
+                      return sibling;
+                    }
+                    if (sibling.querySelector) {
+                      var found = sibling.querySelector('.Subsection');
+                      if (found) { return found; }
+                    }
+                    sibling = sibling.previousElementSibling;
+                  }
+                  current = current.parentElement;
+                }
+                return null;
+              }
+
+              function mediaPlaceholderLabel(kind) {
+                if (kind === 'image') { return 'Tap to view image'; }
+                if (kind === 'table') { return 'Tap to view table'; }
+                return 'Tap to expand';
+              }
+
+              function setMediaWrapperExpanded(wrapper, expanded) {
+                if (!wrapper) { return; }
+                wrapper.classList.toggle('nyccc-media-collapsed', !expanded);
+                wrapper.classList.toggle('nyccc-media-expanded', expanded);
+                var pill = wrapper.querySelector('.nyccc-media-pill');
+                if (pill) {
+                  pill.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+                  var label = pill.querySelector('.nyccc-media-pill-label');
+                  if (label) {
+                    if (expanded) {
+                      if (!label.dataset.collapsedText) {
+                        label.dataset.collapsedText = label.textContent;
+                      }
+                      label.textContent = 'Hide';
+                    } else if (label.dataset.collapsedText) {
+                      label.textContent = label.dataset.collapsedText;
+                    }
+                  }
+                }
+                if (expanded) {
+                  wrapper.__nycccAnchorSubsection = nearestSubsectionBefore(wrapper);
+                  window.__nycccExpandedMedia.add(wrapper);
+                } else {
+                  wrapper.__nycccAnchorSubsection = null;
+                  window.__nycccExpandedMedia.delete(wrapper);
+                }
+              }
+
+              function buildMediaPlaceholder(node, kind) {
+                if (!node || !node.parentNode) { return; }
+                if (node.dataset.nycccMediaReady === 'true') { return; }
+                if (node.closest && node.closest('.nyccc-media-wrapper')) { return; }
+                node.dataset.nycccMediaReady = 'true';
+
+                var wrapper = document.createElement('div');
+                wrapper.className = 'nyccc-media-wrapper nyccc-media-wrapper-' + kind + ' nyccc-media-collapsed';
+
+                var pill = document.createElement('button');
+                pill.type = 'button';
+                pill.className = 'nyccc-media-pill';
+                pill.setAttribute('aria-expanded', 'false');
+
+                var caret = document.createElement('span');
+                caret.className = 'nyccc-media-pill-caret';
+                caret.textContent = '▸';
+
+                var label = document.createElement('span');
+                label.className = 'nyccc-media-pill-label';
+                label.textContent = mediaPlaceholderLabel(kind);
+
+                pill.appendChild(caret);
+                pill.appendChild(label);
+
+                node.parentNode.insertBefore(wrapper, node);
+                wrapper.appendChild(pill);
+                wrapper.appendChild(node);
+                node.classList.add('nyccc-media-content');
+
+                pill.addEventListener('click', function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  var willExpand = wrapper.classList.contains('nyccc-media-collapsed');
+                  setMediaWrapperExpanded(wrapper, willExpand);
+                });
+              }
+
+              function buildMediaPlaceholders() {
+                document.querySelectorAll('img').forEach(function(img) {
+                  buildMediaPlaceholder(img, 'image');
+                });
+                document.querySelectorAll('scrolltable, .xsl-table').forEach(function(node) {
+                  if (node.closest && node.closest('scrolltable, .xsl-table') && node.closest('scrolltable, .xsl-table') !== node) { return; }
+                  buildMediaPlaceholder(node, 'table');
+                });
+                document.querySelectorAll('table').forEach(function(node) {
+                  if (node.closest && node.closest('table') !== node) { return; }
+                  if (node.closest && node.closest('.nyccc-media-wrapper')) { return; }
+                  buildMediaPlaceholder(node, 'table');
+                });
+              }
+              buildMediaPlaceholders();
+
+              function autoCollapseExpandedMedia() {
+                if (!window.__nycccExpandedMedia || window.__nycccExpandedMedia.size === 0) { return; }
+                var subsections = Array.prototype.slice.call(document.querySelectorAll('.Subsection'));
+                if (!subsections.length) { return; }
+                var viewportTop = window.scrollY;
+                var pending = [];
+                window.__nycccExpandedMedia.forEach(function(wrapper) {
+                  var anchor = wrapper.__nycccAnchorSubsection;
+                  if (!anchor) { return; }
+                  var anchorIndex = subsections.indexOf(anchor);
+                  if (anchorIndex < 0) { return; }
+                  var thresholdIndex = anchorIndex + 3;
+                  if (thresholdIndex >= subsections.length) { return; }
+                  var threshold = subsections[thresholdIndex];
+                  var thresholdTop = threshold.getBoundingClientRect().top + window.scrollY;
+                  if (viewportTop >= thresholdTop) {
+                    pending.push(wrapper);
+                  }
+                });
+                pending.forEach(function(wrapper) {
+                  setMediaWrapperExpanded(wrapper, false);
+                });
+              }
+
               function visibleAnchorID() {
                 var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection'));
                 if (!headings.length) { return null; }
@@ -426,6 +619,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 window.requestAnimationFrame(function() {
                   window.__nycccVisibleAnchorFramePending = false;
                   reportVisibleAnchor();
+                  autoCollapseExpandedMedia();
                 });
               };
               window.addEventListener('scroll', window.__nycccVisibleAnchorListener, { passive: true });
@@ -562,125 +756,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             )
         }
 
-        private func rewriteImageSources(in html: String, chapterURL: URL, readAccessURL: URL) -> String {
-            guard let regex = try? NSRegularExpression(pattern: #"(?i)(<img\b[^>]*\bsrc\s*=\s*")([^"]+)(")"#) else {
-                return html
-            }
-
-            let nsHTML = html as NSString
-            let matches = regex.matches(in: html, range: NSRange(location: 0, length: nsHTML.length))
-            guard !matches.isEmpty else { return html }
-
-            let chapterBaseURL = chapterURL.deletingLastPathComponent()
-            let assetsDirectoryURL = resolvedAssetsDirectoryURL(chapterURL: chapterURL, readAccessURL: readAccessURL)
-            var rewrittenHTML = html
-
-            for match in matches.reversed() {
-                guard match.numberOfRanges == 4 else { continue }
-                let originalSource = nsHTML.substring(with: match.range(at: 2))
-                guard let replacementSource = resolvedImageSource(
-                    originalSource,
-                    chapterBaseURL: chapterBaseURL,
-                    assetsDirectoryURL: assetsDirectoryURL
-                ),
-                replacementSource != originalSource else {
-                    continue
-                }
-
-                if let sourceRange = Range(match.range(at: 2), in: rewrittenHTML) {
-                    rewrittenHTML.replaceSubrange(sourceRange, with: replacementSource)
-                }
-            }
-
-            return rewrittenHTML
-        }
-
-        private func resolvedImageSource(
-            _ source: String,
-            chapterBaseURL: URL,
-            assetsDirectoryURL: URL?
-        ) -> String? {
-            guard !source.isEmpty else { return nil }
-
-            let fileManager = FileManager.default
-            let sourceURL = URL(fileURLWithPath: source)
-            let fileName = sourceURL.lastPathComponent
-            guard !fileName.isEmpty else { return nil }
-
-            let chapterFileURL = chapterBaseURL.appendingPathComponent(fileName)
-            if fileManager.fileExists(atPath: chapterFileURL.path) {
-                return chapterFileURL.absoluteString
-            }
-
-            if let assetsDirectoryURL {
-                let assetFileURL = assetsDirectoryURL.appendingPathComponent(fileName)
-                if fileManager.fileExists(atPath: assetFileURL.path) {
-                    return assetFileURL.absoluteString
-                }
-            }
-
-            let baseName = sourceURL.deletingPathExtension().lastPathComponent
-            for ext in ["png", "jpg", "jpeg", "gif", "webp"] {
-                let candidateName = "\(baseName).\(ext)"
-                if let assetsDirectoryURL {
-                    let assetCandidateURL = assetsDirectoryURL.appendingPathComponent(candidateName)
-                    if fileManager.fileExists(atPath: assetCandidateURL.path) {
-                        return assetCandidateURL.absoluteString
-                    }
-                }
-                let chapterCandidateURL = chapterBaseURL.appendingPathComponent(candidateName)
-                if fileManager.fileExists(atPath: chapterCandidateURL.path) {
-                    return chapterCandidateURL.absoluteString
-                }
-            }
-
-            return nil
-        }
-
-        private func resolvedAssetsDirectoryURL(chapterURL: URL, readAccessURL: URL) -> URL? {
-            let fileManager = FileManager.default
-
-            let directAssetsURL = readAccessURL.appendingPathComponent("assets", isDirectory: true)
-            if fileManager.fileExists(atPath: directAssetsURL.path) {
-                return directAssetsURL
-            }
-
-            var searchURL = chapterURL.deletingLastPathComponent()
-            for _ in 0..<5 {
-                let candidate = searchURL.appendingPathComponent("assets", isDirectory: true)
-                if fileManager.fileExists(atPath: candidate.path) {
-                    return candidate
-                }
-                searchURL.deleteLastPathComponent()
-            }
-
-            return nil
-        }
-
-        private func addImageLoadingAttributes(in html: String) -> String {
-            guard let regex = try? NSRegularExpression(pattern: #"(?i)<img\b[^>]*>"#) else {
-                return html
-            }
-            let nsHTML = html as NSString
-            let matches = regex.matches(in: html, range: NSRange(location: 0, length: nsHTML.length))
-            guard !matches.isEmpty else { return html }
-
-            var rewrittenHTML = html
-            for match in matches.reversed() {
-                let tag = nsHTML.substring(with: match.range)
-                var rewrittenTag = tag
-                if rewrittenTag.range(of: #"\sloading\s*="#, options: [.regularExpression, .caseInsensitive]) == nil {
-                    rewrittenTag = rewrittenTag.replacingOccurrences(of: "<img", with: #"<img loading="lazy""#, options: .caseInsensitive)
-                }
-                if rewrittenTag.range(of: #"\sdecoding\s*="#, options: [.regularExpression, .caseInsensitive]) == nil {
-                    rewrittenTag = rewrittenTag.replacingOccurrences(of: "<img", with: #"<img decoding="async""#, options: .caseInsensitive)
-                }
-                guard rewrittenTag != tag, let range = Range(match.range, in: rewrittenHTML) else { continue }
-                rewrittenHTML.replaceSubrange(range, with: rewrittenTag)
-            }
-            return rewrittenHTML
-        }
-
         private static func readerCSS(theme: ReaderTheme, colorScheme: ColorScheme, accentHex: String) -> String {
             let isDark = colorScheme == .dark
             let textColor = isDark ? "#f5f5f7" : "#111111"
@@ -688,6 +763,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let secondaryColor = isDark ? "#b5b5bc" : "#5d6168"
             let borderColor = isDark ? "#6f6f76" : "#c6c6cc"
             let softBorderColor = isDark ? "#4b4b50" : "#d8d8de"
+            let pillBackground = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)"
             let bodyFontSize = max(theme.fontSize * 1.16, 12)
             let sectionHeadingSize = max(theme.fontSize * 1.08, 13)
             let subsectionHeadingSize = max(theme.fontSize * 1.0, 12)
@@ -878,7 +954,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .Subsection h6 {
               display: block !important;
               position: relative;
-              padding-left: 1.05rem;
+              padding-left: 0 !important;
+              text-align: left !important;
             }
             .Subsection h6 {
               padding-right: 2.35rem;
@@ -886,7 +963,26 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .Subsection {
               position: relative !important;
               padding-right: 2.25rem !important;
+              padding-left: 0.7rem !important;
+              border-left: 3px solid \(accentHex) !important;
+              margin-left: 0 !important;
             }
+            .Subsection .Normal-Level,
+            .Subsection .Normal-Level > div,
+            .Subsection > div:not(h6) {
+              text-align: left !important;
+              padding-left: 0 !important;
+              margin-left: 0 !important;
+            }
+            .Subsection.nyccc-depth-2 { border-left-width: 3px !important; padding-left: 0.7rem !important; }
+            .Subsection.nyccc-depth-3 { border-left-width: 2.5px !important; padding-left: 0.6rem !important; }
+            .Subsection.nyccc-depth-3 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.97) !important; }
+            .Subsection.nyccc-depth-4 { border-left-width: 2px !important; padding-left: 0.55rem !important; }
+            .Subsection.nyccc-depth-4 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.94) !important; font-weight: 650 !important; }
+            .Subsection.nyccc-depth-5 { border-left-width: 1.5px !important; padding-left: 0.5rem !important; }
+            .Subsection.nyccc-depth-5 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.9) !important; font-weight: 600 !important; }
+            .Subsection.nyccc-depth-6 { border-left-width: 1px !important; padding-left: 0.45rem !important; }
+            .Subsection.nyccc-depth-6 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.88) !important; font-weight: 550 !important; }
             .nyccc-collapsible-heading h6 {
               cursor: pointer;
               -webkit-user-select: none;
@@ -971,6 +1067,58 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .Normal-Level { color: \(textColor) !important; }
             .Normal-Level + .clearfix { margin: 0; }
             small, sup, sub { color: \(secondaryColor) !important; }
+            .nyccc-media-wrapper {
+              margin: 0.55rem 0 !important;
+              padding: 0 !important;
+              text-align: left !important;
+            }
+            .nyccc-media-pill {
+              appearance: none;
+              -webkit-appearance: none;
+              display: inline-flex;
+              align-items: center;
+              gap: 0.45rem;
+              padding: 0.45rem 0.9rem;
+              border: 1px solid \(softBorderColor);
+              border-radius: 999px;
+              background: \(pillBackground);
+              color: \(accentHex);
+              font-family: inherit;
+              font-size: \(max(theme.fontSize * 0.9, 11))px;
+              font-weight: 600;
+              line-height: 1;
+              cursor: pointer;
+              -webkit-tap-highlight-color: transparent;
+              -webkit-user-select: none;
+              user-select: none;
+            }
+            .nyccc-media-pill:active { opacity: 0.6; }
+            .nyccc-media-pill-caret {
+              display: inline-block;
+              transition: transform 0.18s ease;
+              font-size: 0.78em;
+            }
+            .nyccc-media-expanded .nyccc-media-pill-caret {
+              transform: rotate(90deg);
+            }
+            .nyccc-media-collapsed .nyccc-media-content {
+              display: none !important;
+            }
+            .nyccc-media-expanded .nyccc-media-content {
+              display: block !important;
+              margin-top: 0.55rem !important;
+            }
+            .nyccc-media-wrapper img.nyccc-media-content {
+              display: block !important;
+              max-width: 100% !important;
+              height: auto !important;
+              margin: 0.55rem 0 0 0 !important;
+            }
+            .nyccc-media-wrapper table.nyccc-media-content,
+            .nyccc-media-wrapper scrolltable.nyccc-media-content,
+            .nyccc-media-wrapper .xsl-table.nyccc-media-content {
+              margin-top: 0.55rem !important;
+            }
             """
         }
 

@@ -24,13 +24,12 @@ struct ChapterReaderView: View {
     @State private var scrollPositionSectionID: Int64?
     @State private var focusedSectionUpdateTask: Task<Void, Never>?
     @State private var backgroundPrefetchTask: Task<Void, Never>?
+    @StateObject private var expandedMediaTracker = ExpandedMediaTracker()
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
     private let focusedSectionUpdateDelay: Duration = .milliseconds(70)
     private let prewarmedSectionCount = 4
     private let backgroundPrefetchSectionLimit = 12
-    private let indentStep: CGFloat = 26
-
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
@@ -69,6 +68,7 @@ struct ChapterReaderView: View {
         .scrollPosition(id: $scrollPositionSectionID, anchor: .top)
         .contentShape(Rectangle())
         .coordinateSpace(name: chapterReaderCoordinateSpace)
+        .environmentObject(expandedMediaTracker)
         .onPreferenceChange(ChapterReaderBlockOffsetPreferenceKey.self) { offsets in
             DispatchQueue.main.async {
                 updateFocusedSection(from: offsets)
@@ -180,7 +180,7 @@ struct ChapterReaderView: View {
     }
 
     private func visibleBlockSection(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> some View {
-        let hierarchyIndent = CGFloat(block.sectionNumber.hierarchyIndentLevel) * indentStep
+        let depth = block.sectionNumber.hierarchyIndentLevel
         let normalizedSectionNumber = block.sectionNumber
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
@@ -188,6 +188,10 @@ struct ChapterReaderView: View {
         let isBookmarked = visibleBookmarkedSectionIDs.contains(block.id)
             || visibleBookmarkedSectionNumbers.contains(normalizedSectionNumber)
         let hasNote = visibleNotedSectionIDs.contains(block.id)
+        let showsHierarchyBar = block.kind != .textBlock
+        let barWidth: CGFloat = showsHierarchyBar ? hierarchyBarWidth(forDepth: depth) : 0
+        let barOpacity: Double = showsHierarchyBar ? hierarchyBarOpacity(forDepth: depth) : 0
+        let contentLeftPadding: CGFloat = showsHierarchyBar ? (barWidth + 10) : 0
 
         return VStack(alignment: .leading, spacing: 10) {
             if let groupLabel = block.groupLabel {
@@ -231,7 +235,17 @@ struct ChapterReaderView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.leading, hierarchyIndent)
+            .padding(.leading, contentLeftPadding)
+            .overlay(alignment: .leading) {
+                if showsHierarchyBar {
+                    Rectangle()
+                        .fill(accentColor)
+                        .opacity(barOpacity)
+                        .frame(width: barWidth)
+                        .frame(maxHeight: .infinity)
+                        .allowsHitTesting(false)
+                }
+            }
 
             CodeHairline().padding(.top, 2)
         }
@@ -244,6 +258,26 @@ struct ChapterReaderView: View {
                 )
             }
         )
+    }
+
+    private func hierarchyBarWidth(forDepth depth: Int) -> CGFloat {
+        switch depth {
+        case 0: return 4
+        case 1: return 3
+        case 2: return 2.5
+        case 3: return 2
+        default: return 1.5
+        }
+    }
+
+    private func hierarchyBarOpacity(forDepth depth: Int) -> Double {
+        switch depth {
+        case 0: return 1.0
+        case 1: return 0.78
+        case 2: return 0.6
+        case 3: return 0.48
+        default: return 0.38
+        }
     }
 
     @ViewBuilder
@@ -401,6 +435,7 @@ struct ChapterReaderView: View {
 
         blocks = []
         pendingFocusedSectionID = nil
+        expandedMediaTracker.reset()
         focusedSectionUpdateTask?.cancel()
         focusedSectionUpdateTask = nil
         backgroundPrefetchTask?.cancel()
@@ -484,6 +519,7 @@ struct ChapterReaderView: View {
         pendingFocusedSectionID = topMost
         selectedJumpSectionID = topMost
         rememberedSectionID.wrappedValue = topMost
+        expandedMediaTracker.collapseFar(currentSectionID: topMost, blocks: blocks)
         focusedSectionUpdateTask?.cancel()
         focusedSectionUpdateTask = Task {
             try? await Task.sleep(for: focusedSectionUpdateDelay)
@@ -796,5 +832,50 @@ private extension Array {
         }
 
         return chunks
+    }
+}
+
+@MainActor
+final class ExpandedMediaTracker: ObservableObject {
+    @Published private(set) var expandedBlockIDs: Set<String> = []
+    private var sectionIDForBlock: [String: Int64] = [:]
+    private let collapseThreshold = 3
+
+    func isExpanded(blockID: String) -> Bool {
+        expandedBlockIDs.contains(blockID)
+    }
+
+    func setExpanded(_ expanded: Bool, blockID: String, sectionID: Int64) {
+        if expanded {
+            expandedBlockIDs.insert(blockID)
+            sectionIDForBlock[blockID] = sectionID
+        } else {
+            expandedBlockIDs.remove(blockID)
+            sectionIDForBlock.removeValue(forKey: blockID)
+        }
+    }
+
+    func reset() {
+        expandedBlockIDs.removeAll()
+        sectionIDForBlock.removeAll()
+    }
+
+    func collapseFar(currentSectionID: Int64, blocks: [CodeLibraryViewModel.ChapterReaderBlockSummary]) {
+        guard !expandedBlockIDs.isEmpty else { return }
+        guard let currentIndex = blocks.firstIndex(where: { $0.id == currentSectionID }) else { return }
+        var toRemove: Set<String> = []
+        for blockID in expandedBlockIDs {
+            guard let sectionID = sectionIDForBlock[blockID],
+                  let mediaIndex = blocks.firstIndex(where: { $0.id == sectionID })
+            else { continue }
+            if currentIndex - mediaIndex >= collapseThreshold {
+                toRemove.insert(blockID)
+            }
+        }
+        guard !toRemove.isEmpty else { return }
+        expandedBlockIDs.subtract(toRemove)
+        for id in toRemove {
+            sectionIDForBlock.removeValue(forKey: id)
+        }
     }
 }
