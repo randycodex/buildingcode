@@ -35,6 +35,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var recentSearches: [String] = []
     @Published private(set) var pinnedSearches: [String] = []
     @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
+    @Published private(set) var searchTabRetapCount = 0
     @Published private(set) var bookmarks: [BookmarkedSection] = []
     @Published var selectedVersionFileName: String = ""
     @Published var selectedJurisdictionKey: String = ""
@@ -43,6 +44,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var readerTheme: ReaderTheme
     @Published private(set) var isInitialContentLoaded: Bool = false
     @Published var comparisonModeEnabled: Bool
+    @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
 
     private let locator: BundleDatabaseLocator
@@ -256,7 +258,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private func recordRecentlyViewed(_ entry: RecentlyViewedEntry) {
         var updated = recentlyViewedSections.filter { $0.sectionID != entry.sectionID }
         updated.insert(entry, at: 0)
-        recentlyViewedSections = Array(updated.prefix(10))
+        recentlyViewedSections = Array(updated.prefix(20))
         persistRecentlyViewedSections()
     }
 
@@ -312,8 +314,20 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateComparisonMode(enabled: Bool) {
+        setComparisonMode(enabled: enabled)
+    }
+
+    func setComparisonMode(enabled: Bool, keeping tab: AppTab? = nil) {
+        let tabToKeep = tab ?? selectedTab
         comparisonModeEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: comparisonModeDefaultsKey)
+        selectedTab = tabToKeep
+
+        // Tab insertion can leave UIKit on the old index briefly; re-assert after layout.
+        Task { @MainActor in
+            await Task.yield()
+            selectedTab = tabToKeep
+        }
     }
 
     func requestBrowserTabSwitch(to context: BrowserContextID) {
@@ -954,6 +968,10 @@ final class CodeLibraryViewModel: ObservableObject {
             guard !Task.isCancelled, !workTask.isCancelled else { return }
             searchResults = results
         }
+    }
+
+    func notifySearchTabRetap() {
+        searchTabRetapCount += 1
     }
 
     func recordRecentSearch(_ query: String) {

@@ -4,13 +4,15 @@ import UIKit
 struct SearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var query = ""
-    @State private var searchesAllCodeSections: Bool
+    @State private var searchFilterCodeSectionIDs: Set<Int64>
+    @State private var searchNavigationPath = NavigationPath()
     @State private var scrollOffset: CGFloat = 0
     @FocusState private var isSearchFieldFocused: Bool
 
-    private static let searchesAllCodeSectionsDefaultsKey = "SearchView.searchesAllCodeSections"
+    private static let filterCodeSectionIDsDefaultsKey = "SearchView.filterCodeSectionIDs"
     private let contentHorizontalInset: CGFloat = 16
     private let tabBarClearance: CGFloat = 168
+    private let jumpBackInPageSize = 4
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -21,13 +23,13 @@ struct SearchView: View {
     }
 
     init() {
-        _searchesAllCodeSections = State(
-            initialValue: UserDefaults.standard.bool(forKey: Self.searchesAllCodeSectionsDefaultsKey)
+        _searchFilterCodeSectionIDs = State(
+            initialValue: Self.loadFilterCodeSectionIDs()
         )
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $searchNavigationPath) {
             ScrollView {
                 GeometryReader { proxy in
                     Color.clear
@@ -45,13 +47,13 @@ struct SearchView: View {
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         emptyQueryHistorySection
-                    } else if library.searchResults.isEmpty {
+                    } else if filteredSearchResults.isEmpty {
                         Text("No results")
                             .font(.subheadline)
                             .foregroundStyle(Color.secondary.opacity(0.7))
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.top, 120)
-                    } else if searchesAllCodeSections && !library.codeSections.isEmpty {
+                    } else if showsGroupedSearchResults {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(groupedSearchResults) { group in
                                 sectionGroupHeader(group)
@@ -63,7 +65,7 @@ struct SearchView: View {
                         }
                     } else {
                         LazyVStack(spacing: 0) {
-                            ForEach(library.searchResults) { result in
+                            ForEach(filteredSearchResults) { result in
                                 searchResultLink(result)
                             }
                         }
@@ -83,13 +85,23 @@ struct SearchView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 VStack(spacing: 10) {
-                    searchScopeControl
+                    if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                       !library.codeSections.isEmpty {
+                        searchCodeSectionFilter
+                    }
                     searchField
                 }
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 10)
                 .padding(.bottom, 22)
                 .background(bottomSearchDock)
+            }
+            .background {
+                if library.selectedTab == .search {
+                    TabBarReselectListener {
+                        library.notifySearchTabRetap()
+                    }
+                }
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
@@ -99,14 +111,13 @@ struct SearchView: View {
                     isSearchFieldFocused = true
                 }
             }
-            .onChange(of: searchesAllCodeSections) { _, newValue in
-                UserDefaults.standard.set(newValue, forKey: Self.searchesAllCodeSectionsDefaultsKey)
+            .onChange(of: searchFilterCodeSectionIDs) { _, newValue in
+                Self.persistFilterCodeSectionIDs(newValue)
             }
-            .task(id: SearchTaskID(
-                query: query,
-                searchesAllCodeSections: searchesAllCodeSections,
-                selectedCodeSectionID: library.selectedCodeSectionID
-            )) {
+            .onChange(of: library.searchTabRetapCount) { _, _ in
+                handleSearchTabRetap()
+            }
+            .task(id: query) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {
                     library.search(query: "")
@@ -115,14 +126,64 @@ struct SearchView: View {
 
                 try? await Task.sleep(for: .milliseconds(250))
                 guard !Task.isCancelled else { return }
-                library.search(
-                    query: query,
-                    restrictToSelectedCodeSection: !searchesAllCodeSections
-                )
+                library.search(query: query, restrictToSelectedCodeSection: false)
+            }
+            .navigationDestination(for: Int64.self) { sectionID in
+                ReaderView(sectionID: sectionID)
             }
         }
         .coordinateSpace(name: "searchScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
+    }
+
+    private var filteredSearchResults: [CodeSearchResult] {
+        guard !searchFilterCodeSectionIDs.isEmpty else {
+            return library.searchResults
+        }
+        return library.searchResults.filter { result in
+            guard let codeSectionID = result.codeSectionID else { return false }
+            return searchFilterCodeSectionIDs.contains(codeSectionID)
+        }
+    }
+
+    private var showsGroupedSearchResults: Bool {
+        searchFilterCodeSectionIDs.isEmpty || searchFilterCodeSectionIDs.count > 1
+    }
+
+    private var searchCodeSectionFilter: some View {
+        CodeSectionMultiFilterChips(
+            sections: library.codeSections,
+            selectedIDs: $searchFilterCodeSectionIDs,
+            defaultAccent: accentColor,
+            accentForSection: { Color(uiColor: library.accentColor(for: $0)) }
+        )
+    }
+
+    private func handleSearchTabRetap() {
+        if !searchNavigationPath.isEmpty {
+            searchNavigationPath.removeLast()
+            return
+        }
+
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedQuery.isEmpty else { return }
+        query = ""
+        library.search(query: "")
+    }
+
+    private static func loadFilterCodeSectionIDs() -> Set<Int64> {
+        guard let numbers = UserDefaults.standard.array(forKey: filterCodeSectionIDsDefaultsKey) as? [NSNumber] else {
+            return []
+        }
+        return Set(numbers.map(\.int64Value))
+    }
+
+    private static func persistFilterCodeSectionIDs(_ ids: Set<Int64>) {
+        if ids.isEmpty {
+            UserDefaults.standard.removeObject(forKey: filterCodeSectionIDsDefaultsKey)
+        } else {
+            UserDefaults.standard.set(Array(ids), forKey: filterCodeSectionIDsDefaultsKey)
+        }
     }
 
     private var bottomSearchDock: some View {
@@ -174,22 +235,11 @@ struct SearchView: View {
     }
 
     @ViewBuilder
-    private var searchScopeControl: some View {
-        if !library.codeSections.isEmpty, library.selectedCodeSectionID != nil {
-            Picker("Search Scope", selection: $searchesAllCodeSections) {
-                Text(library.codeSectionName(id: library.selectedCodeSectionID)).tag(false)
-                Text("All Sections").tag(true)
-            }
-            .pickerStyle(.segmented)
-            .accessibilityLabel("Search scope")
-        }
-    }
-
-    @ViewBuilder
     private var emptyQueryHistorySection: some View {
         VStack(alignment: .leading, spacing: 16) {
             if !library.recentlyViewedSections.isEmpty {
                 recentlyViewedSection
+                    .padding(.bottom, 2)
             }
 
             if !library.pinnedSearches.isEmpty {
@@ -202,30 +252,64 @@ struct SearchView: View {
         }
     }
 
-    private var jumpBackInEntries: [RecentlyViewedEntry] {
-        Array(library.recentlyViewedSections.prefix(4))
+    private var jumpBackInPages: [[RecentlyViewedEntry]] {
+        let entries = library.recentlyViewedSections
+        guard !entries.isEmpty else { return [] }
+        return stride(from: 0, to: entries.count, by: jumpBackInPageSize).map { start in
+            Array(entries[start..<min(start + jumpBackInPageSize, entries.count)])
+        }
+    }
+
+    private var jumpBackInPreviewBlockHeight: CGFloat {
+        UIFont.preferredFont(forTextStyle: .caption2).lineHeight * 3
+    }
+
+    private var jumpBackInTileHeight: CGFloat {
+        let caption2 = UIFont.preferredFont(forTextStyle: .caption2)
+        let caption = UIFont.preferredFont(forTextStyle: .caption1)
+        let codeName = UIFont.systemFont(ofSize: 10, weight: .medium)
+        let lineSpacing: CGFloat = 4
+        let tilePadding: CGFloat = 16
+        return caption2.lineHeight
+            + caption.lineHeight
+            + jumpBackInPreviewBlockHeight
+            + codeName.lineHeight
+            + (lineSpacing * 4)
+            + tilePadding
+    }
+
+    /// Two uniform tile rows plus a tight allowance for page dots.
+    private var jumpBackInGridHeight: CGFloat {
+        let rowGap: CGFloat = 8
+        let pageDotsHeight: CGFloat = jumpBackInPages.count > 1 ? 10 : 0
+        return (jumpBackInTileHeight * 2) + rowGap + pageDotsHeight
     }
 
     private var recentlyViewedSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             searchHistorySectionHeader("Jump Back In")
 
-            LazyVGrid(
-                columns: [
-                    GridItem(.flexible(), spacing: 8),
-                    GridItem(.flexible(), spacing: 8),
-                ],
-                spacing: 8
-            ) {
-                ForEach(jumpBackInEntries) { entry in
-                    NavigationLink {
-                        ReaderView(sectionID: entry.sectionID)
-                    } label: {
-                        recentlyViewedTile(entry)
+            TabView {
+                ForEach(Array(jumpBackInPages.enumerated()), id: \.offset) { _, page in
+                    LazyVGrid(
+                        columns: [
+                            GridItem(.flexible(), spacing: 8),
+                            GridItem(.flexible(), spacing: 8),
+                        ],
+                        spacing: 8
+                    ) {
+                        ForEach(page) { entry in
+                            NavigationLink(value: entry.sectionID) {
+                                recentlyViewedTile(entry)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
-                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, alignment: .top)
                 }
             }
+            .tabViewStyle(.page(indexDisplayMode: jumpBackInPages.count > 1 ? .automatic : .never))
+            .frame(height: jumpBackInGridHeight)
         }
     }
 
@@ -246,21 +330,19 @@ struct SearchView: View {
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            if !preview.isEmpty {
-                Text(preview)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(3)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
+            Text(preview.isEmpty ? " " : preview)
+                .font(.caption2)
+                .foregroundStyle(preview.isEmpty ? .clear : .secondary)
+                .lineLimit(3)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, minHeight: jumpBackInPreviewBlockHeight, alignment: .topLeading)
 
             Text(entry.codeSectionName)
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.tertiary)
                 .lineLimit(1)
         }
-        .frame(maxWidth: .infinity, minHeight: 48, alignment: .topLeading)
+        .frame(maxWidth: .infinity, minHeight: jumpBackInTileHeight, maxHeight: jumpBackInTileHeight, alignment: .topLeading)
         .padding(8)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .overlay(
@@ -380,10 +462,7 @@ struct SearchView: View {
 
     private func applySearch(_ searchQuery: String) {
         query = searchQuery
-        library.search(
-            query: searchQuery,
-            restrictToSelectedCodeSection: !searchesAllCodeSections
-        )
+        library.search(query: searchQuery, restrictToSelectedCodeSection: false)
     }
 
     private func searchPinHaptic() {
@@ -392,9 +471,7 @@ struct SearchView: View {
 
     private func searchResultLink(_ result: CodeSearchResult) -> some View {
         VStack(spacing: 0) {
-            NavigationLink {
-                ReaderView(sectionID: result.id)
-            } label: {
+            NavigationLink(value: result.id) {
                 resultRow(result)
             }
             .buttonStyle(.plain)
@@ -418,7 +495,7 @@ struct SearchView: View {
     private var groupedSearchResults: [SearchResultGroup] {
         // Build groups keyed by codeSectionID; results without an ID get a
         // synthetic "Other" bucket at the end so nothing disappears.
-        let grouped = Dictionary(grouping: library.searchResults) { $0.codeSectionID }
+        let grouped = Dictionary(grouping: filteredSearchResults) { $0.codeSectionID }
         let groups: [SearchResultGroup] = grouped.map { id, results in
             let name = id.flatMap { codeSectionID in
                 library.codeSections.first(where: { $0.id == codeSectionID })?.name
@@ -458,7 +535,7 @@ struct SearchView: View {
                     // Skip the per-row code-section badge when the results
                     // are already grouped by code section — the group header
                     // shows it once instead.
-                    if searchesAllCodeSections,
+                    if showsGroupedSearchResults,
                        library.codeSections.isEmpty,
                        let codeSectionID = result.codeSectionID {
                         CodeMetaBadge(text: library.codeSectionName(id: codeSectionID), accent: resultAccent)
@@ -492,12 +569,6 @@ struct SearchView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, 12)
-    }
-
-    private struct SearchTaskID: Hashable {
-        let query: String
-        let searchesAllCodeSections: Bool
-        let selectedCodeSectionID: Int64?
     }
 
     private func dismissKeyboard() {

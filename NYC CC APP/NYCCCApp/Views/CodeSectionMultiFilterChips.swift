@@ -1,0 +1,67 @@
+import SwiftUI
+
+struct CodeSectionMultiFilterChips: View {
+    let sections: [CodeSectionCategory]
+    @Binding var selectedIDs: Set<Int64>
+    let defaultAccent: Color
+    let accentForSection: (Int64) -> Color
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                filterChip(
+                    title: "All",
+                    accent: defaultAccent,
+                    isSelected: selectedIDs.isEmpty
+                ) {
+                    selectedIDs = []
+                }
+
+                ForEach(sections) { codeSection in
+                    let isSelected = selectedIDs.contains(codeSection.id)
+                    filterChip(
+                        title: CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
+                        accent: accentForSection(codeSection.id),
+                        isSelected: isSelected
+                    ) {
+                        toggleSection(codeSection.id)
+                    }
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    private func toggleSection(_ id: Int64) {
+        if selectedIDs.isEmpty {
+            selectedIDs = [id]
+            return
+        }
+
+        if selectedIDs.contains(id) {
+            selectedIDs.remove(id)
+        } else {
+            selectedIDs.insert(id)
+        }
+    }
+
+    private func filterChip(
+        title: String,
+        accent: Color,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isSelected ? Color.white : accent)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(isSelected ? accent : accent.opacity(0.12))
+                )
+        }
+        .buttonStyle(.plain)
+    }
+}

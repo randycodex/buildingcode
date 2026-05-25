@@ -13,8 +13,12 @@ struct SettingsView: View {
         case codeSection
     }
 
-    private var accentColor: Color {
+    private var readerPreviewAccent: Color {
         Color(uiColor: library.accentColor())
+    }
+
+    private var settingsChromeColor: Color {
+        Color(uiColor: .secondaryLabel)
     }
 
     private var collapseProgress: CGFloat {
@@ -38,7 +42,7 @@ struct SettingsView: View {
                         .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
                         .opacity(1 - (collapseProgress * 0.22))
 
-                    CodeSurface(accent: accentColor, padding: 0) {
+                    CodeSurface(accent: settingsChromeColor, padding: 0) {
                         VStack(spacing: 0) {
                             jurisdictionPicker
                             Divider()
@@ -50,7 +54,7 @@ struct SettingsView: View {
                         }
                     }
 
-                    CodeSurface(accent: accentColor, padding: 16) {
+                    CodeSurface(accent: settingsChromeColor, padding: 16) {
                         themePreviewCard
 
                         CodeHairline()
@@ -70,7 +74,7 @@ struct SettingsView: View {
                         lineSpacingSlider
                     }
 
-                    CodeSurface(accent: accentColor, padding: 16) {
+                    CodeSurface(accent: settingsChromeColor, padding: 16) {
                         savedDataTools
                     }
 
@@ -94,9 +98,10 @@ struct SettingsView: View {
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Settings", progress: collapseProgress)
             }
-            .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+            .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .tint(Color(uiColor: .label))
         }
         .coordinateSpace(name: "settingsScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
@@ -174,21 +179,15 @@ struct SettingsView: View {
                     label: "Version",
                     picker: .version,
                     value: {
-                        VStack(alignment: .trailing, spacing: 2) {
-                            Text(selectedVersionPrimaryText)
-                                .font(.headline.weight(.regular))
-                                .foregroundStyle(.primary)
-                                .multilineTextAlignment(.trailing)
-                            Text(selectedJurisdictionName)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .multilineTextAlignment(.trailing)
-                        }
+                        Text(selectedVersionPrimaryText)
+                            .font(.title3.weight(.regular))
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.trailing)
                     },
                     options: {
                         ForEach(library.filteredVersions) { version in
                             expandableSettingsOption(
-                                title: CodeLibraryViewModel.displayName(forLibraryName: version.displayName),
+                                title: versionOptionTitle(for: version),
                                 isSelected: version.fileName == library.selectedVersionFileName
                             ) {
                                 library.updateSelectedVersion(fileName: version.fileName)
@@ -244,7 +243,7 @@ struct SettingsView: View {
     private var comparisonModeToggle: some View {
         Toggle(isOn: Binding(
             get: { library.comparisonModeEnabled },
-            set: { library.updateComparisonMode(enabled: $0) }
+            set: { library.setComparisonMode(enabled: $0, keeping: .settings) }
         )) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Comparison Mode")
@@ -262,11 +261,11 @@ struct SettingsView: View {
 
     private var themePreviewCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            CodeEyebrow(text: "Reader Preview", accent: accentColor)
+            CodeEyebrow(text: "Reader Preview", accent: readerPreviewAccent)
 
             Text("SECTION BC 101: GENERAL")
                 .font(.footnote.weight(.semibold))
-                .foregroundStyle(accentColor)
+                .foregroundStyle(readerPreviewAccent)
 
             Text("101.2 Scope.")
                 .font(library.readerTheme.swiftUIFont(size: previewFontSize + 2, emphasized: true))
@@ -278,8 +277,8 @@ struct SettingsView: View {
                 .lineSpacing(library.readerTheme.lineSpacing)
 
             HStack(spacing: 8) {
-                CodeStatPill(value: "\(Int(library.readerTheme.fontSize)) pt", label: "type", accent: accentColor)
-                CodeStatPill(value: "\(Int(library.readerTheme.lineSpacing))", label: "spacing", accent: accentColor)
+                CodeStatPill(value: "\(Int(library.readerTheme.fontSize)) pt", label: "type", accent: readerPreviewAccent)
+                CodeStatPill(value: "\(Int(library.readerTheme.lineSpacing))", label: "spacing", accent: readerPreviewAccent)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -355,7 +354,7 @@ struct SettingsView: View {
 
     private var savedDataTools: some View {
         VStack(alignment: .leading, spacing: 14) {
-            CodeEyebrow(text: "Saved Data", accent: accentColor)
+            CodeEyebrow(text: "Saved Data", accent: settingsChromeColor)
 
             settingsDangerButton(
                 title: "Clear Recent Searches",
@@ -398,8 +397,12 @@ struct SettingsView: View {
     }
 
     private var selectedVersionPrimaryText: String {
-        let rawName = library.selectedVersion?.codeVersion.replacingOccurrences(of: "\(selectedJurisdictionName) - ", with: "", options: .caseInsensitive) ?? "Not Selected"
-        return CodeLibraryViewModel.displayName(forLibraryName: rawName)
+        guard let version = library.selectedVersion else { return "Not Selected" }
+        return versionOptionTitle(for: version)
+    }
+
+    private func versionOptionTitle(for version: BundledCodeVersion) -> String {
+        CodeLibraryViewModel.displayName(forLibraryName: version.codeVersion)
     }
 
     private var selectedCodeSectionName: String {
@@ -476,7 +479,7 @@ struct SettingsView: View {
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.semibold))
-                        .foregroundStyle(accentColor)
+                        .foregroundStyle(Color(uiColor: .label))
                 }
             }
             .padding(.horizontal, 16)
