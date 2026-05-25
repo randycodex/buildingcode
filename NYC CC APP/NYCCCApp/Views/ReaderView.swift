@@ -181,7 +181,24 @@ struct ReaderView: View {
     }
 
     private func chapterForJump(detail: ReaderSectionDetail) -> CodeChapter? {
-        library.chapters.first {
+        // Search across ALL chapters (not just the currently-selected code
+        // section) so tap-to-jump works for any saved bookmark regardless of
+        // which code section is active in Settings. Match on chapter number
+        // AND code section ID, because chapter "9" exists in several code
+        // sections (Building, Mechanical, Plumbing, etc.) and we need to
+        // land in the one that matches the bookmark.
+        let allChapters = library.chapters(for: nil)
+
+        if let scoped = allChapters.first(where: { chapter in
+            chapter.codeSectionID == detail.codeSectionID
+                && chapter.chapterNumber.caseInsensitiveCompare(detail.chapterNumber) == .orderedSame
+        }) {
+            return scoped
+        }
+
+        // Fallback: section had no codeSectionID (rare for authored content)
+        // — match by chapter number alone.
+        return allChapters.first {
             $0.chapterNumber.caseInsensitiveCompare(detail.chapterNumber) == .orderedSame
         }
     }
