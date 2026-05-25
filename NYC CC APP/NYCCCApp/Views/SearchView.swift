@@ -261,28 +261,37 @@ struct SearchView: View {
     }
 
     private var jumpBackInPreviewBlockHeight: CGFloat {
-        UIFont.preferredFont(forTextStyle: .caption2).lineHeight * 3
+        // SwiftUI line heights run slightly taller than UIFont metrics.
+        UIFont.preferredFont(forTextStyle: .caption2).lineHeight * 3 + 6
     }
 
-    private var jumpBackInTileHeight: CGFloat {
+    private var jumpBackInTileContentHeight: CGFloat {
         let caption2 = UIFont.preferredFont(forTextStyle: .caption2)
         let caption = UIFont.preferredFont(forTextStyle: .caption1)
         let codeName = UIFont.systemFont(ofSize: 10, weight: .medium)
         let lineSpacing: CGFloat = 4
-        let tilePadding: CGFloat = 16
         return caption2.lineHeight
             + caption.lineHeight
             + jumpBackInPreviewBlockHeight
             + codeName.lineHeight
             + (lineSpacing * 4)
-            + tilePadding
+            + 8
     }
 
-    /// Two uniform tile rows plus a tight allowance for page dots.
-    private var jumpBackInGridHeight: CGFloat {
-        let rowGap: CGFloat = 8
-        let pageDotsHeight: CGFloat = jumpBackInPages.count > 1 ? 10 : 0
-        return (jumpBackInTileHeight * 2) + rowGap + pageDotsHeight
+    private var jumpBackInTileOuterHeight: CGFloat {
+        jumpBackInTileContentHeight + 16
+    }
+
+    private func jumpBackInGridHeight(for page: [RecentlyViewedEntry]) -> CGFloat {
+        let rowCount = page.count <= 2 ? 1 : 2
+        let rowGap: CGFloat = rowCount == 2 ? 8 : 0
+        return (jumpBackInTileOuterHeight * CGFloat(rowCount)) + rowGap
+    }
+
+    private var jumpBackInTabViewHeight: CGFloat {
+        let tallestGrid = jumpBackInPages.map { jumpBackInGridHeight(for: $0) }.max() ?? jumpBackInTileOuterHeight
+        let pageDotsHeight: CGFloat = jumpBackInPages.count > 1 ? 28 : 0
+        return tallestGrid + pageDotsHeight
     }
 
     private var recentlyViewedSection: some View {
@@ -291,25 +300,45 @@ struct SearchView: View {
 
             TabView {
                 ForEach(Array(jumpBackInPages.enumerated()), id: \.offset) { _, page in
-                    LazyVGrid(
-                        columns: [
-                            GridItem(.flexible(), spacing: 8),
-                            GridItem(.flexible(), spacing: 8),
-                        ],
-                        spacing: 8
-                    ) {
-                        ForEach(page) { entry in
-                            NavigationLink(value: entry.sectionID) {
-                                recentlyViewedTile(entry)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .top)
+                    jumpBackInPageGrid(page)
+                        .frame(height: jumpBackInGridHeight(for: page), alignment: .top)
+                        .padding(.horizontal, 1)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: jumpBackInPages.count > 1 ? .automatic : .never))
-            .frame(height: jumpBackInGridHeight)
+            .frame(height: jumpBackInTabViewHeight)
+        }
+    }
+
+    @ViewBuilder
+    private func jumpBackInPageGrid(_ page: [RecentlyViewedEntry]) -> some View {
+        let topRow = Array(page.prefix(2))
+        let bottomRow = Array(page.dropFirst(2).prefix(2))
+
+        VStack(spacing: 8) {
+            jumpBackInTileRow(topRow)
+
+            if !bottomRow.isEmpty {
+                jumpBackInTileRow(bottomRow)
+            }
+        }
+    }
+
+    private func jumpBackInTileRow(_ entries: [RecentlyViewedEntry]) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            ForEach(entries) { entry in
+                NavigationLink(value: entry.sectionID) {
+                    recentlyViewedTile(entry)
+                }
+                .buttonStyle(.plain)
+            }
+
+            if entries.count == 1 {
+                Color.clear
+                    .frame(maxWidth: .infinity)
+                    .frame(height: jumpBackInTileOuterHeight)
+                    .accessibilityHidden(true)
+            }
         }
     }
 
@@ -342,8 +371,9 @@ struct SearchView: View {
                 .foregroundStyle(.tertiary)
                 .lineLimit(1)
         }
-        .frame(maxWidth: .infinity, minHeight: jumpBackInTileHeight, maxHeight: jumpBackInTileHeight, alignment: .topLeading)
         .padding(8)
+        .frame(maxWidth: .infinity, minHeight: jumpBackInTileContentHeight, alignment: .topLeading)
+        .frame(height: jumpBackInTileOuterHeight, alignment: .top)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .overlay(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
