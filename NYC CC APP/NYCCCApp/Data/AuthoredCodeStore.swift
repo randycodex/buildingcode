@@ -862,6 +862,14 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         return loadShippedSearchIndex()
     }
 
+    /// Eagerly loads and caches the search index so the first user-initiated
+    /// search finds it already warm. Safe to call from any thread.
+    func warmSearchIndex() {
+        _ = bundleUsesExternalSectionText
+            ? loadShippedSearchIndex()
+            : invertedIndex(for: nil)
+    }
+
     private func loadShippedSearchIndex() -> [String: Set<Int64>] {
         searchIndexLock.lock()
         if let cached = shippedSearchIndex {

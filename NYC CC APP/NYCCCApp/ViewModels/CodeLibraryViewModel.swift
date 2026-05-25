@@ -79,6 +79,11 @@ final class CodeLibraryViewModel: ObservableObject {
     private var versionLoadTask: Task<Void, Never>?
     private var contentLoadTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
+    // Tracks the active inner search task so it can be cancelled independently
+    // when a new search starts. Without this, Task.detached bodies accumulate
+    // concurrently because cancelling the outer Task does not propagate to a
+    // detached child.
+    private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     @Published private(set) var bookmarkRevision: Int = 0
 
     init(
@@ -801,7 +806,13 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func search(query: String, restrictToSelectedCodeSection: Bool = true) {
+        // Cancel both the outer coordination task and the inner work task so
+        // concurrent Task.detached bodies don't pile up and saturate the thread
+        // pool when the user types quickly.
         searchTask?.cancel()
+        activeSearchWorkTask?.cancel()
+        activeSearchWorkTask = nil
+
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedQuery.isEmpty else {
             searchResults = []
@@ -810,11 +821,13 @@ final class CodeLibraryViewModel: ObservableObject {
 
         if let authoredCodeStore {
             let selectedCodeSectionID = restrictToSelectedCodeSection ? self.selectedCodeSectionID : nil
+            let workTask = Task.detached(priority: .userInitiated) {
+                authoredCodeStore.search(query: trimmedQuery, codeSectionID: selectedCodeSectionID)
+            }
+            activeSearchWorkTask = workTask
             searchTask = Task {
-                let results = await Task.detached(priority: .userInitiated) {
-                    authoredCodeStore.search(query: trimmedQuery, codeSectionID: selectedCodeSectionID)
-                }.value
-                guard !Task.isCancelled else { return }
+                let results = await workTask.value
+                guard !Task.isCancelled, !workTask.isCancelled else { return }
                 searchResults = results
             }
             return
@@ -825,19 +838,19 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
 
-        searchTask = Task {
+        let workTask: Task<[CodeSearchResult], Never> = Task.detached(priority: .userInitiated) {
             do {
-                let results = try await Task.detached(priority: .userInitiated) {
-                    let database = try CodeDatabase(databaseURL: databaseURL, locator: BundleDatabaseLocator())
-                    return try database.search(query: trimmedQuery)
-                }.value
-                guard !Task.isCancelled else { return }
-                searchResults = results
+                let database = try CodeDatabase(databaseURL: databaseURL, locator: BundleDatabaseLocator())
+                return (try? database.search(query: trimmedQuery)) ?? []
             } catch {
-                guard !Task.isCancelled else { return }
-                statusMessage = error.localizedDescription
-                searchResults = []
+                return []
             }
+        }
+        activeSearchWorkTask = workTask
+        searchTask = Task {
+            let results = await workTask.value
+            guard !Task.isCancelled, !workTask.isCancelled else { return }
+            searchResults = results
         }
     }
 
@@ -1383,12 +1396,15 @@ final class CodeLibraryViewModel: ObservableObject {
         chapters: [CodeChapter],
         store: AuthoredCodeStore
     ) async {
-        // Authored content lives in-memory in `AuthoredCodeStore` and is fetched
-        // directly via dictionary lookups; the viewModel-side cache is unused on
-        // this path, so there is nothing to prewarm.
         _ = version
         _ = chapters
-        _ = store
+        // Warm the search index in the background so the first search doesn't
+        // pay the cost of reading + JSON-decoding the 3 MB searchIndex.json on
+        // the user's first keystroke. The work runs on a detached task so it
+        // doesn't compete with the chapter preload already in flight.
+        await Task.detached(priority: .background) {
+            _ = store.warmSearchIndex()
+        }.value
     }
 
     private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
