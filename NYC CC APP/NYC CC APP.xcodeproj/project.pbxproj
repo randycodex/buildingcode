@@ -37,6 +37,8 @@
 		A10000000000000000000021 /* CodeSectionMultiFilterChips.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* CodeSectionMultiFilterChips.swift */; };
 		A10000000000000000000022 /* TabBarReselectListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* TabBarReselectListener.swift */; };
 		A10000000000000000000023 /* FolderUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* FolderUI.swift */; };
+		A10000000000000000000024 /* BookmarkExportBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* BookmarkExportBuilder.swift */; };
+		A10000000000000000000025 /* BookmarkExportShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* BookmarkExportShareSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +77,8 @@
 		A20000000000000000000021 /* CodeSectionMultiFilterChips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeSectionMultiFilterChips.swift; sourceTree = "<group>"; };
 		A20000000000000000000022 /* TabBarReselectListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarReselectListener.swift; sourceTree = "<group>"; };
 		A20000000000000000000023 /* FolderUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderUI.swift; sourceTree = "<group>"; };
+		A20000000000000000000024 /* BookmarkExportBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkExportBuilder.swift; sourceTree = "<group>"; };
+		A20000000000000000000025 /* BookmarkExportShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkExportShareSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +144,7 @@
 				A20000000000000000000006 /* UserDataStore.swift */,
 				A20000000000000000000014 /* ReaderThemeStore.swift */,
 				A20000000000000000000007 /* CodeReferenceResolver.swift */,
+				A20000000000000000000024 /* BookmarkExportBuilder.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -176,6 +181,7 @@
 				A20000000000000000000021 /* CodeSectionMultiFilterChips.swift */,
 				A20000000000000000000022 /* TabBarReselectListener.swift */,
 				A20000000000000000000023 /* FolderUI.swift */,
+				A20000000000000000000025 /* BookmarkExportShareSheet.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -299,6 +305,8 @@
 				A10000000000000000000021 /* CodeSectionMultiFilterChips.swift in Sources */,
 				A10000000000000000000022 /* TabBarReselectListener.swift in Sources */,
 				A10000000000000000000023 /* FolderUI.swift in Sources */,
+				A10000000000000000000024 /* BookmarkExportBuilder.swift in Sources */,
+				A10000000000000000000025 /* BookmarkExportShareSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
