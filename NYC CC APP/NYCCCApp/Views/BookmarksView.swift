@@ -9,6 +9,7 @@ struct BookmarksView: View {
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private let tabBarClearance: CGFloat = 104
+    private let contentHorizontalInset: CGFloat = 16
 
     init() {
         _savedFilterCodeSectionIDs = State(
@@ -46,16 +47,6 @@ struct BookmarksView: View {
                         .opacity(1 - (collapseProgress * 0.22))
 
                     if !library.bookmarks.isEmpty {
-                        if !availableFilterSections.isEmpty {
-                            savedFilterControl
-                                .padding(.bottom, 8)
-                        }
-
-                        if !availableTags.isEmpty {
-                            tagFilterControl
-                                .padding(.bottom, 8)
-                        }
-
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(bookmarkGroups) { group in
                                 chapterHeader(group)
@@ -75,12 +66,28 @@ struct BookmarksView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 18)
                 .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Saved", progress: collapseProgress)
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if !library.bookmarks.isEmpty {
+                    VStack(spacing: 10) {
+                        if !availableFilterSections.isEmpty {
+                            savedFilterControl
+                        }
+                        if !availableTags.isEmpty {
+                            tagFilterControl
+                        }
+                    }
+                    .padding(.horizontal, contentHorizontalInset)
+                    .padding(.top, 10)
+                    .padding(.bottom, 22)
+                    .background(bottomDock)
+                }
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
@@ -96,11 +103,20 @@ struct BookmarksView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
+    private var bottomDock: some View {
+        // Mirrors the Search screen's dock styling so both tabs share the same
+        // bottom-anchored filter affordance.
+        Color(uiColor: .systemGroupedBackground)
+            .ignoresSafeArea(edges: .bottom)
+    }
+
     private var availableFilterSections: [CodeSectionCategory] {
-        // Only offer chips for code sections that actually contain a saved
-        // bookmark, so the row doesn't fill with empty chips.
-        let usedIDs = Set(library.bookmarks.compactMap(\.codeSectionID))
-        return library.codeSections.filter { usedIDs.contains($0.id) }
+        // Show every code section in the canonical order so missing sections
+        // (e.g. Fuel Gas before the user has saved anything from it) are still
+        // available as filter chips. Hiding sections that have no bookmarks
+        // yet hid Fuel Gas in real usage; showing them all matches how the
+        // filter behaves on Search.
+        library.codeSections
     }
 
     private var filteredBookmarks: [BookmarkedSection] {

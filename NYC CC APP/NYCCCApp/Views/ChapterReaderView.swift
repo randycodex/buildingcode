@@ -86,6 +86,12 @@ struct ChapterReaderView: View {
                 if selectedJumpSectionID != newValue {
                     selectedJumpSectionID = newValue
                 }
+                // Also drive the bottom jumper's label off this signal so the
+                // text updates immediately when SwiftUI's scrollPosition fires,
+                // not only when the offset-preference handler catches up.
+                if pendingFocusedSectionID != newValue {
+                    pendingFocusedSectionID = newValue
+                }
                 if rememberedSectionID.wrappedValue != newValue {
                     rememberedSectionID.wrappedValue = newValue
                 }
@@ -393,14 +399,15 @@ struct ChapterReaderView: View {
         NavigationStack {
             List {
                 ForEach(visibleJumpBlocks) { block in
+                    let depth = jumpSheetDepth(for: block)
                     Button {
                         jumpToSection(id: block.id, with: proxy)
                         isJumpPickerPresented = false
                     } label: {
                         VStack(alignment: .leading, spacing: 3) {
                             Text(jumpSheetLabel(for: block))
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(accentColor)
+                                .font(jumpSheetFont(forDepth: depth))
+                                .foregroundStyle(accentColor.opacity(jumpSheetOpacity(forDepth: depth)))
                                 .lineLimit(2)
 
                             if selectedJumpSectionID == block.id {
@@ -410,7 +417,7 @@ struct ChapterReaderView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, jumpSheetIndent(for: block))
+                        .padding(.leading, CGFloat(min(depth, 3)) * 14)
                         .padding(.vertical, 6)
                     }
                     .buttonStyle(.plain)
@@ -535,9 +542,12 @@ struct ChapterReaderView: View {
 
     private func updateFocusedSection(from offsets: [Int64: CGFloat]) {
         guard let topMost = topVisibleSectionID(from: offsets) else { return }
-        if pendingFocusedSectionID == topMost || selectedJumpSectionID == topMost {
-            return
-        }
+        // Only gate on `pendingFocusedSectionID` — `selectedJumpSectionID` is
+        // also written by SwiftUI's `.scrollPosition` modifier, so checking
+        // it here caused the jump label to freeze at the first section the
+        // user opened. `pendingFocusedSectionID` is the source of truth for
+        // the bottom jumper's displayed label.
+        if pendingFocusedSectionID == topMost { return }
 
         pendingFocusedSectionID = topMost
         selectedJumpSectionID = topMost
@@ -634,9 +644,36 @@ struct ChapterReaderView: View {
     }
 
     private func jumpSheetIndent(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> CGFloat {
+        CGFloat(min(jumpSheetDepth(for: block), 3)) * 14
+    }
+
+    /// Hierarchical depth used to indent and de-emphasize subsection rows in
+    /// the jump sheet. 0 = top-level section heading, 1+ = nested subsection.
+    private func jumpSheetDepth(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> Int {
         guard block.kind != .textBlock, block.sectionNumber.contains(".") else { return 0 }
-        let depth = max(0, block.sectionNumber.split(separator: ".").count - 1)
-        return CGFloat(min(depth, 3)) * 14
+        return max(0, block.sectionNumber.split(separator: ".").count - 1)
+    }
+
+    /// Lighter weight for nested subsections so the parent section heading
+    /// stays the strongest visual anchor in the jump sheet.
+    private func jumpSheetFont(forDepth depth: Int) -> Font {
+        switch depth {
+        case 0: return .body.weight(.semibold)
+        case 1: return .body.weight(.regular)
+        case 2: return .callout.weight(.regular)
+        default: return .subheadline.weight(.regular)
+        }
+    }
+
+    /// Mild opacity falloff per depth so deeper subsections recede without
+    /// losing legibility on a light or dark sheet background.
+    private func jumpSheetOpacity(forDepth depth: Int) -> Double {
+        switch depth {
+        case 0: return 1.0
+        case 1: return 0.80
+        case 2: return 0.68
+        default: return 0.58
+        }
     }
 
     private func openNotes(for detail: ReaderSectionDetail) {
