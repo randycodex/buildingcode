@@ -15,8 +15,29 @@ struct ReaderView: View {
     @State private var sectionTags: [String] = []
     @State private var pendingCustomTag: String = ""
     @State private var isTagComposerOpen: Bool = false
+    @State private var isFolderPickerOpen: Bool = false
+    @State private var folderEditorTarget: ReaderFolderEditorTarget?
     @FocusState private var isNotesFieldFocused: Bool
     @FocusState private var isTagComposerFocused: Bool
+
+    /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
+    /// so the two states don't share an `Identifiable` collision.
+    enum ReaderFolderEditorTarget: Identifiable {
+        case new
+        case edit(CodeFolder)
+
+        var id: String {
+            switch self {
+            case .new: return "new"
+            case .edit(let folder): return "edit-\(folder.id)"
+            }
+        }
+
+        var folder: CodeFolder? {
+            if case .edit(let f) = self { return f }
+            return nil
+        }
+    }
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: detail?.codeSectionID))
@@ -63,6 +84,9 @@ struct ReaderView: View {
                     }
 
                     if isBookmarked {
+                        CodeHairline().padding(.top, 2)
+                        projectsEditor
+
                         CodeHairline().padding(.top, 2)
                         tagsEditor
                     }
@@ -122,6 +146,52 @@ struct ReaderView: View {
         }
         .onDisappear {
             noteSaveResetTask?.cancel()
+        }
+        .sheet(isPresented: $isFolderPickerOpen) {
+            FolderPickerSheet(
+                folders: library.folders,
+                memberFolderIDs: Set(library.folderMembership[sectionID] ?? []),
+                onToggle: { folder in
+                    let memberIDs = Set(library.folderMembership[sectionID] ?? [])
+                    if memberIDs.contains(folder.id) {
+                        library.removeSection(sectionID, fromFolder: folder.id)
+                    } else {
+                        library.addSection(sectionID, toFolder: folder.id)
+                    }
+                },
+                onCreateNew: {
+                    // Close the picker first, then open the editor for a
+                    // new folder. Presenting one sheet on top of another
+                    // is unreliable in SwiftUI; this two-step keeps the
+                    // animation clean.
+                    isFolderPickerOpen = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        folderEditorTarget = .new
+                    }
+                }
+            )
+        }
+        .sheet(item: $folderEditorTarget) { target in
+            FolderEditorSheet(
+                existing: target.folder,
+                onSave: { name, description, colorHex in
+                    if let existing = target.folder {
+                        library.updateFolder(existing, name: name, description: description, colorHex: colorHex)
+                    } else {
+                        // After creating a new folder from inside the Reader,
+                        // assign the current section to it so the user
+                        // doesn't have to reopen the picker.
+                        if let newFolder = library.createFolder(name: name, description: description, colorHex: colorHex) {
+                            library.addSection(sectionID, toFolder: newFolder.id)
+                        }
+                    }
+                },
+                onDelete: {
+                    if let existing = target.folder {
+                        library.deleteFolder(id: existing.id)
+                    }
+                }
+            )
         }
     }
 
@@ -262,6 +332,24 @@ struct ReaderView: View {
                         .allowsHitTesting(false)
                 }
             }
+        }
+    }
+
+    private var projectsEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Projects")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            FolderMembershipRow(
+                memberFolders: library.folders(containing: sectionID),
+                onRemove: { folder in
+                    library.removeSection(sectionID, fromFolder: folder.id)
+                },
+                onAdd: {
+                    isFolderPickerOpen = true
+                }
+            )
         }
     }
 
