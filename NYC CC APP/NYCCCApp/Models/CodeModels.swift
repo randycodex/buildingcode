@@ -553,6 +553,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let kind: CodeSectionKind
     let isBookmarked: Bool
     let noteBody: String
+    let tags: [String]
 
     init(
         id: Int64,
@@ -565,7 +566,8 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         previewText: String = "",
         kind: CodeSectionKind = .title,
         isBookmarked: Bool = true,
-        noteBody: String = ""
+        noteBody: String = "",
+        tags: [String] = []
     ) {
         self.id = id
         self.codeVersion = codeVersion
@@ -578,6 +580,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         self.kind = kind
         self.isBookmarked = isBookmarked
         self.noteBody = noteBody
+        self.tags = tags
     }
 
     var displayTitle: String {

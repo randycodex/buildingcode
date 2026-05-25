@@ -6,6 +6,7 @@ struct BookmarksView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var savedFilterCodeSectionID: Int64? = nil
     @State private var savedFilterAllSelected: Bool = true
+    @State private var selectedTagFilter: String? = nil
 
     private let tabBarClearance: CGFloat = 104
 
@@ -41,6 +42,11 @@ struct BookmarksView: View {
                     if !library.bookmarks.isEmpty {
                         if !availableFilterSections.isEmpty {
                             savedFilterControl
+                                .padding(.bottom, 8)
+                        }
+
+                        if !availableTags.isEmpty {
+                            tagFilterControl
                                 .padding(.bottom, 8)
                         }
 
@@ -89,10 +95,77 @@ struct BookmarksView: View {
     }
 
     private var filteredBookmarks: [BookmarkedSection] {
-        guard !savedFilterAllSelected, let id = savedFilterCodeSectionID else {
-            return library.bookmarks
+        var results = library.bookmarks
+        if !savedFilterAllSelected, let id = savedFilterCodeSectionID {
+            results = results.filter { $0.codeSectionID == id }
         }
-        return library.bookmarks.filter { $0.codeSectionID == id }
+        if let tag = selectedTagFilter {
+            results = results.filter { bookmark in
+                bookmark.tags.contains { $0.caseInsensitiveCompare(tag) == .orderedSame }
+            }
+        }
+        return results
+    }
+
+    /// Distinct tags actually in use across the user's bookmarks, sorted by
+    /// usage (most-used first). The starter set is only surfaced inside the
+    /// editor — the filter row only shows tags the user has applied at least
+    /// once so it never feels empty.
+    private var availableTags: [String] {
+        var counts: [String: Int] = [:]
+        for bookmark in library.bookmarks {
+            for tag in bookmark.tags {
+                counts[tag, default: 0] += 1
+            }
+        }
+        return counts
+            .sorted {
+                if $0.value != $1.value { return $0.value > $1.value }
+                return $0.key.localizedStandardCompare($1.key) == .orderedAscending
+            }
+            .map(\.key)
+    }
+
+    private var tagFilterControl: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                tagFilterChip(title: "All Tags", isSelected: selectedTagFilter == nil) {
+                    selectedTagFilter = nil
+                }
+                ForEach(availableTags, id: \.self) { tag in
+                    tagFilterChip(
+                        title: tag,
+                        isSelected: selectedTagFilter == tag
+                    ) {
+                        selectedTagFilter = selectedTagFilter == tag ? nil : tag
+                    }
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    private func tagFilterChip(
+        title: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Image(systemName: "tag.fill")
+                    .font(.caption2.weight(.semibold))
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+            }
+            .foregroundStyle(isSelected ? Color.white : .secondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(isSelected ? Color.secondary : Color.secondary.opacity(0.12))
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private var savedFilterControl: some View {
@@ -270,11 +343,33 @@ struct BookmarksView: View {
                         .multilineTextAlignment(.leading)
                         .padding(.top, 4)
                 }
+
+                if !bookmark.tags.isEmpty {
+                    bookmarkTagsRow(bookmark.tags, accent: bookmarkAccent)
+                        .padding(.top, 6)
+                }
             }
 
             Spacer(minLength: 0)
         }
         .padding(.vertical, 12)
+    }
+
+    private func bookmarkTagsRow(_ tags: [String], accent: Color) -> some View {
+        // Wrap with the shared FlowLayout so many tags don't get clipped.
+        FlowLayout(spacing: 6) {
+            ForEach(tags, id: \.self) { tag in
+                Text(tag)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(accent)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(accent.opacity(0.12))
+                    )
+            }
+        }
     }
 
 }

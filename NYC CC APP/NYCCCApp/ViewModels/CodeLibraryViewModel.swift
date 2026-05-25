@@ -926,6 +926,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             let ids = try userDataStore.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
             let noteEntries = try userDataStore.noteEntries(codeVersion: selectedVersion.codeVersion)
+            let tagEntries = (try? userDataStore.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
             let savedSectionIDs = Array(Set(ids).union(noteEntries.keys)).sorted()
             if let authoredCodeStore {
@@ -933,14 +934,16 @@ final class CodeLibraryViewModel: ObservableObject {
                     ids: savedSectionIDs,
                     codeVersion: selectedVersion.codeVersion,
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
-                    notesBySectionID: noteEntries
+                    notesBySectionID: noteEntries,
+                    tagsBySectionID: tagEntries
                 )
             } else {
                 bookmarks = try codeDatabase?.savedSections(
                     ids: savedSectionIDs,
                     codeVersion: selectedVersion.codeVersion,
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
-                    notesBySectionID: noteEntries
+                    notesBySectionID: noteEntries,
+                    tagsBySectionID: tagEntries
                 ) ?? []
             }
         } catch {
@@ -988,6 +991,53 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             statusMessage = error.localizedDescription
         }
+    }
+
+    // MARK: - Tags
+
+    /// Starter tag set that shows up as suggestions on every bookmark. The
+    /// list is intentionally short and architecture-focused; users can still
+    /// add anything they want on top.
+    nonisolated static let starterBookmarkTags: [String] = [
+        "Egress",
+        "Fire Rating",
+        "Accessibility",
+        "Occupancy",
+        "Construction Type",
+        "Shafts",
+        "Mechanical",
+        "Plumbing",
+        "Energy",
+        "Structural",
+        "Existing Building",
+        "Special Inspections",
+        "Alteration",
+        "Mixed-Use",
+        "Residential"
+    ]
+
+    /// Returns the tags currently saved for one section.
+    func tags(sectionID: Int64) -> [String] {
+        guard let selectedVersion, let userDataStore else { return [] }
+        return (try? userDataStore.tags(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
+    }
+
+    /// Replaces a section's tag set. Empty array clears all tags for it.
+    func setTags(_ tags: [String], sectionID: Int64) {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.setTags(tags, sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            refreshBookmarks()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    /// Every tag in use for the current code version with how many bookmarks
+    /// carry it. Sorted by usage (most-used first), then alphabetically.
+    func tagUsageCounts() -> [(tag: String, count: Int)] {
+        guard let selectedVersion, let userDataStore else { return [] }
+        return (try? userDataStore.tagUsageCounts(codeVersion: selectedVersion.codeVersion)) ?? []
     }
 
     func clearAllBookmarks() {

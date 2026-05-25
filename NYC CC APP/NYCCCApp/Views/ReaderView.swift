@@ -12,7 +12,11 @@ struct ReaderView: View {
     @State private var expandedInlineImage: UIImage?
     @State private var noteSaveState: NoteSaveState = .idle
     @State private var noteSaveResetTask: Task<Void, Never>?
+    @State private var sectionTags: [String] = []
+    @State private var pendingCustomTag: String = ""
+    @State private var isTagComposerOpen: Bool = false
     @FocusState private var isNotesFieldFocused: Bool
+    @FocusState private var isTagComposerFocused: Bool
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: detail?.codeSectionID))
@@ -56,6 +60,11 @@ struct ReaderView: View {
                     if !detail.customDiagrams.isEmpty {
                         CodeHairline().padding(.top, 2)
                         FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
+                    }
+
+                    if isBookmarked {
+                        CodeHairline().padding(.top, 2)
+                        tagsEditor
                     }
 
                     notesEditor
@@ -256,6 +265,173 @@ struct ReaderView: View {
         }
     }
 
+    private var tagsEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .center, spacing: 8) {
+                Text("Tags")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+                Button {
+                    withAnimation(.easeInOut(duration: 0.18)) {
+                        isTagComposerOpen.toggle()
+                    }
+                    if isTagComposerOpen {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isTagComposerFocused = true
+                        }
+                    }
+                } label: {
+                    Label(isTagComposerOpen ? "Done" : "Add", systemImage: isTagComposerOpen ? "checkmark" : "plus")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(accentColor)
+                }
+                .buttonStyle(.plain)
+            }
+
+            // Tags applied to this section, shown as removable accent chips.
+            if sectionTags.isEmpty {
+                Text("No tags yet — tap Add to choose from the starter set or type your own.")
+                    .font(.footnote)
+                    .foregroundStyle(.tertiary)
+            } else {
+                tagChipFlow(tags: sectionTags) { tag in
+                    HStack(spacing: 4) {
+                        Text(tag)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(accentColor)
+                        Button {
+                            removeTag(tag)
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(accentColor.opacity(0.7))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule(style: .continuous).fill(accentColor.opacity(0.12))
+                    )
+                }
+            }
+
+            if isTagComposerOpen {
+                tagComposer
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var tagComposer: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            // Free-form input for custom tags. Commit with Return.
+            HStack(spacing: 8) {
+                Image(systemName: "tag")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                TextField("Add a custom tag", text: $pendingCustomTag)
+                    .focused($isTagComposerFocused)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                    .submitLabel(.done)
+                    .onSubmit { commitCustomTag() }
+                if !pendingCustomTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Button("Add") { commitCustomTag() }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(accentColor)
+                        .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
+            )
+
+            // Starter set + the user's previously used tags. Already-applied
+            // tags are dimmed and disabled so users don't double-add.
+            let suggestions = suggestedTagOptions
+            if !suggestions.isEmpty {
+                Text("Suggestions")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 2)
+                tagChipFlow(tags: suggestions) { tag in
+                    let applied = sectionTags.contains { $0.caseInsensitiveCompare(tag) == .orderedSame }
+                    Button {
+                        if !applied { addTag(tag) }
+                    } label: {
+                        Text(tag)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(applied ? Color.secondary : accentColor)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill((applied ? Color.secondary : accentColor).opacity(applied ? 0.08 : 0.12))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(applied)
+                }
+            }
+        }
+    }
+
+    /// Starter tags first (in their canonical order), then any tags the
+    /// user has applied elsewhere that aren't already in the starter set.
+    /// Already-applied tags on THIS section appear too but are dimmed.
+    private var suggestedTagOptions: [String] {
+        let starter = CodeLibraryViewModel.starterBookmarkTags
+        let extras = library.tagUsageCounts()
+            .map(\.tag)
+            .filter { extra in
+                !starter.contains { $0.caseInsensitiveCompare(extra) == .orderedSame }
+            }
+        return starter + extras
+    }
+
+    /// Lightweight flowing chip layout: wraps to multiple lines without
+    /// needing iOS 16+ Layout APIs. Uses a single HStack with
+    /// fixedSize chips and wrapping enabled via a basic accumulator.
+    @ViewBuilder
+    private func tagChipFlow<ChipContent: View>(
+        tags: [String],
+        @ViewBuilder chip: @escaping (String) -> ChipContent
+    ) -> some View {
+        FlowLayout(spacing: 6) {
+            ForEach(tags, id: \.self) { tag in
+                chip(tag)
+            }
+        }
+    }
+
+    private func commitCustomTag() {
+        let trimmed = pendingCustomTag.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        addTag(trimmed)
+        pendingCustomTag = ""
+    }
+
+    private func addTag(_ tag: String) {
+        let cleaned = tag.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleaned.isEmpty else { return }
+        guard !sectionTags.contains(where: { $0.caseInsensitiveCompare(cleaned) == .orderedSame }) else { return }
+        sectionTags.append(cleaned)
+        library.setTags(sectionTags, sectionID: sectionID)
+    }
+
+    private func removeTag(_ tag: String) {
+        sectionTags.removeAll { $0.caseInsensitiveCompare(tag) == .orderedSame }
+        library.setTags(sectionTags, sectionID: sectionID)
+    }
+
     private func loadContent() async {
         let loadedDetail = await library.loadSectionDetailAsync(sectionID: sectionID)
         detail = loadedDetail
@@ -266,11 +442,18 @@ struct ReaderView: View {
         }
         isBookmarked = library.isBookmarked(sectionID: sectionID)
         noteBody = library.noteBody(sectionID: sectionID)
+        sectionTags = library.tags(sectionID: sectionID)
         noteSaveState = .idle
     }
 
     private func toggleBookmark() {
         isBookmarked = library.toggleBookmark(sectionID: sectionID)
+        // If the bookmark was removed, the tag rows were deleted from disk —
+        // reflect that in the editor so the UI doesn't lie until next load.
+        if !isBookmarked {
+            sectionTags = []
+            isTagComposerOpen = false
+        }
     }
 
     private func saveNote() {
@@ -488,6 +671,48 @@ private struct FigureImageView: View {
                 return
             }
             image = UIImage(contentsOfFile: url.path)
+        }
+    }
+}
+
+/// Minimal flow layout that wraps subviews onto multiple lines. Used by the
+/// tag editor so any number of chips wraps cleanly without horizontal
+/// scrolling. iOS 16+ Layout API — fine for this project.
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 6
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var lineHeight: CGFloat = 0
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x + size.width > maxWidth && x > 0 {
+                x = 0
+                y += lineHeight + spacing
+                lineHeight = 0
+            }
+            x += size.width + spacing
+            lineHeight = max(lineHeight, size.height)
+        }
+        return CGSize(width: maxWidth.isFinite ? maxWidth : x, height: y + lineHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x = bounds.minX
+        var y = bounds.minY
+        var lineHeight: CGFloat = 0
+        for view in subviews {
+            let size = view.sizeThatFits(.unspecified)
+            if x + size.width > bounds.maxX && x > bounds.minX {
+                x = bounds.minX
+                y += lineHeight + spacing
+                lineHeight = 0
+            }
+            view.place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: ProposedViewSize(size))
+            x += size.width + spacing
+            lineHeight = max(lineHeight, size.height)
         }
     }
 }

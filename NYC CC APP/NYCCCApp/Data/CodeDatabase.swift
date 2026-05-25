@@ -218,7 +218,8 @@ final class CodeDatabase: CodeReferenceLookup {
         ids: [Int64],
         codeVersion: String,
         bookmarkedSectionIDs: Set<Int64>,
-        notesBySectionID: [Int64: String]
+        notesBySectionID: [Int64: String],
+        tagsBySectionID: [Int64: [String]] = [:]
     ) throws -> [BookmarkedSection] {
         guard !ids.isEmpty else { return [] }
         let placeholders = ids.map { _ in "?" }.joined(separator: ",")
@@ -248,7 +249,8 @@ final class CodeDatabase: CodeReferenceLookup {
                     title: connection.string(at: 4, in: statement),
                     previewText: connection.string(at: 5, in: statement).titleThroughFirstPeriod,
                     isBookmarked: bookmarkedSectionIDs.contains(connection.int64(at: 0, in: statement)),
-                    noteBody: notesBySectionID[connection.int64(at: 0, in: statement)] ?? ""
+                    noteBody: notesBySectionID[connection.int64(at: 0, in: statement)] ?? "",
+                    tags: tagsBySectionID[connection.int64(at: 0, in: statement)] ?? []
                 )
             )
         }

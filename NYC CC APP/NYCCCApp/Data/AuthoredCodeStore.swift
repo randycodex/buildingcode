@@ -909,7 +909,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         ids: [Int64],
         codeVersion: String,
         bookmarkedSectionIDs: Set<Int64>,
-        notesBySectionID: [Int64: String]
+        notesBySectionID: [Int64: String],
+        tagsBySectionID: [Int64: [String]] = [:]
     ) -> [BookmarkedSection] {
         ids.compactMap { id in
             guard let indexed = sectionIndex[id] else { return nil }
@@ -924,7 +925,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 previewText: previewText(for: indexed.section.id, fallbackOfficialText: indexed.section.officialText),
                 kind: indexed.section.kind,
                 isBookmarked: bookmarkedSectionIDs.contains(id),
-                noteBody: notesBySectionID[id] ?? ""
+                noteBody: notesBySectionID[id] ?? "",
+                tags: tagsBySectionID[id] ?? []
             )
         }
         .sorted {
