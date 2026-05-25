@@ -49,6 +49,27 @@ struct BrowseView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
         }
+        .onChange(of: library.selectedCodeSectionID) { _, newValue in
+            // When comparison mode is off, the primary browser should always
+            // mirror the code section chosen in Settings. seedBrowseSectionIfNeeded
+            // only runs once per view appearance, so without this onChange the
+            // browse @State stays stuck on whatever it was first seeded with.
+            guard browserContext == .primary, !library.comparisonModeEnabled else { return }
+            if browseCodeSectionID != newValue {
+                browseCodeSectionID = newValue
+                BrowserContextID.persistCodeSectionID(newValue, for: .primary)
+            }
+        }
+        .onChange(of: library.comparisonModeEnabled) { _, isOn in
+            // Turning comparison mode OFF should snap the primary browser back
+            // to whatever Settings says (so the user sees the section they
+            // picked in the settings, not a stale per-context value).
+            guard browserContext == .primary, !isOn else { return }
+            if browseCodeSectionID != library.selectedCodeSectionID {
+                browseCodeSectionID = library.selectedCodeSectionID
+                BrowserContextID.persistCodeSectionID(library.selectedCodeSectionID, for: .primary)
+            }
+        }
         .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
             DispatchQueue.main.async {
