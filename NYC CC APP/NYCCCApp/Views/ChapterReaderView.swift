@@ -362,21 +362,6 @@ struct ChapterReaderView: View {
             }
             .disabled(visibleJumpBlocks.isEmpty)
 
-            Button {
-                if let firstID = blocks.first?.id {
-                    jumpToSection(id: firstID, with: proxy)
-                }
-            } label: {
-                Image(systemName: "arrow.up.to.line")
-                    .font(.subheadline.weight(.semibold))
-            }
-            .frame(width: 42, height: 42)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .padding(.horizontal, 16)
         .padding(.top, 6)
@@ -408,6 +393,7 @@ struct ChapterReaderView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading, jumpSheetIndent(for: block))
                         .padding(.vertical, 6)
                     }
                     .buttonStyle(.plain)
@@ -594,6 +580,10 @@ struct ChapterReaderView: View {
             return block.displayTitle
         }
 
+        if let groupLabel = block.groupLabel {
+            return groupLabel
+        }
+
         let normalizedSectionNumber = block.sectionNumber
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
@@ -601,9 +591,15 @@ struct ChapterReaderView: View {
             && normalizedSectionNumber.count >= 3
 
         if isSectionGroup {
-            return "Section BC \(normalizedSectionNumber): \(block.displayTitle)"
+            return "Section \(normalizedSectionNumber): \(block.displayTitle)"
         }
         return "\(block.sectionNumber) \(block.displayTitle)"
+    }
+
+    private func jumpSheetIndent(for block: CodeLibraryViewModel.ChapterReaderBlockSummary) -> CGFloat {
+        guard block.kind != .textBlock, block.sectionNumber.contains(".") else { return 0 }
+        let depth = max(0, block.sectionNumber.split(separator: ".").count - 1)
+        return CGFloat(min(depth, 3)) * 14
     }
 
     private func openNotes(for detail: ReaderSectionDetail) {
@@ -814,24 +810,6 @@ private struct ChapterReaderBlockOffsetPreferenceKey: PreferenceKey {
 
     static func reduce(value: inout [Int64: CGFloat], nextValue: () -> [Int64: CGFloat]) {
         value.merge(nextValue(), uniquingKeysWith: { _, new in new })
-    }
-}
-
-private extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        guard size > 0, !isEmpty else { return isEmpty ? [] : [self] }
-
-        var chunks: [[Element]] = []
-        chunks.reserveCapacity((count + size - 1) / size)
-
-        var index = startIndex
-        while index < endIndex {
-            let nextIndex = self.index(index, offsetBy: size, limitedBy: endIndex) ?? endIndex
-            chunks.append(Array(self[index..<nextIndex]))
-            index = nextIndex
-        }
-
-        return chunks
     }
 }
 

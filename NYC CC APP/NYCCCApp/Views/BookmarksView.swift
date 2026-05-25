@@ -101,25 +101,29 @@ struct BookmarksView: View {
     }
 
     private func chapterHeader(_ group: BookmarkChapterGroup) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let groupAccent = bookmarkAccentColor(for: group.codeSectionID)
+
+        return VStack(alignment: .leading, spacing: 5) {
             if !library.codeSections.isEmpty {
                 Text(group.codeSectionName)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(bookmarkAccentColor(for: group.codeSectionID))
+                    .foregroundStyle(groupAccent)
                     .textCase(.uppercase)
             }
 
             Text("Chapter \(group.chapterNumber)")
-                .font(.footnote.weight(.semibold))
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
 
             Text(group.chapterTitle)
-                .font(.headline)
+                .font(.headline.weight(.semibold))
                 .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.top, 20)
-        .padding(.bottom, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 26)
+        .padding(.bottom, 22)
     }
 
     @ViewBuilder
@@ -156,7 +160,7 @@ struct BookmarksView: View {
                     } else {
                         Text(bookmark.sectionNumber)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
+                            .foregroundStyle(bookmarkAccent)
                     }
 
                     if bookmark.isBookmarked {

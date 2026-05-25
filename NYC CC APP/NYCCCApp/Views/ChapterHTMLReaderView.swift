@@ -16,7 +16,6 @@ struct ChapterHTMLReaderView: View {
     @State private var noteBody = ""
     @State private var hasActivatedHTMLReader = true
     @State private var isJumpPickerPresented = false
-    @State private var scrollToTopTrigger = 0
     @State private var cachedBookmarkedAnchorIDs: Set<String> = []
     @State private var cachedBookmarkedSectionNumbers: Set<String> = []
     @State private var cachedNotedSectionNumbers: Set<String> = []
@@ -64,7 +63,10 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var jumpTargets: [ChapterHTMLJumpTarget] {
-        let sectionAnchors = anchors.filter { $0.level <= 2 }
+        let chapterNumber = normalizedSectionNumber(chapter.chapterNumber)
+        let sectionAnchors = anchors.filter {
+            $0.level >= 2 && normalizedSectionNumber($0.sectionNumber) != chapterNumber
+        }
         if !sectionAnchors.isEmpty {
             return sectionAnchors.map {
                 ChapterHTMLJumpTarget(
@@ -265,7 +267,7 @@ struct ChapterHTMLReaderView: View {
             notedSectionNumbers: notedSectionNumbers,
             expandAllTrigger: 0,
             collapseAllTrigger: 0,
-            scrollToTopTrigger: scrollToTopTrigger,
+            scrollToTopTrigger: 0,
             onVisibleAnchorChange: { anchorID in
                 guard let anchor = anchors.first(where: { $0.anchorID == anchorID }) else { return }
                 // Prefer subsection-level anchors for the jump label so it reflects the current title.
@@ -313,23 +315,6 @@ struct ChapterHTMLReaderView: View {
             }
             .disabled(jumpTargets.isEmpty)
 
-            Button {
-                if let firstTarget = jumpTargets.first {
-                    selectedAnchor = firstTarget.publishedAnchor
-                    targetAnchorID = firstTarget.scrollTarget
-                }
-                scrollToTopTrigger += 1
-            } label: {
-                Image(systemName: "arrow.up.to.line")
-                    .font(.subheadline.weight(.semibold))
-            }
-            .frame(width: 42, height: 42)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .padding(.horizontal, 16)
         .padding(.top, 6)
@@ -358,7 +343,10 @@ struct ChapterHTMLReaderView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading, target.menuIndent)
+                        .padding(.vertical, 4)
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .navigationTitle("Jump within chapter")
@@ -469,10 +457,16 @@ private struct ChapterHTMLJumpTarget: Identifiable, Hashable {
     }
 
     var menuLabel: String {
-        if title.localizedCaseInsensitiveContains("Section BC \(sectionNumber)") {
+        if title.range(of: #"^Section\s+[A-Z]+\s+\#(NSRegularExpression.escapedPattern(for: sectionNumber))\b"#, options: [.regularExpression, .caseInsensitive]) != nil {
             return title
         }
-        return "Section BC \(sectionNumber): \(title)"
+        return "\(sectionNumber) \(title)"
+    }
+
+    var menuIndent: CGFloat {
+        guard sectionNumber.contains(".") else { return 0 }
+        let depth = max(0, sectionNumber.split(separator: ".").count - 1)
+        return CGFloat(min(depth, 3)) * 14
     }
 
     var scrollTarget: String {

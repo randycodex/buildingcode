@@ -175,27 +175,7 @@ struct BrowseView: View {
     private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 14) {
             if library.comparisonModeEnabled {
-                CodeEyebrow(text: browserContext.displayName, accent: accentColor)
-            }
-
-            if library.comparisonModeEnabled {
                 Menu {
-                    ForEach(BrowserContextID.allCases) { context in
-                        Button {
-                            library.requestBrowserTabSwitch(to: context)
-                        } label: {
-                            codeSectionPickerLabel(context.displayName, isSelected: context == browserContext)
-                        }
-                    }
-
-                    Divider()
-
-                    Button {
-                        updateCodeSection(nil)
-                    } label: {
-                        codeSectionPickerLabel("All Sections", isSelected: browseCodeSectionID == nil)
-                    }
-
                     ForEach(library.codeSections) { codeSection in
                         Button {
                             updateCodeSection(codeSection.id)
@@ -1099,11 +1079,15 @@ struct CodeMetaBadge: View {
     var body: some View {
         Text(text)
             .font(.caption.weight(.medium))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(accent)
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
-            .background(Color(uiColor: .tertiarySystemGroupedBackground))
+            .background(accent.opacity(0.14))
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(accent.opacity(0.28), lineWidth: 0.75)
+            )
     }
 }
 

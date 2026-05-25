@@ -14,15 +14,6 @@ struct SettingsView: View {
         min(max(-scrollOffset / 64, 0), 1)
     }
 
-    private static let buildTimestamp: String = {
-        let executableURL = Bundle.main.executableURL
-            ?? Bundle.main.bundleURL.appendingPathComponent("NYCCCApp")
-        let date = (try? FileManager.default.attributesOfItem(atPath: executableURL.path)[.modificationDate] as? Date) ?? Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        return formatter.string(from: date)
-    }()
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -88,11 +79,6 @@ struct SettingsView: View {
                             .padding(.horizontal, 6)
                     }
 
-                    Text("Build: \(Self.buildTimestamp)")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 4)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 18)
@@ -342,10 +328,6 @@ struct SettingsView: View {
     private var savedDataTools: some View {
         VStack(alignment: .leading, spacing: 14) {
             CodeEyebrow(text: "Saved Data", accent: accentColor)
-
-            Text("The app only persists your recent searches, reader settings, and the `user_data.sqlite` file used for bookmarks and notes.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
 
             settingsDangerButton(
                 title: "Clear Recent Searches",

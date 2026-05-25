@@ -263,12 +263,12 @@ struct SearchView: View {
                 }
 
                 Text(result.displayTitle)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
+                    .foregroundStyle(resultAccent)
                     .multilineTextAlignment(.leading)
 
                 Text(result.snippet)
-                    .font(.footnote)
+                    .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(4)

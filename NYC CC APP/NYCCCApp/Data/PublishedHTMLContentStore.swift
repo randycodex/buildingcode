@@ -256,7 +256,7 @@ final class PublishedHTMLContentStore {
     }
 
     private static func parseAnchors(in html: String) -> [String: PublishedHTMLAnchor] {
-        let pattern = #"<div\s+id="([^"]+)"[^>]*class="([^"]*(?:Subarticle|Section|Subsection)[^"]*)"[^>]*>.*?<h6[^>]*>(.*?)</h6>"#
+        let pattern = #"<div\s+id="([^"]+)"[^>]*class="([^"]*(?:Article|Subarticle|Section|Subsection)[^"]*)"[^>]*>.*?<h6[^>]*>(.*?)</h6>"#
         guard let expression = try? NSRegularExpression(
             pattern: pattern,
             options: [.caseInsensitive, .dotMatchesLineSeparators]
@@ -327,29 +327,40 @@ final class PublishedHTMLContentStore {
 
         if let sectionMatch = firstMatch(
             in: heading,
-            pattern: #"^Section\s+BC\s+([A-Z0-9.]+):\s*(.+)$"#
+            pattern: #"^Section\s+(BC|MC|PC|FGC)\s+([A-Z0-9.-]+):\s*(.+)$"#
         ) {
             return (
-                sectionNumber: sectionMatch[1],
-                title: "Section BC \(sectionMatch[1]): \(sectionMatch[2])",
+                sectionNumber: sectionMatch[2],
+                title: "Section \(sectionMatch[1]) \(sectionMatch[2]): \(sectionMatch[3])",
                 level: 2
             )
         }
 
         if let sectionMatch = firstMatch(
             in: heading,
-            pattern: #"^#--\s*Section\s+BC\s+([A-Z0-9.]+):\s*(.+)$"#
+            pattern: #"^#--\s*Section\s+(BC|MC|PC|FGC)\s+([A-Z0-9.-]+):\s*(.+)$"#
         ) {
             return (
-                sectionNumber: sectionMatch[1],
-                title: "Section BC \(sectionMatch[1]): \(sectionMatch[2])",
+                sectionNumber: sectionMatch[2],
+                title: "Section \(sectionMatch[1]) \(sectionMatch[2]): \(sectionMatch[3])",
+                level: 2
+            )
+        }
+
+        if let articleMatch = firstMatch(
+            in: heading,
+            pattern: #"^(?:#--\s*)?Article\s+([A-Z0-9.-]+):\s*(.+)$"#
+        ) {
+            return (
+                sectionNumber: articleMatch[1],
+                title: "Article \(articleMatch[1]): \(articleMatch[2])",
                 level: 2
             )
         }
 
         if let titleMatch = firstMatch(
             in: heading,
-            pattern: #"^([A-Z0-9]+(?:\.[A-Z0-9]+)*)\s+(.+)$"#
+            pattern: #"^(?:§\s*)?([A-Z0-9]+(?:[-.][A-Z0-9]+)*)\s+(.+)$"#
         ) {
             return (
                 sectionNumber: titleMatch[1],
@@ -360,7 +371,7 @@ final class PublishedHTMLContentStore {
 
         guard let titleMatch = firstMatch(
             in: heading,
-            pattern: #"^(#-{3,})\s*([A-Z0-9]+(?:\.[A-Z0-9]+)*)\s+(.+)$"#
+            pattern: #"^(#-{3,})\s*(?:§\s*)?([A-Z0-9]+(?:[-.][A-Z0-9]+)*)\s+(.+)$"#
         ) else {
             return nil
         }

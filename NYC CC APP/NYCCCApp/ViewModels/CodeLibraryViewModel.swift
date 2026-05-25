@@ -704,7 +704,11 @@ final class CodeLibraryViewModel: ObservableObject {
             return cached
         }
         if let authoredCodeStore {
-            let detail = authoredCodeStore.sectionDetail(sectionID: sectionID)
+            // Move the synchronous JSON read off the MainActor so the
+            // scroll/layout thread stays responsive while details warm.
+            let detail = await Task.detached(priority: .userInitiated) {
+                authoredCodeStore.sectionDetail(sectionID: sectionID)
+            }.value
             if let detail {
                 storeSectionDetailInCache(detail, sectionID: sectionID)
             }
@@ -749,21 +753,27 @@ final class CodeLibraryViewModel: ObservableObject {
     func loadSectionDetailsAsync(sectionIDs: [Int64]) async -> [ReaderSectionDetail] {
         guard !sectionIDs.isEmpty else { return [] }
 
-        if authoredCodeStore != nil {
-            return await sectionIDs.asyncCompactMap { sectionID in
-                await loadSectionDetailAsync(sectionID: sectionID)
-            }
-        }
-
         var orderedDetails: [Int64: ReaderSectionDetail] = [:]
         var missingIDs: [Int64] = []
-
         for sectionID in sectionIDs {
             if let cached = cachedSectionDetail(for: sectionID) {
                 orderedDetails[sectionID] = cached
             } else {
                 missingIDs.append(sectionID)
             }
+        }
+
+        if let authoredCodeStore, !missingIDs.isEmpty {
+            // Pull all missing details in a single detached batch so we only pay
+            // one MainActor hop per chapter open instead of N.
+            let loaded = await Task.detached(priority: .userInitiated) { () -> [ReaderSectionDetail] in
+                missingIDs.compactMap { authoredCodeStore.sectionDetail(sectionID: $0) }
+            }.value
+            for detail in loaded {
+                storeSectionDetailInCache(detail, sectionID: detail.id)
+                orderedDetails[detail.id] = detail
+            }
+            return sectionIDs.compactMap { orderedDetails[$0] }
         }
 
         if !missingIDs.isEmpty, let sqliteChapterLoader {
@@ -1589,26 +1599,3 @@ private final class CachedReaderSectionDetail: NSObject {
     }
 }
 
-private extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        guard size > 0 else { return [self] }
-        return stride(from: 0, to: count, by: size).map { start in
-            Array(self[start..<Swift.min(start + size, count)])
-        }
-    }
-
-    func asyncCompactMap<T>(
-        _ transform: (Element) async -> T?
-    ) async -> [T] {
-        var results: [T] = []
-        results.reserveCapacity(count)
-
-        for element in self {
-            if let transformed = await transform(element) {
-                results.append(transformed)
-            }
-        }
-
-        return results
-    }
-}
