@@ -33,112 +33,80 @@ struct NYCCCApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                TabView(selection: $selectedTab) {
-                    BrowseView(browserContext: .primary)
+            TabView(selection: $selectedTab) {
+                BrowseView(browserContext: .primary)
+                    .tabItem {
+                        Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                        Text("")
+                    }
+                    .tag(AppTab.browse)
+
+                if library.comparisonModeEnabled {
+                    DeferredBrowseTabView(
+                        browserContext: .secondary,
+                        isActive: selectedTab == .browseSecondary
+                    )
                         .tabItem {
-                            Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                            Image(systemName: "text.line.last.and.arrowtriangle.forward")
                             Text("")
                         }
-                        .tag(AppTab.browse)
+                        .tag(AppTab.browseSecondary)
+                }
 
-                    if library.comparisonModeEnabled {
-                        DeferredBrowseTabView(
-                            browserContext: .secondary,
-                            isActive: selectedTab == .browseSecondary
-                        )
-                            .tabItem {
-                                Image(systemName: "text.line.last.and.arrowtriangle.forward")
-                                Text("")
-                            }
-                            .tag(AppTab.browseSecondary)
+                SearchView()
+                    .tabItem {
+                        Image(systemName: "sparkle.magnifyingglass")
+                        Text("")
                     }
+                    .tag(AppTab.search)
 
-                    SearchView()
-                        .tabItem {
-                            Image(systemName: "sparkle.magnifyingglass")
-                            Text("")
-                        }
-                        .tag(AppTab.search)
-
-                    BookmarksView()
-                        .tabItem {
-                            Image(systemName: selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
-                            Text("")
-                        }
-                        .tag(AppTab.bookmarks)
-
-                    SettingsView()
-                        .tabItem {
-                            Image(systemName: selectedTab == .settings ? "gearshape.fill" : "gearshape")
-                            Text("")
-                        }
-                        .tag(AppTab.settings)
-                }
-                .environmentObject(library)
-                .tint(Color(uiColor: library.accentColor()))
-                .onChange(of: library.comparisonModeEnabled) { _, isEnabled in
-                    if !isEnabled, selectedTab == .browseSecondary {
-                        selectedTab = .browse
+                BookmarksView()
+                    .tabItem {
+                        Image(systemName: selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
+                        Text("")
                     }
-                }
-                .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
-                    guard let requestedContext else { return }
-                    selectedTab = requestedContext == .primary ? .browse : .browseSecondary
-                    library.browserTabSwitchRequest = nil
-                }
-                .onChange(of: selectedTab) { _, newTab in
-                    switch newTab {
-                    case .browse:
-                        library.syncSelectedCodeSection(from: .primary)
-                    case .browseSecondary:
-                        library.syncSelectedCodeSection(from: .secondary)
-                    default:
-                        break
-                    }
-                }
-                .onAppear {
-                    switch selectedTab {
-                    case .browse:
-                        library.syncSelectedCodeSection(from: .primary)
-                    case .browseSecondary:
-                        library.syncSelectedCodeSection(from: .secondary)
-                    default:
-                        break
-                    }
-                }
-                .id(library.comparisonModeEnabled)
+                    .tag(AppTab.bookmarks)
 
-                if !library.isInitialContentLoaded {
-                    loadingOverlay
-                        .transition(.opacity)
+                SettingsView()
+                    .tabItem {
+                        Image(systemName: selectedTab == .settings ? "gearshape.fill" : "gearshape")
+                        Text("")
+                    }
+                    .tag(AppTab.settings)
+            }
+            .environmentObject(library)
+            .tint(Color(uiColor: library.accentColor()))
+            .onChange(of: library.comparisonModeEnabled) { _, isEnabled in
+                if !isEnabled, selectedTab == .browseSecondary {
+                    selectedTab = .browse
                 }
             }
-            .animation(.easeInOut(duration: 0.2), value: library.isInitialContentLoaded)
-        }
-    }
-
-    private var loadingOverlay: some View {
-        ZStack {
-            Color(uiColor: .systemGroupedBackground)
-                .ignoresSafeArea()
-
-            VStack(spacing: 16) {
-                ProgressView()
-                    .controlSize(.large)
-                    .tint(Color(uiColor: library.accentColor()))
-
-                VStack(spacing: 4) {
-                    Text("Loading chapters")
-                        .font(.headline)
-                        .foregroundStyle(.primary)
-
-                    Text("Preparing the current code version")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+            .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
+                guard let requestedContext else { return }
+                selectedTab = requestedContext == .primary ? .browse : .browseSecondary
+                library.browserTabSwitchRequest = nil
+            }
+            .onChange(of: selectedTab) { _, newTab in
+                switch newTab {
+                case .browse:
+                    library.syncSelectedCodeSection(from: .primary)
+                case .browseSecondary:
+                    library.syncSelectedCodeSection(from: .secondary)
+                default:
+                    break
                 }
             }
-            .padding(24)
+            .onAppear {
+                switch selectedTab {
+                case .browse:
+                    library.syncSelectedCodeSection(from: .primary)
+                case .browseSecondary:
+                    library.syncSelectedCodeSection(from: .secondary)
+                default:
+                    break
+                }
+            }
+            .id(library.comparisonModeEnabled)
         }
     }
 

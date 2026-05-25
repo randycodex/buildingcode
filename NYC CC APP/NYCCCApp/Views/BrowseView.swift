@@ -24,7 +24,7 @@ struct BrowseView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if library.availableVersions.isEmpty {
+                if library.availableVersions.isEmpty && library.isInitialContentLoaded {
                     CodeEmptyStateCard(
                         title: "No Code Content",
                         systemImage: "books.vertical",
@@ -34,6 +34,10 @@ struct BrowseView: View {
                     .padding(20)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+                } else if library.availableVersions.isEmpty {
+                    // Content is still loading — show nothing rather than flashing
+                    // an empty-state card for the ~20 ms the async load takes.
+                    Color(uiColor: .systemGroupedBackground).ignoresSafeArea()
                 } else {
                     browseContent
                         .onAppear {
