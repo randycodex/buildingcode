@@ -3,15 +3,17 @@ import SwiftUI
 struct CodeSectionMultiFilterChips: View {
     let sections: [CodeSectionCategory]
     @Binding var selectedIDs: Set<Int64>
-    let defaultAccent: Color
     let accentForSection: (Int64) -> Color
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
+                // The "All" chip uses a neutral grey rather than the library's
+                // accent so it reads as a non-state (no code section picked),
+                // matching how the All Tags chip behaves on the Saved screen.
                 filterChip(
                     title: "All",
-                    accent: defaultAccent,
+                    accent: Color.secondary,
                     isSelected: selectedIDs.isEmpty
                 ) {
                     selectedIDs = []

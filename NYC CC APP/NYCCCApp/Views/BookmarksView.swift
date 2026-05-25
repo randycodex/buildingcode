@@ -85,7 +85,9 @@ struct BookmarksView: View {
                     }
                     .padding(.horizontal, contentHorizontalInset)
                     .padding(.top, 10)
-                    .padding(.bottom, 22)
+                    // Mirrors the Search dock; sits flush above the floating
+                    // tab bar pill instead of leaving a tall solid strip.
+                    .padding(.bottom, 6)
                     .background(bottomDock)
                 }
             }
@@ -200,7 +202,6 @@ struct BookmarksView: View {
         CodeSectionMultiFilterChips(
             sections: availableFilterSections,
             selectedIDs: $savedFilterCodeSectionIDs,
-            defaultAccent: accentColor,
             accentForSection: { bookmarkAccentColor(for: $0) }
         )
     }

@@ -10,6 +10,7 @@ struct SearchView: View {
     @State private var cachedFilteredResults: [CodeSearchResult] = []
     @State private var cachedGroupedResults: [SearchResultGroup] = []
     @State private var cachedJumpBackInPages: [JumpBackInPage] = []
+    @State private var jumpBackInPageIndex: Int = 0
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let filterCodeSectionIDsDefaultsKey = "SearchView.filterCodeSectionIDs"
@@ -96,7 +97,9 @@ struct SearchView: View {
                 }
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 10)
-                .padding(.bottom, 22)
+                // Sits right above the floating tab bar pill — the solid dock
+                // edge now lines up with the tab bar's top, no large gap.
+                .padding(.bottom, 6)
                 .background(bottomSearchDock)
             }
             .background {
@@ -220,7 +223,6 @@ struct SearchView: View {
         CodeSectionMultiFilterChips(
             sections: library.codeSections,
             selectedIDs: $searchFilterCodeSectionIDs,
-            defaultAccent: accentColor,
             accentForSection: { Color(uiColor: library.accentColor(for: $0)) }
         )
     }
@@ -330,27 +332,46 @@ struct SearchView: View {
     }
 
     private var jumpBackInTabViewHeight: CGFloat {
-        let tallestGrid = cachedJumpBackInPages
+        cachedJumpBackInPages
             .map { jumpBackInGridHeight(for: $0.entries) }
             .max() ?? jumpBackInTileOuterHeight
-        let pageDotsHeight: CGFloat = cachedJumpBackInPages.count > 1 ? 28 : 0
-        return tallestGrid + pageDotsHeight
     }
 
     private var recentlyViewedSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             searchHistorySectionHeader("Jump Back In")
 
-            TabView {
-                ForEach(cachedJumpBackInPages) { page in
+            TabView(selection: $jumpBackInPageIndex) {
+                ForEach(Array(cachedJumpBackInPages.enumerated()), id: \.element.id) { index, page in
                     jumpBackInPageGrid(page.entries)
-                        .frame(height: jumpBackInGridHeight(for: page.entries), alignment: .top)
-                        .padding(.horizontal, 1)
+                        // Pin partial pages (1–3 tiles on the final page) to
+                        // the top-leading corner so the lone tile doesn't
+                        // float to the middle of the TabView's frame.
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .tag(index)
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: cachedJumpBackInPages.count > 1 ? .automatic : .never))
+            // Render our own dots below so they don't overlap the tiles.
+            .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height: jumpBackInTabViewHeight)
+
+            if cachedJumpBackInPages.count > 1 {
+                jumpBackInPageDots
+            }
         }
+    }
+
+    private var jumpBackInPageDots: some View {
+        HStack(spacing: 6) {
+            ForEach(cachedJumpBackInPages.indices, id: \.self) { index in
+                Circle()
+                    .fill(index == jumpBackInPageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
+                    .frame(width: 6, height: 6)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.top, 4)
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
