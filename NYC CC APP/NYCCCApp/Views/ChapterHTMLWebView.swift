@@ -373,7 +373,16 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     setCollapsed(sectionHeading, false);
                   }
                 }
-                return card || target;
+                // Return the actual anchor target so scrollIntoView lands on
+                // the specific subsection the user asked for. Returning the
+                // card (which always begins at the parent .Section heading)
+                // would scroll several subsections above the bookmark.
+                // Only fall back to the card when the anchor IS the .Section
+                // heading at the card root.
+                if (target.classList && target.classList.contains('Section')) {
+                  return card || target;
+                }
+                return target;
               };
 
               buildSectionCards();
