@@ -10,6 +10,9 @@ struct BookmarksView: View {
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private let tabBarClearance: CGFloat = 104
     private let contentHorizontalInset: CGFloat = 16
+    /// Matches `SearchView.dockContentMinHeight` so the two bottom docks
+    /// look identical above the floating tab bar regardless of filter rows.
+    private let dockContentMinHeight: CGFloat = 86
 
     init() {
         _savedFilterCodeSectionIDs = State(
@@ -83,6 +86,7 @@ struct BookmarksView: View {
                             tagFilterControl
                         }
                     }
+                    .frame(minHeight: dockContentMinHeight, alignment: .bottom)
                     .padding(.horizontal, contentHorizontalInset)
                     .padding(.top, 10)
                     // Mirrors the Search dock; sits flush above the floating

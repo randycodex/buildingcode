@@ -17,6 +17,10 @@ struct SearchView: View {
     private let contentHorizontalInset: CGFloat = 16
     private let tabBarClearance: CGFloat = 168
     private let jumpBackInPageSize = 4
+    /// Shared with `BookmarksView` so both docks occupy the same vertical
+    /// real estate above the floating tab bar regardless of how many filter
+    /// rows are present.
+    private let dockContentMinHeight: CGFloat = 86
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -95,6 +99,7 @@ struct SearchView: View {
                     }
                     searchField
                 }
+                .frame(minHeight: dockContentMinHeight, alignment: .bottom)
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 10)
                 // Sits right above the floating tab bar pill — the solid dock
@@ -391,10 +396,18 @@ struct SearchView: View {
     private func jumpBackInTileRow(_ entries: [RecentlyViewedEntry]) -> some View {
         HStack(alignment: .top, spacing: 8) {
             ForEach(entries) { entry in
-                NavigationLink(value: entry.sectionID) {
-                    recentlyViewedTile(entry)
+                ZStack(alignment: .topTrailing) {
+                    NavigationLink(value: entry.sectionID) {
+                        recentlyViewedTile(entry)
+                    }
+                    .buttonStyle(.plain)
+
+                    // Bookmark toggle pinned to the tile's top-right corner.
+                    // Sits OUTSIDE the NavigationLink so its own tap region
+                    // is consumed before navigation triggers.
+                    jumpBackInBookmarkButton(for: entry)
+                        .padding(6)
                 }
-                .buttonStyle(.plain)
             }
 
             if entries.count == 1 {
@@ -404,6 +417,23 @@ struct SearchView: View {
                     .accessibilityHidden(true)
             }
         }
+    }
+
+    private func jumpBackInBookmarkButton(for entry: RecentlyViewedEntry) -> some View {
+        let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
+        let isBookmarked = library.isBookmarked(sectionID: entry.sectionID)
+        return Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            library.toggleBookmark(sectionID: entry.sectionID)
+        } label: {
+            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(isBookmarked ? tileAccent : Color.secondary.opacity(0.7))
+                .frame(width: 28, height: 28)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(isBookmarked ? "Remove bookmark" : "Bookmark section")
     }
 
     private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
