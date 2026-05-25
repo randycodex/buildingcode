@@ -37,6 +37,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
     @Published private(set) var searchTabRetapCount = 0
     @Published private(set) var bookmarks: [BookmarkedSection] = []
+    @Published private(set) var exportState: BookmarkExportState = .idle
     @Published private(set) var folders: [CodeFolder] = []
     /// sectionID → ordered list of folderIDs containing that section. Cached
     /// up front so the Reader and Saved screens don't make per-section DB
@@ -95,6 +96,7 @@ final class CodeLibraryViewModel: ObservableObject {
     // concurrently because cancelling the outer Task does not propagate to a
     // detached child.
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
+    private var activeExportTask: Task<Void, Never>?
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
     private var pendingTabAssertionToken: Int = 0
@@ -1239,6 +1241,101 @@ final class CodeLibraryViewModel: ObservableObject {
         return folders.filter { memberIDs.contains($0.id) }
     }
 
+    // MARK: - PDF export
+
+    /// Kicks off an async PDF build for the supplied subset of bookmarks.
+    /// The caller (BookmarksView) decides what to pass — e.g. the currently
+    /// filtered list, all bookmarks, or one folder's contents. State
+    /// transitions via `exportState`; the view subscribes for progress
+    /// and the final URL.
+    func startBookmarkExport(
+        bookmarks selection: [BookmarkedSection],
+        contextLabel: String?
+    ) {
+        guard !selection.isEmpty else {
+            exportState = .failed("No saved sections to export.")
+            return
+        }
+        activeExportTask?.cancel()
+        exportState = .building(progress: 0, sectionTitle: "Preparing…")
+
+        let codeSectionNameMap: [Int64: String] = Dictionary(
+            uniqueKeysWithValues: codeSections.map { ($0.id, $0.name) }
+        )
+        let codeVersionLabel = selectedVersion.map { Self.displayName(forLibraryName: $0.codeVersion) }
+            ?? "NYC Construction Codes"
+
+        // Snapshot bookmarks + lookup so the detached body has no
+        // MainActor-isolated references.
+        let bookmarksSnapshot = selection
+        let context = contextLabel
+
+        // We need an MainActor-safe loader that the detached builder can
+        // invoke. loadSectionDetailAsync hops through Task.detached inside
+        // already, so this hop is cheap.
+        let loader: @Sendable (Int64) async -> String? = { [weak self] sectionID in
+            guard let self else { return nil }
+            let detail = await self.loadSectionDetailAsync(sectionID: sectionID)
+            return detail?.officialText
+        }
+
+        activeExportTask = Task { [weak self] in
+            let builder = BookmarkExportBuilder(
+                bookmarks: bookmarksSnapshot,
+                codeSectionNames: codeSectionNameMap,
+                metadata: .init(
+                    codeVersionLabel: codeVersionLabel,
+                    exportContext: context,
+                    exportDate: Date()
+                ),
+                loadFullBody: loader,
+                onProgress: { current, total in
+                    guard let self else { return }
+                    let progress = Double(current) / Double(max(total, 1))
+                    let title = bookmarksSnapshot.indices.contains(current - 1)
+                        ? bookmarksSnapshot[current - 1].displayTitle
+                        : "Building PDF…"
+                    await MainActor.run {
+                        self.exportState = .building(progress: progress, sectionTitle: title)
+                    }
+                }
+            )
+            do {
+                let url = try await Task.detached(priority: .userInitiated) {
+                    try await builder.build()
+                }.value
+                await MainActor.run {
+                    self?.exportState = .ready(url: url, sectionCount: bookmarksSnapshot.count)
+                }
+            } catch is CancellationError {
+                await MainActor.run { self?.exportState = .idle }
+            } catch let error as BookmarkExportBuilder.BuildError {
+                await MainActor.run {
+                    self?.exportState = .failed(error.localizedDescription)
+                }
+            } catch {
+                await MainActor.run {
+                    self?.exportState = .failed(error.localizedDescription)
+                }
+            }
+        }
+    }
+
+    /// Cancels an in-flight export. The progress sheet uses this when the
+    /// user taps Cancel.
+    func cancelBookmarkExport() {
+        activeExportTask?.cancel()
+        activeExportTask = nil
+        exportState = .idle
+    }
+
+    /// Resets export state after the share sheet dismisses so the sheet
+    /// won't be re-presented by SwiftUI on the next state change.
+    func clearBookmarkExportState() {
+        activeExportTask = nil
+        exportState = .idle
+    }
+
     /// Wipes every folder + membership row. Wired into the existing Settings
     /// clear-data flow so users can reset their organization without losing
     /// the underlying bookmarks.
@@ -2002,5 +2099,15 @@ private final class CachedReaderSectionDetail: NSObject {
     init(_ detail: ReaderSectionDetail) {
         self.detail = detail
     }
+}
+
+/// State machine driving the Saved screen's PDF export flow.
+enum BookmarkExportState: Equatable {
+    case idle
+    /// `progress` in [0,1]; `sectionTitle` is the latest bookmark being
+    /// processed (so the progress sheet can show a meaningful subtitle).
+    case building(progress: Double, sectionTitle: String)
+    case ready(url: URL, sectionCount: Int)
+    case failed(String)
 }
 

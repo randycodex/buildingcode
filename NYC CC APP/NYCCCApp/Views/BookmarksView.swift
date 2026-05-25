@@ -8,6 +8,7 @@ struct BookmarksView: View {
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var selectedTagFilter: String? = nil
     @State private var folderEditorTarget: FolderEditorTarget?
+    @State private var isExportActionSheetPresented = false
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
@@ -131,6 +132,11 @@ struct BookmarksView: View {
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .modifier(BookmarkExportToolbarModifier(
+                hasBookmarks: !library.bookmarks.isEmpty,
+                isPresented: $isExportActionSheetPresented,
+                actionSheetButtons: { exportActionSheetButtons }
+            ))
             .onAppear {
                 library.refreshBookmarks()
             }
@@ -168,9 +174,122 @@ struct BookmarksView: View {
                     }
                 )
             }
+            .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         }
         .coordinateSpace(name: "savedScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
+    }
+
+    // MARK: - Export
+
+    /// Modal shown while the builder runs. Progress bar + cancel.
+    @ViewBuilder
+    private var exportProgressSheet: some View {
+        if case let .building(progress, sectionTitle) = library.exportState {
+            VStack(spacing: 20) {
+                ProgressView(value: progress)
+                    .tint(Color.appChrome)
+                    .padding(.horizontal, 24)
+
+                VStack(spacing: 4) {
+                    Text("Building PDF")
+                        .font(.headline)
+                    Text(sectionTitle)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+
+                Button(role: .cancel) {
+                    library.cancelBookmarkExport()
+                } label: {
+                    Text("Cancel")
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            Capsule().fill(Color.secondary.opacity(0.15))
+                        )
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 24)
+            }
+            .padding(.vertical, 32)
+            .presentationDetents([.height(220)])
+            .interactiveDismissDisabled()
+        }
+    }
+
+    /// Action-sheet buttons for the Export toolbar. Offers up to three
+    /// options: current filter (only if a filter is active and narrows
+    /// the list), all saved sections, and per-folder exports for each
+    /// existing project.
+    @ViewBuilder
+    private var exportActionSheetButtons: some View {
+        let filteredCount = filteredBookmarks.count
+        let totalCount = library.bookmarks.count
+        let isFiltered = filteredCount > 0 && filteredCount < totalCount
+
+        if isFiltered {
+            Button("Export current filter (\(filteredCount))") {
+                library.startBookmarkExport(
+                    bookmarks: filteredBookmarks,
+                    contextLabel: currentFilterContextLabel
+                )
+            }
+        }
+
+        Button("Export all saved (\(totalCount))") {
+            library.startBookmarkExport(
+                bookmarks: library.bookmarks,
+                contextLabel: nil
+            )
+        }
+
+        // Per-folder shortcuts only show when the folder has content;
+        // empty folders aren't useful as export targets.
+        ForEach(library.folders.filter { folderHasBookmarks($0) }) { folder in
+            Button("Export “\(folder.name)”") {
+                let folderBookmarks = library.bookmarks.filter { bookmark in
+                    Set(library.folderMembership[bookmark.id] ?? []).contains(folder.id)
+                }
+                library.startBookmarkExport(
+                    bookmarks: folderBookmarks,
+                    contextLabel: folder.name
+                )
+            }
+        }
+
+        Button("Cancel", role: .cancel) { }
+    }
+
+    private func folderHasBookmarks(_ folder: CodeFolder) -> Bool {
+        library.bookmarks.contains { bookmark in
+            Set(library.folderMembership[bookmark.id] ?? []).contains(folder.id)
+        }
+    }
+
+    /// Short label for the "Current filter" export so its PDF header shows
+    /// something meaningful instead of a blank context. Combines whichever
+    /// filter dimensions are active.
+    private var currentFilterContextLabel: String? {
+        var parts: [String] = []
+        if !savedFilterFolderIDs.isEmpty {
+            let names = library.folders
+                .filter { savedFilterFolderIDs.contains($0.id) }
+                .map(\.name)
+            if !names.isEmpty { parts.append("Projects: \(names.joined(separator: ", "))") }
+        }
+        if !savedFilterCodeSectionIDs.isEmpty {
+            let names = library.codeSections
+                .filter { savedFilterCodeSectionIDs.contains($0.id) }
+                .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
+            if !names.isEmpty { parts.append(names.joined(separator: ", ")) }
+        }
+        if let tag = selectedTagFilter {
+            parts.append("Tag: \(tag)")
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     private var bottomDock: some View {
@@ -469,6 +588,99 @@ private struct BookmarkChapterGroup: Identifiable {
     let items: [BookmarkedSection]
 
     var id: String { "\(codeSectionID.map(String.init) ?? "all")-\(chapterNumber)" }
+}
+
+/// Toolbar button + confirmation dialog. Lives in its own modifier so the
+/// parent view body stays inside the type-checker's tractable budget.
+private struct BookmarkExportToolbarModifier<Buttons: View>: ViewModifier {
+    let hasBookmarks: Bool
+    @Binding var isPresented: Bool
+    @ViewBuilder var actionSheetButtons: () -> Buttons
+
+    func body(content: Content) -> some View {
+        content
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isPresented = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color.appChrome)
+                    }
+                    .disabled(!hasBookmarks)
+                    .accessibilityLabel("Export saved sections as PDF")
+                }
+            }
+            .confirmationDialog(
+                "Export saved sections",
+                isPresented: $isPresented,
+                titleVisibility: .visible
+            ) {
+                actionSheetButtons()
+            }
+    }
+}
+
+/// Hoists the three export-related modal modifiers out of BookmarksView's
+/// body so SwiftUI's compile-time type checker doesn't choke on the long
+/// modifier chain. Behaviorally identical to inlining the modifiers.
+private struct BookmarkExportModifier<Progress: View>: ViewModifier {
+    @ObservedObject var library: CodeLibraryViewModel
+    @ViewBuilder var progressSheet: () -> Progress
+
+    private var isBuilding: Bool {
+        if case .building = library.exportState { return true }
+        return false
+    }
+
+    private var isReady: Bool {
+        if case .ready = library.exportState { return true }
+        return false
+    }
+
+    private var failureMessage: String? {
+        if case .failed(let message) = library.exportState { return message }
+        return nil
+    }
+
+    private var readyURL: URL? {
+        if case .ready(let url, _) = library.exportState { return url }
+        return nil
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: Binding(
+                get: { isBuilding },
+                set: { if !$0 { library.cancelBookmarkExport() } }
+            )) {
+                progressSheet()
+            }
+            .sheet(isPresented: Binding(
+                get: { isReady },
+                set: { if !$0 { library.clearBookmarkExportState() } }
+            )) {
+                if let url = readyURL {
+                    BookmarkExportShareSheet(fileURL: url) {
+                        library.clearBookmarkExportState()
+                    }
+                    .ignoresSafeArea()
+                }
+            }
+            .alert(
+                "Export failed",
+                isPresented: Binding(
+                    get: { failureMessage != nil },
+                    set: { _ in library.clearBookmarkExportState() }
+                ),
+                presenting: failureMessage
+            ) { _ in
+                Button("OK", role: .cancel) { library.clearBookmarkExportState() }
+            } message: { message in
+                Text(message)
+            }
+    }
 }
 
 #if DEBUG
