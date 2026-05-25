@@ -64,14 +64,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         if context.coordinator.loadedURL != chapterURL {
             context.coordinator.loadedURL = chapterURL
             context.coordinator.pendingAnchorID = targetAnchorID
-            if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
-                webView.loadHTMLString(
-                    HTMLAssetPathResolver.normalizeSharedAssetPaths(in: html),
-                    baseURL: readAccessURL
-                )
-            } else {
-                webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
-            }
+            // Load off the main thread: reading a multi-MB HTML file and
+            // running normalizeSharedAssetPaths synchronously in updateUIView
+            // blocks the UI for the entire duration of the file read.
+            context.coordinator.loadHTMLAsync(
+                chapterURL: chapterURL,
+                readAccessURL: readAccessURL,
+                into: webView
+            )
             return
         }
 
@@ -120,6 +120,26 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
+        private var htmlLoadTask: Task<Void, Never>?
+
+        func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
+            htmlLoadTask?.cancel()
+            htmlLoadTask = Task.detached(priority: .userInitiated) { [weak self, weak webView] in
+                guard let self, let webView else { return }
+                if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
+                    let normalized = HTMLAssetPathResolver.normalizeSharedAssetPaths(in: html)
+                    guard !Task.isCancelled else { return }
+                    await MainActor.run {
+                        webView.loadHTMLString(normalized, baseURL: readAccessURL)
+                    }
+                } else {
+                    guard !Task.isCancelled else { return }
+                    await MainActor.run {
+                        webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
+                    }
+                }
+            }
+        }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             applyReaderScripts(to: webView)
