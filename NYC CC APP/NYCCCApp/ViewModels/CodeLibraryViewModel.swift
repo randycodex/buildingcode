@@ -222,6 +222,11 @@ final class CodeLibraryViewModel: ObservableObject {
         } else {
             UserDefaults.standard.removeObject(forKey: selectedCodeSectionDefaultsKey)
         }
+        // Keep the primary browser context in sync so BrowseView always opens
+        // on the section chosen here when comparison mode is off.
+        if !comparisonModeEnabled {
+            BrowserContextID.persistCodeSectionID(id, for: .primary)
+        }
         guard let authoredCodeStore else { return }
         codeSections = authoredCodeStore.codeSections()
         chapters = authoredCodeStore.chapters(codeSectionID: id)

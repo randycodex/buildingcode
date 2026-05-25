@@ -306,9 +306,18 @@ struct BrowseView: View {
 
         switch browserContext {
         case .primary:
-            browseCodeSectionID = stored
-                ?? library.selectedCodeSectionID
-                ?? library.codeSections.first?.id
+            // When comparison mode is off the primary browser should always
+            // reflect the code section chosen in Settings. The per-context
+            // stored value is only authoritative during comparison sessions.
+            if library.comparisonModeEnabled {
+                browseCodeSectionID = stored
+                    ?? library.selectedCodeSectionID
+                    ?? library.codeSections.first?.id
+            } else {
+                browseCodeSectionID = library.selectedCodeSectionID
+                    ?? stored
+                    ?? library.codeSections.first?.id
+            }
         case .secondary:
             let primarySectionID = BrowserContextID.storedCodeSectionID(for: .primary)
                 ?? library.selectedCodeSectionID
@@ -318,9 +327,7 @@ struct BrowseView: View {
                 ?? primarySectionID
         }
 
-        if stored == nil {
-            BrowserContextID.persistCodeSectionID(browseCodeSectionID, for: browserContext)
-        }
+        BrowserContextID.persistCodeSectionID(browseCodeSectionID, for: browserContext)
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {
