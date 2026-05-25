@@ -124,17 +124,17 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
             htmlLoadTask?.cancel()
-            htmlLoadTask = Task.detached(priority: .userInitiated) { [weak self, weak webView] in
-                guard let self, let webView else { return }
+            htmlLoadTask = Task.detached(priority: .userInitiated) { [weak webView] in
+                guard let webView else { return }
                 if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
                     let normalized = HTMLAssetPathResolver.normalizeSharedAssetPaths(in: html)
                     guard !Task.isCancelled else { return }
-                    await MainActor.run {
+                    await MainActor.run { () -> Void in
                         webView.loadHTMLString(normalized, baseURL: readAccessURL)
                     }
                 } else {
                     guard !Task.isCancelled else { return }
-                    await MainActor.run {
+                    await MainActor.run { () -> Void in
                         webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
                     }
                 }

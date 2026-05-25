@@ -270,7 +270,7 @@ final class CodeLibraryViewModel: ObservableObject {
     /// list. Names not in this table fall back to alphabetical order at the
     /// end. Matching is case-insensitive and tolerates "Code"/"Codes" suffixes
     /// or jurisdiction prefixes (e.g. "NYC Building Code").
-    private static let codeSectionOrderKeywords: [String] = [
+    nonisolated private static let codeSectionOrderKeywords: [String] = [
         "general administrative",
         "building",
         "fuel gas",
@@ -278,7 +278,7 @@ final class CodeLibraryViewModel: ObservableObject {
         "plumbing"
     ]
 
-    static func codeSectionOrderRank(forName name: String) -> Int {
+    nonisolated static func codeSectionOrderRank(forName name: String) -> Int {
         let lowered = name.lowercased()
         for (index, keyword) in codeSectionOrderKeywords.enumerated() {
             if lowered.contains(keyword) { return index }
@@ -286,7 +286,7 @@ final class CodeLibraryViewModel: ObservableObject {
         return Int.max
     }
 
-    static func sortedCodeSections(_ sections: [CodeSectionCategory]) -> [CodeSectionCategory] {
+    nonisolated static func sortedCodeSections(_ sections: [CodeSectionCategory]) -> [CodeSectionCategory] {
         sections.sorted { lhs, rhs in
             let lhsRank = codeSectionOrderRank(forName: lhs.name)
             let rhsRank = codeSectionOrderRank(forName: rhs.name)
@@ -1432,7 +1432,7 @@ final class CodeLibraryViewModel: ObservableObject {
         // the user's first keystroke. The work runs on a detached task so it
         // doesn't compete with the chapter preload already in flight.
         await Task.detached(priority: .background) {
-            _ = store.warmSearchIndex()
+            store.warmSearchIndex()
         }.value
     }
 
