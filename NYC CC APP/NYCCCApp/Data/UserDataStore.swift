@@ -68,6 +68,10 @@ final class UserDataStore {
             // Drop the section's tags too so they don't show as ghost
             // entries on the Saved tag filter after the bookmark is gone.
             try? clearTags(sectionID: sectionID, codeVersion: codeVersion)
+            // Also strip folder membership for the same reason — a project
+            // folder shouldn't keep referencing a section the user just
+            // unbookmarked.
+            try? removeSectionFromAllFolders(sectionID: sectionID, codeVersion: codeVersion)
             return
         }
 
@@ -184,6 +188,33 @@ final class UserDataStore {
 
             CREATE INDEX IF NOT EXISTS idx_bookmark_tags_lookup
                 ON bookmark_tags(code_version, tag);
+
+            CREATE TABLE IF NOT EXISTS folders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                code_version TEXT NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT NOT NULL DEFAULT '',
+                color_hex TEXT NOT NULL,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_folders_version
+                ON folders(code_version);
+
+            CREATE TABLE IF NOT EXISTS folder_sections (
+                folder_id INTEGER NOT NULL,
+                code_version TEXT NOT NULL,
+                section_id INTEGER NOT NULL,
+                added_at TEXT NOT NULL,
+                PRIMARY KEY(folder_id, section_id)
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_folder_sections_section
+                ON folder_sections(section_id, code_version);
+
+            CREATE INDEX IF NOT EXISTS idx_folder_sections_folder
+                ON folder_sections(folder_id);
             """
         )
     }
@@ -339,6 +370,18 @@ final class UserDataStore {
         try connection.bind(text: codeVersion, index: 1, to: tagWipe)
         _ = try connection.step(tagWipe)
 
+        // Folder membership references bookmarks. Wipe the junction so
+        // folders don't keep ghost section IDs after Clear Bookmarks.
+        let folderMembershipWipe = try connection.prepare(
+            """
+            DELETE FROM folder_sections
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(folderMembershipWipe) }
+        try connection.bind(text: codeVersion, index: 1, to: folderMembershipWipe)
+        _ = try connection.step(folderMembershipWipe)
+
         try vacuumIfNeeded()
     }
 
@@ -369,7 +412,269 @@ final class UserDataStore {
         try vacuumIfNeeded()
     }
 
+    // MARK: - Folders
+
+    /// All folders for a code version, ordered by sort_order then name.
+    func folders(codeVersion: String) throws -> [FolderRecord] {
+        let statement = try connection.prepare(
+            """
+            SELECT id, name, description, color_hex, sort_order, created_at
+            FROM folders
+            WHERE code_version = ?
+            ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+
+        var results: [FolderRecord] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            results.append(
+                FolderRecord(
+                    id: connection.int64(at: 0, in: statement),
+                    name: connection.string(at: 1, in: statement),
+                    description: connection.string(at: 2, in: statement),
+                    colorHex: connection.string(at: 3, in: statement),
+                    sortOrder: Int(connection.int64(at: 4, in: statement)),
+                    createdAt: connection.string(at: 5, in: statement)
+                )
+            )
+        }
+        return results
+    }
+
+    /// Returns sectionID → [folderID] for every folder membership in the
+    /// version. The view model uses this to render the Projects row in the
+    /// Reader without a per-section round trip.
+    func folderMembership(codeVersion: String) throws -> [Int64: [Int64]] {
+        let statement = try connection.prepare(
+            """
+            SELECT section_id, folder_id
+            FROM folder_sections
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+
+        var result: [Int64: [Int64]] = [:]
+        while try connection.step(statement) == SQLITE_ROW {
+            let sectionID = connection.int64(at: 0, in: statement)
+            let folderID = connection.int64(at: 1, in: statement)
+            result[sectionID, default: []].append(folderID)
+        }
+        return result
+    }
+
+    /// Returns sectionIDs that belong to a given folder, ordered by when
+    /// they were added (oldest first so the user's project reads forward).
+    func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64] {
+        let statement = try connection.prepare(
+            """
+            SELECT section_id
+            FROM folder_sections
+            WHERE folder_id = ? AND code_version = ?
+            ORDER BY added_at ASC;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, folderID)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+
+        var sectionIDs: [Int64] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            sectionIDs.append(connection.int64(at: 0, in: statement))
+        }
+        return sectionIDs
+    }
+
+    @discardableResult
+    func createFolder(
+        name: String,
+        description: String,
+        colorHex: String,
+        codeVersion: String
+    ) throws -> Int64 {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            throw NSError(
+                domain: "UserDataStore",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Folder name cannot be empty."]
+            )
+        }
+
+        // sort_order = max(existing) + 1 so new folders land at the end of
+        // the list until the user reorders.
+        let nextSortOrder: Int = {
+            guard let stmt = try? connection.prepare(
+                "SELECT COALESCE(MAX(sort_order), -1) FROM folders WHERE code_version = ?;"
+            ) else { return 0 }
+            defer { connection.finalize(stmt) }
+            try? connection.bind(text: codeVersion, index: 1, to: stmt)
+            return ((try? connection.step(stmt)) == SQLITE_ROW)
+                ? Int(connection.int64(at: 0, in: stmt)) + 1
+                : 0
+        }()
+
+        let statement = try connection.prepare(
+            """
+            INSERT INTO folders (code_version, name, description, color_hex, sort_order, created_at)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        try connection.bind(text: trimmedName, index: 2, to: statement)
+        try connection.bind(text: description, index: 3, to: statement)
+        try connection.bind(text: colorHex, index: 4, to: statement)
+        sqlite3_bind_int64(statement, 5, Int64(nextSortOrder))
+        try connection.bind(text: isoFormatter.string(from: Date()), index: 6, to: statement)
+        _ = try connection.step(statement)
+
+        return connection.lastInsertedRowID()
+    }
+
+    func updateFolder(
+        id: Int64,
+        name: String,
+        description: String,
+        colorHex: String,
+        codeVersion: String
+    ) throws {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else {
+            throw NSError(
+                domain: "UserDataStore",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Folder name cannot be empty."]
+            )
+        }
+
+        let statement = try connection.prepare(
+            """
+            UPDATE folders
+            SET name = ?, description = ?, color_hex = ?
+            WHERE id = ? AND code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: trimmedName, index: 1, to: statement)
+        try connection.bind(text: description, index: 2, to: statement)
+        try connection.bind(text: colorHex, index: 3, to: statement)
+        sqlite3_bind_int64(statement, 4, id)
+        try connection.bind(text: codeVersion, index: 5, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    func deleteFolder(id: Int64, codeVersion: String) throws {
+        // Manual cascade — folder_sections doesn't have a FK constraint, so
+        // we wipe membership rows first.
+        let cascade = try connection.prepare(
+            """
+            DELETE FROM folder_sections
+            WHERE folder_id = ?;
+            """
+        )
+        defer { connection.finalize(cascade) }
+        sqlite3_bind_int64(cascade, 1, id)
+        _ = try connection.step(cascade)
+
+        let statement = try connection.prepare(
+            """
+            DELETE FROM folders
+            WHERE id = ? AND code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, id)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws {
+        let statement = try connection.prepare(
+            """
+            INSERT OR IGNORE INTO folder_sections (folder_id, code_version, section_id, added_at)
+            VALUES (?, ?, ?, ?);
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, folderID)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        sqlite3_bind_int64(statement, 3, sectionID)
+        try connection.bind(text: isoFormatter.string(from: Date()), index: 4, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws {
+        let statement = try connection.prepare(
+            """
+            DELETE FROM folder_sections
+            WHERE folder_id = ? AND section_id = ? AND code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, folderID)
+        sqlite3_bind_int64(statement, 2, sectionID)
+        try connection.bind(text: codeVersion, index: 3, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    /// Removes a section from every folder it belongs to. Called by
+    /// toggleBookmark when a bookmark is removed so a section stripped of
+    /// its bookmark doesn't keep showing up in folder filters.
+    func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws {
+        let statement = try connection.prepare(
+            """
+            DELETE FROM folder_sections
+            WHERE section_id = ? AND code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, sectionID)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    /// Wipes every folder + membership row. Wired into Settings' clear-data
+    /// flow so users can reset their organization without losing bookmarks.
+    func clearAllFolders(codeVersion: String) throws {
+        let folderStmt = try connection.prepare(
+            """
+            DELETE FROM folder_sections
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(folderStmt) }
+        try connection.bind(text: codeVersion, index: 1, to: folderStmt)
+        _ = try connection.step(folderStmt)
+
+        let cleanup = try connection.prepare(
+            """
+            DELETE FROM folders
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(cleanup) }
+        try connection.bind(text: codeVersion, index: 1, to: cleanup)
+        _ = try connection.step(cleanup)
+
+        try vacuumIfNeeded()
+    }
+
     private func vacuumIfNeeded() throws {
         try connection.execute("VACUUM;")
     }
+}
+
+/// Database row tuple for a folder. The view model maps this to a
+/// `CodeFolder` model so view code never touches SQLite types.
+struct FolderRecord: Sendable {
+    let id: Int64
+    let name: String
+    let description: String
+    let colorHex: String
+    let sortOrder: Int
+    let createdAt: String
 }

@@ -37,6 +37,11 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
     @Published private(set) var searchTabRetapCount = 0
     @Published private(set) var bookmarks: [BookmarkedSection] = []
+    @Published private(set) var folders: [CodeFolder] = []
+    /// sectionID → ordered list of folderIDs containing that section. Cached
+    /// up front so the Reader and Saved screens don't make per-section DB
+    /// round trips when rendering the Projects row.
+    @Published private(set) var folderMembership: [Int64: [Int64]] = [:]
     @Published var selectedVersionFileName: String = ""
     @Published var selectedJurisdictionKey: String = ""
     @Published var selectedCodeSectionID: Int64?
@@ -1119,6 +1124,131 @@ final class CodeLibraryViewModel: ObservableObject {
 
         if bookmarkedSectionIDs != previousBookmarkedIDs || bookmarks != previousBookmarks {
             bookmarkRevision &+= 1
+        }
+
+        // Folders piggy-back on bookmarks: when bookmarks reload, folder
+        // membership may also have changed (e.g. via cascade on
+        // toggleBookmark). Refresh both together so views stay in sync.
+        refreshFolders()
+    }
+
+    // MARK: - Folders
+
+    func refreshFolders() {
+        guard let selectedVersion, let userDataStore else {
+            folders = []
+            folderMembership = [:]
+            return
+        }
+
+        do {
+            let records = try userDataStore.folders(codeVersion: selectedVersion.codeVersion)
+            folders = records.map { record in
+                CodeFolder(
+                    id: record.id,
+                    name: record.name,
+                    description: record.description,
+                    colorHex: record.colorHex,
+                    sortOrder: record.sortOrder,
+                    createdAt: ISO8601DateFormatter().date(from: record.createdAt) ?? Date()
+                )
+            }
+            folderMembership = (try? userDataStore.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
+        } catch {
+            statusMessage = error.localizedDescription
+            folders = []
+            folderMembership = [:]
+        }
+    }
+
+    @discardableResult
+    func createFolder(name: String, description: String = "", colorHex: String = CodeFolder.defaultColorHex) -> CodeFolder? {
+        guard let selectedVersion, let userDataStore else { return nil }
+        do {
+            let id = try userDataStore.createFolder(
+                name: name,
+                description: description,
+                colorHex: colorHex,
+                codeVersion: selectedVersion.codeVersion
+            )
+            refreshFolders()
+            return folders.first { $0.id == id }
+        } catch {
+            statusMessage = error.localizedDescription
+            return nil
+        }
+    }
+
+    func updateFolder(_ folder: CodeFolder, name: String, description: String, colorHex: String) {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.updateFolder(
+                id: folder.id,
+                name: name,
+                description: description,
+                colorHex: colorHex,
+                codeVersion: selectedVersion.codeVersion
+            )
+            refreshFolders()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func deleteFolder(id: Int64) {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.deleteFolder(id: id, codeVersion: selectedVersion.codeVersion)
+            refreshFolders()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func addSection(_ sectionID: Int64, toFolder folderID: Int64) {
+        guard let selectedVersion, let userDataStore else { return }
+        // Adding a section to a folder implicitly bookmarks it — folders are
+        // a *grouping* of saved sections, so an unbookmarked section in a
+        // folder makes no sense. The DB cleanup goes the other way too
+        // (unbookmark wipes folder rows), so this keeps the invariant tight.
+        if !isBookmarked(sectionID: sectionID) {
+            _ = toggleBookmark(sectionID: sectionID)
+        }
+        do {
+            try userDataStore.addSection(sectionID, toFolder: folderID, codeVersion: selectedVersion.codeVersion)
+            refreshFolders()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64) {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.removeSection(sectionID, fromFolder: folderID, codeVersion: selectedVersion.codeVersion)
+            refreshFolders()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    /// All folders that currently contain a given section.
+    func folders(containing sectionID: Int64) -> [CodeFolder] {
+        let memberIDs = Set(folderMembership[sectionID] ?? [])
+        guard !memberIDs.isEmpty else { return [] }
+        return folders.filter { memberIDs.contains($0.id) }
+    }
+
+    /// Wipes every folder + membership row. Wired into the existing Settings
+    /// clear-data flow so users can reset their organization without losing
+    /// the underlying bookmarks.
+    func clearAllFolders() {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.clearAllFolders(codeVersion: selectedVersion.codeVersion)
+            refreshFolders()
+        } catch {
+            statusMessage = error.localizedDescription
         }
     }
 

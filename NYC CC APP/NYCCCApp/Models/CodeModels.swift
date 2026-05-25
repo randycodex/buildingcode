@@ -319,6 +319,32 @@ struct CodeSectionCategory: Identifiable, Hashable, Sendable {
     let name: String
 }
 
+/// A user-created Project folder. Bookmarks can be assigned to many folders;
+/// each folder is just a named, colored, ordered grouping the user defines
+/// for their own organizational workflow.
+struct CodeFolder: Identifiable, Hashable, Sendable {
+    let id: Int64
+    let name: String
+    let description: String
+    let colorHex: String
+    let sortOrder: Int
+    let createdAt: Date
+
+    /// Six preset hex palette offered in the folder editor. Chosen to not
+    /// clash with the code-section accents (Building orange, Plumbing blue,
+    /// Mechanical green, Fuel Gas red, General Administrative purple).
+    static let presetColorHexes: [String] = [
+        "#5C6BC0",   // Indigo
+        "#26A69A",   // Teal
+        "#FF7043",   // Coral
+        "#AB47BC",   // Purple
+        "#789262",   // Sage
+        "#8D6E63"    // Bronze
+    ]
+
+    static let defaultColorHex: String = presetColorHexes[0]
+}
+
 struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
     let sectionID: Int64
     let sectionNumber: String
