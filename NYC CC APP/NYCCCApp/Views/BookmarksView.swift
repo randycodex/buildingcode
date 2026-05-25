@@ -11,7 +11,9 @@ struct BookmarksView: View {
     private let tabBarClearance: CGFloat = 104
 
     init() {
-        _savedFilterCodeSectionIDs = State(initialValue: Self.loadFilterCodeSectionIDs())
+        _savedFilterCodeSectionIDs = State(
+            initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
+        )
     }
 
     private var accentColor: Color {
@@ -87,7 +89,7 @@ struct BookmarksView: View {
                 library.refreshBookmarks()
             }
             .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
-                Self.persistFilterCodeSectionIDs(newValue)
+                FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
             }
         }
         .coordinateSpace(name: "savedScroll")
@@ -185,21 +187,6 @@ struct BookmarksView: View {
             defaultAccent: accentColor,
             accentForSection: { bookmarkAccentColor(for: $0) }
         )
-    }
-
-    private static func loadFilterCodeSectionIDs() -> Set<Int64> {
-        guard let numbers = UserDefaults.standard.array(forKey: filterCodeSectionIDsDefaultsKey) as? [NSNumber] else {
-            return []
-        }
-        return Set(numbers.map(\.int64Value))
-    }
-
-    private static func persistFilterCodeSectionIDs(_ ids: Set<Int64>) {
-        if ids.isEmpty {
-            UserDefaults.standard.removeObject(forKey: filterCodeSectionIDsDefaultsKey)
-        } else {
-            UserDefaults.standard.set(Array(ids), forKey: filterCodeSectionIDsDefaultsKey)
-        }
     }
 
     private var bookmarkGroups: [BookmarkChapterGroup] {

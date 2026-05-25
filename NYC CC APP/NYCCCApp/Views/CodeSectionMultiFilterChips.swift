@@ -65,3 +65,22 @@ struct CodeSectionMultiFilterChips: View {
         .buttonStyle(.plain)
     }
 }
+
+/// Shared `UserDefaults` persistence for `Set<Int64>` filter selections.
+/// Used by Search and Saved (Bookmarks) to keep their chip selections sticky.
+enum FilterIDsStorage {
+    static func load(key: String) -> Set<Int64> {
+        guard let numbers = UserDefaults.standard.array(forKey: key) as? [NSNumber] else {
+            return []
+        }
+        return Set(numbers.map(\.int64Value))
+    }
+
+    static func persist(_ ids: Set<Int64>, key: String) {
+        if ids.isEmpty {
+            UserDefaults.standard.removeObject(forKey: key)
+        } else {
+            UserDefaults.standard.set(Array(ids), forKey: key)
+        }
+    }
+}

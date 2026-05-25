@@ -7,6 +7,9 @@ struct SearchView: View {
     @State private var searchFilterCodeSectionIDs: Set<Int64>
     @State private var searchNavigationPath = NavigationPath()
     @State private var scrollOffset: CGFloat = 0
+    @State private var cachedFilteredResults: [CodeSearchResult] = []
+    @State private var cachedGroupedResults: [SearchResultGroup] = []
+    @State private var cachedJumpBackInPages: [JumpBackInPage] = []
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let filterCodeSectionIDsDefaultsKey = "SearchView.filterCodeSectionIDs"
@@ -24,7 +27,7 @@ struct SearchView: View {
 
     init() {
         _searchFilterCodeSectionIDs = State(
-            initialValue: Self.loadFilterCodeSectionIDs()
+            initialValue: FilterIDsStorage.load(key: Self.filterCodeSectionIDsDefaultsKey)
         )
     }
 
@@ -47,7 +50,7 @@ struct SearchView: View {
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         emptyQueryHistorySection
-                    } else if filteredSearchResults.isEmpty {
+                    } else if cachedFilteredResults.isEmpty {
                         Text("No results")
                             .font(.subheadline)
                             .foregroundStyle(Color.secondary.opacity(0.7))
@@ -55,7 +58,7 @@ struct SearchView: View {
                             .padding(.top, 120)
                     } else if showsGroupedSearchResults {
                         LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(groupedSearchResults) { group in
+                            ForEach(cachedGroupedResults) { group in
                                 sectionGroupHeader(group)
 
                                 ForEach(group.results) { result in
@@ -65,7 +68,7 @@ struct SearchView: View {
                         }
                     } else {
                         LazyVStack(spacing: 0) {
-                            ForEach(filteredSearchResults) { result in
+                            ForEach(cachedFilteredResults) { result in
                                 searchResultLink(result)
                             }
                         }
@@ -97,22 +100,34 @@ struct SearchView: View {
                 .background(bottomSearchDock)
             }
             .background {
-                if library.selectedTab == .search {
-                    TabBarReselectListener {
-                        library.notifySearchTabRetap()
-                    }
+                // Mount unconditionally and gate the callback inside, so the
+                // delegate isn't re-installed each time the user switches tabs.
+                // That avoids subtle delegate-capture issues if the previous
+                // coordinator hasn't detached yet during a tab animation.
+                TabBarReselectListener { [weak library] in
+                    guard let library, library.selectedTab == .search else { return }
+                    library.notifySearchTabRetap()
                 }
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                rebuildSearchCaches()
+                rebuildJumpBackInCache()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     isSearchFieldFocused = true
                 }
             }
             .onChange(of: searchFilterCodeSectionIDs) { _, newValue in
-                Self.persistFilterCodeSectionIDs(newValue)
+                FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
+                rebuildSearchCaches()
+            }
+            .onChange(of: library.searchResults) { _, _ in
+                rebuildSearchCaches()
+            }
+            .onChange(of: library.recentlyViewedSections) { _, _ in
+                rebuildJumpBackInCache()
             }
             .onChange(of: library.searchTabRetapCount) { _, _ in
                 handleSearchTabRetap()
@@ -120,7 +135,12 @@ struct SearchView: View {
             .task(id: query) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {
-                    library.search(query: "")
+                    // Only reset results if there's anything to clear —
+                    // avoids cancelling an unrelated in-flight search task
+                    // on initial appear.
+                    if !library.searchResults.isEmpty {
+                        library.search(query: "")
+                    }
                     return
                 }
 
@@ -136,18 +156,64 @@ struct SearchView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
-    private var filteredSearchResults: [CodeSearchResult] {
-        guard !searchFilterCodeSectionIDs.isEmpty else {
-            return library.searchResults
+    private var showsGroupedSearchResults: Bool {
+        searchFilterCodeSectionIDs.isEmpty || searchFilterCodeSectionIDs.count > 1
+    }
+
+    /// Rebuilds the filtered + grouped search caches. Called only when the
+    /// underlying results or the filter set change, so SwiftUI body renders
+    /// driven by scroll offset don't re-run Dictionary(grouping:) + sort.
+    private func rebuildSearchCaches() {
+        let filtered: [CodeSearchResult]
+        if searchFilterCodeSectionIDs.isEmpty {
+            filtered = library.searchResults
+        } else {
+            filtered = library.searchResults.filter { result in
+                guard let codeSectionID = result.codeSectionID else { return false }
+                return searchFilterCodeSectionIDs.contains(codeSectionID)
+            }
         }
-        return library.searchResults.filter { result in
-            guard let codeSectionID = result.codeSectionID else { return false }
-            return searchFilterCodeSectionIDs.contains(codeSectionID)
+        cachedFilteredResults = filtered
+        cachedGroupedResults = Self.makeGroupedResults(
+            filtered,
+            codeSections: library.codeSections
+        )
+    }
+
+    private static func makeGroupedResults(
+        _ results: [CodeSearchResult],
+        codeSections: [CodeSectionCategory]
+    ) -> [SearchResultGroup] {
+        let grouped = Dictionary(grouping: results) { $0.codeSectionID }
+        let groups: [SearchResultGroup] = grouped.map { id, results in
+            let name = id.flatMap { codeSectionID in
+                codeSections.first(where: { $0.id == codeSectionID })?.name
+            }
+            return SearchResultGroup(
+                id: id.map(String.init) ?? "other",
+                codeSectionID: id,
+                codeSectionName: name ?? "Other",
+                results: results
+            )
+        }
+        return groups.sorted { lhs, rhs in
+            let lhsRank = CodeLibraryViewModel.codeSectionOrderRank(forName: lhs.codeSectionName)
+            let rhsRank = CodeLibraryViewModel.codeSectionOrderRank(forName: rhs.codeSectionName)
+            if lhsRank != rhsRank { return lhsRank < rhsRank }
+            return lhs.codeSectionName.localizedStandardCompare(rhs.codeSectionName) == .orderedAscending
         }
     }
 
-    private var showsGroupedSearchResults: Bool {
-        searchFilterCodeSectionIDs.isEmpty || searchFilterCodeSectionIDs.count > 1
+    private func rebuildJumpBackInCache() {
+        let entries = library.recentlyViewedSections
+        guard !entries.isEmpty else {
+            cachedJumpBackInPages = []
+            return
+        }
+        cachedJumpBackInPages = stride(from: 0, to: entries.count, by: jumpBackInPageSize).map { start in
+            let slice = Array(entries[start..<min(start + jumpBackInPageSize, entries.count)])
+            return JumpBackInPage(entries: slice)
+        }
     }
 
     private var searchCodeSectionFilter: some View {
@@ -169,21 +235,6 @@ struct SearchView: View {
         guard !trimmedQuery.isEmpty else { return }
         query = ""
         library.search(query: "")
-    }
-
-    private static func loadFilterCodeSectionIDs() -> Set<Int64> {
-        guard let numbers = UserDefaults.standard.array(forKey: filterCodeSectionIDsDefaultsKey) as? [NSNumber] else {
-            return []
-        }
-        return Set(numbers.map(\.int64Value))
-    }
-
-    private static func persistFilterCodeSectionIDs(_ ids: Set<Int64>) {
-        if ids.isEmpty {
-            UserDefaults.standard.removeObject(forKey: filterCodeSectionIDsDefaultsKey)
-        } else {
-            UserDefaults.standard.set(Array(ids), forKey: filterCodeSectionIDsDefaultsKey)
-        }
     }
 
     private var bottomSearchDock: some View {
@@ -227,10 +278,8 @@ struct SearchView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .strokeBorder(Color(uiColor: .separator).opacity(0.55), lineWidth: 0.75)
         )
-        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .onTapGesture {
-            isSearchFieldFocused = true
-        }
+        // The TextField handles focus natively. An extra .onTapGesture here
+        // can interfere with cursor-position taps inside the field on iOS 17+.
         .accessibilityElement(children: .contain)
     }
 
@@ -249,14 +298,6 @@ struct SearchView: View {
             if !unpinnedRecentSearches.isEmpty {
                 recentSearchSection
             }
-        }
-    }
-
-    private var jumpBackInPages: [[RecentlyViewedEntry]] {
-        let entries = library.recentlyViewedSections
-        guard !entries.isEmpty else { return [] }
-        return stride(from: 0, to: entries.count, by: jumpBackInPageSize).map { start in
-            Array(entries[start..<min(start + jumpBackInPageSize, entries.count)])
         }
     }
 
@@ -289,8 +330,10 @@ struct SearchView: View {
     }
 
     private var jumpBackInTabViewHeight: CGFloat {
-        let tallestGrid = jumpBackInPages.map { jumpBackInGridHeight(for: $0) }.max() ?? jumpBackInTileOuterHeight
-        let pageDotsHeight: CGFloat = jumpBackInPages.count > 1 ? 28 : 0
+        let tallestGrid = cachedJumpBackInPages
+            .map { jumpBackInGridHeight(for: $0.entries) }
+            .max() ?? jumpBackInTileOuterHeight
+        let pageDotsHeight: CGFloat = cachedJumpBackInPages.count > 1 ? 28 : 0
         return tallestGrid + pageDotsHeight
     }
 
@@ -299,13 +342,13 @@ struct SearchView: View {
             searchHistorySectionHeader("Jump Back In")
 
             TabView {
-                ForEach(Array(jumpBackInPages.enumerated()), id: \.offset) { _, page in
-                    jumpBackInPageGrid(page)
-                        .frame(height: jumpBackInGridHeight(for: page), alignment: .top)
+                ForEach(cachedJumpBackInPages) { page in
+                    jumpBackInPageGrid(page.entries)
+                        .frame(height: jumpBackInGridHeight(for: page.entries), alignment: .top)
                         .padding(.horizontal, 1)
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: jumpBackInPages.count > 1 ? .automatic : .never))
+            .tabViewStyle(.page(indexDisplayMode: cachedJumpBackInPages.count > 1 ? .automatic : .never))
             .frame(height: jumpBackInTabViewHeight)
         }
     }
@@ -431,7 +474,8 @@ struct SearchView: View {
         leadingSystemImage: String,
         showsRemoveButton: Bool
     ) -> some View {
-        VStack(spacing: 0) {
+        let isPinned = library.isSearchPinned(searchQuery)
+        return VStack(spacing: 0) {
             HStack(spacing: 12) {
                 Button {
                     applySearch(searchQuery)
@@ -453,23 +497,23 @@ struct SearchView: View {
 
                 Button {
                     searchPinHaptic()
-                    if library.isSearchPinned(searchQuery) {
+                    if isPinned {
                         library.unpinSearch(searchQuery)
                     } else {
                         library.pinSearch(searchQuery)
                     }
                 } label: {
-                    Image(systemName: library.isSearchPinned(searchQuery) ? "pin.fill" : "pin")
+                    Image(systemName: isPinned ? "pin.fill" : "pin")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(
-                            library.isSearchPinned(searchQuery)
+                            isPinned
                                 ? AnyShapeStyle(accentColor)
                                 : AnyShapeStyle(.tertiary)
                         )
                         .frame(width: 18, height: 18)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(library.isSearchPinned(searchQuery) ? "Unpin search" : "Pin search")
+                .accessibilityLabel(isPinned ? "Unpin search" : "Pin search")
 
                 if showsRemoveButton {
                     Button {
@@ -522,27 +566,12 @@ struct SearchView: View {
         let results: [CodeSearchResult]
     }
 
-    private var groupedSearchResults: [SearchResultGroup] {
-        // Build groups keyed by codeSectionID; results without an ID get a
-        // synthetic "Other" bucket at the end so nothing disappears.
-        let grouped = Dictionary(grouping: filteredSearchResults) { $0.codeSectionID }
-        let groups: [SearchResultGroup] = grouped.map { id, results in
-            let name = id.flatMap { codeSectionID in
-                library.codeSections.first(where: { $0.id == codeSectionID })?.name
-            }
-            return SearchResultGroup(
-                id: id.map(String.init) ?? "other",
-                codeSectionID: id,
-                codeSectionName: name ?? "Other",
-                results: results
-            )
-        }
-        return groups.sorted { lhs, rhs in
-            let lhsRank = CodeLibraryViewModel.codeSectionOrderRank(forName: lhs.codeSectionName)
-            let rhsRank = CodeLibraryViewModel.codeSectionOrderRank(forName: rhs.codeSectionName)
-            if lhsRank != rhsRank { return lhsRank < rhsRank }
-            return lhs.codeSectionName.localizedStandardCompare(rhs.codeSectionName) == .orderedAscending
-        }
+    /// One page of "Jump Back In" tiles. The id is derived from the first
+    /// entry's sectionID so SwiftUI never recycles a page view across content
+    /// shifts (which would otherwise show stale tiles mid-swipe).
+    private struct JumpBackInPage: Identifiable {
+        let entries: [RecentlyViewedEntry]
+        var id: Int64 { entries.first?.sectionID ?? 0 }
     }
 
     private func sectionGroupHeader(_ group: SearchResultGroup) -> some View {

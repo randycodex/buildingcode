@@ -90,6 +90,9 @@ final class CodeLibraryViewModel: ObservableObject {
     // concurrently because cancelling the outer Task does not propagate to a
     // detached child.
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
+    /// Monotonic token used to suppress stale tab re-assertions after a
+    /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
+    private var pendingTabAssertionToken: Int = 0
     @Published private(set) var bookmarkRevision: Int = 0
 
     init(
@@ -323,10 +326,18 @@ final class CodeLibraryViewModel: ObservableObject {
         UserDefaults.standard.set(enabled, forKey: comparisonModeDefaultsKey)
         selectedTab = tabToKeep
 
-        // Tab insertion can leave UIKit on the old index briefly; re-assert after layout.
+        // Inserting/removing the secondary browse tab can leave UIKit on a
+        // stale index for one layout pass. Re-assert after a frame, but use a
+        // token so a user tap during that window cancels the re-assertion
+        // instead of snapping the tab back.
+        pendingTabAssertionToken &+= 1
+        let token = pendingTabAssertionToken
         Task { @MainActor in
-            await Task.yield()
-            selectedTab = tabToKeep
+            try? await Task.sleep(for: .milliseconds(16))
+            guard token == self.pendingTabAssertionToken else { return }
+            if self.selectedTab != tabToKeep {
+                self.selectedTab = tabToKeep
+            }
         }
     }
 
@@ -335,9 +346,36 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func syncSelectedCodeSection(from context: BrowserContextID) {
-        let codeSectionID = BrowserContextID.storedCodeSectionID(for: context)
-            ?? (context == .primary ? selectedCodeSectionID : nil)
+        let codeSectionID: Int64?
+        if let stored = BrowserContextID.storedCodeSectionID(for: context) {
+            codeSectionID = stored
+        } else if context == .primary {
+            codeSectionID = selectedCodeSectionID
+        } else {
+            // First time the secondary browser appears (comparison mode just
+            // enabled): default it to a *different* code section than primary
+            // so the two browsers immediately show distinct content. Falls
+            // back to the primary selection if only one section exists.
+            codeSectionID = defaultSecondaryCodeSectionID()
+            BrowserContextID.persistCodeSectionID(codeSectionID, for: .secondary)
+        }
         updateSelectedCodeSection(id: codeSectionID)
+    }
+
+    /// Picks a code section for the secondary browser that's different from
+    /// the primary when possible. Honors the canonical sort order so the
+    /// "next" section is predictable (e.g. primary on Building → secondary
+    /// on Fuel Gas).
+    private func defaultSecondaryCodeSectionID() -> Int64? {
+        let ordered = Self.sortedCodeSections(codeSections)
+        guard !ordered.isEmpty else { return nil }
+        guard let primaryID = selectedCodeSectionID,
+              let primaryIndex = ordered.firstIndex(where: { $0.id == primaryID })
+        else {
+            return ordered.first?.id
+        }
+        let nextIndex = (primaryIndex + 1) % ordered.count
+        return ordered[nextIndex].id
     }
 
     func codeSectionName(id: Int64?) -> String {
@@ -971,7 +1009,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func notifySearchTabRetap() {
-        searchTabRetapCount += 1
+        // Wrap on overflow — this is a sentinel counter, only the change
+        // matters, not the absolute value.
+        searchTabRetapCount &+= 1
     }
 
     func recordRecentSearch(_ query: String) {

@@ -36,7 +36,12 @@ struct TabBarReselectListener: UIViewControllerRepresentable {
             self.listenerViewController = listener
 
             if tabBarController.delegate !== self {
-                forwardedDelegate = tabBarController.delegate
+                // Guard against capturing a stale instance of ourselves as the
+                // "forwarded" delegate during rapid mount/unmount cycles. Only
+                // remember the existing delegate if it's something else.
+                if !(tabBarController.delegate is Coordinator) {
+                    forwardedDelegate = tabBarController.delegate
+                }
                 tabBarController.delegate = self
             }
             lastSelectedIndex = tabBarController.selectedIndex
