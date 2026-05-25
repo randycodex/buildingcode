@@ -233,7 +233,7 @@ final class CodeLibraryViewModel: ObservableObject {
             BrowserContextID.persistCodeSectionID(id, for: .primary)
         }
         guard let authoredCodeStore else { return }
-        codeSections = authoredCodeStore.codeSections()
+        codeSections = Self.sortedCodeSections(authoredCodeStore.codeSections())
         chapters = authoredCodeStore.chapters(codeSectionID: id)
         searchResults = []
     }
@@ -264,6 +264,35 @@ final class CodeLibraryViewModel: ObservableObject {
 
     static func displayName(forCodeSectionName name: String) -> String {
         displayName(forLibraryName: name)
+    }
+
+    /// Canonical display order for code sections everywhere they appear in a
+    /// list. Names not in this table fall back to alphabetical order at the
+    /// end. Matching is case-insensitive and tolerates "Code"/"Codes" suffixes
+    /// or jurisdiction prefixes (e.g. "NYC Building Code").
+    private static let codeSectionOrderKeywords: [String] = [
+        "general administrative",
+        "building",
+        "fuel gas",
+        "mechanical",
+        "plumbing"
+    ]
+
+    static func codeSectionOrderRank(forName name: String) -> Int {
+        let lowered = name.lowercased()
+        for (index, keyword) in codeSectionOrderKeywords.enumerated() {
+            if lowered.contains(keyword) { return index }
+        }
+        return Int.max
+    }
+
+    static func sortedCodeSections(_ sections: [CodeSectionCategory]) -> [CodeSectionCategory] {
+        sections.sorted { lhs, rhs in
+            let lhsRank = codeSectionOrderRank(forName: lhs.name)
+            let rhsRank = codeSectionOrderRank(forName: rhs.name)
+            if lhsRank != rhsRank { return lhsRank < rhsRank }
+            return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+        }
     }
 
     static func displayName(forLibraryName name: String) -> String {
@@ -1102,7 +1131,7 @@ final class CodeLibraryViewModel: ObservableObject {
         )
         return AuthoredContentSnapshot(
             store: store,
-            codeSections: availableCodeSections,
+            codeSections: Self.sortedCodeSections(availableCodeSections),
             resolvedCodeSectionID: resolvedCodeSectionID,
             chapters: chapters
         )

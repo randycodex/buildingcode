@@ -50,22 +50,20 @@ struct SearchView: View {
                             .foregroundStyle(Color.secondary.opacity(0.7))
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.top, 120)
+                    } else if searchesAllCodeSections && !library.codeSections.isEmpty {
+                        LazyVStack(alignment: .leading, spacing: 0) {
+                            ForEach(groupedSearchResults) { group in
+                                sectionGroupHeader(group)
+
+                                ForEach(group.results) { result in
+                                    searchResultLink(result)
+                                }
+                            }
+                        }
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(library.searchResults) { result in
-                                NavigationLink {
-                                    ReaderView(sectionID: result.id)
-                                } label: {
-                                    resultRow(result)
-                                }
-                                .buttonStyle(.plain)
-                                .simultaneousGesture(
-                                    TapGesture().onEnded {
-                                        library.recordRecentSearch(query)
-                                    }
-                                )
-
-                                CodeHairline()
+                                searchResultLink(result)
                             }
                         }
                     }
@@ -238,13 +236,77 @@ struct SearchView: View {
         }
     }
 
+    private func searchResultLink(_ result: CodeSearchResult) -> some View {
+        VStack(spacing: 0) {
+            NavigationLink {
+                ReaderView(sectionID: result.id)
+            } label: {
+                resultRow(result)
+            }
+            .buttonStyle(.plain)
+            .simultaneousGesture(
+                TapGesture().onEnded {
+                    library.recordRecentSearch(query)
+                }
+            )
+
+            CodeHairline()
+        }
+    }
+
+    private struct SearchResultGroup: Identifiable {
+        let id: String
+        let codeSectionID: Int64?
+        let codeSectionName: String
+        let results: [CodeSearchResult]
+    }
+
+    private var groupedSearchResults: [SearchResultGroup] {
+        // Build groups keyed by codeSectionID; results without an ID get a
+        // synthetic "Other" bucket at the end so nothing disappears.
+        let grouped = Dictionary(grouping: library.searchResults) { $0.codeSectionID }
+        let groups: [SearchResultGroup] = grouped.map { id, results in
+            let name = id.flatMap { codeSectionID in
+                library.codeSections.first(where: { $0.id == codeSectionID })?.name
+            }
+            return SearchResultGroup(
+                id: id.map(String.init) ?? "other",
+                codeSectionID: id,
+                codeSectionName: name ?? "Other",
+                results: results
+            )
+        }
+        return groups.sorted { lhs, rhs in
+            let lhsRank = CodeLibraryViewModel.codeSectionOrderRank(forName: lhs.codeSectionName)
+            let rhsRank = CodeLibraryViewModel.codeSectionOrderRank(forName: rhs.codeSectionName)
+            if lhsRank != rhsRank { return lhsRank < rhsRank }
+            return lhs.codeSectionName.localizedStandardCompare(rhs.codeSectionName) == .orderedAscending
+        }
+    }
+
+    private func sectionGroupHeader(_ group: SearchResultGroup) -> some View {
+        let groupAccent = Color(uiColor: library.accentColor(for: group.codeSectionID))
+        return Text(CodeLibraryViewModel.displayName(forCodeSectionName: group.codeSectionName))
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(groupAccent)
+            .textCase(.uppercase)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 22)
+            .padding(.bottom, 8)
+    }
+
     private func resultRow(_ result: CodeSearchResult) -> some View {
         let resultAccent = Color(uiColor: library.accentColor(for: result.codeSectionID))
 
         return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    if searchesAllCodeSections, let codeSectionID = result.codeSectionID {
+                    // Skip the per-row code-section badge when the results
+                    // are already grouped by code section — the group header
+                    // shows it once instead.
+                    if searchesAllCodeSections,
+                       library.codeSections.isEmpty,
+                       let codeSectionID = result.codeSectionID {
                         CodeMetaBadge(text: library.codeSectionName(id: codeSectionID), accent: resultAccent)
                     }
 
