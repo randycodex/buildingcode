@@ -271,53 +271,23 @@ struct ReaderView: View {
                     .font(.headline)
 
                 ForEach(references) { reference in
-                    HStack(alignment: .center, spacing: 10) {
-                        switch reference.destination {
-                        case .section(let section):
-                            NavigationLink {
-                                ReaderView(sectionID: section.id)
-                            } label: {
-                                ReferenceRow(reference: reference, accent: accent)
-                            }
-                            .buttonStyle(.plain)
-                        case .chapter(let chapter):
-                            NavigationLink {
-                                ReferenceChapterDestination(chapter: chapter)
-                            } label: {
-                                ReferenceRow(reference: reference, accent: accent)
-                            }
-                            .buttonStyle(.plain)
-                        }
-
+                    switch reference.destination {
+                    case .section(let section):
                         NavigationLink {
-                            CompareWorkspaceView(referenceTarget: compareTarget(for: reference))
+                            ReaderView(sectionID: section.id)
                         } label: {
-                            Image(systemName: "square.split.2x1")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(accent)
-                                .frame(width: 36, height: 36)
+                            ReferenceRow(reference: reference, accent: accent)
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel("Open reference in compare")
+                    case .chapter(let chapter):
+                        NavigationLink {
+                            ReferenceChapterDestination(chapter: chapter)
+                        } label: {
+                            ReferenceRow(reference: reference, accent: accent)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
-            }
-        }
-
-        private func compareTarget(for reference: ResolvedCodeReference) -> CompareLaunchTarget {
-            switch reference.destination {
-            case .section(let section):
-                return CompareLaunchTarget(
-                    codeSectionID: sourceCodeSectionID,
-                    chapterNumber: section.chapterNumber,
-                    sectionID: section.id
-                )
-            case .chapter(let chapter):
-                return CompareLaunchTarget(
-                    codeSectionID: chapter.codeSectionID ?? sourceCodeSectionID,
-                    chapterID: chapter.id,
-                    chapterNumber: chapter.chapterNumber
-                )
             }
         }
     }
@@ -395,9 +365,9 @@ struct ReaderView: View {
         var body: some View {
             Group {
                 if let initialSection = initialSection ?? library.firstSection(for: chapter) {
-                    ChapterReaderView(
+                    ChapterHTMLReaderView(
                         chapter: chapter,
-                        initialSectionID: initialSection.id
+                        initialSection: initialSection
                     )
                 } else {
                     VStack(spacing: 12) {

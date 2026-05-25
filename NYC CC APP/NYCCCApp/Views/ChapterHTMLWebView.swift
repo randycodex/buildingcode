@@ -25,6 +25,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let colorScheme: ColorScheme
     let bookmarkedAnchorIDs: Set<String>
     let bookmarkedSectionNumbers: Set<String>
+    let notedSectionNumbers: Set<String>
     let expandAllTrigger: Int
     let collapseAllTrigger: Int
     let scrollToTopTrigger: Int
@@ -44,12 +45,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.scrollView.delegate = context.coordinator
-        webView.backgroundColor = UIColor.systemGroupedBackground
-        webView.scrollView.backgroundColor = UIColor.systemGroupedBackground
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
         webView.scrollView.minimumZoomScale = 1
         webView.scrollView.maximumZoomScale = 1
         webView.scrollView.bouncesZoom = false
-        webView.isOpaque = true
+        webView.isOpaque = false
         webView.allowsBackForwardNavigationGestures = false
         context.coordinator.parent = self
         return webView
@@ -57,9 +58,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         context.coordinator.parent = self
-        let webBackground: UIColor = colorScheme == .dark ? .black : .systemGroupedBackground
-        webView.backgroundColor = webBackground
-        webView.scrollView.backgroundColor = webBackground
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
 
         if context.coordinator.loadedURL != chapterURL {
             context.coordinator.loadedURL = chapterURL
@@ -82,7 +82,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
 
         if context.coordinator.appliedBookmarkedAnchorIDs != bookmarkedAnchorIDs ||
-            context.coordinator.appliedBookmarkedSectionNumbers != bookmarkedSectionNumbers {
+            context.coordinator.appliedBookmarkedSectionNumbers != bookmarkedSectionNumbers ||
+            context.coordinator.appliedNotedSectionNumbers != notedSectionNumbers {
             context.coordinator.applyBookmarkDecorations(to: webView)
         }
         if context.coordinator.appliedExpandAllTrigger != expandAllTrigger {
@@ -115,6 +116,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedColorScheme: ColorScheme?
         var appliedBookmarkedAnchorIDs: Set<String> = []
         var appliedBookmarkedSectionNumbers: Set<String> = []
+        var appliedNotedSectionNumbers: Set<String> = []
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
@@ -409,141 +411,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               }
               applyDepthClasses();
 
-              if (!window.__nycccExpandedMedia) {
-                window.__nycccExpandedMedia = new Set();
-              }
-
-              function nearestSubsectionBefore(node) {
-                var current = node;
-                while (current && current !== document.body) {
-                  var sibling = current.previousElementSibling;
-                  while (sibling) {
-                    if (sibling.classList && sibling.classList.contains('Subsection')) {
-                      return sibling;
-                    }
-                    if (sibling.querySelector) {
-                      var found = sibling.querySelector('.Subsection');
-                      if (found) { return found; }
-                    }
-                    sibling = sibling.previousElementSibling;
-                  }
-                  current = current.parentElement;
-                }
-                return null;
-              }
-
-              function mediaPlaceholderLabel(kind) {
-                if (kind === 'image') { return 'Tap to view image'; }
-                if (kind === 'table') { return 'Tap to view table'; }
-                return 'Tap to expand';
-              }
-
-              function setMediaWrapperExpanded(wrapper, expanded) {
-                if (!wrapper) { return; }
-                wrapper.classList.toggle('nyccc-media-collapsed', !expanded);
-                wrapper.classList.toggle('nyccc-media-expanded', expanded);
-                var pill = wrapper.querySelector('.nyccc-media-pill');
-                if (pill) {
-                  pill.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-                  var label = pill.querySelector('.nyccc-media-pill-label');
-                  if (label) {
-                    if (expanded) {
-                      if (!label.dataset.collapsedText) {
-                        label.dataset.collapsedText = label.textContent;
-                      }
-                      label.textContent = 'Hide';
-                    } else if (label.dataset.collapsedText) {
-                      label.textContent = label.dataset.collapsedText;
-                    }
-                  }
-                }
-                if (expanded) {
-                  wrapper.__nycccAnchorSubsection = nearestSubsectionBefore(wrapper);
-                  window.__nycccExpandedMedia.add(wrapper);
-                } else {
-                  wrapper.__nycccAnchorSubsection = null;
-                  window.__nycccExpandedMedia.delete(wrapper);
-                }
-              }
-
-              function buildMediaPlaceholder(node, kind) {
-                if (!node || !node.parentNode) { return; }
-                if (node.dataset.nycccMediaReady === 'true') { return; }
-                if (node.closest && node.closest('.nyccc-media-wrapper')) { return; }
-                node.dataset.nycccMediaReady = 'true';
-
-                var wrapper = document.createElement('div');
-                wrapper.className = 'nyccc-media-wrapper nyccc-media-wrapper-' + kind + ' nyccc-media-collapsed';
-
-                var pill = document.createElement('button');
-                pill.type = 'button';
-                pill.className = 'nyccc-media-pill';
-                pill.setAttribute('aria-expanded', 'false');
-
-                var caret = document.createElement('span');
-                caret.className = 'nyccc-media-pill-caret';
-                caret.textContent = '▸';
-
-                var label = document.createElement('span');
-                label.className = 'nyccc-media-pill-label';
-                label.textContent = mediaPlaceholderLabel(kind);
-
-                pill.appendChild(caret);
-                pill.appendChild(label);
-
-                node.parentNode.insertBefore(wrapper, node);
-                wrapper.appendChild(pill);
-                wrapper.appendChild(node);
-                node.classList.add('nyccc-media-content');
-
-                pill.addEventListener('click', function(event) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  var willExpand = wrapper.classList.contains('nyccc-media-collapsed');
-                  setMediaWrapperExpanded(wrapper, willExpand);
-                });
-              }
-
-              function buildMediaPlaceholders() {
-                document.querySelectorAll('img').forEach(function(img) {
-                  buildMediaPlaceholder(img, 'image');
-                });
-                document.querySelectorAll('scrolltable, .xsl-table').forEach(function(node) {
-                  if (node.closest && node.closest('scrolltable, .xsl-table') && node.closest('scrolltable, .xsl-table') !== node) { return; }
-                  buildMediaPlaceholder(node, 'table');
-                });
-                document.querySelectorAll('table').forEach(function(node) {
-                  if (node.closest && node.closest('table') !== node) { return; }
-                  if (node.closest && node.closest('.nyccc-media-wrapper')) { return; }
-                  buildMediaPlaceholder(node, 'table');
-                });
-              }
-              buildMediaPlaceholders();
-
-              function autoCollapseExpandedMedia() {
-                if (!window.__nycccExpandedMedia || window.__nycccExpandedMedia.size === 0) { return; }
-                var subsections = Array.prototype.slice.call(document.querySelectorAll('.Subsection'));
-                if (!subsections.length) { return; }
-                var viewportTop = window.scrollY;
-                var pending = [];
-                window.__nycccExpandedMedia.forEach(function(wrapper) {
-                  var anchor = wrapper.__nycccAnchorSubsection;
-                  if (!anchor) { return; }
-                  var anchorIndex = subsections.indexOf(anchor);
-                  if (anchorIndex < 0) { return; }
-                  var thresholdIndex = anchorIndex + 3;
-                  if (thresholdIndex >= subsections.length) { return; }
-                  var threshold = subsections[thresholdIndex];
-                  var thresholdTop = threshold.getBoundingClientRect().top + window.scrollY;
-                  if (viewportTop >= thresholdTop) {
-                    pending.push(wrapper);
-                  }
-                });
-                pending.forEach(function(wrapper) {
-                  setMediaWrapperExpanded(wrapper, false);
-                });
-              }
-
               function visibleAnchorID() {
                 var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection'));
                 if (!headings.length) { return null; }
@@ -619,7 +486,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 window.requestAnimationFrame(function() {
                   window.__nycccVisibleAnchorFramePending = false;
                   reportVisibleAnchor();
-                  autoCollapseExpandedMedia();
                 });
               };
               window.addEventListener('scroll', window.__nycccVisibleAnchorListener, { passive: true });
@@ -639,12 +505,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             guard let parent else { return }
             appliedBookmarkedAnchorIDs = parent.bookmarkedAnchorIDs
             appliedBookmarkedSectionNumbers = parent.bookmarkedSectionNumbers
+            appliedNotedSectionNumbers = parent.notedSectionNumbers
             let anchorIDs = Array(parent.bookmarkedAnchorIDs).sorted()
             let sectionNumbers = Array(parent.bookmarkedSectionNumbers).sorted()
+            let notedSectionNumbers = Array(parent.notedSectionNumbers).sorted()
             let javascript = """
             (function() {
               var bookmarkedAnchors = new Set(\(Self.javascriptStringArray(anchorIDs)));
               var bookmarkedSections = new Set(\(Self.javascriptStringArray(sectionNumbers)));
+              var notedSections = new Set(\(Self.javascriptStringArray(notedSectionNumbers)));
 
               function normalizeSectionNumber(value) {
                 return String(value || '')
@@ -666,11 +535,41 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 var sectionNumber = sectionNumberForBookmarkHeading(heading);
                 var isBookmarked = heading.classList.contains('Subsection') &&
                   (bookmarkedAnchors.has(anchorID) || bookmarkedSections.has(sectionNumber));
-                heading.querySelectorAll('.nyccc-bookmark-marker').forEach(function(marker) {
+                var hasNote = heading.classList.contains('Subsection') && notedSections.has(sectionNumber);
+                heading.querySelectorAll('.nyccc-bookmark-marker, .nyccc-status-badges').forEach(function(marker) {
                   marker.remove();
                 });
                 heading.classList.toggle('nyccc-bookmarked-heading', isBookmarked);
+                heading.classList.toggle('nyccc-noted-heading', hasNote);
                 heading.setAttribute('data-nyccc-section-number', sectionNumber || '');
+
+                if (isBookmarked || hasNote) {
+                  var h6 = heading.querySelector('h6') || heading;
+                  var badges = document.createElement('span');
+                  badges.className = 'nyccc-status-badges';
+                  badges.setAttribute('aria-hidden', 'true');
+                  if (hasNote) {
+                    var note = document.createElement('span');
+                    note.className = 'nyccc-status-badge nyccc-note-badge';
+                    var noteIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    noteIcon.setAttribute('viewBox', '0 0 24 24');
+                    noteIcon.setAttribute('aria-hidden', 'true');
+                    var notePage = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    notePage.setAttribute('d', 'M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z');
+                    var noteFold = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    noteFold.setAttribute('d', 'M15 3v5h5');
+                    noteIcon.appendChild(notePage);
+                    noteIcon.appendChild(noteFold);
+                    note.appendChild(noteIcon);
+                    badges.appendChild(note);
+                  }
+                  if (isBookmarked) {
+                    var bookmark = document.createElement('span');
+                    bookmark.className = 'nyccc-status-badge nyccc-bookmark-badge';
+                    badges.appendChild(bookmark);
+                  }
+                  h6.appendChild(badges);
+                }
               });
             })();
             """
@@ -763,7 +662,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let secondaryColor = isDark ? "#b5b5bc" : "#5d6168"
             let borderColor = isDark ? "#6f6f76" : "#c6c6cc"
             let softBorderColor = isDark ? "#4b4b50" : "#d8d8de"
-            let pillBackground = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)"
+            let guideLineColor = isDark ? "rgba(255,255,255,0.18)" : "rgba(60,60,67,0.18)"
             let bodyFontSize = max(theme.fontSize * 1.16, 12)
             let sectionHeadingSize = max(theme.fontSize * 1.08, 13)
             let subsectionHeadingSize = max(theme.fontSize * 1.0, 12)
@@ -828,7 +727,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .Section,
             .Subsection {
-              border-top: 1px solid \(borderColor);
+              border-top: 0 !important;
               padding-top: 0.8rem;
               margin-top: 0.8rem !important;
               scroll-margin-top: 96px;
@@ -880,13 +779,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-section-card-expanded .Section h6 {
               padding: 0.74rem 2.35rem 0.74rem 0 !important;
-              border-bottom: 1px solid \(borderColor);
+              border-bottom: 0 !important;
             }
             .nyccc-section-card-expanded .Subsection {
               margin-top: 0.72rem !important;
               padding-top: 0.72rem !important;
               padding-right: 0 !important;
-              border-top-color: \(softBorderColor) !important;
+              border-top: 0 !important;
             }
             .nyccc-section-card-expanded .Subsection h6 {
               padding-left: 0 !important;
@@ -963,8 +862,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .Subsection {
               position: relative !important;
               padding-right: 2.25rem !important;
-              padding-left: 0.7rem !important;
-              border-left: 3px solid \(accentHex) !important;
+              padding-left: 1.45rem !important;
+              border-left: 0 !important;
+              background-repeat: no-repeat !important;
+              background-size: 3px 100% !important;
+              background-position: 0.12rem 0 !important;
+              background-image: linear-gradient(\(accentHex), \(accentHex)) !important;
               margin-left: 0 !important;
             }
             .Subsection .Normal-Level,
@@ -974,14 +877,43 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               padding-left: 0 !important;
               margin-left: 0 !important;
             }
-            .Subsection.nyccc-depth-2 { border-left-width: 3px !important; padding-left: 0.7rem !important; }
-            .Subsection.nyccc-depth-3 { border-left-width: 2.5px !important; padding-left: 0.6rem !important; }
+            .Subsection h6::before {
+              content: "" !important;
+              display: none !important;
+            }
+            .Subsection.nyccc-depth-2 {
+              padding-left: 1.45rem !important;
+              background-size: 3px 100% !important;
+              background-position: 0.12rem 0 !important;
+              background-image: linear-gradient(\(accentHex), \(accentHex)) !important;
+            }
+            .Subsection.nyccc-depth-3 {
+              padding-left: 2.1rem !important;
+              background-size: 1px 100%, 3px 100% !important;
+              background-position: 0.12rem 0, 0.78rem 0 !important;
+              background-image: linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(accentHex), \(accentHex)) !important;
+            }
             .Subsection.nyccc-depth-3 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.97) !important; }
-            .Subsection.nyccc-depth-4 { border-left-width: 2px !important; padding-left: 0.55rem !important; }
+            .Subsection.nyccc-depth-4 {
+              padding-left: 2.75rem !important;
+              background-size: 1px 100%, 1px 100%, 3px 100% !important;
+              background-position: 0.12rem 0, 0.78rem 0, 1.44rem 0 !important;
+              background-image: linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(accentHex), \(accentHex)) !important;
+            }
             .Subsection.nyccc-depth-4 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.94) !important; font-weight: 650 !important; }
-            .Subsection.nyccc-depth-5 { border-left-width: 1.5px !important; padding-left: 0.5rem !important; }
+            .Subsection.nyccc-depth-5 {
+              padding-left: 3.4rem !important;
+              background-size: 1px 100%, 1px 100%, 1px 100%, 3px 100% !important;
+              background-position: 0.12rem 0, 0.78rem 0, 1.44rem 0, 2.1rem 0 !important;
+              background-image: linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(accentHex), \(accentHex)) !important;
+            }
             .Subsection.nyccc-depth-5 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.9) !important; font-weight: 600 !important; }
-            .Subsection.nyccc-depth-6 { border-left-width: 1px !important; padding-left: 0.45rem !important; }
+            .Subsection.nyccc-depth-6 {
+              padding-left: 4.05rem !important;
+              background-size: 1px 100%, 1px 100%, 1px 100%, 1px 100%, 3px 100% !important;
+              background-position: 0.12rem 0, 0.78rem 0, 1.44rem 0, 2.1rem 0, 2.76rem 0 !important;
+              background-image: linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(guideLineColor), \(guideLineColor)), linear-gradient(\(accentHex), \(accentHex)) !important;
+            }
             .Subsection.nyccc-depth-6 h6 { font-size: calc(\(subsectionHeadingSize)px * 0.88) !important; font-weight: 550 !important; }
             .nyccc-collapsible-heading h6 {
               cursor: pointer;
@@ -991,7 +923,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .nyccc-section-open-target {
               cursor: pointer;
             }
-            .nyccc-collapsible-heading h6::before {
+            .Section.nyccc-collapsible-heading h6::before {
               content: "" !important;
               display: none !important;
             }
@@ -1001,7 +933,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .Subsection.nyccc-bookmarked-heading h6::after {
               content: "" !important;
-              display: block !important;
+              display: none !important;
               position: absolute !important;
               right: 0.1rem !important;
               top: 0 !important;
@@ -1013,6 +945,43 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-bookmark-marker {
               display: none !important;
+            }
+            .nyccc-status-badges {
+              display: inline-flex !important;
+              align-items: center !important;
+              gap: 0.35rem !important;
+              margin-left: 0.55rem !important;
+              vertical-align: 0.05rem !important;
+            }
+            .nyccc-status-badge {
+              display: inline-flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              width: 1rem !important;
+              height: 1rem !important;
+              font-size: 0.58rem !important;
+              font-weight: 800 !important;
+              line-height: 1 !important;
+              color: \(isDark ? "#111111" : "#ffffff") !important;
+              background: \(secondaryColor) !important;
+              border-radius: 0.28rem !important;
+            }
+            .nyccc-bookmark-badge {
+              width: 0.72rem !important;
+              height: 1rem !important;
+              border-radius: 0.1rem 0.1rem 0.04rem 0.04rem !important;
+              background: \(accentHex) !important;
+              clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%) !important;
+            }
+            .nyccc-note-badge svg {
+              width: 0.72rem !important;
+              height: 0.72rem !important;
+              display: block !important;
+              fill: none !important;
+              stroke: currentColor !important;
+              stroke-width: 2.3 !important;
+              stroke-linecap: round !important;
+              stroke-linejoin: round !important;
             }
             .Normal-Level > div { margin: \(paragraphSpacing)rem 0 !important; }
             p, li { margin: 0.35rem 0 !important; }
@@ -1067,58 +1036,6 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .Normal-Level { color: \(textColor) !important; }
             .Normal-Level + .clearfix { margin: 0; }
             small, sup, sub { color: \(secondaryColor) !important; }
-            .nyccc-media-wrapper {
-              margin: 0.55rem 0 !important;
-              padding: 0 !important;
-              text-align: left !important;
-            }
-            .nyccc-media-pill {
-              appearance: none;
-              -webkit-appearance: none;
-              display: inline-flex;
-              align-items: center;
-              gap: 0.45rem;
-              padding: 0.45rem 0.9rem;
-              border: 1px solid \(softBorderColor);
-              border-radius: 999px;
-              background: \(pillBackground);
-              color: \(accentHex);
-              font-family: inherit;
-              font-size: \(max(theme.fontSize * 0.9, 11))px;
-              font-weight: 600;
-              line-height: 1;
-              cursor: pointer;
-              -webkit-tap-highlight-color: transparent;
-              -webkit-user-select: none;
-              user-select: none;
-            }
-            .nyccc-media-pill:active { opacity: 0.6; }
-            .nyccc-media-pill-caret {
-              display: inline-block;
-              transition: transform 0.18s ease;
-              font-size: 0.78em;
-            }
-            .nyccc-media-expanded .nyccc-media-pill-caret {
-              transform: rotate(90deg);
-            }
-            .nyccc-media-collapsed .nyccc-media-content {
-              display: none !important;
-            }
-            .nyccc-media-expanded .nyccc-media-content {
-              display: block !important;
-              margin-top: 0.55rem !important;
-            }
-            .nyccc-media-wrapper img.nyccc-media-content {
-              display: block !important;
-              max-width: 100% !important;
-              height: auto !important;
-              margin: 0.55rem 0 0 0 !important;
-            }
-            .nyccc-media-wrapper table.nyccc-media-content,
-            .nyccc-media-wrapper scrolltable.nyccc-media-content,
-            .nyccc-media-wrapper .xsl-table.nyccc-media-content {
-              margin-top: 0.55rem !important;
-            }
             """
         }
 

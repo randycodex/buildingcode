@@ -20,8 +20,6 @@ struct ContentBlockListView: View {
     var onSelectionChange: ((Bool) -> Void)? = nil
 
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @EnvironmentObject private var expandedMediaTracker: ExpandedMediaTracker
-
     private var htmlStore: PublishedHTMLContentStore {
         ContentBlockHTMLStoreCache.shared.store(
             for: library.selectedVersion?.authoredHTMLBundlePath
@@ -56,61 +54,29 @@ struct ContentBlockListView: View {
                             )
                         }
                     case .table:
-                        CollapsibleMediaBlock(
-                            blockID: block.id,
-                            sectionID: detail.id,
-                            label: tablePillLabel(for: block, in: detail)
-                        ) {
-                            if let tableID = block.tableID,
-                               let table = detail.tableBlocks.first(where: { $0.id == tableID }) {
-                                TableBlockView(table: table, baseURL: htmlBaseURL)
-                            } else if let html = block.html, !html.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                RawTableBlockView(htmlFragment: html, tableID: block.id, baseURL: htmlBaseURL)
-                            } else {
-                                MissingTableBlockView(tableID: block.tableID ?? "")
-                            }
+                        if let tableID = block.tableID,
+                           let table = detail.tableBlocks.first(where: { $0.id == tableID }) {
+                            TableBlockView(table: table, baseURL: htmlBaseURL)
+                        } else if let html = block.html, !html.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            RawTableBlockView(htmlFragment: html, tableID: block.id, baseURL: htmlBaseURL)
+                        } else {
+                            MissingTableBlockView(tableID: block.tableID ?? "")
                         }
                     case .image:
-                        CollapsibleMediaBlock(
-                            blockID: block.id,
-                            sectionID: detail.id,
-                            label: imagePillLabel(for: block)
-                        ) {
-                            if let imageURL = imageURL(for: block) {
-                                ImageBlockView(
-                                    imageURL: imageURL,
-                                    caption: block.caption,
-                                    onOpenImage: onOpenImage
-                                )
-                            } else {
-                                ImageBlockPlaceholderView(imageID: block.imageID ?? "", caption: block.caption)
-                            }
+                        if let imageURL = imageURL(for: block) {
+                            ImageBlockView(
+                                imageURL: imageURL,
+                                caption: block.caption,
+                                onOpenImage: onOpenImage
+                            )
+                        } else {
+                            ImageBlockPlaceholderView(imageID: block.imageID ?? "", caption: block.caption)
                         }
                     }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-    }
-
-    private func tablePillLabel(for block: CodeContentBlock, in detail: ReaderSectionDetail) -> String {
-        if let caption = block.caption?.trimmingCharacters(in: .whitespacesAndNewlines), !caption.isEmpty {
-            return caption
-        }
-        if let tableID = block.tableID,
-           let table = detail.tableBlocks.first(where: { $0.id == tableID }),
-           let caption = table.caption?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !caption.isEmpty {
-            return caption
-        }
-        return "Tap to view table"
-    }
-
-    private func imagePillLabel(for block: CodeContentBlock) -> String {
-        if let caption = block.caption?.trimmingCharacters(in: .whitespacesAndNewlines), !caption.isEmpty {
-            return caption
-        }
-        return "Tap to view image"
     }
 
     private func attributedText(for block: CodeContentBlock) -> NSAttributedString {

@@ -635,7 +635,7 @@ struct ChapterReaderView: View {
     }
 }
 
-private struct ChapterNoteSheet: View {
+struct ChapterNoteSheet: View {
     let detail: ReaderSectionDetail
     @Binding var noteBody: String
     let accentColor: Color

@@ -32,7 +32,6 @@
 		A1000000000000000000001B /* ChapterHTMLWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001B /* ChapterHTMLWebView.swift */; };
 		A1000000000000000000001C /* ChapterHTMLReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001C /* ChapterHTMLReaderView.swift */; };
 		A1000000000000000000001D /* CodeContent in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* CodeContent */; };
-		A1000000000000000000001E /* CompareWorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001E /* CompareWorkspaceView.swift */; };
 		A1000000000000000000001F /* Signposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001F /* Signposts.swift */; };
 		A10000000000000000000020 /* BrowserContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* BrowserContext.swift */; };
 /* End PBXBuildFile section */
@@ -68,7 +67,6 @@
 		A2000000000000000000001B /* ChapterHTMLWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLWebView.swift; sourceTree = "<group>"; };
 		A2000000000000000000001C /* ChapterHTMLReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterHTMLReaderView.swift; sourceTree = "<group>"; };
 		A2000000000000000000001D /* CodeContent */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CodeContent; sourceTree = "<group>"; };
-		A2000000000000000000001E /* CompareWorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareWorkspaceView.swift; sourceTree = "<group>"; };
 		A2000000000000000000001F /* Signposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signposts.swift; sourceTree = "<group>"; };
 		A20000000000000000000020 /* BrowserContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserContext.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -167,7 +165,6 @@
 				A20000000000000000000015 /* ChapterReaderView.swift */,
 				A2000000000000000000001B /* ChapterHTMLWebView.swift */,
 				A2000000000000000000001C /* ChapterHTMLReaderView.swift */,
-				A2000000000000000000001E /* CompareWorkspaceView.swift */,
 				A20000000000000000000018 /* AttributedTextView.swift */,
 				A20000000000000000000019 /* ContentBlockView.swift */,
 			);
@@ -286,7 +283,6 @@
 				A10000000000000000000015 /* ChapterReaderView.swift in Sources */,
 				A1000000000000000000001B /* ChapterHTMLWebView.swift in Sources */,
 				A1000000000000000000001C /* ChapterHTMLReaderView.swift in Sources */,
-				A1000000000000000000001E /* CompareWorkspaceView.swift in Sources */,
 				A10000000000000000000018 /* AttributedTextView.swift in Sources */,
 				A10000000000000000000019 /* ContentBlockView.swift in Sources */,
 				A1000000000000000000001F /* Signposts.swift in Sources */,

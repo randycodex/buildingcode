@@ -99,11 +99,10 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.chapterItems) { chapter in
                                         NavigationLink {
-                                            ChapterLaunchView(
+                                            chapterDestination(
                                                 chapter: chapter,
                                                 rememberedSectionID: rememberedSectionBinding(for: chapter.id)
                                             )
-                                                .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
                                                 chapter: chapter,
@@ -121,11 +120,10 @@ struct BrowseView: View {
                                 LazyVGrid(columns: columns, spacing: 12) {
                                     ForEach(group.appendixItems) { chapter in
                                         NavigationLink {
-                                            ChapterLaunchView(
+                                            chapterDestination(
                                                 chapter: chapter,
                                                 rememberedSectionID: rememberedSectionBinding(for: chapter.id)
                                             )
-                                                .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
                                         } label: {
                                             ChapterTile(
                                                 chapter: chapter,
@@ -154,6 +152,24 @@ struct BrowseView: View {
             CodeAppBackdrop(accent: Color(uiColor: library.accentColor(for: browseCodeSectionID)))
                 .ignoresSafeArea()
         )
+    }
+
+    @ViewBuilder
+    private func chapterDestination(chapter: CodeChapter, rememberedSectionID: Binding<Int64?>) -> some View {
+        if let initialSection = library.firstSection(for: chapter) {
+            ChapterHTMLReaderView(
+                chapter: chapter,
+                initialSection: initialSection,
+                rememberedNativeSectionID: rememberedSectionID
+            )
+            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+        } else {
+            ChapterLaunchView(
+                chapter: chapter,
+                rememberedSectionID: rememberedSectionID
+            )
+            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+        }
     }
 
     private var libraryHeader: some View {
@@ -507,10 +523,10 @@ private struct ChapterLaunchView: View {
     var body: some View {
         Group {
             if let initialSection = initialSection ?? library.firstSection(for: chapter) {
-                ChapterReaderView(
+                ChapterHTMLReaderView(
                     chapter: chapter,
-                    initialSectionID: initialSection.id,
-                    rememberedSectionID: rememberedSectionID
+                    initialSection: initialSection,
+                    rememberedNativeSectionID: rememberedSectionID
                 )
             } else {
                 VStack(spacing: 12) {
@@ -652,9 +668,9 @@ struct ChapterSectionsView: View {
 
                 ForEach(group.sections, id: \.id) { section in
                     NavigationLink {
-                        ChapterReaderView(
+                        ChapterHTMLReaderView(
                             chapter: chapter,
-                            initialSectionID: section.id
+                            initialSection: section
                         )
                     } label: {
                         sectionBubble(section: section)

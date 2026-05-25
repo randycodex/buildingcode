@@ -12,11 +12,14 @@ struct ChapterHTMLReaderView: View {
     @State private var selectedAnchor: PublishedHTMLAnchor?
     @State private var anchors: [PublishedHTMLAnchor] = []
     @State private var openedSection: CodeSectionSummary?
+    @State private var noteTarget: ReaderSectionDetail?
+    @State private var noteBody = ""
     @State private var hasActivatedHTMLReader = true
     @State private var isJumpPickerPresented = false
     @State private var scrollToTopTrigger = 0
     @State private var cachedBookmarkedAnchorIDs: Set<String> = []
     @State private var cachedBookmarkedSectionNumbers: Set<String> = []
+    @State private var cachedNotedSectionNumbers: Set<String> = []
     @State private var cachedBookmarkRevision: Int = -1
     @State private var cachedHTMLStoreRootPath: String?
     @State private var cachedHTMLStore: PublishedHTMLContentStore?
@@ -47,11 +50,6 @@ struct ChapterHTMLReaderView: View {
 
     private var readAccessURL: URL? {
         htmlStore.readAccessURL()
-    }
-
-    private var shouldUseNativeAuthoredReader: Bool {
-        guard library.selectedVersion?.contentKind == .authored else { return false }
-        return !library.sectionGroups(for: chapter).isEmpty
     }
 
     private var currentJumpLabel: String {
@@ -97,22 +95,31 @@ struct ChapterHTMLReaderView: View {
         cachedBookmarkedSectionNumbers
     }
 
-    private func recomputeBookmarkedSets() {
+    private var notedSectionNumbers: Set<String> {
+        cachedNotedSectionNumbers
+    }
+
+    private func recomputeSavedDecorations() {
         var anchorIDs: Set<String> = []
         var sectionNumbers = Set(library.bookmarks.map { bookmark in
             normalizedSectionNumber(bookmark.sectionNumber)
         })
+        var notedSectionNumbers: Set<String> = []
 
         for anchor in anchors {
-            guard let summary = library.sectionSummary(sectionNumber: anchor.sectionNumber),
-                  library.isBookmarked(sectionID: summary.id)
-            else { continue }
-            anchorIDs.insert(anchor.anchorID)
-            sectionNumbers.insert(normalizedSectionNumber(summary.sectionNumber))
+            guard let summary = library.sectionSummary(sectionNumber: anchor.sectionNumber) else { continue }
+            if library.isBookmarked(sectionID: summary.id) {
+                anchorIDs.insert(anchor.anchorID)
+                sectionNumbers.insert(normalizedSectionNumber(summary.sectionNumber))
+            }
+            if !library.noteBody(sectionID: summary.id).trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                notedSectionNumbers.insert(normalizedSectionNumber(summary.sectionNumber))
+            }
         }
 
         cachedBookmarkedAnchorIDs = anchorIDs
         cachedBookmarkedSectionNumbers = sectionNumbers
+        cachedNotedSectionNumbers = notedSectionNumbers
         cachedBookmarkRevision = library.bookmarkRevision
     }
 
@@ -122,13 +129,7 @@ struct ChapterHTMLReaderView: View {
 
     var body: some View {
         Group {
-            if shouldUseNativeAuthoredReader {
-                ChapterReaderView(
-                    chapter: chapter,
-                    initialSectionID: initialSection.id,
-                    rememberedSectionID: rememberedNativeSectionID
-                )
-            } else if let chapterURL, let readAccessURL {
+            if let chapterURL, let readAccessURL {
                 if hasActivatedHTMLReader {
                     htmlReader(chapterURL: chapterURL, readAccessURL: readAccessURL)
                 } else {
@@ -179,13 +180,13 @@ struct ChapterHTMLReaderView: View {
                 selectedAnchor = anchor
                 targetAnchorID = anchor?.anchorID
             }
-            recomputeBookmarkedSets()
+            recomputeSavedDecorations()
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
-            recomputeBookmarkedSets()
+            recomputeSavedDecorations()
         }
         .onChange(of: anchors) { _, _ in
-            recomputeBookmarkedSets()
+            recomputeSavedDecorations()
         }
         .task(id: chapter.id) {
             guard hasActivatedHTMLReader else { return }
@@ -193,6 +194,23 @@ struct ChapterHTMLReaderView: View {
         }
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet
+        }
+        .sheet(item: $noteTarget) { detail in
+            ChapterNoteSheet(
+                detail: detail,
+                noteBody: $noteBody,
+                accentColor: accentColor,
+                isBookmarked: library.isBookmarked(sectionID: detail.id),
+                onToggleBookmark: {
+                    let isBookmarked = library.toggleBookmark(sectionID: detail.id)
+                    recomputeSavedDecorations()
+                    return isBookmarked
+                },
+                onSave: { body in
+                    library.saveNote(sectionID: detail.id, body: body)
+                    recomputeSavedDecorations()
+                }
+            )
         }
         .navigationDestination(item: $openedSection) { section in
             ReaderView(sectionID: section.id)
@@ -244,6 +262,7 @@ struct ChapterHTMLReaderView: View {
             colorScheme: colorScheme,
             bookmarkedAnchorIDs: bookmarkedAnchorIDs,
             bookmarkedSectionNumbers: bookmarkedSectionNumbers,
+            notedSectionNumbers: notedSectionNumbers,
             expandAllTrigger: 0,
             collapseAllTrigger: 0,
             scrollToTopTrigger: scrollToTopTrigger,
@@ -255,7 +274,7 @@ struct ChapterHTMLReaderView: View {
                 }
             },
             onOpenSectionForAnchor: { target in
-                openedSection = sectionSummary(for: target)
+                openNotes(for: target)
             }
         )
         .overlay(alignment: .top) {
@@ -414,6 +433,15 @@ struct ChapterHTMLReaderView: View {
         }
 
         return nil
+    }
+
+    private func openNotes(for target: ChapterHTMLSectionTarget) {
+        guard let section = sectionSummary(for: target) else { return }
+        Task { @MainActor in
+            guard let detail = await library.loadSectionDetailAsync(sectionID: section.id) else { return }
+            noteBody = library.noteBody(sectionID: detail.id)
+            noteTarget = detail
+        }
     }
 
     private func sectionNumber(from headerLine: String) -> String {

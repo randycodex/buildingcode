@@ -42,25 +42,12 @@ struct BookmarksView: View {
                                 chapterHeader(group)
 
                                 ForEach(group.items) { bookmark in
-                                    HStack(alignment: .top, spacing: 10) {
-                                        NavigationLink {
-                                            bookmarkDestination(for: bookmark)
-                                        } label: {
-                                            bookmarkRow(bookmark)
-                                        }
-                                        .buttonStyle(.plain)
-
-                                        NavigationLink {
-                                            CompareWorkspaceView(referenceTarget: compareTarget(for: bookmark))
-                                        } label: {
-                                            Image(systemName: "square.split.2x1")
-                                                .font(.subheadline.weight(.semibold))
-                                                .foregroundStyle(bookmarkAccentColor(for: bookmark.codeSectionID))
-                                                .frame(width: 36, height: 36)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .accessibilityLabel("Open saved item in compare")
+                                    NavigationLink {
+                                        bookmarkDestination(for: bookmark)
+                                    } label: {
+                                        bookmarkRow(bookmark)
                                     }
+                                    .buttonStyle(.plain)
 
                                     CodeHairline()
                                 }
@@ -213,13 +200,6 @@ struct BookmarksView: View {
         .padding(.vertical, 12)
     }
 
-    private func compareTarget(for bookmark: BookmarkedSection) -> CompareLaunchTarget {
-        CompareLaunchTarget(
-            codeSectionID: bookmark.codeSectionID,
-            chapterNumber: bookmark.chapterNumber,
-            sectionID: bookmark.id
-        )
-    }
 }
 
 private struct BookmarkGroupKey: Hashable {
