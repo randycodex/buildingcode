@@ -436,6 +436,7 @@ struct ReaderView: View {
         let loadedDetail = await library.loadSectionDetailAsync(sectionID: sectionID)
         detail = loadedDetail
         if let loadedDetail {
+            library.noteSectionOpened(loadedDetail)
             references = library.resolveReferences(for: loadedDetail)
         } else {
             references = []

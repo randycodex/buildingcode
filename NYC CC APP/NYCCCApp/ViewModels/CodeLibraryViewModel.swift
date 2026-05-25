@@ -33,6 +33,8 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var chapters: [CodeChapter] = []
     @Published private(set) var searchResults: [CodeSearchResult] = []
     @Published private(set) var recentSearches: [String] = []
+    @Published private(set) var pinnedSearches: [String] = []
+    @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
     @Published private(set) var bookmarks: [BookmarkedSection] = []
     @Published var selectedVersionFileName: String = ""
     @Published var selectedJurisdictionKey: String = ""
@@ -49,6 +51,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private let userDataStore: UserDataStore?
     private let readerThemeStore: ReaderThemeStore
     private let recentSearchesDefaultsKey = "recentSearches"
+    private let pinnedSearchesDefaultsKey = "pinnedSearches"
+    private let recentlyViewedSectionsDefaultsKey = "recentlyViewedSections"
     private var codeDatabase: CodeDatabase?
     private var sqliteChapterLoader: SQLiteChapterLoader?
     private var authoredCodeStore: AuthoredCodeStore?
@@ -97,6 +101,8 @@ final class CodeLibraryViewModel: ObservableObject {
         self.readerTheme = readerThemeStore.load()
         self.userDataStore = try? UserDataStore()
         self.recentSearches = Self.loadRecentSearches()
+        self.pinnedSearches = Self.loadPinnedSearches()
+        self.recentlyViewedSections = Self.loadRecentlyViewedSections()
         self.comparisonModeEnabled = UserDefaults.standard.bool(forKey: comparisonModeDefaultsKey)
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
@@ -199,6 +205,73 @@ final class CodeLibraryViewModel: ObservableObject {
         UserDefaults.standard.set(chapter.id, forKey: lastOpenedChapterIDDefaultsKey)
         // The chapter is already being opened, so a pending idle preload is stale.
         lastChapterPreloadTask?.cancel()
+    }
+
+    func noteSectionOpened(_ detail: ReaderSectionDetail) {
+        recordRecentlyViewed(
+            RecentlyViewedEntry(
+                sectionID: detail.id,
+                sectionNumber: detail.sectionNumber,
+                title: detail.displayTitle,
+                chapterTitle: detail.chapterTitle,
+                codeSectionID: detail.codeSectionID,
+                codeSectionName: codeSectionName(id: detail.codeSectionID),
+                previewText: sectionPreviewSnippet(from: detail.officialText),
+                viewedAt: Date()
+            )
+        )
+    }
+
+    func noteSectionOpened(anchor: PublishedHTMLAnchor, chapter: CodeChapter) {
+        guard let summary = sectionSummary(sectionNumber: anchor.sectionNumber) else { return }
+        let officialText = loadSectionDetail(sectionID: summary.id)?.officialText ?? ""
+        recordRecentlyViewed(
+            RecentlyViewedEntry(
+                sectionID: summary.id,
+                sectionNumber: summary.sectionNumber,
+                title: summary.displayTitle,
+                chapterTitle: chapter.title,
+                codeSectionID: chapter.codeSectionID,
+                codeSectionName: codeSectionName(id: chapter.codeSectionID),
+                previewText: sectionPreviewSnippet(from: officialText),
+                viewedAt: Date()
+            )
+        )
+    }
+
+    func sectionPreviewSnippet(from officialText: String) -> String {
+        let normalized = officialText
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else { return "" }
+
+        let limit = 120
+        if normalized.count <= limit {
+            return normalized
+        }
+        let end = normalized.index(normalized.startIndex, offsetBy: limit)
+        return String(normalized[..<end]).trimmingCharacters(in: .whitespacesAndNewlines) + "…"
+    }
+
+    private func recordRecentlyViewed(_ entry: RecentlyViewedEntry) {
+        var updated = recentlyViewedSections.filter { $0.sectionID != entry.sectionID }
+        updated.insert(entry, at: 0)
+        recentlyViewedSections = Array(updated.prefix(10))
+        persistRecentlyViewedSections()
+    }
+
+    private func persistRecentlyViewedSections() {
+        guard let data = try? JSONEncoder().encode(recentlyViewedSections) else { return }
+        UserDefaults.standard.set(data, forKey: recentlyViewedSectionsDefaultsKey)
+    }
+
+    private static func loadRecentlyViewedSections() -> [RecentlyViewedEntry] {
+        guard let data = UserDefaults.standard.data(forKey: "recentlyViewedSections"),
+              let decoded = try? JSONDecoder().decode([RecentlyViewedEntry].self, from: data)
+        else {
+            return []
+        }
+        return decoded.sorted { $0.viewedAt > $1.viewedAt }
     }
 
     private func preloadLastOpenedChapterIfNeeded() {
@@ -903,8 +976,42 @@ final class CodeLibraryViewModel: ObservableObject {
         UserDefaults.standard.removeObject(forKey: recentSearchesDefaultsKey)
     }
 
+    func pinSearch(_ query: String) {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, !isSearchPinned(trimmed) else { return }
+
+        var updated = pinnedSearches.filter { $0.caseInsensitiveCompare(trimmed) != .orderedSame }
+        updated.insert(trimmed, at: 0)
+        pinnedSearches = updated
+        persistPinnedSearches()
+    }
+
+    func unpinSearch(_ query: String) {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+
+        pinnedSearches.removeAll { $0.caseInsensitiveCompare(trimmed) == .orderedSame }
+        persistPinnedSearches()
+    }
+
+    func isSearchPinned(_ query: String) -> Bool {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        return pinnedSearches.contains { $0.caseInsensitiveCompare(trimmed) == .orderedSame }
+    }
+
+    private func persistPinnedSearches() {
+        UserDefaults.standard.set(pinnedSearches, forKey: pinnedSearchesDefaultsKey)
+    }
+
     private static func loadRecentSearches() -> [String] {
         (UserDefaults.standard.array(forKey: "recentSearches") as? [String] ?? [])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+
+    private static func loadPinnedSearches() -> [String] {
+        (UserDefaults.standard.array(forKey: "pinnedSearches") as? [String] ?? [])
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
     }

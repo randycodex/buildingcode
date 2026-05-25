@@ -9,6 +9,7 @@ struct SearchView: View {
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let searchesAllCodeSectionsDefaultsKey = "SearchView.searchesAllCodeSections"
+    private let contentHorizontalInset: CGFloat = 16
     private let tabBarClearance: CGFloat = 168
 
     private var accentColor: Color {
@@ -36,14 +37,14 @@ struct SearchView: View {
 
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Search")
-                        .font(.system(size: 32, weight: .bold, design: .default))
+                        .font(.system(size: 16, weight: .bold, design: .default))
                         .foregroundStyle(.primary)
                         .padding(.bottom, 8)
                         .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
                         .opacity(1 - (collapseProgress * 0.22))
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        recentSearchSection
+                        emptyQueryHistorySection
                     } else if library.searchResults.isEmpty {
                         Text("No results")
                             .font(.subheadline)
@@ -69,7 +70,7 @@ struct SearchView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 18)
                 .padding(.bottom, tabBarClearance)
             }
@@ -85,7 +86,7 @@ struct SearchView: View {
                     searchScopeControl
                     searchField
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 10)
                 .padding(.bottom, 22)
                 .background(bottomSearchDock)
@@ -185,55 +186,208 @@ struct SearchView: View {
     }
 
     @ViewBuilder
-    private var recentSearchSection: some View {
-        if !library.recentSearches.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Recent Searches")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
+    private var emptyQueryHistorySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if !library.recentlyViewedSections.isEmpty {
+                recentlyViewedSection
+            }
 
-                LazyVStack(spacing: 0) {
-                    ForEach(library.recentSearches, id: \.self) { recentSearch in
-                        HStack(spacing: 12) {
-                            Button {
-                                query = recentSearch
-                                library.search(
-                                    query: recentSearch,
-                                    restrictToSelectedCodeSection: !searchesAllCodeSections
-                                )
-                            } label: {
-                                HStack(spacing: 10) {
-                                    Image(systemName: "clock.arrow.circlepath")
-                                        .font(.footnote.weight(.semibold))
-                                        .foregroundStyle(.secondary)
+            if !library.pinnedSearches.isEmpty {
+                pinnedSearchSection
+            }
 
-                                    Text(recentSearch)
-                                        .font(.subheadline)
-                                        .foregroundStyle(.primary)
-                                        .multilineTextAlignment(.leading)
+            if !unpinnedRecentSearches.isEmpty {
+                recentSearchSection
+            }
+        }
+    }
 
-                                    Spacer(minLength: 0)
-                                }
-                            }
-                            .buttonStyle(.plain)
+    private var jumpBackInEntries: [RecentlyViewedEntry] {
+        Array(library.recentlyViewedSections.prefix(4))
+    }
 
-                            Button {
-                                library.removeRecentSearch(recentSearch)
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(.tertiary)
-                                    .frame(width: 18, height: 18)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                        .padding(.vertical, 12)
+    private var recentlyViewedSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            searchHistorySectionHeader("Jump Back In")
 
-                        CodeHairline()
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(), spacing: 8),
+                    GridItem(.flexible(), spacing: 8),
+                ],
+                spacing: 8
+            ) {
+                ForEach(jumpBackInEntries) { entry in
+                    NavigationLink {
+                        ReaderView(sectionID: entry.sectionID)
+                    } label: {
+                        recentlyViewedTile(entry)
                     }
+                    .buttonStyle(.plain)
                 }
             }
         }
+    }
+
+    private func recentlyViewedTile(_ entry: RecentlyViewedEntry) -> some View {
+        let tileAccent = Color(uiColor: library.accentColor(for: entry.codeSectionID))
+        let preview = entry.previewText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return VStack(alignment: .leading, spacing: 4) {
+            Text(entry.sectionNumber)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(tileAccent)
+                .lineLimit(1)
+
+            Text(entry.title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            if !preview.isEmpty {
+                Text(preview)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Text(entry.codeSectionName)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.tertiary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, minHeight: 48, alignment: .topLeading)
+        .padding(8)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(Color(uiColor: .separator).opacity(0.55), lineWidth: 0.75)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private var unpinnedRecentSearches: [String] {
+        library.recentSearches.filter { !library.isSearchPinned($0) }
+    }
+
+    private var pinnedSearchSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            searchHistorySectionHeader("Pinned")
+
+            LazyVStack(spacing: 0) {
+                ForEach(library.pinnedSearches, id: \.self) { pinnedSearch in
+                    searchHistoryRow(
+                        pinnedSearch,
+                        leadingSystemImage: "pin.fill",
+                        showsRemoveButton: false
+                    )
+                }
+            }
+        }
+    }
+
+    private var recentSearchSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            searchHistorySectionHeader("Recent Searches")
+
+            LazyVStack(spacing: 0) {
+                ForEach(unpinnedRecentSearches, id: \.self) { recentSearch in
+                    searchHistoryRow(
+                        recentSearch,
+                        leadingSystemImage: "clock.arrow.circlepath",
+                        showsRemoveButton: true
+                    )
+                }
+            }
+        }
+    }
+
+    private func searchHistorySectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(accentColor)
+            .textCase(.uppercase)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func searchHistoryRow(
+        _ searchQuery: String,
+        leadingSystemImage: String,
+        showsRemoveButton: Bool
+    ) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Button {
+                    applySearch(searchQuery)
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: leadingSystemImage)
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.secondary)
+
+                        Text(searchQuery)
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        Spacer(minLength: 0)
+                    }
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    searchPinHaptic()
+                    if library.isSearchPinned(searchQuery) {
+                        library.unpinSearch(searchQuery)
+                    } else {
+                        library.pinSearch(searchQuery)
+                    }
+                } label: {
+                    Image(systemName: library.isSearchPinned(searchQuery) ? "pin.fill" : "pin")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(
+                            library.isSearchPinned(searchQuery)
+                                ? AnyShapeStyle(accentColor)
+                                : AnyShapeStyle(.tertiary)
+                        )
+                        .frame(width: 18, height: 18)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(library.isSearchPinned(searchQuery) ? "Unpin search" : "Pin search")
+
+                if showsRemoveButton {
+                    Button {
+                        library.removeRecentSearch(searchQuery)
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.tertiary)
+                            .frame(width: 18, height: 18)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Remove recent search")
+                }
+            }
+            .padding(.vertical, 12)
+
+            CodeHairline()
+        }
+    }
+
+    private func applySearch(_ searchQuery: String) {
+        query = searchQuery
+        library.search(
+            query: searchQuery,
+            restrictToSelectedCodeSection: !searchesAllCodeSections
+        )
+    }
+
+    private func searchPinHaptic() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
 
     private func searchResultLink(_ result: CodeSearchResult) -> some View {

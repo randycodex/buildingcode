@@ -25,6 +25,7 @@ struct ChapterHTMLReaderView: View {
     @State private var cachedHTMLStore: PublishedHTMLContentStore?
     @State private var scrollProgress: CGFloat = 0
     @State private var scrollProgressSyncTrigger = 0
+    @State private var lastRecordedVisibleAnchorID: String?
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -202,12 +203,14 @@ struct ChapterHTMLReaderView: View {
         }
         .onChange(of: chapter.id) { _, _ in
             scrollProgress = 0
+            lastRecordedVisibleAnchorID = nil
         }
         .task(id: chapter.id) {
             guard hasActivatedHTMLReader else { return }
             if anchors.isEmpty {
                 await loadAnchors()
             }
+            recordRecentlyViewedForVisibleAnchor(targetAnchorID ?? selectedAnchor?.anchorID)
             requestScrollProgressSync()
         }
         .sheet(isPresented: $isJumpPickerPresented) {
@@ -301,6 +304,7 @@ struct ChapterHTMLReaderView: View {
                 if anchor.level >= 3 || selectedAnchor == nil {
                     selectedAnchor = anchor
                 }
+                recordRecentlyViewedForVisibleAnchor(anchorID)
             },
             onScrollProgressChange: { progress in
                 scrollProgress = progress
@@ -393,6 +397,16 @@ struct ChapterHTMLReaderView: View {
 
     private func requestScrollProgressSync() {
         scrollProgressSyncTrigger &+= 1
+    }
+
+    private func recordRecentlyViewedForVisibleAnchor(_ anchorID: String?) {
+        guard let anchorID,
+              let anchor = anchors.first(where: { $0.anchorID == anchorID }),
+              lastRecordedVisibleAnchorID != anchorID
+        else { return }
+
+        lastRecordedVisibleAnchorID = anchorID
+        library.noteSectionOpened(anchor: anchor, chapter: chapter)
     }
 
     private func ensureHTMLStoreCached() {

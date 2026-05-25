@@ -319,6 +319,74 @@ struct CodeSectionCategory: Identifiable, Hashable, Sendable {
     let name: String
 }
 
+struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
+    let sectionID: Int64
+    let sectionNumber: String
+    let title: String
+    let chapterTitle: String
+    let codeSectionID: Int64?
+    let codeSectionName: String
+    let previewText: String
+    let viewedAt: Date
+
+    var id: Int64 { sectionID }
+
+    init(
+        sectionID: Int64,
+        sectionNumber: String,
+        title: String,
+        chapterTitle: String,
+        codeSectionID: Int64?,
+        codeSectionName: String,
+        previewText: String = "",
+        viewedAt: Date
+    ) {
+        self.sectionID = sectionID
+        self.sectionNumber = sectionNumber
+        self.title = title
+        self.chapterTitle = chapterTitle
+        self.codeSectionID = codeSectionID
+        self.codeSectionName = codeSectionName
+        self.previewText = previewText
+        self.viewedAt = viewedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sectionID = try container.decode(Int64.self, forKey: .sectionID)
+        sectionNumber = try container.decode(String.self, forKey: .sectionNumber)
+        title = try container.decode(String.self, forKey: .title)
+        chapterTitle = try container.decode(String.self, forKey: .chapterTitle)
+        codeSectionID = try container.decodeIfPresent(Int64.self, forKey: .codeSectionID)
+        codeSectionName = try container.decode(String.self, forKey: .codeSectionName)
+        previewText = try container.decodeIfPresent(String.self, forKey: .previewText) ?? ""
+        viewedAt = try container.decode(Date.self, forKey: .viewedAt)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(sectionID, forKey: .sectionID)
+        try container.encode(sectionNumber, forKey: .sectionNumber)
+        try container.encode(title, forKey: .title)
+        try container.encode(chapterTitle, forKey: .chapterTitle)
+        try container.encodeIfPresent(codeSectionID, forKey: .codeSectionID)
+        try container.encode(codeSectionName, forKey: .codeSectionName)
+        try container.encode(previewText, forKey: .previewText)
+        try container.encode(viewedAt, forKey: .viewedAt)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case sectionID
+        case sectionNumber
+        case title
+        case chapterTitle
+        case codeSectionID
+        case codeSectionName
+        case previewText
+        case viewedAt
+    }
+}
+
 struct CodeSectionSummary: Identifiable, Hashable, Sendable {
     let id: Int64
     let chapterNumber: String

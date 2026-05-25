@@ -33,7 +33,7 @@ struct BookmarksView: View {
 
                 VStack(alignment: .leading, spacing: 0) {
                     Text("Saved")
-                        .font(.system(size: 32, weight: .bold, design: .default))
+                        .font(.system(size: 16, weight: .bold, design: .default))
                         .foregroundStyle(.primary)
                         .padding(.bottom, 8)
                         .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
