@@ -1094,6 +1094,30 @@ struct CodeSectionHeader: View {
     }
 }
 
+/// Adaptive greys used for menus, tab-bar icons, navigation chrome, and any
+/// glyph that is *not* tied to a code-section accent color. Designed so the
+/// rendered color is never pure white or pure black in either appearance —
+/// a soft near-label for selected/foreground chrome and an even softer near-
+/// white for text/glyphs sitting on top of an accent fill.
+extension UIColor {
+    /// Soft adaptive grey for non-accent chrome (~88% of `.label`).
+    /// Dark mode: warm near-white. Light mode: deep grey.
+    static let appChrome = UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(white: 0.88, alpha: 1)
+            : UIColor(white: 0.18, alpha: 1)
+    }
+
+    /// Near-white for text/icons placed on top of an accent-filled background
+    /// (e.g. selected chip capsules). Crisp contrast without going pure white.
+    static let appChromeOnFill = UIColor(white: 0.96, alpha: 1)
+}
+
+extension Color {
+    static var appChrome: Color { Color(uiColor: .appChrome) }
+    static var appChromeOnFill: Color { Color(uiColor: .appChromeOnFill) }
+}
+
 struct CodeEyebrow: View {
     let text: String
     let accent: Color

@@ -101,7 +101,7 @@ struct SettingsView: View {
             .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .tint(Color(uiColor: .label))
+            .tint(Color.appChrome)
         }
         .coordinateSpace(name: "settingsScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
@@ -479,7 +479,7 @@ struct SettingsView: View {
                 if isSelected {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Color(uiColor: .label))
+                        .foregroundStyle(Color.appChrome)
                 }
             }
             .padding(.horizontal, 16)

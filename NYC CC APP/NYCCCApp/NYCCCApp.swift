@@ -18,7 +18,7 @@ struct NYCCCApp: App {
             .foregroundColor: UIColor.clear,
             .font: UIFont.preferredFont(forTextStyle: .caption2)
         ]
-        stacked.selected.iconColor = UIColor.label
+        stacked.selected.iconColor = UIColor.appChrome
         stacked.selected.titleTextAttributes = [
             .foregroundColor: UIColor.clear,
             .font: UIFont.preferredFont(forTextStyle: .caption2)
@@ -73,7 +73,7 @@ struct NYCCCApp: App {
                     .tag(AppTab.settings)
             }
             .environmentObject(library)
-            .tint(Color(uiColor: .label))
+            .tint(Color.appChrome)
             .onChange(of: library.comparisonModeEnabled) { _, isEnabled in
                 if !isEnabled, library.selectedTab == .browseSecondary {
                     library.selectedTab = .browse

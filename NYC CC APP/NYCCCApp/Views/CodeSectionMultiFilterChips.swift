@@ -54,7 +54,7 @@ struct CodeSectionMultiFilterChips: View {
         Button(action: action) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(isSelected ? Color.white : accent)
+                .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 7)
                 .background(
