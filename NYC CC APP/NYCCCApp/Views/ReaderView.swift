@@ -118,10 +118,42 @@ struct ReaderView: View {
 
     @ViewBuilder
     private func header(detail: ReaderSectionDetail) -> some View {
+        if let chapter = chapterForJump(detail: detail) {
+            NavigationLink {
+                ChapterHTMLReaderView(
+                    chapter: chapter,
+                    initialSection: CodeSectionSummary(
+                        id: detail.id,
+                        chapterNumber: detail.chapterNumber,
+                        sectionNumber: detail.sectionNumber,
+                        title: detail.title,
+                        kind: detail.kind
+                    )
+                )
+            } label: {
+                headerContent(detail: detail, jumpAffordance: true)
+            }
+            .buttonStyle(.plain)
+        } else {
+            headerContent(detail: detail, jumpAffordance: false)
+        }
+    }
+
+    @ViewBuilder
+    private func headerContent(detail: ReaderSectionDetail, jumpAffordance: Bool) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             if detail.kind == .textBlock {
-                Text(detail.displayTitle)
-                    .font(.title3.weight(.semibold))
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(detail.displayTitle)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.leading)
+                    if jumpAffordance {
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                }
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Text(detail.sectionNumber)
@@ -131,6 +163,11 @@ struct ReaderView: View {
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
+                    if jumpAffordance {
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
                 }
             }
             if detail.kind != .textBlock {
@@ -138,6 +175,14 @@ struct ReaderView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+    }
+
+    private func chapterForJump(detail: ReaderSectionDetail) -> CodeChapter? {
+        library.chapters.first {
+            $0.chapterNumber.caseInsensitiveCompare(detail.chapterNumber) == .orderedSame
         }
     }
 

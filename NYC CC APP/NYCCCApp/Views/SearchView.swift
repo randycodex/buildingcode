@@ -45,12 +45,11 @@ struct SearchView: View {
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         recentSearchSection
                     } else if library.searchResults.isEmpty {
-                        CodeEmptyStateCard(
-                            title: "No Results",
-                            systemImage: "magnifyingglass",
-                            description: "Try a section number, chapter term, or phrase from the code text.",
-                            accent: accentColor
-                        )
+                        Text("No results")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.secondary.opacity(0.7))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 120)
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(library.searchResults) { result in

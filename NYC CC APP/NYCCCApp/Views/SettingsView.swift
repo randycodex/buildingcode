@@ -4,7 +4,14 @@ struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
+    @State private var expandedPicker: ExpandedPicker?
     private let tabBarClearance: CGFloat = 104
+
+    private enum ExpandedPicker: Hashable {
+        case jurisdiction
+        case version
+        case codeSection
+    }
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
@@ -130,19 +137,25 @@ struct SettingsView: View {
                 }
                 .padding(16)
             } else {
-                codeLibraryMenuRow(label: "Jurisdiction") {
-                    Text(selectedJurisdictionName)
-                        .font(.title3.weight(.regular))
-                        .foregroundStyle(.primary)
-                } menu: {
-                    ForEach(library.availableJurisdictions) { jurisdiction in
-                        Button(jurisdiction.name) {
-                            library.updateSelectedJurisdiction(key: jurisdiction.id)
+                expandableSettingsRow(
+                    label: "Jurisdiction",
+                    picker: .jurisdiction,
+                    value: {
+                        Text(selectedJurisdictionName)
+                            .font(.title3.weight(.regular))
+                            .foregroundStyle(.primary)
+                    },
+                    options: {
+                        ForEach(library.availableJurisdictions) { jurisdiction in
+                            expandableSettingsOption(
+                                title: jurisdiction.name,
+                                isSelected: jurisdiction.id == library.selectedJurisdictionKey
+                            ) {
+                                library.updateSelectedJurisdiction(key: jurisdiction.id)
+                            }
                         }
                     }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                )
             }
         }
     }
@@ -157,26 +170,32 @@ struct SettingsView: View {
                 }
                 .padding(16)
             } else {
-                codeLibraryMenuRow(label: "Version") {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text(selectedVersionPrimaryText)
-                            .font(.headline.weight(.regular))
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.trailing)
-                        Text(selectedJurisdictionName)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.trailing)
-                    }
-                } menu: {
-                    ForEach(library.filteredVersions) { version in
-                        Button(CodeLibraryViewModel.displayName(forLibraryName: version.displayName)) {
-                            library.updateSelectedVersion(fileName: version.fileName)
+                expandableSettingsRow(
+                    label: "Version",
+                    picker: .version,
+                    value: {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text(selectedVersionPrimaryText)
+                                .font(.headline.weight(.regular))
+                                .foregroundStyle(.primary)
+                                .multilineTextAlignment(.trailing)
+                            Text(selectedJurisdictionName)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.trailing)
+                        }
+                    },
+                    options: {
+                        ForEach(library.filteredVersions) { version in
+                            expandableSettingsOption(
+                                title: CodeLibraryViewModel.displayName(forLibraryName: version.displayName),
+                                isSelected: version.fileName == library.selectedVersionFileName
+                            ) {
+                                library.updateSelectedVersion(fileName: version.fileName)
+                            }
                         }
                     }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                )
             }
         }
     }
@@ -191,24 +210,33 @@ struct SettingsView: View {
                 }
                 .padding(16)
             } else {
-                codeLibraryMenuRow(label: "Code Section") {
-                    Text(selectedCodeSectionName)
-                        .font(.title3.weight(.regular))
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.trailing)
-                } menu: {
-                    Button("All Sections") {
-                        library.updateSelectedCodeSection(id: nil)
-                    }
+                expandableSettingsRow(
+                    label: "Code Section",
+                    picker: .codeSection,
+                    value: {
+                        Text(selectedCodeSectionName)
+                            .font(.title3.weight(.regular))
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.trailing)
+                    },
+                    options: {
+                        expandableSettingsOption(
+                            title: "All Sections",
+                            isSelected: library.selectedCodeSectionID == nil
+                        ) {
+                            library.updateSelectedCodeSection(id: nil)
+                        }
 
-                    ForEach(library.codeSections) { codeSection in
-                        Button(CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name)) {
-                            library.updateSelectedCodeSection(id: codeSection.id)
+                        ForEach(library.codeSections) { codeSection in
+                            expandableSettingsOption(
+                                title: CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
+                                isSelected: codeSection.id == library.selectedCodeSectionID
+                            ) {
+                                library.updateSelectedCodeSection(id: codeSection.id)
+                            }
                         }
                     }
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                )
             }
         }
     }
@@ -374,27 +402,79 @@ struct SettingsView: View {
         return "All Sections"
     }
 
-    private func codeLibraryMenuRow<Value: View>(
+    private func expandableSettingsRow<Value: View, Options: View>(
         label: String,
+        picker: ExpandedPicker,
         @ViewBuilder value: () -> Value,
-        @ViewBuilder menu: () -> some View
+        @ViewBuilder options: () -> Options
     ) -> some View {
-        Menu {
-            menu()
+        let isExpanded = expandedPicker == picker
+
+        return VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.22)) {
+                    expandedPicker = isExpanded ? nil : picker
+                }
+            } label: {
+                HStack(alignment: .center, spacing: 12) {
+                    Text(label)
+                        .font(.title3)
+                        .foregroundStyle(.primary)
+
+                    Spacer(minLength: 0)
+
+                    value()
+
+                    Image(systemName: "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(spacing: 0) {
+                    options()
+                }
+                .padding(.bottom, 6)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+    }
+
+    private func expandableSettingsOption(
+        title: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button {
+            action()
+            withAnimation(.easeInOut(duration: 0.22)) {
+                expandedPicker = nil
+            }
         } label: {
-            HStack(alignment: .center, spacing: 12) {
-                Text(label)
-                    .font(.title3)
+            HStack(spacing: 10) {
+                Text(title)
+                    .font(.subheadline)
                     .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
 
                 Spacer(minLength: 0)
 
-                value()
-
-                Image(systemName: "chevron.down")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(accentColor)
+                }
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

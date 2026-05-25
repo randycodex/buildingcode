@@ -4,6 +4,8 @@ import UIKit
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
+    @State private var savedFilterCodeSectionID: Int64? = nil
+    @State private var savedFilterAllSelected: Bool = true
 
     private let tabBarClearance: CGFloat = 104
 
@@ -37,6 +39,11 @@ struct BookmarksView: View {
                         .opacity(1 - (collapseProgress * 0.22))
 
                     if !library.bookmarks.isEmpty {
+                        if !availableFilterSections.isEmpty {
+                            savedFilterControl
+                                .padding(.bottom, 8)
+                        }
+
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(bookmarkGroups) { group in
                                 chapterHeader(group)
@@ -74,8 +81,70 @@ struct BookmarksView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
+    private var availableFilterSections: [CodeSectionCategory] {
+        // Only offer chips for code sections that actually contain a saved
+        // bookmark, so the row doesn't fill with empty chips.
+        let usedIDs = Set(library.bookmarks.compactMap(\.codeSectionID))
+        return library.codeSections.filter { usedIDs.contains($0.id) }
+    }
+
+    private var filteredBookmarks: [BookmarkedSection] {
+        guard !savedFilterAllSelected, let id = savedFilterCodeSectionID else {
+            return library.bookmarks
+        }
+        return library.bookmarks.filter { $0.codeSectionID == id }
+    }
+
+    private var savedFilterControl: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                savedFilterChip(
+                    title: "All",
+                    accent: accentColor,
+                    isSelected: savedFilterAllSelected
+                ) {
+                    savedFilterAllSelected = true
+                    savedFilterCodeSectionID = nil
+                }
+
+                ForEach(availableFilterSections) { codeSection in
+                    let isSelected = !savedFilterAllSelected && savedFilterCodeSectionID == codeSection.id
+                    savedFilterChip(
+                        title: CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
+                        accent: bookmarkAccentColor(for: codeSection.id),
+                        isSelected: isSelected
+                    ) {
+                        savedFilterAllSelected = false
+                        savedFilterCodeSectionID = codeSection.id
+                    }
+                }
+            }
+            .padding(.vertical, 2)
+        }
+    }
+
+    private func savedFilterChip(
+        title: String,
+        accent: Color,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isSelected ? Color.white : accent)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(isSelected ? accent : accent.opacity(0.12))
+                )
+        }
+        .buttonStyle(.plain)
+    }
+
     private var bookmarkGroups: [BookmarkChapterGroup] {
-        let grouped = Dictionary(grouping: library.bookmarks) { bookmark in
+        let grouped = Dictionary(grouping: filteredBookmarks) { bookmark in
             BookmarkGroupKey(
                 codeSectionID: bookmark.codeSectionID,
                 chapterNumber: bookmark.chapterNumber
@@ -103,7 +172,7 @@ struct BookmarksView: View {
     private func chapterHeader(_ group: BookmarkChapterGroup) -> some View {
         let groupAccent = bookmarkAccentColor(for: group.codeSectionID)
 
-        return VStack(alignment: .leading, spacing: 5) {
+        return VStack(alignment: .leading, spacing: 6) {
             if !library.codeSections.isEmpty {
                 Text(group.codeSectionName)
                     .font(.caption.weight(.semibold))
@@ -111,15 +180,19 @@ struct BookmarksView: View {
                     .textCase(.uppercase)
             }
 
-            Text("Chapter \(group.chapterNumber)")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text("Chapter \(group.chapterNumber)")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                    .fixedSize(horizontal: true, vertical: false)
 
-            Text(group.chapterTitle)
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
+                Text(group.chapterTitle)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 26)

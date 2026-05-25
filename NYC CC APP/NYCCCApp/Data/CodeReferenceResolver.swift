@@ -74,9 +74,15 @@ final class CodeReferenceResolver {
         let fullRange = NSRange(location: 0, length: capture.utf16.count)
         let mutable = NSMutableString(string: capture)
         splitPattern.replaceMatches(in: mutable, range: fullRange, withTemplate: "|")
+        // Also trim trailing punctuation (period, comma, colon, semicolon) so
+        // tokens like "904.12.2." resolve correctly. The regex capture group
+        // greedily included the sentence-ending period, which previously
+        // caused the last reference in a "Sections X and Y." list to fail
+        // the section-index lookup.
+        let trimChars = CharacterSet.whitespacesAndNewlines.union(CharacterSet(charactersIn: ".,;:"))
         return String(mutable)
             .split(separator: "|")
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() }
+            .map { $0.trimmingCharacters(in: trimChars).uppercased() }
             .filter { !$0.isEmpty }
     }
 }
