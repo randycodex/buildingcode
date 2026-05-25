@@ -378,6 +378,14 @@ struct SettingsView: View {
                 systemImage: "note.text",
                 action: .clearNotes
             )
+
+            CodeHairline()
+
+            settingsDangerButton(
+                title: "Clear All Tags",
+                systemImage: "tag.slash",
+                action: .clearTags
+            )
         }
     }
 
@@ -510,6 +518,8 @@ struct SettingsView: View {
             library.clearAllBookmarks()
         case .clearNotes:
             library.clearAllNotes()
+        case .clearTags:
+            library.clearAllTags()
         }
         pendingClearAction = nil
     }
@@ -519,6 +529,7 @@ private enum ClearSettingsAction: Identifiable {
     case clearSearches
     case clearBookmarks
     case clearNotes
+    case clearTags
 
     var id: String { buttonTitle }
 
@@ -530,6 +541,8 @@ private enum ClearSettingsAction: Identifiable {
             return "Clear All Bookmarks"
         case .clearNotes:
             return "Clear All Notes"
+        case .clearTags:
+            return "Clear All Tags"
         }
     }
 
@@ -541,6 +554,8 @@ private enum ClearSettingsAction: Identifiable {
             return "Clear all bookmarks?"
         case .clearNotes:
             return "Clear all notes?"
+        case .clearTags:
+            return "Clear all tags?"
         }
     }
 
@@ -552,6 +567,8 @@ private enum ClearSettingsAction: Identifiable {
             return "This removes every bookmark saved for the current code version."
         case .clearNotes:
             return "This removes every note saved for the current code version."
+        case .clearTags:
+            return "This removes every tag from saved sections for the current code version. Bookmarks and notes are not affected."
         }
     }
 }

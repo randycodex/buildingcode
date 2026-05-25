@@ -1060,6 +1060,16 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func clearAllTags() {
+        guard let selectedVersion, let userDataStore else { return }
+        do {
+            try userDataStore.clearAllTags(codeVersion: selectedVersion.codeVersion)
+            refreshBookmarks()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
     private func openSelectedContent() {
         contentLoadTask?.cancel()
         clearCaches()

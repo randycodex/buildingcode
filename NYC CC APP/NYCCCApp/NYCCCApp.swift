@@ -35,6 +35,7 @@ struct NYCCCApp: App {
         WindowGroup {
             TabView(selection: $selectedTab) {
                 BrowseView(browserContext: .primary)
+                    .environment(\.isBrowserTabActive, selectedTab == .browse)
                     .tabItem {
                         Image(systemName: "text.line.first.and.arrowtriangle.forward")
                         Text("")
@@ -129,6 +130,7 @@ private struct DeferredBrowseTabView: View {
         Group {
             if hasActivated || isActive {
                 BrowseView(browserContext: browserContext)
+                    .environment(\.isBrowserTabActive, isActive)
             } else {
                 Color.clear
                     .accessibilityHidden(true)

@@ -309,17 +309,19 @@ struct BookmarksView: View {
                             .foregroundStyle(bookmarkAccent)
                     }
 
-                    if bookmark.isBookmarked {
-                        Image(systemName: "bookmark.fill")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(bookmarkAccent)
-                    }
-
                     if bookmark.hasNote {
                         Image(systemName: "note.text")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(bookmarkAccent)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 16, height: 16)
                             .accessibilityLabel("Has note")
+                    }
+
+                    if bookmark.isBookmarked {
+                        Image(systemName: "bookmark.fill")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(bookmarkAccent)
+                            .frame(width: 16, height: 16)
                     }
                 }
 

@@ -24,6 +24,10 @@ struct ChapterReaderView: View {
     @State private var scrollPositionSectionID: Int64?
     @State private var focusedSectionUpdateTask: Task<Void, Never>?
     @State private var backgroundPrefetchTask: Task<Void, Never>?
+    @State private var scrollProgress: CGFloat = 0
+    @State private var lastBlockOffsets: [Int64: CGFloat] = [:]
+    @State private var loadedBlocksChapterID: Int64?
+    @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @StateObject private var expandedMediaTracker = ExpandedMediaTracker()
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
     private let chapterReaderScrollTopThreshold: CGFloat = 140
@@ -71,6 +75,8 @@ struct ChapterReaderView: View {
         .environmentObject(expandedMediaTracker)
         .onPreferenceChange(ChapterReaderBlockOffsetPreferenceKey.self) { offsets in
             DispatchQueue.main.async {
+                lastBlockOffsets = offsets
+                updateScrollProgress(from: offsets)
                 updateFocusedSection(from: offsets)
             }
         }
@@ -88,9 +94,6 @@ struct ChapterReaderView: View {
         .onTapGesture {
             guard hasActiveTextSelection else { return }
             dismissTextSelection()
-        }
-        .overlay(alignment: .top) {
-            CodeTopContentFade(alwaysVisible: true)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar(proxy: proxy)
@@ -118,6 +121,10 @@ struct ChapterReaderView: View {
                 .frame(maxWidth: 260)
                 .multilineTextAlignment(.center)
             }
+        }
+        .tint(accentColor)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            ChapterReadingProgressBar(progress: scrollProgress, accentColor: accentColor)
         }
         .fullScreenCover(
             isPresented: Binding(
@@ -158,6 +165,12 @@ struct ChapterReaderView: View {
         }
         .onAppear {
             syncVisibleSavedState()
+            updateScrollProgress(from: lastBlockOffsets)
+        }
+        .onChange(of: isBrowserTabActive) { _, isActive in
+            if isActive {
+                updateScrollProgress(from: lastBlockOffsets)
+            }
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
             syncVisibleSavedState()
@@ -167,6 +180,9 @@ struct ChapterReaderView: View {
             focusedSectionUpdateTask = nil
             backgroundPrefetchTask?.cancel()
             backgroundPrefetchTask = nil
+        }
+        .overlay(alignment: .top) {
+            CodeTopContentFade(alwaysVisible: true)
         }
     }
 
@@ -283,19 +299,19 @@ struct ChapterReaderView: View {
     @ViewBuilder
     private func sectionStatusIndicators(isBookmarked: Bool, hasNote: Bool) -> some View {
         if isBookmarked || hasNote {
-        HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 if hasNote {
-                Image(systemName: "note.text")
-                    .font(.subheadline.weight(.semibold))
+                    Image(systemName: "note.text")
+                        .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
-                    .frame(width: 28, height: 28)
+                        .frame(width: 16, height: 16)
                 }
 
                 if isBookmarked {
-                Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                    .font(.subheadline.weight(.semibold))
+                    Image(systemName: "bookmark.fill")
+                        .font(.caption2.weight(.semibold))
                         .foregroundStyle(accentColor)
-                    .frame(width: 28, height: 28)
+                        .frame(width: 16, height: 16)
                 }
             }
         }
@@ -349,7 +365,7 @@ struct ChapterReaderView: View {
                         .font(.caption2.weight(.semibold))
                 }
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(.primary)
+                .foregroundStyle(accentColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 11)
@@ -360,6 +376,7 @@ struct ChapterReaderView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
+            .buttonStyle(.plain)
             .disabled(visibleJumpBlocks.isEmpty)
 
         }
@@ -415,11 +432,18 @@ struct ChapterReaderView: View {
     }
 
     private func loadBlocks(with proxy: ScrollViewProxy) async {
+        if loadedBlocksChapterID == chapter.id, !blocks.isEmpty {
+            updateScrollProgress(from: lastBlockOffsets)
+            return
+        }
+
         let signpostID = OSSignpostID(log: AppSignpost.reader)
         os_signpost(.begin, log: AppSignpost.reader, name: "loadBlocks", signpostID: signpostID, "%{public}@", chapter.chapterNumber)
         defer { os_signpost(.end, log: AppSignpost.reader, name: "loadBlocks", signpostID: signpostID) }
 
+        loadedBlocksChapterID = chapter.id
         blocks = []
+        scrollProgress = 0
         pendingFocusedSectionID = nil
         expandedMediaTracker.reset()
         focusedSectionUpdateTask?.cancel()
@@ -494,6 +518,19 @@ struct ChapterReaderView: View {
         rememberedSectionID.wrappedValue = id
         pendingScrollSectionID = id
         scrollIfNeeded(with: proxy, animated: true)
+    }
+
+    private func updateScrollProgress(from offsets: [Int64: CGFloat]) {
+        let visibleBlocks = visibleJumpBlocks
+        guard !visibleBlocks.isEmpty else {
+            scrollProgress = 0
+            return
+        }
+        guard let topID = topVisibleSectionID(from: offsets),
+              let index = visibleBlocks.firstIndex(where: { $0.id == topID })
+        else { return }
+        let denominator = max(visibleBlocks.count - 1, 1)
+        scrollProgress = CGFloat(index) / CGFloat(denominator)
     }
 
     private func updateFocusedSection(from offsets: [Int64: CGFloat]) {
@@ -803,6 +840,29 @@ private struct ChapterBlockBodyView: View {
 private struct ChapterBlockBodyTaskID: Hashable {
     let sectionID: Int64
     let theme: ReaderTheme
+}
+
+struct ChapterReadingProgressBar: View {
+    let progress: CGFloat
+    let accentColor: Color
+
+    var body: some View {
+        GeometryReader { proxy in
+            let clamped = min(max(progress, 0), 1)
+            let barWidth = proxy.size.width * clamped
+            ZStack(alignment: .leading) {
+                Rectangle()
+                    .fill(accentColor.opacity(0.22))
+                Rectangle()
+                    .fill(accentColor)
+                    .frame(width: max(barWidth, clamped > 0 ? 3 : 0))
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 3)
+        .animation(.linear(duration: 0.05), value: progress)
+        .allowsHitTesting(false)
+    }
 }
 
 private struct ChapterReaderBlockOffsetPreferenceKey: PreferenceKey {

@@ -7,6 +7,7 @@ struct ChapterHTMLReaderView: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.isBrowserTabActive) private var isBrowserTabActive
 
     @State private var targetAnchorID: String?
     @State private var selectedAnchor: PublishedHTMLAnchor?
@@ -22,6 +23,8 @@ struct ChapterHTMLReaderView: View {
     @State private var cachedBookmarkRevision: Int = -1
     @State private var cachedHTMLStoreRootPath: String?
     @State private var cachedHTMLStore: PublishedHTMLContentStore?
+    @State private var scrollProgress: CGFloat = 0
+    @State private var scrollProgressSyncTrigger = 0
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -173,6 +176,7 @@ struct ChapterHTMLReaderView: View {
                 .multilineTextAlignment(.center)
             }
         }
+        .tint(accentColor)
         .onAppear {
             ensureHTMLStoreCached()
             library.noteChapterOpened(chapter: chapter)
@@ -183,6 +187,12 @@ struct ChapterHTMLReaderView: View {
                 targetAnchorID = anchor?.anchorID
             }
             recomputeSavedDecorations()
+            requestScrollProgressSync()
+        }
+        .onChange(of: isBrowserTabActive) { _, isActive in
+            if isActive {
+                requestScrollProgressSync()
+            }
         }
         .onChange(of: library.bookmarkRevision) { _, _ in
             recomputeSavedDecorations()
@@ -190,9 +200,15 @@ struct ChapterHTMLReaderView: View {
         .onChange(of: anchors) { _, _ in
             recomputeSavedDecorations()
         }
+        .onChange(of: chapter.id) { _, _ in
+            scrollProgress = 0
+        }
         .task(id: chapter.id) {
             guard hasActivatedHTMLReader else { return }
-            await loadAnchors()
+            if anchors.isEmpty {
+                await loadAnchors()
+            }
+            requestScrollProgressSync()
         }
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet
@@ -217,6 +233,16 @@ struct ChapterHTMLReaderView: View {
         .navigationDestination(item: $openedSection) { section in
             ReaderView(sectionID: section.id)
                 .environmentObject(library)
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader {
+                ChapterReadingProgressBar(progress: scrollProgress, accentColor: accentColor)
+            }
+        }
+        .overlay(alignment: .top) {
+            if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader {
+                CodeTopContentFade(alwaysVisible: true)
+            }
         }
     }
 
@@ -268,6 +294,7 @@ struct ChapterHTMLReaderView: View {
             expandAllTrigger: 0,
             collapseAllTrigger: 0,
             scrollToTopTrigger: 0,
+            scrollProgressSyncTrigger: scrollProgressSyncTrigger,
             onVisibleAnchorChange: { anchorID in
                 guard let anchor = anchors.first(where: { $0.anchorID == anchorID }) else { return }
                 // Prefer subsection-level anchors for the jump label so it reflects the current title.
@@ -275,13 +302,13 @@ struct ChapterHTMLReaderView: View {
                     selectedAnchor = anchor
                 }
             },
+            onScrollProgressChange: { progress in
+                scrollProgress = progress
+            },
             onOpenSectionForAnchor: { target in
                 openNotes(for: target)
             }
         )
-        .overlay(alignment: .top) {
-            CodeTopContentFade(alwaysVisible: true)
-        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             jumpBar
                 .background(pageBackgroundColor)
@@ -302,7 +329,7 @@ struct ChapterHTMLReaderView: View {
                         .font(.caption2.weight(.semibold))
                 }
                 .font(.subheadline.weight(.medium))
-                .foregroundStyle(.primary)
+                .foregroundStyle(accentColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 11)
@@ -313,6 +340,7 @@ struct ChapterHTMLReaderView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
+            .buttonStyle(.plain)
             .disabled(jumpTargets.isEmpty)
 
         }
@@ -361,6 +389,10 @@ struct ChapterHTMLReaderView: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+    }
+
+    private func requestScrollProgressSync() {
+        scrollProgressSyncTrigger &+= 1
     }
 
     private func ensureHTMLStoreCached() {

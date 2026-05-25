@@ -29,7 +29,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let expandAllTrigger: Int
     let collapseAllTrigger: Int
     let scrollToTopTrigger: Int
+    let scrollProgressSyncTrigger: Int
     let onVisibleAnchorChange: ((String) -> Void)?
+    let onScrollProgressChange: ((CGFloat) -> Void)?
     let onOpenSectionForAnchor: ((ChapterHTMLSectionTarget) -> Void)?
 
     func makeCoordinator() -> Coordinator {
@@ -40,6 +42,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         let configuration = WKWebViewConfiguration()
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
         configuration.userContentController.add(context.coordinator, name: Coordinator.visibleAnchorMessageName)
+        configuration.userContentController.add(context.coordinator, name: Coordinator.scrollProgressMessageName)
         configuration.userContentController.add(context.coordinator, name: Coordinator.openSectionMessageName)
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
@@ -63,6 +66,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
         if context.coordinator.loadedURL != chapterURL {
             context.coordinator.loadedURL = chapterURL
+            context.coordinator.resetScrollProgressReporting()
             context.coordinator.pendingAnchorID = targetAnchorID
             // Load off the main thread: reading a multi-MB HTML file and
             // running normalizeSharedAssetPaths synchronously in updateUIView
@@ -101,10 +105,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             context.coordinator.appliedScrollToTopTrigger = scrollToTopTrigger
             context.coordinator.scrollToTop(in: webView)
         }
+        if context.coordinator.appliedScrollProgressSyncTrigger != scrollProgressSyncTrigger {
+            context.coordinator.appliedScrollProgressSyncTrigger = scrollProgressSyncTrigger
+            context.coordinator.syncScrollProgress(in: webView)
+        }
     }
 
     final class Coordinator: NSObject, WKNavigationDelegate, UIScrollViewDelegate, WKScriptMessageHandler {
         static let visibleAnchorMessageName = "nycccVisibleAnchor"
+        static let scrollProgressMessageName = "nycccScrollProgress"
         static let openSectionMessageName = "nycccOpenSection"
 
         var parent: ChapterHTMLWebView?
@@ -120,7 +129,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
+        var appliedScrollProgressSyncTrigger = 0
         private var htmlLoadTask: Task<Void, Never>?
+        private var lastReportedScrollProgress: CGFloat = -1
 
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
             htmlLoadTask?.cancel()
@@ -146,6 +157,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             applyBookmarkDecorations(to: webView)
             scroll(to: pendingAnchorID ?? parent?.targetAnchorID, in: webView)
             pendingAnchorID = nil
+            lastReportedScrollProgress = -1
+            reportScrollProgress(from: webView.scrollView)
         }
 
         func applyReaderScripts(to webView: WKWebView) {
@@ -470,6 +483,22 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 } catch (error) {}
               }
 
+              function reportScrollProgress() {
+                var scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+                var scrollHeight = Math.max(
+                  document.documentElement.scrollHeight || 0,
+                  document.body ? document.body.scrollHeight : 0
+                );
+                var clientHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+                var maxScroll = Math.max(scrollHeight - clientHeight, 1);
+                var progress = Math.min(Math.max(scrollTop / maxScroll, 0), 1);
+                if (window.__nycccLastScrollProgress === progress) { return; }
+                window.__nycccLastScrollProgress = progress;
+                try {
+                  window.webkit.messageHandlers.\(Coordinator.scrollProgressMessageName).postMessage(progress);
+                } catch (error) {}
+              }
+
               document.querySelectorAll('.Section, .Subsection').forEach(function(heading) {
                 if (heading.dataset.nycccCollapseReady === 'true') { return; }
                 heading.dataset.nycccCollapseReady = 'true';
@@ -515,10 +544,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 window.requestAnimationFrame(function() {
                   window.__nycccVisibleAnchorFramePending = false;
                   reportVisibleAnchor();
+                  reportScrollProgress();
                 });
               };
               window.addEventListener('scroll', window.__nycccVisibleAnchorListener, { passive: true });
-              setTimeout(reportVisibleAnchor, 0);
+              setTimeout(function() {
+                reportVisibleAnchor();
+                reportScrollProgress();
+              }, 0);
             })();
             """
             webView.evaluateJavaScript(javascript)
@@ -643,11 +676,59 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             webView.evaluateJavaScript(javascript)
         }
 
+        func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            reportScrollProgress(from: scrollView)
+        }
+
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
             nil
         }
 
+        private func reportScrollProgress(from scrollView: UIScrollView) {
+            let contentHeight = scrollView.contentSize.height
+            let viewportHeight = scrollView.bounds.height
+            guard contentHeight > 0, viewportHeight > 0 else { return }
+
+            let maxOffset = max(
+                contentHeight - viewportHeight + scrollView.adjustedContentInset.top + scrollView.adjustedContentInset.bottom,
+                1
+            )
+            let offset = scrollView.contentOffset.y + scrollView.adjustedContentInset.top
+            deliverScrollProgress(min(max(offset / maxOffset, 0), 1))
+        }
+
+        func resetScrollProgressReporting() {
+            lastReportedScrollProgress = -1
+        }
+
+        func syncScrollProgress(in webView: WKWebView) {
+            resetScrollProgressReporting()
+            reportScrollProgress(from: webView.scrollView)
+        }
+
+        private func deliverScrollProgress(_ progress: CGFloat) {
+            let clamped = min(max(progress, 0), 1)
+            guard abs(clamped - lastReportedScrollProgress) > 0.002 else { return }
+            lastReportedScrollProgress = clamped
+            DispatchQueue.main.async { [weak self] in
+                self?.parent?.onScrollProgressChange?(clamped)
+            }
+        }
+
         func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            if message.name == Self.scrollProgressMessageName {
+                let progress: CGFloat
+                if let value = message.body as? Double {
+                    progress = CGFloat(value)
+                } else if let value = message.body as? NSNumber {
+                    progress = CGFloat(truncating: value)
+                } else {
+                    return
+                }
+                deliverScrollProgress(progress)
+                return
+            }
+
             if message.name == Self.openSectionMessageName {
                 guard let target = sectionTarget(from: message.body) else { return }
                 DispatchQueue.main.async { [weak self] in
@@ -978,33 +1059,31 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             .nyccc-status-badges {
               display: inline-flex !important;
               align-items: center !important;
-              gap: 0.35rem !important;
-              margin-left: 0.55rem !important;
-              vertical-align: 0.05rem !important;
+              gap: 0.28rem !important;
+              margin-left: 0.45rem !important;
+              vertical-align: 0.08rem !important;
             }
             .nyccc-status-badge {
               display: inline-flex !important;
               align-items: center !important;
               justify-content: center !important;
-              width: 1rem !important;
-              height: 1rem !important;
-              font-size: 0.58rem !important;
-              font-weight: 800 !important;
-              line-height: 1 !important;
-              color: \(isDark ? "#111111" : "#ffffff") !important;
-              background: \(secondaryColor) !important;
-              border-radius: 0.28rem !important;
+              flex-shrink: 0 !important;
             }
             .nyccc-bookmark-badge {
-              width: 0.72rem !important;
-              height: 1rem !important;
-              border-radius: 0.1rem 0.1rem 0.04rem 0.04rem !important;
+              width: 0.56rem !important;
+              height: 0.78rem !important;
+              border-radius: 0.08rem 0.08rem 0.03rem 0.03rem !important;
               background: \(accentHex) !important;
               clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%) !important;
             }
+            .nyccc-note-badge {
+              background: transparent !important;
+              border-radius: 0 !important;
+              color: \(secondaryColor) !important;
+            }
             .nyccc-note-badge svg {
-              width: 0.72rem !important;
-              height: 0.72rem !important;
+              width: 0.62rem !important;
+              height: 0.62rem !important;
               display: block !important;
               fill: none !important;
               stroke: currentColor !important;

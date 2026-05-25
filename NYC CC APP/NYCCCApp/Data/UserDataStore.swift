@@ -355,6 +355,20 @@ final class UserDataStore {
         try vacuumIfNeeded()
     }
 
+    /// Removes every tag for the given code version. Bookmarks and notes are kept.
+    func clearAllTags(codeVersion: String) throws {
+        let statement = try connection.prepare(
+            """
+            DELETE FROM bookmark_tags
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        _ = try connection.step(statement)
+        try vacuumIfNeeded()
+    }
+
     private func vacuumIfNeeded() throws {
         try connection.execute("VACUUM;")
     }

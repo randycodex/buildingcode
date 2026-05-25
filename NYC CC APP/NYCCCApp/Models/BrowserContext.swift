@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
     case primary
@@ -33,5 +34,17 @@ enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
 
     static func persistCodeSectionID(_ id: Int64?, for context: BrowserContextID) {
         UserDefaults.standard.set(id ?? -1, forKey: context.codeSectionDefaultsKey)
+    }
+}
+
+private struct BrowserTabActiveKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+    /// Whether this browse tab is the selected comparison-mode browser tab.
+    var isBrowserTabActive: Bool {
+        get { self[BrowserTabActiveKey.self] }
+        set { self[BrowserTabActiveKey.self] = newValue }
     }
 }
