@@ -19,7 +19,7 @@ struct FolderFilterChipsRow: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 filterChip(
-                    title: "All",
+                    title: "All Projects",
                     accent: Color.secondary,
                     isSelected: selectedIDs.isEmpty
                 ) {

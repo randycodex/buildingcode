@@ -8,11 +8,11 @@ struct CodeSectionMultiFilterChips: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                // The "All" chip uses a neutral grey rather than the library's
-                // accent so it reads as a non-state (no code section picked),
-                // matching how the All Tags chip behaves on the Saved screen.
+                // The "All Sections" chip uses a neutral grey rather than the
+                // library's accent so it reads as a non-state (no code section
+                // picked), matching how the All Tags chip behaves on Saved.
                 filterChip(
-                    title: "All",
+                    title: "All Sections",
                     accent: Color.secondary,
                     isSelected: selectedIDs.isEmpty
                 ) {

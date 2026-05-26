@@ -1,0 +1,950 @@
+{
+  "chapters" : [
+    {
+      "blockCount" : 100,
+      "chapterID" : 1,
+      "chapterNumber" : "1",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 100,
+      "sectionCount" : 107
+    },
+    {
+      "blockCount" : 5,
+      "chapterID" : 2,
+      "chapterNumber" : "2",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 5,
+      "sectionCount" : 19
+    },
+    {
+      "blockCount" : 63,
+      "chapterID" : 3,
+      "chapterNumber" : "3",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 59,
+      "sectionCount" : 59
+    },
+    {
+      "blockCount" : 650,
+      "chapterID" : 4,
+      "chapterNumber" : "4",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 626,
+      "sectionCount" : 646
+    },
+    {
+      "blockCount" : 113,
+      "chapterID" : 5,
+      "chapterNumber" : "5",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 100,
+      "sectionCount" : 114
+    },
+    {
+      "blockCount" : 18,
+      "chapterID" : 6,
+      "chapterNumber" : "6",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 14,
+      "sectionCount" : 16
+    },
+    {
+      "blockCount" : 624,
+      "chapterID" : 7,
+      "chapterNumber" : "7",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 494,
+      "sectionCount" : 515
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 8,
+      "chapterNumber" : "8",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 59
+    },
+    {
+      "blockCount" : 553,
+      "chapterID" : 9,
+      "chapterNumber" : "9",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 549,
+      "sectionCount" : 581
+    },
+    {
+      "blockCount" : 492,
+      "chapterID" : 10,
+      "chapterNumber" : "10",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 466,
+      "sectionCount" : 506
+    },
+    {
+      "blockCount" : 302,
+      "chapterID" : 11,
+      "chapterNumber" : "11",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 285,
+      "sectionCount" : 304
+    },
+    {
+      "blockCount" : 113,
+      "chapterID" : 12,
+      "chapterNumber" : "12",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 106,
+      "sectionCount" : 127
+    },
+    {
+      "blockCount" : 2,
+      "chapterID" : 13,
+      "chapterNumber" : "13",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 2,
+      "sectionCount" : 2
+    },
+    {
+      "blockCount" : 157,
+      "chapterID" : 14,
+      "chapterNumber" : "14",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 153,
+      "sectionCount" : 161
+    },
+    {
+      "blockCount" : 226,
+      "chapterID" : 15,
+      "chapterNumber" : "15",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 199,
+      "sectionCount" : 199
+    },
+    {
+      "blockCount" : 314,
+      "chapterID" : 16,
+      "chapterNumber" : "16",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 236,
+      "sectionCount" : 254
+    },
+    {
+      "blockCount" : 233,
+      "chapterID" : 17,
+      "chapterNumber" : "17",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 213,
+      "sectionCount" : 241
+    },
+    {
+      "blockCount" : 410,
+      "chapterID" : 18,
+      "chapterNumber" : "18",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 381,
+      "sectionCount" : 409
+    },
+    {
+      "blockCount" : 206,
+      "chapterID" : 19,
+      "chapterNumber" : "19",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 202,
+      "sectionCount" : 238
+    },
+    {
+      "blockCount" : 6,
+      "chapterID" : 20,
+      "chapterNumber" : "20",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 6,
+      "sectionCount" : 6
+    },
+    {
+      "blockCount" : 203,
+      "chapterID" : 21,
+      "chapterNumber" : "21",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 183,
+      "sectionCount" : 188
+    },
+    {
+      "blockCount" : 62,
+      "chapterID" : 22,
+      "chapterNumber" : "22",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 62,
+      "sectionCount" : 76
+    },
+    {
+      "blockCount" : 385,
+      "chapterID" : 23,
+      "chapterNumber" : "23",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 249,
+      "sectionCount" : 265
+    },
+    {
+      "blockCount" : 65,
+      "chapterID" : 24,
+      "chapterNumber" : "24",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 61,
+      "sectionCount" : 69
+    },
+    {
+      "blockCount" : 81,
+      "chapterID" : 25,
+      "chapterNumber" : "25",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 71,
+      "sectionCount" : 71
+    },
+    {
+      "blockCount" : 126,
+      "chapterID" : 26,
+      "chapterNumber" : "26",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 116,
+      "sectionCount" : 125
+    },
+    {
+      "blockCount" : 47,
+      "chapterID" : 27,
+      "chapterNumber" : "27",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 47,
+      "sectionCount" : 49
+    },
+    {
+      "blockCount" : 1,
+      "chapterID" : 28,
+      "chapterNumber" : "28",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 1,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 1,
+      "chapterID" : 29,
+      "chapterNumber" : "29",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 1,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 141,
+      "chapterID" : 30,
+      "chapterNumber" : "30",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 139,
+      "sectionCount" : 144
+    },
+    {
+      "blockCount" : 159,
+      "chapterID" : 31,
+      "chapterNumber" : "31",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 159,
+      "sectionCount" : 162
+    },
+    {
+      "blockCount" : 54,
+      "chapterID" : 32,
+      "chapterNumber" : "32",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 54,
+      "sectionCount" : 115
+    },
+    {
+      "blockCount" : 933,
+      "chapterID" : 33,
+      "chapterNumber" : "33",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 899,
+      "sectionCount" : 1029
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 34,
+      "chapterNumber" : "34",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 66,
+      "chapterID" : 35,
+      "chapterNumber" : "35",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 3,
+      "sectionCount" : 4
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 36,
+      "chapterNumber" : "A",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 37,
+      "chapterNumber" : "B",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 38,
+      "chapterNumber" : "C",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 56,
+      "chapterID" : 39,
+      "chapterNumber" : "D",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 14,
+      "sectionCount" : 15
+    },
+    {
+      "blockCount" : 58,
+      "chapterID" : 40,
+      "chapterNumber" : "E",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 56,
+      "sectionCount" : 56
+    },
+    {
+      "blockCount" : 10,
+      "chapterID" : 41,
+      "chapterNumber" : "F",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 10,
+      "sectionCount" : 13
+    },
+    {
+      "blockCount" : 154,
+      "chapterID" : 42,
+      "chapterNumber" : "G",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 140,
+      "sectionCount" : 258
+    },
+    {
+      "blockCount" : 77,
+      "chapterID" : 43,
+      "chapterNumber" : "H",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 75,
+      "sectionCount" : 75
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 44,
+      "chapterNumber" : "I",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 45,
+      "chapterNumber" : "J",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 46,
+      "chapterNumber" : "K",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 15,
+      "chapterID" : 47,
+      "chapterNumber" : "K1",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 1,
+      "sectionCount" : 376
+    },
+    {
+      "blockCount" : 1,
+      "chapterID" : 48,
+      "chapterNumber" : "K2",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 1,
+      "sectionCount" : 27
+    },
+    {
+      "blockCount" : 1,
+      "chapterID" : 49,
+      "chapterNumber" : "K3",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 1,
+      "sectionCount" : 117
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 50,
+      "chapterNumber" : "L",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 7,
+      "chapterID" : 51,
+      "chapterNumber" : "M",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 3,
+      "sectionCount" : 3
+    },
+    {
+      "blockCount" : 5,
+      "chapterID" : 52,
+      "chapterNumber" : "N",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 5,
+      "sectionCount" : 9
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 53,
+      "chapterNumber" : "O",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 54,
+      "chapterNumber" : "P",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 12,
+      "chapterID" : 55,
+      "chapterNumber" : "Q",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 8,
+      "sectionCount" : 8
+    },
+    {
+      "blockCount" : 28,
+      "chapterID" : 56,
+      "chapterNumber" : "R",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 18,
+      "sectionCount" : 38
+    },
+    {
+      "blockCount" : 31,
+      "chapterID" : 57,
+      "chapterNumber" : "S",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 1,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 62,
+      "chapterID" : 58,
+      "chapterNumber" : "U",
+      "codeSectionID" : 1,
+      "preparedSectionCount" : 60,
+      "sectionCount" : 67
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 59,
+      "chapterNumber" : "A",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 60,
+      "chapterNumber" : "B",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 61,
+      "chapterNumber" : "C",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 62,
+      "chapterNumber" : "D",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 63,
+      "chapterNumber" : "E",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 64,
+      "chapterNumber" : "F",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 65,
+      "chapterNumber" : "G",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 61,
+      "chapterID" : 66,
+      "chapterNumber" : "1",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 61,
+      "sectionCount" : 74
+    },
+    {
+      "blockCount" : 5,
+      "chapterID" : 67,
+      "chapterNumber" : "2",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 5,
+      "sectionCount" : 5
+    },
+    {
+      "blockCount" : 161,
+      "chapterID" : 68,
+      "chapterNumber" : "3",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 137,
+      "sectionCount" : 139
+    },
+    {
+      "blockCount" : 241,
+      "chapterID" : 69,
+      "chapterNumber" : "4",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 209,
+      "sectionCount" : 232
+    },
+    {
+      "blockCount" : 304,
+      "chapterID" : 70,
+      "chapterNumber" : "5",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 226,
+      "sectionCount" : 242
+    },
+    {
+      "blockCount" : 127,
+      "chapterID" : 71,
+      "chapterNumber" : "6",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 125,
+      "sectionCount" : 135
+    },
+    {
+      "blockCount" : 6,
+      "chapterID" : 72,
+      "chapterNumber" : "7",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 6,
+      "sectionCount" : 6
+    },
+    {
+      "blockCount" : 12,
+      "chapterID" : 73,
+      "chapterNumber" : "8",
+      "codeSectionID" : 4,
+      "preparedSectionCount" : 3,
+      "sectionCount" : 3
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 74,
+      "chapterNumber" : "1",
+      "codeSectionID" : 3,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 476
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 75,
+      "chapterNumber" : "2",
+      "codeSectionID" : 3,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 238
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 76,
+      "chapterNumber" : "3",
+      "codeSectionID" : 3,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 317
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 77,
+      "chapterNumber" : "4",
+      "codeSectionID" : 3,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 287
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 78,
+      "chapterNumber" : "5",
+      "codeSectionID" : 3,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 111
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 79,
+      "chapterNumber" : "A",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 80,
+      "chapterNumber" : "B",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 7,
+      "chapterID" : 81,
+      "chapterNumber" : "C",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 1,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 55,
+      "chapterID" : 82,
+      "chapterNumber" : "1",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 55,
+      "sectionCount" : 65
+    },
+    {
+      "blockCount" : 5,
+      "chapterID" : 83,
+      "chapterNumber" : "2",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 5,
+      "sectionCount" : 5
+    },
+    {
+      "blockCount" : 125,
+      "chapterID" : 84,
+      "chapterNumber" : "3",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 119,
+      "sectionCount" : 120
+    },
+    {
+      "blockCount" : 65,
+      "chapterID" : 85,
+      "chapterNumber" : "4",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 33,
+      "sectionCount" : 51
+    },
+    {
+      "blockCount" : 285,
+      "chapterID" : 86,
+      "chapterNumber" : "5",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 264,
+      "sectionCount" : 295
+    },
+    {
+      "blockCount" : 141,
+      "chapterID" : 87,
+      "chapterNumber" : "6",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 138,
+      "sectionCount" : 157
+    },
+    {
+      "blockCount" : 34,
+      "chapterID" : 88,
+      "chapterNumber" : "7",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 34,
+      "sectionCount" : 34
+    },
+    {
+      "blockCount" : 131,
+      "chapterID" : 89,
+      "chapterNumber" : "8",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 115,
+      "sectionCount" : 119
+    },
+    {
+      "blockCount" : 103,
+      "chapterID" : 90,
+      "chapterNumber" : "9",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 103,
+      "sectionCount" : 107
+    },
+    {
+      "blockCount" : 64,
+      "chapterID" : 91,
+      "chapterNumber" : "10",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 54,
+      "sectionCount" : 56
+    },
+    {
+      "blockCount" : 114,
+      "chapterID" : 92,
+      "chapterNumber" : "11",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 110,
+      "sectionCount" : 123
+    },
+    {
+      "blockCount" : 147,
+      "chapterID" : 93,
+      "chapterNumber" : "12",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 141,
+      "sectionCount" : 152
+    },
+    {
+      "blockCount" : 176,
+      "chapterID" : 94,
+      "chapterNumber" : "13",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 162,
+      "sectionCount" : 172
+    },
+    {
+      "blockCount" : 22,
+      "chapterID" : 95,
+      "chapterNumber" : "14",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 22,
+      "sectionCount" : 22
+    },
+    {
+      "blockCount" : 28,
+      "chapterID" : 96,
+      "chapterNumber" : "15",
+      "codeSectionID" : 6,
+      "preparedSectionCount" : 3,
+      "sectionCount" : 3
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 97,
+      "chapterNumber" : "A",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 98,
+      "chapterNumber" : "B",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 11,
+      "chapterID" : 99,
+      "chapterNumber" : "C",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 11,
+      "sectionCount" : 12
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 100,
+      "chapterNumber" : "D",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 38,
+      "chapterID" : 101,
+      "chapterNumber" : "E",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 8,
+      "sectionCount" : 20
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 102,
+      "chapterNumber" : "F",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 0,
+      "chapterID" : 103,
+      "chapterNumber" : "G",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 0,
+      "sectionCount" : 1
+    },
+    {
+      "blockCount" : 68,
+      "chapterID" : 104,
+      "chapterNumber" : "1",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 68,
+      "sectionCount" : 78
+    },
+    {
+      "blockCount" : 5,
+      "chapterID" : 105,
+      "chapterNumber" : "2",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 5,
+      "sectionCount" : 5
+    },
+    {
+      "blockCount" : 90,
+      "chapterID" : 106,
+      "chapterNumber" : "3",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 86,
+      "sectionCount" : 90
+    },
+    {
+      "blockCount" : 160,
+      "chapterID" : 107,
+      "chapterNumber" : "4",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 158,
+      "sectionCount" : 158
+    },
+    {
+      "blockCount" : 31,
+      "chapterID" : 108,
+      "chapterNumber" : "5",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 31,
+      "sectionCount" : 32
+    },
+    {
+      "blockCount" : 222,
+      "chapterID" : 109,
+      "chapterNumber" : "6",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 195,
+      "sectionCount" : 210
+    },
+    {
+      "blockCount" : 197,
+      "chapterID" : 110,
+      "chapterNumber" : "7",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 165,
+      "sectionCount" : 171
+    },
+    {
+      "blockCount" : 47,
+      "chapterID" : 111,
+      "chapterNumber" : "8",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 45,
+      "sectionCount" : 46
+    },
+    {
+      "blockCount" : 97,
+      "chapterID" : 112,
+      "chapterNumber" : "9",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 83,
+      "sectionCount" : 85
+    },
+    {
+      "blockCount" : 37,
+      "chapterID" : 113,
+      "chapterNumber" : "10",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 37,
+      "sectionCount" : 38
+    },
+    {
+      "blockCount" : 109,
+      "chapterID" : 114,
+      "chapterNumber" : "11",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 88,
+      "sectionCount" : 95
+    },
+    {
+      "blockCount" : 6,
+      "chapterID" : 115,
+      "chapterNumber" : "12",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 6,
+      "sectionCount" : 6
+    },
+    {
+      "blockCount" : 126,
+      "chapterID" : 116,
+      "chapterNumber" : "13",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 118,
+      "sectionCount" : 120
+    },
+    {
+      "blockCount" : 33,
+      "chapterID" : 117,
+      "chapterNumber" : "14",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 25,
+      "sectionCount" : 25
+    },
+    {
+      "blockCount" : 24,
+      "chapterID" : 118,
+      "chapterNumber" : "15",
+      "codeSectionID" : 5,
+      "preparedSectionCount" : 3,
+      "sectionCount" : 3
+    }
+  ],
+  "generatedAt" : "2026-05-23T04:00:24Z",
+  "schemaVersion" : 1
+}
