@@ -102,8 +102,6 @@ struct SearchView: View {
                 .frame(minHeight: dockContentMinHeight, alignment: .bottom)
                 .padding(.horizontal, contentHorizontalInset)
                 .padding(.top, 10)
-                // Sits right above the floating tab bar pill — the solid dock
-                // edge now lines up with the tab bar's top, no large gap.
                 .padding(.bottom, 6)
                 .background(bottomSearchDock)
             }
@@ -346,18 +344,23 @@ struct SearchView: View {
         VStack(alignment: .leading, spacing: 8) {
             searchHistorySectionHeader("Jump Back In")
 
-            TabView(selection: $jumpBackInPageIndex) {
-                ForEach(Array(cachedJumpBackInPages.enumerated()), id: \.element.id) { index, page in
-                    jumpBackInPageGrid(page.entries)
-                        // Pin partial pages (1–3 tiles on the final page) to
-                        // the top-leading corner so the lone tile doesn't
-                        // float to the middle of the TabView's frame.
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                        .tag(index)
+            GeometryReader { proxy in
+                let pageWidth = proxy.size.width
+                TabView(selection: $jumpBackInPageIndex) {
+                    ForEach(Array(cachedJumpBackInPages.enumerated()), id: \.element.id) { index, page in
+                        jumpBackInPageGrid(
+                            page.entries,
+                            pageWidth: pageWidth,
+                            isLastPage: index == cachedJumpBackInPages.indices.last
+                        )
+                            .frame(width: pageWidth, height: jumpBackInGridHeight(for: page.entries), alignment: .topLeading)
+                            .tag(index)
+                    }
                 }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(width: pageWidth, height: jumpBackInTabViewHeight)
+                .clipped()
             }
-            // Render our own dots below so they don't overlap the tiles.
-            .tabViewStyle(.page(indexDisplayMode: .never))
             .frame(height: jumpBackInTabViewHeight)
 
             if cachedJumpBackInPages.count > 1 {
@@ -380,42 +383,67 @@ struct SearchView: View {
     }
 
     @ViewBuilder
-    private func jumpBackInPageGrid(_ page: [RecentlyViewedEntry]) -> some View {
-        let topRow = Array(page.prefix(2))
-        let bottomRow = Array(page.dropFirst(2).prefix(2))
+    private func jumpBackInPageGrid(
+        _ page: [RecentlyViewedEntry],
+        pageWidth: CGFloat,
+        isLastPage: Bool
+    ) -> some View {
+        let pageSlots = Array(page.prefix(jumpBackInPageSize))
+        let shouldPlaceSingleFinalTileOnRight = isLastPage && pageSlots.count == 1
 
         VStack(spacing: 8) {
-            jumpBackInTileRow(topRow)
+            jumpBackInTileRow(
+                leftEntry: shouldPlaceSingleFinalTileOnRight ? nil : (pageSlots.indices.contains(0) ? pageSlots[0] : nil),
+                rightEntry: shouldPlaceSingleFinalTileOnRight ? pageSlots[0] : (pageSlots.indices.contains(1) ? pageSlots[1] : nil),
+                pageWidth: pageWidth
+            )
 
-            if !bottomRow.isEmpty {
-                jumpBackInTileRow(bottomRow)
+            if pageSlots.count > 2 {
+                jumpBackInTileRow(
+                    leftEntry: pageSlots.indices.contains(2) ? pageSlots[2] : nil,
+                    rightEntry: pageSlots.indices.contains(3) ? pageSlots[3] : nil,
+                    pageWidth: pageWidth
+                )
             }
         }
     }
 
-    private func jumpBackInTileRow(_ entries: [RecentlyViewedEntry]) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            ForEach(entries) { entry in
-                ZStack(alignment: .topTrailing) {
-                    NavigationLink(value: entry.sectionID) {
-                        recentlyViewedTile(entry)
-                    }
-                    .buttonStyle(.plain)
+    private func jumpBackInTileRow(
+        leftEntry: RecentlyViewedEntry?,
+        rightEntry: RecentlyViewedEntry?,
+        pageWidth: CGFloat
+    ) -> some View {
+        let gap: CGFloat = 8
+        let tileWidth = max(0, (pageWidth - gap) / 2)
 
-                    // Bookmark toggle pinned to the tile's top-right corner.
-                    // Sits OUTSIDE the NavigationLink so its own tap region
-                    // is consumed before navigation triggers.
-                    jumpBackInBookmarkButton(for: entry)
-                        .padding(6)
+        return HStack(alignment: .top, spacing: 8) {
+            jumpBackInTileSlot(leftEntry, tileWidth: tileWidth)
+            jumpBackInTileSlot(rightEntry, tileWidth: tileWidth)
+        }
+        .frame(width: pageWidth, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func jumpBackInTileSlot(_ entry: RecentlyViewedEntry?, tileWidth: CGFloat) -> some View {
+        if let entry {
+            ZStack(alignment: .topTrailing) {
+                NavigationLink(value: entry.sectionID) {
+                    recentlyViewedTile(entry)
+                        .frame(width: tileWidth)
                 }
-            }
+                .buttonStyle(.plain)
 
-            if entries.count == 1 {
-                Color.clear
-                    .frame(maxWidth: .infinity)
-                    .frame(height: jumpBackInTileOuterHeight)
-                    .accessibilityHidden(true)
+                // Bookmark toggle pinned to the tile's top-right corner.
+                // Sits OUTSIDE the NavigationLink so its own tap region
+                // is consumed before navigation triggers.
+                jumpBackInBookmarkButton(for: entry)
+                    .padding(6)
             }
+        } else {
+            Color.clear
+                .frame(width: tileWidth)
+                .frame(height: jumpBackInTileOuterHeight)
+                .accessibilityHidden(true)
         }
     }
 

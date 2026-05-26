@@ -1279,6 +1279,10 @@ final class CodeLibraryViewModel: ObservableObject {
             return detail?.officialText
         }
 
+        let updateExportState: @MainActor @Sendable (BookmarkExportState) -> Void = { [weak self] state in
+            self?.exportState = state
+        }
+
         activeExportTask = Task { [weak self] in
             let builder = BookmarkExportBuilder(
                 bookmarks: bookmarksSnapshot,
@@ -1290,14 +1294,11 @@ final class CodeLibraryViewModel: ObservableObject {
                 ),
                 loadFullBody: loader,
                 onProgress: { current, total in
-                    guard let self else { return }
                     let progress = Double(current) / Double(max(total, 1))
                     let title = bookmarksSnapshot.indices.contains(current - 1)
                         ? bookmarksSnapshot[current - 1].displayTitle
                         : "Building PDF…"
-                    await MainActor.run {
-                        self.exportState = .building(progress: progress, sectionTitle: title)
-                    }
+                    await updateExportState(.building(progress: progress, sectionTitle: title))
                 }
             )
             do {
@@ -2110,4 +2111,3 @@ enum BookmarkExportState: Equatable {
     case ready(url: URL, sectionCount: Int)
     case failed(String)
 }
-

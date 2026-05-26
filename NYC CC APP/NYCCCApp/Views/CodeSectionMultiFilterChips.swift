@@ -1,5 +1,9 @@
 import SwiftUI
 
+enum CodeFilterChipMetrics {
+    static let primaryChipWidth: CGFloat = 122
+}
+
 struct CodeSectionMultiFilterChips: View {
     let sections: [CodeSectionCategory]
     @Binding var selectedIDs: Set<Int64>
@@ -14,7 +18,8 @@ struct CodeSectionMultiFilterChips: View {
                 filterChip(
                     title: "All Sections",
                     accent: Color.secondary,
-                    isSelected: selectedIDs.isEmpty
+                    isSelected: selectedIDs.isEmpty,
+                    minWidth: CodeFilterChipMetrics.primaryChipWidth
                 ) {
                     selectedIDs = []
                 }
@@ -51,12 +56,14 @@ struct CodeSectionMultiFilterChips: View {
         title: String,
         accent: Color,
         isSelected: Bool,
+        minWidth: CGFloat? = nil,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
+                .frame(minWidth: minWidth, alignment: .leading)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 7)
                 .background(

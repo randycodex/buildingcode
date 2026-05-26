@@ -52,6 +52,23 @@ struct BookmarksView: View {
         Color(uiColor: library.accentColor())
     }
 
+    private var exportButton: some View {
+        Button {
+            isExportActionSheetPresented = true
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(Color.appChrome)
+                .frame(width: 36, height: 36)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(library.bookmarks.isEmpty)
+        .opacity(library.bookmarks.isEmpty ? 0 : 1)
+        .accessibilityHidden(library.bookmarks.isEmpty)
+        .accessibilityLabel("Export saved sections as PDF")
+    }
+
     private func bookmarkAccentColor(for codeSectionID: Int64?) -> Color {
         Color(uiColor: library.accentColor(for: codeSectionID))
     }
@@ -104,6 +121,11 @@ struct BookmarksView: View {
             .overlay(alignment: .top) {
                 CodeTopContentFade(title: "Saved", progress: collapseProgress)
             }
+            .overlay(alignment: .topTrailing) {
+                exportButton
+                    .padding(.top, 14)
+                    .padding(.trailing, contentHorizontalInset)
+            }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if !library.bookmarks.isEmpty {
                     VStack(spacing: 10) {
@@ -123,8 +145,6 @@ struct BookmarksView: View {
                     .frame(minHeight: dockContentMinHeight, alignment: .bottom)
                     .padding(.horizontal, contentHorizontalInset)
                     .padding(.top, 10)
-                    // Mirrors the Search dock; sits flush above the floating
-                    // tab bar pill instead of leaving a tall solid strip.
                     .padding(.bottom, 6)
                     .background(bottomDock)
                 }
@@ -132,11 +152,13 @@ struct BookmarksView: View {
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .modifier(BookmarkExportToolbarModifier(
-                hasBookmarks: !library.bookmarks.isEmpty,
+            .confirmationDialog(
+                "Export saved sections",
                 isPresented: $isExportActionSheetPresented,
-                actionSheetButtons: { exportActionSheetButtons }
-            ))
+                titleVisibility: .visible
+            ) {
+                exportActionSheetButtons
+            }
             .onAppear {
                 library.refreshBookmarks()
             }
@@ -334,18 +356,6 @@ struct BookmarksView: View {
         return results
     }
 
-    /// Projects row in the bottom dock. Always present so the user can
-    /// create their first project without leaving the screen. Long-press
-    /// on a folder chip opens the editor for that folder.
-    private var folderFilterControl: some View {
-        FolderFilterChipsRow(
-            folders: library.folders,
-            selectedIDs: $savedFilterFolderIDs,
-            onNew: { folderEditorTarget = .new },
-            onEdit: { folder in folderEditorTarget = .edit(folder) }
-        )
-    }
-
     /// Distinct tags actually in use across the user's bookmarks, sorted by
     /// usage (most-used first). The starter set is only surfaced inside the
     /// editor — the filter row only shows tags the user has applied at least
@@ -363,6 +373,18 @@ struct BookmarksView: View {
                 return $0.key.localizedStandardCompare($1.key) == .orderedAscending
             }
             .map(\.key)
+    }
+
+    /// Projects row in the bottom dock. Always present so the user can
+    /// create their first project without leaving the screen. Long-press
+    /// on a folder chip opens the editor for that folder.
+    private var folderFilterControl: some View {
+        FolderFilterChipsRow(
+            folders: library.folders,
+            selectedIDs: $savedFilterFolderIDs,
+            onNew: { folderEditorTarget = .new },
+            onEdit: { folder in folderEditorTarget = .edit(folder) }
+        )
     }
 
     private var tagFilterControl: some View {
@@ -389,7 +411,8 @@ struct BookmarksView: View {
         isSelected: Bool,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        let minWidth = title == "All Tags" ? CodeFilterChipMetrics.primaryChipWidth : nil
+        return Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: "tag.fill")
                     .font(.caption2.weight(.semibold))
@@ -397,6 +420,7 @@ struct BookmarksView: View {
                     .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(isSelected ? Color.appChromeOnFill : .secondary)
+            .frame(minWidth: minWidth, alignment: .leading)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(
@@ -588,38 +612,6 @@ private struct BookmarkChapterGroup: Identifiable {
     let items: [BookmarkedSection]
 
     var id: String { "\(codeSectionID.map(String.init) ?? "all")-\(chapterNumber)" }
-}
-
-/// Toolbar button + confirmation dialog. Lives in its own modifier so the
-/// parent view body stays inside the type-checker's tractable budget.
-private struct BookmarkExportToolbarModifier<Buttons: View>: ViewModifier {
-    let hasBookmarks: Bool
-    @Binding var isPresented: Bool
-    @ViewBuilder var actionSheetButtons: () -> Buttons
-
-    func body(content: Content) -> some View {
-        content
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isPresented = true
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color.appChrome)
-                    }
-                    .disabled(!hasBookmarks)
-                    .accessibilityLabel("Export saved sections as PDF")
-                }
-            }
-            .confirmationDialog(
-                "Export saved sections",
-                isPresented: $isPresented,
-                titleVisibility: .visible
-            ) {
-                actionSheetButtons()
-            }
-    }
 }
 
 /// Hoists the three export-related modal modifiers out of BookmarksView's

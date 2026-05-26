@@ -21,7 +21,8 @@ struct FolderFilterChipsRow: View {
                 filterChip(
                     title: "All Projects",
                     accent: Color.secondary,
-                    isSelected: selectedIDs.isEmpty
+                    isSelected: selectedIDs.isEmpty,
+                    minWidth: CodeFilterChipMetrics.primaryChipWidth
                 ) {
                     selectedIDs = []
                 }
@@ -83,6 +84,7 @@ struct FolderFilterChipsRow: View {
         title: String,
         accent: Color,
         isSelected: Bool,
+        minWidth: CGFloat? = nil,
         leadingDot: Color? = nil,
         action: @escaping () -> Void
     ) -> some View {
@@ -97,6 +99,7 @@ struct FolderFilterChipsRow: View {
                     .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
+            .frame(minWidth: minWidth, alignment: .leading)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(
