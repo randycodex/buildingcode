@@ -56,11 +56,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         webView.isOpaque = false
         webView.allowsBackForwardNavigationGestures = false
         context.coordinator.parent = self
+        context.coordinator.webView = webView
         return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         context.coordinator.parent = self
+        context.coordinator.webView = webView
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
 
@@ -117,6 +119,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         static let openSectionMessageName = "nycccOpenSection"
 
         var parent: ChapterHTMLWebView?
+        weak var webView: WKWebView?
         var loadedURL: URL?
         var pendingAnchorID: String?
         var lastScrolledAnchorID: String?
@@ -132,6 +135,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedScrollProgressSyncTrigger = 0
         private var htmlLoadTask: Task<Void, Never>?
         private var lastReportedScrollProgress: CGFloat = -1
+        private var visibleAnchorReportPending = false
 
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
             htmlLoadTask?.cancel()
@@ -453,6 +457,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               }
               applyDepthClasses();
 
+              function anchorIDForHeading(heading) {
+                if (!heading) { return null; }
+                if (heading.id) { return heading.id; }
+                var namedAnchor = heading.querySelector('a[name], a[id]');
+                if (!namedAnchor) { return null; }
+                return namedAnchor.getAttribute('name') || namedAnchor.id || null;
+              }
+
               function visibleAnchorID() {
                 var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection'));
                 if (!headings.length) { return null; }
@@ -470,7 +482,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   }
                 }
 
-                return candidate ? candidate.id : null;
+                return anchorIDForHeading(candidate);
               }
 
               function reportVisibleAnchor() {
@@ -537,6 +549,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 }
               });
 
+              window.__nycccReportVisibleAnchor = reportVisibleAnchor;
               window.removeEventListener('scroll', window.__nycccVisibleAnchorListener);
               window.__nycccVisibleAnchorListener = function() {
                 if (window.__nycccVisibleAnchorFramePending === true) { return; }
@@ -678,6 +691,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             reportScrollProgress(from: scrollView)
+            scheduleVisibleAnchorReport()
         }
 
         func viewForZooming(in scrollView: UIScrollView) -> UIView? {
@@ -704,6 +718,21 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         func syncScrollProgress(in webView: WKWebView) {
             resetScrollProgressReporting()
             reportScrollProgress(from: webView.scrollView)
+            reportVisibleAnchor(in: webView)
+        }
+
+        private func scheduleVisibleAnchorReport() {
+            guard let webView, !visibleAnchorReportPending else { return }
+            visibleAnchorReportPending = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self, weak webView] in
+                guard let self, let webView else { return }
+                self.visibleAnchorReportPending = false
+                self.reportVisibleAnchor(in: webView)
+            }
+        }
+
+        private func reportVisibleAnchor(in webView: WKWebView) {
+            webView.evaluateJavaScript("window.__nycccReportVisibleAnchor && window.__nycccReportVisibleAnchor();")
         }
 
         private func deliverScrollProgress(_ progress: CGFloat) {

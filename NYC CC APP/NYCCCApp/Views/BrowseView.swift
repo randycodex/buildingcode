@@ -448,10 +448,6 @@ struct BrowseView: View {
     }
 
     private func tilePalette(forCodeSectionName name: String) -> ChapterTilePalette {
-        if library.readerTheme.accentPalette == .monochrome {
-            return .monochrome
-        }
-
         let normalizedName = name
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .uppercased()
@@ -977,6 +973,24 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
 
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
+    }
+}
+
+enum CodeScreenMetrics {
+    static let topTitlePadding: CGFloat = 18
+}
+
+struct CodeScreenTitle: View {
+    let title: String
+    let collapseProgress: CGFloat
+
+    var body: some View {
+        Text(title)
+            .font(.system(size: 16, weight: .bold, design: .default))
+            .foregroundStyle(.primary)
+            .padding(.bottom, 8)
+            .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+            .opacity(1 - (collapseProgress * 0.22))
     }
 }
 

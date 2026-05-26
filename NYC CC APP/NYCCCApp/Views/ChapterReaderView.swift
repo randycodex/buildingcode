@@ -376,10 +376,6 @@ struct ChapterReaderView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 11)
                 .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
-                )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
             .buttonStyle(.plain)

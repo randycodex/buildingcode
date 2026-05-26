@@ -22,7 +22,7 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     case monospaced
 
     static var allCases: [ReaderFontChoice] {
-        [.sanFrancisco, .sfPro, .sfMono, .newYork]
+        [.sfPro, .rounded, .newYork, .sfMono]
     }
 
     var id: String { rawValue }
@@ -30,13 +30,13 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     var displayName: String {
         switch self {
         case .sfPro:
-            return "SF Pro"
+            return "System"
         case .sfCompact:
             return "San Francisco"
         case .sfMono:
-            return "SF Mono"
+            return "Monospaced"
         case .newYork:
-            return "New York"
+            return "Serif"
         case .sanFrancisco:
             return "San Francisco"
         case .serif:
@@ -50,11 +50,11 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
 
     var normalizedChoice: ReaderFontChoice {
         switch self {
-        case .sanFrancisco, .sfPro, .sfMono, .newYork:
+        case .sfPro, .sfMono, .newYork, .rounded:
             return self
+        case .sanFrancisco:
+            return .sfPro
         case .sfCompact:
-            return .sanFrancisco
-        case .rounded:
             return .sfPro
         case .serif:
             return .newYork
@@ -64,20 +64,9 @@ enum ReaderFontChoice: String, Codable, Identifiable, Sendable, CaseIterable {
     }
 }
 
-enum ReaderAccentPalette: String, CaseIterable, Codable, Identifiable, Sendable {
+enum ReaderAccentPalette: String, Codable, Sendable {
     case codeBased
     case monochrome
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .codeBased:
-            return "Code Based"
-        case .monochrome:
-            return "Black & White"
-        }
-    }
 }
 
 struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
@@ -95,6 +84,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     var normalized: ReaderTheme {
         var theme = self
         theme.fontChoice = theme.fontChoice.normalizedChoice
+        theme.accentPalette = .codeBased
         theme.fontSize = min(max(theme.fontSize, Self.minimumFontSize), Self.maximumFontSize)
         return theme
     }
@@ -124,9 +114,6 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     }
 
     var accentColor: PlatformColor {
-        if accentPalette == .monochrome {
-            return .labelCompatible
-        }
         return CodeSectionThemeProfile.building.accentColor
     }
 

@@ -99,7 +99,7 @@ struct FolderFilterChipsRow: View {
                     .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
-            .frame(minWidth: minWidth, alignment: .leading)
+            .frame(width: minWidth, alignment: .leading)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(

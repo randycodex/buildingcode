@@ -446,10 +446,6 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func accentColor(for codeSectionID: Int64? = nil) -> PlatformColor {
-        if readerTheme.accentPalette == .monochrome {
-            return .labelCompatible
-        }
-
         let resolvedSectionID = codeSectionID ?? selectedCodeSectionID
         let codeSectionName = codeSections
             .first(where: { $0.id == resolvedSectionID })?
@@ -458,10 +454,6 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func accentHex(for codeSectionID: Int64? = nil, colorScheme: ColorScheme) -> String {
-        if readerTheme.accentPalette == .monochrome {
-            return colorScheme == .dark ? "#F5F5F7" : "#111111"
-        }
-
         let resolvedSectionID = codeSectionID ?? selectedCodeSectionID
         let codeSectionName = codeSections
             .first(where: { $0.id == resolvedSectionID })?

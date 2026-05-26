@@ -90,12 +90,7 @@ struct BookmarksView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Saved")
-                        .font(.system(size: 16, weight: .bold, design: .default))
-                        .foregroundStyle(.primary)
-                        .padding(.bottom, 8)
-                        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
-                        .opacity(1 - (collapseProgress * 0.22))
+                    CodeScreenTitle(title: "Saved", collapseProgress: collapseProgress)
 
                     if !library.bookmarks.isEmpty {
                         LazyVStack(alignment: .leading, spacing: 0) {
@@ -118,7 +113,7 @@ struct BookmarksView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, 18)
+                .padding(.top, CodeScreenMetrics.topTitlePadding)
                 .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
@@ -440,7 +435,7 @@ struct BookmarksView: View {
                     .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(isSelected ? Color.appChromeOnFill : .secondary)
-            .frame(minWidth: minWidth, alignment: .leading)
+            .frame(width: minWidth, alignment: .leading)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(

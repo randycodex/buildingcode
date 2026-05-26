@@ -46,12 +46,7 @@ struct SearchView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Search")
-                        .font(.system(size: 16, weight: .bold, design: .default))
-                        .foregroundStyle(.primary)
-                        .padding(.bottom, 8)
-                        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
-                        .opacity(1 - (collapseProgress * 0.22))
+                    CodeScreenTitle(title: "Search", collapseProgress: collapseProgress)
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         emptyQueryHistorySection
@@ -81,7 +76,7 @@ struct SearchView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, 18)
+                .padding(.top, CodeScreenMetrics.topTitlePadding)
                 .padding(.bottom, tabBarClearance)
             }
             .contentShape(Rectangle())
@@ -497,10 +492,6 @@ struct SearchView: View {
         .frame(maxWidth: .infinity, minHeight: jumpBackInTileContentHeight, alignment: .topLeading)
         .frame(height: jumpBackInTileOuterHeight, alignment: .top)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(Color(uiColor: .separator).opacity(0.55), lineWidth: 0.75)
-        )
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 

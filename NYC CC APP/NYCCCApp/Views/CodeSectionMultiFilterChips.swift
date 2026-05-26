@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum CodeFilterChipMetrics {
-    static let primaryChipWidth: CGFloat = 122
+    static let primaryChipWidth: CGFloat = 86
 }
 
 struct CodeSectionMultiFilterChips: View {
@@ -63,7 +63,7 @@ struct CodeSectionMultiFilterChips: View {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
-                .frame(minWidth: minWidth, alignment: .leading)
+                .frame(width: minWidth, alignment: .leading)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 7)
                 .background(

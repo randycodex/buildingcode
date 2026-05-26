@@ -35,12 +35,7 @@ struct SettingsView: View {
                 .frame(height: 0)
 
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("Settings")
-                        .font(.system(size: 16, weight: .bold, design: .default))
-                        .foregroundStyle(.primary)
-                        .padding(.bottom, 8)
-                        .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
-                        .opacity(1 - (collapseProgress * 0.22))
+                    CodeScreenTitle(title: "Settings", collapseProgress: collapseProgress)
 
                     CodeSurface(accent: settingsChromeColor, padding: 0) {
                         VStack(spacing: 0) {
@@ -60,10 +55,6 @@ struct SettingsView: View {
                         CodeHairline()
 
                         fontPicker
-
-                        CodeHairline()
-
-                        accentPicker
 
                         CodeHairline()
 
@@ -92,7 +83,7 @@ struct SettingsView: View {
 
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 18)
+                .padding(.top, CodeScreenMetrics.topTitlePadding)
                 .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
@@ -295,21 +286,6 @@ struct SettingsView: View {
         )) {
             ForEach(ReaderFontChoice.allCases) { choice in
                 Text(choice.displayName).tag(choice)
-            }
-        }
-    }
-
-    private var accentPicker: some View {
-        Picker("Accent Color", selection: Binding(
-            get: { library.readerTheme.accentPalette },
-            set: { newValue in
-                var theme = library.readerTheme
-                theme.accentPalette = newValue
-                library.updateReaderTheme(theme)
-            }
-        )) {
-            ForEach(ReaderAccentPalette.allCases) { palette in
-                Text(palette.displayName).tag(palette)
             }
         }
     }

@@ -300,8 +300,7 @@ struct ChapterHTMLReaderView: View {
             scrollProgressSyncTrigger: scrollProgressSyncTrigger,
             onVisibleAnchorChange: { anchorID in
                 guard let anchor = anchors.first(where: { $0.anchorID == anchorID }) else { return }
-                // Prefer subsection-level anchors for the jump label so it reflects the current title.
-                if anchor.level >= 3 || selectedAnchor == nil {
+                if selectedAnchor?.anchorID != anchor.anchorID {
                     selectedAnchor = anchor
                 }
                 recordRecentlyViewedForVisibleAnchor(anchorID)
@@ -338,10 +337,6 @@ struct ChapterHTMLReaderView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 11)
                 .background(Color(uiColor: .secondarySystemGroupedBackground))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
-                )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
             .buttonStyle(.plain)
@@ -362,21 +357,12 @@ struct ChapterHTMLReaderView: View {
                         targetAnchorID = target.scrollTarget
                         isJumpPickerPresented = false
                     } label: {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(target.menuLabel)
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(.primary)
-                                .lineLimit(2)
-                            if target.anchorID == selectedAnchor?.anchorID ||
-                                normalizedSectionNumber(target.sectionNumber) == normalizedSectionNumber(selectedAnchor?.sectionNumber ?? "") {
-                                Text("Current")
-                                    .font(.caption)
-                                    .foregroundStyle(accentColor)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading, target.menuIndent)
-                        .padding(.vertical, 4)
+                        ChapterHTMLJumpTargetRow(
+                            target: target,
+                            isCurrent: target.anchorID == selectedAnchor?.anchorID ||
+                                normalizedSectionNumber(target.sectionNumber) == normalizedSectionNumber(selectedAnchor?.sectionNumber ?? ""),
+                            accentColor: accentColor
+                        )
                     }
                     .buttonStyle(.plain)
                 }
@@ -492,6 +478,44 @@ struct ChapterHTMLReaderView: View {
     }
 }
 
+private struct ChapterHTMLJumpTargetRow: View {
+    let target: ChapterHTMLJumpTarget
+    let isCurrent: Bool
+    let accentColor: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: target.isPrimarySection ? 5 : 3) {
+            if target.isPrimarySection {
+                Text(target.menuLabel)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(isCurrent ? accentColor : .primary)
+                    .lineLimit(2)
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(target.sectionNumber)
+                        .font(target.numberFont)
+                        .foregroundStyle(isCurrent ? accentColor : accentColor.opacity(0.88))
+                        .lineLimit(1)
+
+                    Text(target.cleanTitle)
+                        .font(target.titleFont)
+                        .foregroundStyle(target.titleColor)
+                        .lineLimit(2)
+                }
+            }
+
+            if isCurrent {
+                Text("Current")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(accentColor)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.leading, target.menuIndent)
+        .padding(.vertical, target.rowVerticalPadding)
+    }
+}
+
 private struct ChapterHTMLJumpTarget: Identifiable, Hashable {
     let sectionNumber: String
     let title: String
@@ -511,8 +535,43 @@ private struct ChapterHTMLJumpTarget: Identifiable, Hashable {
 
     var menuIndent: CGFloat {
         guard sectionNumber.contains(".") else { return 0 }
-        let depth = max(0, sectionNumber.split(separator: ".").count - 1)
-        return CGFloat(min(depth, 3)) * 14
+        return CGFloat(min(hierarchyDepth, 3)) * 16
+    }
+
+    var hierarchyDepth: Int {
+        guard sectionNumber.contains(".") else { return 0 }
+        return max(0, sectionNumber.split(separator: ".").count - 1)
+    }
+
+    var isPrimarySection: Bool {
+        level <= 2 || title.range(of: #"^Section\s+"#, options: [.regularExpression, .caseInsensitive]) != nil
+    }
+
+    var cleanTitle: String {
+        let escapedSection = NSRegularExpression.escapedPattern(for: sectionNumber)
+        let pattern = #"^\s*(?:Section\s+[A-Z]+\s+)?"# + escapedSection + #"\s*[:.]?\s*"#
+        return title.replacingOccurrences(
+            of: pattern,
+            with: "",
+            options: [.regularExpression, .caseInsensitive]
+        )
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var numberFont: Font {
+        hierarchyDepth <= 1 ? .body.weight(.bold) : .callout.weight(.semibold)
+    }
+
+    var titleFont: Font {
+        hierarchyDepth <= 1 ? .body.weight(.semibold) : .callout.weight(.medium)
+    }
+
+    var titleColor: Color {
+        hierarchyDepth <= 1 ? .primary : .secondary
+    }
+
+    var rowVerticalPadding: CGFloat {
+        isPrimarySection ? 8 : 5
     }
 
     var scrollTarget: String {
