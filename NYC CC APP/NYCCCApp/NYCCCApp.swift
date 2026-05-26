@@ -32,45 +32,54 @@ struct NYCCCApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TabView(selection: $library.selectedTab) {
-                BrowseView(browserContext: .primary)
-                    .environment(\.isBrowserTabActive, library.selectedTab == .browse)
-                    .tabItem {
-                        Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                        Text("")
-                    }
-                    .tag(AppTab.browse)
+            Group {
+                if library.isInitialContentLoaded {
+                    TabView(selection: $library.selectedTab) {
+                        BrowseView(browserContext: .primary)
+                            .environment(\.isBrowserTabActive, library.selectedTab == .browse)
+                            .tabItem {
+                                Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                                Text("")
+                            }
+                            .tag(AppTab.browse)
 
-                if library.comparisonModeEnabled {
-                    BrowseView(browserContext: .secondary)
-                        .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
-                        .tabItem {
-                            Image(systemName: "text.line.last.and.arrowtriangle.forward")
-                            Text("")
+                        if library.comparisonModeEnabled {
+                            BrowseView(browserContext: .secondary)
+                                .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
+                                .tabItem {
+                                    Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                                    Text("")
+                                }
+                                .tag(AppTab.browseSecondary)
                         }
-                        .tag(AppTab.browseSecondary)
+
+                        SearchView()
+                            .tabItem {
+                                Image(systemName: "sparkle.magnifyingglass")
+                                Text("")
+                            }
+                            .tag(AppTab.search)
+
+                        BookmarksView()
+                            .tabItem {
+                                Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
+                                Text("")
+                            }
+                            .tag(AppTab.bookmarks)
+
+                        SettingsView()
+                            .tabItem {
+                                Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
+                                Text("")
+                            }
+                            .tag(AppTab.settings)
+                    }
+                } else {
+                    AppLaunchLoadingView(
+                        progress: library.initialLoadProgress,
+                        message: library.statusMessage ?? "Loading code library..."
+                    )
                 }
-
-                SearchView()
-                    .tabItem {
-                        Image(systemName: "sparkle.magnifyingglass")
-                        Text("")
-                    }
-                    .tag(AppTab.search)
-
-                BookmarksView()
-                    .tabItem {
-                        Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
-                        Text("")
-                    }
-                    .tag(AppTab.bookmarks)
-
-                SettingsView()
-                    .tabItem {
-                        Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
-                        Text("")
-                    }
-                    .tag(AppTab.settings)
             }
             .environmentObject(library)
             .tint(Color.appChrome)
@@ -100,7 +109,19 @@ struct NYCCCApp: App {
                     break
                 }
             }
+            .onChange(of: library.isInitialContentLoaded) { _, isLoaded in
+                guard isLoaded else { return }
+                switch library.selectedTab {
+                case .browse:
+                    library.syncSelectedCodeSection(from: .primary)
+                case .browseSecondary:
+                    library.syncSelectedCodeSection(from: .secondary)
+                default:
+                    break
+                }
+            }
             .onAppear {
+                guard library.isInitialContentLoaded else { return }
                 switch library.selectedTab {
                 case .browse:
                     library.syncSelectedCodeSection(from: .primary)
@@ -113,6 +134,56 @@ struct NYCCCApp: App {
         }
     }
 }
+
+private struct AppLaunchLoadingView: View {
+    let progress: Double
+    let message: String
+
+    var body: some View {
+        VStack(spacing: 22) {
+            VStack(spacing: 8) {
+                Text("NYC Code")
+                    .font(.system(size: 28, weight: .bold, design: .default))
+                    .foregroundStyle(.primary)
+
+                Text(message)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+            }
+
+            VStack(spacing: 9) {
+                GeometryReader { proxy in
+                    ZStack(alignment: .leading) {
+                        Capsule(style: .continuous)
+                            .fill(Color.secondary.opacity(0.18))
+
+                        Capsule(style: .continuous)
+                            .fill(Color.appChrome)
+                            .frame(width: max(12, proxy.size.width * min(max(progress, 0), 1)))
+                    }
+                }
+                .frame(height: 8)
+
+                Text("\(Int((min(max(progress, 0), 1) * 100).rounded()))%")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            .frame(maxWidth: 260)
+        }
+        .padding(28)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CodeAppBackdrop(accent: Color.appChrome).ignoresSafeArea())
+    }
+}
+
+#if DEBUG
+#Preview("App Launch Loading") {
+    AppLaunchLoadingView(progress: 0.64, message: "Preparing chapters...")
+}
+#endif
 
 #if DEBUG
 #Preview("App Shell") {

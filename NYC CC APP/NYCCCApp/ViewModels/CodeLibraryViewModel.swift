@@ -11,6 +11,12 @@ final class CodeLibraryViewModel: ObservableObject {
         let chapters: [CodeChapter]
     }
 
+    private struct SQLiteContentSnapshot: Sendable {
+        let database: CodeDatabase
+        let loader: SQLiteChapterLoader
+        let chapters: [CodeChapter]
+    }
+
     struct ChapterBlockDescriptor: Identifiable, Sendable {
         let sectionID: Int64
         let groupLabel: String?
@@ -49,6 +55,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var statusMessage: String?
     @Published var readerTheme: ReaderTheme
     @Published private(set) var isInitialContentLoaded: Bool = false
+    @Published private(set) var initialLoadProgress: Double = 0
     @Published var comparisonModeEnabled: Bool
     @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
@@ -118,6 +125,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.comparisonModeEnabled = UserDefaults.standard.bool(forKey: comparisonModeDefaultsKey)
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
+        initialLoadProgress = 0
         reload()
     }
 
@@ -147,6 +155,7 @@ final class CodeLibraryViewModel: ObservableObject {
         contentLoadTask?.cancel()
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
+        initialLoadProgress = 0
 
         versionLoadTask = Task { [selectedVersionDefaultsKey] in
             let availableVersions = await Task.detached(priority: .userInitiated) {
@@ -789,6 +798,18 @@ final class CodeLibraryViewModel: ObservableObject {
         }
         guard let codeDatabase else { return [] }
         return referenceResolver.resolveReferences(in: detail.officialText, database: codeDatabase)
+    }
+
+    func resolveReferencesAsync(for detail: ReaderSectionDetail) async -> [ResolvedCodeReference] {
+        if let authoredCodeStore {
+            return await Task.detached(priority: .utility) {
+                CodeReferenceResolver().resolveReferences(in: detail.officialText, database: authoredCodeStore)
+            }.value
+        }
+        guard let codeDatabase else { return [] }
+        return await Task.detached(priority: .utility) {
+            CodeReferenceResolver().resolveReferences(in: detail.officialText, database: codeDatabase)
+        }.value
     }
 
     func chapterBlockSummaries(for chapter: CodeChapter) async -> [ChapterReaderBlockSummary] {
@@ -1466,6 +1487,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private func openSelectedContent() {
         contentLoadTask?.cancel()
         clearCaches()
+        isInitialContentLoaded = false
+        initialLoadProgress = 0
         guard let selectedVersion else {
             codeSections = []
             selectedCodeSectionID = nil
@@ -1475,6 +1498,7 @@ final class CodeLibraryViewModel: ObservableObject {
             codeDatabase = nil
             authoredCodeStore = nil
             statusMessage = "Bundle authored content or a generated SQLite database to browse code content."
+            initialLoadProgress = 1
             isInitialContentLoaded = true
             return
         }
@@ -1485,34 +1509,43 @@ final class CodeLibraryViewModel: ObservableObject {
 
         switch selectedVersion.contentKind {
         case .sqlite:
-            do {
-                authoredCodeStore = nil
-                codeSections = []
-                selectedCodeSectionID = nil
-                codeDatabase = try CodeDatabase(databaseURL: selectedVersion.fileURL, locator: locator)
-                sqliteChapterLoader = try SQLiteChapterLoader(databaseURL: selectedVersion.fileURL)
-                chapters = try codeDatabase?.chapters() ?? []
-                refreshBookmarks()
-                // Flip the overlay off as soon as tiles can render; prewarm
-                // continues in the background.
-                self.statusMessage = nil
-                self.isInitialContentLoaded = true
-                let chapters = self.chapters
-                contentLoadTask = Task {
-                    await self.prewarmSQLiteContent(chapters: chapters)
+            authoredCodeStore = nil
+            codeSections = []
+            selectedCodeSectionID = nil
+            contentLoadTask = Task {
+                do {
+                    let snapshot = try await Task.detached(priority: .userInitiated) {
+                        try Self.loadSQLiteContentSnapshot(version: selectedVersion)
+                    }.value
                     guard !Task.isCancelled else { return }
+
+                    self.codeDatabase = snapshot.database
+                    self.sqliteChapterLoader = snapshot.loader
+                    self.initialLoadProgress = 0.35
+                    self.chapters = snapshot.chapters
+                    self.refreshBookmarks()
+                    self.initialLoadProgress = 0.55
+                    await self.prewarmSQLiteContent(chapters: snapshot.chapters)
+                    guard !Task.isCancelled else { return }
+                    self.initialLoadProgress = 0.9
                     self.preloadLastOpenedChapterIfNeeded()
+                    self.statusMessage = nil
+                    self.initialLoadProgress = 1
+                    self.isInitialContentLoaded = true
+                } catch {
+                    guard !Task.isCancelled else { return }
+                    self.codeSections = []
+                    self.selectedCodeSectionID = nil
+                    self.chapters = []
+                    self.searchResults = []
+                    self.bookmarks = []
+                    self.codeDatabase = nil
+                    self.sqliteChapterLoader = nil
+                    self.authoredCodeStore = nil
+                    self.statusMessage = error.localizedDescription
+                    self.initialLoadProgress = 1
+                    self.isInitialContentLoaded = true
                 }
-            } catch {
-                codeSections = []
-                selectedCodeSectionID = nil
-                chapters = []
-                searchResults = []
-                bookmarks = []
-                codeDatabase = nil
-                sqliteChapterLoader = nil
-                authoredCodeStore = nil
-                statusMessage = error.localizedDescription
             }
         case .authored:
             let selectedCodeSectionID = self.selectedCodeSectionID
@@ -1527,6 +1560,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     }.value
                     guard !Task.isCancelled else { return }
 
+                    self.initialLoadProgress = 0.35
                     self.codeDatabase = nil
                     self.sqliteChapterLoader = nil
                     self.authoredCodeStore = snapshot.store
@@ -1535,17 +1569,18 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.chapters = snapshot.chapters
                     self.searchResults = []
                     self.refreshBookmarks()
-                    // Flip the overlay off as soon as tiles can render; prewarm
-                    // and last-chapter preload continue in the background.
-                    self.statusMessage = nil
-                    self.isInitialContentLoaded = true
+                    self.initialLoadProgress = 0.55
                     await self.prewarmAuthoredContent(
                         version: selectedVersion,
                         chapters: snapshot.chapters,
                         store: snapshot.store
                     )
                     guard !Task.isCancelled else { return }
+                    self.initialLoadProgress = 0.9
                     self.preloadLastOpenedChapterIfNeeded()
+                    self.statusMessage = nil
+                    self.initialLoadProgress = 1
+                    self.isInitialContentLoaded = true
                 } catch {
                     guard !Task.isCancelled else { return }
                     self.codeSections = []
@@ -1557,10 +1592,20 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.sqliteChapterLoader = nil
                     self.authoredCodeStore = nil
                     self.statusMessage = error.localizedDescription
+                    self.initialLoadProgress = 1
                     self.isInitialContentLoaded = true
                 }
             }
         }
+    }
+
+    private nonisolated static func loadSQLiteContentSnapshot(
+        version: BundledCodeVersion
+    ) throws -> SQLiteContentSnapshot {
+        let database = try CodeDatabase(databaseURL: version.fileURL, locator: BundleDatabaseLocator())
+        let loader = try SQLiteChapterLoader(databaseURL: version.fileURL)
+        let chapters = try database.chapters()
+        return SQLiteContentSnapshot(database: database, loader: loader, chapters: chapters)
     }
 
     private nonisolated static func loadAuthoredContentSnapshot(
@@ -1879,24 +1924,46 @@ final class CodeLibraryViewModel: ObservableObject {
         store: AuthoredCodeStore
     ) async {
         _ = version
-        _ = chapters
         // Warm the search index in the background so the first search doesn't
         // pay the cost of reading + JSON-decoding the 3 MB searchIndex.json on
-        // the user's first keystroke. The work runs on a detached task so it
-        // doesn't compete with the chapter preload already in flight.
+        // the user's first keystroke.
         await Task.detached(priority: .background) {
             store.warmSearchIndex()
         }.value
+
+        let chapterIDs = chapters.map(\.id)
+        let sectionIDs = await Task.detached(priority: .utility) {
+            store.firstSectionIDs(chapterIDs: chapterIDs)
+        }.value
+        await prewarmSectionDetails(sectionIDs)
     }
 
     private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
-        // Section groups are now loaded lazily per chapter on first open.
-        // The previous full-bundle sweep ran every chapter's SQLite query
-        // sequentially at launch, costing CPU + memory for data most users
-        // never reach. Lazy loading keeps the cold launch responsive and
-        // pays for itself the first time a chapter actually opens.
-        _ = sqliteChapterLoader
-        _ = chapters
+        guard let sqliteChapterLoader else { return }
+        do {
+            let sectionIDs = try await sqliteChapterLoader.firstSectionIDs(chapterIDs: chapters.map(\.id))
+            await prewarmSectionDetails(sectionIDs)
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    private func prewarmSectionDetails(_ sectionIDs: [Int64]) async {
+        guard !sectionIDs.isEmpty else { return }
+
+        let batchSize = 24
+        let total = max(sectionIDs.count, 1)
+        var loadedCount = 0
+        for startIndex in stride(from: 0, to: sectionIDs.count, by: batchSize) {
+            if Task.isCancelled { return }
+            let endIndex = min(startIndex + batchSize, sectionIDs.count)
+            let batch = Array(sectionIDs[startIndex..<endIndex])
+            _ = await loadSectionDetailsAsync(sectionIDs: batch)
+            loadedCount += batch.count
+            let progress = Double(loadedCount) / Double(total)
+            initialLoadProgress = min(0.9, 0.55 + (progress * 0.35))
+            await Task.yield()
+        }
     }
 
     private func formattedNSAttributedText(for detail: ReaderSectionDetail) -> NSAttributedString {
@@ -2091,6 +2158,10 @@ private actor SQLiteChapterLoader {
         try sectionIDs.compactMap { sectionID in
             try database.sectionDetail(sectionID: sectionID)
         }
+    }
+
+    func firstSectionIDs(chapterIDs: [Int64]) throws -> [Int64] {
+        try database.firstSectionIDs(chapterIDs: chapterIDs)
     }
 }
 

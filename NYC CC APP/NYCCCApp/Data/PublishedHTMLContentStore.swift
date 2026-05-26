@@ -165,10 +165,14 @@ final class PublishedHTMLContentStore {
             return []
         }
         let parsedAnchors = sortedAnchors(parseAnchors(in: html).values)
+        let parsedFeatures = parseInlineFeatures(in: html)
 
         anchorCacheLock.lock()
         storeAnchors(parsedAnchors, for: cacheKey)
         anchorCacheLock.unlock()
+        inlineFeatureCacheLock.lock()
+        storeInlineFeatures(parsedFeatures, for: cacheKey)
+        inlineFeatureCacheLock.unlock()
 
         return parsedAnchors
     }
@@ -191,22 +195,34 @@ final class PublishedHTMLContentStore {
         inlineFeatureCacheLock.unlock()
 
         let result: PublishedHTMLFeatureSet
+        let parsedAnchors: [PublishedHTMLAnchor]?
         if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
-            result = PublishedHTMLFeatureSet(
-                containsInlineImages: html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil,
-                containsInlineTables: html.range(
-                    of: #"<(?:table|ScrollTable)\b|class="[^"]*\bxsl-table\b"#,
-                    options: [.regularExpression, .caseInsensitive]
-                ) != nil
-            )
+            result = parseInlineFeatures(in: html)
+            parsedAnchors = sortedAnchors(parseAnchors(in: html).values)
         } else {
             result = PublishedHTMLFeatureSet(containsInlineImages: false, containsInlineTables: false)
+            parsedAnchors = nil
         }
 
         inlineFeatureCacheLock.lock()
         storeInlineFeatures(result, for: key)
         inlineFeatureCacheLock.unlock()
+        if let parsedAnchors {
+            anchorCacheLock.lock()
+            storeAnchors(parsedAnchors, for: key)
+            anchorCacheLock.unlock()
+        }
         return result
+    }
+
+    private static func parseInlineFeatures(in html: String) -> PublishedHTMLFeatureSet {
+        PublishedHTMLFeatureSet(
+            containsInlineImages: html.range(of: #"<img\b"#, options: [.regularExpression, .caseInsensitive]) != nil,
+            containsInlineTables: html.range(
+                of: #"<(?:table|ScrollTable)\b|class="[^"]*\bxsl-table\b"#,
+                options: [.regularExpression, .caseInsensitive]
+            ) != nil
+        )
     }
 
     private static func storeAnchors(_ anchors: [PublishedHTMLAnchor], for key: String) {

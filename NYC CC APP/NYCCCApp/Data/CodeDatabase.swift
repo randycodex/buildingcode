@@ -1,7 +1,7 @@
 import Foundation
 import SQLite3
 
-final class CodeDatabase: CodeReferenceLookup {
+final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
     private let connection: SQLiteConnection
     private let locator: BundleDatabaseLocator
     private lazy var hasEditorSectionGroupsTable: Bool = {
@@ -74,8 +74,7 @@ final class CodeDatabase: CodeReferenceLookup {
             SELECT sections.id,
                    chapters.chapter_number,
                    sections.section_number,
-                   sections.title,
-                   sections.official_text
+                   sections.title
             FROM sections
             JOIN chapters ON chapters.id = sections.chapter_id
             WHERE chapter_id = ?
@@ -96,20 +95,26 @@ final class CodeDatabase: CodeReferenceLookup {
                 sectionNumber: connection.string(at: 2, in: statement),
                 title: connection.string(at: 3, in: statement)
             )
-            let officialText = connection.string(at: 4, in: statement)
             let groupID = summary.sectionNumber.topLevelSectionIdentifier
-            let fallbackMetadata = inferredGroupMetadata(from: officialText, fallbackGroupID: groupID)
-            let metadata = persistedMetadata[groupID] ?? fallbackMetadata
 
             if let index = indicesByGroupID[groupID] {
                 let existing = groupedSections[index]
+                var sections = existing.sections
+                sections.append(summary)
                 groupedSections[index] = CodeSectionGroup(
                     id: existing.id,
                     headerLine: existing.headerLine,
-                    headingLine: existing.headingLine ?? metadata.headingLine,
-                    sections: existing.sections + [summary]
+                    headingLine: existing.headingLine,
+                    sections: sections
                 )
             } else {
+                let metadata: (headerLine: String, headingLine: String?)
+                if let persisted = persistedMetadata[groupID] {
+                    metadata = persisted
+                } else {
+                    let officialText = try officialText(sectionID: summary.id)
+                    metadata = inferredGroupMetadata(from: officialText, fallbackGroupID: groupID)
+                }
                 groupedSections.append(
                     CodeSectionGroup(
                         id: groupID,
@@ -123,6 +128,30 @@ final class CodeDatabase: CodeReferenceLookup {
         }
 
         return groupedSections
+    }
+
+    func firstSectionIDs(chapterIDs: [Int64]) throws -> [Int64] {
+        var ids: [Int64] = []
+        ids.reserveCapacity(chapterIDs.count)
+
+        for chapterID in chapterIDs {
+            let statement = try connection.prepare(
+                """
+                SELECT id
+                FROM sections
+                WHERE chapter_id = ?
+                ORDER BY sort_key, section_number
+                LIMIT 1;
+                """
+            )
+            defer { connection.finalize(statement) }
+            sqlite3_bind_int64(statement, 1, chapterID)
+            if try connection.step(statement) == SQLITE_ROW {
+                ids.append(connection.int64(at: 0, in: statement))
+            }
+        }
+
+        return ids
     }
 
     func sectionDetail(sectionID: Int64) throws -> ReaderSectionDetail? {
@@ -174,6 +203,21 @@ final class CodeDatabase: CodeReferenceLookup {
             textSpans: try textSpans(for: sectionID),
             richTextOverrideData: (try? richTextOverride(for: sectionID)) ?? nil
         )
+    }
+
+    private func officialText(sectionID: Int64) throws -> String {
+        let statement = try connection.prepare(
+            """
+            SELECT official_text
+            FROM sections
+            WHERE id = ?
+            LIMIT 1;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, sectionID)
+        guard try connection.step(statement) == SQLITE_ROW else { return "" }
+        return connection.string(at: 0, in: statement)
     }
 
     func search(query: String) throws -> [CodeSearchResult] {

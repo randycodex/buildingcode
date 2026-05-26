@@ -277,33 +277,44 @@ final class UserDataStore {
             .filter { !$0.isEmpty }
             .filter { seen.insert($0.lowercased()).inserted }
 
-        let delete = try connection.prepare(
-            """
-            DELETE FROM bookmark_tags
-            WHERE code_version = ? AND section_id = ?;
-            """
-        )
-        defer { connection.finalize(delete) }
-        try connection.bind(text: codeVersion, index: 1, to: delete)
-        sqlite3_bind_int64(delete, 2, sectionID)
-        _ = try connection.step(delete)
-
-        guard !cleaned.isEmpty else { return }
-
-        let timestamp = isoFormatter.string(from: Date())
-        for tag in cleaned {
-            let insert = try connection.prepare(
+        try connection.execute("BEGIN IMMEDIATE TRANSACTION;")
+        do {
+            let delete = try connection.prepare(
                 """
-                INSERT INTO bookmark_tags (code_version, section_id, tag, created_at)
-                VALUES (?, ?, ?, ?);
+                DELETE FROM bookmark_tags
+                WHERE code_version = ? AND section_id = ?;
                 """
             )
-            defer { connection.finalize(insert) }
-            try connection.bind(text: codeVersion, index: 1, to: insert)
-            sqlite3_bind_int64(insert, 2, sectionID)
-            try connection.bind(text: tag, index: 3, to: insert)
-            try connection.bind(text: timestamp, index: 4, to: insert)
-            _ = try connection.step(insert)
+            defer { connection.finalize(delete) }
+            try connection.bind(text: codeVersion, index: 1, to: delete)
+            sqlite3_bind_int64(delete, 2, sectionID)
+            _ = try connection.step(delete)
+
+            if !cleaned.isEmpty {
+                let timestamp = isoFormatter.string(from: Date())
+                let insert = try connection.prepare(
+                    """
+                    INSERT INTO bookmark_tags (code_version, section_id, tag, created_at)
+                    VALUES (?, ?, ?, ?);
+                    """
+                )
+                defer { connection.finalize(insert) }
+
+                for tag in cleaned {
+                    sqlite3_reset(insert)
+                    sqlite3_clear_bindings(insert)
+                    try connection.bind(text: codeVersion, index: 1, to: insert)
+                    sqlite3_bind_int64(insert, 2, sectionID)
+                    try connection.bind(text: tag, index: 3, to: insert)
+                    try connection.bind(text: timestamp, index: 4, to: insert)
+                    _ = try connection.step(insert)
+                }
+            }
+
+            try connection.execute("COMMIT;")
+        } catch {
+            try? connection.execute("ROLLBACK;")
+            throw error
         }
     }
 

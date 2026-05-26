@@ -9,6 +9,9 @@ struct BookmarksView: View {
     @State private var selectedTagFilter: String? = nil
     @State private var folderEditorTarget: FolderEditorTarget?
     @State private var isExportActionSheetPresented = false
+    @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
+    @State private var cachedAvailableTags: [String] = []
+    @State private var cachedBookmarkGroups: [BookmarkChapterGroup] = []
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
@@ -96,7 +99,7 @@ struct BookmarksView: View {
 
                     if !library.bookmarks.isEmpty {
                         LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(bookmarkGroups) { group in
+                            ForEach(cachedBookmarkGroups) { group in
                                 chapterHeader(group)
 
                                 ForEach(group.items) { bookmark in
@@ -138,7 +141,7 @@ struct BookmarksView: View {
                         if !availableFilterSections.isEmpty {
                             savedFilterControl
                         }
-                        if !availableTags.isEmpty {
+                        if !cachedAvailableTags.isEmpty {
                             tagFilterControl
                         }
                     }
@@ -161,12 +164,27 @@ struct BookmarksView: View {
             }
             .onAppear {
                 library.refreshBookmarks()
+                rebuildBookmarkCaches()
             }
             .onChange(of: savedFilterCodeSectionIDs) { _, newValue in
                 FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
+                rebuildBookmarkCaches()
             }
             .onChange(of: savedFilterFolderIDs) { _, newValue in
                 FilterIDsStorage.persist(newValue, key: Self.filterFolderIDsDefaultsKey)
+                rebuildBookmarkCaches()
+            }
+            .onChange(of: selectedTagFilter) { _, _ in
+                rebuildBookmarkCaches()
+            }
+            .onChange(of: library.bookmarks) { _, _ in
+                rebuildBookmarkCaches()
+            }
+            .onChange(of: library.folderMembership) { _, _ in
+                rebuildBookmarkCaches()
+            }
+            .onChange(of: library.codeSections) { _, _ in
+                rebuildBookmarkCaches()
             }
             .onChange(of: library.folders) { _, newFolders in
                 // If a folder was deleted while it was in the active filter
@@ -176,6 +194,8 @@ struct BookmarksView: View {
                 let pruned = savedFilterFolderIDs.intersection(liveIDs)
                 if pruned != savedFilterFolderIDs {
                     savedFilterFolderIDs = pruned
+                } else {
+                    rebuildBookmarkCaches()
                 }
             }
             .sheet(item: $folderEditorTarget) { target in
@@ -248,14 +268,14 @@ struct BookmarksView: View {
     /// existing project.
     @ViewBuilder
     private var exportActionSheetButtons: some View {
-        let filteredCount = filteredBookmarks.count
+        let filteredCount = cachedFilteredBookmarks.count
         let totalCount = library.bookmarks.count
         let isFiltered = filteredCount > 0 && filteredCount < totalCount
 
         if isFiltered {
             Button("Export current filter (\(filteredCount))") {
                 library.startBookmarkExport(
-                    bookmarks: filteredBookmarks,
+                    bookmarks: cachedFilteredBookmarks,
                     contextLabel: currentFilterContextLabel
                 )
             }
@@ -330,7 +350,7 @@ struct BookmarksView: View {
         library.codeSections
     }
 
-    private var filteredBookmarks: [BookmarkedSection] {
+    private func makeFilteredBookmarks() -> [BookmarkedSection] {
         var results = library.bookmarks
         if !savedFilterCodeSectionIDs.isEmpty {
             results = results.filter { bookmark in
@@ -360,7 +380,7 @@ struct BookmarksView: View {
     /// usage (most-used first). The starter set is only surfaced inside the
     /// editor — the filter row only shows tags the user has applied at least
     /// once so it never feels empty.
-    private var availableTags: [String] {
+    private func makeAvailableTags() -> [String] {
         var counts: [String: Int] = [:]
         for bookmark in library.bookmarks {
             for tag in bookmark.tags {
@@ -393,7 +413,7 @@ struct BookmarksView: View {
                 tagFilterChip(title: "All Tags", isSelected: selectedTagFilter == nil) {
                     selectedTagFilter = nil
                 }
-                ForEach(availableTags, id: \.self) { tag in
+                ForEach(cachedAvailableTags, id: \.self) { tag in
                     tagFilterChip(
                         title: tag,
                         isSelected: selectedTagFilter == tag
@@ -439,8 +459,15 @@ struct BookmarksView: View {
         )
     }
 
-    private var bookmarkGroups: [BookmarkChapterGroup] {
-        let grouped = Dictionary(grouping: filteredBookmarks) { bookmark in
+    private func rebuildBookmarkCaches() {
+        let filtered = makeFilteredBookmarks()
+        cachedFilteredBookmarks = filtered
+        cachedAvailableTags = makeAvailableTags()
+        cachedBookmarkGroups = makeBookmarkGroups(from: filtered)
+    }
+
+    private func makeBookmarkGroups(from bookmarks: [BookmarkedSection]) -> [BookmarkChapterGroup] {
+        let grouped = Dictionary(grouping: bookmarks) { bookmark in
             BookmarkGroupKey(
                 codeSectionID: bookmark.codeSectionID,
                 chapterNumber: bookmark.chapterNumber
