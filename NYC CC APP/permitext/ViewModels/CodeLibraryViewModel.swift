@@ -244,7 +244,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func noteSectionOpened(anchor: PublishedHTMLAnchor, chapter: CodeChapter) {
-        guard let summary = sectionSummary(sectionNumber: anchor.sectionNumber) else { return }
+        guard let summary = sectionSummary(sectionNumber: anchor.sectionNumber, codeSectionID: chapter.codeSectionID) else { return }
         let officialText = loadSectionDetail(sectionID: summary.id)?.officialText ?? ""
         recordRecentlyViewed(
             RecentlyViewedEntry(
@@ -931,6 +931,37 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             statusMessage = error.localizedDescription
             return nil
+        }
+    }
+
+    func sectionSummary(sectionNumber: String, codeSectionID: Int64?) -> CodeSectionSummary? {
+        let normalized = sectionNumber
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
+
+        guard !normalized.isEmpty else { return nil }
+
+        if let authoredCodeStore {
+            return try? authoredCodeStore.sectionSummary(sectionNumber: normalized, codeSectionID: codeSectionID)
+        }
+
+        return sectionSummary(sectionNumber: normalized)
+    }
+
+    func recentEntry(for codeSectionID: Int64?) -> RecentlyViewedEntry? {
+        recentlyViewedSections.first { entry in
+            entry.codeSectionID == codeSectionID
+        } ?? recentlyViewedSections.first
+    }
+
+    func chapter(for entry: RecentlyViewedEntry) -> CodeChapter? {
+        chapter(forSectionID: entry.sectionID)
+    }
+
+    func chapter(forSectionID sectionID: Int64) -> CodeChapter? {
+        guard let detail = loadSectionDetail(sectionID: sectionID) else { return nil }
+        return chapters(for: detail.codeSectionID).first { chapter in
+            chapter.chapterNumber == detail.chapterNumber
         }
     }
 

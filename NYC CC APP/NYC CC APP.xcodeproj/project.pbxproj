@@ -39,7 +39,6 @@
 		A10000000000000000000023 /* FolderUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* FolderUI.swift */; };
 		A10000000000000000000024 /* BookmarkExportBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* BookmarkExportBuilder.swift */; };
 		A10000000000000000000025 /* BookmarkExportShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* BookmarkExportShareSheet.swift */; };
-		A10000000000000000000027 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,7 +79,6 @@
 		A20000000000000000000023 /* FolderUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderUI.swift; sourceTree = "<group>"; };
 		A20000000000000000000024 /* BookmarkExportBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkExportBuilder.swift; sourceTree = "<group>"; };
 		A20000000000000000000025 /* BookmarkExportShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkExportShareSheet.swift; sourceTree = "<group>"; };
-		A20000000000000000000027 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,7 +189,6 @@
 		A40000000000000000000009 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A20000000000000000000027 /* AppIcon.icon */,
 				A2000000000000000000000F /* nyc_code_sample.sqlite */,
 				A20000000000000000000012 /* nyc_code_2022.sqlite */,
 				A20000000000000000000017 /* nyc_code_authored.json */,
@@ -268,7 +265,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000000000000000000027 /* AppIcon.icon in Resources */,
 				A10000000000000000000017 /* nyc_code_authored.json in Resources */,
 				A1000000000000000000001D /* CodeContent in Resources */,
 			);

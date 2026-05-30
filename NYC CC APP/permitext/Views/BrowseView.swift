@@ -11,6 +11,8 @@ struct BrowseView: View {
     @State private var browseCodeSectionID: Int64?
     @State private var hasSeededBrowseSection = false
     @State private var rememberedSectionIDs: [Int64: Int64] = [:]
+    @State private var rememberedAnchorIDs: [Int64: String] = [:]
+    @State private var rememberedScrollOffsets: [Int64: Double] = [:]
     private let tabBarClearance: CGFloat = 104
 
     private var accentColor: Color {
@@ -126,7 +128,9 @@ struct BrowseView: View {
                                         NavigationLink {
                                             chapterDestination(
                                                 chapter: chapter,
-                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id)
+                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id),
+                                                rememberedAnchorID: rememberedAnchorBinding(for: chapter.id),
+                                                rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id)
                                             )
                                         } label: {
                                             ChapterTile(
@@ -147,7 +151,9 @@ struct BrowseView: View {
                                         NavigationLink {
                                             chapterDestination(
                                                 chapter: chapter,
-                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id)
+                                                rememberedSectionID: rememberedSectionBinding(for: chapter.id),
+                                                rememberedAnchorID: rememberedAnchorBinding(for: chapter.id),
+                                                rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id)
                                             )
                                         } label: {
                                             ChapterTile(
@@ -180,12 +186,20 @@ struct BrowseView: View {
     }
 
     @ViewBuilder
-    private func chapterDestination(chapter: CodeChapter, rememberedSectionID: Binding<Int64?>) -> some View {
-        if let initialSection = library.firstSection(for: chapter) {
+    private func chapterDestination(
+        chapter: CodeChapter,
+        rememberedSectionID: Binding<Int64?>,
+        rememberedAnchorID: Binding<String?>,
+        rememberedScrollOffset: Binding<Double?>,
+        initialSection overrideInitialSection: CodeSectionSummary? = nil
+    ) -> some View {
+        if let initialSection = overrideInitialSection ?? library.firstSection(for: chapter) {
             ChapterHTMLReaderView(
                 chapter: chapter,
                 initialSection: initialSection,
-                rememberedNativeSectionID: rememberedSectionID
+                rememberedNativeSectionID: rememberedSectionID,
+                rememberedAnchorID: rememberedAnchorID,
+                rememberedScrollOffset: rememberedScrollOffset
             )
             .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
         } else {
@@ -315,13 +329,70 @@ struct BrowseView: View {
 
     private func rememberedSectionBinding(for chapterID: Int64) -> Binding<Int64?> {
         Binding(
-            get: { rememberedSectionIDs[chapterID] },
+            get: {
+                rememberedSectionIDs[chapterID] ?? BrowserContextID.storedSectionID(
+                    for: chapterID,
+                    context: browserContext
+                )
+            },
             set: { newValue in
                 if let newValue {
                     rememberedSectionIDs[chapterID] = newValue
                 } else {
                     rememberedSectionIDs.removeValue(forKey: chapterID)
                 }
+                BrowserContextID.persistSectionID(
+                    newValue,
+                    for: chapterID,
+                    context: browserContext
+                )
+            }
+        )
+    }
+
+    private func rememberedAnchorBinding(for chapterID: Int64) -> Binding<String?> {
+        Binding(
+            get: {
+                rememberedAnchorIDs[chapterID] ?? BrowserContextID.storedAnchorID(
+                    for: chapterID,
+                    context: browserContext
+                )
+            },
+            set: { newValue in
+                let trimmed = newValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+                if let trimmed, !trimmed.isEmpty {
+                    rememberedAnchorIDs[chapterID] = trimmed
+                } else {
+                    rememberedAnchorIDs.removeValue(forKey: chapterID)
+                }
+                BrowserContextID.persistAnchorID(
+                    trimmed,
+                    for: chapterID,
+                    context: browserContext
+                )
+            }
+        )
+    }
+
+    private func rememberedScrollOffsetBinding(for chapterID: Int64) -> Binding<Double?> {
+        Binding(
+            get: {
+                rememberedScrollOffsets[chapterID] ?? BrowserContextID.storedScrollOffset(
+                    for: chapterID,
+                    context: browserContext
+                )
+            },
+            set: { newValue in
+                if let newValue, newValue >= 0 {
+                    rememberedScrollOffsets[chapterID] = newValue
+                } else {
+                    rememberedScrollOffsets.removeValue(forKey: chapterID)
+                }
+                BrowserContextID.persistScrollOffset(
+                    newValue,
+                    for: chapterID,
+                    context: browserContext
+                )
             }
         )
     }

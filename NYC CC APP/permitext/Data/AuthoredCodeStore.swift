@@ -233,6 +233,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private let codeSectionNameByID: [Int64: String]
     private let sectionsByChapterIDIndex: [Int64: [Section]]
     private let sectionNumberIndex: [String: CodeSectionSummary]
+    private let sectionNumberByCodeSectionIndex: [String: CodeSectionSummary]
     private let chapterNumberIndex: [String: CodeChapter]
     private let tableBlocksByID: [String: CodeTableBlock]
     private let authoredHTMLChaptersURL: URL
@@ -324,6 +325,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         var indexedSectionsByCodeSectionID: [Int64: [IndexedSection]] = [:]
         var sectionsByChapterIDIndex: [Int64: [Section]] = [:]
         var sectionNumberIndex: [String: CodeSectionSummary] = [:]
+        var sectionNumberByCodeSectionIndex: [String: CodeSectionSummary] = [:]
         var chapterNumberIndex: [String: CodeChapter] = [:]
         let tableBlocksByID = Self.tableBlockLookup(decodedProject.tableBlocks ?? [])
         let authoredHTMLChaptersURL = jsonURL
@@ -373,6 +375,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                             kind: section.kind
                         )
                         sectionNumberIndex[section.sectionNumber.uppercased()] = summary
+                        if let codeSectionID = chapterModel.codeSectionID {
+                            sectionNumberByCodeSectionIndex[
+                                Self.scopedSectionNumberKey(section.sectionNumber, codeSectionID: codeSectionID)
+                            ] = summary
+                        }
                         let indexed = IndexedSection(
                             chapter: chapterModel,
                             group: CodeSectionGroup(
@@ -414,6 +421,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         self.codeSectionNameByID = Dictionary(uniqueKeysWithValues: codeSections.map { ($0.id, $0.name) })
         self.sectionsByChapterIDIndex = sectionsByChapterIDIndex
         self.sectionNumberIndex = sectionNumberIndex
+        self.sectionNumberByCodeSectionIndex = sectionNumberByCodeSectionIndex
         self.chapterNumberIndex = chapterNumberIndex
         self.tableBlocksByID = tableBlocksByID
         self.authoredHTMLChaptersURL = authoredHTMLChaptersURL
@@ -1005,6 +1013,19 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     func sectionSummary(sectionNumber: String) throws -> CodeSectionSummary? {
         sectionNumberIndex[sectionNumber.uppercased()]
+    }
+
+    func sectionSummary(sectionNumber: String, codeSectionID: Int64?) throws -> CodeSectionSummary? {
+        guard let codeSectionID else {
+            return try sectionSummary(sectionNumber: sectionNumber)
+        }
+        return sectionNumberByCodeSectionIndex[
+            Self.scopedSectionNumberKey(sectionNumber, codeSectionID: codeSectionID)
+        ]
+    }
+
+    private static func scopedSectionNumberKey(_ sectionNumber: String, codeSectionID: Int64) -> String {
+        "\(codeSectionID):\(sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines).uppercased())"
     }
 
     private struct HTMLHeading {
