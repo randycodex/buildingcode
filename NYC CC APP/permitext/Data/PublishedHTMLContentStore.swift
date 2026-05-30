@@ -42,6 +42,7 @@ final class PublishedHTMLContentStore {
     private static let metadataCacheLimit = 96
 
     private let rootURL: URL?
+    private let readAccessRootURL: URL?
     private var chapterCache: [String: ChapterCache] = [:]
 
     init(resourceURL: URL? = Bundle.main.resourceURL, relativeRootPath: String?, codeSectionSlug: String? = nil) {
@@ -55,14 +56,23 @@ final class PublishedHTMLContentStore {
                 let codeSectionURL = baseURL
                     .appendingPathComponent("code-sections", isDirectory: true)
                     .appendingPathComponent(codeSectionSlug, isDirectory: true)
-                self.rootURL = FileManager.default.fileExists(atPath: codeSectionURL.path) ? codeSectionURL : baseURL
+                if FileManager.default.fileExists(atPath: codeSectionURL.path) {
+                    self.rootURL = codeSectionURL
+                    self.readAccessRootURL = baseURL
+                } else {
+                    self.rootURL = baseURL
+                    self.readAccessRootURL = baseURL
+                }
             } else {
                 self.rootURL = baseURL
+                self.readAccessRootURL = baseURL
             }
         } else {
-            self.rootURL = resourceURL?
+            let defaultRootURL = resourceURL?
                 .appendingPathComponent("CodeContent", isDirectory: true)
                 .appendingPathComponent("2022-construction-codes", isDirectory: true)
+            self.rootURL = defaultRootURL
+            self.readAccessRootURL = defaultRootURL
         }
     }
 
@@ -76,7 +86,7 @@ final class PublishedHTMLContentStore {
     }
 
     func readAccessURL() -> URL? {
-        rootURL
+        readAccessRootURL ?? rootURL
     }
 
     private struct ImageManifestFile: Decodable {
