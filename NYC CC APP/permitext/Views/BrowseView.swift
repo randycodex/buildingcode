@@ -1299,7 +1299,7 @@ struct CodeEmptyStateCard: View {
 
 #if DEBUG
 private struct BrowseViewPreviewContainer: View {
-    @StateObject private var library = CodeLibraryViewModel()
+    @StateObject private var library = CodeLibraryViewModel.preview()
 
     var body: some View {
         BrowseView()
@@ -1308,7 +1308,7 @@ private struct BrowseViewPreviewContainer: View {
 }
 
 private struct ChapterSectionsPreviewContainer: View {
-    @StateObject private var library = CodeLibraryViewModel()
+    @StateObject private var library = CodeLibraryViewModel.preview()
 
     var body: some View {
         NavigationStack {
@@ -1328,17 +1328,11 @@ private struct ChapterSectionsPreviewContainer: View {
     }
 }
 
-struct BrowseView_Previews: PreviewProvider {
-    static var previews: some View {
-        BrowseViewPreviewContainer()
-            .previewDisplayName("Browse")
-    }
+#Preview("Browse") {
+    BrowseViewPreviewContainer()
 }
 
-struct ChapterSectionsView_Previews: PreviewProvider {
-    static var previews: some View {
-        ChapterSectionsPreviewContainer()
-            .previewDisplayName("Chapter Sections")
-    }
+#Preview("Chapter Sections") {
+    ChapterSectionsPreviewContainer()
 }
 #endif

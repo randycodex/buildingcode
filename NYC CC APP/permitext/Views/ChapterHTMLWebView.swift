@@ -477,7 +477,29 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection'));
                 if (!headings.length) { return null; }
 
-                var viewportTop = window.scrollY + 88;
+                var sampleY = Math.min(window.innerHeight * 0.42, 320);
+                var sampleX = Math.max(16, Math.min(window.innerWidth - 16, window.innerWidth * 0.18));
+                var sampledElement = document.elementFromPoint(sampleX, sampleY) ||
+                  document.elementFromPoint(Math.floor(window.innerWidth / 2), sampleY);
+                if (sampledElement) {
+                  var directHeading = sampledElement.closest && sampledElement.closest('.Section, .Subsection');
+                  if (directHeading) {
+                    return anchorIDForHeading(directHeading);
+                  }
+
+                  var visibleHeading = headings[0];
+                  for (var h = 0; h < headings.length; h++) {
+                    var relation = headings[h].compareDocumentPosition(sampledElement);
+                    if (headings[h] === sampledElement || (relation & Node.DOCUMENT_POSITION_FOLLOWING)) {
+                      visibleHeading = headings[h];
+                    } else if (relation & Node.DOCUMENT_POSITION_PRECEDING) {
+                      break;
+                    }
+                  }
+                  return anchorIDForHeading(visibleHeading);
+                }
+
+                var viewportTop = window.scrollY + sampleY;
                 var candidate = headings[0];
 
                 for (var i = 0; i < headings.length; i++) {
@@ -714,6 +736,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 guard let self, let webView else { return }
                 self.suppressScrollOffsetReportsUntil = nil
                 self.reportScrollProgress(from: webView.scrollView)
+                self.reportVisibleAnchor(in: webView)
             }
         }
 

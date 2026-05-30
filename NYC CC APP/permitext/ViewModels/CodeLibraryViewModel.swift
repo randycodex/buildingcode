@@ -112,7 +112,8 @@ final class CodeLibraryViewModel: ObservableObject {
     init(
         locator: BundleDatabaseLocator = BundleDatabaseLocator(),
         formattingEngine: FormattingEngine = FormattingEngine(),
-        readerThemeStore: ReaderThemeStore = ReaderThemeStore()
+        readerThemeStore: ReaderThemeStore = ReaderThemeStore(),
+        loadsInitialContent: Bool = true
     ) {
         self.locator = locator
         self.formattingEngine = formattingEngine
@@ -126,8 +127,51 @@ final class CodeLibraryViewModel: ObservableObject {
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         initialLoadProgress = 0
-        reload()
+        if loadsInitialContent {
+            reload()
+        }
     }
+
+    #if DEBUG
+    static func preview() -> CodeLibraryViewModel {
+        let model = CodeLibraryViewModel(loadsInitialContent: false)
+        let version = BundledCodeVersion(
+            fileName: "preview-authored-content",
+            fileURL: URL(fileURLWithPath: "/dev/null"),
+            codeVersion: "2022 Construction Codes",
+            contentKind: .authored,
+            authoredCodeID: 1,
+            jurisdictionID: 1,
+            jurisdictionName: "New York City",
+            authoredHTMLBundlePath: nil
+        )
+        let buildingSectionID: Int64 = 1
+        let plumbingSectionID: Int64 = 2
+
+        model.availableVersions = [version]
+        model.availableJurisdictions = [
+            BundledJurisdiction(id: "new-york-city", jurisdictionID: 1, name: "New York City")
+        ]
+        model.codeSections = [
+            CodeSectionCategory(id: buildingSectionID, codeID: 1, name: "Building Code"),
+            CodeSectionCategory(id: plumbingSectionID, codeID: 1, name: "Plumbing Code")
+        ]
+        model.chapters = [
+            CodeChapter(id: 101, codeSectionID: buildingSectionID, chapterNumber: "1", title: "Administration"),
+            CodeChapter(id: 102, codeSectionID: buildingSectionID, chapterNumber: "3", title: "Occupancy Classification and Use"),
+            CodeChapter(id: 103, codeSectionID: buildingSectionID, chapterNumber: "5", title: "General Building Heights and Areas"),
+            CodeChapter(id: 201, codeSectionID: plumbingSectionID, chapterNumber: "1", title: "Administration"),
+            CodeChapter(id: 202, codeSectionID: plumbingSectionID, chapterNumber: "6", title: "Water Supply and Distribution")
+        ]
+        model.selectedVersionFileName = version.fileName
+        model.selectedJurisdictionKey = "new-york-city"
+        model.selectedCodeSectionID = buildingSectionID
+        model.statusMessage = nil
+        model.initialLoadProgress = 1
+        model.isInitialContentLoaded = true
+        return model
+    }
+    #endif
 
     var selectedVersion: BundledCodeVersion? {
         filteredVersions.first { $0.fileName == selectedVersionFileName }

@@ -555,6 +555,6 @@ private enum ClearSettingsAction: Identifiable {
 #if DEBUG
 #Preview("Settings") {
     SettingsView()
-        .environmentObject(CodeLibraryViewModel())
+        .environmentObject(CodeLibraryViewModel.preview())
 }
 #endif

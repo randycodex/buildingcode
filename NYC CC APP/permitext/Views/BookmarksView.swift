@@ -3,7 +3,6 @@ import UIKit
 
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @State private var scrollOffset: CGFloat = 0
     @State private var savedFilterCodeSectionIDs: Set<Int64>
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var selectedTagFilter: String? = nil
@@ -13,18 +12,15 @@ struct BookmarksView: View {
     @State private var projectPageIndex: Int = 0
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
     @State private var cachedAvailableTags: [String] = []
-    @State private var cachedBookmarkGroups: [BookmarkChapterGroup] = []
+    @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
     private let tabBarClearance: CGFloat = 104
     private let contentHorizontalInset: CGFloat = 16
     private let projectTilePageSize = 4
-    private let projectTileOuterHeight: CGFloat = 122
-    /// Floor for the dock. With a single filter row the dock matches the
-    /// Search dock at 86pt; when more rows are present (projects + sections
-    /// + tags) the frame grows naturally past the floor.
-    private let dockContentMinHeight: CGFloat = 86
+    private let projectTileOuterHeight: CGFloat = 57
+    private let fixedHeaderTitleTopCompensation: CGFloat = 20
 
     init() {
         _savedFilterCodeSectionIDs = State(
@@ -100,89 +96,52 @@ struct BookmarksView: View {
         Color(uiColor: library.accentColor(for: codeSectionID))
     }
 
-    private var collapseProgress: CGFloat {
-        min(max(-scrollOffset / 64, 0), 1)
-    }
-
     var body: some View {
         NavigationStack {
-            ScrollView {
-                GeometryReader { proxy in
-                    Color.clear
-                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("savedScroll")).minY)
-                }
-                .frame(height: 0)
+            VStack(spacing: 0) {
+                savedHeaderContent
 
-                VStack(alignment: .leading, spacing: 0) {
-                    CodeScreenTitle(title: "Saved", collapseProgress: collapseProgress)
+                if !library.bookmarks.isEmpty {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(Array(cachedBookmarkCodeGroups.enumerated()), id: \.element.id) { index, codeGroup in
+                                codeSectionHeader(codeGroup, isFirst: index == 0)
 
-                    if !library.bookmarks.isEmpty {
-                        if !library.folders.isEmpty {
-                            projectTilesSection
-                                .padding(.top, 12)
-                                .padding(.bottom, 6)
-                        }
+                                ForEach(codeGroup.chapterGroups) { group in
+                                    chapterHeader(group)
 
-                        LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(cachedBookmarkGroups) { group in
-                                chapterHeader(group)
+                                    ForEach(group.items) { bookmark in
+                                        NavigationLink {
+                                            bookmarkDestination(for: bookmark)
+                                        } label: {
+                                            bookmarkRow(bookmark)
+                                        }
+                                        .buttonStyle(.plain)
 
-                                ForEach(group.items) { bookmark in
-                                    NavigationLink {
-                                        bookmarkDestination(for: bookmark)
-                                    } label: {
-                                        bookmarkRow(bookmark)
+                                        CodeHairline()
                                     }
-                                    .buttonStyle(.plain)
-
-                                    CodeHairline()
                                 }
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .padding(.horizontal, contentHorizontalInset)
+                        .padding(.bottom, tabBarClearance)
                     }
-                }
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, CodeScreenMetrics.topTitlePadding)
-                .padding(.bottom, tabBarClearance)
+                } else {
+                    Spacer(minLength: 0)
             }
-            .overlay(alignment: .top) {
-                CodeTopContentFade(title: "Saved", progress: collapseProgress)
+        }
+        .overlay(alignment: .topTrailing) {
+            HStack(spacing: 6) {
+                sortButton
+                exportButton
             }
-            .overlay(alignment: .topTrailing) {
-                HStack(spacing: 6) {
-                    sortButton
-                    exportButton
-                }
-                .padding(.top, 14)
-                .padding(.trailing, contentHorizontalInset)
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                if !library.bookmarks.isEmpty {
-                    VStack(spacing: 10) {
-                        // Projects row sits at the top of the dock so it
-                        // reads as the broadest filter dimension. Always
-                        // present (even with zero folders) so the "+ New"
-                        // affordance is always reachable from this screen.
-                        folderFilterControl
-
-                        if !availableFilterSections.isEmpty {
-                            savedFilterControl
-                        }
-                        if !cachedAvailableTags.isEmpty {
-                            tagFilterControl
-                        }
-                    }
-                    .frame(minHeight: dockContentMinHeight, alignment: .bottom)
-                    .padding(.horizontal, contentHorizontalInset)
-                    .padding(.top, 10)
-                    .padding(.bottom, 6)
-                    .background(bottomDock)
-                }
-            }
-            .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
+            .padding(.top, 14 + fixedHeaderTitleTopCompensation)
+            .padding(.trailing, contentHorizontalInset)
+        }
+        .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
             .confirmationDialog(
                 "Export saved sections",
                 isPresented: $isExportActionSheetPresented,
@@ -249,9 +208,27 @@ struct BookmarksView: View {
             }
             .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         }
-        .coordinateSpace(name: "savedScroll")
-        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
+
+private var savedHeaderContent: some View {
+    VStack(alignment: .leading, spacing: 0) {
+        CodeScreenTitle(title: "Saved", collapseProgress: 0)
+
+        if !library.bookmarks.isEmpty {
+            if !library.folders.isEmpty {
+                    projectTilesSection
+                        .padding(.top, 12)
+                }
+
+                savedInlineFilters
+                    .padding(.top, library.folders.isEmpty ? 12 : 8)
+                    .padding(.bottom, 14)
+            }
+    }
+    .frame(maxWidth: .infinity, alignment: .topLeading)
+    .padding(.horizontal, contentHorizontalInset)
+    .padding(.top, CodeScreenMetrics.topTitlePadding + fixedHeaderTitleTopCompensation)
+}
 
     // MARK: - Export
 
@@ -347,12 +324,6 @@ struct BookmarksView: View {
     /// filter dimensions are active.
     private var currentFilterContextLabel: String? {
         var parts: [String] = []
-        if !savedFilterFolderIDs.isEmpty {
-            let names = library.folders
-                .filter { savedFilterFolderIDs.contains($0.id) }
-                .map(\.name)
-            if !names.isEmpty { parts.append("Projects: \(names.joined(separator: ", "))") }
-        }
         if !savedFilterCodeSectionIDs.isEmpty {
             let names = library.codeSections
                 .filter { savedFilterCodeSectionIDs.contains($0.id) }
@@ -365,13 +336,6 @@ struct BookmarksView: View {
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
-    private var bottomDock: some View {
-        // Mirrors the Search screen's dock styling so both tabs share the same
-        // bottom-anchored filter affordance.
-        Color(uiColor: .systemGroupedBackground)
-            .ignoresSafeArea(edges: .bottom)
-    }
-
     private var projectPages: [[CodeFolder]] {
         stride(from: 0, to: library.folders.count, by: projectTilePageSize).map { start in
             Array(library.folders[start..<min(start + projectTilePageSize, library.folders.count)])
@@ -379,9 +343,8 @@ struct BookmarksView: View {
     }
 
     private func projectGridHeight(for page: [CodeFolder]) -> CGFloat {
-        let rowCount = page.count <= 2 ? 1 : 2
-        let rowGap: CGFloat = rowCount == 2 ? 8 : 0
-        return (projectTileOuterHeight * CGFloat(rowCount)) + rowGap
+        let rowCount = min(4, max(1, Int(ceil(Double(page.count) / 2.0))))
+        return (projectTileOuterHeight * CGFloat(rowCount)) + (CGFloat(rowCount - 1) * 8)
     }
 
     private var projectTabViewHeight: CGFloat {
@@ -446,17 +409,15 @@ struct BookmarksView: View {
     private func projectPageGrid(_ page: [CodeFolder], pageWidth: CGFloat) -> some View {
         let pageSlots = Array(page.prefix(projectTilePageSize))
 
-        VStack(spacing: 8) {
-            projectTileRow(
-                leftFolder: pageSlots.indices.contains(0) ? pageSlots[0] : nil,
-                rightFolder: pageSlots.indices.contains(1) ? pageSlots[1] : nil,
-                pageWidth: pageWidth
-            )
+        let rowCount = min(4, max(1, Int(ceil(Double(pageSlots.count) / 2.0))))
 
-            if pageSlots.count > 2 {
+        VStack(spacing: 8) {
+            ForEach(0..<rowCount, id: \.self) { rowIndex in
+                let leftIndex = rowIndex * 2
+                let rightIndex = leftIndex + 1
                 projectTileRow(
-                    leftFolder: pageSlots.indices.contains(2) ? pageSlots[2] : nil,
-                    rightFolder: pageSlots.indices.contains(3) ? pageSlots[3] : nil,
+                    leftFolder: pageSlots.indices.contains(leftIndex) ? pageSlots[leftIndex] : nil,
+                    rightFolder: pageSlots.indices.contains(rightIndex) ? pageSlots[rightIndex] : nil,
                     pageWidth: pageWidth
                 )
             }
@@ -506,41 +467,31 @@ struct BookmarksView: View {
     private func projectTile(_ folder: CodeFolder) -> some View {
         let color = Color(uiColor: PlatformColor(hex: folder.colorHex) ?? .systemBlue)
         let count = library.bookmarkCount(inFolder: folder.id)
-        let description = folder.description.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack(alignment: .top, spacing: 8) {
+        return VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .center, spacing: 7) {
                 Circle()
                     .fill(color)
-                    .frame(width: 10, height: 10)
-                    .padding(.top, 3)
-                Spacer(minLength: 0)
+                    .frame(width: 8, height: 8)
+
+                Text(folder.name)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
                 Image(systemName: "folder")
-                    .font(.footnote.weight(.semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundStyle(color)
             }
-
-            Text(folder.name)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.primary)
-                .lineLimit(2)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            Text(description.isEmpty ? " " : description)
-                .font(.caption2)
-                .foregroundStyle(description.isEmpty ? .clear : .secondary)
-                .lineLimit(2)
-                .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, minHeight: 30, alignment: .topLeading)
 
             Text("\(count) saved")
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.tertiary)
                 .lineLimit(1)
         }
-        .padding(10)
-        .frame(height: projectTileOuterHeight, alignment: .topLeading)
+        .padding(9)
+        .frame(height: projectTileOuterHeight, alignment: .center)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
@@ -560,16 +511,6 @@ struct BookmarksView: View {
             results = results.filter { bookmark in
                 guard let id = bookmark.codeSectionID else { return false }
                 return savedFilterCodeSectionIDs.contains(id)
-            }
-        }
-        if !savedFilterFolderIDs.isEmpty {
-            // A bookmark passes the folder filter if it belongs to ANY
-            // selected folder — OR semantics within the folder dimension,
-            // AND across other dimensions (matches how the section + tag
-            // filters compose).
-            results = results.filter { bookmark in
-                let memberIDs = Set(library.folderMembership[bookmark.id] ?? [])
-                return !memberIDs.isDisjoint(with: savedFilterFolderIDs)
             }
         }
         if let tag = selectedTagFilter {
@@ -599,16 +540,16 @@ struct BookmarksView: View {
             .map(\.key)
     }
 
-    /// Projects row in the bottom dock. Always present so the user can
-    /// create their first project without leaving the screen. Long-press
-    /// on a folder chip opens the editor for that folder.
-    private var folderFilterControl: some View {
-        FolderFilterChipsRow(
-            folders: library.folders,
-            selectedIDs: $savedFilterFolderIDs,
-            onNew: { folderEditorTarget = .new },
-            onEdit: { folder in folderEditorTarget = .edit(folder) }
-        )
+    @ViewBuilder
+    private var savedInlineFilters: some View {
+        VStack(spacing: 10) {
+            if !availableFilterSections.isEmpty {
+                savedFilterControl
+            }
+            if !cachedAvailableTags.isEmpty {
+                tagFilterControl
+            }
+        }
     }
 
     private var tagFilterControl: some View {
@@ -667,68 +608,87 @@ struct BookmarksView: View {
         let filtered = makeFilteredBookmarks()
         cachedFilteredBookmarks = filtered
         cachedAvailableTags = makeAvailableTags()
-        cachedBookmarkGroups = makeBookmarkGroups(from: filtered)
+        cachedBookmarkCodeGroups = makeBookmarkCodeGroups(from: filtered)
     }
 
-    private func makeBookmarkGroups(from bookmarks: [BookmarkedSection]) -> [BookmarkChapterGroup] {
+    private func makeBookmarkCodeGroups(from bookmarks: [BookmarkedSection]) -> [BookmarkCodeGroup] {
         let sortedBookmarks = BookmarkSorter.sorted(
             bookmarks,
             mode: savedSortMode,
             codeSectionName: { library.codeSectionName(id: $0) }
         )
         let order = Dictionary(uniqueKeysWithValues: sortedBookmarks.enumerated().map { ($0.element.id, $0.offset) })
-        let grouped = Dictionary(grouping: sortedBookmarks) { bookmark in
-            BookmarkGroupKey(
-                codeSectionID: bookmark.codeSectionID,
-                chapterNumber: bookmark.chapterNumber
-            )
+        let groupedByCodeSection = Dictionary(grouping: sortedBookmarks) { bookmark in
+            BookmarkCodeGroupKey(codeSectionID: bookmark.codeSectionID)
         }
-        return grouped.map { key, items in
-            BookmarkChapterGroup(
-                codeSectionID: key.codeSectionID,
-                codeSectionName: library.codeSectionName(id: key.codeSectionID),
-                chapterNumber: key.chapterNumber,
-                chapterTitle: items.first?.chapterTitle ?? "",
-                items: items.sorted {
-                    (order[$0.id] ?? 0) < (order[$1.id] ?? 0)
-                }
+
+        return groupedByCodeSection.map { codeKey, codeItems in
+            let groupedByChapter = Dictionary(grouping: codeItems) { bookmark in
+                BookmarkChapterGroupKey(chapterNumber: bookmark.chapterNumber)
+            }
+            let chapterGroups = groupedByChapter.map { chapterKey, chapterItems in
+                BookmarkChapterGroup(
+                    chapterNumber: chapterKey.chapterNumber,
+                    chapterTitle: chapterItems.first?.chapterTitle ?? "",
+                    items: chapterItems.sorted {
+                        (order[$0.id] ?? 0) < (order[$1.id] ?? 0)
+                    }
+                )
+            }
+            .sorted {
+                let lhsOrder = $0.items.map { order[$0.id] ?? 0 }.min() ?? 0
+                let rhsOrder = $1.items.map { order[$0.id] ?? 0 }.min() ?? 0
+                return lhsOrder < rhsOrder
+            }
+
+            return BookmarkCodeGroup(
+                codeSectionID: codeKey.codeSectionID,
+                codeSectionName: library.codeSectionName(id: codeKey.codeSectionID),
+                chapterGroups: chapterGroups
             )
         }
         .sorted {
-            let lhsOrder = $0.items.map { order[$0.id] ?? 0 }.min() ?? 0
-            let rhsOrder = $1.items.map { order[$0.id] ?? 0 }.min() ?? 0
+            let lhsOrder = $0.chapterGroups
+                .flatMap(\.items)
+                .map { order[$0.id] ?? 0 }
+                .min() ?? 0
+            let rhsOrder = $1.chapterGroups
+                .flatMap(\.items)
+                .map { order[$0.id] ?? 0 }
+                .min() ?? 0
             return lhsOrder < rhsOrder
         }
     }
 
-    private func chapterHeader(_ group: BookmarkChapterGroup) -> some View {
+    private func codeSectionHeader(_ group: BookmarkCodeGroup, isFirst: Bool) -> some View {
         let groupAccent = bookmarkAccentColor(for: group.codeSectionID)
 
-        return VStack(alignment: .leading, spacing: 6) {
-            if !library.codeSections.isEmpty {
-                Text(group.codeSectionName)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(groupAccent)
-                    .textCase(.uppercase)
-            }
+        return Text(group.codeSectionName)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(groupAccent)
+            .textCase(.uppercase)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, isFirst ? 8 : 18)
+            .padding(.bottom, 10)
+    }
 
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                Text("Chapter \(group.chapterNumber)")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-                    .fixedSize(horizontal: true, vertical: false)
+    private func chapterHeader(_ group: BookmarkChapterGroup) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text("Chapter \(group.chapterNumber)")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .fixedSize(horizontal: true, vertical: false)
 
-                Text(group.chapterTitle)
-                    .font(.headline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text(group.chapterTitle)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary.opacity(0.9))
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 26)
-        .padding(.bottom, 22)
+        .padding(.top, 12)
+        .padding(.bottom, 14)
     }
 
     @ViewBuilder
@@ -835,19 +795,28 @@ struct BookmarksView: View {
 
 }
 
-private struct BookmarkGroupKey: Hashable {
+private struct BookmarkCodeGroupKey: Hashable {
     let codeSectionID: Int64?
+}
+
+private struct BookmarkChapterGroupKey: Hashable {
     let chapterNumber: String
 }
 
-private struct BookmarkChapterGroup: Identifiable {
+private struct BookmarkCodeGroup: Identifiable {
     let codeSectionID: Int64?
     let codeSectionName: String
+    let chapterGroups: [BookmarkChapterGroup]
+
+    var id: String { codeSectionID.map(String.init) ?? codeSectionName }
+}
+
+private struct BookmarkChapterGroup: Identifiable {
     let chapterNumber: String
     let chapterTitle: String
     let items: [BookmarkedSection]
 
-    var id: String { "\(codeSectionID.map(String.init) ?? "all")-\(chapterNumber)" }
+    var id: String { chapterNumber }
 }
 
 /// Hoists the three export-related modal modifiers out of BookmarksView's
@@ -1279,6 +1248,6 @@ private enum ProjectFolderEditorTarget: Identifiable {
 #if DEBUG
 #Preview("Bookmarks") {
     BookmarksView()
-        .environmentObject(CodeLibraryViewModel())
+        .environmentObject(CodeLibraryViewModel.preview())
 }
 #endif

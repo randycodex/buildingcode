@@ -124,6 +124,11 @@ struct SearchView: View {
                 FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
                 rebuildSearchCaches()
             }
+            .onChange(of: isSearchFieldFocused) { _, isFocused in
+                if !isFocused, !searchFilterCodeSectionIDs.isEmpty {
+                    searchFilterCodeSectionIDs.removeAll()
+                }
+            }
             .onChange(of: library.searchResults) { _, _ in
                 rebuildSearchCaches()
             }
@@ -709,6 +714,6 @@ struct SearchView: View {
 #if DEBUG
 #Preview("Search") {
     SearchView()
-        .environmentObject(CodeLibraryViewModel())
+        .environmentObject(CodeLibraryViewModel.preview())
 }
 #endif

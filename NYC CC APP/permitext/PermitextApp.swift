@@ -209,6 +209,6 @@ private struct AppLaunchLoadingView: View {
                 Text("")
             }
     }
-    .environmentObject(CodeLibraryViewModel())
+    .environmentObject(CodeLibraryViewModel.preview())
 }
 #endif

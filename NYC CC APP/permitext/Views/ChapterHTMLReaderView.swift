@@ -322,7 +322,7 @@ struct ChapterHTMLReaderView: View {
             scrollProgressSyncTrigger: scrollProgressSyncTrigger,
             restoreScrollOffset: rememberedScrollOffset.wrappedValue,
             onVisibleAnchorChange: { anchorID in
-                guard let anchor = anchors.first(where: { $0.anchorID == anchorID }) else { return }
+                guard let anchor = anchorMatchingReportedAnchorID(anchorID) else { return }
                 if selectedAnchor?.anchorID != anchor.anchorID {
                     selectedAnchor = anchor
                 }
@@ -423,12 +423,23 @@ struct ChapterHTMLReaderView: View {
 
     private func recordRecentlyViewedForVisibleAnchor(_ anchorID: String?) {
         guard let anchorID,
-              let anchor = anchors.first(where: { $0.anchorID == anchorID }),
+              let anchor = anchorMatchingReportedAnchorID(anchorID),
               lastRecordedVisibleAnchorID != anchorID
         else { return }
 
         lastRecordedVisibleAnchorID = anchorID
         library.noteSectionOpened(anchor: anchor, chapter: chapter)
+    }
+
+    private func anchorMatchingReportedAnchorID(_ anchorID: String) -> PublishedHTMLAnchor? {
+        if let exactAnchor = anchors.first(where: { $0.anchorID == anchorID }) {
+            return exactAnchor
+        }
+
+        let normalizedReportedID = normalizedSectionNumber(anchorID)
+        return anchors.first { anchor in
+            normalizedReportedID.contains(normalizedSectionNumber(anchor.sectionNumber))
+        }
     }
 
     private func ensureHTMLStoreCached() {
