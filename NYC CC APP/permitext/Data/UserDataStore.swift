@@ -6,14 +6,22 @@ final class UserDataStore {
     private let isoFormatter = ISO8601DateFormatter()
 
     init() throws {
-        let appSupport = try FileManager.default.url(
+        let fileManager = FileManager.default
+        let baseSupport = try fileManager.url(
             for: .applicationSupportDirectory,
             in: .userDomainMask,
             appropriateFor: nil,
             create: true
-        ).appendingPathComponent("NYCCCApp", isDirectory: true)
+        )
+        let appSupport = baseSupport.appendingPathComponent("permitext", isDirectory: true)
+        let legacySupport = baseSupport.appendingPathComponent("NYCCCApp", isDirectory: true)
 
-        try FileManager.default.createDirectory(at: appSupport, withIntermediateDirectories: true, attributes: nil)
+        if !fileManager.fileExists(atPath: appSupport.path),
+           fileManager.fileExists(atPath: legacySupport.path) {
+            try fileManager.moveItem(at: legacySupport, to: appSupport)
+        }
+
+        try fileManager.createDirectory(at: appSupport, withIntermediateDirectories: true, attributes: nil)
         let databaseURL = appSupport.appendingPathComponent("user_data.sqlite")
         connection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
         try createSchema()

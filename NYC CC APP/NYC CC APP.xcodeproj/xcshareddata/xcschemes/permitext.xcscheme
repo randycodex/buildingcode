@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A50000000000000000000001"
-               BuildableName = "NYCCCApp.app"
-               BlueprintName = "NYCCCApp"
+               BuildableName = "permitext.app"
+               BlueprintName = "permitext"
                ReferencedContainer = "container:NYC CC APP.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -31,7 +31,7 @@
       shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -46,8 +46,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A50000000000000000000001"
-            BuildableName = "NYCCCApp.app"
-            BlueprintName = "NYCCCApp"
+            BuildableName = "permitext.app"
+            BlueprintName = "permitext"
             ReferencedContainer = "container:NYC CC APP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,8 +63,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A50000000000000000000001"
-            BuildableName = "NYCCCApp.app"
-            BlueprintName = "NYCCCApp"
+            BuildableName = "permitext.app"
+            BlueprintName = "permitext"
             ReferencedContainer = "container:NYC CC APP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

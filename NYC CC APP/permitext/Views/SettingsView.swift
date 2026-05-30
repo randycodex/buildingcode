@@ -69,7 +69,7 @@ struct SettingsView: View {
                         savedDataTools
                     }
 
-                    Text("NYC Code (Unofficial) is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
+                    Text("permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)

@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 @main
-struct NYCCCApp: App {
+struct PermitextApp: App {
     @StateObject private var library = CodeLibraryViewModel()
 
     init() {
@@ -142,7 +142,7 @@ private struct AppLaunchLoadingView: View {
     var body: some View {
         VStack(spacing: 22) {
             VStack(spacing: 8) {
-                Text("NYC Code")
+                Text("permitext")
                     .font(.system(size: 28, weight: .bold, design: .default))
                     .foregroundStyle(.primary)
 

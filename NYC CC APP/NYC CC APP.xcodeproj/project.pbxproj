@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A10000000000000000000001 /* NYCCCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* NYCCCApp.swift */; };
+		A10000000000000000000001 /* PermitextApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* PermitextApp.swift */; };
 		A10000000000000000000002 /* CodeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* CodeModels.swift */; };
 		A10000000000000000000003 /* SQLiteSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* SQLiteSupport.swift */; };
 		A10000000000000000000004 /* BundleDatabaseLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* BundleDatabaseLocator.swift */; };
@@ -39,11 +39,12 @@
 		A10000000000000000000023 /* FolderUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* FolderUI.swift */; };
 		A10000000000000000000024 /* BookmarkExportBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* BookmarkExportBuilder.swift */; };
 		A10000000000000000000025 /* BookmarkExportShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* BookmarkExportShareSheet.swift */; };
+		A10000000000000000000027 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A20000000000000000000000 /* NYCCCApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NYCCCApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A20000000000000000000001 /* NYCCCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NYCCCApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000000 /* permitext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = permitext.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000001 /* PermitextApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermitextApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* CodeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeModels.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* SQLiteSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteSupport.swift; sourceTree = "<group>"; };
 		A20000000000000000000004 /* BundleDatabaseLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleDatabaseLocator.swift; sourceTree = "<group>"; };
@@ -79,6 +80,7 @@
 		A20000000000000000000023 /* FolderUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderUI.swift; sourceTree = "<group>"; };
 		A20000000000000000000024 /* BookmarkExportBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkExportBuilder.swift; sourceTree = "<group>"; };
 		A20000000000000000000025 /* BookmarkExportShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkExportShareSheet.swift; sourceTree = "<group>"; };
+		A20000000000000000000027 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,15 +97,15 @@
 		A40000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
-				A40000000000000000000002 /* NYCCCApp */,
+				A40000000000000000000002 /* permitext */,
 				A40000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		A40000000000000000000002 /* NYCCCApp */ = {
+		A40000000000000000000002 /* permitext */ = {
 			isa = PBXGroup;
 			children = (
-				A20000000000000000000001 /* NYCCCApp.swift */,
+				A20000000000000000000001 /* PermitextApp.swift */,
 				A40000000000000000000004 /* Models */,
 				A4000000000000000000000A /* Diagnostics */,
 				A40000000000000000000005 /* Data */,
@@ -112,13 +114,13 @@
 				A40000000000000000000008 /* Views */,
 				A40000000000000000000009 /* Resources */,
 			);
-			path = NYCCCApp;
+			path = permitext;
 			sourceTree = "<group>";
 		};
 		A40000000000000000000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A20000000000000000000000 /* NYCCCApp.app */,
+				A20000000000000000000000 /* permitext.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -189,6 +191,7 @@
 		A40000000000000000000009 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				A20000000000000000000027 /* AppIcon.icon */,
 				A2000000000000000000000F /* nyc_code_sample.sqlite */,
 				A20000000000000000000012 /* nyc_code_2022.sqlite */,
 				A20000000000000000000017 /* nyc_code_authored.json */,
@@ -210,9 +213,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A50000000000000000000001 /* NYCCCApp */ = {
+		A50000000000000000000001 /* permitext */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A70000000000000000000002 /* Build configuration list for PBXNativeTarget "NYCCCApp" */;
+			buildConfigurationList = A70000000000000000000002 /* Build configuration list for PBXNativeTarget "permitext" */;
 			buildPhases = (
 				A30000000000000000000002 /* Sources */,
 				A30000000000000000000001 /* Frameworks */,
@@ -222,9 +225,9 @@
 			);
 			dependencies = (
 			);
-			name = NYCCCApp;
-			productName = NYCCCApp;
-			productReference = A20000000000000000000000 /* NYCCCApp.app */;
+			name = permitext;
+			productName = permitext;
+			productReference = A20000000000000000000000 /* permitext.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -255,7 +258,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A50000000000000000000001 /* NYCCCApp */,
+				A50000000000000000000001 /* permitext */,
 			);
 		};
 /* End PBXProject section */
@@ -265,6 +268,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000000027 /* AppIcon.icon in Resources */,
 				A10000000000000000000017 /* nyc_code_authored.json in Resources */,
 				A1000000000000000000001D /* CodeContent in Resources */,
 			);
@@ -277,7 +281,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000000000000000000001 /* NYCCCApp.swift in Sources */,
+				A10000000000000000000001 /* PermitextApp.swift in Sources */,
 				A10000000000000000000002 /* CodeModels.swift in Sources */,
 				A10000000000000000000012 /* ReaderTheme.swift in Sources */,
 				A10000000000000000000003 /* SQLiteSupport.swift in Sources */,
@@ -411,10 +415,11 @@
 		A80000000000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = NYCCCApp/Info.plist;
+				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -422,8 +427,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.nycccapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.randycodex.permitext;
+				PRODUCT_NAME = permitext;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -435,10 +440,11 @@
 		A80000000000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = NYCCCApp/Info.plist;
+				INFOPLIST_FILE = permitext/Info.plist;
 				INFOPLIST_OUTPUT_FORMAT = xml;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -446,8 +452,8 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.unofficial.nycccapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.randycodex.permitext;
+				PRODUCT_NAME = permitext;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -468,7 +474,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A70000000000000000000002 /* Build configuration list for PBXNativeTarget "NYCCCApp" */ = {
+		A70000000000000000000002 /* Build configuration list for PBXNativeTarget "permitext" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A80000000000000000000003 /* Debug */,
