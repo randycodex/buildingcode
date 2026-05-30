@@ -46,6 +46,27 @@ final class UserDataStore {
         return ids
     }
 
+    func bookmarkCreatedAtBySectionID(codeVersion: String) throws -> [Int64: Date] {
+        let statement = try connection.prepare(
+            """
+            SELECT section_id, created_at
+            FROM bookmarks
+            WHERE code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+
+        var result: [Int64: Date] = [:]
+        while try connection.step(statement) == SQLITE_ROW {
+            let sectionID = connection.int64(at: 0, in: statement)
+            if let date = isoFormatter.date(from: connection.string(at: 1, in: statement)) {
+                result[sectionID] = date
+            }
+        }
+        return result
+    }
+
     func isBookmarked(sectionID: Int64, codeVersion: String) throws -> Bool {
         let statement = try connection.prepare(
             """
@@ -85,14 +106,17 @@ final class UserDataStore {
 
         let statement = try connection.prepare(
             """
-            INSERT INTO bookmarks (code_version, section_id, created_at)
-            VALUES (?, ?, ?);
+            INSERT INTO bookmarks (code_version, section_id, created_at, updated_at, client_id)
+            VALUES (?, ?, ?, ?, ?);
             """
         )
         defer { connection.finalize(statement) }
+        let now = isoFormatter.string(from: Date())
         try connection.bind(text: codeVersion, index: 1, to: statement)
         sqlite3_bind_int64(statement, 2, sectionID)
-        try connection.bind(text: isoFormatter.string(from: Date()), index: 3, to: statement)
+        try connection.bind(text: now, index: 3, to: statement)
+        try connection.bind(text: now, index: 4, to: statement)
+        try connection.bind(text: UUID().uuidString, index: 5, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -151,8 +175,8 @@ final class UserDataStore {
 
         let statement = try connection.prepare(
             """
-            INSERT INTO notes (code_version, section_id, body, updated_at)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO notes (code_version, section_id, body, updated_at, client_id)
+            VALUES (?, ?, ?, ?, ?)
             ON CONFLICT(code_version, section_id) DO UPDATE SET
                 body = excluded.body,
                 updated_at = excluded.updated_at;
@@ -163,6 +187,7 @@ final class UserDataStore {
         sqlite3_bind_int64(statement, 2, sectionID)
         try connection.bind(text: body, index: 3, to: statement)
         try connection.bind(text: isoFormatter.string(from: Date()), index: 4, to: statement)
+        try connection.bind(text: UUID().uuidString, index: 5, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -171,14 +196,17 @@ final class UserDataStore {
             """
             CREATE TABLE IF NOT EXISTS bookmarks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                client_id TEXT NOT NULL DEFAULT '',
                 code_version TEXT NOT NULL,
                 section_id INTEGER NOT NULL,
                 created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT '',
                 UNIQUE(code_version, section_id)
             );
 
             CREATE TABLE IF NOT EXISTS notes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                client_id TEXT NOT NULL DEFAULT '',
                 code_version TEXT NOT NULL,
                 section_id INTEGER NOT NULL,
                 body TEXT NOT NULL,
@@ -187,10 +215,12 @@ final class UserDataStore {
             );
 
             CREATE TABLE IF NOT EXISTS bookmark_tags (
+                client_id TEXT NOT NULL DEFAULT '',
                 code_version TEXT NOT NULL,
                 section_id INTEGER NOT NULL,
                 tag TEXT NOT NULL,
                 created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT '',
                 PRIMARY KEY(code_version, section_id, tag)
             );
 
@@ -199,22 +229,26 @@ final class UserDataStore {
 
             CREATE TABLE IF NOT EXISTS folders (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                client_id TEXT NOT NULL DEFAULT '',
                 code_version TEXT NOT NULL,
                 name TEXT NOT NULL,
                 description TEXT NOT NULL DEFAULT '',
                 color_hex TEXT NOT NULL,
                 sort_order INTEGER NOT NULL DEFAULT 0,
-                created_at TEXT NOT NULL
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT ''
             );
 
             CREATE INDEX IF NOT EXISTS idx_folders_version
                 ON folders(code_version);
 
             CREATE TABLE IF NOT EXISTS folder_sections (
+                client_id TEXT NOT NULL DEFAULT '',
                 folder_id INTEGER NOT NULL,
                 code_version TEXT NOT NULL,
                 section_id INTEGER NOT NULL,
                 added_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT '',
                 PRIMARY KEY(folder_id, section_id)
             );
 
@@ -225,6 +259,49 @@ final class UserDataStore {
                 ON folder_sections(folder_id);
             """
         )
+        try migrateSyncColumns()
+    }
+
+    private func migrateSyncColumns() throws {
+        try addColumnIfMissing(table: "bookmarks", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "bookmarks", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "notes", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "bookmark_tags", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "bookmark_tags", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "folders", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "folders", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "folder_sections", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
+        try addColumnIfMissing(table: "folder_sections", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
+        try backfillSyncColumns()
+    }
+
+    private func addColumnIfMissing(table: String, column: String, definition: String) throws {
+        let statement = try connection.prepare("PRAGMA table_info(\(table));")
+        defer { connection.finalize(statement) }
+        var exists = false
+        while try connection.step(statement) == SQLITE_ROW {
+            if connection.string(at: 1, in: statement).caseInsensitiveCompare(column) == .orderedSame {
+                exists = true
+                break
+            }
+        }
+        if !exists {
+            try connection.execute("ALTER TABLE \(table) ADD COLUMN \(column) \(definition);")
+        }
+    }
+
+    private func backfillSyncColumns() throws {
+        let now = isoFormatter.string(from: Date())
+        try connection.execute("UPDATE bookmarks SET client_id = lower(hex(randomblob(16))) WHERE client_id = '';")
+        try connection.execute("UPDATE bookmarks SET updated_at = CASE WHEN updated_at = '' THEN created_at ELSE updated_at END;")
+        try connection.execute("UPDATE notes SET client_id = lower(hex(randomblob(16))) WHERE client_id = '';")
+        try connection.execute("UPDATE bookmark_tags SET client_id = lower(hex(randomblob(16))) WHERE client_id = '';")
+        try connection.execute("UPDATE bookmark_tags SET updated_at = CASE WHEN updated_at = '' THEN created_at ELSE updated_at END;")
+        try connection.execute("UPDATE folders SET client_id = lower(hex(randomblob(16))) WHERE client_id = '';")
+        try connection.execute("UPDATE folders SET updated_at = CASE WHEN updated_at = '' THEN created_at ELSE updated_at END;")
+        try connection.execute("UPDATE folder_sections SET client_id = lower(hex(randomblob(16))) WHERE client_id = '';")
+        try connection.execute("UPDATE folder_sections SET updated_at = CASE WHEN updated_at = '' THEN added_at ELSE updated_at END;")
+        try connection.execute("UPDATE notes SET updated_at = '\(now)' WHERE updated_at = '';")
     }
 
     // MARK: - Tags
@@ -302,8 +379,8 @@ final class UserDataStore {
                 let timestamp = isoFormatter.string(from: Date())
                 let insert = try connection.prepare(
                     """
-                    INSERT INTO bookmark_tags (code_version, section_id, tag, created_at)
-                    VALUES (?, ?, ?, ?);
+                    INSERT INTO bookmark_tags (code_version, section_id, tag, created_at, updated_at, client_id)
+                    VALUES (?, ?, ?, ?, ?, ?);
                     """
                 )
                 defer { connection.finalize(insert) }
@@ -315,6 +392,8 @@ final class UserDataStore {
                     sqlite3_bind_int64(insert, 2, sectionID)
                     try connection.bind(text: tag, index: 3, to: insert)
                     try connection.bind(text: timestamp, index: 4, to: insert)
+                    try connection.bind(text: timestamp, index: 5, to: insert)
+                    try connection.bind(text: UUID().uuidString, index: 6, to: insert)
                     _ = try connection.step(insert)
                 }
             }
@@ -437,7 +516,7 @@ final class UserDataStore {
     func folders(codeVersion: String) throws -> [FolderRecord] {
         let statement = try connection.prepare(
             """
-            SELECT id, name, description, color_hex, sort_order, created_at
+            SELECT id, client_id, name, description, color_hex, sort_order, created_at, updated_at
             FROM folders
             WHERE code_version = ?
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
@@ -451,11 +530,13 @@ final class UserDataStore {
             results.append(
                 FolderRecord(
                     id: connection.int64(at: 0, in: statement),
-                    name: connection.string(at: 1, in: statement),
-                    description: connection.string(at: 2, in: statement),
-                    colorHex: connection.string(at: 3, in: statement),
-                    sortOrder: Int(connection.int64(at: 4, in: statement)),
-                    createdAt: connection.string(at: 5, in: statement)
+                    clientID: connection.string(at: 1, in: statement),
+                    name: connection.string(at: 2, in: statement),
+                    description: connection.string(at: 3, in: statement),
+                    colorHex: connection.string(at: 4, in: statement),
+                    sortOrder: Int(connection.int64(at: 5, in: statement)),
+                    createdAt: connection.string(at: 6, in: statement),
+                    updatedAt: connection.string(at: 7, in: statement)
                 )
             )
         }
@@ -538,17 +619,20 @@ final class UserDataStore {
 
         let statement = try connection.prepare(
             """
-            INSERT INTO folders (code_version, name, description, color_hex, sort_order, created_at)
-            VALUES (?, ?, ?, ?, ?, ?);
+            INSERT INTO folders (client_id, code_version, name, description, color_hex, sort_order, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             """
         )
         defer { connection.finalize(statement) }
-        try connection.bind(text: codeVersion, index: 1, to: statement)
-        try connection.bind(text: trimmedName, index: 2, to: statement)
-        try connection.bind(text: description, index: 3, to: statement)
-        try connection.bind(text: colorHex, index: 4, to: statement)
-        sqlite3_bind_int64(statement, 5, Int64(nextSortOrder))
-        try connection.bind(text: isoFormatter.string(from: Date()), index: 6, to: statement)
+        let now = isoFormatter.string(from: Date())
+        try connection.bind(text: UUID().uuidString, index: 1, to: statement)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        try connection.bind(text: trimmedName, index: 3, to: statement)
+        try connection.bind(text: description, index: 4, to: statement)
+        try connection.bind(text: colorHex, index: 5, to: statement)
+        sqlite3_bind_int64(statement, 6, Int64(nextSortOrder))
+        try connection.bind(text: now, index: 7, to: statement)
+        try connection.bind(text: now, index: 8, to: statement)
         _ = try connection.step(statement)
 
         return connection.lastInsertedRowID()
@@ -573,7 +657,7 @@ final class UserDataStore {
         let statement = try connection.prepare(
             """
             UPDATE folders
-            SET name = ?, description = ?, color_hex = ?
+            SET name = ?, description = ?, color_hex = ?, updated_at = ?
             WHERE id = ? AND code_version = ?;
             """
         )
@@ -581,8 +665,9 @@ final class UserDataStore {
         try connection.bind(text: trimmedName, index: 1, to: statement)
         try connection.bind(text: description, index: 2, to: statement)
         try connection.bind(text: colorHex, index: 3, to: statement)
-        sqlite3_bind_int64(statement, 4, id)
-        try connection.bind(text: codeVersion, index: 5, to: statement)
+        try connection.bind(text: isoFormatter.string(from: Date()), index: 4, to: statement)
+        sqlite3_bind_int64(statement, 5, id)
+        try connection.bind(text: codeVersion, index: 6, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -614,15 +699,18 @@ final class UserDataStore {
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws {
         let statement = try connection.prepare(
             """
-            INSERT OR IGNORE INTO folder_sections (folder_id, code_version, section_id, added_at)
-            VALUES (?, ?, ?, ?);
+            INSERT OR IGNORE INTO folder_sections (client_id, folder_id, code_version, section_id, added_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?);
             """
         )
         defer { connection.finalize(statement) }
-        sqlite3_bind_int64(statement, 1, folderID)
-        try connection.bind(text: codeVersion, index: 2, to: statement)
-        sqlite3_bind_int64(statement, 3, sectionID)
-        try connection.bind(text: isoFormatter.string(from: Date()), index: 4, to: statement)
+        let now = isoFormatter.string(from: Date())
+        try connection.bind(text: UUID().uuidString, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, folderID)
+        try connection.bind(text: codeVersion, index: 3, to: statement)
+        sqlite3_bind_int64(statement, 4, sectionID)
+        try connection.bind(text: now, index: 5, to: statement)
+        try connection.bind(text: now, index: 6, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -691,9 +779,11 @@ final class UserDataStore {
 /// `CodeFolder` model so view code never touches SQLite types.
 struct FolderRecord: Sendable {
     let id: Int64
+    let clientID: String
     let name: String
     let description: String
     let colorHex: String
     let sortOrder: Int
     let createdAt: String
+    let updatedAt: String
 }

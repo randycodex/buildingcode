@@ -324,11 +324,13 @@ struct CodeSectionCategory: Identifiable, Hashable, Sendable {
 /// for their own organizational workflow.
 struct CodeFolder: Identifiable, Hashable, Sendable {
     let id: Int64
+    let clientID: String
     let name: String
     let description: String
     let colorHex: String
     let sortOrder: Int
     let createdAt: Date
+    let updatedAt: Date
 
     /// Six preset hex palette offered in the folder editor. Chosen to not
     /// clash with the code-section accents (Building orange, Plumbing blue,
@@ -648,6 +650,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let isBookmarked: Bool
     let noteBody: String
     let tags: [String]
+    let bookmarkedAt: Date?
 
     init(
         id: Int64,
@@ -661,7 +664,8 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         kind: CodeSectionKind = .title,
         isBookmarked: Bool = true,
         noteBody: String = "",
-        tags: [String] = []
+        tags: [String] = [],
+        bookmarkedAt: Date? = nil
     ) {
         self.id = id
         self.codeVersion = codeVersion
@@ -675,6 +679,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         self.isBookmarked = isBookmarked
         self.noteBody = noteBody
         self.tags = tags
+        self.bookmarkedAt = bookmarkedAt
     }
 
     var displayTitle: String {
@@ -683,6 +688,92 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
 
     var hasNote: Bool {
         !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+}
+
+enum BookmarkSortMode: String, CaseIterable, Identifiable {
+    case codeOrder
+    case recentlySaved
+    case codeBook
+    case title
+    case tag
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .codeOrder: return "Code Order"
+        case .recentlySaved: return "Recent"
+        case .codeBook: return "Code Book"
+        case .title: return "Title"
+        case .tag: return "Tag"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .codeOrder: return "list.number"
+        case .recentlySaved: return "clock"
+        case .codeBook: return "books.vertical"
+        case .title: return "textformat"
+        case .tag: return "tag"
+        }
+    }
+}
+
+enum BookmarkSorter {
+    static func sorted(
+        _ bookmarks: [BookmarkedSection],
+        mode: BookmarkSortMode,
+        codeSectionName: (Int64?) -> String
+    ) -> [BookmarkedSection] {
+        bookmarks.sorted { lhs, rhs in
+            switch mode {
+            case .codeOrder:
+                return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
+            case .recentlySaved:
+                let lhsDate = lhs.bookmarkedAt ?? .distantPast
+                let rhsDate = rhs.bookmarkedAt ?? .distantPast
+                if lhsDate != rhsDate { return lhsDate > rhsDate }
+                return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
+            case .codeBook:
+                let lhsName = codeSectionName(lhs.codeSectionID)
+                let rhsName = codeSectionName(rhs.codeSectionID)
+                if lhsName != rhsName {
+                    return lhsName.localizedStandardCompare(rhsName) == .orderedAscending
+                }
+                return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
+            case .title:
+                let titleCompare = lhs.displayTitle.localizedStandardCompare(rhs.displayTitle)
+                if titleCompare != .orderedSame { return titleCompare == .orderedAscending }
+                return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
+            case .tag:
+                let lhsTag = lhs.tags.first ?? ""
+                let rhsTag = rhs.tags.first ?? ""
+                if lhsTag != rhsTag {
+                    if lhsTag.isEmpty { return false }
+                    if rhsTag.isEmpty { return true }
+                    return lhsTag.localizedStandardCompare(rhsTag) == .orderedAscending
+                }
+                return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
+            }
+        }
+    }
+
+    private static func compareCodeOrder(
+        _ lhs: BookmarkedSection,
+        _ rhs: BookmarkedSection,
+        codeSectionName: (Int64?) -> String
+    ) -> Bool {
+        let lhsCode = codeSectionName(lhs.codeSectionID)
+        let rhsCode = codeSectionName(rhs.codeSectionID)
+        if lhsCode != rhsCode {
+            return lhsCode.localizedStandardCompare(rhsCode) == .orderedAscending
+        }
+        if lhs.chapterNumber != rhs.chapterNumber {
+            return lhs.chapterNumber.compare(rhs.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+        }
+        return lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
     }
 }
 

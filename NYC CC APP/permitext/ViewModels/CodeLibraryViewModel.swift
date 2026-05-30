@@ -1143,6 +1143,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let ids = try userDataStore.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
             let noteEntries = try userDataStore.noteEntries(codeVersion: selectedVersion.codeVersion)
             let tagEntries = (try? userDataStore.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            let bookmarkDates = (try? userDataStore.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
             let savedSectionIDs = Array(Set(ids).union(noteEntries.keys)).sorted()
             if let authoredCodeStore {
@@ -1151,7 +1152,8 @@ final class CodeLibraryViewModel: ObservableObject {
                     codeVersion: selectedVersion.codeVersion,
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
                     notesBySectionID: noteEntries,
-                    tagsBySectionID: tagEntries
+                    tagsBySectionID: tagEntries,
+                    bookmarkCreatedAtBySectionID: bookmarkDates
                 )
             } else {
                 bookmarks = try codeDatabase?.savedSections(
@@ -1159,7 +1161,8 @@ final class CodeLibraryViewModel: ObservableObject {
                     codeVersion: selectedVersion.codeVersion,
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
                     notesBySectionID: noteEntries,
-                    tagsBySectionID: tagEntries
+                    tagsBySectionID: tagEntries,
+                    bookmarkCreatedAtBySectionID: bookmarkDates
                 ) ?? []
             }
         } catch {
@@ -1192,11 +1195,13 @@ final class CodeLibraryViewModel: ObservableObject {
             folders = records.map { record in
                 CodeFolder(
                     id: record.id,
+                    clientID: record.clientID,
                     name: record.name,
                     description: record.description,
                     colorHex: record.colorHex,
                     sortOrder: record.sortOrder,
-                    createdAt: ISO8601DateFormatter().date(from: record.createdAt) ?? Date()
+                    createdAt: ISO8601DateFormatter().date(from: record.createdAt) ?? Date(),
+                    updatedAt: ISO8601DateFormatter().date(from: record.updatedAt) ?? Date()
                 )
             }
             folderMembership = (try? userDataStore.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
@@ -1283,6 +1288,27 @@ final class CodeLibraryViewModel: ObservableObject {
         let memberIDs = Set(folderMembership[sectionID] ?? [])
         guard !memberIDs.isEmpty else { return [] }
         return folders.filter { memberIDs.contains($0.id) }
+    }
+
+    func folder(id: Int64) -> CodeFolder? {
+        folders.first { $0.id == id }
+    }
+
+    func bookmarks(inFolder folderID: Int64) -> [BookmarkedSection] {
+        bookmarks.filter { bookmark in
+            Set(folderMembership[bookmark.id] ?? []).contains(folderID)
+        }
+    }
+
+    func bookmarkCount(inFolder folderID: Int64) -> Int {
+        bookmarks(inFolder: folderID).count
+    }
+
+    func removeSections(_ sectionIDs: Set<Int64>, fromFolder folderID: Int64) {
+        guard !sectionIDs.isEmpty else { return }
+        sectionIDs.forEach { sectionID in
+            removeSection(sectionID, fromFolder: folderID)
+        }
     }
 
     // MARK: - PDF export

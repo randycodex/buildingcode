@@ -263,7 +263,8 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
         codeVersion: String,
         bookmarkedSectionIDs: Set<Int64>,
         notesBySectionID: [Int64: String],
-        tagsBySectionID: [Int64: [String]] = [:]
+        tagsBySectionID: [Int64: [String]] = [:],
+        bookmarkCreatedAtBySectionID: [Int64: Date] = [:]
     ) throws -> [BookmarkedSection] {
         guard !ids.isEmpty else { return [] }
         let placeholders = ids.map { _ in "?" }.joined(separator: ",")
@@ -294,7 +295,8 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
                     previewText: connection.string(at: 5, in: statement).titleThroughFirstPeriod,
                     isBookmarked: bookmarkedSectionIDs.contains(connection.int64(at: 0, in: statement)),
                     noteBody: notesBySectionID[connection.int64(at: 0, in: statement)] ?? "",
-                    tags: tagsBySectionID[connection.int64(at: 0, in: statement)] ?? []
+                    tags: tagsBySectionID[connection.int64(at: 0, in: statement)] ?? [],
+                    bookmarkedAt: bookmarkCreatedAtBySectionID[connection.int64(at: 0, in: statement)]
                 )
             )
         }
