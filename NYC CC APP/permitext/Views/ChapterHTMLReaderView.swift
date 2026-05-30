@@ -4,6 +4,8 @@ struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
     var rememberedNativeSectionID: Binding<Int64?> = .constant(nil)
+    var rememberedAnchorID: Binding<String?> = .constant(nil)
+    var rememberedScrollOffset: Binding<Double?> = .constant(nil)
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
@@ -113,7 +115,10 @@ struct ChapterHTMLReaderView: View {
         var notedSectionNumbers: Set<String> = []
 
         for anchor in anchors {
-            guard let summary = library.sectionSummary(sectionNumber: anchor.sectionNumber) else { continue }
+            guard let summary = library.sectionSummary(
+                sectionNumber: anchor.sectionNumber,
+                codeSectionID: chapter.codeSectionID
+            ) else { continue }
             if library.isBookmarked(sectionID: summary.id) {
                 anchorIDs.insert(anchor.anchorID)
                 sectionNumbers.insert(normalizedSectionNumber(summary.sectionNumber))
@@ -131,6 +136,23 @@ struct ChapterHTMLReaderView: View {
 
     private var initialAnchor: PublishedHTMLAnchor? {
         anchors.first { normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(initialSection.sectionNumber) }
+    }
+
+    private var restoredInitialAnchor: PublishedHTMLAnchor? {
+        if let rememberedAnchorID = rememberedAnchorID.wrappedValue,
+           let rememberedAnchor = anchors.first(where: { $0.anchorID == rememberedAnchorID }) {
+            return rememberedAnchor
+        }
+
+        if let rememberedSectionID = rememberedNativeSectionID.wrappedValue,
+           let rememberedDetail = library.loadSectionDetail(sectionID: rememberedSectionID),
+           let rememberedAnchor = anchors.first(where: {
+               normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(rememberedDetail.sectionNumber)
+           }) {
+            return rememberedAnchor
+        }
+
+        return initialAnchor
     }
 
     var body: some View {
@@ -183,7 +205,7 @@ struct ChapterHTMLReaderView: View {
             library.noteChapterOpened(chapter: chapter)
             library.refreshBookmarks()
             if targetAnchorID == nil {
-                let anchor = initialAnchor
+                let anchor = restoredInitialAnchor
                 selectedAnchor = anchor
                 targetAnchorID = anchor?.anchorID
             }
@@ -298,15 +320,29 @@ struct ChapterHTMLReaderView: View {
             collapseAllTrigger: 0,
             scrollToTopTrigger: 0,
             scrollProgressSyncTrigger: scrollProgressSyncTrigger,
+            restoreScrollOffset: rememberedScrollOffset.wrappedValue,
             onVisibleAnchorChange: { anchorID in
                 guard let anchor = anchors.first(where: { $0.anchorID == anchorID }) else { return }
                 if selectedAnchor?.anchorID != anchor.anchorID {
                     selectedAnchor = anchor
                 }
+                if rememberedAnchorID.wrappedValue != anchor.anchorID {
+                    rememberedAnchorID.wrappedValue = anchor.anchorID
+                }
+                if let summary = library.sectionSummary(
+                    sectionNumber: anchor.sectionNumber,
+                    codeSectionID: chapter.codeSectionID
+                ),
+                   rememberedNativeSectionID.wrappedValue != summary.id {
+                    rememberedNativeSectionID.wrappedValue = summary.id
+                }
                 recordRecentlyViewedForVisibleAnchor(anchorID)
             },
             onScrollProgressChange: { progress in
                 scrollProgress = progress
+            },
+            onScrollOffsetChange: { offset in
+                rememberedScrollOffset.wrappedValue = Double(offset)
             },
             onOpenSectionForAnchor: { target in
                 openNotes(for: target)
@@ -419,9 +455,7 @@ struct ChapterHTMLReaderView: View {
         anchors = loadedAnchors
 
         if targetAnchorID == nil {
-            let anchor = loadedAnchors.first {
-                normalizedSectionNumber($0.sectionNumber) == normalizedSectionNumber(initialSection.sectionNumber)
-            }
+            let anchor = restoredInitialAnchor
             selectedAnchor = anchor
             targetAnchorID = anchor?.anchorID
         }
@@ -435,19 +469,19 @@ struct ChapterHTMLReaderView: View {
 
     private func sectionSummary(for target: ChapterHTMLSectionTarget) -> CodeSectionSummary? {
         if let anchor = anchors.first(where: { $0.anchorID == target.anchorID }),
-           let section = library.sectionSummary(sectionNumber: anchor.sectionNumber) {
+           let section = library.sectionSummary(sectionNumber: anchor.sectionNumber, codeSectionID: chapter.codeSectionID) {
             return section
         }
 
         if let sectionNumber = target.sectionNumber,
-           let section = library.sectionSummary(sectionNumber: sectionNumber) {
+           let section = library.sectionSummary(sectionNumber: sectionNumber, codeSectionID: chapter.codeSectionID) {
             return section
         }
 
         if let sectionNumber = target.sectionNumber {
             let normalizedTarget = normalizedSectionNumber(sectionNumber)
             if let anchor = anchors.first(where: { normalizedSectionNumber($0.sectionNumber) == normalizedTarget }),
-               let section = library.sectionSummary(sectionNumber: anchor.sectionNumber) {
+               let section = library.sectionSummary(sectionNumber: anchor.sectionNumber, codeSectionID: chapter.codeSectionID) {
                 return section
             }
         }

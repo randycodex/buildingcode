@@ -30,8 +30,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let collapseAllTrigger: Int
     let scrollToTopTrigger: Int
     let scrollProgressSyncTrigger: Int
+    let restoreScrollOffset: Double?
     let onVisibleAnchorChange: ((String) -> Void)?
     let onScrollProgressChange: ((CGFloat) -> Void)?
+    let onScrollOffsetChange: ((CGFloat) -> Void)?
     let onOpenSectionForAnchor: ((ChapterHTMLSectionTarget) -> Void)?
 
     func makeCoordinator() -> Coordinator {
@@ -136,6 +138,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         private var htmlLoadTask: Task<Void, Never>?
         private var lastReportedScrollProgress: CGFloat = -1
         private var visibleAnchorReportPending = false
+        private var suppressVisibleAnchorReportsUntil: Date?
+        private var suppressScrollOffsetReportsUntil: Date?
 
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
             htmlLoadTask?.cancel()
@@ -159,7 +163,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             applyReaderScripts(to: webView)
             applyBookmarkDecorations(to: webView)
-            scroll(to: pendingAnchorID ?? parent?.targetAnchorID, in: webView)
+            if let offset = parent?.restoreScrollOffset, offset > 0 {
+                scroll(toOffset: CGFloat(offset), in: webView)
+            } else {
+                scroll(to: pendingAnchorID ?? parent?.targetAnchorID, in: webView)
+            }
             pendingAnchorID = nil
             lastReportedScrollProgress = -1
             reportScrollProgress(from: webView.scrollView)
@@ -654,6 +662,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         func scroll(to anchorID: String?, in webView: WKWebView) {
             guard let anchorID, !anchorID.isEmpty else { return }
             lastScrolledAnchorID = anchorID
+            suppressVisibleAnchorReportsUntil = Date().addingTimeInterval(0.65)
+            suppressScrollOffsetReportsUntil = Date().addingTimeInterval(0.65)
             let javascript = """
             (function() {
               var target = document.getElementById(\(Self.javascriptString(anchorID)));
@@ -689,6 +699,24 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             webView.evaluateJavaScript(javascript)
         }
 
+        func scroll(toOffset offset: CGFloat, in webView: WKWebView) {
+            suppressVisibleAnchorReportsUntil = Date().addingTimeInterval(0.65)
+            suppressScrollOffsetReportsUntil = Date().addingTimeInterval(0.65)
+            let y = max(offset, 0)
+            let javascript = """
+            (function() {
+              window.scrollTo({ top: \(Double(y)), behavior: 'auto' });
+              return true;
+            })();
+            """
+            webView.evaluateJavaScript(javascript)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [weak self, weak webView] in
+                guard let self, let webView else { return }
+                self.suppressScrollOffsetReportsUntil = nil
+                self.reportScrollProgress(from: webView.scrollView)
+            }
+        }
+
         func scrollViewDidScroll(_ scrollView: UIScrollView) {
             reportScrollProgress(from: scrollView)
             scheduleVisibleAnchorReport()
@@ -709,6 +737,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             )
             let offset = scrollView.contentOffset.y + scrollView.adjustedContentInset.top
             deliverScrollProgress(min(max(offset / maxOffset, 0), 1))
+            if let suppressScrollOffsetReportsUntil,
+               Date() < suppressScrollOffsetReportsUntil {
+                return
+            }
+            suppressScrollOffsetReportsUntil = nil
+            let rawOffset = max(scrollView.contentOffset.y, 0)
+            DispatchQueue.main.async { [weak self] in
+                self?.parent?.onScrollOffsetChange?(rawOffset)
+            }
         }
 
         func resetScrollProgressReporting() {
@@ -770,6 +807,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   let anchorID = message.body as? String,
                   !anchorID.isEmpty
             else { return }
+
+            if let suppressVisibleAnchorReportsUntil,
+               Date() < suppressVisibleAnchorReportsUntil,
+               anchorID != lastScrolledAnchorID {
+                return
+            }
+            suppressVisibleAnchorReportsUntil = nil
 
             DispatchQueue.main.async { [weak self] in
                 self?.parent?.onVisibleAnchorChange?(anchorID)
