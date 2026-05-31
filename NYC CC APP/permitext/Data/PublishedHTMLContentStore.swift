@@ -78,15 +78,43 @@ final class PublishedHTMLContentStore {
 
     func chapterURL(chapterNumber: String) -> URL? {
         guard let rootURL else { return nil }
-        let fileName = "\(chapterNumber.uppercased()).html"
-        let url = rootURL
-            .appendingPathComponent("chapters", isDirectory: true)
-            .appendingPathComponent(fileName, isDirectory: false)
-        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+        let chaptersURL = rootURL.appendingPathComponent("chapters", isDirectory: true)
+        for fileName in Self.chapterFileNameCandidates(for: chapterNumber) {
+            let url = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
+            if FileManager.default.fileExists(atPath: url.path) {
+                return url
+            }
+        }
+        return nil
     }
 
     func readAccessURL() -> URL? {
         readAccessRootURL ?? rootURL
+    }
+
+    private static func chapterFileNameCandidates(for chapterNumber: String) -> [String] {
+        let trimmed = chapterNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+
+        var candidates: [String] = []
+        func append(_ fileName: String) {
+            if !candidates.contains(fileName) {
+                candidates.append(fileName)
+            }
+        }
+
+        append("\(trimmed.uppercased()).html")
+        append("\(trimmed).html")
+        append("Chapter \(trimmed).html")
+        if trimmed.localizedCaseInsensitiveContains("appendix") {
+            append("Appendices.html")
+        } else if trimmed.rangeOfCharacter(from: .letters) != nil {
+            append("Appendix \(trimmed.uppercased()).html")
+            append("Appendix \(trimmed).html")
+            append("Appendices.html")
+        }
+
+        return candidates
     }
 
     private struct ImageManifestFile: Decodable {

@@ -6,7 +6,7 @@ private enum ContentBlockHTMLAssetResolver {
     static func resolveSharedAssetPaths(in html: String, baseURL: URL?) -> String {
         guard let baseURL else {
             return html.replacingOccurrences(
-                of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+                of: #"(?i)(["'(=]\s*)(?:\.\./)+assets/"#,
                 with: "$1assets/",
                 options: .regularExpression
             )
@@ -18,7 +18,7 @@ private enum ContentBlockHTMLAssetResolver {
 
         return html
             .replacingOccurrences(
-                of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+                of: #"(?i)(["'(=]\s*)(?:\.\./)+assets/"#,
                 with: "$1\(assetRoot)",
                 options: .regularExpression
             )
@@ -136,11 +136,22 @@ struct ContentBlockListView: View {
     }
 
     private func resolvedImageCandidates(for imageID: String, relativeTo readAccessURL: URL) -> [URL] {
+        let normalizedImageID = imageID
+            .replacingOccurrences(
+                of: #"(?i)^(?:\.\./)+assets/"#,
+                with: "",
+                options: .regularExpression
+            )
+            .replacingOccurrences(
+                of: #"(?i)^assets/"#,
+                with: "",
+                options: .regularExpression
+            )
         let directURL = readAccessURL.appendingPathComponent(imageID)
         let assetDirectoryURL = readAccessURL.appendingPathComponent("assets", isDirectory: true)
-        let assetURL = assetDirectoryURL.appendingPathComponent(imageID)
+        let assetURL = assetDirectoryURL.appendingPathComponent(normalizedImageID)
 
-        let baseName = URL(fileURLWithPath: imageID).deletingPathExtension().lastPathComponent
+        let baseName = URL(fileURLWithPath: normalizedImageID).deletingPathExtension().lastPathComponent
         let fallbackExtensions = ["png", "jpg", "jpeg", "gif", "webp"]
         let fallbackURLs = fallbackExtensions.flatMap { ext in
             [

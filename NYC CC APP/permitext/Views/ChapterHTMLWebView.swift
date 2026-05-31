@@ -9,7 +9,7 @@ private enum HTMLAssetPathResolver {
 
         return html
             .replacingOccurrences(
-                of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+                of: #"(?i)(["'(=]\s*)(?:\.\./)+assets/"#,
                 with: "$1\(assetRoot)",
                 options: .regularExpression
             )

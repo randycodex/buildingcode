@@ -1083,24 +1083,52 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         codeSectionName: String?,
         chaptersURL: URL
     ) -> URL? {
-        let fileName = "\(chapterNumber).html"
-        let flatURL = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
-        if FileManager.default.fileExists(atPath: flatURL.path) {
-            return flatURL
+        for fileName in chapterHTMLFileNameCandidates(for: chapterNumber) {
+            let flatURL = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
+            if FileManager.default.fileExists(atPath: flatURL.path) {
+                return flatURL
+            }
         }
 
         guard let codeSectionName else { return nil }
-        let sectionedURL = chaptersURL
+        let sectionedChaptersURL = chaptersURL
             .deletingLastPathComponent()
             .appendingPathComponent("code-sections", isDirectory: true)
             .appendingPathComponent(slug(codeSectionName), isDirectory: true)
             .appendingPathComponent("chapters", isDirectory: true)
-            .appendingPathComponent(fileName, isDirectory: false)
-        if FileManager.default.fileExists(atPath: sectionedURL.path) {
-            return sectionedURL
+        for fileName in chapterHTMLFileNameCandidates(for: chapterNumber) {
+            let sectionedURL = sectionedChaptersURL.appendingPathComponent(fileName, isDirectory: false)
+            if FileManager.default.fileExists(atPath: sectionedURL.path) {
+                return sectionedURL
+            }
         }
 
         return nil
+    }
+
+    private static func chapterHTMLFileNameCandidates(for chapterNumber: String) -> [String] {
+        let trimmed = chapterNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+
+        var candidates: [String] = []
+        func append(_ fileName: String) {
+            if !candidates.contains(fileName) {
+                candidates.append(fileName)
+            }
+        }
+
+        append("\(trimmed).html")
+        append("\(trimmed.uppercased()).html")
+        append("Chapter \(trimmed).html")
+        if trimmed.localizedCaseInsensitiveContains("appendix") {
+            append("Appendices.html")
+        } else if trimmed.rangeOfCharacter(from: .letters) != nil {
+            append("Appendix \(trimmed.uppercased()).html")
+            append("Appendix \(trimmed).html")
+            append("Appendices.html")
+        }
+
+        return candidates
     }
 
     private static func htmlHeadings(in html: String) -> [HTMLHeading] {
