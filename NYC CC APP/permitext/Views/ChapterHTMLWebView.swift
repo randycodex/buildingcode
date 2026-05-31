@@ -2,12 +2,22 @@ import SwiftUI
 import WebKit
 
 private enum HTMLAssetPathResolver {
-    static func normalizeSharedAssetPaths(in html: String) -> String {
-        html.replacingOccurrences(
-            of: #"(?i)(["'(=]\s*)\.\./assets/"#,
-            with: "$1assets/",
-            options: .regularExpression
-        )
+    static func resolveSharedAssetPaths(in html: String, readAccessURL: URL) -> String {
+        let assetRoot = readAccessURL
+            .appendingPathComponent("assets", isDirectory: true)
+            .absoluteString
+
+        return html
+            .replacingOccurrences(
+                of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+                with: "$1\(assetRoot)",
+                options: .regularExpression
+            )
+            .replacingOccurrences(
+                of: #"(?i)(["'(=]\s*)assets/"#,
+                with: "$1\(assetRoot)",
+                options: .regularExpression
+            )
     }
 }
 
@@ -146,7 +156,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             htmlLoadTask = Task.detached(priority: .userInitiated) { [weak webView] in
                 guard let webView else { return }
                 if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
-                    let normalized = HTMLAssetPathResolver.normalizeSharedAssetPaths(in: html)
+                    let normalized = HTMLAssetPathResolver.resolveSharedAssetPaths(
+                        in: html,
+                        readAccessURL: readAccessURL
+                    )
                     guard !Task.isCancelled else { return }
                     await MainActor.run { () -> Void in
                         webView.loadHTMLString(normalized, baseURL: readAccessURL)

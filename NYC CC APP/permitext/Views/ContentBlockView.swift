@@ -3,12 +3,30 @@ import SwiftUI
 import WebKit
 
 private enum ContentBlockHTMLAssetResolver {
-    static func normalizeSharedAssetPaths(in html: String) -> String {
-        html.replacingOccurrences(
-            of: #"(?i)(["'(=]\s*)\.\./assets/"#,
-            with: "$1assets/",
-            options: .regularExpression
-        )
+    static func resolveSharedAssetPaths(in html: String, baseURL: URL?) -> String {
+        guard let baseURL else {
+            return html.replacingOccurrences(
+                of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+                with: "$1assets/",
+                options: .regularExpression
+            )
+        }
+
+        let assetRoot = baseURL
+            .appendingPathComponent("assets", isDirectory: true)
+            .absoluteString
+
+        return html
+            .replacingOccurrences(
+                of: #"(?i)(["'(=]\s*)\.\./assets/"#,
+                with: "$1\(assetRoot)",
+                options: .regularExpression
+            )
+            .replacingOccurrences(
+                of: #"(?i)(["'(=]\s*)assets/"#,
+                with: "$1\(assetRoot)",
+                options: .regularExpression
+            )
     }
 }
 
@@ -557,7 +575,7 @@ private struct TableWebView: UIViewRepresentable {
         guard context.coordinator.loadedHTML != html else { return }
         context.coordinator.loadedHTML = html
         webView.loadHTMLString(
-            ContentBlockHTMLAssetResolver.normalizeSharedAssetPaths(in: html),
+            ContentBlockHTMLAssetResolver.resolveSharedAssetPaths(in: html, baseURL: baseURL),
             baseURL: baseURL
         )
     }
