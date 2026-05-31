@@ -46,7 +46,7 @@ struct ReaderView: View {
     var body: some View {
         ScrollView {
             if let detail {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     if !library.codeSections.isEmpty {
                         CodeEyebrow(text: library.codeSectionName(id: detail.codeSectionID), accent: accentColor)
                     }
@@ -93,8 +93,8 @@ struct ReaderView: View {
 
                     notesEditor
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
+                .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+                .padding(.top, CodeScreenMetrics.topTitlePadding)
                 .padding(.bottom, 28)
             } else {
                 CodeEmptyStateCard(
@@ -103,7 +103,7 @@ struct ReaderView: View {
                     description: "Preparing the selected code section.",
                     accent: accentColor
                 )
-                .padding(.horizontal, 20)
+                .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
                 .padding(.top, 80)
             }
         }
@@ -224,7 +224,7 @@ struct ReaderView: View {
             if detail.kind == .textBlock {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text(detail.displayTitle)
-                        .font(.title3.weight(.semibold))
+                        .font(CodeTypography.codeSectionTitle)
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
                     if jumpAffordance {
@@ -236,10 +236,10 @@ struct ReaderView: View {
             } else {
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     Text(detail.sectionNumber)
-                        .font(.title3.weight(.semibold))
+                        .font(CodeTypography.codeSectionTitle)
                         .foregroundStyle(accentColor)
                     Text(detail.displayTitle)
-                        .font(.title3.weight(.semibold))
+                        .font(CodeTypography.codeSectionTitle)
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
                     if jumpAffordance {
@@ -314,9 +314,9 @@ struct ReaderView: View {
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .background(Color(uiColor: .secondarySystemGroupedBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                             .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
                     )
                     .onChange(of: noteBody) { _, _ in
@@ -327,7 +327,7 @@ struct ReaderView: View {
                     Text("Add a note")
                         .font(library.readerTheme.swiftUIFont())
                         .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, CodeScreenMetrics.cardPadding)
                         .padding(.vertical, 16)
                         .allowsHitTesting(false)
                 }
@@ -436,9 +436,9 @@ struct ReaderView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
             .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                     .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
             )
 
@@ -740,13 +740,13 @@ private struct FigureImageView: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                             .stroke(Color(uiColor: .separator), lineWidth: 1)
                     )
             } else {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                     .fill(Color(uiColor: .secondarySystemGroupedBackground))
                     .frame(height: 180)
                     .overlay {
@@ -806,3 +806,13 @@ struct FlowLayout: Layout {
         }
     }
 }
+
+#if DEBUG
+#Preview("Reader") {
+    NavigationStack {
+        ReaderView(sectionID: 1)
+    }
+    .environmentObject(CodeLibraryViewModel.preview())
+    .preferredColorScheme(.light)
+}
+#endif

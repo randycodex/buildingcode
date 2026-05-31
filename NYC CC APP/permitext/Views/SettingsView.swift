@@ -11,7 +11,7 @@ struct SettingsView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var expandedPicker: ExpandedPicker?
-    private let tabBarClearance: CGFloat = 104
+    private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
 
     private enum ExpandedPicker: Hashable {
         case jurisdiction
@@ -55,7 +55,7 @@ struct SettingsView: View {
                         }
                     }
 
-                    CodeSurface(accent: settingsChromeColor, padding: 16) {
+                    CodeSurface(accent: settingsChromeColor) {
                         themePreviewCard
 
                         CodeHairline()
@@ -71,7 +71,7 @@ struct SettingsView: View {
                         lineSpacingSlider
                     }
 
-                    CodeSurface(accent: settingsChromeColor, padding: 16) {
+                    CodeSurface(accent: settingsChromeColor) {
                         savedDataTools
                     }
 
@@ -88,7 +88,7 @@ struct SettingsView: View {
                     }
 
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 .padding(.top, CodeScreenMetrics.topTitlePadding)
                 .padding(.bottom, tabBarClearance)
             }
@@ -137,7 +137,7 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
-                .padding(16)
+                .padding(CodeScreenMetrics.cardPadding)
             } else {
                 expandableSettingsRow(
                     label: "Jurisdiction",
@@ -170,7 +170,7 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
-                .padding(16)
+                .padding(CodeScreenMetrics.cardPadding)
             } else {
                 expandableSettingsRow(
                     label: "Version",
@@ -204,7 +204,7 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
-                .padding(16)
+                .padding(CodeScreenMetrics.cardPadding)
             } else {
                 expandableSettingsRow(
                     label: "Code Section",
@@ -465,7 +465,7 @@ struct SettingsView: View {
                         .foregroundStyle(Color.appChrome)
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, CodeScreenMetrics.cardPadding)
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
@@ -563,5 +563,6 @@ private enum ClearSettingsAction: Identifiable {
 #Preview("Settings") {
     SettingsView()
         .environmentObject(CodeLibraryViewModel.preview())
+        .preferredColorScheme(.light)
 }
 #endif

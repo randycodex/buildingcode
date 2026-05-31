@@ -14,8 +14,8 @@ struct SearchView: View {
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let filterCodeSectionIDsDefaultsKey = "SearchView.filterCodeSectionIDs"
-    private let contentHorizontalInset: CGFloat = 16
-    private let tabBarClearance: CGFloat = 168
+    private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
+    private let tabBarClearance: CGFloat = CodeScreenMetrics.searchTabBarClearance
     private let jumpBackInPageSize = CodeScreenMetrics.tileGridPageSize
     /// Shared with `BookmarksView` so both docks occupy the same vertical
     /// real estate above the floating tab bar regardless of how many filter
@@ -276,11 +276,11 @@ struct SearchView: View {
             }
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                 .strokeBorder(Color(uiColor: .separator).opacity(0.55), lineWidth: 0.75)
         )
         // The TextField handles focus natively. An extra .onTapGesture here
@@ -385,7 +385,7 @@ struct SearchView: View {
         rightEntry: RecentlyViewedEntry?,
         pageWidth: CGFloat
     ) -> some View {
-        let gap: CGFloat = 8
+        let gap: CGFloat = CodeScreenMetrics.tileGridRowSpacing
         let tileWidth = max(0, (pageWidth - gap) / 2)
 
         return HStack(alignment: .top, spacing: CodeScreenMetrics.tileGridRowSpacing) {
@@ -465,11 +465,11 @@ struct SearchView: View {
                 .foregroundStyle(.tertiary)
                 .lineLimit(1)
         }
-        .padding(8)
+        .padding(CodeScreenMetrics.tileGridRowSpacing)
         .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.jumpBackInTileContentHeight, alignment: .topLeading)
         .frame(height: CodeScreenMetrics.twoByTwoTileRowHeight, alignment: .top)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
     }
 
     private var unpinnedRecentSearches: [String] {
@@ -510,7 +510,7 @@ struct SearchView: View {
 
     private func searchHistorySectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.caption.weight(.semibold))
+            .font(CodeTypography.sectionLabel)
             .foregroundStyle(accentColor)
             .textCase(.uppercase)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -575,7 +575,7 @@ struct SearchView: View {
                     .accessibilityLabel("Remove recent search")
                 }
             }
-            .padding(.vertical, 12)
+            .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
 
             CodeHairline()
         }
@@ -628,8 +628,8 @@ struct SearchView: View {
             .foregroundStyle(groupAccent)
             .textCase(.uppercase)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.top, 22)
-            .padding(.bottom, 8)
+            .padding(.top, CodeScreenMetrics.groupedSectionTopPadding)
+            .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
     }
 
     private func resultRow(_ result: CodeSearchResult) -> some View {
@@ -651,7 +651,7 @@ struct SearchView: View {
                         CodeMetaBadge(text: "Text Block", accent: resultAccent)
                     } else {
                         Text(result.sectionNumber)
-                            .font(.subheadline.weight(.semibold))
+                            .font(CodeTypography.codeSectionNumber)
                             .foregroundStyle(resultAccent)
                     }
 
@@ -674,7 +674,7 @@ struct SearchView: View {
 
             Spacer(minLength: 0)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
     }
 
     private func dismissKeyboard() {
@@ -687,5 +687,6 @@ struct SearchView: View {
 #Preview("Search") {
     SearchView()
         .environmentObject(CodeLibraryViewModel.preview())
+        .preferredColorScheme(.light)
 }
 #endif

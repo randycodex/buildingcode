@@ -16,12 +16,12 @@ struct PermitextApp: App {
         stacked.normal.iconColor = UIColor.secondaryLabel
         stacked.normal.titleTextAttributes = [
             .foregroundColor: UIColor.clear,
-            .font: UIFont.preferredFont(forTextStyle: .caption2)
+            .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
         ]
         stacked.selected.iconColor = UIColor.appChrome
         stacked.selected.titleTextAttributes = [
             .foregroundColor: UIColor.clear,
-            .font: UIFont.preferredFont(forTextStyle: .caption2)
+            .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
         ]
         stacked.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 20)
         stacked.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 20)

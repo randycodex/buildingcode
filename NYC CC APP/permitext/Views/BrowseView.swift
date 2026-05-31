@@ -92,7 +92,7 @@ struct BrowseView: View {
                 .frame(height: 0)
 
                 libraryHeader
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                     .padding(.top, 18)
                     .padding(.bottom, 12)
 
@@ -103,7 +103,7 @@ struct BrowseView: View {
                         description: "The selected code section does not have any chapters yet.",
                         accent: Color(uiColor: library.accentColor(for: browseCodeSectionID))
                     )
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 } else {
                     let columns = [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
                     let codeSectionName = selectedCodeSectionName
@@ -169,7 +169,7 @@ struct BrowseView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -787,11 +787,11 @@ struct ChapterSectionsView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                 .fill(Color(uiColor: .secondarySystemGroupedBackground))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                 .stroke(Color(uiColor: .separator), lineWidth: 1)
         )
     }
@@ -1048,11 +1048,17 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
 }
 
 enum CodeScreenMetrics {
+    static let screenHorizontalPadding: CGFloat = 16
+    static let readerHorizontalPadding: CGFloat = 20
     static let topTitlePadding: CGFloat = 18
+    static let tabBarClearance: CGFloat = 104
+    static let searchTabBarClearance: CGFloat = 168
     /// Space between the screen title and the first content block (eyebrow, cards, etc.).
     static let contentSpacingBelowTitle: CGFloat = 16
     /// Space between an uppercase section eyebrow and the content below it.
     static let sectionSpacingBelowEyebrow: CGFloat = 8
+    static let groupedSectionTopPadding: CGFloat = 22
+    static let rowVerticalPadding: CGFloat = 12
     static let screenTitleFontSize: CGFloat = 16
     /// Cap-height band of screen titles such as “Saved” (between the red guide lines).
     static var screenTitleLineHeight: CGFloat {
@@ -1061,10 +1067,17 @@ enum CodeScreenMetrics {
     /// Trailing actions sized to sit inside the title word band, not the padding below it.
     static var screenHeaderActionSlotSize: CGFloat { screenTitleLineHeight }
     static let screenHeaderActionPointSize: CGFloat = 13
+    static let toolbarButtonSize: CGFloat = 36
+    static let toolbarIconPointSize: CGFloat = 17
     /// Trailing padding below a recents/projects tile block (matches Search jump-back-in).
     static let tileGridSectionBottomPadding: CGFloat = 2
     static let tileGridRowSpacing: CGFloat = 8
     static let tileGridPageSize = 4
+    static let tileCornerRadius: CGFloat = 10
+    static let cardCornerRadius: CGFloat = 14
+    static let cardPadding: CGFloat = 16
+    static let compactCardPadding: CGFloat = 9
+    static let dividerOpacity: CGFloat = 1
     /// Saved project tile content height (width comes from the 2-column grid).
     static let savedProjectTileHeight: CGFloat = 57
 
@@ -1116,13 +1129,23 @@ enum CodeScreenMetrics {
     }
 }
 
+enum CodeTypography {
+    static let screenTitle = Font.system(size: CodeScreenMetrics.screenTitleFontSize, weight: .bold, design: .default)
+    static let sectionLabel = Font.caption.weight(.semibold)
+    static let cardTitle = Font.subheadline.weight(.semibold)
+    static let cardMetadata = Font.caption
+    static let mutedPreview = Font.footnote
+    static let codeSectionNumber = Font.subheadline.weight(.semibold)
+    static let codeSectionTitle = Font.title3.weight(.semibold)
+}
+
 struct CodeScreenSectionEyebrow: View {
     let text: String
     let accent: Color
 
     var body: some View {
         Text(text)
-            .font(.caption.weight(.semibold))
+            .font(CodeTypography.sectionLabel)
             .foregroundStyle(accent)
             .textCase(.uppercase)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -1166,7 +1189,7 @@ struct CodeScreenTitleRow<Trailing: View>: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 6) {
                 Text(title)
-                    .font(.system(size: CodeScreenMetrics.screenTitleFontSize, weight: .bold, design: .default))
+                    .font(CodeTypography.screenTitle)
                     .foregroundStyle(.primary)
                     .frame(height: titleBandHeight, alignment: .leading)
                     .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
@@ -1240,7 +1263,7 @@ struct CodeSurface<Content: View>: View {
     let padding: CGFloat
     let content: Content
 
-    init(accent: Color, padding: CGFloat = 16, @ViewBuilder content: () -> Content) {
+    init(accent: Color, padding: CGFloat = CodeScreenMetrics.cardPadding, @ViewBuilder content: () -> Content) {
         self.accent = accent
         self.padding = padding
         self.content = content()
@@ -1253,11 +1276,11 @@ struct CodeSurface<Content: View>: View {
         .padding(padding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                 .fill(Color(uiColor: .secondarySystemGroupedBackground))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                 .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
         )
     }
@@ -1329,7 +1352,7 @@ struct CodeEyebrow: View {
 
     var body: some View {
         Text(text)
-            .font(.caption.weight(.semibold))
+            .font(CodeTypography.sectionLabel)
             .foregroundStyle(accent)
             .textCase(.uppercase)
             .tracking(0.2)
@@ -1347,9 +1370,9 @@ struct CodeMetaBadge: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
             .background(accent.opacity(0.14))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous)
                     .strokeBorder(accent.opacity(0.28), lineWidth: 0.75)
             )
     }
@@ -1372,7 +1395,7 @@ struct CodeStatPill: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 7)
         .background(Color(uiColor: .tertiarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
     }
 }
 
@@ -1424,6 +1447,7 @@ private struct BrowseViewPreviewContainer: View {
     var body: some View {
         BrowseView()
             .environmentObject(library)
+            .preferredColorScheme(.light)
     }
 }
 
@@ -1445,6 +1469,7 @@ private struct ChapterSectionsPreviewContainer: View {
             }
         }
         .environmentObject(library)
+        .preferredColorScheme(.light)
     }
 }
 

@@ -17,7 +17,7 @@ struct FolderFilterChipsRow: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: CodeFilterChipMetrics.spacing) {
                 filterChip(
                     title: "All Projects",
                     accent: Color.secondary,
@@ -52,11 +52,12 @@ struct FolderFilterChipsRow: View {
                         Image(systemName: "plus")
                             .font(.caption.weight(.bold))
                         Text("New")
-                            .font(.subheadline.weight(.semibold))
+                            .font(CodeFilterChipMetrics.font)
                     }
                     .foregroundStyle(Color.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, CodeFilterChipMetrics.compactHorizontalPadding)
+                    .padding(.vertical, CodeFilterChipMetrics.verticalPadding)
+                    .frame(minHeight: CodeFilterChipMetrics.minHeight)
                     .background(
                         Capsule(style: .continuous)
                             .strokeBorder(Color.secondary.opacity(0.35), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
@@ -96,12 +97,13 @@ struct FolderFilterChipsRow: View {
                         .frame(width: 6, height: 6)
                 }
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(CodeFilterChipMetrics.font)
             }
             .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
             .frame(width: minWidth)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
+            .padding(.horizontal, CodeFilterChipMetrics.compactHorizontalPadding)
+            .padding(.vertical, CodeFilterChipMetrics.verticalPadding)
+            .frame(minHeight: CodeFilterChipMetrics.minHeight)
             .background(
                 Capsule(style: .continuous)
                     .fill(isSelected ? accent : accent.opacity(0.12))

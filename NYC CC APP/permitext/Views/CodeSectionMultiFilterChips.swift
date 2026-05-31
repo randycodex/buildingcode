@@ -3,6 +3,12 @@ import SwiftUI
 enum CodeFilterChipMetrics {
     static let primaryChipWidth: CGFloat = 86
     static let savedPrimaryChipWidth: CGFloat = 104
+    static let spacing: CGFloat = 8
+    static let horizontalPadding: CGFloat = 14
+    static let verticalPadding: CGFloat = 7
+    static let compactHorizontalPadding: CGFloat = 12
+    static let minHeight: CGFloat = 32
+    static let font = Font.subheadline.weight(.semibold)
 }
 
 struct CodeSectionMultiFilterChips: View {
@@ -13,7 +19,7 @@ struct CodeSectionMultiFilterChips: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: CodeFilterChipMetrics.spacing) {
                 // The "All Sections" chip uses a neutral grey rather than the
                 // library's accent so it reads as a non-state (no code section
                 // picked), matching how the All Tags chip behaves on Saved.
@@ -63,11 +69,12 @@ struct CodeSectionMultiFilterChips: View {
     ) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.subheadline.weight(.semibold))
+                .font(CodeFilterChipMetrics.font)
                 .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
                 .frame(width: minWidth)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
+                .padding(.horizontal, CodeFilterChipMetrics.horizontalPadding)
+                .padding(.vertical, CodeFilterChipMetrics.verticalPadding)
+                .frame(minHeight: CodeFilterChipMetrics.minHeight)
                 .background(
                     Capsule(style: .continuous)
                         .fill(isSelected ? accent : accent.opacity(0.12))

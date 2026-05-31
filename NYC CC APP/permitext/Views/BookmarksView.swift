@@ -16,8 +16,8 @@ struct BookmarksView: View {
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
-    private let tabBarClearance: CGFloat = 104
-    private let contentHorizontalInset: CGFloat = 16
+    private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
+    private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
     private let projectTilePageSize = CodeScreenMetrics.tileGridPageSize
 
     init() {
@@ -439,7 +439,7 @@ private var savedBookmarkList: some View {
         rightFolder: CodeFolder?,
         pageWidth: CGFloat
     ) -> some View {
-        let gap: CGFloat = 8
+        let gap: CGFloat = CodeScreenMetrics.tileGridRowSpacing
         let tileWidth = max(0, (pageWidth - gap) / 2)
 
         return HStack(alignment: .top, spacing: CodeScreenMetrics.tileGridRowSpacing) {
@@ -500,10 +500,10 @@ private var savedBookmarkList: some View {
                 .foregroundStyle(.tertiary)
                 .lineLimit(1)
         }
-        .padding(9)
+        .padding(CodeScreenMetrics.compactCardPadding)
         .frame(height: CodeScreenMetrics.savedProjectTileHeight, alignment: .center)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
     }
 
     private var availableFilterSections: [CodeSectionCategory] {
@@ -564,7 +564,7 @@ private var savedBookmarkList: some View {
 
     private var tagFilterControl: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: CodeFilterChipMetrics.spacing) {
                 tagFilterChip(title: "All Tags", isSelected: selectedTagFilter == nil) {
                     selectedTagFilter = nil
                 }
@@ -592,12 +592,13 @@ private var savedBookmarkList: some View {
                 Image(systemName: "tag.fill")
                     .font(.caption2.weight(.semibold))
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(CodeFilterChipMetrics.font)
             }
             .foregroundStyle(isSelected ? Color.appChromeOnFill : .secondary)
             .frame(width: minWidth, alignment: .leading)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
+            .padding(.horizontal, CodeFilterChipMetrics.compactHorizontalPadding)
+            .padding(.vertical, CodeFilterChipMetrics.verticalPadding)
+            .frame(minHeight: CodeFilterChipMetrics.minHeight)
             .background(
                 Capsule(style: .continuous)
                     .fill(isSelected ? Color.secondary : Color.secondary.opacity(0.12))
@@ -788,7 +789,7 @@ private var savedBookmarkList: some View {
 
             Spacer(minLength: 0)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
     }
 
     private func bookmarkTagsRow(_ tags: [String], accent: Color) -> some View {
@@ -906,7 +907,7 @@ struct ProjectView: View {
     @State private var selectedSectionIDs: Set<Int64> = []
     @State private var folderEditorTarget: ProjectFolderEditorTarget?
 
-    private let contentHorizontalInset: CGFloat = 16
+    private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
 
     private var folder: CodeFolder? {
         library.folder(id: folderID)
@@ -926,7 +927,7 @@ struct ProjectView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                 projectHeader
 
                 if projectBookmarks.isEmpty {
@@ -948,7 +949,7 @@ struct ProjectView: View {
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(.horizontal, contentHorizontalInset)
-            .padding(.top, 18)
+            .padding(.top, CodeScreenMetrics.topTitlePadding)
             .padding(.bottom, 40)
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
@@ -1030,9 +1031,9 @@ struct ProjectView: View {
                     }
                 } label: {
                     Image(systemName: "pencil")
-                        .font(.headline.weight(.semibold))
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                         .foregroundStyle(Color.appChrome)
-                        .frame(width: 36, height: 36)
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Edit project")
@@ -1064,9 +1065,9 @@ struct ProjectView: View {
             }
         } label: {
             Image(systemName: "arrow.up.arrow.down")
-                .font(.headline.weight(.semibold))
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: 36, height: 36)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Sort project")
@@ -1077,9 +1078,9 @@ struct ProjectView: View {
             isExportActionSheetPresented = true
         } label: {
             Image(systemName: "square.and.arrow.up")
-                .font(.headline.weight(.semibold))
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: 36, height: 36)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
         }
         .buttonStyle(.plain)
         .disabled(projectBookmarks.isEmpty)
@@ -1096,9 +1097,9 @@ struct ProjectView: View {
             }
         } label: {
             Image(systemName: isSelecting ? "checkmark.circle.fill" : "checklist")
-                .font(.headline.weight(.semibold))
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: 36, height: 36)
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
         }
         .buttonStyle(.plain)
         .disabled(projectBookmarks.isEmpty)
@@ -1220,7 +1221,7 @@ struct ProjectView: View {
             .buttonStyle(.plain)
             .disabled(isSelecting)
         }
-        .padding(.vertical, 12)
+        .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
         .contentShape(Rectangle())
         .onTapGesture {
             if isSelecting {
@@ -1264,5 +1265,12 @@ private enum ProjectFolderEditorTarget: Identifiable {
 #Preview("Bookmarks") {
     BookmarksView()
         .environmentObject(CodeLibraryViewModel.preview())
+        .preferredColorScheme(.light)
+}
+
+#Preview("Project") {
+    ProjectView(folderID: 1)
+        .environmentObject(CodeLibraryViewModel.preview())
+        .preferredColorScheme(.light)
 }
 #endif
