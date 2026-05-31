@@ -1051,6 +1051,7 @@ enum CodeScreenMetrics {
     static let screenHorizontalPadding: CGFloat = 16
     static let readerHorizontalPadding: CGFloat = 20
     static let topTitlePadding: CGFloat = 18
+    static let scrollMeasuredTitleTopPadding: CGFloat = 0
     static let tabBarClearance: CGFloat = 104
     static let searchTabBarClearance: CGFloat = 168
     /// Space between the screen title and the first content block (eyebrow, cards, etc.).
@@ -1059,6 +1060,9 @@ enum CodeScreenMetrics {
     static let sectionSpacingBelowEyebrow: CGFloat = 8
     static let groupedSectionTopPadding: CGFloat = 22
     static let rowVerticalPadding: CGFloat = 12
+    static let controlSpacing: CGFloat = 10
+    static let savedChapterHeaderTopPadding: CGFloat = 12
+    static let savedChapterHeaderBottomPadding: CGFloat = 6
     static let screenTitleFontSize: CGFloat = 16
     /// Cap-height band of screen titles such as “Saved” (between the red guide lines).
     static var screenTitleLineHeight: CGFloat {
@@ -1268,11 +1272,18 @@ struct CodeTopContentFade: View {
 struct CodeSurface<Content: View>: View {
     let accent: Color
     let padding: CGFloat
+    let showsBorder: Bool
     let content: Content
 
-    init(accent: Color, padding: CGFloat = CodeScreenMetrics.cardPadding, @ViewBuilder content: () -> Content) {
+    init(
+        accent: Color,
+        padding: CGFloat = CodeScreenMetrics.cardPadding,
+        showsBorder: Bool = true,
+        @ViewBuilder content: () -> Content
+    ) {
         self.accent = accent
         self.padding = padding
+        self.showsBorder = showsBorder
         self.content = content()
     }
 
@@ -1288,7 +1299,7 @@ struct CodeSurface<Content: View>: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
-                .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
+                .strokeBorder(showsBorder ? Color(uiColor: .separator) : Color.clear, lineWidth: 1)
         )
     }
 }

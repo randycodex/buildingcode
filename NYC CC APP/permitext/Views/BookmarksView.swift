@@ -703,8 +703,8 @@ private var savedBookmarkList: some View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.top, 12)
-        .padding(.bottom, 14)
+        .padding(.top, CodeScreenMetrics.savedChapterHeaderTopPadding)
+        .padding(.bottom, CodeScreenMetrics.savedChapterHeaderBottomPadding)
     }
 
     @ViewBuilder

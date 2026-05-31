@@ -76,7 +76,7 @@ struct SearchView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, CodeScreenMetrics.topTitlePadding)
+                .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
                 .padding(.bottom, tabBarClearance)
             }
             .contentShape(Rectangle())

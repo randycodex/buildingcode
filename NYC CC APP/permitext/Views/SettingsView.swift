@@ -43,7 +43,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     CodeScreenTitle(title: "Settings", collapseProgress: collapseProgress)
 
-                    CodeSurface(accent: settingsChromeColor, padding: 0) {
+                    CodeSurface(accent: settingsChromeColor, padding: 0, showsBorder: false) {
                         VStack(spacing: 0) {
                             jurisdictionPicker
                             Divider()
@@ -55,7 +55,7 @@ struct SettingsView: View {
                         }
                     }
 
-                    CodeSurface(accent: settingsChromeColor) {
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         themePreviewCard
 
                         CodeHairline()
@@ -71,7 +71,7 @@ struct SettingsView: View {
                         lineSpacingSlider
                     }
 
-                    CodeSurface(accent: settingsChromeColor) {
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         savedDataTools
                     }
 
@@ -89,7 +89,7 @@ struct SettingsView: View {
 
                 }
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                .padding(.top, CodeScreenMetrics.topTitlePadding)
+                .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
                 .padding(.bottom, tabBarClearance)
             }
             .overlay(alignment: .top) {
@@ -254,6 +254,7 @@ struct SettingsView: View {
         }
         .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
         .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
+        .toggleStyle(SettingsSwitchToggleStyle())
     }
 
     private var themePreviewCard: some View {
@@ -555,6 +556,40 @@ private enum ClearSettingsAction: Identifiable {
             return "This removes every note saved for the current code version."
         case .clearTags:
             return "This removes every tag from saved sections for the current code version. Bookmarks and notes are not affected."
+        }
+    }
+}
+
+private struct SettingsSwitchToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(alignment: .center, spacing: CodeScreenMetrics.controlSpacing) {
+            configuration.label
+
+            Spacer(minLength: 0)
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.18)) {
+                    configuration.isOn.toggle()
+                }
+            } label: {
+                ZStack(alignment: configuration.isOn ? .trailing : .leading) {
+                    Capsule(style: .continuous)
+                        .fill(configuration.isOn ? Color.appChrome : Color(uiColor: .tertiarySystemGroupedBackground))
+                        .overlay(
+                            Capsule(style: .continuous)
+                                .strokeBorder(Color(uiColor: .separator).opacity(configuration.isOn ? 0.55 : 0.95), lineWidth: 1)
+                        )
+
+                    Circle()
+                        .fill(Color(uiColor: .systemBackground))
+                        .shadow(color: Color.black.opacity(0.18), radius: 2, x: 0, y: 1)
+                        .padding(3)
+                }
+                .frame(width: 54, height: 32)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Comparison Mode")
+            .accessibilityValue(configuration.isOn ? "On" : "Off")
         }
     }
 }
