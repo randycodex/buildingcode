@@ -1049,6 +1049,84 @@ struct CodeScrollOffsetPreferenceKey: PreferenceKey {
 
 enum CodeScreenMetrics {
     static let topTitlePadding: CGFloat = 18
+    /// Space between the screen title and the first content block (eyebrow, cards, etc.).
+    static let contentSpacingBelowTitle: CGFloat = 16
+    /// Space between an uppercase section eyebrow and the content below it.
+    static let sectionSpacingBelowEyebrow: CGFloat = 8
+    static let screenTitleFontSize: CGFloat = 16
+    /// Cap-height band of screen titles such as “Saved” (between the red guide lines).
+    static var screenTitleLineHeight: CGFloat {
+        UIFont.systemFont(ofSize: screenTitleFontSize, weight: .bold).lineHeight
+    }
+    /// Trailing actions sized to sit inside the title word band, not the padding below it.
+    static var screenHeaderActionSlotSize: CGFloat { screenTitleLineHeight }
+    static let screenHeaderActionPointSize: CGFloat = 13
+    /// Trailing padding below a recents/projects tile block (matches Search jump-back-in).
+    static let tileGridSectionBottomPadding: CGFloat = 2
+    static let tileGridRowSpacing: CGFloat = 8
+    static let tileGridPageSize = 4
+    /// Saved project tile content height (width comes from the 2-column grid).
+    static let savedProjectTileHeight: CGFloat = 57
+
+    static var jumpBackInPreviewBlockHeight: CGFloat {
+        UIFont.preferredFont(forTextStyle: .caption2).lineHeight * 3 + 6
+    }
+
+    static var jumpBackInTileContentHeight: CGFloat {
+        let caption2 = UIFont.preferredFont(forTextStyle: .caption2)
+        let caption = UIFont.preferredFont(forTextStyle: .caption1)
+        let codeName = UIFont.systemFont(ofSize: 10, weight: .medium)
+        let lineSpacing: CGFloat = 4
+        return caption2.lineHeight
+            + caption.lineHeight
+            + jumpBackInPreviewBlockHeight
+            + codeName.lineHeight
+            + (lineSpacing * 4)
+            + 8
+    }
+
+    /// Row height for the shared 2-wide recents/projects tile grid (Search sets the reference).
+    static var twoByTwoTileRowHeight: CGFloat {
+        jumpBackInTileContentHeight + 16
+    }
+
+    static func tileGridRowCount(forItemCount itemCount: Int) -> Int {
+        itemCount <= 2 ? 1 : 2
+    }
+
+    static func tileGridHeight(forItemCount itemCount: Int) -> CGFloat {
+        let rowCount = tileGridRowCount(forItemCount: itemCount)
+        let rowGap: CGFloat = rowCount == 2 ? tileGridRowSpacing : 0
+        return (twoByTwoTileRowHeight * CGFloat(rowCount)) + rowGap
+    }
+
+    static let settingsPickerRowVerticalPadding: CGFloat = 12
+    static let settingsPickerRowHorizontalPadding: CGFloat = 16
+
+    /// Compact 2×2 project grid on Saved (tiles stay `savedProjectTileHeight`).
+    static func savedProjectGridHeight(forItemCount itemCount: Int) -> CGFloat {
+        let rowCount = tileGridRowCount(forItemCount: itemCount)
+        let rowGap: CGFloat = rowCount == 2 ? tileGridRowSpacing : 0
+        return (savedProjectTileHeight * CGFloat(rowCount)) + rowGap
+    }
+
+    /// Fixed pager height for a full Saved projects page (four slots in two rows).
+    static var savedProjectFullPageGridHeight: CGFloat {
+        savedProjectGridHeight(forItemCount: tileGridPageSize)
+    }
+}
+
+struct CodeScreenSectionEyebrow: View {
+    let text: String
+    let accent: Color
+
+    var body: some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(accent)
+            .textCase(.uppercase)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
 }
 
 struct CodeScreenTitle: View {
@@ -1057,11 +1135,53 @@ struct CodeScreenTitle: View {
 
     var body: some View {
         Text(title)
-            .font(.system(size: 16, weight: .bold, design: .default))
+            .font(.system(size: CodeScreenMetrics.screenTitleFontSize, weight: .bold, design: .default))
             .foregroundStyle(.primary)
             .padding(.bottom, 8)
             .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
             .opacity(1 - (collapseProgress * 0.22))
+    }
+}
+
+/// Screen title with optional trailing actions aligned to the title **word** band
+/// (e.g. the top/bottom edges of “Saved”), with standard spacing below the band.
+struct CodeScreenTitleRow<Trailing: View>: View {
+    let title: String
+    let collapseProgress: CGFloat
+    @ViewBuilder let trailing: () -> Trailing
+
+    init(
+        title: String,
+        collapseProgress: CGFloat = 0,
+        @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }
+    ) {
+        self.title = title
+        self.collapseProgress = collapseProgress
+        self.trailing = trailing
+    }
+
+    var body: some View {
+        let titleBandHeight = CodeScreenMetrics.screenTitleLineHeight
+
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .center, spacing: 6) {
+                Text(title)
+                    .font(.system(size: CodeScreenMetrics.screenTitleFontSize, weight: .bold, design: .default))
+                    .foregroundStyle(.primary)
+                    .frame(height: titleBandHeight, alignment: .leading)
+                    .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+                    .opacity(1 - (collapseProgress * 0.22))
+
+                Spacer(minLength: 0)
+
+                trailing()
+                    .frame(height: titleBandHeight, alignment: .center)
+            }
+            .frame(height: titleBandHeight, alignment: .leading)
+
+            Spacer()
+                .frame(height: 8)
+        }
     }
 }
 

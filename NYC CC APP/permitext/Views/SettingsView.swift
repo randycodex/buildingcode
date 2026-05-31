@@ -1,5 +1,11 @@
 import SwiftUI
 
+private enum SettingsRowTypography {
+    static let label = Font.body.weight(.medium)
+    static let value = Font.body
+    static let toggleTitle = Font.body.weight(.medium)
+}
+
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
@@ -34,7 +40,7 @@ struct SettingsView: View {
                 }
                 .frame(height: 0)
 
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     CodeScreenTitle(title: "Settings", collapseProgress: collapseProgress)
 
                     CodeSurface(accent: settingsChromeColor, padding: 0) {
@@ -138,7 +144,7 @@ struct SettingsView: View {
                     picker: .jurisdiction,
                     value: {
                         Text(selectedJurisdictionName)
-                            .font(.title3.weight(.regular))
+                            .font(SettingsRowTypography.value)
                             .foregroundStyle(.primary)
                     },
                     options: {
@@ -171,7 +177,7 @@ struct SettingsView: View {
                     picker: .version,
                     value: {
                         Text(selectedVersionPrimaryText)
-                            .font(.title3.weight(.regular))
+                            .font(SettingsRowTypography.value)
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.trailing)
                     },
@@ -205,7 +211,7 @@ struct SettingsView: View {
                     picker: .codeSection,
                     value: {
                         Text(selectedCodeSectionName)
-                            .font(.title3.weight(.regular))
+                            .font(SettingsRowTypography.value)
                             .foregroundStyle(.primary)
                             .multilineTextAlignment(.trailing)
                     },
@@ -238,7 +244,7 @@ struct SettingsView: View {
         )) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Comparison Mode")
-                    .font(.title3)
+                    .font(SettingsRowTypography.toggleTitle)
                     .foregroundStyle(.primary)
 
                 Text("Adds a second browser tab for side-by-side code review.")
@@ -246,8 +252,8 @@ struct SettingsView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
+        .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
     }
 
     private var themePreviewCard: some View {
@@ -405,8 +411,9 @@ struct SettingsView: View {
             } label: {
                 HStack(alignment: .center, spacing: 12) {
                     Text(label)
-                        .font(.title3)
+                        .font(SettingsRowTypography.label)
                         .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Spacer(minLength: 0)
 
@@ -417,8 +424,8 @@ struct SettingsView: View {
                         .foregroundStyle(.tertiary)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 14)
+                .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
+                .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)

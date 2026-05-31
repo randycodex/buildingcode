@@ -22,7 +22,7 @@ struct FolderFilterChipsRow: View {
                     title: "All Projects",
                     accent: Color.secondary,
                     isSelected: selectedIDs.isEmpty,
-                    minWidth: CodeFilterChipMetrics.primaryChipWidth
+                    minWidth: CodeFilterChipMetrics.savedPrimaryChipWidth
                 ) {
                     selectedIDs = []
                 }
@@ -99,7 +99,7 @@ struct FolderFilterChipsRow: View {
                     .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
-            .frame(width: minWidth, alignment: .leading)
+            .frame(width: minWidth)
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(

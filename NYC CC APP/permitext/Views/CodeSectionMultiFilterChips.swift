@@ -2,12 +2,14 @@ import SwiftUI
 
 enum CodeFilterChipMetrics {
     static let primaryChipWidth: CGFloat = 86
+    static let savedPrimaryChipWidth: CGFloat = 104
 }
 
 struct CodeSectionMultiFilterChips: View {
     let sections: [CodeSectionCategory]
     @Binding var selectedIDs: Set<Int64>
     let accentForSection: (Int64) -> Color
+    var primaryChipWidth: CGFloat = CodeFilterChipMetrics.primaryChipWidth
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -19,7 +21,7 @@ struct CodeSectionMultiFilterChips: View {
                     title: "All Sections",
                     accent: Color.secondary,
                     isSelected: selectedIDs.isEmpty,
-                    minWidth: CodeFilterChipMetrics.primaryChipWidth
+                    minWidth: primaryChipWidth
                 ) {
                     selectedIDs = []
                 }
@@ -63,7 +65,7 @@ struct CodeSectionMultiFilterChips: View {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(isSelected ? Color.appChromeOnFill : accent)
-                .frame(width: minWidth, alignment: .leading)
+                .frame(width: minWidth)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 7)
                 .background(

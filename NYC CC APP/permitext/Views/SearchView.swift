@@ -16,7 +16,7 @@ struct SearchView: View {
     private static let filterCodeSectionIDsDefaultsKey = "SearchView.filterCodeSectionIDs"
     private let contentHorizontalInset: CGFloat = 16
     private let tabBarClearance: CGFloat = 168
-    private let jumpBackInPageSize = 4
+    private let jumpBackInPageSize = CodeScreenMetrics.tileGridPageSize
     /// Shared with `BookmarksView` so both docks occupy the same vertical
     /// real estate above the floating tab bar regardless of how many filter
     /// rows are present.
@@ -45,7 +45,7 @@ struct SearchView: View {
                 }
                 .frame(height: 0)
 
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     CodeScreenTitle(title: "Search", collapseProgress: collapseProgress)
 
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -293,7 +293,7 @@ struct SearchView: View {
         VStack(alignment: .leading, spacing: 16) {
             if !library.recentlyViewedSections.isEmpty {
                 recentlyViewedSection
-                    .padding(.bottom, 2)
+                    .padding(.bottom, CodeScreenMetrics.tileGridSectionBottomPadding)
             }
 
             if !library.pinnedSearches.isEmpty {
@@ -306,43 +306,15 @@ struct SearchView: View {
         }
     }
 
-    private var jumpBackInPreviewBlockHeight: CGFloat {
-        // SwiftUI line heights run slightly taller than UIFont metrics.
-        UIFont.preferredFont(forTextStyle: .caption2).lineHeight * 3 + 6
-    }
-
-    private var jumpBackInTileContentHeight: CGFloat {
-        let caption2 = UIFont.preferredFont(forTextStyle: .caption2)
-        let caption = UIFont.preferredFont(forTextStyle: .caption1)
-        let codeName = UIFont.systemFont(ofSize: 10, weight: .medium)
-        let lineSpacing: CGFloat = 4
-        return caption2.lineHeight
-            + caption.lineHeight
-            + jumpBackInPreviewBlockHeight
-            + codeName.lineHeight
-            + (lineSpacing * 4)
-            + 8
-    }
-
-    private var jumpBackInTileOuterHeight: CGFloat {
-        jumpBackInTileContentHeight + 16
-    }
-
-    private func jumpBackInGridHeight(for page: [RecentlyViewedEntry]) -> CGFloat {
-        let rowCount = page.count <= 2 ? 1 : 2
-        let rowGap: CGFloat = rowCount == 2 ? 8 : 0
-        return (jumpBackInTileOuterHeight * CGFloat(rowCount)) + rowGap
-    }
-
     private var jumpBackInTabViewHeight: CGFloat {
         cachedJumpBackInPages
-            .map { jumpBackInGridHeight(for: $0.entries) }
-            .max() ?? jumpBackInTileOuterHeight
+            .map { CodeScreenMetrics.tileGridHeight(forItemCount: $0.entries.count) }
+            .max() ?? CodeScreenMetrics.twoByTwoTileRowHeight
     }
 
     private var recentlyViewedSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            searchHistorySectionHeader("Jump Back In")
+        VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
+            CodeScreenSectionEyebrow(text: "Jump Back In", accent: accentColor)
 
             GeometryReader { proxy in
                 let pageWidth = proxy.size.width
@@ -353,7 +325,7 @@ struct SearchView: View {
                             pageWidth: pageWidth,
                             isLastPage: index == cachedJumpBackInPages.indices.last
                         )
-                            .frame(width: pageWidth, height: jumpBackInGridHeight(for: page.entries), alignment: .topLeading)
+                            .frame(width: pageWidth, height: CodeScreenMetrics.tileGridHeight(forItemCount: page.entries.count), alignment: .topLeading)
                             .tag(index)
                     }
                 }
@@ -391,7 +363,7 @@ struct SearchView: View {
         let pageSlots = Array(page.prefix(jumpBackInPageSize))
         let shouldPlaceSingleFinalTileOnRight = isLastPage && pageSlots.count == 1
 
-        VStack(spacing: 8) {
+        VStack(spacing: CodeScreenMetrics.tileGridRowSpacing) {
             jumpBackInTileRow(
                 leftEntry: shouldPlaceSingleFinalTileOnRight ? nil : (pageSlots.indices.contains(0) ? pageSlots[0] : nil),
                 rightEntry: shouldPlaceSingleFinalTileOnRight ? pageSlots[0] : (pageSlots.indices.contains(1) ? pageSlots[1] : nil),
@@ -416,11 +388,11 @@ struct SearchView: View {
         let gap: CGFloat = 8
         let tileWidth = max(0, (pageWidth - gap) / 2)
 
-        return HStack(alignment: .top, spacing: 8) {
+        return HStack(alignment: .top, spacing: CodeScreenMetrics.tileGridRowSpacing) {
             jumpBackInTileSlot(leftEntry, tileWidth: tileWidth)
             jumpBackInTileSlot(rightEntry, tileWidth: tileWidth)
         }
-        .frame(width: pageWidth, alignment: .leading)
+        .frame(width: pageWidth, height: CodeScreenMetrics.twoByTwoTileRowHeight, alignment: .topLeading)
     }
 
     @ViewBuilder
@@ -442,7 +414,7 @@ struct SearchView: View {
         } else {
             Color.clear
                 .frame(width: tileWidth)
-                .frame(height: jumpBackInTileOuterHeight)
+                .frame(height: CodeScreenMetrics.twoByTwoTileRowHeight)
                 .accessibilityHidden(true)
         }
     }
@@ -486,7 +458,7 @@ struct SearchView: View {
                 .foregroundStyle(preview.isEmpty ? .clear : .secondary)
                 .lineLimit(3)
                 .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, minHeight: jumpBackInPreviewBlockHeight, alignment: .topLeading)
+                .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.jumpBackInPreviewBlockHeight, alignment: .topLeading)
 
             Text(entry.codeSectionName)
                 .font(.system(size: 10, weight: .medium))
@@ -494,8 +466,8 @@ struct SearchView: View {
                 .lineLimit(1)
         }
         .padding(8)
-        .frame(maxWidth: .infinity, minHeight: jumpBackInTileContentHeight, alignment: .topLeading)
-        .frame(height: jumpBackInTileOuterHeight, alignment: .top)
+        .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.jumpBackInTileContentHeight, alignment: .topLeading)
+        .frame(height: CodeScreenMetrics.twoByTwoTileRowHeight, alignment: .top)
         .background(Color(uiColor: .secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
