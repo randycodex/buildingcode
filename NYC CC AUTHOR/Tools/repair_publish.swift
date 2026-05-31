@@ -3,9 +3,14 @@ import Foundation
 private let outputURL = URL(
     fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Resources/nyc_code_authored.json"
 )
-private let defaultHTMLDirectoryURL = URL(
-    fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/2022 NYC BC/2022 Construction Codes"
-)
+private let defaultHTMLDirectoryCandidates = [
+    URL(
+        fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/New York City/2022 Construction Codes/Building Code"
+    ),
+    URL(
+        fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/2022 NYC BC/2022 Construction Codes"
+    )
+]
 
 @main
 struct RepairPublishTool {
@@ -27,7 +32,7 @@ struct RepairPublishTool {
             .filter { FileManager.default.fileExists(atPath: $0.path) }
 
         if documentURLs.isEmpty && explicitPaths.isEmpty {
-            documentURLs = try fallbackHTMLDocuments(in: defaultHTMLDirectoryURL)
+            documentURLs = try fallbackHTMLDocuments()
         }
 
         guard !documentURLs.isEmpty else {
@@ -158,18 +163,26 @@ struct RepairPublishTool {
         return EditorDocument(fileURL: url, kind: .html, htmlContent: html)
     }
 
-    private static func fallbackHTMLDocuments(in directoryURL: URL) throws -> [URL] {
-        let urls = try FileManager.default.contentsOfDirectory(
-            at: directoryURL,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles]
-        )
+    private static func fallbackHTMLDocuments() throws -> [URL] {
+        for directoryURL in defaultHTMLDirectoryCandidates where FileManager.default.fileExists(atPath: directoryURL.path) {
+            let urls = try FileManager.default.contentsOfDirectory(
+                at: directoryURL,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles]
+            )
 
-        return urls
-            .filter { $0.pathExtension.lowercased() == "html" }
-            .sorted {
-                $0.lastPathComponent.compare($1.lastPathComponent, options: [.numeric, .caseInsensitive]) == .orderedAscending
+            let htmlURLs = urls
+                .filter { $0.pathExtension.lowercased() == "html" }
+                .sorted {
+                    $0.lastPathComponent.compare($1.lastPathComponent, options: [.numeric, .caseInsensitive]) == .orderedAscending
+                }
+
+            if !htmlURLs.isEmpty {
+                return htmlURLs
             }
+        }
+
+        return []
     }
 
     private static func sectionNumber(fromGroupHeader headerLine: String) -> String {

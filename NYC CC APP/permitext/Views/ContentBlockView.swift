@@ -293,6 +293,7 @@ private struct ImageBlockView: View {
 
     @State private var loadedImage: UIImage?
     @State private var displayWidth: CGFloat?
+    @State private var failedToLoad = false
 
     private var inlineLoadID: String {
         let bucket = displayWidth.map { ImageBlockCache.sizeBucket(forMaxPixelSize: $0 * UIScreen.main.scale * 2) } ?? 0
@@ -316,9 +317,28 @@ private struct ImageBlockView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
                     }
                     .buttonStyle(.plain)
+                } else if failedToLoad {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.footnote.weight(.semibold))
+                            Text("Image unavailable")
+                                .font(.footnote.weight(.semibold))
+                        }
+                        .foregroundStyle(.secondary)
+
+                        Text(imageURL.lastPathComponent)
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                            .textSelection(.enabled)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading)
+                    .padding(CodeScreenMetrics.cardPadding)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
                 } else {
                     HStack(spacing: 8) {
                         ProgressView()
@@ -346,6 +366,7 @@ private struct ImageBlockView: View {
             displayWidth = width
         }
         .task(id: inlineLoadID) {
+            failedToLoad = false
             let bucket = displayWidth.map { ImageBlockCache.sizeBucket(forMaxPixelSize: $0 * UIScreen.main.scale * 2) }
             if let bucket, let cached = ImageBlockCache.shared.inlineImage(for: imageURL, sizeBucket: bucket) {
                 loadedImage = cached
@@ -355,7 +376,10 @@ private struct ImageBlockView: View {
             let data = await Task.detached(priority: .utility) {
                 try? Data(contentsOf: imageURL, options: [.mappedIfSafe])
             }.value
-            guard let data else { return }
+            guard let data else {
+                failedToLoad = true
+                return
+            }
 
             let image: UIImage?
             if let bucket {
@@ -366,7 +390,12 @@ private struct ImageBlockView: View {
                 image = UIImage(data: data)
             }
 
-            guard let image else { return }
+            guard let image,
+                  image.size.width > 1 || image.size.height > 1
+            else {
+                failedToLoad = true
+                return
+            }
             if let bucket {
                 ImageBlockCache.shared.setInlineImage(image, for: imageURL, sizeBucket: bucket)
             }
