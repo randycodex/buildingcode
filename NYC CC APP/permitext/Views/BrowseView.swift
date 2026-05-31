@@ -1157,12 +1157,19 @@ struct CodeScreenTitle: View {
     let collapseProgress: CGFloat
 
     var body: some View {
-        Text(title)
-            .font(.system(size: CodeScreenMetrics.screenTitleFontSize, weight: .bold, design: .default))
-            .foregroundStyle(.primary)
-            .padding(.bottom, 8)
-            .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
-            .opacity(1 - (collapseProgress * 0.22))
+        let titleBandHeight = CodeScreenMetrics.screenTitleLineHeight
+
+        VStack(alignment: .leading, spacing: 0) {
+            Text(title)
+                .font(CodeTypography.screenTitle)
+                .foregroundStyle(.primary)
+                .frame(height: titleBandHeight, alignment: .leading)
+                .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
+                .opacity(1 - (collapseProgress * 0.22))
+
+            Spacer()
+                .frame(height: 8)
+        }
     }
 }
 
