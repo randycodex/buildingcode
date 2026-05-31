@@ -10,6 +10,7 @@ struct BookmarksView: View {
     @State private var isExportActionSheetPresented = false
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
     @State private var projectPageIndex: Int = 0
+    @State private var scrollOffset: CGFloat = 0
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
     @State private var cachedAvailableTags: [String] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
@@ -51,6 +52,10 @@ struct BookmarksView: View {
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor())
+    }
+
+    private var collapseProgress: CGFloat {
+        min(max(-scrollOffset / 64, 0), 1)
     }
 
     private var exportButton: some View {
@@ -105,6 +110,12 @@ struct BookmarksView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
+                GeometryReader { proxy in
+                    Color.clear
+                        .preference(key: CodeScrollOffsetPreferenceKey.self, value: proxy.frame(in: .named("savedScroll")).minY)
+                }
+                .frame(height: 0)
+
                 VStack(alignment: .leading, spacing: 0) {
                     savedScreenHeader
 
@@ -114,12 +125,15 @@ struct BookmarksView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .topLeading)
                 .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, CodeScreenMetrics.topTitlePadding)
+                .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
                 .padding(.bottom, tabBarClearance)
             }
+            .overlay(alignment: .top) {
+                CodeTopContentFade(title: "Saved", progress: collapseProgress)
+            }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .confirmationDialog(
                 "Export saved sections",
                 isPresented: $isExportActionSheetPresented,
@@ -186,11 +200,13 @@ struct BookmarksView: View {
             }
             .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         }
+        .coordinateSpace(name: "savedScroll")
+        .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
 private var savedScreenHeader: some View {
     VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-        CodeScreenTitleRow(title: "Saved", collapseProgress: 0) {
+        CodeScreenTitleRow(title: "Saved", collapseProgress: collapseProgress) {
             HStack(spacing: 6) {
                 sortButton
                 exportButton
