@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193095\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193095\"><\/AnnotationDrawer><div>Reduced clearance protective assemblies, including structural and support elements, shall be constructed of noncombustible materials. Spacers utilized to maintain an airspace between the protective assembly and the protected material or assembly shall be noncombustible. Where a space between the protective assembly and protected combustible material or assembly is specified, the same space shall be provided around the edges of the protective assembly and the spacers shall be placed so as to allow air circulation by convection in such space. Protective assemblies shall not be placed less than 1 inch (25.4 mm) from the mechanical appliances, devices or equipment, regardless of the allowable reduced clearance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10302-html-1",
+      "kind" : "html",
+      "plainText" : "Reduced clearance protective assemblies, including structural and support elements, shall be constructed of noncombustible materials. Spacers utilized to maintain an airspace between the protective assembly and the protected material or assembly shall be noncombustible. Where a space between the protective assembly and protected combustible material or assembly is specified, the same space shall be provided around the edges of the protective assembly and the spacers shall be placed so as to allow air circulation by convection in such space. Protective assemblies shall not be placed less than 1 inch (25.4 mm) from the mechanical appliances, devices or equipment, regardless of the allowable reduced clearance."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 10302
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172435\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172435\"><\/AnnotationDrawer><div>The activation of ventilating equipment required by the alternatives in Sections 909.20.4 and 909.20.5 shall be by smoke detectors installed at each floor level at an approved location at the entrance to the smokeproof enclosure. When the closing device for the stairway and ramp shaft and vestibule doors is activated by smoke detection or power failure, the mechanical equipment shall activate and operate at the required performance levels. Smoke detectors shall be installed in accordance with Section 907.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1976-html-1",
+      "kind" : "html",
+      "plainText" : "The activation of ventilating equipment required by the alternatives in Sections 909.20.4 and 909.20.5 shall be by smoke detectors installed at each floor level at an approved location at the entrance to the smokeproof enclosure. When the closing device for the stairway and ramp shaft and vestibule doors is activated by smoke detection or power failure, the mechanical equipment shall activate and operate at the required performance levels. Smoke detectors shall be installed in accordance with Section 907.3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1976
+}

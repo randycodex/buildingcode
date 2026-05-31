@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195871\"><\/AnnotationDrawer><div>Systems containing 100 pounds (45.4 kg) or more of a refrigerant, other than systems utilizing nonpositive displacement compressors, shall have stop valves, in addition to those required by Section 1107.8, on each inlet of each liquid receiver. Stop valves shall not be required on the inlet of a receiver in a condensing unit, nor on the inlet of a receiver which is an integral part of the condenser.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24082-html-1",
+      "kind" : "html",
+      "plainText" : "Systems containing 100 pounds (45.4 kg) or more of a refrigerant, other than systems utilizing nonpositive displacement compressors, shall have stop valves, in addition to those required by Section 1107.8, on each inlet of each liquid receiver. Stop valves shall not be required on the inlet of a receiver in a condensing unit, nor on the inlet of a receiver which is an integral part of the condenser."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24082
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196684\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196684\"><\/AnnotationDrawer><div>Replacement of tanks in prior code buildings may utilize an existing gravity ventilation system complying with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196685\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196685\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The total net free area of supply and exhaust openings shall be equal to at least 1 percent of the floor area of the room, equally divided between the supply and exhaust; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196686\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196686\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Independent supply and exhaust openings to the outside; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196687\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196687\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Independent supply and exhaust ducts to the outside.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196688\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196688\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196688\"><\/AnnotationDrawer><h6><a name=\"JD_MC1306\" id=\"JD_MC1306\" title=\"MC 1306\"><\/a>Section MC 1306: Oil Gauging<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11585-html-1",
+      "kind" : "html",
+      "plainText" : "Replacement of tanks in prior code buildings may utilize an existing gravity ventilation system complying with the following:\n\n 1. The total net free area of supply and exhaust openings shall be equal to at least 1 percent of the floor area of the room, equally divided between the supply and exhaust; and\n\n 2. Independent supply and exhaust openings to the outside; or\n\n 3. Independent supply and exhaust ducts to the outside.\n\n Section MC 1306: Oil Gauging"
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11585
+}

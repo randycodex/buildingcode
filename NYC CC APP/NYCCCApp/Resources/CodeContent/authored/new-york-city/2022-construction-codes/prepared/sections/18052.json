@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179811\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179811\"><\/AnnotationDrawer><div>Where bracket assemblies or structural eccentric forces cause bending, the resulting moment design of the helical pile shall ensure stability in accordance with Section 1810.2.5 and general engineering practice. Where side-mount brackets are used and a stability analysis indicates that there is insufficient internal stability to resist overturning and translation, helical piles shall be installed staggered or other means shall be designed to provide stability and prevent rotation of the foundation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18052-html-1",
+      "kind" : "html",
+      "plainText" : "Where bracket assemblies or structural eccentric forces cause bending, the resulting moment design of the helical pile shall ensure stability in accordance with Section 1810.2.5 and general engineering practice. Where side-mount brackets are used and a stability analysis indicates that there is insufficient internal stability to resist overturning and translation, helical piles shall be installed staggered or other means shall be designed to provide stability and prevent rotation of the foundation."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18052
+}

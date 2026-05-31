@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193446\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193446\"><\/AnnotationDrawer><div>Valve-regulated lead-acid (VRLA) batteries installed in cabinets, as regulated by Section 608.6.2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code,<\/span> shall be provided with ventilation in accordance with Section 502.5.3 and either Section 502.5.1 or 502.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23246-html-1",
+      "kind" : "html",
+      "plainText" : "Valve-regulated lead-acid (VRLA) batteries installed in cabinets, as regulated by Section 608.6.2 of the New York City Fire Code, shall be provided with ventilation in accordance with Section 502.5.3 and either Section 502.5.1 or 502.5.2."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23246
+}

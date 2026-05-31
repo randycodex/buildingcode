@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186817\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186817\"><\/AnnotationDrawer><div>Any equipment brought onto the job that requires permits, as well as a description of the equipment, where it is to be located, permit number, issue and expiration date of the permit, and certificate of inspection, if required, shall be entered on a separate permit log that shall be maintained at the site by the site safety manager or coordinator and kept at the site.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6509-html-1",
+      "kind" : "html",
+      "plainText" : "Any equipment brought onto the job that requires permits, as well as a description of the equipment, where it is to be located, permit number, issue and expiration date of the permit, and certificate of inspection, if required, shall be entered on a separate permit log that shall be maintained at the site by the site safety manager or coordinator and kept at the site."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6509
+}

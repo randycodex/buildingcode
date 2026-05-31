@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173267\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173267\"><\/AnnotationDrawer><div>Areas of rescue assistance shall be provided with a two-way communication system complying with Sections 1009.8.1 and 1009.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2232-html-1",
+      "kind" : "html",
+      "plainText" : "Areas of rescue assistance shall be provided with a two-way communication system complying with Sections 1009.8.1 and 1009.8.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2232
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184510\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184510\"><\/AnnotationDrawer><div>Balconies, including railings and supporting brackets, no parts of which are less than 10 feet (3048 mm) above the ground or sidewalk level, may be constructed to project not more than 2 feet 6 inches (762 mm) beyond the street line. When permitted by the provisions of this code, fire escapes that are part of a required exit may be constructed to project not more than 4 feet 6 inches (1372 mm) beyond the street line provided no part, including any movable ladder or stair, is lower than 10 feet (3048 mm) above the ground or sidewalk level when not in use.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184511\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184511\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-204394', hash: '#JD_L.L.2012\/028' }}\">L.L. 2012\/028<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19569-html-1",
+      "kind" : "html",
+      "plainText" : "Balconies, including railings and supporting brackets, no parts of which are less than 10 feet (3048 mm) above the ground or sidewalk level, may be constructed to project not more than 2 feet 6 inches (762 mm) beyond the street line. When permitted by the provisions of this code, fire escapes that are part of a required exit may be constructed to project not more than 4 feet 6 inches (1372 mm) beyond the street line provided no part, including any movable ladder or stair, is lower than 10 feet (3048 mm) above the ground or sidewalk level when not in use.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012\/028 ."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19569
+}

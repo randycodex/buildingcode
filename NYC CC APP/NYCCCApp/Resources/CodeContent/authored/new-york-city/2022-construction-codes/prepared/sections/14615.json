@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168235\"><\/AnnotationDrawer><div>Coal pockets located less than 30 feet (9144 mm) from interior lot lines or from structures on the same lot shall be constructed of not less than Type IB construction. Where more than 30 feet (9144 mm) from interior lot lines, or where erected along a railroad right-of-way, the minimum type of construction of such structures not more than 65 feet (19 812 mm) in building height shall be Type IV.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14615-html-1",
+      "kind" : "html",
+      "plainText" : "Coal pockets located less than 30 feet (9144 mm) from interior lot lines or from structures on the same lot shall be constructed of not less than Type IB construction. Where more than 30 feet (9144 mm) from interior lot lines, or where erected along a railroad right-of-way, the minimum type of construction of such structures not more than 65 feet (19 812 mm) in building height shall be Type IV."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14615
+}

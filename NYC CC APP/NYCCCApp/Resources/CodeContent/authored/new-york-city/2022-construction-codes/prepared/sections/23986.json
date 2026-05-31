@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195597\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195597\"><\/AnnotationDrawer><div>Notification of refrigerant discharge shall be provided in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23986-html-1",
+      "kind" : "html",
+      "plainText" : "Notification of refrigerant discharge shall be provided in accordance with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 23986
+}

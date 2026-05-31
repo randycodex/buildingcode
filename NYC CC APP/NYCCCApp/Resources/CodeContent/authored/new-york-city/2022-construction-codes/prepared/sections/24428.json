@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196729\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196729\"><\/AnnotationDrawer><div>Solar energy equipment and appliances shall conform to the requirements of this chapter and shall be installed in accordance with the manufacturer's installation instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24428-html-1",
+      "kind" : "html",
+      "plainText" : "Solar energy equipment and appliances shall conform to the requirements of this chapter and shall be installed in accordance with the manufacturer's installation instructions."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 24428
+}

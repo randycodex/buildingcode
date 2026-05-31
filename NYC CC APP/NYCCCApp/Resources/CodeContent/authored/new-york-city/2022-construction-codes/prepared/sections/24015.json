@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195707\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195707\"><\/AnnotationDrawer><div>Machinery rooms shall be designed and constructed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24015-html-1",
+      "kind" : "html",
+      "plainText" : "Machinery rooms shall be designed and constructed in accordance with the New York City Building Code and this section."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24015
+}

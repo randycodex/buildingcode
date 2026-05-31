@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196138\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196138\"><\/AnnotationDrawer><div>Where required by Sections 1210.6.4 through 1210.6.6, the preparation and installation of mechanical and thermoplastic-welded joints shall comply with Sections 1210.6.3.1 and 1210.6.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24196-html-1",
+      "kind" : "html",
+      "plainText" : "Where required by Sections 1210.6.4 through 1210.6.6, the preparation and installation of mechanical and thermoplastic-welded joints shall comply with Sections 1210.6.3.1 and 1210.6.3.2."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24196
+}

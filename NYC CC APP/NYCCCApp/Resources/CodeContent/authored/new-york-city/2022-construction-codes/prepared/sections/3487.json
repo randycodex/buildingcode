@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177395\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177395\"><\/AnnotationDrawer><div>Where a structure is intended to have forklifts or other movable equipment present, the structure shall be designed for the total vehicle or equipment load and the individual wheel loads for the anticipated vehicles as specified by the owner of the facility. These loads shall be posted in accordance with Section 1607.7.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3487-html-1",
+      "kind" : "html",
+      "plainText" : "Where a structure is intended to have forklifts or other movable equipment present, the structure shall be designed for the total vehicle or equipment load and the individual wheel loads for the anticipated vehicles as specified by the owner of the facility. These loads shall be posted in accordance with Section 1607.7.5."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3487
+}

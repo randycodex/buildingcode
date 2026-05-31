@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163842\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163842\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Downspouts and leaders shall be connected to a roof washer and shall be equipped with a debris excluder or equivalent device to prevent the contamination of collected rainwater with leaves, sticks, pine needles and similar material. Debris excluders and equivalent devices shall be self-cleaning.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25578-html-1",
+      "kind" : "html",
+      "plainText" : "Downspouts and leaders shall be connected to a roof washer and shall be equipped with a debris excluder or equivalent device to prevent the contamination of collected rainwater with leaves, sticks, pine needles and similar material. Debris excluders and equivalent devices shall be self-cleaning."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 25578
+}

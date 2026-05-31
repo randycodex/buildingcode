@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197343\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197343\"><\/AnnotationDrawer><div>Refer to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156835', hash: '#JD_28-114' }}\">Article 114<\/Link> and Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156823', hash: '#JD_28-113.4' }}\">28-113.4<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7957-html-1",
+      "kind" : "html",
+      "plainText" : "Refer to Article 114 and Section 28-113.4 of the Administrative Code ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 7957
+}

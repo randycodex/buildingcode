@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171670\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171670\"><\/AnnotationDrawer><div>Risers and laterals of Class III standpipe systems shall be protected as required for Class I systems in accordance with Section 905.4.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1729-html-1",
+      "kind" : "html",
+      "plainText" : "Risers and laterals of Class III standpipe systems shall be protected as required for Class I systems in accordance with Section 905.4.1."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1729
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161597\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161597\"><\/AnnotationDrawer><div>Emergency showers and eyewash stations shall conform to ISEA Z358.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24723-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency showers and eyewash stations shall conform to ISEA Z358.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24723
+}

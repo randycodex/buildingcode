@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198083\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198083\"><\/AnnotationDrawer><div>Testing of piping systems shall be performed in a manner that protects the safety of employees and the public during the test. Bulkheads, anchorage, and bracing suitably designed to resist test pressures shall be installed if necessary. Prior to testing, the interior of the pipe shall be purged to flush out all foreign material, including weld splatter, dirt, rags, and other debris left inside the pipe during welding operations and piping installation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8215-html-1",
+      "kind" : "html",
+      "plainText" : "Testing of piping systems shall be performed in a manner that protects the safety of employees and the public during the test. Bulkheads, anchorage, and bracing suitably designed to resist test pressures shall be installed if necessary. Prior to testing, the interior of the pipe shall be purged to flush out all foreign material, including weld splatter, dirt, rags, and other debris left inside the pipe during welding operations and piping installation."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8215
+}

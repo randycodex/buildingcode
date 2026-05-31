@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161961\"><\/AnnotationDrawer><div>Connections to city water mains shall comply with the rules of the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12051-html-1",
+      "kind" : "html",
+      "plainText" : "Connections to city water mains shall comply with the rules of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12051
+}

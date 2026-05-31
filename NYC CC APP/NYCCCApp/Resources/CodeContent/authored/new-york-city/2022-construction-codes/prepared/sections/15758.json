@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172313\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172313\"><\/AnnotationDrawer><div>Passive smoke control systems actuated by spot-type detectors listed for releasing service shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15758-html-1",
+      "kind" : "html",
+      "plainText" : "Passive smoke control systems actuated by spot-type detectors listed for releasing service shall be permitted."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15758
+}

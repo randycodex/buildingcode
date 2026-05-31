@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176345\"><\/AnnotationDrawer><div>Exterior wall coverings shall be fireblocked in accordance with Section 718.2.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3162-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior wall coverings shall be fireblocked in accordance with Section 718.2.6."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3162
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163930\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163930\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The manual shall include a detailed system schematic, and locations and a list of all system components, including manufacturer and model number.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25620-html-1",
+      "kind" : "html",
+      "plainText" : "The manual shall include a detailed system schematic, and locations and a list of all system components, including manufacturer and model number."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 25620
+}

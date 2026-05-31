@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173353\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173353\"><\/AnnotationDrawer><div>The force for pushing or pulling open interior swinging egress doors, other than fire doors, shall not exceed 5-pounds (22.2 N). These forces do not apply to the force required to retract latch bolts or disengage other devices that hold the door in a closed position. For other swinging doors, as well as sliding and folding doors, the door latch shall release when subjected to a 15-pound (66.7 N) force. The door shall be set in motion when subjected to a 30-pound (133.4 N) force. The door shall swing to a full-open position when subjected to a 15-pound (66.7 N) force.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16080-html-1",
+      "kind" : "html",
+      "plainText" : "The force for pushing or pulling open interior swinging egress doors, other than fire doors, shall not exceed 5-pounds (22.2 N). These forces do not apply to the force required to retract latch bolts or disengage other devices that hold the door in a closed position. For other swinging doors, as well as sliding and folding doors, the door latch shall release when subjected to a 15-pound (66.7 N) force. The door shall be set in motion when subjected to a 30-pound (133.4 N) force. The door shall swing to a full-open position when subjected to a 15-pound (66.7 N) force."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16080
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163139\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163139\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The required dry-vent connection for wet-vented systems shall comply with Sections 912.2.1 and 912.2.2.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25335-html-1",
+      "kind" : "html",
+      "plainText" : "The required dry-vent connection for wet-vented systems shall comply with Sections 912.2.1 and 912.2.2."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25335
+}

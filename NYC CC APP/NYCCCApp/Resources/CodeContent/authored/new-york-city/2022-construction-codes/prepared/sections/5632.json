@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184223\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184223\"><\/AnnotationDrawer><div>A pool alarm must be capable of detecting entry into the water at any point on the surface of the swimming pool. If necessary to provide detection capability at every point on the surface of the swimming pool, more than one pool alarm shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5632-html-1",
+      "kind" : "html",
+      "plainText" : "A pool alarm must be capable of detecting entry into the water at any point on the surface of the swimming pool. If necessary to provide detection capability at every point on the surface of the swimming pool, more than one pool alarm shall be provided."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5632
+}

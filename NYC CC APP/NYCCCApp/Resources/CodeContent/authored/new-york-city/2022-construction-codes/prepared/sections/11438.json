@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196287\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196287\"><\/AnnotationDrawer><div>Piping materials shall conform to the ASTM standards cited in this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11438-html-1",
+      "kind" : "html",
+      "plainText" : "Piping materials shall conform to the ASTM standards cited in this section."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11438
+}

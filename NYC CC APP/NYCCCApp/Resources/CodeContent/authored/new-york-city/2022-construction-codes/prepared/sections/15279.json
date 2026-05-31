@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170699\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170699\"><\/AnnotationDrawer><div>Spray-applied fire-resistant materials shall be identified by density and thickness required for a given fire-resistance rating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15279-html-1",
+      "kind" : "html",
+      "plainText" : "Spray-applied fire-resistant materials shall be identified by density and thickness required for a given fire-resistance rating."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15279
+}

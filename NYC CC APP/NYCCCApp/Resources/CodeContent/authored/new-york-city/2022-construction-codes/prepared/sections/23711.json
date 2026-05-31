@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194837\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194837\"><\/AnnotationDrawer><div>Chimneys and vents shall be designed and constructed so as to provide the necessary draft and capacity for each appliance connected to completely exhaust the products of combustion to the outside air. The temperature on adjacent combustible surfaces shall not be raised above 160&#176;F (71.1&#176;C). Chimneys and vents shall be designed to resist the effects of condensation that would cause deterioration of the chimney or vent.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23711-html-1",
+      "kind" : "html",
+      "plainText" : "Chimneys and vents shall be designed and constructed so as to provide the necessary draft and capacity for each appliance connected to completely exhaust the products of combustion to the outside air. The temperature on adjacent combustible surfaces shall not be raised above 160°F (71.1°C). Chimneys and vents shall be designed to resist the effects of condensation that would cause deterioration of the chimney or vent."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23711
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163993\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163993\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Seepage bed excavations shall be not less than 5 feet (1524 mm) in width and have more than one distribution pipe. The absorption area of a seepage bed shall be computed by using the bottom of the trench area. Distribution piping in a seepage bed shall be uniformly spaced not greater than 5 feet (1524 mm) and not less than 3 feet (914 mm) apart, and greater than 3 feet (914 mm) and not less than 1 foot (305 mm) from the sidewall or headwall.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12816-html-1",
+      "kind" : "html",
+      "plainText" : "Seepage bed excavations shall be not less than 5 feet (1524 mm) in width and have more than one distribution pipe. The absorption area of a seepage bed shall be computed by using the bottom of the trench area. Distribution piping in a seepage bed shall be uniformly spaced not greater than 5 feet (1524 mm) and not less than 3 feet (914 mm) apart, and greater than 3 feet (914 mm) and not less than 1 foot (305 mm) from the sidewall or headwall."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 12816
+}

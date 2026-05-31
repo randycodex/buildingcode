@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198139\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198139\"><\/AnnotationDrawer><div>When alterations, extensions or repairs to existing gas meter piping or gas distribution piping requires the operation of a service head valve, regulator valve or meter valve that would interrupt the flow of gas to a building, the utility shall be notified by the owner or his or her authorized representative.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8236-html-1",
+      "kind" : "html",
+      "plainText" : "When alterations, extensions or repairs to existing gas meter piping or gas distribution piping requires the operation of a service head valve, regulator valve or meter valve that would interrupt the flow of gas to a building, the utility shall be notified by the owner or his or her authorized representative."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8236
+}

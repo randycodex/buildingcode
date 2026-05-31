@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171945\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171945\"><\/AnnotationDrawer><div>Where a compartment smoke control system is installed in an underground building as required by Section 405, automatic smoke detectors shall be provided in accordance with Section 907.2.18.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1806-html-1",
+      "kind" : "html",
+      "plainText" : "Where a compartment smoke control system is installed in an underground building as required by Section 405, automatic smoke detectors shall be provided in accordance with Section 907.2.18.1."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1806
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179454\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179454\"><\/AnnotationDrawer><div>Deep foundations that have heaved during the driving of adjacent deep foundations shall be redriven as necessary to develop the required capacity and penetration, or the capacity of the deep foundation shall be verified by load tests in accordance with Section 1810.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4094-html-1",
+      "kind" : "html",
+      "plainText" : "Deep foundations that have heaved during the driving of adjacent deep foundations shall be redriven as necessary to develop the required capacity and penetration, or the capacity of the deep foundation shall be verified by load tests in accordance with Section 1810.4."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4094
+}

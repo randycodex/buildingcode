@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198492\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198492\"><\/AnnotationDrawer><div>Noncombustible fireblocking shall be provided in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8365-html-1",
+      "kind" : "html",
+      "plainText" : "Noncombustible fireblocking shall be provided in accordance with the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8365
+}

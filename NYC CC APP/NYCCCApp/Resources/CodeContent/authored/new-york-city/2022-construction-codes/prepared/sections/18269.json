@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180436\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180436\"><\/AnnotationDrawer><div>The bending of reinforcement shall comply with Sections 1907.3.1 and 1907.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18269-html-1",
+      "kind" : "html",
+      "plainText" : "The bending of reinforcement shall comply with Sections 1907.3.1 and 1907.3.2."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18269
+}

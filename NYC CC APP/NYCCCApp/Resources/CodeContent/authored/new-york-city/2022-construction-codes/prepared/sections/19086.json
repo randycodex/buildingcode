@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183179\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183179\"><\/AnnotationDrawer><div>Where the wall is required to have a fire-resistance rating, data based on tests conducted in accordance with ASTM E 119 or UL 263 shall be provided to substantiate that the fire-resistance rating is maintained.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19086-html-1",
+      "kind" : "html",
+      "plainText" : "Where the wall is required to have a fire-resistance rating, data based on tests conducted in accordance with ASTM E 119 or UL 263 shall be provided to substantiate that the fire-resistance rating is maintained."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19086
+}

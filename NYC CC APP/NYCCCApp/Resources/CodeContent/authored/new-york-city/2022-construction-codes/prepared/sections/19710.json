@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184805\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184805\"><\/AnnotationDrawer><div>The pre-shift safety meeting shall include a review of activities and tasks to be performed during the shift, including specific safety concerns or risks associated with fulfilling such work. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184806\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184806\"><\/AnnotationDrawer><div>(L.L. 2017\/204, 11\/17\/2017, eff. 5\/16\/2018) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19710-html-1",
+      "kind" : "html",
+      "plainText" : "The pre-shift safety meeting shall include a review of activities and tasks to be performed during the shift, including specific safety concerns or risks associated with fulfilling such work. \n\n (L.L. 2017\/204, 11\/17\/2017, eff. 5\/16\/2018)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19710
+}

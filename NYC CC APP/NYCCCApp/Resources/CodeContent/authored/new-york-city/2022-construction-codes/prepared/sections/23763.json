@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194966\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194966\"><\/AnnotationDrawer><div>Connectors shall be located entirely within the room in which the connecting appliance is located, except as provided for in Section 803.10.4. Where passing through an unheated space, a connector shall not be constructed of single-wall pipe.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23763-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors shall be located entirely within the room in which the connecting appliance is located, except as provided for in Section 803.10.4. Where passing through an unheated space, a connector shall not be constructed of single-wall pipe."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23763
+}

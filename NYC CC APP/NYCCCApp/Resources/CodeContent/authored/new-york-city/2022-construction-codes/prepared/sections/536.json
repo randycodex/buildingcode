@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167484\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167484\"><\/AnnotationDrawer><div>Special amusement buildings shall be equipped with an automatic fire detection system in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-171717', hash: '#JD_BC907' }}\">907<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "536-html-1",
+      "kind" : "html",
+      "plainText" : "Special amusement buildings shall be equipped with an automatic fire detection system in accordance with Section 907 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 536
+}

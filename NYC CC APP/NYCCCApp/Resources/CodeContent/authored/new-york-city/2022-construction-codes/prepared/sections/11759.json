@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161220\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">All plumbing products and materials shall be listed by a third-party certification agency as complying with the referenced standards. Products and materials shall be identified in accordance with Section 303.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161221\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161221\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161221\"><\/AnnotationDrawer><h6><a name=\"JD_PC304\" id=\"JD_PC304\" title=\"PC 304\"><\/a>Section PC 304: Rodent Proofing<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11759-html-1",
+      "kind" : "html",
+      "plainText" : "All plumbing products and materials shall be listed by a third-party certification agency as complying with the referenced standards. Products and materials shall be identified in accordance with Section 303.1. \n\n Section PC 304: Rodent Proofing"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11759
+}

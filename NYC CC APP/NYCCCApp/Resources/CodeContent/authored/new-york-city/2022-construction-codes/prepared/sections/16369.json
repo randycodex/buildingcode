@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174490\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174490\"><\/AnnotationDrawer><div>The common path of egress travel shall not exceed 30 feet (9144 mm) from any seat to a point where an occupant has a choice of two paths of egress travel to two exits.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174491\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174492\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174492\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;For areas, such as box seats, galleries or balconies, serving less than 75 occupants, the common path of egress travel shall not exceed 75 feet (22 860 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174493\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174493\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;For smoke-protected assembly seating, the common path of egress travel shall not exceed 50 feet (15 240 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16369-html-1",
+      "kind" : "html",
+      "plainText" : "The common path of egress travel shall not exceed 30 feet (9144 mm) from any seat to a point where an occupant has a choice of two paths of egress travel to two exits.\n\n Exceptions: \n\n 1. For areas, such as box seats, galleries or balconies, serving less than 75 occupants, the common path of egress travel shall not exceed 75 feet (22 860 mm).\n\n 2. For smoke-protected assembly seating, the common path of egress travel shall not exceed 50 feet (15 240 mm)."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16369
+}

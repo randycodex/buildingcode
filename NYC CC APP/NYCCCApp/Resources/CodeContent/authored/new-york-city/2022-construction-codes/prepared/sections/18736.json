@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181791\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181791\"><\/AnnotationDrawer><div>Lumber decking is permitted to be laid up following one of five standard patterns as defined in Sections 2304.9.2.1 through 2304.9.2.5. Other patterns are permitted to be used provided they are substantiated through engineering analysis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18736-html-1",
+      "kind" : "html",
+      "plainText" : "Lumber decking is permitted to be laid up following one of five standard patterns as defined in Sections 2304.9.2.1 through 2304.9.2.5. Other patterns are permitted to be used provided they are substantiated through engineering analysis."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18736
+}

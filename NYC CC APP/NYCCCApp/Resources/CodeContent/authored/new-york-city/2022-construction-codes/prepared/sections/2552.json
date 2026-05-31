@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174530\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174530\"><\/AnnotationDrawer><div>Transitions between stairways and stepped aisles shall comply with either Section 1029.10.1 or 1029.10.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2552-html-1",
+      "kind" : "html",
+      "plainText" : "Transitions between stairways and stepped aisles shall comply with either Section 1029.10.1 or 1029.10.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2552
+}

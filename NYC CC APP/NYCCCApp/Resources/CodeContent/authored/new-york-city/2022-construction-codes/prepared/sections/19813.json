@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185277\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185277\"><\/AnnotationDrawer><div>The site safety orientation and refresher required by Section 3301.11 shall contain instruction on site specific fire hazards, fire safety safeguards, and fire safety procedures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19813-html-1",
+      "kind" : "html",
+      "plainText" : "The site safety orientation and refresher required by Section 3301.11 shall contain instruction on site specific fire hazards, fire safety safeguards, and fire safety procedures."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19813
+}

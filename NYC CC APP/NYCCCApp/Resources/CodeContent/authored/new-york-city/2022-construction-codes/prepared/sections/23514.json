@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194233\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194233\"><\/AnnotationDrawer><div>Plenum enclosure construction materials that are exposed to the airflow shall comply with the requirements of Section 703.5 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> or such materials shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 50 when tested in accordance with ASTM E 84 or UL 723. The temperature of air delivered to or through these plenums shall not exceed 250&#176;F (121.1&#176;C), except where used as part of an engineered smoke control system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194234\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194234\"><\/AnnotationDrawer><div>The use of gypsum boards to form plenums shall be limited to systems where the air temperatures do not exceed 125&#176;F (51.7&#176;C) and the building and mechanical system design conditions are such that the gypsum board surface temperature will be maintained above the airstream dew-point temperature. Air plenums formed by gypsum boards shall not be incorporated in air-handling systems utilizing evaporative coolers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23514-html-1",
+      "kind" : "html",
+      "plainText" : "Plenum enclosure construction materials that are exposed to the airflow shall comply with the requirements of Section 703.5 of the New York City Building Code or such materials shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 50 when tested in accordance with ASTM E 84 or UL 723. The temperature of air delivered to or through these plenums shall not exceed 250°F (121.1°C), except where used as part of an engineered smoke control system.\n\n The use of gypsum boards to form plenums shall be limited to systems where the air temperatures do not exceed 125°F (51.7°C) and the building and mechanical system design conditions are such that the gypsum board surface temperature will be maintained above the airstream dew-point temperature. Air plenums formed by gypsum boards shall not be incorporated in air-handling systems utilizing evaporative coolers."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23514
+}

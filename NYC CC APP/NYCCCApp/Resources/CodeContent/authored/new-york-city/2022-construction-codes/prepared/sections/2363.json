@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173799\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173799\"><\/AnnotationDrawer><div>In high-rise buildings subject to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166650', hash: '#JD_BC403' }}\">403<\/Link>, exit signs shall be placed within exits at horizontal extensions to indicate the transition from vertical to horizontal direction and at turns along the horizontal path.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2363-html-1",
+      "kind" : "html",
+      "plainText" : "In high-rise buildings subject to Section 403 , exit signs shall be placed within exits at horizontal extensions to indicate the transition from vertical to horizontal direction and at turns along the horizontal path."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2363
+}

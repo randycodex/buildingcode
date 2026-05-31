@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175871\"><\/AnnotationDrawer><div>The top of at least one window or other opening providing required natural lighting to a habitable room shall be a minimum of 7 feet (2133.6 mm) above the floor of the room or space served by the window or opening.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175872\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175872\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Mezzanines. Where the required natural lighting for a habitable mezzanine level is provided by a window(s) on the lower level in accordance with Section 1205.2.2, Exception 4, and where compliance with Section 1205.2.7.2 is not feasible on the mezzanine floor, Section 1205.2.7.2 shall not apply to such mezzanine floor provided that such window(s) is on the opposite wall from the mezzanine, and the top of such window is at least 12 inches (304.8 mm) above the floor of the mezzanine.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16823-html-1",
+      "kind" : "html",
+      "plainText" : "The top of at least one window or other opening providing required natural lighting to a habitable room shall be a minimum of 7 feet (2133.6 mm) above the floor of the room or space served by the window or opening.\n\n Exception: Mezzanines. Where the required natural lighting for a habitable mezzanine level is provided by a window(s) on the lower level in accordance with Section 1205.2.2, Exception 4, and where compliance with Section 1205.2.7.2 is not feasible on the mezzanine floor, Section 1205.2.7.2 shall not apply to such mezzanine floor provided that such window(s) is on the opposite wall from the mezzanine, and the top of such window is at least 12 inches (304.8 mm) above the floor of the mezzanine."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16823
+}

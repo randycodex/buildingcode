@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198566\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198566\"><\/AnnotationDrawer><div>Special gas vent shall be listed and installed in accordance with the terms of the special gas vent listing and the manufacturers' instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21220-html-1",
+      "kind" : "html",
+      "plainText" : "Special gas vent shall be listed and installed in accordance with the terms of the special gas vent listing and the manufacturers' instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21220
+}

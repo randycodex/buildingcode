@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171532\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171532\"><\/AnnotationDrawer><div>Connections to protected premises and supervising station fire alarm systems shall be tested to verify proper identification and retransmission of alarms from automatic fire-extinguishing systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15508-html-1",
+      "kind" : "html",
+      "plainText" : "Connections to protected premises and supervising station fire alarm systems shall be tested to verify proper identification and retransmission of alarms from automatic fire-extinguishing systems."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15508
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181052\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181052\"><\/AnnotationDrawer><div>The exterior air intake shall be capable of providing all combustion air from the exterior of the dwelling. The exterior air intake shall not be located within the garage, attic, basement or crawl space of the dwelling nor shall the air intake be located at an elevation higher than the firebox. The exterior air intake shall be covered with a corrosion-resistant screen of 1\/4-inch (6.4 mm) mesh.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18495-html-1",
+      "kind" : "html",
+      "plainText" : "The exterior air intake shall be capable of providing all combustion air from the exterior of the dwelling. The exterior air intake shall not be located within the garage, attic, basement or crawl space of the dwelling nor shall the air intake be located at an elevation higher than the firebox. The exterior air intake shall be covered with a corrosion-resistant screen of 1\/4-inch (6.4 mm) mesh."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18495
+}

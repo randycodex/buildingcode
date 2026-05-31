@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163054\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163054\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Stack vents and vent stacks connected into a common vent header at the top of the stacks and extending to the open air above the roof at one point shall be sized in accordance with the requirements of Section 906.1, but shall not be smaller than the smallest stack vent. The number of fixture units shall be the sum of all fixture units on all stacks connected thereto, and the developed length shall be the longest vent length from the intersection at the base of the most distant stack to the vent terminal in the open air, as a direct extension of one stack.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12480-html-1",
+      "kind" : "html",
+      "plainText" : "Stack vents and vent stacks connected into a common vent header at the top of the stacks and extending to the open air above the roof at one point shall be sized in accordance with the requirements of Section 906.1, but shall not be smaller than the smallest stack vent. The number of fixture units shall be the sum of all fixture units on all stacks connected thereto, and the developed length shall be the longest vent length from the intersection at the base of the most distant stack to the vent terminal in the open air, as a direct extension of one stack."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12480
+}

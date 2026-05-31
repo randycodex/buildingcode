@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185897\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185897\"><\/AnnotationDrawer><div>Where mechanical demolition equipment, other than handheld devices, is to be used for the full or partial demolition of a building, the safety zone shall be equal to or greater than half the height of the building to be demolished; such safety zone may be reduced by the same ratio as the building is being demolished.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6225-html-1",
+      "kind" : "html",
+      "plainText" : "Where mechanical demolition equipment, other than handheld devices, is to be used for the full or partial demolition of a building, the safety zone shall be equal to or greater than half the height of the building to be demolished; such safety zone may be reduced by the same ratio as the building is being demolished."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6225
+}

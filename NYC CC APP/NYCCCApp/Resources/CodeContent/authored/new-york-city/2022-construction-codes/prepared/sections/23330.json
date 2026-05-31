@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193659\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193659\"><\/AnnotationDrawer><div>The mechanical ventilation system shall operate continuously.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193660\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193660\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193661\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193661\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Mechanical ventilation systems that are interlocked with a gas detection system designed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193662\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193662\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Mechanical ventilation systems in garages that are used only for the repair of vehicles fueled by liquid fuels or odorized gases, such as CNG, where the ventilation system is electrically interlocked with the lighting circuit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23330-html-1",
+      "kind" : "html",
+      "plainText" : "The mechanical ventilation system shall operate continuously.\n\n Exceptions: \n\n 1. Mechanical ventilation systems that are interlocked with a gas detection system designed in accordance with the New York City Building Code. \n\n 2. Mechanical ventilation systems in garages that are used only for the repair of vehicles fueled by liquid fuels or odorized gases, such as CNG, where the ventilation system is electrically interlocked with the lighting circuit."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23330
+}

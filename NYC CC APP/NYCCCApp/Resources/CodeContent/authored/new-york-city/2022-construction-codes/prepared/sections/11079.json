@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195355\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195355\"><\/AnnotationDrawer><div>Outdoor air intake openings shall be protected in accordance with Section 401.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195356\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195356\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195356\"><\/AnnotationDrawer><h6><a name=\"JD_MC919\" id=\"JD_MC919\" title=\"MC 919\"><\/a>Section MC 919: Conversion Burners<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11079-html-1",
+      "kind" : "html",
+      "plainText" : "Outdoor air intake openings shall be protected in accordance with Section 401.5.\n\n Section MC 919: Conversion Burners"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11079
+}

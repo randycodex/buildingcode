@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186005\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186005\"><\/AnnotationDrawer><div>Prior to the commencement of demolition operations, all asbestos shall be removed from the area authorized to be demolished by the department work permit, and certification to that effect shall be filed with the department and the Department of Environmental Protection. Such asbestos removal shall be in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156464', hash: '#JD_28-106' }}\">28-106<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> and rules promulgated by the commissioner of the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6261-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the commencement of demolition operations, all asbestos shall be removed from the area authorized to be demolished by the department work permit, and certification to that effect shall be filed with the department and the Department of Environmental Protection. Such asbestos removal shall be in accordance with Section 28-106 of the Administrative Code and rules promulgated by the commissioner of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6261
+}

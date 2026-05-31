@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179567\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179567\"><\/AnnotationDrawer><div>Built-up sections of steel piles fabricated from welded plates shall comply with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179568\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179568\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The flange projections shall not exceed 14 times the minimum thickness of metal in either the flange or the web and the flange widths shall not be less than 80 percent of the depth of the section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179569\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179569\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The nominal depth in the direction of the web shall not be less than 8 inches (203.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179570\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179570\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Flanges and web shall have a minimum nominal thickness of 3\/8 inch (9.5 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4128-html-1",
+      "kind" : "html",
+      "plainText" : "Built-up sections of steel piles fabricated from welded plates shall comply with the following:\n\n 1. The flange projections shall not exceed 14 times the minimum thickness of metal in either the flange or the web and the flange widths shall not be less than 80 percent of the depth of the section.\n\n 2. The nominal depth in the direction of the web shall not be less than 8 inches (203.2 mm).\n\n 3. Flanges and web shall have a minimum nominal thickness of 3\/8 inch (9.5 mm)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4128
+}

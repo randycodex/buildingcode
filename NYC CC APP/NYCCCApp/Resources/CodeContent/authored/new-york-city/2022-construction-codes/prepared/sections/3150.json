@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176303\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176303\"><\/AnnotationDrawer><div>Fiber-cement siding complying with Section 1404.10 shall be permitted on exterior walls of Type I, II, III, IV and V construction for wind pressure resistance or wind speed exposures as indicated by the manufacturer's listing and label and the installation instructions. Where specified, the siding shall be installed over sheathing or materials listed in Section 2304.6 and shall be installed to conform to the water-resistive barrier requirements in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176081', hash: '#JD_BC1403' }}\">1403<\/Link>. Siding and accessories shall be installed in accordance with the manufacturer's instructions. Unless otherwise specified in the the manufacturer's instructions, nails used to fasten the siding to wood studs shall be corrosion-resistant round head smooth shank and shall be long enough to penetrate the studs at least 1 inch (25.4 mm). For cold-formed steel light-frame construction, corrosion-resistant fasteners shall be used. Screw fasteners shall penetrate the cold-formed steel framing at least three exposed full threads. Other fasteners shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3150-html-1",
+      "kind" : "html",
+      "plainText" : "Fiber-cement siding complying with Section 1404.10 shall be permitted on exterior walls of Type I, II, III, IV and V construction for wind pressure resistance or wind speed exposures as indicated by the manufacturer's listing and label and the installation instructions. Where specified, the siding shall be installed over sheathing or materials listed in Section 2304.6 and shall be installed to conform to the water-resistive barrier requirements in Section 1403 . Siding and accessories shall be installed in accordance with the manufacturer's instructions. Unless otherwise specified in the the manufacturer's instructions, nails used to fasten the siding to wood studs shall be corrosion-resistant round head smooth shank and shall be long enough to penetrate the studs at least 1 inch (25.4 mm). For cold-formed steel light-frame construction, corrosion-resistant fasteners shall be used. Screw fasteners shall penetrate the cold-formed steel framing at least three exposed full threads. Other fasteners shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3150
+}

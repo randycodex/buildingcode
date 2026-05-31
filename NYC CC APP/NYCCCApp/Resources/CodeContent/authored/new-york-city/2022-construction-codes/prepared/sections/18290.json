@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180480\"><\/AnnotationDrawer><div>In corrosive environments or other severe exposure conditions, prestressed and nonprestressed reinforcement shall be provided with additional protection in accordance with ACI 318, Section 20.6.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18290-html-1",
+      "kind" : "html",
+      "plainText" : "In corrosive environments or other severe exposure conditions, prestressed and nonprestressed reinforcement shall be provided with additional protection in accordance with ACI 318, Section 20.6.1.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18290
+}

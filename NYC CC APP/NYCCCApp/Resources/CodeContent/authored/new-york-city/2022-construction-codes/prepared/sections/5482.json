@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183821\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183821\"><\/AnnotationDrawer><div>The supply fan shall either be adjustable with a capacity of at least 1,000 cfm (0.4719 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s) per door, or that specified by a registered design professional to meet the requirements of a designed pressurization system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5482-html-1",
+      "kind" : "html",
+      "plainText" : "The supply fan shall either be adjustable with a capacity of at least 1,000 cfm (0.4719 m\n\n 3 \n\n \/s) per door, or that specified by a registered design professional to meet the requirements of a designed pressurization system."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5482
+}

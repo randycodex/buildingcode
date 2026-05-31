@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187562\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187562\"><\/AnnotationDrawer><div>No operator of hoisting equipment shall start a pick when:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187563\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187563\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The wind speed exceeds 30 mph (3-second gust), the threshold specified by the manufacturer of the hoisting equipment, or the threshold indicated on plans, whichever is lower; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187564\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187564\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;As otherwise warranted by weather conditions or weather forecasts.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20576-html-1",
+      "kind" : "html",
+      "plainText" : "No operator of hoisting equipment shall start a pick when:\n\n 1. The wind speed exceeds 30 mph (3-second gust), the threshold specified by the manufacturer of the hoisting equipment, or the threshold indicated on plans, whichever is lower; or\n\n 2. As otherwise warranted by weather conditions or weather forecasts."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20576
+}

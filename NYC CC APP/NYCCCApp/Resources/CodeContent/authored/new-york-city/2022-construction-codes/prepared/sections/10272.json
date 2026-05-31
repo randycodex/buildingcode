@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192992\"><\/AnnotationDrawer><div>Equipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-192993\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-192993\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-192993\"><\/AnnotationDrawer><h6><a name=\"JD_MC305\" id=\"JD_MC305\" title=\"MC 305\"><\/a>Section MC 305: Piping Support<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10272-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment and appliances installed on rooftops of buildings shall be installed in accordance with the requirements of the New York City Fire Code regarding rooftop access and obstructions, and shall not obstruct or interfere with firefighting operations or the operation of any doors, windows, fire escapes, or other means of egress or other building components requiring operation or access.\n\n Section MC 305: Piping Support"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 10272
+}

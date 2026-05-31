@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180288\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180288\"><\/AnnotationDrawer><div>On a given project, if the total volume of concrete is such that the frequency of testing required by Section 1905.6.2.1 would provide less than five strength tests for a given class of concrete, tests shall be made from at least five randomly selected batches or from each batch if fewer than five batches are used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4380-html-1",
+      "kind" : "html",
+      "plainText" : "On a given project, if the total volume of concrete is such that the frequency of testing required by Section 1905.6.2.1 would provide less than five strength tests for a given class of concrete, tests shall be made from at least five randomly selected batches or from each batch if fewer than five batches are used."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4380
+}

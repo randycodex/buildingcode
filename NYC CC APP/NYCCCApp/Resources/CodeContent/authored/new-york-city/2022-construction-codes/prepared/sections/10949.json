@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194997\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194997\"><\/AnnotationDrawer><div>The connector shall extend to the inner face of the chimney or vent liner, but not beyond. A connector entering a masonry chimney shall be cemented to masonry in an approved manner. Where thimbles are installed to facilitate removal of the connector from the masonry chimney, the thimble shall be permanently cemented in place with high-temperature cement.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10949-html-1",
+      "kind" : "html",
+      "plainText" : "The connector shall extend to the inner face of the chimney or vent liner, but not beyond. A connector entering a masonry chimney shall be cemented to masonry in an approved manner. Where thimbles are installed to facilitate removal of the connector from the masonry chimney, the thimble shall be permanently cemented in place with high-temperature cement."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10949
+}

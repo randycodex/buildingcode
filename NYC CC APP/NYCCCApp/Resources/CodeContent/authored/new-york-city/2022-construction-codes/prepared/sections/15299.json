@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170809\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170809\"><\/AnnotationDrawer><div>The fire-resistance rating of a wood frame assembly is equal to the sum of the time assigned to the membrane on the fire-exposed side, the time assigned to the framing members and the time assigned for additional contribution by other protective measures such as insulation. The membrane on the unexposed side shall not be included in determining the fire resistance of the assembly.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15299-html-1",
+      "kind" : "html",
+      "plainText" : "The fire-resistance rating of a wood frame assembly is equal to the sum of the time assigned to the membrane on the fire-exposed side, the time assigned to the framing members and the time assigned for additional contribution by other protective measures such as insulation. The membrane on the unexposed side shall not be included in determining the fire resistance of the assembly."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15299
+}

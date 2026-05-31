@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199265\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199265\"><\/AnnotationDrawer><div>A ventilation opening into the sauna room shall be provided. The opening shall be not less than 4 inches by 8 inches (101.6 mm by 203.2 mm) located near the top of the door into the sauna room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21455-html-1",
+      "kind" : "html",
+      "plainText" : "A ventilation opening into the sauna room shall be provided. The opening shall be not less than 4 inches by 8 inches (101.6 mm by 203.2 mm) located near the top of the door into the sauna room."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21455
+}

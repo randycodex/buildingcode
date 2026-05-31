@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177397\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177397\"><\/AnnotationDrawer><div>Impact loads and fatigue loading shall be considered in the design of the supporting structure. For the purposes of design, the vehicle and wheel loads shall be increased by 30 percent to account for impact.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17316-html-1",
+      "kind" : "html",
+      "plainText" : "Impact loads and fatigue loading shall be considered in the design of the supporting structure. For the purposes of design, the vehicle and wheel loads shall be increased by 30 percent to account for impact."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17316
+}

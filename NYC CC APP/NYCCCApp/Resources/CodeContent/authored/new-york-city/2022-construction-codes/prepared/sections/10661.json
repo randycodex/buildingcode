@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194137\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194137\"><\/AnnotationDrawer><div>An exhaust system shall discharge to the outside of the building either directly by flue or indirectly through the bin or vault into which the system discharges except where the contaminants have been removed. Exhaust system discharge shall be permitted to be recirculated provided that the solid particulate has been removed at a minimum efficiency of 99.9 percent at 10 microns (10.01 mm), vapor concentrations are less than 25 percent of the LFL, and approved equipment is used to monitor the vapor concentration.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10661-html-1",
+      "kind" : "html",
+      "plainText" : "An exhaust system shall discharge to the outside of the building either directly by flue or indirectly through the bin or vault into which the system discharges except where the contaminants have been removed. Exhaust system discharge shall be permitted to be recirculated provided that the solid particulate has been removed at a minimum efficiency of 99.9 percent at 10 microns (10.01 mm), vapor concentrations are less than 25 percent of the LFL, and approved equipment is used to monitor the vapor concentration."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10661
+}

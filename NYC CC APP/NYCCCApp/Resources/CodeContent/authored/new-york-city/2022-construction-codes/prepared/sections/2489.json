@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174288\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174288\"><\/AnnotationDrawer><div>A registered design professional shall review the manufacturer product literature and information from the testing agency and verify that the products installed are labeled as meeting the standards in Section 1025.4. The registered design professional shall verify which particular products were installed in which parts of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2489-html-1",
+      "kind" : "html",
+      "plainText" : "A registered design professional shall review the manufacturer product literature and information from the testing agency and verify that the products installed are labeled as meeting the standards in Section 1025.4. The registered design professional shall verify which particular products were installed in which parts of the building."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2489
+}

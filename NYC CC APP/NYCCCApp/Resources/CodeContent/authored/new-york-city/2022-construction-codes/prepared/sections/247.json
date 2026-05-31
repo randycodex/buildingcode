@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166638\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166638\"><\/AnnotationDrawer><div>Where more than one exit is required, they shall be so arranged that it is possible to travel in either direction from any point in a mall of a covered mall building to separate exits or from any point in an open mall of an open mall building to two separate locations on the perimeter line, provided neither location is an exterior wall of an anchor building or parking garage. The width of an exit passageway or corridor from a mall shall be not less than 66 inches (1676 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166639\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Access to exits is permitted by way of a dead-end mall that does not exceed a length equal to twice the width of the mall measured at the narrowest location within the dead-end portion of the mall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "247-html-1",
+      "kind" : "html",
+      "plainText" : "Where more than one exit is required, they shall be so arranged that it is possible to travel in either direction from any point in a mall of a covered mall building to separate exits or from any point in an open mall of an open mall building to two separate locations on the perimeter line, provided neither location is an exterior wall of an anchor building or parking garage. The width of an exit passageway or corridor from a mall shall be not less than 66 inches (1676 mm).\n\n Exception: Access to exits is permitted by way of a dead-end mall that does not exceed a length equal to twice the width of the mall measured at the narrowest location within the dead-end portion of the mall."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 247
+}

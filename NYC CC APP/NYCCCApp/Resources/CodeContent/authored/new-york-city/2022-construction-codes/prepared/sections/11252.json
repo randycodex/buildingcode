@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195855\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195855\"><\/AnnotationDrawer><div>Type 3003-0 aluminum tubing with high-pressure fittings shall not be used with methyl chloride and other refrigerants known to deteriorate aluminum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11252-html-1",
+      "kind" : "html",
+      "plainText" : "Type 3003-0 aluminum tubing with high-pressure fittings shall not be used with methyl chloride and other refrigerants known to deteriorate aluminum."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11252
+}

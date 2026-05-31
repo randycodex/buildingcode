@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180730\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180730\"><\/AnnotationDrawer><div>Masonry shall comply with the provisions of TMS 402, TMS 403 or TMS 404, as well as the applicable requirements of this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18394-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry shall comply with the provisions of TMS 402, TMS 403 or TMS 404, as well as the applicable requirements of this chapter."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18394
+}

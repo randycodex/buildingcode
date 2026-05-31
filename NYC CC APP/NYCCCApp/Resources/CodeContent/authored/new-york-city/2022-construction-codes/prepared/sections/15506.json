@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171528\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171528\"><\/AnnotationDrawer><div>Notification appliances, connections to fire alarm systems and connections to central supervising stations shall be tested in accordance with this section and Section 907 to verify proper operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15506-html-1",
+      "kind" : "html",
+      "plainText" : "Notification appliances, connections to fire alarm systems and connections to central supervising stations shall be tested in accordance with this section and Section 907 to verify proper operation."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15506
+}

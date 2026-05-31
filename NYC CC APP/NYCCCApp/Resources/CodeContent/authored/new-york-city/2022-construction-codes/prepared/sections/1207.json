@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169661\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169661\"><\/AnnotationDrawer><div>Penetrations of a fire-resistance-rated floor, floor\/ceiling assembly or the ceiling membrane of a roof\/ceiling assembly not required to be enclosed in a shaft by Section 711.1 shall be protected in accordance with Sections 714.4.1 through 714.4.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1207-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations of a fire-resistance-rated floor, floor\/ceiling assembly or the ceiling membrane of a roof\/ceiling assembly not required to be enclosed in a shaft by Section 711.1 shall be protected in accordance with Sections 714.4.1 through 714.4.2.2."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1207
+}

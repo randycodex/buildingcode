@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196599\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196599\"><\/AnnotationDrawer><div>All fuel-oil storage tanks shall be built of steel plates or sheets, made by the open hearth or basic oxygen process. Such steel shall be free from physical imperfections, and shall be new, in good condition, and free from rust.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11551-html-1",
+      "kind" : "html",
+      "plainText" : "All fuel-oil storage tanks shall be built of steel plates or sheets, made by the open hearth or basic oxygen process. Such steel shall be free from physical imperfections, and shall be new, in good condition, and free from rust."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11551
+}

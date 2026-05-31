@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166684\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166684\"><\/AnnotationDrawer><div>Any other wall assembly that provides impact resistance equivalent to that required by Sections 403.2.3.1 and 403.2.3.2 for Hard Body Impact Classification Level 3, as measured by the test method described in ASTM C 1629 \/ C 1629M, shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "262-html-1",
+      "kind" : "html",
+      "plainText" : "Any other wall assembly that provides impact resistance equivalent to that required by Sections 403.2.3.1 and 403.2.3.2 for Hard Body Impact Classification Level 3, as measured by the test method described in ASTM C 1629 \/ C 1629M, shall be permitted."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 262
+}

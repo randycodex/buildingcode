@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171939\"><\/AnnotationDrawer><div>An automatic fire detection system shall be installed throughout high-piled combustible storage areas where required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1803-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic fire detection system shall be installed throughout high-piled combustible storage areas where required by the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1803
+}

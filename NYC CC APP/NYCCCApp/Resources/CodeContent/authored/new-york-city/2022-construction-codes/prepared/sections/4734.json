@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181254\"><\/AnnotationDrawer><div>Round chimney flues shall have a minimum net cross-sectional area of not less than 1\/12 of the fireplace opening. Square chimney flues shall have a minimum net cross-sectional area of not less than 1\/10 of the fireplace opening. Rectangular chimney flues with an aspect ratio less than 2 to 1 shall have a minimum net cross-sectional area of not less than 1\/10 of the fireplace opening. Rectangular chimney flues with an aspect ratio of 2 to 1 or more shall have a minimum net cross-sectional area of not less than 1\/8 of the fireplace opening.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4734-html-1",
+      "kind" : "html",
+      "plainText" : "Round chimney flues shall have a minimum net cross-sectional area of not less than 1\/12 of the fireplace opening. Square chimney flues shall have a minimum net cross-sectional area of not less than 1\/10 of the fireplace opening. Rectangular chimney flues with an aspect ratio less than 2 to 1 shall have a minimum net cross-sectional area of not less than 1\/10 of the fireplace opening. Rectangular chimney flues with an aspect ratio of 2 to 1 or more shall have a minimum net cross-sectional area of not less than 1\/8 of the fireplace opening."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4734
+}

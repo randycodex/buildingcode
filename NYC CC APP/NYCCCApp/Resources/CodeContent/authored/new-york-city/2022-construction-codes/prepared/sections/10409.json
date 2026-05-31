@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193416\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193416\"><\/AnnotationDrawer><div>The following shall be independent of other exhaust systems:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193417\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193417\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Single or combined mechanical exhaust systems from bath, toilet, urinal, locker, service sink closets and similar rooms shall be independent of all other exhaust systems, except as permitted in Section 501.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193418\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193418\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;A separate grease duct system shall be provided for each Type I hood except as provided in Section 506.3.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193419\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193419\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Hazardous exhaust systems shall be independent of other types of exhaust systems as provided in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-194040', hash: '#JD_MC510' }}\">510<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193420\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193420\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193420\"><\/AnnotationDrawer><h6><a name=\"JD_MC502\" id=\"JD_MC502\" title=\"MC 502\"><\/a>Section MC 502: Required Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10409-html-1",
+      "kind" : "html",
+      "plainText" : "The following shall be independent of other exhaust systems:\n\n 1. Single or combined mechanical exhaust systems from bath, toilet, urinal, locker, service sink closets and similar rooms shall be independent of all other exhaust systems, except as permitted in Section 501.3.1.\n\n 2. A separate grease duct system shall be provided for each Type I hood except as provided in Section 506.3.5.\n\n 3. Hazardous exhaust systems shall be independent of other types of exhaust systems as provided in Section 510 .\n\n Section MC 502: Required Systems"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10409
+}

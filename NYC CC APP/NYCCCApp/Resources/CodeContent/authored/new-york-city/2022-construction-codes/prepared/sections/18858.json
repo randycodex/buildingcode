@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182271\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182271\"><\/AnnotationDrawer><div>Headers shall be provided over each opening in interior bearing partitions as required in Section 2308.5.5.1. The spans in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182169', hash: '#JD_BCTable2308.4.1.1(2)' }}\">Table 2308.4.1.1(2)<\/Link> are permitted to be used. Wall studs shall support the ends of the header in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182169', hash: '#JD_BCTable2308.4.1.1(1)' }}\">Table 2308.4.1.1(1)<\/Link> or <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182169', hash: '#JD_BCTable2308.4.1.1(2)' }}\">2308.4.1.1(2)<\/Link>, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18858-html-1",
+      "kind" : "html",
+      "plainText" : "Headers shall be provided over each opening in interior bearing partitions as required in Section 2308.5.5.1. The spans in Table 2308.4.1.1(2) are permitted to be used. Wall studs shall support the ends of the header in accordance with Table 2308.4.1.1(1) or 2308.4.1.1(2) , as applicable."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18858
+}

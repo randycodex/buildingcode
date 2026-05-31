@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171617\"><\/AnnotationDrawer><div>Class I automatic wet standpipes shall be provided in nonsprinklered Group A buildings having an occupant load exceeding 1,000 persons.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171618\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171619\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171619\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Open-air-seating spaces without enclosed spaces.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171620\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171620\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Class I automatic dry and semiautomatic dry standpipes or manual wet standpipes are allowed in buildings where the highest floor surface used for human occupancy is not more than 75 feet (22 860 mm) above the lowest level of Fire Department vehicle access. Dry standpipes are permitted only where subject to freezing temperatures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15540-html-1",
+      "kind" : "html",
+      "plainText" : "Class I automatic wet standpipes shall be provided in nonsprinklered Group A buildings having an occupant load exceeding 1,000 persons.\n\n Exceptions: \n\n 1. Open-air-seating spaces without enclosed spaces.\n\n 2. Class I automatic dry and semiautomatic dry standpipes or manual wet standpipes are allowed in buildings where the highest floor surface used for human occupancy is not more than 75 feet (22 860 mm) above the lowest level of Fire Department vehicle access. Dry standpipes are permitted only where subject to freezing temperatures."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15540
+}

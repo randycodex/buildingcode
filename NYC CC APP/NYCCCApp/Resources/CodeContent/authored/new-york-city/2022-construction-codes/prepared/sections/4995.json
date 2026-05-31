@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182143\"><\/AnnotationDrawer><div>Maximum floor-to-floor height shall not exceed 11 feet, 7 inches (3531 mm). Exterior bearing wall and interior braced wall heights shall not exceed a stud height of 10 feet (3048 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4995-html-1",
+      "kind" : "html",
+      "plainText" : "Maximum floor-to-floor height shall not exceed 11 feet, 7 inches (3531 mm). Exterior bearing wall and interior braced wall heights shall not exceed a stud height of 10 feet (3048 mm)."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4995
+}

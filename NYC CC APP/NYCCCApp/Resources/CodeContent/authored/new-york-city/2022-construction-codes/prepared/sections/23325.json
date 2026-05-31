@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193642\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193642\"><\/AnnotationDrawer><div>Mechanical exhaust systems for public garages, as required in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193177', hash: '#JD_MCCh.4' }}\">Chapter 4<\/Link>, shall operate continuously or in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193335', hash: '#JD_MC404' }}\">404<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23325-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical exhaust systems for public garages, as required in Chapter 4 , shall operate continuously or in accordance with Section 404 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23325
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162766\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162766\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Vertical stack offsets shall be sized as required for straight stacks in accordance with <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162751', hash: '#JD_PCTable710.1(2)' }}\">Table 710.1(2)<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">, except where required to be sized as a building drain in accordance with Section 711.1.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12357-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical stack offsets shall be sized as required for straight stacks in accordance with Table 710.1(2) , except where required to be sized as a building drain in accordance with Section 711.1.1."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12357
+}

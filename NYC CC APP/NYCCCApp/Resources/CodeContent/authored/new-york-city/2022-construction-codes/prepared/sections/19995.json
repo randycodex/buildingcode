@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185752\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185752\"><\/AnnotationDrawer><div>Adjusting devices shall not be used if heavily rusted, bent, dented, rewelded or having broken weldments or other defects.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19995-html-1",
+      "kind" : "html",
+      "plainText" : "Adjusting devices shall not be used if heavily rusted, bent, dented, rewelded or having broken weldments or other defects."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19995
+}

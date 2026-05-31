@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167871\"><\/AnnotationDrawer><div>Tank openings other than vents from tanks inside buildings shall be designed to ensure that liquids or vapor concentrations are not released inside the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14481-html-1",
+      "kind" : "html",
+      "plainText" : "Tank openings other than vents from tanks inside buildings shall be designed to ensure that liquids or vapor concentrations are not released inside the building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14481
+}

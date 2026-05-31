@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177609\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177609\"><\/AnnotationDrawer><div>Structural members and systems and components and cladding in a building or structure shall be anchored to resist wind-induced overturning, uplift and sliding and to provide continuous load paths for these forces to the foundation. Where a portion of the resistance to these forces is provided by dead load, the dead load, including the weight of soils and foundations, shall be taken as the minimum dead load likely to be in place during a design wind event.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17379-html-1",
+      "kind" : "html",
+      "plainText" : "Structural members and systems and components and cladding in a building or structure shall be anchored to resist wind-induced overturning, uplift and sliding and to provide continuous load paths for these forces to the foundation. Where a portion of the resistance to these forces is provided by dead load, the dead load, including the weight of soils and foundations, shall be taken as the minimum dead load likely to be in place during a design wind event."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17379
+}

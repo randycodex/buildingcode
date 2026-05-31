@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168012\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168012\"><\/AnnotationDrawer><div>A continuous gas detection system shall be provided for HPM gases where the physiological warning threshold level of the gas is at a higher level than the accepted permissible exposure limit (PEL) for the gas and for flammable gases in accordance with Sections 415.11.7.1 and 415.11.7.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14533-html-1",
+      "kind" : "html",
+      "plainText" : "A continuous gas detection system shall be provided for HPM gases where the physiological warning threshold level of the gas is at a higher level than the accepted permissible exposure limit (PEL) for the gas and for flammable gases in accordance with Sections 415.11.7.1 and 415.11.7.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14533
+}

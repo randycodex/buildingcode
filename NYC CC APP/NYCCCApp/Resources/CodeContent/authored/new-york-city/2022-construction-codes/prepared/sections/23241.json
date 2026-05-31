@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193434\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193434\"><\/AnnotationDrawer><div>Ventilation shall be provided in an approved manner in battery-charging areas to prevent a dangerous accumulation of flammable gases.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193435\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193435\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Lithium-ion batteries shall not require ventilation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23241-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation shall be provided in an approved manner in battery-charging areas to prevent a dangerous accumulation of flammable gases.\n\n Exception: Lithium-ion batteries shall not require ventilation."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23241
+}

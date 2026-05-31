@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188536\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188536\"><\/AnnotationDrawer><div>Periodic, progress and special inspections shall be performed in accordance with this section. All work applications, regardless of the scope of work, shall be subject to the progress and special inspection requirements of Sections G107.2 through G107.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7027-html-1",
+      "kind" : "html",
+      "plainText" : "Periodic, progress and special inspections shall be performed in accordance with this section. All work applications, regardless of the scope of work, shall be subject to the progress and special inspection requirements of Sections G107.2 through G107.4."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7027
+}

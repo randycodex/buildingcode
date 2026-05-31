@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188799\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188799\"><\/AnnotationDrawer><div>Recreational vehicles in A-Zones shall be fully licensed and ready for highway use, and shall be placed on a site for less than 180 consecutive days.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13081-html-1",
+      "kind" : "html",
+      "plainText" : "Recreational vehicles in A-Zones shall be fully licensed and ready for highway use, and shall be placed on a site for less than 180 consecutive days."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13081
+}

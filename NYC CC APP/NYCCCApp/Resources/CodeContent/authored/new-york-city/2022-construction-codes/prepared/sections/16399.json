@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174576\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174576\"><\/AnnotationDrawer><div>Ramped aisles shall have landings in accordance with Sections 1012.6 through 1012.6.5. Landings for ramped aisles shall be permitted to overlap required aisles or cross aisles.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16399-html-1",
+      "kind" : "html",
+      "plainText" : "Ramped aisles shall have landings in accordance with Sections 1012.6 through 1012.6.5. Landings for ramped aisles shall be permitted to overlap required aisles or cross aisles."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16399
+}

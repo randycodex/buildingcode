@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195911\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195911\"><\/AnnotationDrawer><div>A certificate of test shall be provided for all systems containing 55 pounds (24.9 kg) or more of refrigerant. The certificate shall give the name of the refrigerant and the field test pressure applied to the high side and the low side of the system. The certification of test shall be signed by the installer and shall be made part of the public record.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195912\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195912\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195912\"><\/AnnotationDrawer><h6><a name=\"JD_MC1109\" id=\"JD_MC1109\" title=\"MC 1109\"><\/a>Section MC 1109: Periodic Testing<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11273-html-1",
+      "kind" : "html",
+      "plainText" : "A certificate of test shall be provided for all systems containing 55 pounds (24.9 kg) or more of refrigerant. The certificate shall give the name of the refrigerant and the field test pressure applied to the high side and the low side of the system. The certification of test shall be signed by the installer and shall be made part of the public record.\n\n Section MC 1109: Periodic Testing"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11273
+}

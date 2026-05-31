@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189143\"><\/AnnotationDrawer><div>Wall signs attached to exterior walls of solid masonry, concrete or stone shall be safely and securely attached by means of metal anchors, bolts or expansion screws of not less than 3\/8 inch (9.5 mm) diameter and shall be embedded at least 5 inches (127 mm). Wood blocks shall not be used for anchorage, except in the case of wall signs attached to buildings with walls of wood. A wall sign shall not be supported by anchorages secured to an unbraced parapet wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7230-html-1",
+      "kind" : "html",
+      "plainText" : "Wall signs attached to exterior walls of solid masonry, concrete or stone shall be safely and securely attached by means of metal anchors, bolts or expansion screws of not less than 3\/8 inch (9.5 mm) diameter and shall be embedded at least 5 inches (127 mm). Wood blocks shall not be used for anchorage, except in the case of wall signs attached to buildings with walls of wood. A wall sign shall not be supported by anchorages secured to an unbraced parapet wall."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7230
+}

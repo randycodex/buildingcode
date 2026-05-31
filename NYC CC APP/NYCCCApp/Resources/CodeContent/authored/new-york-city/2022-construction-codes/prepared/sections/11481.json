@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196381\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196381\"><\/AnnotationDrawer><div>Fuel oil shall be supplied by a transfer pump or automatic pump.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11481-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel oil shall be supplied by a transfer pump or automatic pump."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11481
+}

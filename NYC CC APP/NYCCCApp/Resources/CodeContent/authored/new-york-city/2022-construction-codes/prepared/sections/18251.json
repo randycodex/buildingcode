@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180395\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180395\"><\/AnnotationDrawer><div>Concrete that has partially hardened or been contaminated by foreign materials shall not be deposited in the structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18251-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete that has partially hardened or been contaminated by foreign materials shall not be deposited in the structure."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18251
+}

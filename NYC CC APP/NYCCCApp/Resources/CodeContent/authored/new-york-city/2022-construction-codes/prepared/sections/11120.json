@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195478\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195478\"><\/AnnotationDrawer><div>Gas and oil modulating burners shall be provided with burner controls (oil and gas equivalent ratings) in accordance with ASME CSD-1 and NFPA 85.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11120-html-1",
+      "kind" : "html",
+      "plainText" : "Gas and oil modulating burners shall be provided with burner controls (oil and gas equivalent ratings) in accordance with ASME CSD-1 and NFPA 85."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11120
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196707\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196707\"><\/AnnotationDrawer><div>A relief valve shall be installed on the pump discharge line where a valve is located downstream of the pump.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24419-html-1",
+      "kind" : "html",
+      "plainText" : "A relief valve shall be installed on the pump discharge line where a valve is located downstream of the pump."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24419
+}

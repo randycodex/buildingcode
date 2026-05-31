@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182794\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182794\"><\/AnnotationDrawer><div>Glazing in walls, enclosures or fences containing or facing hot tubs, spas, whirlpools, saunas, steam rooms, bathtubs, showers and indoor or outdoor swimming pools where the bottom exposed edge of the glazing is less than 60 inches (1524 mm) measured vertically above any standing or walking surface shall be considered a hazardous location. This shall apply to single glazing and all panes in multiple glazing.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182795\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182795\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Glazing that is more than 60 inches (1524 mm), measured horizontally and in a straight line, from the water's edge of a bathtub, hot tub, spa, whirlpool or swimming pool.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18963-html-1",
+      "kind" : "html",
+      "plainText" : "Glazing in walls, enclosures or fences containing or facing hot tubs, spas, whirlpools, saunas, steam rooms, bathtubs, showers and indoor or outdoor swimming pools where the bottom exposed edge of the glazing is less than 60 inches (1524 mm) measured vertically above any standing or walking surface shall be considered a hazardous location. This shall apply to single glazing and all panes in multiple glazing.\n\n Exception: Glazing that is more than 60 inches (1524 mm), measured horizontally and in a straight line, from the water's edge of a bathtub, hot tub, spa, whirlpool or swimming pool."
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 18963
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198870\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198870\"><\/AnnotationDrawer><div>A manually operated damper shall not be placed in the vent connector for any appliance. Fixed baffles shall not be classified as manually operated dampers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21331-html-1",
+      "kind" : "html",
+      "plainText" : "A manually operated damper shall not be placed in the vent connector for any appliance. Fixed baffles shall not be classified as manually operated dampers."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21331
+}

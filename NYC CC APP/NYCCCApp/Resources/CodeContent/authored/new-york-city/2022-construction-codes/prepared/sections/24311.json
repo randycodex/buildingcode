@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196391\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196391\"><\/AnnotationDrawer><div>In systems with fuel oil storage tanks above the lowest level, overflow piping from tanks installed above the lowest floor shall be piped by gravity into the top of the tank at the lowest floor that supplies fuel to such tank. The overflow pipe shall be minimum two pipe sizes larger than fuel oil supply pipe. Valves shall not be installed on overflow piping.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24311-html-1",
+      "kind" : "html",
+      "plainText" : "In systems with fuel oil storage tanks above the lowest level, overflow piping from tanks installed above the lowest floor shall be piped by gravity into the top of the tank at the lowest floor that supplies fuel to such tank. The overflow pipe shall be minimum two pipe sizes larger than fuel oil supply pipe. Valves shall not be installed on overflow piping."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24311
+}

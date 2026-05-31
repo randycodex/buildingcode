@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173074\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173074\"><\/AnnotationDrawer><div>Day care facilities, rooms or spaces that are classified under Occupancy Group E providing care for more than 10 children shall have access to not less than two exits or exit access doorways.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2181-html-1",
+      "kind" : "html",
+      "plainText" : "Day care facilities, rooms or spaces that are classified under Occupancy Group E providing care for more than 10 children shall have access to not less than two exits or exit access doorways."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2181
+}

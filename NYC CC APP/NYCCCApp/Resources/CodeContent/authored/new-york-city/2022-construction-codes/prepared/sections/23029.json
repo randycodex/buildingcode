@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192465\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192465\"><\/AnnotationDrawer><div>Where any work or installation does not pass an initial test or inspection, the necessary corrections shall be made to comply with this code. The work or installation shall then be resubmitted to the department for inspection and testing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23029-html-1",
+      "kind" : "html",
+      "plainText" : "Where any work or installation does not pass an initial test or inspection, the necessary corrections shall be made to comply with this code. The work or installation shall then be resubmitted to the department for inspection and testing."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 23029
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188443\"><\/AnnotationDrawer><div>The applicant shall file an application in writing on a form furnished by the commissioner. The commissioner shall not approve such application unless the applicant submits all plans, details, data and documents demonstrating that the development complies with Sections G104.2.1 through G104.2.3 and all other provisions of this appendix.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6998-html-1",
+      "kind" : "html",
+      "plainText" : "The applicant shall file an application in writing on a form furnished by the commissioner. The commissioner shall not approve such application unless the applicant submits all plans, details, data and documents demonstrating that the development complies with Sections G104.2.1 through G104.2.3 and all other provisions of this appendix."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 6998
+}

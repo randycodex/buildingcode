@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169197\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169197\"><\/AnnotationDrawer><div>The fire protection peer review shall be performed by a qualified independent fire protection engineer who has been retained by or on behalf of the owner. The peer reviewer shall have relevant experience performing fire-engineering analyses. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169198\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169198\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224244\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224244\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14863-html-1",
+      "kind" : "html",
+      "plainText" : "The fire protection peer review shall be performed by a qualified independent fire protection engineer who has been retained by or on behalf of the owner. The peer reviewer shall have relevant experience performing fire-engineering analyses. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14863
+}

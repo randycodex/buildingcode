@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188866\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188866\"><\/AnnotationDrawer><div>Temporary storage includes storage of goods and materials for a period of fewer than 180 days. Stored materials shall not include hazardous materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13105-html-1",
+      "kind" : "html",
+      "plainText" : "Temporary storage includes storage of goods and materials for a period of fewer than 180 days. Stored materials shall not include hazardous materials."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13105
+}

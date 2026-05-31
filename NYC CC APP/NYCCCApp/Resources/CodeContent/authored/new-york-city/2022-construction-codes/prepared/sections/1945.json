@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172366\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172366\"><\/AnnotationDrawer><div>Smoke or fire detectors that are a part of a smoke control system shall be tested in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-171003', hash: '#JD_BCCh.9' }}\">Chapter 9<\/Link> in their installed condition. Where applicable, this testing shall include verification of airflow in both minimum and maximum conditions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1945-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke or fire detectors that are a part of a smoke control system shall be tested in accordance with Chapter 9 in their installed condition. Where applicable, this testing shall include verification of airflow in both minimum and maximum conditions."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1945
+}

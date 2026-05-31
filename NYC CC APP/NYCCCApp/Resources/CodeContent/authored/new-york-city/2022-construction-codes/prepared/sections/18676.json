@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181604\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181604\"><\/AnnotationDrawer><div>Lumber, timber, plywood, piles and poles supporting permanent structures required by Section 2304.12 to be preservative treated shall conform to AWPA U1 and M4. Lumber and plywood used in permanent wood foundation systems shall conform to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178838', hash: '#JD_BCCh.18' }}\">Chapter 18<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18676-html-1",
+      "kind" : "html",
+      "plainText" : "Lumber, timber, plywood, piles and poles supporting permanent structures required by Section 2304.12 to be preservative treated shall conform to AWPA U1 and M4. Lumber and plywood used in permanent wood foundation systems shall conform to Chapter 18 of this code."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18676
+}

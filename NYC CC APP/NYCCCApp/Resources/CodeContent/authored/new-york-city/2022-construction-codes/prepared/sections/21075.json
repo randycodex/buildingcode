@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198185\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198185\"><\/AnnotationDrawer><div>After the piping system has been placed in operation, appliances and equipment subsequently installed shall be purged before being placed into operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-198186\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-198186\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-198186\"><\/AnnotationDrawer><h6><a name=\"JD_FGC407\" id=\"JD_FGC407\" title=\"FGC 407\"><\/a>Section FGC 407: Piping Support<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21075-html-1",
+      "kind" : "html",
+      "plainText" : "After the piping system has been placed in operation, appliances and equipment subsequently installed shall be purged before being placed into operation.\n\n Section FGC 407: Piping Support"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21075
+}

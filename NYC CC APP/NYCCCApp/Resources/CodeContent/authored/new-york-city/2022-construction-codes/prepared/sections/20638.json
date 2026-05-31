@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187825\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187825\"><\/AnnotationDrawer><div>Synthetic slings shall only be used in conjunction with tower crane erection, jumping, and dismantling if the manufacturer's manual specifically states or recommends the use of synthetic slings. Synthetic slings shall not be used unless softening mechanisms have been applied to all sharp edges.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20638-html-1",
+      "kind" : "html",
+      "plainText" : "Synthetic slings shall only be used in conjunction with tower crane erection, jumping, and dismantling if the manufacturer's manual specifically states or recommends the use of synthetic slings. Synthetic slings shall not be used unless softening mechanisms have been applied to all sharp edges."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20638
+}

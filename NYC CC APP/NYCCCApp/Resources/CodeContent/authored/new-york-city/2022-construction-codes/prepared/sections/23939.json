@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195463\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195463\"><\/AnnotationDrawer><div>Clearances shall be maintained around boilers, generators, heaters, tanks and related equipment and appliances so as to permit inspection, servicing, repair, replacement and visibility of all gauges. When boilers are installed or replaced, clearance shall be provided to allow access for maintenance and repair per the boiler's listing and manufacturer's instructions. Passageways for inspection around all sides of boilers shall have an unobstructed width of not less than 18 inches (457.2 mm) unless the boiler's listing or department approval or manufacturer's instructions state otherwise.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23939-html-1",
+      "kind" : "html",
+      "plainText" : "Clearances shall be maintained around boilers, generators, heaters, tanks and related equipment and appliances so as to permit inspection, servicing, repair, replacement and visibility of all gauges. When boilers are installed or replaced, clearance shall be provided to allow access for maintenance and repair per the boiler's listing and manufacturer's instructions. Passageways for inspection around all sides of boilers shall have an unobstructed width of not less than 18 inches (457.2 mm) unless the boiler's listing or department approval or manufacturer's instructions state otherwise."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 23939
+}

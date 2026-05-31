@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168349\"><\/AnnotationDrawer><div>Drainage lines from sinks used for radioactive wastes shall be without traps, and shall lead to retention tanks when required by the provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Health Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "826-html-1",
+      "kind" : "html",
+      "plainText" : "Drainage lines from sinks used for radioactive wastes shall be without traps, and shall lead to retention tanks when required by the provisions of the New York City Health Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 826
+}

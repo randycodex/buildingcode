@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180206\"><\/AnnotationDrawer><div>Splitting tensile strength tests shall not be used as a basis for field acceptance of concrete.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4352-html-1",
+      "kind" : "html",
+      "plainText" : "Splitting tensile strength tests shall not be used as a basis for field acceptance of concrete."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4352
+}

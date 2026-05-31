@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167404\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167404\"><\/AnnotationDrawer><div>All scenery or scenic elements shall be of noncombustible materials, or of materials having a flame-spread rating not exceeding 25, or of materials that have been rendered flameproof in compliance with the rules of the Fire Commissioner. Scenery and scenic elements not complying with the above requirements may be used only when expressly permitted by the Fire Department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "509-html-1",
+      "kind" : "html",
+      "plainText" : "All scenery or scenic elements shall be of noncombustible materials, or of materials having a flame-spread rating not exceeding 25, or of materials that have been rendered flameproof in compliance with the rules of the Fire Commissioner. Scenery and scenic elements not complying with the above requirements may be used only when expressly permitted by the Fire Department."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 509
+}

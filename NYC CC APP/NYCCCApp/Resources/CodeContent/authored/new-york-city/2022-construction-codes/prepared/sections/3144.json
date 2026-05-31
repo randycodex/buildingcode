@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176291\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176291\"><\/AnnotationDrawer><div>Windows and doors shall be installed in accordance with the manufacturer's instructions. Fastener size and spacing shall be provided in such instructions and shall be calculated based on maximum loads and spacing used in the tests.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3144-html-1",
+      "kind" : "html",
+      "plainText" : "Windows and doors shall be installed in accordance with the manufacturer's instructions. Fastener size and spacing shall be provided in such instructions and shall be calculated based on maximum loads and spacing used in the tests."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3144
+}

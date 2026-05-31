@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176674\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176674\"><\/AnnotationDrawer><div>A drip edge shall be provided at eaves and rake edges of shingle roofs. Adjacent segments of the drip edge shall be lapped a minimum of 2 inches (50.8 mm). The vertical leg of drip edges shall be a minimum of 1 1\/2 inches (38.1 mm) in width and shall extend a minimum of 1\/4 inch (6.4 mm) below sheathing. The drip edge shall extend back on the roof a minimum of 2 inches (50.8 mm). Underlayment shall be installed over drip edges along eaves. Drip edges shall be installed over underlayment along rake edges. Drip edges shall be mechanically fastened a maximum of 12 inches (304.8 mm) on center.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3271-html-1",
+      "kind" : "html",
+      "plainText" : "A drip edge shall be provided at eaves and rake edges of shingle roofs. Adjacent segments of the drip edge shall be lapped a minimum of 2 inches (50.8 mm). The vertical leg of drip edges shall be a minimum of 1 1\/2 inches (38.1 mm) in width and shall extend a minimum of 1\/4 inch (6.4 mm) below sheathing. The drip edge shall extend back on the roof a minimum of 2 inches (50.8 mm). Underlayment shall be installed over drip edges along eaves. Drip edges shall be installed over underlayment along rake edges. Drip edges shall be mechanically fastened a maximum of 12 inches (304.8 mm) on center."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3271
+}

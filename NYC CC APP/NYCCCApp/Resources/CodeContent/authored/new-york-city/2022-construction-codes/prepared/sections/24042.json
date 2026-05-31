@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195784\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195784\"><\/AnnotationDrawer><div>There shall not be an open flame-producing device or continuously operating hot surface over 800&#176;F (426.7&#176;C) permanently installed in the room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24042-html-1",
+      "kind" : "html",
+      "plainText" : "There shall not be an open flame-producing device or continuously operating hot surface over 800°F (426.7°C) permanently installed in the room."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24042
+}

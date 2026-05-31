@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194093\"><\/AnnotationDrawer><div>Hazardous exhaust ducts that penetrate fire-resistance-rated shafts shall comply with Section 714.3.1 or 714.3.1.2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10648-html-1",
+      "kind" : "html",
+      "plainText" : "Hazardous exhaust ducts that penetrate fire-resistance-rated shafts shall comply with Section 714.3.1 or 714.3.1.2 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10648
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179783\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179783\"><\/AnnotationDrawer><div>The allowable lateral load resisted by a helical pile shall not exceed 3 tons (29.4 kN).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18040-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable lateral load resisted by a helical pile shall not exceed 3 tons (29.4 kN)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18040
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195542\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195542\"><\/AnnotationDrawer><div>Every hot water boiler shall have a pressure gauge and a temperature gauge, or a combination pressure and temperature gauge. The gauges shall indicate the temperature and pressure within the normal range of the system's operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11143-html-1",
+      "kind" : "html",
+      "plainText" : "Every hot water boiler shall have a pressure gauge and a temperature gauge, or a combination pressure and temperature gauge. The gauges shall indicate the temperature and pressure within the normal range of the system's operation."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11143
+}

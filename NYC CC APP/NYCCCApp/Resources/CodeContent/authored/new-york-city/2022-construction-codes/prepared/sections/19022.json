@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182994\"><\/AnnotationDrawer><div>Installation of these materials shall be in compliance with ASTM C 926 and ASTM C 1063.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19022-html-1",
+      "kind" : "html",
+      "plainText" : "Installation of these materials shall be in compliance with ASTM C 926 and ASTM C 1063."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 19022
+}

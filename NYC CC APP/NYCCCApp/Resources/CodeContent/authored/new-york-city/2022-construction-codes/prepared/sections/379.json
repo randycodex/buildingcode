@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167006\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167006\"><\/AnnotationDrawer><div>Enclosed parking garages shall meet the means of egress requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "379-html-1",
+      "kind" : "html",
+      "plainText" : "Enclosed parking garages shall meet the means of egress requirements of Chapter 10 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 379
+}

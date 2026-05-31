@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186811\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186811\"><\/AnnotationDrawer><div>If at any point during the day an alternate site safety manager or coordinator acts as the primary site safety manager, this shall be noted in the log, and the alternate site safety manager shall log in. If a site safety manager or coordinator is relieved of his or her responsibilities at the site, or a site safety manager or coordinator leaves the site for any reason, this shall be indicated in the site safety log, and another site safety manager or coordinator shall assume the duties of such relieved or absent site safety manager or coordinator by signing in.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20335-html-1",
+      "kind" : "html",
+      "plainText" : "If at any point during the day an alternate site safety manager or coordinator acts as the primary site safety manager, this shall be noted in the log, and the alternate site safety manager shall log in. If a site safety manager or coordinator is relieved of his or her responsibilities at the site, or a site safety manager or coordinator leaves the site for any reason, this shall be indicated in the site safety log, and another site safety manager or coordinator shall assume the duties of such relieved or absent site safety manager or coordinator by signing in."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20335
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174586\"><\/AnnotationDrawer><div>Where the gradient of stepped aisles is to be the same as the gradient of adjoining seating areas, the riser height shall be not less than 4 inches (101.6 mm) nor more than 8 inches (203.2 mm) and shall be uniform within each flight.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174587\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174587\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Riser height nonuniformity shall be limited to the extent necessitated by changes in the gradient of the adjoining seating area to maintain adequate sightlines. Where nonuniformities exceed 3\/16 inch (4.8 mm) between adjacent risers, the exact location of such nonuniformities shall be indicated with a distinctive marking stripe on each tread at the nosing or leading edge adjacent to the nonuniform risers. Such stripe shall be not less than 1 inch (25.4 mm), and not more than 2 inches (50.8 mm), wide. The edge marking stripe shall be distinctively different from the contrasting marking stripe.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16403-html-1",
+      "kind" : "html",
+      "plainText" : "Where the gradient of stepped aisles is to be the same as the gradient of adjoining seating areas, the riser height shall be not less than 4 inches (101.6 mm) nor more than 8 inches (203.2 mm) and shall be uniform within each flight.\n\n Exception: Riser height nonuniformity shall be limited to the extent necessitated by changes in the gradient of the adjoining seating area to maintain adequate sightlines. Where nonuniformities exceed 3\/16 inch (4.8 mm) between adjacent risers, the exact location of such nonuniformities shall be indicated with a distinctive marking stripe on each tread at the nosing or leading edge adjacent to the nonuniform risers. Such stripe shall be not less than 1 inch (25.4 mm), and not more than 2 inches (50.8 mm), wide. The edge marking stripe shall be distinctively different from the contrasting marking stripe."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16403
+}

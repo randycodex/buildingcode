@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181351\"><\/AnnotationDrawer><div>Shop drawings shall include the location of oversized, short slotted and long slotted holes, and shall comply with AISC 303.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18596-html-1",
+      "kind" : "html",
+      "plainText" : "Shop drawings shall include the location of oversized, short slotted and long slotted holes, and shall comply with AISC 303."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18596
+}

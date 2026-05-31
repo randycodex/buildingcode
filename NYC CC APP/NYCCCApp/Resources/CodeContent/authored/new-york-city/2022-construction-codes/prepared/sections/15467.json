@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171416\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171416\"><\/AnnotationDrawer><div>Water supplies for automatic sprinkler systems shall comply with this section and the standards referenced in Section 903.3.1. The potable water supply shall be protected against back flow in accordance with the requirements of this section, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code,<\/span> and Rules of the New York City Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15467-html-1",
+      "kind" : "html",
+      "plainText" : "Water supplies for automatic sprinkler systems shall comply with this section and the standards referenced in Section 903.3.1. The potable water supply shall be protected against back flow in accordance with the requirements of this section, the New York City Plumbing Code, and Rules of the New York City Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15467
+}

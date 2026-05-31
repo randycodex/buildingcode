@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182841\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182841\"><\/AnnotationDrawer><div>Glass installed as floors, landings, stairs and in similar locations shall be designed and engineered by a registered design professional and the design shall include the applicable provisions of ASTM E 2751 and the load requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link>. Such assemblies shall comply with the fire-resistance rating and marking requirements of this code where applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5150-html-1",
+      "kind" : "html",
+      "plainText" : "Glass installed as floors, landings, stairs and in similar locations shall be designed and engineered by a registered design professional and the design shall include the applicable provisions of ASTM E 2751 and the load requirements of Chapter 16 . Such assemblies shall comply with the fire-resistance rating and marking requirements of this code where applicable."
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 5150
+}

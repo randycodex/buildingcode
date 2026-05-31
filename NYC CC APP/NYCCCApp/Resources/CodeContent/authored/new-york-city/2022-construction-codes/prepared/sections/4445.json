@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180444\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180444\"><\/AnnotationDrawer><div>At the time concrete is placed, reinforcement shall be free from mud, oil or other nonmetallic coatings that decrease bond. Zinc and epoxy-coating of steel reinforcement in accordance with ACI 318, Section 20.6.2 shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4445-html-1",
+      "kind" : "html",
+      "plainText" : "At the time concrete is placed, reinforcement shall be free from mud, oil or other nonmetallic coatings that decrease bond. Zinc and epoxy-coating of steel reinforcement in accordance with ACI 318, Section 20.6.2 shall be permitted."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4445
+}

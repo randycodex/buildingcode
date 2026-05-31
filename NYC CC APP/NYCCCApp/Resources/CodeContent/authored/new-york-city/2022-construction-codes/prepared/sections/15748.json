@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172289\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172289\"><\/AnnotationDrawer><div>In addition to other requirements, belt-driven fans shall have 1.5 times the number of belts required for the design duty with the minimum number of belts being two. Fans shall be selected for stable performance based on normal temperature and, where applicable, elevated temperature. Calculations and manufacturer's fan curves shall be part of the documentation procedures. Fans shall be supported and restrained by noncombustible devices in accordance with the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link>. Motors driving fans shall not be operated beyond their nameplate horsepower (kilowatts), as determined from measurement of actual current draw, and shall have a minimum service factor of 1.15.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15748-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to other requirements, belt-driven fans shall have 1.5 times the number of belts required for the design duty with the minimum number of belts being two. Fans shall be selected for stable performance based on normal temperature and, where applicable, elevated temperature. Calculations and manufacturer's fan curves shall be part of the documentation procedures. Fans shall be supported and restrained by noncombustible devices in accordance with the requirements of Chapter 16 . Motors driving fans shall not be operated beyond their nameplate horsepower (kilowatts), as determined from measurement of actual current draw, and shall have a minimum service factor of 1.15."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15748
+}

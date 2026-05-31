@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195480\"><\/AnnotationDrawer><div>Conversion burners shall be installed in accordance with ANSI Z21.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195481\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195481\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195481\"><\/AnnotationDrawer><h6><a name=\"JD_MC1005\" id=\"JD_MC1005\" title=\"MC 1005\"><\/a>Section MC 1005: Boiler Connections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11121-html-1",
+      "kind" : "html",
+      "plainText" : "Conversion burners shall be installed in accordance with ANSI Z21.8.\n\n Section MC 1005: Boiler Connections"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11121
+}

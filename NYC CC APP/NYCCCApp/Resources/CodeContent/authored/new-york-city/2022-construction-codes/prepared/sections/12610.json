@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163424\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163424\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Conductor pipes shall not be used as soil, waste or vent pipes, and soil, waste or vent pipes shall not be used as conductors.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12610-html-1",
+      "kind" : "html",
+      "plainText" : "Conductor pipes shall not be used as soil, waste or vent pipes, and soil, waste or vent pipes shall not be used as conductors."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 12610
+}

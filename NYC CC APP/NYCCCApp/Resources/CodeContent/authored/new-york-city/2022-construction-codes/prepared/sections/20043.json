@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185870\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185870\"><\/AnnotationDrawer><div>The designation of the competent person required by Section 3305.8.7.6 shall be recorded in the construction superintendent's log required by Section 3301.13.13, or where the project does not require a construction superintendent, the designation of the competent person shall be documented in the form of a notarized letter on the letterhead of the permit holder. The record letter shall state the name and contact information of the competent person, the date of designation and shall be signed and dated by the permit holder, the competent person and the person who designated the competent person.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20043-html-1",
+      "kind" : "html",
+      "plainText" : "The designation of the competent person required by Section 3305.8.7.6 shall be recorded in the construction superintendent's log required by Section 3301.13.13, or where the project does not require a construction superintendent, the designation of the competent person shall be documented in the form of a notarized letter on the letterhead of the permit holder. The record letter shall state the name and contact information of the competent person, the date of designation and shall be signed and dated by the permit holder, the competent person and the person who designated the competent person."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20043
+}

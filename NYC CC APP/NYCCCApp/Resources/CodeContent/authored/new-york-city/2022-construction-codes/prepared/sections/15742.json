@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172276\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172276\"><\/AnnotationDrawer><div>A documented engineering analysis shall be provided for conditions that assume fire growth is halted at the time of sprinkler activation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15742-html-1",
+      "kind" : "html",
+      "plainText" : "A documented engineering analysis shall be provided for conditions that assume fire growth is halted at the time of sprinkler activation."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15742
+}

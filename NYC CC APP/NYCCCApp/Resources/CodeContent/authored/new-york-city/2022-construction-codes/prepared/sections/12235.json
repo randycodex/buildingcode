@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162433\"><\/AnnotationDrawer><div>Fixtures capable of supplying an emergency source of potable water in accordance with this section shall be identified by a legible sign stating: \"EMERGENCY DRINKING WATER.\" Signs shall be readily visible and located near such fixtures and on the door to any room or closet in which such a fixture is located.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12235-html-1",
+      "kind" : "html",
+      "plainText" : "Fixtures capable of supplying an emergency source of potable water in accordance with this section shall be identified by a legible sign stating: \"EMERGENCY DRINKING WATER.\" Signs shall be readily visible and located near such fixtures and on the door to any room or closet in which such a fixture is located."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12235
+}

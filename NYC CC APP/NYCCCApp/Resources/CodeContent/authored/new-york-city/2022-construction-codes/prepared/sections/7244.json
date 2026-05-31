@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189179\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189179\"><\/AnnotationDrawer><div>Fabric used in flexible fabric signs shall be flame resistant in accordance with NFPA 701 or listed under UL 214.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7244-html-1",
+      "kind" : "html",
+      "plainText" : "Fabric used in flexible fabric signs shall be flame resistant in accordance with NFPA 701 or listed under UL 214."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7244
+}

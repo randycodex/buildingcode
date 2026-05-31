@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186047\"><\/AnnotationDrawer><div>Wherever a shaftway or planking required by Section 3306.9.12.1 has been temporarily removed to permit debris removal, the floor opening shall be protected by a guardrail system that meets the requirements of Sections 3308.7.1 through 3308.7.5. Such protection required by Section 3306.9.12.1 shall be promptly replaced in position upon the ceasing of such work at the end of each workday.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20105-html-1",
+      "kind" : "html",
+      "plainText" : "Wherever a shaftway or planking required by Section 3306.9.12.1 has been temporarily removed to permit debris removal, the floor opening shall be protected by a guardrail system that meets the requirements of Sections 3308.7.1 through 3308.7.5. Such protection required by Section 3306.9.12.1 shall be promptly replaced in position upon the ceasing of such work at the end of each workday."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20105
+}

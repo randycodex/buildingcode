@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186860\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186860\"><\/AnnotationDrawer><div>Delete Section 4.3 in its entirety.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20356-html-1",
+      "kind" : "html",
+      "plainText" : "Delete Section 4.3 in its entirety."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20356
+}

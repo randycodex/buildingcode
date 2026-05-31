@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166966\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166966\"><\/AnnotationDrawer><div>Mixed uses shall be allowed in the same building as an open parking garage subject to the provisions of Sections 402.4.2.3, 406.5.11, 508.1, 510.3, 510.4 and 510.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14193-html-1",
+      "kind" : "html",
+      "plainText" : "Mixed uses shall be allowed in the same building as an open parking garage subject to the provisions of Sections 402.4.2.3, 406.5.11, 508.1, 510.3, 510.4 and 510.7."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14193
+}

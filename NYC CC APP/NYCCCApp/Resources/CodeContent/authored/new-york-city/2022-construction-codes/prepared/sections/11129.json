@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195499\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195499\"><\/AnnotationDrawer><div>Safety and relief valve discharge pipes shall be of rigid pipe that is approved for the temperature of the system. The discharge pipe shall, at a minimum, be the same diameter as the safety or relief valve outlet. Safety and relief valve discharge pipes shall be properly supported to prevent stress on the valve and vessel. Safety and relief valves shall not discharge so as to be a hazard, a potential cause of damage or otherwise a nuisance. Discharge of hazardous materials must be properly contained in a method approved by the department. High-pressure-steam safety valves shall be vented to the outside of the structure. Where a low-pressure safety valve or a relief valve discharges to the drainage system, the installation shall conform to the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11129-html-1",
+      "kind" : "html",
+      "plainText" : "Safety and relief valve discharge pipes shall be of rigid pipe that is approved for the temperature of the system. The discharge pipe shall, at a minimum, be the same diameter as the safety or relief valve outlet. Safety and relief valve discharge pipes shall be properly supported to prevent stress on the valve and vessel. Safety and relief valves shall not discharge so as to be a hazard, a potential cause of damage or otherwise a nuisance. Discharge of hazardous materials must be properly contained in a method approved by the department. High-pressure-steam safety valves shall be vented to the outside of the structure. Where a low-pressure safety valve or a relief valve discharges to the drainage system, the installation shall conform to the New York City Plumbing Code ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11129
+}

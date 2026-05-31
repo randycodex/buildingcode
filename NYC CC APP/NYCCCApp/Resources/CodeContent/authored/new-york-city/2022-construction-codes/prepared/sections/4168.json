@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179688\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179688\"><\/AnnotationDrawer><div>Where a structure is assigned to Seismic Design Category C or D in accordance with Section 1613, the reinforcement requirements of Sections 1812.1.2.3 through 1812.1.2.5 shall be met.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4168-html-1",
+      "kind" : "html",
+      "plainText" : "Where a structure is assigned to Seismic Design Category C or D in accordance with Section 1613, the reinforcement requirements of Sections 1812.1.2.3 through 1812.1.2.5 shall be met."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4168
+}

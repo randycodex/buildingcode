@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183542\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183542\"><\/AnnotationDrawer><div>Emergency or standby power shall be provided in occupancies with hazardous materials in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and Section 414.5.2 of this code<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19212-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency or standby power shall be provided in occupancies with hazardous materials in accordance with the New York City Fire Code and Section 414.5.2 of this code ."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 19212
+}

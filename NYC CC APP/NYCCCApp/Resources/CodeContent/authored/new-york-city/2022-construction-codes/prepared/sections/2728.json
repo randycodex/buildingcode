@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175081\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175081\"><\/AnnotationDrawer><div>A kitchen counter that is required to comply with Section 1003.12.3.2 or 1003.12.4.2 (Height) of ICC A117.1 shall be permitted to be adjustable or designed to be replaceable as a unit at variable heights between 29 inches and 36 inches ( 736.6 mm and 914.4 mm), measured from the floor to the top of the work surface. The owner shall adjust or replace such countertop at the time an individual with disabilities takes occupancy of the unit, or within 10 days of the date the request is made by such individual, whichever is later, at the owner's expense.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2728-html-1",
+      "kind" : "html",
+      "plainText" : "A kitchen counter that is required to comply with Section 1003.12.3.2 or 1003.12.4.2 (Height) of ICC A117.1 shall be permitted to be adjustable or designed to be replaceable as a unit at variable heights between 29 inches and 36 inches ( 736.6 mm and 914.4 mm), measured from the floor to the top of the work surface. The owner shall adjust or replace such countertop at the time an individual with disabilities takes occupancy of the unit, or within 10 days of the date the request is made by such individual, whichever is later, at the owner's expense."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2728
+}

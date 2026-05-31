@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166348\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166348\"><\/AnnotationDrawer><div>Residential Group R includes, among others, the use of a building or structure, or a portion thereof, for dwelling or sleeping purposes when not classified as an Institutional Group I. Buildings containing 3 or more dwelling units shall be subject to the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York State Multiple Dwelling Law.<\/span> Residential occupancies shall be classified as Groups R-1, R-2, or R-3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14004-html-1",
+      "kind" : "html",
+      "plainText" : "Residential Group R includes, among others, the use of a building or structure, or a portion thereof, for dwelling or sleeping purposes when not classified as an Institutional Group I. Buildings containing 3 or more dwelling units shall be subject to the New York State Multiple Dwelling Law. Residential occupancies shall be classified as Groups R-1, R-2, or R-3."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 14004
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179349\"><\/AnnotationDrawer><div>A tolerance of 3 inches (76.2 mm) from the designed location shall be permitted in the installation of each deep foundation as measured from its head, without reduction in load capacity of the deep foundation group unless otherwise noted on the foundation plans. When deep foundations are installed outside of this tolerance, the true loading on such deep foundations shall be analytically determined from a survey that defines the actual location of the deep foundations as installed and using the actual eccentricity in the deep foundation group with respect to the line of action of the applied load.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17893-html-1",
+      "kind" : "html",
+      "plainText" : "A tolerance of 3 inches (76.2 mm) from the designed location shall be permitted in the installation of each deep foundation as measured from its head, without reduction in load capacity of the deep foundation group unless otherwise noted on the foundation plans. When deep foundations are installed outside of this tolerance, the true loading on such deep foundations shall be analytically determined from a survey that defines the actual location of the deep foundations as installed and using the actual eccentricity in the deep foundation group with respect to the line of action of the applied load."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17893
+}

@@ -1,0 +1,24 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177320\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177320\"><\/AnnotationDrawer><div>Where specifically required by Sections 1616.4 and 1616.5, elements and components shall be designed to resist the forces calculated using the following combination of factored loads:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177321\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177321\"><\/AnnotationDrawer><div style=\"margin-bottom=10pt\">&#160;<div class=\"xsl-table\">",
+      "id" : "3468-html-1",
+      "kind" : "html",
+      "plainText" : "Where specifically required by Sections 1616.4 and 1616.5, elements and components shall be designed to resist the forces calculated using the following combination of factored loads:"
+    },
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: &#10;                  700px&#10;                ;\"><colgroup><col width=\"58.286%&#10;              \"><\/col><col width=\"17.143%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div>1.2<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">D<\/span> + <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">A<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">k<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t (0.5<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">L<\/span> or 0.2<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">S<\/span>)<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">(Equation 16-28)<\/span>&#160;<\/div><\/td><\/tr><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div> 0.9<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">D<\/span> + <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">A<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">k<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t + 0.2<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">W<\/span><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">(Equation 16-29)<\/span>&#160;<\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "3468-table-2",
+      "kind" : "table"
+    },
+    {
+      "html" : "<\/div><\/div><div style=\"margin-bottom=10pt\">&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177322\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177322\"><\/AnnotationDrawer><div>where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177323\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">&#160;&#160;&#160;A<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">k<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t is the load effect of the vehicular impact or gas explosion.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3468-html-3",
+      "kind" : "html",
+      "plainText" : "where:\n\n A k \n\n is the load effect of the vehicular impact or gas explosion."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3468
+}

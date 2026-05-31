@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170683\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170683\"><\/AnnotationDrawer><div>The gypsum board or gypsum panel products shall be supported as illustrated in either <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170586', hash: '#JD_BCFigure722.5.1(2)' }}\">Figure 722.5.1(2)<\/Link> for fire-resistance ratings of 4 hours or less, or <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170586', hash: '#JD_BCFigure722.5.1(3)' }}\">Figure 722.5.1(3)<\/Link> for fire-resistance ratings of 3 hours or less.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15275-html-1",
+      "kind" : "html",
+      "plainText" : "The gypsum board or gypsum panel products shall be supported as illustrated in either Figure 722.5.1(2) for fire-resistance ratings of 4 hours or less, or Figure 722.5.1(3) for fire-resistance ratings of 3 hours or less."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15275
+}

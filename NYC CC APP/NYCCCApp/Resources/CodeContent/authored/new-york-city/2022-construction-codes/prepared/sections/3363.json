@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176919\"><\/AnnotationDrawer><div>Unless otherwise noted, required underlayment shall conform to ASTM D 226, ASTM D 4869 or ASTM D 6757.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3363-html-1",
+      "kind" : "html",
+      "plainText" : "Unless otherwise noted, required underlayment shall conform to ASTM D 226, ASTM D 4869 or ASTM D 6757."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3363
+}

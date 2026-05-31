@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174467\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174467\"><\/AnnotationDrawer><div>Aisles and aisle accessways serving a smoke-protected assembly seating area shall be provided with a smoke control system complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-234097', hash: '#JD_BC909' }}\">909<\/Link> or natural ventilation designed to maintain the smoke level not less than 6 feet (1828.8 mm) above the floor of the means of egress.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16364-html-1",
+      "kind" : "html",
+      "plainText" : "Aisles and aisle accessways serving a smoke-protected assembly seating area shall be provided with a smoke control system complying with Section 909 or natural ventilation designed to maintain the smoke level not less than 6 feet (1828.8 mm) above the floor of the means of egress."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16364
+}

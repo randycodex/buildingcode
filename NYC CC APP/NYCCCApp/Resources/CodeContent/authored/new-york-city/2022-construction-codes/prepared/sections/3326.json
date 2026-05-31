@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176829\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176829\"><\/AnnotationDrawer><div>An ice barrier that consists of at least two layers of underlayment cemented together or of a self-adhering polymer-modified bitumen sheet shall be used in lieu of normal underlayment and extend from the lowest edges of all roof surfaces to a point at least 24 inches (609.6 mm) inside the exterior wall line of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176830\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176830\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Detached accessory structures that contain no conditioned floor area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3326-html-1",
+      "kind" : "html",
+      "plainText" : "An ice barrier that consists of at least two layers of underlayment cemented together or of a self-adhering polymer-modified bitumen sheet shall be used in lieu of normal underlayment and extend from the lowest edges of all roof surfaces to a point at least 24 inches (609.6 mm) inside the exterior wall line of the building.\n\n Exception: Detached accessory structures that contain no conditioned floor area."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3326
+}

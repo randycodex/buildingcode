@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161538\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161538\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Floor flanges for water closets or similar fixtures shall be not less than 0.125 inch (3.2 mm) thick for brass, 0.25 inch (6.4 mm) thick for plastic and 0.25 inch (6.4 mm) thick and not less than a 2-inch (51 mm) caulking depth for cast-iron or galvanized malleable iron.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161539\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Floor flanges of hard lead shall weigh not less than 1 pound, 9 ounces (0.7 kg) and shall be composed of lead alloy with not less than 7.75-percent antimony by weight. Closet screws and bolts shall be of brass. Flanges shall be secured to the building structure with corrosion-resistant screws or bolts.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24698-html-1",
+      "kind" : "html",
+      "plainText" : "Floor flanges for water closets or similar fixtures shall be not less than 0.125 inch (3.2 mm) thick for brass, 0.25 inch (6.4 mm) thick for plastic and 0.25 inch (6.4 mm) thick and not less than a 2-inch (51 mm) caulking depth for cast-iron or galvanized malleable iron. \n\n Floor flanges of hard lead shall weigh not less than 1 pound, 9 ounces (0.7 kg) and shall be composed of lead alloy with not less than 7.75-percent antimony by weight. Closet screws and bolts shall be of brass. Flanges shall be secured to the building structure with corrosion-resistant screws or bolts."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24698
+}

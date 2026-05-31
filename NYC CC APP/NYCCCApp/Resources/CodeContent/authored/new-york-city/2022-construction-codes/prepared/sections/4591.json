@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180861\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180861\"><\/AnnotationDrawer><div>No salt or other chemicals for the purpose of lowering the freezing temperature of water shall be permitted in the mortar or grout mix.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4591-html-1",
+      "kind" : "html",
+      "plainText" : "No salt or other chemicals for the purpose of lowering the freezing temperature of water shall be permitted in the mortar or grout mix."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4591
+}

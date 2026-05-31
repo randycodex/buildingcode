@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193602\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193602\"><\/AnnotationDrawer><div>Filling or dispensing connections on indoor stationary tanks shall be provided with a means of local exhaust. Such exhaust shall be designed to capture fumes and vapors. The exhaust shall be directed to a treatment system where required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10485-html-1",
+      "kind" : "html",
+      "plainText" : "Filling or dispensing connections on indoor stationary tanks shall be provided with a means of local exhaust. Such exhaust shall be designed to capture fumes and vapors. The exhaust shall be directed to a treatment system where required by the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10485
+}

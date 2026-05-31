@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186333\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186333\"><\/AnnotationDrawer><div>In the event a duly authorized city agency must repair, maintain, or install city property, including but not limited to intersection control signs, electrical equipment, traffic signals, lane markings, sewer and water manholes, bus shelters, street lighting, other street furniture, or fire hydrants, at a location where pedestrian protection required by this chapter is located, such pedestrian protection shall be removed as directed by the department of buildings as long as the removal is deemed to be safe and, if necessary, suitable appropriate pedestrian protection that does not interfere with the work of such city agency is installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6372-html-1",
+      "kind" : "html",
+      "plainText" : "In the event a duly authorized city agency must repair, maintain, or install city property, including but not limited to intersection control signs, electrical equipment, traffic signals, lane markings, sewer and water manholes, bus shelters, street lighting, other street furniture, or fire hydrants, at a location where pedestrian protection required by this chapter is located, such pedestrian protection shall be removed as directed by the department of buildings as long as the removal is deemed to be safe and, if necessary, suitable appropriate pedestrian protection that does not interfere with the work of such city agency is installed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6372
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172033\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172033\"><\/AnnotationDrawer><div>A presignal feature shall not be installed unless approved by the Fire Department. Where a presignal feature is provided, a signal shall be annunciated at a constantly attended location approved by the Fire Department, in order that occupant notification can be activated in the event of fire or other emergency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15663-html-1",
+      "kind" : "html",
+      "plainText" : "A presignal feature shall not be installed unless approved by the Fire Department. Where a presignal feature is provided, a signal shall be annunciated at a constantly attended location approved by the Fire Department, in order that occupant notification can be activated in the event of fire or other emergency."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15663
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182950\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182950\"><\/AnnotationDrawer><div>Fasteners at the top and bottom plates of vertical assemblies, or the edges and ends of horizontal assemblies perpendicular to supports, and at the wall line are permitted to be omitted except on shear resisting elements or fire-resistance-rated assemblies. Fasteners shall be applied in such a manner as not to fracture the face paper with the fastener head.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5181-html-1",
+      "kind" : "html",
+      "plainText" : "Fasteners at the top and bottom plates of vertical assemblies, or the edges and ends of horizontal assemblies perpendicular to supports, and at the wall line are permitted to be omitted except on shear resisting elements or fire-resistance-rated assemblies. Fasteners shall be applied in such a manner as not to fracture the face paper with the fastener head."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5181
+}

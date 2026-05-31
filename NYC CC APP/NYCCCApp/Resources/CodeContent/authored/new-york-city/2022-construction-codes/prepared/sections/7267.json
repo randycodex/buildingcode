@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189231\"><\/AnnotationDrawer><div>The application of the referenced standards shall be as specified in Section 102.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7267-html-1",
+      "kind" : "html",
+      "plainText" : "The application of the referenced standards shall be as specified in Section 102.4."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7267
+}

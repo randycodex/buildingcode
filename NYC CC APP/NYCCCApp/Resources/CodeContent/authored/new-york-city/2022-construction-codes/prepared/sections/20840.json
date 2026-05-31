@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197478\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197478\"><\/AnnotationDrawer><div>The equipment and appliances within every room containing fuel-burning appliances shall be installed so as to allow free circulation of air. Provisions shall be made to allow for the simultaneous operation of mechanical exhaust systems, fireplaces or other equipment and appliances operating in the same room or space from which combustion, ventilation, and dilution air is being drawn. Such provisions shall prevent the operation of such appliances, equipment and systems from affecting the supply of combustion, ventilation, and dilution air.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20840-html-1",
+      "kind" : "html",
+      "plainText" : "The equipment and appliances within every room containing fuel-burning appliances shall be installed so as to allow free circulation of air. Provisions shall be made to allow for the simultaneous operation of mechanical exhaust systems, fireplaces or other equipment and appliances operating in the same room or space from which combustion, ventilation, and dilution air is being drawn. Such provisions shall prevent the operation of such appliances, equipment and systems from affecting the supply of combustion, ventilation, and dilution air."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20840
+}

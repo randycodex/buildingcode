@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171484\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171484\"><\/AnnotationDrawer><div>Automatic fire-extinguishing systems, other than automatic sprinkler systems, shall be designed, installed, inspected, tested and maintained in accordance with the provisions of this section, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code,<\/span> and the applicable referenced standards.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1662-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic fire-extinguishing systems, other than automatic sprinkler systems, shall be designed, installed, inspected, tested and maintained in accordance with the provisions of this section, the New York City Fire Code, and the applicable referenced standards."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1662
+}

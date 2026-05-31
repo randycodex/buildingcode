@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172578\"><\/AnnotationDrawer><div>Where required in locations described in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G<\/Link> of this code, a secondary fire command center shall be provided subject to the approval of the Fire Department. Design and installation requirements shall be in accordance with NFPA 72.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-172579\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-172579\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-172579\"><\/AnnotationDrawer><h6><a name=\"JD_BC912\" id=\"JD_BC912\" title=\"BC 912\"><\/a>Section BC 912: Fire Department Connections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2032-html-1",
+      "kind" : "html",
+      "plainText" : "Where required in locations described in Appendix G of this code, a secondary fire command center shall be provided subject to the approval of the Fire Department. Design and installation requirements shall be in accordance with NFPA 72.\n\n Section BC 912: Fire Department Connections"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2032
+}

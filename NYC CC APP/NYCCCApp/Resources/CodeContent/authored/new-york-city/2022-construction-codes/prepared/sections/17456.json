@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177994\"><\/AnnotationDrawer><div>For analysis of this type, dynamic effects of member loss or specific local loads shall be considered. The structure does not need to remain elastic; however, the response ratio and rotation limits obtained from <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177995', hash: '#JD_BCTable1617.8.3' }}\">Table 1617.8.3<\/Link> shall not be exceeded.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17456-html-1",
+      "kind" : "html",
+      "plainText" : "For analysis of this type, dynamic effects of member loss or specific local loads shall be considered. The structure does not need to remain elastic; however, the response ratio and rotation limits obtained from Table 1617.8.3 shall not be exceeded."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17456
+}

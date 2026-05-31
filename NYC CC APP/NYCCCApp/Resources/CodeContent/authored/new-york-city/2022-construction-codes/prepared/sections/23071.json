@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192929\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192929\"><\/AnnotationDrawer><div>Flanges and lips of nonstructural cold-formed steel wall studs shall be permitted along the centerline of the web of the framing member, shall not exceed 1 1\/2 inches (38.1 mm) in width or 4 inches (101.6 mm) in length, and the holes shall not be spaced less than 24 inches (609.6 mm) center to center from another hole or less than 10 inches (254 mm) from the bearing end.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23071-html-1",
+      "kind" : "html",
+      "plainText" : "Flanges and lips of nonstructural cold-formed steel wall studs shall be permitted along the centerline of the web of the framing member, shall not exceed 1 1\/2 inches (38.1 mm) in width or 4 inches (101.6 mm) in length, and the holes shall not be spaced less than 24 inches (609.6 mm) center to center from another hole or less than 10 inches (254 mm) from the bearing end."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23071
+}

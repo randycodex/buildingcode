@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174082\"><\/AnnotationDrawer><div>Exterior egress balconies shall have a minimum fire separation distance of 10 feet (3048 mm) measured at right angles from the exterior edge of the egress balcony to the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174083\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174083\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Adjacent lot lines.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174084\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Other portions of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174085\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174085\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Other buildings on the same lot unless the adjacent building exterior walls and openings are protected in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169061', hash: '#JD_BC705' }}\">705<\/Link> based on fire separation distance.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174086\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174086\"><\/AnnotationDrawer><div>For the purposes of this section, other portions of the building shall be treated as separate buildings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16254-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior egress balconies shall have a minimum fire separation distance of 10 feet (3048 mm) measured at right angles from the exterior edge of the egress balcony to the following:\n\n 1. Adjacent lot lines.\n\n 2. Other portions of the building.\n\n 3. Other buildings on the same lot unless the adjacent building exterior walls and openings are protected in accordance with Section 705 based on fire separation distance.\n\n For the purposes of this section, other portions of the building shall be treated as separate buildings."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16254
+}

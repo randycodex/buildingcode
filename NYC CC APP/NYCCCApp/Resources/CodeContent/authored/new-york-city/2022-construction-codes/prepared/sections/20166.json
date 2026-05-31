@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186232\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186232\"><\/AnnotationDrawer><div>Sidewalk sheds shall be installed and located so to not unreasonably obstruct, either visually or physically, traffic, curb cuts, curb ramps, vehicular access points, street lighting poles, traffic lights or signs, fire hydrants, fire department connections, water sampling stations, bus shelters, or other street furniture, trees, adjacent show windows, means of ingress\/egress, subway entrances, or access points to vaults, manholes, or other underground structures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20166-html-1",
+      "kind" : "html",
+      "plainText" : "Sidewalk sheds shall be installed and located so to not unreasonably obstruct, either visually or physically, traffic, curb cuts, curb ramps, vehicular access points, street lighting poles, traffic lights or signs, fire hydrants, fire department connections, water sampling stations, bus shelters, or other street furniture, trees, adjacent show windows, means of ingress\/egress, subway entrances, or access points to vaults, manholes, or other underground structures."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20166
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171399\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171399\"><\/AnnotationDrawer><div>Sprinkler protection and freeze protection shall be provided in open-ended corridors and associated exterior stairways and ramps as specified in Section 1027.6, Exception 3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15462-html-1",
+      "kind" : "html",
+      "plainText" : "Sprinkler protection and freeze protection shall be provided in open-ended corridors and associated exterior stairways and ramps as specified in Section 1027.6, Exception 3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15462
+}

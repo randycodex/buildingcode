@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170161\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170161\"><\/AnnotationDrawer><div>Insulating materials used in noncombustible construction must either: Satisfactorily pass a test for determining noncombustibility of elementary materials, based on the test procedures of ASTM E 136; or Have a flame spread index not greater than 25, a smoke-development index not greater than 50, and be without evidence of continued progressive combustion when tested in accordance with ASTM E 84.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1354-html-1",
+      "kind" : "html",
+      "plainText" : "Insulating materials used in noncombustible construction must either: Satisfactorily pass a test for determining noncombustibility of elementary materials, based on the test procedures of ASTM E 136; or Have a flame spread index not greater than 25, a smoke-development index not greater than 50, and be without evidence of continued progressive combustion when tested in accordance with ASTM E 84."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1354
+}

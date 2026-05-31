@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173357\"><\/AnnotationDrawer><div>Special doors and security grilles shall comply with the requirements of Sections 1010.1.4.1 through 1010.1.4.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2254-html-1",
+      "kind" : "html",
+      "plainText" : "Special doors and security grilles shall comply with the requirements of Sections 1010.1.4.1 through 1010.1.4.4."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2254
+}

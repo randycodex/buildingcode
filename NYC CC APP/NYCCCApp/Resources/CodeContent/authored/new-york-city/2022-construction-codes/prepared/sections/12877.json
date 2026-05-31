@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188223\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188223\"><\/AnnotationDrawer><div>Public TTYs shall be identified by the International Symbol of TTY complying with Section 703.6.3.2 (International Symbol of TTY) of ICC A117.1. Directional signs indicating the location of the nearest public TTY shall be provided at banks of public pay telephones not containing a public TTY. Additionally, where signs provide direction to public pay telephones, they shall also provide direction to public TTYs. Such signs shall comply with visual signage requirements in ICC A117.1, including Section 703.2 (Visual Characters) and shall include the International Symbol of TTY.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12877-html-1",
+      "kind" : "html",
+      "plainText" : "Public TTYs shall be identified by the International Symbol of TTY complying with Section 703.6.3.2 (International Symbol of TTY) of ICC A117.1. Directional signs indicating the location of the nearest public TTY shall be provided at banks of public pay telephones not containing a public TTY. Additionally, where signs provide direction to public pay telephones, they shall also provide direction to public TTYs. Such signs shall comply with visual signage requirements in ICC A117.1, including Section 703.2 (Visual Characters) and shall include the International Symbol of TTY."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12877
+}

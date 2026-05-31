@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176010\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176010\"><\/AnnotationDrawer><div>No kitchen or kitchenette shall be occupied for sleeping purposes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16870-html-1",
+      "kind" : "html",
+      "plainText" : "No kitchen or kitchenette shall be occupied for sleeping purposes."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16870
+}

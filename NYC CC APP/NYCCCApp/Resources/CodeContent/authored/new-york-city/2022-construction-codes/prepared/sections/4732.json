@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181236\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181236\"><\/AnnotationDrawer><div>Chimney flues shall not be smaller in area than the area of the connector from the appliance. Chimney flues connected to more than one appliance shall be not less than the area of the largest connector plus 50 percent of the areas of additional chimney connectors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181237\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181237\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181238\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181238\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Chimney flues serving oil-fired appliances sized in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> and NFPA 31.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181239\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181239\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Chimney flues serving gas-fired appliances sized in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4732-html-1",
+      "kind" : "html",
+      "plainText" : "Chimney flues shall not be smaller in area than the area of the connector from the appliance. Chimney flues connected to more than one appliance shall be not less than the area of the largest connector plus 50 percent of the areas of additional chimney connectors.\n\n Exceptions: \n\n 1. Chimney flues serving oil-fired appliances sized in accordance with the New York City Mechanical Code and NFPA 31.\n\n 2. Chimney flues serving gas-fired appliances sized in accordance with the New York City Fuel Gas Code."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4732
+}

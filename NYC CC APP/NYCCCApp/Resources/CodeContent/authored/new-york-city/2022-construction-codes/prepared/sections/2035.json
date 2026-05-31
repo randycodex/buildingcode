@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172585\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172585\"><\/AnnotationDrawer><div>The location of Fire Department connections shall be as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2035-html-1",
+      "kind" : "html",
+      "plainText" : "The location of Fire Department connections shall be as follows:"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2035
+}

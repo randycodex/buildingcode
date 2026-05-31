@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164480\"><\/AnnotationDrawer><div>The inspections set forth in Sections 110.3.1 through 110.3.7 shall be made during the progress of work to verify substantial compliance with the code and with approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13917-html-1",
+      "kind" : "html",
+      "plainText" : "The inspections set forth in Sections 110.3.1 through 110.3.7 shall be made during the progress of work to verify substantial compliance with the code and with approved construction documents."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13917
+}

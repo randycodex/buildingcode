@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172583\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172583\"><\/AnnotationDrawer><div>With respect to hydrants, driveways, buildings and landscaping, Fire Department connections shall be so located that fire apparatus and hose connected to supply the system will not obstruct access to the buildings for other fire apparatus.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15862-html-1",
+      "kind" : "html",
+      "plainText" : "With respect to hydrants, driveways, buildings and landscaping, Fire Department connections shall be so located that fire apparatus and hose connected to supply the system will not obstruct access to the buildings for other fire apparatus."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15862
+}

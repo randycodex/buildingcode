@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197819\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197819\"><\/AnnotationDrawer><div>The pipe size for each section of higher pressure gas piping shall be determined using the longest length of piping from the point of delivery to the most remote line pressure regulator. The pipe size from the line pressure regulator to each outlet shall be determined using the length of piping from the regulator to the most remote outlet served by the regulator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8110-html-1",
+      "kind" : "html",
+      "plainText" : "The pipe size for each section of higher pressure gas piping shall be determined using the longest length of piping from the point of delivery to the most remote line pressure regulator. The pipe size from the line pressure regulator to each outlet shall be determined using the length of piping from the regulator to the most remote outlet served by the regulator."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8110
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167641\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167641\"><\/AnnotationDrawer><div>High-piled stock or rack storage in any occupancy group shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>, including the requirement for permit approval<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-167642\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-167642\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-167642\"><\/AnnotationDrawer><h6><a name=\"JD_BC414\" id=\"JD_BC414\" title=\"BC 414\"><\/a>Section BC 414: Hazardous Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14417-html-1",
+      "kind" : "html",
+      "plainText" : "High-piled stock or rack storage in any occupancy group shall comply with the New York City Fire Code , including the requirement for permit approval . \n\n Section BC 414: Hazardous Materials"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14417
+}

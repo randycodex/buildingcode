@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186545\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186545\"><\/AnnotationDrawer><div>Guardrail systems installed to protect unenclosed perimeters may be removed where vertical safety netting systems meeting the requirements of Section 3308.5 have been installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20267-html-1",
+      "kind" : "html",
+      "plainText" : "Guardrail systems installed to protect unenclosed perimeters may be removed where vertical safety netting systems meeting the requirements of Section 3308.5 have been installed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20267
+}

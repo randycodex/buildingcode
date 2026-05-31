@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179706\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179706\"><\/AnnotationDrawer><div>Caisson piles shall consist of a shaft section of concrete or grout-filled pipe, extending to bedrock, with an uncased socket drilled into bedrock of Class 1c or better and filled with concrete or grout. The caisson pile shall have a full-length structural steel core, full length steel reinforcing, or a stub core or steel reinforcing installed in the rock socket and extending into the pipe portion a distance equal to the socket depth. The minimum outside diameter of the caisson pile shall be 7 inches (177.8 mm), and the diameter of the rock socket shall be approximately equal to the inside diameter of the caisson pile.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18005-html-1",
+      "kind" : "html",
+      "plainText" : "Caisson piles shall consist of a shaft section of concrete or grout-filled pipe, extending to bedrock, with an uncased socket drilled into bedrock of Class 1c or better and filled with concrete or grout. The caisson pile shall have a full-length structural steel core, full length steel reinforcing, or a stub core or steel reinforcing installed in the rock socket and extending into the pipe portion a distance equal to the socket depth. The minimum outside diameter of the caisson pile shall be 7 inches (177.8 mm), and the diameter of the rock socket shall be approximately equal to the inside diameter of the caisson pile."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18005
+}

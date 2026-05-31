@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187652\"><\/AnnotationDrawer><div>Material hoists, bucket hoists and their components shall be constructed in compliance with the manufacturing specifications, the requirements of this code, and rules promulgated by the commissioner. If there is a discrepancy, the stricter requirement shall be met.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187653\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187653\"><\/AnnotationDrawer><div>Upon completion of the installation of the hoisting equipment and\/or its runback structure, an inspection report verifying that the hoist has been installed in accordance with the design drawings, construction documents and specifications shall be prepared by the designer, installer or an approved inspection agency designated by both the designer and installer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20609-html-1",
+      "kind" : "html",
+      "plainText" : "Material hoists, bucket hoists and their components shall be constructed in compliance with the manufacturing specifications, the requirements of this code, and rules promulgated by the commissioner. If there is a discrepancy, the stricter requirement shall be met.\n\n Upon completion of the installation of the hoisting equipment and\/or its runback structure, an inspection report verifying that the hoist has been installed in accordance with the design drawings, construction documents and specifications shall be prepared by the designer, installer or an approved inspection agency designated by both the designer and installer."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20609
+}

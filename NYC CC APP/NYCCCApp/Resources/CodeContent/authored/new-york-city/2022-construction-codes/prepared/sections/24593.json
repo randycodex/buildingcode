@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161239\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161239\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Building drains that connect to private sewage disposal systems shall be a minimum of 36 inches (914 mm) below finished grade at the point of septic tank connection. Building sewers and drains shall be a minimum of 36 inches (914 mm) below grade.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24593-html-1",
+      "kind" : "html",
+      "plainText" : "Building drains that connect to private sewage disposal systems shall be a minimum of 36 inches (914 mm) below finished grade at the point of septic tank connection. Building sewers and drains shall be a minimum of 36 inches (914 mm) below grade."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 24593
+}

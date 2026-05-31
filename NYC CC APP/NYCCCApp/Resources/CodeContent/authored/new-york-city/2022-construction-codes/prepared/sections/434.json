@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167194\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167194\"><\/AnnotationDrawer><div>Exit access from all other portions of a building not classified as a care suite shall not pass through a care suite. In a care suite required to have more than one exit, one exit access is permitted to pass through an adjacent care suite provided all of the other requirements of Sections 407.4 and 1016.2 are satisfied.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "434-html-1",
+      "kind" : "html",
+      "plainText" : "Exit access from all other portions of a building not classified as a care suite shall not pass through a care suite. In a care suite required to have more than one exit, one exit access is permitted to pass through an adjacent care suite provided all of the other requirements of Sections 407.4 and 1016.2 are satisfied."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 434
+}

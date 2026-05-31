@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198291\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198291\"><\/AnnotationDrawer><div>A shutoff valve not less than the nominal size of the piping system shall be installed ahead of the connector in accordance with Section 409.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21112-html-1",
+      "kind" : "html",
+      "plainText" : "A shutoff valve not less than the nominal size of the piping system shall be installed ahead of the connector in accordance with Section 409.5."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21112
+}

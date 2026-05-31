@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181279\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181279\"><\/AnnotationDrawer><div>A smoke test shall be made as outlined below. Any faults or leaks found shall be corrected. Such smoke test shall be witnessed by a representative of the commissioner. In lieu thereof, the commissioner may accept the test report of the design professional engineer responsible for the test, which shall be submitted in writing to the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4742-html-1",
+      "kind" : "html",
+      "plainText" : "A smoke test shall be made as outlined below. Any faults or leaks found shall be corrected. Such smoke test shall be witnessed by a representative of the commissioner. In lieu thereof, the commissioner may accept the test report of the design professional engineer responsible for the test, which shall be submitted in writing to the department."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4742
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198637\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198637\"><\/AnnotationDrawer><div>Where one chimney flue serves gas appliances and liquid fuel-burning appliances, the appliances shall be connected through separate openings or shall be connected through a single opening where joined by a suitable fitting located as close as practical to the chimney. Where two or more openings are provided into one chimney flue, they shall be at different levels. Where the appliances are automatically controlled, they shall be equipped with safety shutoff devices.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21241-html-1",
+      "kind" : "html",
+      "plainText" : "Where one chimney flue serves gas appliances and liquid fuel-burning appliances, the appliances shall be connected through separate openings or shall be connected through a single opening where joined by a suitable fitting located as close as practical to the chimney. Where two or more openings are provided into one chimney flue, they shall be at different levels. Where the appliances are automatically controlled, they shall be equipped with safety shutoff devices."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21241
+}

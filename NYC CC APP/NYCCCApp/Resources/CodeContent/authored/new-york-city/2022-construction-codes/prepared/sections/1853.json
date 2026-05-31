@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172085\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172085\"><\/AnnotationDrawer><div>Each floor shall be zoned separately. For non-addressable systems, a zone shall not exceed 22,500 square feet (2090.3 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t). The length of any zone shall not exceed 300 feet (91 440 mm) in any direction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172086\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172086\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Automatic sprinkler system zones shall not exceed the area permitted by NFPA 13. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1853-html-1",
+      "kind" : "html",
+      "plainText" : "Each floor shall be zoned separately. For non-addressable systems, a zone shall not exceed 22,500 square feet (2090.3 m\n\n 2 \n\n ). The length of any zone shall not exceed 300 feet (91 440 mm) in any direction.\n\n Exception: Automatic sprinkler system zones shall not exceed the area permitted by NFPA 13."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1853
+}

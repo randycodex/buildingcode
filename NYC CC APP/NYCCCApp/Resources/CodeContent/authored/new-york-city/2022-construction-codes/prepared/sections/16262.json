@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174108\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174108\"><\/AnnotationDrawer><div>Interior exit stairways and ramps shall terminate at an exit discharge or a public way.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174109\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> A combination of interior exit stairways, interior exit ramps and exit passageways, constructed in accordance with Sections 1023.2, 1023.3.1 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174173', hash: '#JD_BC1024' }}\">1024<\/Link>, respectively, and forming a continuous protected enclosure, shall be permitted to extend an interior exit stairway or ramp to the exit discharge or a public way.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16262-html-1",
+      "kind" : "html",
+      "plainText" : "Interior exit stairways and ramps shall terminate at an exit discharge or a public way.\n\n Exception: A combination of interior exit stairways, interior exit ramps and exit passageways, constructed in accordance with Sections 1023.2, 1023.3.1 and 1024 , respectively, and forming a continuous protected enclosure, shall be permitted to extend an interior exit stairway or ramp to the exit discharge or a public way."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16262
+}

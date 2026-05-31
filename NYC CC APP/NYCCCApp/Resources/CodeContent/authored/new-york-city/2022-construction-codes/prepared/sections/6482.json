@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186699\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186699\"><\/AnnotationDrawer><div>For a project that requires a site safety plan, the general contractor shall enact and maintain a site safety monitoring program to implement such site safety plan. The site safety monitoring program shall, at a minimum, comply with Sections 3310.5 through 3310.10.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186700\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186700\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Subject to the approval of the commissioner, a site safety monitoring program may be waived, reduced, or modified in accordance with Section 3310.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6482-html-1",
+      "kind" : "html",
+      "plainText" : "For a project that requires a site safety plan, the general contractor shall enact and maintain a site safety monitoring program to implement such site safety plan. The site safety monitoring program shall, at a minimum, comply with Sections 3310.5 through 3310.10.\n\n Exception: Subject to the approval of the commissioner, a site safety monitoring program may be waived, reduced, or modified in accordance with Section 3310.11."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6482
+}

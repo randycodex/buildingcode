@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180887\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180887\"><\/AnnotationDrawer><div>An existing masonry wall may be used in the alteration or extension of a building provided that it meets the requirements of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18432-html-1",
+      "kind" : "html",
+      "plainText" : "An existing masonry wall may be used in the alteration or extension of a building provided that it meets the requirements of this code."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18432
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175173\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175173\"><\/AnnotationDrawer><div>Every dwelling unit and every sleeping unit not required to be an Accessible unit shall be a Type B+NYC unit unless the number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4. Where no Type B+NYC units are required in accordance with Section 1107.7.4, all units shall be Type B units. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175174\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175174\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The number of Type B units is permitted to be reduced in accordance with Section 1107.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2759-html-1",
+      "kind" : "html",
+      "plainText" : "Every dwelling unit and every sleeping unit not required to be an Accessible unit shall be a Type B+NYC unit unless the number of Type B+NYC units is permitted to be reduced in accordance with Section 1107.7.4. Where no Type B+NYC units are required in accordance with Section 1107.7.4, all units shall be Type B units. \n\n Exception: The number of Type B units is permitted to be reduced in accordance with Section 1107.7."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2759
+}

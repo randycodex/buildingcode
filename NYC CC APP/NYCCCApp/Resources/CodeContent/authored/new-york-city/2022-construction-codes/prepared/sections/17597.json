@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178464\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178464\"><\/AnnotationDrawer><div>The thickness of the sprayed fire-resistant material applied to floor, roof and wall assemblies shall be determined in accordance with ASTM E 605, making not fewer than four measurements for each 1,000 square feet (92.9 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of the sprayed area in each story or portion thereof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17597-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of the sprayed fire-resistant material applied to floor, roof and wall assemblies shall be determined in accordance with ASTM E 605, making not fewer than four measurements for each 1,000 square feet (92.9 m\n\n 2 \n\n ) of the sprayed area in each story or portion thereof."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17597
+}

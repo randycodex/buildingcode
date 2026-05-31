@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199417\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199417\"><\/AnnotationDrawer><div>Illuminating appliances designed for post mounting shall be securely and rigidly attached to a post. Posts shall be rigidly mounted in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span> Drain openings shall be provided near the base of posts where there is a possibility of water collecting inside them.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8687-html-1",
+      "kind" : "html",
+      "plainText" : "Illuminating appliances designed for post mounting shall be securely and rigidly attached to a post. Posts shall be rigidly mounted in accordance with the requirements of the New York City Building Code. Drain openings shall be provided near the base of posts where there is a possibility of water collecting inside them."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8687
+}

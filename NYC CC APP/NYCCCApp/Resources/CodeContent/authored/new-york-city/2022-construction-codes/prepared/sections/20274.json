@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186559\"><\/AnnotationDrawer><div>Repairs to unenclosed perimeter protection shall be in accordance with the specifications of the manufacturer of such and shall provide the original manufacturer factor of safety, or where manufacturer specifications do not exist, shall be repaired in accordance with specifications developed by the registered design professional responsible for the design of the unenclosed perimeter protection in accordance with Section 3308.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186560\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186560\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Structural nets and debris nets shall not be repaired.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20274-html-1",
+      "kind" : "html",
+      "plainText" : "Repairs to unenclosed perimeter protection shall be in accordance with the specifications of the manufacturer of such and shall provide the original manufacturer factor of safety, or where manufacturer specifications do not exist, shall be repaired in accordance with specifications developed by the registered design professional responsible for the design of the unenclosed perimeter protection in accordance with Section 3308.3.1.\n\n Exception: Structural nets and debris nets shall not be repaired."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20274
+}

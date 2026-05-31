@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179285\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179285\"><\/AnnotationDrawer><div>Where load tests are required per Section 1810.3 or 1810.4.1.1.1, the deep foundations shall be load tested in accordance with the applicable section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4039-html-1",
+      "kind" : "html",
+      "plainText" : "Where load tests are required per Section 1810.3 or 1810.4.1.1.1, the deep foundations shall be load tested in accordance with the applicable section."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4039
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160667\"><\/AnnotationDrawer><div>If a section, subsection, sentence, clause or phrase of this code is, for any reason, held to be unconstitutional, such decision shall not affect the validity of the remaining portions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-160668\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-160668\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-160668\"><\/AnnotationDrawer><h6><a name=\"JD_PC102\" id=\"JD_PC102\" title=\"PC 102\"><\/a>Section PC 102: Applicability<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24491-html-1",
+      "kind" : "html",
+      "plainText" : "If a section, subsection, sentence, clause or phrase of this code is, for any reason, held to be unconstitutional, such decision shall not affect the validity of the remaining portions of this code.\n\n Section PC 102: Applicability"
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 24491
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181964\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181964\"><\/AnnotationDrawer><div>For under-floor ventilation (crawl space), see Section 1203.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4974-html-1",
+      "kind" : "html",
+      "plainText" : "For under-floor ventilation (crawl space), see Section 1203.4."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4974
+}

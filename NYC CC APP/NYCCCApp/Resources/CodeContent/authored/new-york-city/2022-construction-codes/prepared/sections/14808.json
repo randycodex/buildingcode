@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169003\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169003\"><\/AnnotationDrawer><div>Where columns are required to have protection to achieve a fire-resistance rating, the entire column shall be provided individual encasement protection by protecting it on all sides for the full column height, including connections to other structural members, with materials having the required fire-resistance rating. Where the column extends through a ceiling, the encasement protection shall be continuous from the top of the foundation or floor\/ceiling assembly below through the ceiling space to the top of the column.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14808-html-1",
+      "kind" : "html",
+      "plainText" : "Where columns are required to have protection to achieve a fire-resistance rating, the entire column shall be provided individual encasement protection by protecting it on all sides for the full column height, including connections to other structural members, with materials having the required fire-resistance rating. Where the column extends through a ceiling, the encasement protection shall be continuous from the top of the foundation or floor\/ceiling assembly below through the ceiling space to the top of the column."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14808
+}

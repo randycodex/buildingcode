@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178214\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178214\"><\/AnnotationDrawer><div>Work that is subject to special inspection and performed on the approved fabricator's premises shall be inspected by the special inspection agency in accordance with Section 1704.2.2.3. Approval of fabricators shall be based upon review of the fabricator's written procedural and quality control manuals and periodic auditing of fabrication practices by an approved agency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3690-html-1",
+      "kind" : "html",
+      "plainText" : "Work that is subject to special inspection and performed on the approved fabricator's premises shall be inspected by the special inspection agency in accordance with Section 1704.2.2.3. Approval of fabricators shall be based upon review of the fabricator's written procedural and quality control manuals and periodic auditing of fabrication practices by an approved agency."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3690
+}

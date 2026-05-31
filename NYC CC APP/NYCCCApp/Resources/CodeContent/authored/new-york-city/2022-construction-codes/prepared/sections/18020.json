@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179736\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179736\"><\/AnnotationDrawer><div>Reinforcement shall consist of deformed reinforcing bars in accordance with ASTM A 615 Grade 60 or 75 or ASTM A 722 Grade 150. The steel pipe or casing shall have a minimum yield strength of 45,000 psi (310.3 MPa) and a minimum elongation of 15 percent as shown by mill certifications or two coupon test samples per 40,000 pounds (18 143.7 kg) of pipe or casing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18020-html-1",
+      "kind" : "html",
+      "plainText" : "Reinforcement shall consist of deformed reinforcing bars in accordance with ASTM A 615 Grade 60 or 75 or ASTM A 722 Grade 150. The steel pipe or casing shall have a minimum yield strength of 45,000 psi (310.3 MPa) and a minimum elongation of 15 percent as shown by mill certifications or two coupon test samples per 40,000 pounds (18 143.7 kg) of pipe or casing."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18020
+}

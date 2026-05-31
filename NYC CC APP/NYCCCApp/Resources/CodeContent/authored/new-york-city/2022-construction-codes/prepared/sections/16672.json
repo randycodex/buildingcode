@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175410\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175410\"><\/AnnotationDrawer><div>Visible display screens, including touchscreens, shall be provided in accordance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16672-html-1",
+      "kind" : "html",
+      "plainText" : "Visible display screens, including touchscreens, shall be provided in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16672
+}

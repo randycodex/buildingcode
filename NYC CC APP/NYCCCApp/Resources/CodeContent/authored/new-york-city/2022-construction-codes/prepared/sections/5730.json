@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184480\"><\/AnnotationDrawer><div>Vaults may be permitted in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Charter<\/span> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-30397', hash: '#JD_T19' }}\">Title 19<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code.<\/span> Such vaults shall comply with the provisions of this code and other applicable laws and rules.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5730-html-1",
+      "kind" : "html",
+      "plainText" : "Vaults may be permitted in accordance with the New York City Charter and Title 19 of the Administrative Code. Such vaults shall comply with the provisions of this code and other applicable laws and rules."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5730
+}

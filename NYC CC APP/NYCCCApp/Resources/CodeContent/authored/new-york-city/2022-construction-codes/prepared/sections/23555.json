@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194347\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194347\"><\/AnnotationDrawer><div>Ducts connecting to a furnace shall have a clearance to combustibles in accordance with the furnace manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23555-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts connecting to a furnace shall have a clearance to combustibles in accordance with the furnace manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23555
+}

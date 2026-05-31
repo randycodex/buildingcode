@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162646\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162646\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints between glass pipe and other types of materials shall be made with adapters having a TFE seal and shall be installed in accordance with the manufacturer's instructions.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25149-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between glass pipe and other types of materials shall be made with adapters having a TFE seal and shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25149
+}

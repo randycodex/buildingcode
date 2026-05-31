@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198529\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198529\"><\/AnnotationDrawer><div>Listed direct-vent appliances shall be considered properly vented where installed in accordance with the terms of its listing, the manufacturer's instructions and Section 503.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21207-html-1",
+      "kind" : "html",
+      "plainText" : "Listed direct-vent appliances shall be considered properly vented where installed in accordance with the terms of its listing, the manufacturer's instructions and Section 503.8."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21207
+}

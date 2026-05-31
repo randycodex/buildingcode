@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192886\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192886\"><\/AnnotationDrawer><div>Fuel-fired appliances shall be designed for use with the type of fuel to which they will be connected and the altitude at which they are installed. Appliances that comprise parts of the building mechanical system shall not be converted for the usage of a different fuel, except where approved and converted in accordance with the manufacturer's instructions. The fuel input rate shall not be increased or decreased beyond the limit rating for the altitude at which the appliance is installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10225-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-fired appliances shall be designed for use with the type of fuel to which they will be connected and the altitude at which they are installed. Appliances that comprise parts of the building mechanical system shall not be converted for the usage of a different fuel, except where approved and converted in accordance with the manufacturer's instructions. The fuel input rate shall not be increased or decreased beyond the limit rating for the altitude at which the appliance is installed."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 10225
+}

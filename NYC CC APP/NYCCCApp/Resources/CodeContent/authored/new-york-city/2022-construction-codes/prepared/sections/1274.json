@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169870\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169870\"><\/AnnotationDrawer><div>permitted. Fire-protection-rated glazing requiring 45-minute opening protection in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169848', hash: '#JD_BCTable716.6' }}\">Table 716.6<\/Link> shall be limited to fire partitions designed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169338', hash: '#JD_BC708' }}\">708<\/Link> and fire barriers utilized in the applications set forth in Sections 707.3.6, 707.3.7 and 707.3.9 where the fire-resistance rating does not exceed 1 hour. Fire-resistance-rated glazing assemblies tested in accordance with ASTM E 119 or UL 263 shall not be subject to the limitations of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1274-html-1",
+      "kind" : "html",
+      "plainText" : "permitted. Fire-protection-rated glazing requiring 45-minute opening protection in accordance with Table 716.6 shall be limited to fire partitions designed in accordance with Section 708 and fire barriers utilized in the applications set forth in Sections 707.3.6, 707.3.7 and 707.3.9 where the fire-resistance rating does not exceed 1 hour. Fire-resistance-rated glazing assemblies tested in accordance with ASTM E 119 or UL 263 shall not be subject to the limitations of this section."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1274
+}

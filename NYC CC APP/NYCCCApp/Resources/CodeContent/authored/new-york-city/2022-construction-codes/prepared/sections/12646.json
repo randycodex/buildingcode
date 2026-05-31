@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163534\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163534\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The suitability of the subsurface soils must be verified in place by either a percolation test or a permeability test. Where testing determines that the infiltration rate of the subsurface soils is less than 1\/2 inch (12.7 mm) per hour, private on-site stormwater disposal systems shall not be permitted. Such tests shall conform to Section 1114.2.2.1 or 1114.2.2.2, as applicable.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12646-html-1",
+      "kind" : "html",
+      "plainText" : "The suitability of the subsurface soils must be verified in place by either a percolation test or a permeability test. Where testing determines that the infiltration rate of the subsurface soils is less than 1\/2 inch (12.7 mm) per hour, private on-site stormwater disposal systems shall not be permitted. Such tests shall conform to Section 1114.2.2.1 or 1114.2.2.2, as applicable."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 12646
+}

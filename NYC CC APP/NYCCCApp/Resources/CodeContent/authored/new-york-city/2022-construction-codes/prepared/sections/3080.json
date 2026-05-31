@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176143\"><\/AnnotationDrawer><div>Basic hardboard shall conform to the requirements of ANSI A135.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3080-html-1",
+      "kind" : "html",
+      "plainText" : "Basic hardboard shall conform to the requirements of ANSI A135.4."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3080
+}

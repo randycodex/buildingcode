@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179871\"><\/AnnotationDrawer><div>Load testing shall be in accordance with PTI DC35.1. Extended creep tests shall be performed for any anchors designed with bonded zones located within materials designated as Class 1d, Class 4 or Class 5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4247-html-1",
+      "kind" : "html",
+      "plainText" : "Load testing shall be in accordance with PTI DC35.1. Extended creep tests shall be performed for any anchors designed with bonded zones located within materials designated as Class 1d, Class 4 or Class 5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4247
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176216\"><\/AnnotationDrawer><div>Anchored masonry veneer shall comply with the provisions of Sections 1405.6, 1405.7, 1405.8 and 1405.9 and Sections 12.1 and 12.2 of TMS 402, as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180723', hash: '#JD_BCCh.21' }}\">Chapter 21<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16936-html-1",
+      "kind" : "html",
+      "plainText" : "Anchored masonry veneer shall comply with the provisions of Sections 1405.6, 1405.7, 1405.8 and 1405.9 and Sections 12.1 and 12.2 of TMS 402, as modified by Chapter 21 of this code."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 16936
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193956\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193956\"><\/AnnotationDrawer><div>Exhaust outlets located within the hood shall be located to optimize the capture of particulate matter. Each outlet shall serve not more than a 12-foot (3657.6 mm) section of hood.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23422-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust outlets located within the hood shall be located to optimize the capture of particulate matter. Each outlet shall serve not more than a 12-foot (3657.6 mm) section of hood."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23422
+}

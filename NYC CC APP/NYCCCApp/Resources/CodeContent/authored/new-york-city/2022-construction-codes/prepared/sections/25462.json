@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163503\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163503\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The sump pit shall be not less than 18 inches (457 mm) in diameter and not less than 24 inches (610 mm) in depth, unless otherwise approved. The pit shall be accessible and located such that all drainage flows into the pit by gravity. The sump pit shall be constructed of tile, steel, plastic, cast iron, concrete or other approved material, with a removable cover adequate to support anticipated loads in the area of use. The pit floor shall be solid and provide permanent support for the pump.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25462-html-1",
+      "kind" : "html",
+      "plainText" : "The sump pit shall be not less than 18 inches (457 mm) in diameter and not less than 24 inches (610 mm) in depth, unless otherwise approved. The pit shall be accessible and located such that all drainage flows into the pit by gravity. The sump pit shall be constructed of tile, steel, plastic, cast iron, concrete or other approved material, with a removable cover adequate to support anticipated loads in the area of use. The pit floor shall be solid and provide permanent support for the pump."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25462
+}

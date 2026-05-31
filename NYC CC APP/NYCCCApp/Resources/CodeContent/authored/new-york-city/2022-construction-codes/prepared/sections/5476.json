@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183809\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183809\"><\/AnnotationDrawer><div>A rational analysis complying with Section 909.4 shall be submitted with the construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5476-html-1",
+      "kind" : "html",
+      "plainText" : "A rational analysis complying with Section 909.4 shall be submitted with the construction documents."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5476
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196559\"><\/AnnotationDrawer><div>Tanks shall be installed in accordance with the provisions of section 1305.13.1 through 1305.13.4. For the purposes of this section, fuel oil stored on roofs shall be deemed inside of buildings. At least 15 inches (381 mm) clearance shall be provided over tanks and on all sides between the tanks and the enclosure, embankment or dike or greater clearance as required by the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24367-html-1",
+      "kind" : "html",
+      "plainText" : "Tanks shall be installed in accordance with the provisions of section 1305.13.1 through 1305.13.4. For the purposes of this section, fuel oil stored on roofs shall be deemed inside of buildings. At least 15 inches (381 mm) clearance shall be provided over tanks and on all sides between the tanks and the enclosure, embankment or dike or greater clearance as required by the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24367
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167263\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167263\"><\/AnnotationDrawer><div>Doors to resident sleeping units shall have a clear width of not less than 28 inches (711 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "457-html-1",
+      "kind" : "html",
+      "plainText" : "Doors to resident sleeping units shall have a clear width of not less than 28 inches (711 mm)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 457
+}

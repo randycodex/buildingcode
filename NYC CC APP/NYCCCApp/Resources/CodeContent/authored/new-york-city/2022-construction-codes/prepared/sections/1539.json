@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171013\"><\/AnnotationDrawer><div>Fire protection systems shall be dedicated to one building only.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171014\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171014\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Upon review and approval by the commissioner and the Fire Department, multiple buildings may be served by one fire protection system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1539-html-1",
+      "kind" : "html",
+      "plainText" : "Fire protection systems shall be dedicated to one building only.\n\n Exception: Upon review and approval by the commissioner and the Fire Department, multiple buildings may be served by one fire protection system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1539
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198107\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198107\"><\/AnnotationDrawer><div>Each digital gauge used to measure pressure in the magnitude of 3 psig (20.9 kPa gauge) and higher shall meet the following requirements in addition to satisfying the minimum requirements set forth in Section 406.4.3:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198108\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198108\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The gauge shall have a minimum reading of 1\/100 of a psig (69 Pa), and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198109\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;An extra charged battery shall be readily available for immediate use with the gauge.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21047-html-1",
+      "kind" : "html",
+      "plainText" : "Each digital gauge used to measure pressure in the magnitude of 3 psig (20.9 kPa gauge) and higher shall meet the following requirements in addition to satisfying the minimum requirements set forth in Section 406.4.3:\n\n 1. The gauge shall have a minimum reading of 1\/100 of a psig (69 Pa), and\n\n 2. An extra charged battery shall be readily available for immediate use with the gauge."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21047
+}

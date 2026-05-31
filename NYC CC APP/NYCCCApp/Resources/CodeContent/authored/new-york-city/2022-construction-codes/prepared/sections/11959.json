@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161735\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161735\"><\/AnnotationDrawer><div>The approval and installation of all sterilizers shall conform to the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York city mechanical code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11959-html-1",
+      "kind" : "html",
+      "plainText" : "The approval and installation of all sterilizers shall conform to the requirements of the New York city mechanical code ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11959
+}

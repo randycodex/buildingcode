@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198479\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198479\"><\/AnnotationDrawer><div>The design, sizing and installation of vents for Category II, III and IV appliances shall be in accordance with the appliance manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21184-html-1",
+      "kind" : "html",
+      "plainText" : "The design, sizing and installation of vents for Category II, III and IV appliances shall be in accordance with the appliance manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21184
+}

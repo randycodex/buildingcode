@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187396\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187396\"><\/AnnotationDrawer><div>The fulcrum point of the beam shall rest on a secure bearing at least 6 inches (152 mm) in each horizontal dimension. The beam shall be secured against movement and shall be securely braced against tipping at both the fulcrum point and the inboard end.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6697-html-1",
+      "kind" : "html",
+      "plainText" : "The fulcrum point of the beam shall rest on a secure bearing at least 6 inches (152 mm) in each horizontal dimension. The beam shall be secured against movement and shall be securely braced against tipping at both the fulcrum point and the inboard end."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6697
+}

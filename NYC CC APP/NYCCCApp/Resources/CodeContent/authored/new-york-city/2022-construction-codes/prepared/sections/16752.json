@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175658\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175658\"><\/AnnotationDrawer><div>Where provided in the locations in Sections 1111.4.1 and 1111.4.2 of this code, variable message signs shall comply with the variable message sign requirements of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16752-html-1",
+      "kind" : "html",
+      "plainText" : "Where provided in the locations in Sections 1111.4.1 and 1111.4.2 of this code, variable message signs shall comply with the variable message sign requirements of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16752
+}

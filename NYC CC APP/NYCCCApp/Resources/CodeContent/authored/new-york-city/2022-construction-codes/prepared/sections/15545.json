@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171637\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171637\"><\/AnnotationDrawer><div>Stages greater than 1,000 square feet in area (92.9 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t), or any assembly occupancy having an occupant load of 1,000 or more with a stage of any size, shall be equipped with a Class III wet standpipe system with a hose station on each side of the stage. Such hose stations shall comply with Section 905.6 and shall have sufficient hose to provide protection for the entire stage area from either standpipe location. The exceptions allowed under Section 905.3.1 shall not apply to these hose stations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15545-html-1",
+      "kind" : "html",
+      "plainText" : "Stages greater than 1,000 square feet in area (92.9 m\n\n 2 \n\n ), or any assembly occupancy having an occupant load of 1,000 or more with a stage of any size, shall be equipped with a Class III wet standpipe system with a hose station on each side of the stage. Such hose stations shall comply with Section 905.6 and shall have sufficient hose to provide protection for the entire stage area from either standpipe location. The exceptions allowed under Section 905.3.1 shall not apply to these hose stations."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15545
+}

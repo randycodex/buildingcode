@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184301\"><\/AnnotationDrawer><div>Diving towers shall be rigidly constructed and permanently anchored. The depth of the water below a diving board shall be not less than 102 inches (2591 mm) for a board 39 inches (991 mm) or less above the water. For a diving board more than 39 inches (991 mm) and not more than 118 inches (2997 mm) above the water, the depth of the water below the board shall be not less than 144 inches (3658 mm). For a diving board or platform more than 118 inches (2997 mm) above the water, the depth of the water below the board shall be not less than 192 inches (4877 mm). Indoor swimming pools shall provide not less than 144 inches (3658 mm) overhead clearance above all diving boards.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5668-html-1",
+      "kind" : "html",
+      "plainText" : "Diving towers shall be rigidly constructed and permanently anchored. The depth of the water below a diving board shall be not less than 102 inches (2591 mm) for a board 39 inches (991 mm) or less above the water. For a diving board more than 39 inches (991 mm) and not more than 118 inches (2997 mm) above the water, the depth of the water below the board shall be not less than 144 inches (3658 mm). For a diving board or platform more than 118 inches (2997 mm) above the water, the depth of the water below the board shall be not less than 192 inches (4877 mm). Indoor swimming pools shall provide not less than 144 inches (3658 mm) overhead clearance above all diving boards."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5668
+}

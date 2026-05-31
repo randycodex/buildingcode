@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162705\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162705\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Cleanout plugs shall be of brass, plastic or other approved materials. Cleanout plugs for borosilicate glass piping systems shall be of borosilicate glass. Brass cleanout plugs shall conform to ASTM A 74 and shall be limited for use only on metallic piping systems. Plastic cleanout plugs shall conform to the referenced standards for plastic pipe fittings, as indicated in <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162493', hash: '#JD_PCTable702.4' }}\">Table 702.4<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">. Cleanout plugs shall have a raised square head, a countersunk square head or a countersunk slot head. Where a cleanout plug will have a trim cover screw installed into the plug, the plug shall be manufactured with a blind end threaded hole for such purpose.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25166-html-1",
+      "kind" : "html",
+      "plainText" : "Cleanout plugs shall be of brass, plastic or other approved materials. Cleanout plugs for borosilicate glass piping systems shall be of borosilicate glass. Brass cleanout plugs shall conform to ASTM A 74 and shall be limited for use only on metallic piping systems. Plastic cleanout plugs shall conform to the referenced standards for plastic pipe fittings, as indicated in Table 702.4 . Cleanout plugs shall have a raised square head, a countersunk square head or a countersunk slot head. Where a cleanout plug will have a trim cover screw installed into the plug, the plug shall be manufactured with a blind end threaded hole for such purpose."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25166
+}

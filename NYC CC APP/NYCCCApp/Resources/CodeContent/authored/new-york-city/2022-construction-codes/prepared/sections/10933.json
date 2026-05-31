@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194952\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194952\"><\/AnnotationDrawer><div>Vents shall terminate not less than 5 feet (1524 mm) in vertical height above the highest connected appliance flue collar.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194953\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194953\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194954\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194954\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Venting systems of direct vent appliances shall be installed in accordance with the appliance and the vent manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194955\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194955\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Appliances listed for outdoor installations incorporating integral venting means shall be installed in accordance with their listings and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10933-html-1",
+      "kind" : "html",
+      "plainText" : "Vents shall terminate not less than 5 feet (1524 mm) in vertical height above the highest connected appliance flue collar.\n\n Exceptions: \n\n 1. Venting systems of direct vent appliances shall be installed in accordance with the appliance and the vent manufacturer's instructions.\n\n 2. Appliances listed for outdoor installations incorporating integral venting means shall be installed in accordance with their listings and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10933
+}

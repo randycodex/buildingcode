@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174645\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174645\"><\/AnnotationDrawer><div>Places of assembly in which the net floor area, exclusive of stage area, is less than 12 square feet (1.11 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) per person shall have special egress provisions in accordance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16422-html-1",
+      "kind" : "html",
+      "plainText" : "Places of assembly in which the net floor area, exclusive of stage area, is less than 12 square feet (1.11 m\n\n 2 \n\n ) per person shall have special egress provisions in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16422
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163100\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163100\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The lower section of the drainage stack shall be vented by a yoke vent connecting between the offset and the next lower horizontal branch. The yoke vent connection shall be permitted to be a vertical extension of the drainage stack. The size of the yoke vent and connection shall be a minimum of the size required for the vent stack of the drainage stack.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163101\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163101\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163101\"><\/AnnotationDrawer><h6><a name=\"JD_PC908\" id=\"JD_PC908\" title=\"PC 908\"><\/a>Section PC 908: Relief Vents &#8211; Stacks of More than 10 Branch Intervals<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25322-html-1",
+      "kind" : "html",
+      "plainText" : "The lower section of the drainage stack shall be vented by a yoke vent connecting between the offset and the next lower horizontal branch. The yoke vent connection shall be permitted to be a vertical extension of the drainage stack. The size of the yoke vent and connection shall be a minimum of the size required for the vent stack of the drainage stack. \n\n Section PC 908: Relief Vents - Stacks of More than 10 Branch Intervals"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25322
+}

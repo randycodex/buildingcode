@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230028\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230028\"><\/AnnotationDrawer><div>The ADU shall be constructed as a separate building from the primary dwelling. Both the ADU and the primary dwelling shall provide: \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230027\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230027\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;All vertical circulation and exit systems required by this code without entering the other building. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230026\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;All fire protection systems required by this code without reliance on the other building. A shared water supply in accordance with Section U103.5.4 shall be permitted. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7856-html-1",
+      "kind" : "html",
+      "plainText" : "The ADU shall be constructed as a separate building from the primary dwelling. Both the ADU and the primary dwelling shall provide: \n\n 1. All vertical circulation and exit systems required by this code without entering the other building. \n\n 2. All fire protection systems required by this code without reliance on the other building. A shared water supply in accordance with Section U103.5.4 shall be permitted."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7856
+}

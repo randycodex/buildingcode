@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162714\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162714\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Cleanouts for 6-inch (153 mm) and smaller piping shall be provided with a clearance of not less than 18 inches (457 mm) from, and perpendicular to, the face of the opening to any obstruction. Cleanouts for 8-inch (203 mm) and larger piping shall be provided with a clearance of not less than 36 inches (914 mm) from, and perpendicular to, the face of the opening to any obstruction.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25169-html-1",
+      "kind" : "html",
+      "plainText" : "Cleanouts for 6-inch (153 mm) and smaller piping shall be provided with a clearance of not less than 18 inches (457 mm) from, and perpendicular to, the face of the opening to any obstruction. Cleanouts for 8-inch (203 mm) and larger piping shall be provided with a clearance of not less than 36 inches (914 mm) from, and perpendicular to, the face of the opening to any obstruction."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25169
+}

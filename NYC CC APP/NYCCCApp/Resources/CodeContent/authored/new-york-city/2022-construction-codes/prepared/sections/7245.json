@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189181\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189181\"><\/AnnotationDrawer><div>The same fabric shall not be used for longer than a 12 month period. The same fabric may be relocated and re-erected within that 12 month period, but in no case shall re-inking of fabrics be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7245-html-1",
+      "kind" : "html",
+      "plainText" : "The same fabric shall not be used for longer than a 12 month period. The same fabric may be relocated and re-erected within that 12 month period, but in no case shall re-inking of fabrics be permitted."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7245
+}

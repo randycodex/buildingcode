@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184516\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184516\"><\/AnnotationDrawer><div>Marquees shall project no closer to the curb line than 2 feet (610 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5744-html-1",
+      "kind" : "html",
+      "plainText" : "Marquees shall project no closer to the curb line than 2 feet (610 mm)."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5744
+}

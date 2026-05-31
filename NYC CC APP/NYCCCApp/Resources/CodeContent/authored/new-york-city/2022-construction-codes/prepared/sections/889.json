@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168610\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168610\"><\/AnnotationDrawer><div>The aggregate floor area of Group H occupancies located in an unlimited area building shall not exceed 10 percent of the area of the building and shall not exceed the area limitations for the Group H occupancies as specified in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168483', hash: '#JD_BC506' }}\">506<\/Link> based on the perimeter of each Group H floor area that fronts on a public way or open space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "889-html-1",
+      "kind" : "html",
+      "plainText" : "The aggregate floor area of Group H occupancies located in an unlimited area building shall not exceed 10 percent of the area of the building and shall not exceed the area limitations for the Group H occupancies as specified in Section 506 based on the perimeter of each Group H floor area that fronts on a public way or open space."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 889
+}

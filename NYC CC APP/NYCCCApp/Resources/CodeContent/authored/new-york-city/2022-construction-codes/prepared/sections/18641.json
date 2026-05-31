@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181452\"><\/AnnotationDrawer><div>The design of cold-formed steel light-frame construction to resist seismic forces shall be in accordance with the provisions of Section 2211.1.1.1 or 2211.1.1.2, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18641-html-1",
+      "kind" : "html",
+      "plainText" : "The design of cold-formed steel light-frame construction to resist seismic forces shall be in accordance with the provisions of Section 2211.1.1.1 or 2211.1.1.2, as applicable."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18641
+}

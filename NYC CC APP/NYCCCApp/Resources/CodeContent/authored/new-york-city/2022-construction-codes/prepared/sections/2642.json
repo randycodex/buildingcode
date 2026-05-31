@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174836\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174836\"><\/AnnotationDrawer><div>Group U occupancies are not required to comply with this chapter other than the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174837\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174837\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;In agricultural buildings and livestock shelters, access is required to paved work areas and areas open to the general public.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174838\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174838\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Green houses and stables open to the public.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174839\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174839\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Private garages or carports that contain required accessible parking.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2642-html-1",
+      "kind" : "html",
+      "plainText" : "Group U occupancies are not required to comply with this chapter other than the following:\n\n 1. In agricultural buildings and livestock shelters, access is required to paved work areas and areas open to the general public.\n\n 2. Green houses and stables open to the public.\n\n 3. Private garages or carports that contain required accessible parking."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2642
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162448\"><\/AnnotationDrawer><div>The determination as to whether connection to an available sanitary or combined public sewer is feasible shall be in accordance with the applicable standards of the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12241-html-1",
+      "kind" : "html",
+      "plainText" : "The determination as to whether connection to an available sanitary or combined public sewer is feasible shall be in accordance with the applicable standards of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12241
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187091\"><\/AnnotationDrawer><div>Where sustained winds or wind gusts at the site exceed 30 miles per hour, the installation, repair, maintenance, adjustment, use, operation, and removal of scaffolds located on the roof or setback of a building, exterior to a building or structure, on a working deck, or in an area with an unenclosed perimeter shall cease and the scaffold shall be secured. If the manufacturer or designer of the scaffold recommends work to cease at a lower wind speed, such recommendation shall instead apply. Wind speed shall be determined based on data from the nearest United States weather bureau reporting station, or an anemometer located at the site, freely exposed to the wind, and calibrated in accordance with ASTM D 5096. No scaffold installation, repair, maintenance, adjustment, use, operation, or removal work shall commence where the weather forecast indicates the work will not be able to be safely completed and the scaffold secured before sustained winds or wind gusts exceed the thresholds established by this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6599-html-1",
+      "kind" : "html",
+      "plainText" : "Where sustained winds or wind gusts at the site exceed 30 miles per hour, the installation, repair, maintenance, adjustment, use, operation, and removal of scaffolds located on the roof or setback of a building, exterior to a building or structure, on a working deck, or in an area with an unenclosed perimeter shall cease and the scaffold shall be secured. If the manufacturer or designer of the scaffold recommends work to cease at a lower wind speed, such recommendation shall instead apply. Wind speed shall be determined based on data from the nearest United States weather bureau reporting station, or an anemometer located at the site, freely exposed to the wind, and calibrated in accordance with ASTM D 5096. No scaffold installation, repair, maintenance, adjustment, use, operation, or removal work shall commence where the weather forecast indicates the work will not be able to be safely completed and the scaffold secured before sustained winds or wind gusts exceed the thresholds established by this section."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6599
+}

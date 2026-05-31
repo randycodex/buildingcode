@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195699\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195699\"><\/AnnotationDrawer><div>Where the refrigerant-containing parts of a system are located in one or more spaces that do not communicate through permanent openings or HVAC ducts, the volume of the smallest, enclosed occupied space shall be used to determine the permissible quantity of refrigerant in the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24012-html-1",
+      "kind" : "html",
+      "plainText" : "Where the refrigerant-containing parts of a system are located in one or more spaces that do not communicate through permanent openings or HVAC ducts, the volume of the smallest, enclosed occupied space shall be used to determine the permissible quantity of refrigerant in the system."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24012
+}

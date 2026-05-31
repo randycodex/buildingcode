@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194616\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194616\"><\/AnnotationDrawer><div>A listed smoke damper designed to resist the passage of smoke shall be provided at each point where an air transfer opening penetrates a smoke partition. Smoke dampers and smoke damper actuation methods shall comply with Section 607.3.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194617\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194618\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Where the installation of a smoke damper will interfere with the operation of a required smoke control system in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-194165', hash: '#JD_MC513' }}\">513<\/Link>, approved alternate protection shall be used.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194619\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194619\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Smoke dampers shall not be required in ducts where the air continues to move and the air-handling system installed is arranged to prevent recirculation of exhaust or return air under fire emergency conditions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10818-html-1",
+      "kind" : "html",
+      "plainText" : "A listed smoke damper designed to resist the passage of smoke shall be provided at each point where an air transfer opening penetrates a smoke partition. Smoke dampers and smoke damper actuation methods shall comply with Section 607.3.3.2.\n\n Exceptions: \n\n 1. Where the installation of a smoke damper will interfere with the operation of a required smoke control system in accordance with Section 513 , approved alternate protection shall be used.\n\n 2. Smoke dampers shall not be required in ducts where the air continues to move and the air-handling system installed is arranged to prevent recirculation of exhaust or return air under fire emergency conditions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10818
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194053\"><\/AnnotationDrawer><div>Equipment or machinery within a building that generates or emits combustible fibers shall be provided with an approved dust-collecting and exhaust system. Such systems shall comply with this code and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10632-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment or machinery within a building that generates or emits combustible fibers shall be provided with an approved dust-collecting and exhaust system. Such systems shall comply with this code and the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10632
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184808\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184808\"><\/AnnotationDrawer><div>The permit holder shall maintain, for each worker, a record of one pre-shift safety meeting per week. Such record shall include for each such meeting: \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184809\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184809\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The date and time of each such meeting; \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184810\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184810\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The name, title and company affiliation of each worker who participated; and \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184811\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184811\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The name, title and company affiliation of the competent person who conducted such meeting, along with such person's signature. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184812\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184812\"><\/AnnotationDrawer><div>(L.L. 2017\/204, 11\/17\/2017, eff. 5\/16\/2018) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19711-html-1",
+      "kind" : "html",
+      "plainText" : "The permit holder shall maintain, for each worker, a record of one pre-shift safety meeting per week. Such record shall include for each such meeting: \n\n 1. The date and time of each such meeting; \n\n 2. The name, title and company affiliation of each worker who participated; and \n\n 3. The name, title and company affiliation of the competent person who conducted such meeting, along with such person's signature. \n\n (L.L. 2017\/204, 11\/17\/2017, eff. 5\/16\/2018)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19711
+}

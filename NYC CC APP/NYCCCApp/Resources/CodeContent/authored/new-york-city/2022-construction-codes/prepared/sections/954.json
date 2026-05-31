@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168863\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168863\"><\/AnnotationDrawer><div>Where a horizontal separation of 20 feet (6096 mm) or more is provided, wood columns and arches conforming to heavy timber sizes in accordance with Section 2304.11 shall be permitted to be used externally.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168864\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168864\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where prohibited by Exceptions 1, 2 or 3 of Section 602.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "954-html-1",
+      "kind" : "html",
+      "plainText" : "Where a horizontal separation of 20 feet (6096 mm) or more is provided, wood columns and arches conforming to heavy timber sizes in accordance with Section 2304.11 shall be permitted to be used externally.\n\n Exception: Where prohibited by Exceptions 1, 2 or 3 of Section 602.4."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 954
+}

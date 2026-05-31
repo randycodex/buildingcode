@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199359\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199359\"><\/AnnotationDrawer><div>A minimum clearance of 24 inches (609.6 mm) shall be maintained between the cooking top and combustible material above the hood. The hood shall be at least as wide as the open-top broiler unit and be centered over the unit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8666-html-1",
+      "kind" : "html",
+      "plainText" : "A minimum clearance of 24 inches (609.6 mm) shall be maintained between the cooking top and combustible material above the hood. The hood shall be at least as wide as the open-top broiler unit and be centered over the unit."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8666
+}

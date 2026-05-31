@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163499\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163499\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The sump pump, pit and discharge piping shall conform to Sections 1113.1.1 through 1113.1.4.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12635-html-1",
+      "kind" : "html",
+      "plainText" : "The sump pump, pit and discharge piping shall conform to Sections 1113.1.1 through 1113.1.4."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 12635
+}

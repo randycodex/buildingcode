@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169726\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169726\"><\/AnnotationDrawer><div>Fire-resistant joint systems in smoke barriers, and joints at the intersection of a horizontal smoke barrier and an exterior curtain wall, shall be tested in accordance with the requirements of UL 2079 for air leakage. The L rating of the joint system shall not exceed 5 cfm per linear foot (0.00775 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s m) of joint at 0.30 inch (7.47 Pa) of water for both the ambient temperature and elevated temperature tests.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-169727\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-169727\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-169727\"><\/AnnotationDrawer><h6><a name=\"JD_BC716\" id=\"JD_BC716\" title=\"BC 716\"><\/a>Section BC 716: Opening Protectives<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15052-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-resistant joint systems in smoke barriers, and joints at the intersection of a horizontal smoke barrier and an exterior curtain wall, shall be tested in accordance with the requirements of UL 2079 for air leakage. The L rating of the joint system shall not exceed 5 cfm per linear foot (0.00775 m\n 3 \n \/s m) of joint at 0.30 inch (7.47 Pa) of water for both the ambient temperature and elevated temperature tests.\n\n Section BC 716: Opening Protectives"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15052
+}

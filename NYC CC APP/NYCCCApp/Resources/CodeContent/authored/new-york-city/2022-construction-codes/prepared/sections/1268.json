@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169858\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169858\"><\/AnnotationDrawer><div>Nonsymmetrical fire-protection-rated glazing systems in fire partitions, fire barriers or in exterior walls with a fire separation distance of 5 feet (1524 mm) or less pursuant to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169061', hash: '#JD_BC705' }}\">705<\/Link> shall be tested with both faces exposed to the furnace, and the assigned fire protection rating shall be the shortest duration obtained from the two tests conducted in compliance with NFPA 257 or UL 9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1268-html-1",
+      "kind" : "html",
+      "plainText" : "Nonsymmetrical fire-protection-rated glazing systems in fire partitions, fire barriers or in exterior walls with a fire separation distance of 5 feet (1524 mm) or less pursuant to Section 705 shall be tested with both faces exposed to the furnace, and the assigned fire protection rating shall be the shortest duration obtained from the two tests conducted in compliance with NFPA 257 or UL 9."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1268
+}

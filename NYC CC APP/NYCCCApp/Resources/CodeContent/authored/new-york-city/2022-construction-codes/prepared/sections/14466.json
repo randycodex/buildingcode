@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167839\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167839\"><\/AnnotationDrawer><div>Group H-2 and H-3 occupancies containing water-reactive materials shall be resistant to water penetration. Piping for conveying liquids shall not be over or through areas containing water reactives, unless isolated by approved liquid-tight construction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167840\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167840\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Fire protection piping shall be permitted over or through areas containing water reactives without isolating it with liquid-tight construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14466-html-1",
+      "kind" : "html",
+      "plainText" : "Group H-2 and H-3 occupancies containing water-reactive materials shall be resistant to water penetration. Piping for conveying liquids shall not be over or through areas containing water reactives, unless isolated by approved liquid-tight construction.\n\n Exception: Fire protection piping shall be permitted over or through areas containing water reactives without isolating it with liquid-tight construction."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14466
+}

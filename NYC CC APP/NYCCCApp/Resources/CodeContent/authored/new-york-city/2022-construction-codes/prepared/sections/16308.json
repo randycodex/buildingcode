@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174264\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174264\"><\/AnnotationDrawer><div>All approved materials shall be labeled and identified with the manufacturer's name, model number and the name of the approved agency in a minimum of 6 point type with at least one such identification on each piece of material installed. However, labeling is not required for pieces of material less than 1 foot (304.8 mm) in length that are placed in immediate proximity of an identical model that is labeled. Materials may include supplemental identifying information such as the trade name or \"NYC\".<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16308-html-1",
+      "kind" : "html",
+      "plainText" : "All approved materials shall be labeled and identified with the manufacturer's name, model number and the name of the approved agency in a minimum of 6 point type with at least one such identification on each piece of material installed. However, labeling is not required for pieces of material less than 1 foot (304.8 mm) in length that are placed in immediate proximity of an identical model that is labeled. Materials may include supplemental identifying information such as the trade name or \"NYC\"."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16308
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185143\"><\/AnnotationDrawer><div>Areas that are at least 10 feet (3048 mm) from an unenclosed perimeter, as measured in all directions from the unenclosed perimeter, shall be cleaned of debris periodically throughout the day.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185144\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185144\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> In locations where unenclosed perimeter protection has been temporarily removed, the requirements of Section 3308.10 shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5932-html-1",
+      "kind" : "html",
+      "plainText" : "Areas that are at least 10 feet (3048 mm) from an unenclosed perimeter, as measured in all directions from the unenclosed perimeter, shall be cleaned of debris periodically throughout the day.\n\n Exception: In locations where unenclosed perimeter protection has been temporarily removed, the requirements of Section 3308.10 shall apply."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5932
+}

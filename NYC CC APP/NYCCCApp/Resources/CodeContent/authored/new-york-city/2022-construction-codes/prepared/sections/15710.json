@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-234098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-234098\"><\/AnnotationDrawer><div>Natural gas alarms listed in accordance with a standard established or adopted by department rule shall be provided and installed in accordance with department rules. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-234100\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-234100\"><\/AnnotationDrawer><div>(L.L. 2025\/102, 7\/30\/2025, eff. 7\/30\/2025) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-234097\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-234097\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-234097\"><\/AnnotationDrawer><h6><a name=\"JD_BC909\" id=\"JD_BC909\" title=\"BC 909\"><\/a>Section BC 909: Smoke Control Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15710-html-1",
+      "kind" : "html",
+      "plainText" : "Natural gas alarms listed in accordance with a standard established or adopted by department rule shall be provided and installed in accordance with department rules. \n\n (L.L. 2025\/102, 7\/30\/2025, eff. 7\/30\/2025) \n\n Section BC 909: Smoke Control Systems"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15710
+}

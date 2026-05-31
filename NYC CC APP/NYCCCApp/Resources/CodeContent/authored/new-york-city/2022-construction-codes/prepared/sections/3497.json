@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177419\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177419\"><\/AnnotationDrawer><div>The live loads specified in Sections 1607.3 through 1607.9 shall be assumed to include adequate allowance for impact conditions. Provisions shall be made in the structural design for uses and loads that involve unusual vibration and impact forces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3497-html-1",
+      "kind" : "html",
+      "plainText" : "The live loads specified in Sections 1607.3 through 1607.9 shall be assumed to include adequate allowance for impact conditions. Provisions shall be made in the structural design for uses and loads that involve unusual vibration and impact forces."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3497
+}

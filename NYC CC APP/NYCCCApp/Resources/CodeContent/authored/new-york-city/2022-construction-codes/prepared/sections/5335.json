@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183438\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183438\"><\/AnnotationDrawer><div>The label for plastic composites used in exterior applications as deck boards, stair treads, handrails and guards shall indicate the type and magnitude of the load determined in accordance with ASTM D 7032.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5335-html-1",
+      "kind" : "html",
+      "plainText" : "The label for plastic composites used in exterior applications as deck boards, stair treads, handrails and guards shall indicate the type and magnitude of the load determined in accordance with ASTM D 7032."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5335
+}

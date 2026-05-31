@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195584\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195584\"><\/AnnotationDrawer><div>Refrigeration systems shall comply with the requirements of this code and, except as modified by this code, ASHRAE 15. Ammonia-refrigerating systems shall comply with this code and, except as modified by this code, ASHRAE 15 and IIAR 2. Such systems shall be maintained in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11158-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigeration systems shall comply with the requirements of this code and, except as modified by this code, ASHRAE 15. Ammonia-refrigerating systems shall comply with this code and, except as modified by this code, ASHRAE 15 and IIAR 2. Such systems shall be maintained in accordance with the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11158
+}

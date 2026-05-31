@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172770\"><\/AnnotationDrawer><div>Construction documents for gas detection systems shall be submitted for review and approval to the Fire Department prior to system installation. Construction documents shall include, but not be limited to, the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172771\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172771\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Gas detection system devices and equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172772\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172772\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Engineering evaluation.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172773\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172773\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Items required by Section 907.1.1, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15932-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents for gas detection systems shall be submitted for review and approval to the Fire Department prior to system installation. Construction documents shall include, but not be limited to, the following:\n\n 1. Gas detection system devices and equipment.\n\n 2. Engineering evaluation.\n\n 3. Items required by Section 907.1.1, as applicable."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15932
+}

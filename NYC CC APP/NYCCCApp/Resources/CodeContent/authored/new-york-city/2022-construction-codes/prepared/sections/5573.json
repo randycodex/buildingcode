@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184059\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184059\"><\/AnnotationDrawer><div>In addition to the primary inflation system, in structures exceeding 1,500 square feet (140 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area, an auxiliary inflation system shall be provided with sufficient capacity to maintain the inflation of the structure in case of primary system failure. The auxiliary inflation system shall operate automatically when there is a loss of internal pressure and when the primary blower system becomes inoperative. Initiation of auxiliary inflation system shall be indicated by an audible and visual alert at the entrance or a regularly attended location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5573-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the primary inflation system, in structures exceeding 1,500 square feet (140 m\n\n 2 \n\n ) in area, an auxiliary inflation system shall be provided with sufficient capacity to maintain the inflation of the structure in case of primary system failure. The auxiliary inflation system shall operate automatically when there is a loss of internal pressure and when the primary blower system becomes inoperative. Initiation of auxiliary inflation system shall be indicated by an audible and visual alert at the entrance or a regularly attended location."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5573
+}

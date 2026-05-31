@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194248\"><\/AnnotationDrawer><div>Combustible electrical wires and cables and optical fiber cables exposed within a plenum shall be listed as having a maximum peak optical density of 0.50 or less, an average optical density of 0.15 or less, and a maximum flame spread distance of 5 feet (1524 mm) or less when tested in accordance with NFPA 262 or shall be installed in metal raceways or metal sheathed cable. Combustible optical fiber and communication raceways exposed within a plenum shall be listed as having a maximum peak optical density of 0.5 or less, an average optical density of 0.15 or less, and a maximum flame spread distance of 5 feet (1524 mm) or less when tested in accordance with UL 2024. Only plenum-rated wires and cables shall be installed in plenum-rated raceways. Electrical wires and cables, optical fiber cables and raceways addressed in this section shall be listed and labeled and shall be installed in accordance with <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23519-html-1",
+      "kind" : "html",
+      "plainText" : "Combustible electrical wires and cables and optical fiber cables exposed within a plenum shall be listed as having a maximum peak optical density of 0.50 or less, an average optical density of 0.15 or less, and a maximum flame spread distance of 5 feet (1524 mm) or less when tested in accordance with NFPA 262 or shall be installed in metal raceways or metal sheathed cable. Combustible optical fiber and communication raceways exposed within a plenum shall be listed as having a maximum peak optical density of 0.5 or less, an average optical density of 0.15 or less, and a maximum flame spread distance of 5 feet (1524 mm) or less when tested in accordance with UL 2024. Only plenum-rated wires and cables shall be installed in plenum-rated raceways. Electrical wires and cables, optical fiber cables and raceways addressed in this section shall be listed and labeled and shall be installed in accordance with New York City Electrical Code ."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23519
+}

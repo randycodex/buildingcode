@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163056\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163056\"><\/AnnotationDrawer><div>Where it is desired to terminate stacks at a point below the roof terminus of the main vent stack, the sub-stack may connect to the main vent stack provided the portion of the main vent stack above the connection is sized for the total fixture unit load connected thereto, and for the maximum developed length of the stack or sub-stack.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163057\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163057\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163057\"><\/AnnotationDrawer><h6><a name=\"JD_PC905\" id=\"JD_PC905\" title=\"PC 905\"><\/a>Section PC 905: Vent Connections and Grades<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25306-html-1",
+      "kind" : "html",
+      "plainText" : "Where it is desired to terminate stacks at a point below the roof terminus of the main vent stack, the sub-stack may connect to the main vent stack provided the portion of the main vent stack above the connection is sized for the total fixture unit load connected thereto, and for the maximum developed length of the stack or sub-stack.\n\n Section PC 905: Vent Connections and Grades"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25306
+}

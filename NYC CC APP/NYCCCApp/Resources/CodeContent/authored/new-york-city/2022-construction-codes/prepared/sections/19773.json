@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185172\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185172\"><\/AnnotationDrawer><div>Material stored adjacent to a sidewalk, walkway, or pathway that remains open to the public shall not be piled higher than 3 feet (914 mm), or where a solid fence or barrier is provided, to within one foot (305 mm) of the top of such fence or barrier. For the purposes of this section, the term \"adjacent to\" shall be any area that is within a horizontal distance that is equal to or less than the vertical height of the piled material.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185173\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185173\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Material stored within a dumpster or similar solid container, provided such material is not piled above the top of such dumpster or container.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19773-html-1",
+      "kind" : "html",
+      "plainText" : "Material stored adjacent to a sidewalk, walkway, or pathway that remains open to the public shall not be piled higher than 3 feet (914 mm), or where a solid fence or barrier is provided, to within one foot (305 mm) of the top of such fence or barrier. For the purposes of this section, the term \"adjacent to\" shall be any area that is within a horizontal distance that is equal to or less than the vertical height of the piled material.\n\n Exception: Material stored within a dumpster or similar solid container, provided such material is not piled above the top of such dumpster or container."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19773
+}

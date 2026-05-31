@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172502\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172502\"><\/AnnotationDrawer><div>Smoke and heat vents installed in accordance with Section 910.3 or a mechanical smoke removal system installed in accordance with Section 910.4 shall be installed in buildings and portions thereof used as a Group F-1 or S-1 occupancy having more than 50,000 square feet (4645.2 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of undivided area. In occupied portions of a building equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, where the upper surface of the story is not a roof assembly, a mechanical smoke removal system in accordance with Section 910.4 shall be installed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172503\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172503\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Group S-1 aircraft repair hangars.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15830-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke and heat vents installed in accordance with Section 910.3 or a mechanical smoke removal system installed in accordance with Section 910.4 shall be installed in buildings and portions thereof used as a Group F-1 or S-1 occupancy having more than 50,000 square feet (4645.2 m\n\n 2 \n\n ) of undivided area. In occupied portions of a building equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, where the upper surface of the story is not a roof assembly, a mechanical smoke removal system in accordance with Section 910.4 shall be installed.\n\n Exception: Group S-1 aircraft repair hangars."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15830
+}

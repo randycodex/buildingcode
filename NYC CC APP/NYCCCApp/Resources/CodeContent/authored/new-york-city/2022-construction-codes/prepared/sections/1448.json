@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170685\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170685\"><\/AnnotationDrawer><div>The determination of the fire resistance of structural steel columns from <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170586', hash: '#JD_BCFigure722.5.1(4)' }}\">Figure 722.5.1(4)<\/Link> is permitted for various thicknesses of gypsum wallboard as a function of the weight-to-heated-perimeter ratio <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">(W\/D)<\/span> of the column. For structural steel columns with weight-to-heated-perimeter ratios <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">(W\/D)<\/span> greater than 3.65, the thickness of gypsum wallboard required for specified fire-resistance ratings shall be the same as the thickness determined for a W14 x 233 wide flange shape.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1448-html-1",
+      "kind" : "html",
+      "plainText" : "The determination of the fire resistance of structural steel columns from Figure 722.5.1(4) is permitted for various thicknesses of gypsum wallboard as a function of the weight-to-heated-perimeter ratio (W\/D) of the column. For structural steel columns with weight-to-heated-perimeter ratios (W\/D) greater than 3.65, the thickness of gypsum wallboard required for specified fire-resistance ratings shall be the same as the thickness determined for a W14 x 233 wide flange shape."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1448
+}

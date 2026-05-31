@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187584\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187584\"><\/AnnotationDrawer><div>The hoisting or lowering of any suspended article on the outside of any building in the city shall be performed in accordance with the requirements of Sections 3316.9.1 through 3316.9.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20583-html-1",
+      "kind" : "html",
+      "plainText" : "The hoisting or lowering of any suspended article on the outside of any building in the city shall be performed in accordance with the requirements of Sections 3316.9.1 through 3316.9.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20583
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178775\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178775\"><\/AnnotationDrawer><div>Structural components and assemblies shall be tested in accordance with the appropriate material standards listed in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-187960', hash: '#JD_BCCh.35' }}\">Chapter 35<\/Link>. In the absence of a standard that contains an applicable load test procedure, the test procedure shall be developed by a registered design professional and approved. The test procedure shall simulate loads and conditions of application that the completed structure or portion thereof will be subjected to in normal use.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3887-html-1",
+      "kind" : "html",
+      "plainText" : "Structural components and assemblies shall be tested in accordance with the appropriate material standards listed in Chapter 35 . In the absence of a standard that contains an applicable load test procedure, the test procedure shall be developed by a registered design professional and approved. The test procedure shall simulate loads and conditions of application that the completed structure or portion thereof will be subjected to in normal use."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3887
+}

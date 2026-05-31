@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188667\"><\/AnnotationDrawer><div>In addition to the requirements of ASCE 24, the following standards shall apply to post-FIRM construction, horizontal enlargements and substantial improvements located within A-Zones, other than Coastal A-Zones.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7052-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of ASCE 24, the following standards shall apply to post-FIRM construction, horizontal enlargements and substantial improvements located within A-Zones, other than Coastal A-Zones."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7052
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195654\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195654\"><\/AnnotationDrawer><div>Double-indirect open-spray systems, indirect closed systems and indirect-vented closed systems shall be classified as low-probability systems, provided that all refrigerant-containing piping and fittings are isolated when the quantities in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195633', hash: '#JD_MCTable1103.1' }}\">Table 1103.1<\/Link> are exceeded.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24001-html-1",
+      "kind" : "html",
+      "plainText" : "Double-indirect open-spray systems, indirect closed systems and indirect-vented closed systems shall be classified as low-probability systems, provided that all refrigerant-containing piping and fittings are isolated when the quantities in Table 1103.1 are exceeded."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24001
+}

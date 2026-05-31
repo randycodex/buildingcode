@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169740\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169740\"><\/AnnotationDrawer><div>For fire-protection-rated glazing, the label shall bear the following identification required in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169732', hash: '#JD_BCTable716.3' }}\">Tables 716.3<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169848', hash: '#JD_BCTable716.6' }}\">716.6<\/Link>: \"OH - XXX.\" \"OH\" indicates that the glazing meets both the fire protection and the hose-stream requirements of NFPA 257 or UL 9 and is permitted to be used in fire window openings. The placeholder \"XXX\" represents the fire-rating period, in minutes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15057-html-1",
+      "kind" : "html",
+      "plainText" : "For fire-protection-rated glazing, the label shall bear the following identification required in Tables 716.3 and 716.6 : \"OH - XXX.\" \"OH\" indicates that the glazing meets both the fire protection and the hose-stream requirements of NFPA 257 or UL 9 and is permitted to be used in fire window openings. The placeholder \"XXX\" represents the fire-rating period, in minutes."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15057
+}

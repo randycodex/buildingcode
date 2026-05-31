@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174232\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174232\"><\/AnnotationDrawer><div>Obstacles at or below 6 feet 6 inches (1981.2 mm) in height and projecting more than 4 inches (101.6 mm) into the egress path shall be outlined with markings not less than 1 inch (25.4 mm) in width comprised of a pattern of alternating equal bands, of luminous material and black, with the alternating bands not more than 2 inches (50.8 mm) thick and angled at 45 degrees (0.79 rad). Obstacles shall include, but are not limited to, standpipes, hose cabinets, wall projections and restricted height areas. However, such markings shall not conceal any required information or indicators including but not limited to instructions to occupants for the use of standpipes. Markings on obstacles shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192262', hash: '#JD_BCFigureS101.1(6)' }}\">Figure S101.1(6)<\/Link> in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192260', hash: '#JD_BCAppS' }}\">Appendix S<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2467-html-1",
+      "kind" : "html",
+      "plainText" : "Obstacles at or below 6 feet 6 inches (1981.2 mm) in height and projecting more than 4 inches (101.6 mm) into the egress path shall be outlined with markings not less than 1 inch (25.4 mm) in width comprised of a pattern of alternating equal bands, of luminous material and black, with the alternating bands not more than 2 inches (50.8 mm) thick and angled at 45 degrees (0.79 rad). Obstacles shall include, but are not limited to, standpipes, hose cabinets, wall projections and restricted height areas. However, such markings shall not conceal any required information or indicators including but not limited to instructions to occupants for the use of standpipes. Markings on obstacles shall comply with Figure S101.1(6) in Appendix S ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2467
+}

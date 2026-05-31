@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194186\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194186\"><\/AnnotationDrawer><div>Environmental exhaust air and toilet exhaust may be combined in any occupancy downstream of all air inlets of the system provided that such exhaust cannot be recirculated. In Group R occupancies, exhaust from domestic kitchens and toilets\/baths from one or more dwelling or sleeping units may be combined at a point downstream of all air inlets of the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194187\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194187\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194187\"><\/AnnotationDrawer><h6><a name=\"JD_MC515\" id=\"JD_MC515\" title=\"MC 515\"><\/a>Section MC 515: Postfire Smoke Purge Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10678-html-1",
+      "kind" : "html",
+      "plainText" : "Environmental exhaust air and toilet exhaust may be combined in any occupancy downstream of all air inlets of the system provided that such exhaust cannot be recirculated. In Group R occupancies, exhaust from domestic kitchens and toilets\/baths from one or more dwelling or sleeping units may be combined at a point downstream of all air inlets of the system.\n\n Section MC 515: Postfire Smoke Purge Systems"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10678
+}

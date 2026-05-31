@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174939\"><\/AnnotationDrawer><div>At least 10 percent, but not less than one, of care recipient and visitor parking spaces provided to serve hospital outpatient facilities shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16506-html-1",
+      "kind" : "html",
+      "plainText" : "At least 10 percent, but not less than one, of care recipient and visitor parking spaces provided to serve hospital outpatient facilities shall be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16506
+}

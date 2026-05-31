@@ -1,0 +1,884 @@
+{
+  "chapters" : [
+    {
+      "chapterNumber" : "1",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 1,
+      "title" : "Administration"
+    },
+    {
+      "chapterNumber" : "2",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 2,
+      "title" : "Definitions"
+    },
+    {
+      "chapterNumber" : "3",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 3,
+      "title" : "Use and Occupancy Classification"
+    },
+    {
+      "chapterNumber" : "4",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 4,
+      "title" : "Special Detailed Requirements Based on Use and Occupancy"
+    },
+    {
+      "chapterNumber" : "5",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 5,
+      "title" : "General Building Heights and Areas; Separation of Occupancies"
+    },
+    {
+      "chapterNumber" : "6",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 6,
+      "title" : "Types of Construction"
+    },
+    {
+      "chapterNumber" : "7",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 7,
+      "title" : "Fire and Smoke Protection Features"
+    },
+    {
+      "chapterNumber" : "8",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 8,
+      "title" : "Interior Finishes"
+    },
+    {
+      "chapterNumber" : "9",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 9,
+      "title" : "Fire Protection Systems"
+    },
+    {
+      "chapterNumber" : "10",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 10,
+      "title" : "Means of Egress"
+    },
+    {
+      "chapterNumber" : "11",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 11,
+      "title" : "Accessibility"
+    },
+    {
+      "chapterNumber" : "12",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 12,
+      "title" : "Interior Environment"
+    },
+    {
+      "chapterNumber" : "13",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 13,
+      "title" : "Energy Efficiency"
+    },
+    {
+      "chapterNumber" : "14",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 14,
+      "title" : "Exterior Walls"
+    },
+    {
+      "chapterNumber" : "15",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 15,
+      "title" : "Roof Assemblies and Rooftop Structures"
+    },
+    {
+      "chapterNumber" : "16",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 16,
+      "title" : "Structural Design"
+    },
+    {
+      "chapterNumber" : "17",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 17,
+      "title" : "Special Inspections and Tests"
+    },
+    {
+      "chapterNumber" : "18",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 18,
+      "title" : "Soils and Foundations"
+    },
+    {
+      "chapterNumber" : "19",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 19,
+      "title" : "Concrete"
+    },
+    {
+      "chapterNumber" : "20",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 20,
+      "title" : "Aluminum"
+    },
+    {
+      "chapterNumber" : "21",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 21,
+      "title" : "Masonry"
+    },
+    {
+      "chapterNumber" : "22",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 22,
+      "title" : "Steel"
+    },
+    {
+      "chapterNumber" : "23",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 23,
+      "title" : "Wood"
+    },
+    {
+      "chapterNumber" : "24",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 24,
+      "title" : "Glass and Glazing"
+    },
+    {
+      "chapterNumber" : "25",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 25,
+      "title" : "Gypsum Board, Gypsum Panel Products and Plaster"
+    },
+    {
+      "chapterNumber" : "26",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 26,
+      "title" : "Plastic"
+    },
+    {
+      "chapterNumber" : "27",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 27,
+      "title" : "Electrical"
+    },
+    {
+      "chapterNumber" : "28",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 28,
+      "title" : "Mechanical Systems"
+    },
+    {
+      "chapterNumber" : "29",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 29,
+      "title" : "Plumbing Systems"
+    },
+    {
+      "chapterNumber" : "30",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 30,
+      "title" : "Elevators and Conveying Systems"
+    },
+    {
+      "chapterNumber" : "31",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 31,
+      "title" : "Special Construction"
+    },
+    {
+      "chapterNumber" : "32",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 32,
+      "title" : "Encroachments Into the Public Right-of-Way"
+    },
+    {
+      "chapterNumber" : "33",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 33,
+      "title" : "Safeguards During Construction or Demolition"
+    },
+    {
+      "chapterNumber" : "34",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 34,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "35",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 35,
+      "title" : "Referenced Standards"
+    },
+    {
+      "chapterNumber" : "A",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 36,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "B",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 37,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "C",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 38,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "D",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 39,
+      "title" : "Fire Districts"
+    },
+    {
+      "chapterNumber" : "E",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 40,
+      "title" : "Supplementary Accessibility Requirements"
+    },
+    {
+      "chapterNumber" : "F",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 41,
+      "title" : "Rodent Proofing"
+    },
+    {
+      "chapterNumber" : "G",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 42,
+      "title" : "Flood-Resistant Construction"
+    },
+    {
+      "chapterNumber" : "H",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 43,
+      "title" : "Outdoor Signs"
+    },
+    {
+      "chapterNumber" : "I",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 44,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "J",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 45,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "K",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 46,
+      "title" : "Modified Industry Standards for Elevators and Conveying Systems"
+    },
+    {
+      "chapterNumber" : "K1",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 47,
+      "title" : "Modifications to ASME A17.1-2013, Safety Code for Elevators and Escalators"
+    },
+    {
+      "chapterNumber" : "K2",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 48,
+      "title" : "Modifications to ASME B20.1\/2015, Safety Standard for Conveyors and Related Equipment"
+    },
+    {
+      "chapterNumber" : "K3",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 49,
+      "title" : "Modifications to ASME A17.3-2015, Safety Code for Existing Elevators and Escalators"
+    },
+    {
+      "chapterNumber" : "L",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 50,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "M",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 51,
+      "title" : "Supplementary Requirements for One- and Two-Family Dwellings"
+    },
+    {
+      "chapterNumber" : "N",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 52,
+      "title" : "Assistive Listening Systems Performance Standards"
+    },
+    {
+      "chapterNumber" : "O",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 53,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "P",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 54,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "Q",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 55,
+      "title" : "Modified National Standards for Automatic Sprinkler, Standpipe, Fire Pump, Fire Alarm, and Smoke Control Systems"
+    },
+    {
+      "chapterNumber" : "R",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 56,
+      "title" : "Acoustical Tile and Lay-In Panel Ceiling Suspension Systems"
+    },
+    {
+      "chapterNumber" : "S",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 57,
+      "title" : "Supplementary Figures for Luminous Egress Path Markings"
+    },
+    {
+      "chapterNumber" : "U",
+      "codeID" : 1,
+      "codeSectionID" : 1,
+      "id" : 58,
+      "title" : "Ancillary Dwelling Units"
+    },
+    {
+      "chapterNumber" : "A",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 59,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "B",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 60,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "C",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 61,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "D",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 62,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "E",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 63,
+      "title" : "Meters and Gas Service Piping"
+    },
+    {
+      "chapterNumber" : "F",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 64,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "G",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 65,
+      "title" : "High Pressure Natural Gas Installations"
+    },
+    {
+      "chapterNumber" : "1",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 66,
+      "title" : "Administration"
+    },
+    {
+      "chapterNumber" : "2",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 67,
+      "title" : "Definitions"
+    },
+    {
+      "chapterNumber" : "3",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 68,
+      "title" : "General Regulations"
+    },
+    {
+      "chapterNumber" : "4",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 69,
+      "title" : "Gas Piping Installations"
+    },
+    {
+      "chapterNumber" : "5",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 70,
+      "title" : "Chimneys and Vents"
+    },
+    {
+      "chapterNumber" : "6",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 71,
+      "title" : "Specific Appliances"
+    },
+    {
+      "chapterNumber" : "7",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 72,
+      "title" : "Gaseous Hydrogen Systems"
+    },
+    {
+      "chapterNumber" : "8",
+      "codeID" : 1,
+      "codeSectionID" : 4,
+      "id" : 73,
+      "title" : "Referenced Standards"
+    },
+    {
+      "chapterNumber" : "1",
+      "codeID" : 1,
+      "codeSectionID" : 3,
+      "id" : 74,
+      "title" : "Administration"
+    },
+    {
+      "chapterNumber" : "2",
+      "codeID" : 1,
+      "codeSectionID" : 3,
+      "id" : 75,
+      "title" : "Enforcement"
+    },
+    {
+      "chapterNumber" : "3",
+      "codeID" : 1,
+      "codeSectionID" : 3,
+      "id" : 76,
+      "title" : "Maintenance of Buildings"
+    },
+    {
+      "chapterNumber" : "4",
+      "codeID" : 1,
+      "codeSectionID" : 3,
+      "id" : 77,
+      "title" : "Licensing and Registration of Businesses, Trades and Occupations Engaged in Building Work"
+    },
+    {
+      "chapterNumber" : "5",
+      "codeID" : 1,
+      "codeSectionID" : 3,
+      "id" : 78,
+      "title" : "Miscellaneous Provisions"
+    },
+    {
+      "chapterNumber" : "A",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 79,
+      "title" : "Chimney Connector Pass-Throughs"
+    },
+    {
+      "chapterNumber" : "B",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 80,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "C",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 81,
+      "title" : "Fuel Oil Storage Tank Venting Options"
+    },
+    {
+      "chapterNumber" : "1",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 82,
+      "title" : "Administration"
+    },
+    {
+      "chapterNumber" : "2",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 83,
+      "title" : "Definitions"
+    },
+    {
+      "chapterNumber" : "3",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 84,
+      "title" : "General Regulations"
+    },
+    {
+      "chapterNumber" : "4",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 85,
+      "title" : "Ventilation"
+    },
+    {
+      "chapterNumber" : "5",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 86,
+      "title" : "Exhaust Systems"
+    },
+    {
+      "chapterNumber" : "6",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 87,
+      "title" : "Duct Systems"
+    },
+    {
+      "chapterNumber" : "7",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 88,
+      "title" : "Combustion, Ventilation, and Dilution Air"
+    },
+    {
+      "chapterNumber" : "8",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 89,
+      "title" : "Chimneys and Vents"
+    },
+    {
+      "chapterNumber" : "9",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 90,
+      "title" : "Specific Appliances and Equipment"
+    },
+    {
+      "chapterNumber" : "10",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 91,
+      "title" : "Boilers, Water Heaters and Pressure Vessels"
+    },
+    {
+      "chapterNumber" : "11",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 92,
+      "title" : "Refrigeration"
+    },
+    {
+      "chapterNumber" : "12",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 93,
+      "title" : "Hydronic Piping"
+    },
+    {
+      "chapterNumber" : "13",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 94,
+      "title" : "Fuel-Oil Piping and Storage"
+    },
+    {
+      "chapterNumber" : "14",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 95,
+      "title" : "Solar Systems"
+    },
+    {
+      "chapterNumber" : "15",
+      "codeID" : 1,
+      "codeSectionID" : 6,
+      "id" : 96,
+      "title" : "Referenced Standards"
+    },
+    {
+      "chapterNumber" : "A",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 97,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "B",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 98,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "C",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 99,
+      "title" : "Structural Safety"
+    },
+    {
+      "chapterNumber" : "D",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 100,
+      "title" : "Reserved"
+    },
+    {
+      "chapterNumber" : "E",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 101,
+      "title" : "Sizing of Water Piping System"
+    },
+    {
+      "chapterNumber" : "F",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 102,
+      "title" : "Repealed"
+    },
+    {
+      "chapterNumber" : "G",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 103,
+      "title" : "Repealed"
+    },
+    {
+      "chapterNumber" : "1",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 104,
+      "title" : "Administration"
+    },
+    {
+      "chapterNumber" : "2",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 105,
+      "title" : "Definitions"
+    },
+    {
+      "chapterNumber" : "3",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 106,
+      "title" : "General Regulations"
+    },
+    {
+      "chapterNumber" : "4",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 107,
+      "title" : "Fixtures, Faucets and Fixture Fittings"
+    },
+    {
+      "chapterNumber" : "5",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 108,
+      "title" : "Water Heaters"
+    },
+    {
+      "chapterNumber" : "6",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 109,
+      "title" : "Water Supply and Distribution"
+    },
+    {
+      "chapterNumber" : "7",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 110,
+      "title" : "Sanitary Drainage"
+    },
+    {
+      "chapterNumber" : "8",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 111,
+      "title" : "Indirect\/special Waste"
+    },
+    {
+      "chapterNumber" : "9",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 112,
+      "title" : "Vents"
+    },
+    {
+      "chapterNumber" : "10",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 113,
+      "title" : "Traps, Interceptors and Separators"
+    },
+    {
+      "chapterNumber" : "11",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 114,
+      "title" : "Storm Drainage"
+    },
+    {
+      "chapterNumber" : "12",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 115,
+      "title" : "Special Piping and Storage Systems"
+    },
+    {
+      "chapterNumber" : "13",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 116,
+      "title" : "Nonpotable Water Systems"
+    },
+    {
+      "chapterNumber" : "14",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 117,
+      "title" : "Subsurface Landscape Irrigation Systems"
+    },
+    {
+      "chapterNumber" : "15",
+      "codeID" : 1,
+      "codeSectionID" : 5,
+      "id" : 118,
+      "title" : "Referenced Standards"
+    }
+  ],
+  "chapterStructureSchemaVersion" : 2,
+  "codes" : [
+    {
+      "id" : 1,
+      "jurisdictionID" : 1,
+      "name" : "2022 CONSTRUCTION CODES"
+    }
+  ],
+  "codeSections" : [
+    {
+      "codeID" : 1,
+      "id" : 1,
+      "name" : "BUILDING CODE"
+    },
+    {
+      "codeID" : 1,
+      "id" : 3,
+      "name" : "GENERAL ADMINISTRATIVE PROVISIONS"
+    },
+    {
+      "codeID" : 1,
+      "id" : 4,
+      "name" : "FUEL GAS CODE"
+    },
+    {
+      "codeID" : 1,
+      "id" : 5,
+      "name" : "PLUMBING CODE"
+    },
+    {
+      "codeID" : 1,
+      "id" : 6,
+      "name" : "MECHANICAL CODE"
+    }
+  ],
+  "jurisdictions" : [
+    {
+      "id" : 1,
+      "name" : "New York City"
+    }
+  ],
+  "lastStructuredImportPaths" : [
+
+  ],
+  "nextChapterID" : 119,
+  "nextCodeID" : 4,
+  "nextCodeSectionID" : 7,
+  "nextJurisdictionID" : 4,
+  "nextSectionID" : 12891,
+  "schemaVersion" : 5,
+  "sectionContentSchemaVersion" : 2,
+  "tables" : [
+
+  ]
+}

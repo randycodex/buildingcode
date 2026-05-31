@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198145\"><\/AnnotationDrawer><div>Appliances and equipment shall not be placed in operation until after the piping system has been checked in accordance with Section 406.6.3, the piping system has been purged in accordance with Section 406.7 and the connections to the appliances have been checked for leakage<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8239-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances and equipment shall not be placed in operation until after the piping system has been checked in accordance with Section 406.6.3, the piping system has been purged in accordance with Section 406.7 and the connections to the appliances have been checked for leakage"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8239
+}

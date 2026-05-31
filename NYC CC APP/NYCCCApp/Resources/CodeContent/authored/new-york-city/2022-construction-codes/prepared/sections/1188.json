@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169615\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169615\"><\/AnnotationDrawer><div>Incinerator rooms shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168725', hash: '#JD_BCTable509' }}\">Table 509<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1188-html-1",
+      "kind" : "html",
+      "plainText" : "Incinerator rooms shall comply with Table 509 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1188
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184456\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184456\"><\/AnnotationDrawer><div>Elements of existing fences, guards and railings shall not be increased in height, thickness, spacing or opacity.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184457\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184457\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184458\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184458\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Fences, guards and railings that are required to comply with other requirements of this code, including <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapters 10<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">16<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184459\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184459\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Buildings or structures designated by the Landmarks Preservation Commission, where such fences, guards or railings are approved by the Landmarks Preservation Commission.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5724-html-1",
+      "kind" : "html",
+      "plainText" : "Elements of existing fences, guards and railings shall not be increased in height, thickness, spacing or opacity.\n\n Exceptions: \n\n 1. Fences, guards and railings that are required to comply with other requirements of this code, including Chapters 10 and 16 .\n\n 2. Buildings or structures designated by the Landmarks Preservation Commission, where such fences, guards or railings are approved by the Landmarks Preservation Commission."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5724
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181701\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181701\"><\/AnnotationDrawer><div>The truss submittal package provided by the truss manufacturer shall consist of each individual truss design drawing, the truss placement diagram, the permanent individual truss member restraint\/bracing method and details and any other structural details germane to the trusses; and, as applicable, the cover\/truss index sheet.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18710-html-1",
+      "kind" : "html",
+      "plainText" : "The truss submittal package provided by the truss manufacturer shall consist of each individual truss design drawing, the truss placement diagram, the permanent individual truss member restraint\/bracing method and details and any other structural details germane to the trusses; and, as applicable, the cover\/truss index sheet."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18710
+}

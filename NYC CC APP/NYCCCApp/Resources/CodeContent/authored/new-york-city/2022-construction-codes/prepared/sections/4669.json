@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181056\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181056\"><\/AnnotationDrawer><div>The combustion air passageway shall be not less than 6 square inches (3870 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) and not more than 55 square inches (0.035 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t), except that combustion air systems for listed fireplaces or for fireplaces tested for emissions shall be constructed according to the fireplace manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4669-html-1",
+      "kind" : "html",
+      "plainText" : "The combustion air passageway shall be not less than 6 square inches (3870 mm\n\n 2 \n\n ) and not more than 55 square inches (0.035 m\n\n 2 \n\n ), except that combustion air systems for listed fireplaces or for fireplaces tested for emissions shall be constructed according to the fireplace manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4669
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168357\"><\/AnnotationDrawer><div>Doors opening into storage vaults shall meet shielding requirements and have a fire-protection rating of not less than 3 hours.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "830-html-1",
+      "kind" : "html",
+      "plainText" : "Doors opening into storage vaults shall meet shielding requirements and have a fire-protection rating of not less than 3 hours."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 830
+}

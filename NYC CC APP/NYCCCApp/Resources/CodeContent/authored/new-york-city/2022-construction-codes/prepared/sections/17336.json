@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177455\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177455\"><\/AnnotationDrawer><div>The live loads shall not be reduced in passenger vehicle garages.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177456\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177456\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The live loads for members supporting two or more floors are permitted to be reduced by a maximum of 20 percent, but the live load shall not be less than L as calculated in Section 1607.11.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17336-html-1",
+      "kind" : "html",
+      "plainText" : "The live loads shall not be reduced in passenger vehicle garages.\n\n Exception: The live loads for members supporting two or more floors are permitted to be reduced by a maximum of 20 percent, but the live load shall not be less than L as calculated in Section 1607.11.1."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17336
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184734\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184734\"><\/AnnotationDrawer><div>Project information panels shall be maintained so that the panel remains legible, securely attached, and free of sharp edges, protruding nails, or similar hazards. Content required by Section 3301.9.1.1 shall not be obscured by panel attachments, including but not limited to grommets or grommet holes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5859-html-1",
+      "kind" : "html",
+      "plainText" : "Project information panels shall be maintained so that the panel remains legible, securely attached, and free of sharp edges, protruding nails, or similar hazards. Content required by Section 3301.9.1.1 shall not be obscured by panel attachments, including but not limited to grommets or grommet holes."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5859
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175327\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175327\"><\/AnnotationDrawer><div>In assembly and mercantile occupancies, an accessible family or assisted-use toilet room shall be provided where an aggregate of six or more male and female water closets is required. In buildings of mixed occupancy, only those water closets required for the assembly or mercantile occupancy shall be used to determine the family or assisted-use toilet room requirement. In recreational facilities where separate-sex bathing rooms are provided, an accessible family or assisted-use bathing room shall be provided. Fixtures located within family or assisted-use toilet and bathing rooms required by this section are permitted to be included in the number of fixtures required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span> for either the male or the female occupants.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175328\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175328\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where each separate-sex bathing room has only one shower or bathtub fixture, a family or assisted-use bathing room is not required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16640-html-1",
+      "kind" : "html",
+      "plainText" : "In assembly and mercantile occupancies, an accessible family or assisted-use toilet room shall be provided where an aggregate of six or more male and female water closets is required. In buildings of mixed occupancy, only those water closets required for the assembly or mercantile occupancy shall be used to determine the family or assisted-use toilet room requirement. In recreational facilities where separate-sex bathing rooms are provided, an accessible family or assisted-use bathing room shall be provided. Fixtures located within family or assisted-use toilet and bathing rooms required by this section are permitted to be included in the number of fixtures required by the New York City Plumbing Code for either the male or the female occupants.\n\n Exception: Where each separate-sex bathing room has only one shower or bathtub fixture, a family or assisted-use bathing room is not required."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16640
+}

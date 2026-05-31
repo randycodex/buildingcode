@@ -1,0 +1,46 @@
+{
+  "chapterID": 35,
+  "chapterNumber": "35",
+  "groups": [
+    {
+      "headerLine": "SECTION BC 3501",
+      "headingLine": "GENERAL",
+      "id": "SECTION BC 3501",
+      "sections": [
+        {
+          "id": 6860,
+          "kind": "title",
+          "sectionNumber": "3501.1",
+          "title": "3501.1 General."
+        },
+        {
+          "id": 6861,
+          "kind": "title",
+          "sectionNumber": "3501.2",
+          "title": "3501.2 Subsequent additions, modifications or deletions."
+        },
+        {
+          "id": 6862,
+          "kind": "title",
+          "sectionNumber": "3501.3",
+          "title": "3501.3 Applicability."
+        }
+      ]
+    },
+    {
+      "headerLine": "SECTION BC 3502",
+      "headingLine": "STANDARDS",
+      "id": "SECTION BC 3502",
+      "sections": [
+        {
+          "id": 6863,
+          "kind": "textBlock",
+          "sectionNumber": "3502",
+          "title": "SECTION 3502: Standards"
+        }
+      ]
+    }
+  ],
+  "rawDraftText": "#- Chapter 35: Referenced Standards\n\n#-- Section BC 3501: General\n\n#--- 3501.1 General.\n\nThis chapter lists the standards that are referenced in various sections of this document. The standards are listed herein by the promulgating agency of the standard, the standard identification, the effective date and title and the section or sections of this document that reference the standard.\n\n#--- 3501.2 Subsequent additions, modifications or deletions.\n\nRefer to the rules of the department for any subsequent additions, modifications or deletions that may have been made to these standards in accordance with Section 28-103.19 of the Administrative Code.\n\n#--- 3501.3 Applicability.\n\nThe application of the referenced standards shall be as specified in Section 102.4.\n\n#-- Section BC 3502: Standards\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/026, L.L. 2011/021, L.L. 2011/071, L.L. 2011/075, L.L. 2013/112, L.L. 2014/051, and L.L. 2023/077.",
+  "schemaVersion": 1
+}

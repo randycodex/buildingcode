@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186314\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186314\"><\/AnnotationDrawer><div>Fences required by this section shall be installed prior to the commencement of work. Such required fences shall not be removed until:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186315\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186315\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The site has been filled and graded and all hazards to the public removed; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186316\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186316\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The facade has been enclosed, with all doors and windows installed, and all exterior work, except for incidental work including but not limited to landscaping, painting, weatherproofing, or installation of signs or fixtures, has been completed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20192-html-1",
+      "kind" : "html",
+      "plainText" : "Fences required by this section shall be installed prior to the commencement of work. Such required fences shall not be removed until:\n\n 1. The site has been filled and graded and all hazards to the public removed; or\n\n 2. The facade has been enclosed, with all doors and windows installed, and all exterior work, except for incidental work including but not limited to landscaping, painting, weatherproofing, or installation of signs or fixtures, has been completed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20192
+}

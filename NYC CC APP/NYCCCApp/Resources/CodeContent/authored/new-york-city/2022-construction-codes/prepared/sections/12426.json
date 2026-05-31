@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162938\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162938\"><\/AnnotationDrawer><div>Steam pipes shall not connect to any part of a drainage or plumbing system and water above 150&#176;F (66&#176;C) shall not be discharged into any part of a drainage system. Such pipes shall discharge into an indirect waste receptor connected to the drainage system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12426-html-1",
+      "kind" : "html",
+      "plainText" : "Steam pipes shall not connect to any part of a drainage or plumbing system and water above 150°F (66°C) shall not be discharged into any part of a drainage system. Such pipes shall discharge into an indirect waste receptor connected to the drainage system."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 12426
+}

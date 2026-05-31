@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181201\"><\/AnnotationDrawer><div>Masonry chimneys for medium-heat appliances shall comply with the provisions of Sections 2113.11.2.1 through 2113.11.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18544-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry chimneys for medium-heat appliances shall comply with the provisions of Sections 2113.11.2.1 through 2113.11.2.5."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18544
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188039\"><\/AnnotationDrawer><div>The following city areas are hereby established as being inside the fire districts:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188040\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188040\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;All of the borough of Manhattan.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188041\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188041\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;All of the borough of Bronx.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188042\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188042\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;All of the borough of Brooklyn.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188043\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188043\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Such portions of the boroughs of Staten Island and Queens as are indicated on the \"fire district maps\" as per Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188089', hash: '#JD_BCD106' }}\">D106<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188044\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188044\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188044\"><\/AnnotationDrawer><h6><a name=\"JD_BCD102\" id=\"JD_BCD102\" title=\"BC D102\"><\/a>Section BC D102: Building Restrictions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6867-html-1",
+      "kind" : "html",
+      "plainText" : "The following city areas are hereby established as being inside the fire districts:\n\n 1. All of the borough of Manhattan.\n\n 2. All of the borough of Bronx.\n\n 3. All of the borough of Brooklyn.\n\n 4. Such portions of the boroughs of Staten Island and Queens as are indicated on the \"fire district maps\" as per Section D106 .\n\n Section BC D102: Building Restrictions"
+    }
+  ],
+  "chapterNumber" : "D",
+  "schemaVersion" : 1,
+  "sectionID" : 6867
+}

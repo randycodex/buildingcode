@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161231\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Pipes passing through or encased in concrete or cinder walls and floors or other corrosive material shall be protected against external corrosion by a protective sheathing or wrapping or other means that will withstand any reaction from the lime and acid of concrete, cinder or other corrosive material. Sheathing or wrapping shall allow for movement including expansion and contraction of piping to prevent any rubbing action. Thickness of sheathing or wrapping material shall be not less than 0.025 inch (0.64 mm).<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11764-html-1",
+      "kind" : "html",
+      "plainText" : "Pipes passing through or encased in concrete or cinder walls and floors or other corrosive material shall be protected against external corrosion by a protective sheathing or wrapping or other means that will withstand any reaction from the lime and acid of concrete, cinder or other corrosive material. Sheathing or wrapping shall allow for movement including expansion and contraction of piping to prevent any rubbing action. Thickness of sheathing or wrapping material shall be not less than 0.025 inch (0.64 mm)."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11764
+}

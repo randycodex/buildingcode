@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183165\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183165\"><\/AnnotationDrawer><div>Foam plastic used as interior trim in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183266', hash: '#JD_BC2604' }}\">2604<\/Link> shall be permitted without a thermal barrier.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5253-html-1",
+      "kind" : "html",
+      "plainText" : "Foam plastic used as interior trim in accordance with Section 2604 shall be permitted without a thermal barrier."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5253
+}

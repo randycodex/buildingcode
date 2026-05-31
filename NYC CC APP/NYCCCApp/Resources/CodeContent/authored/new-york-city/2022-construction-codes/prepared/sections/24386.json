@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196620\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196620\"><\/AnnotationDrawer><div>The minimum thickness shall be as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196621\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196621\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Tanks 36 inches (914.4 mm) in diameter or less shall have at least a 1\/4-inch (6.4 mm) shell and 1\/4-inch (6.4 mm) heads.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196622\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196622\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Tanks 37 inches (940 mm) to 72 inches (1828.8 mm) in diameter shall have at least a 1\/4-inch (6.4 mm) shell and 5\/16-inch (7.9 mm) heads.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196623\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196623\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Tanks 73 inches (1854 mm) to 120 inches (3048 mm) in diameter shall have at least a 5\/16-inch (7.9 mm) shell and 3\/8-inch (9.5 mm) heads.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196624\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196624\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Tanks over 120 inches (3048 mm) in diameter shall be of at least 3\/8-inch (9.5 mm) steel and shall be stiffened by angle rings or equivalent members so as to retain their cylindrical form.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24386-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum thickness shall be as follows:\n\n 1. Tanks 36 inches (914.4 mm) in diameter or less shall have at least a 1\/4-inch (6.4 mm) shell and 1\/4-inch (6.4 mm) heads.\n\n 2. Tanks 37 inches (940 mm) to 72 inches (1828.8 mm) in diameter shall have at least a 1\/4-inch (6.4 mm) shell and 5\/16-inch (7.9 mm) heads.\n\n 3. Tanks 73 inches (1854 mm) to 120 inches (3048 mm) in diameter shall have at least a 5\/16-inch (7.9 mm) shell and 3\/8-inch (9.5 mm) heads.\n\n 4. Tanks over 120 inches (3048 mm) in diameter shall be of at least 3\/8-inch (9.5 mm) steel and shall be stiffened by angle rings or equivalent members so as to retain their cylindrical form."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24386
+}

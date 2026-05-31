@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171213\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171213\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be provided for Group A-3 occupancies where any one of the following conditions exists:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171214\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171214\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The fire area exceeds 12,000 square feet (1114.8 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171215\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171215\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The fire area has an occupant load of 300 or more.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171216\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The aggregate occupant load of all fire areas occupied by Group A, located on any given floor other than the level of exit discharge, is 300 or more.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171217\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171217\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Areas used exclusively as participant sports areas where the main floor area is located at the same level as the level of exit discharge of the main entrance and exit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1576-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be provided for Group A-3 occupancies where any one of the following conditions exists:\n\n 1. The fire area exceeds 12,000 square feet (1114.8 m\n\n 2 \n\n ).\n\n 2. The fire area has an occupant load of 300 or more.\n\n 3. The aggregate occupant load of all fire areas occupied by Group A, located on any given floor other than the level of exit discharge, is 300 or more.\n\n Exception: Areas used exclusively as participant sports areas where the main floor area is located at the same level as the level of exit discharge of the main entrance and exit."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1576
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182738\"><\/AnnotationDrawer><div>Individual glazed areas, including glass mirrors, in hazardous locations as defined in Section 2406.4 shall comply with Sections 2406.1.1 through 2406.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182739\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182739\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Mirrors and other glass panels mounted or hung on a surface that provides a continuous backing support.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18950-html-1",
+      "kind" : "html",
+      "plainText" : "Individual glazed areas, including glass mirrors, in hazardous locations as defined in Section 2406.4 shall comply with Sections 2406.1.1 through 2406.1.4.\n\n Exception: Mirrors and other glass panels mounted or hung on a surface that provides a continuous backing support."
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 18950
+}

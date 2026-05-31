@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184355\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184355\"><\/AnnotationDrawer><div>Unless separated from seating inside the building by fire partitions complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169532', hash: '#JD_BC713' }}\">713<\/Link>, the seating for enclosed sidewalk cafes shall be added to that inside the building in order to determine whether a place of assembly certificate of operation is required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5686-html-1",
+      "kind" : "html",
+      "plainText" : "Unless separated from seating inside the building by fire partitions complying with Section 713 , the seating for enclosed sidewalk cafes shall be added to that inside the building in order to determine whether a place of assembly certificate of operation is required."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5686
+}

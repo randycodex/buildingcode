@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173665\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173665\"><\/AnnotationDrawer><div>The walking surface of treads and landings of a stairway shall not be sloped steeper than one unit vertical in 48 units horizontal (2-percent slope) in any direction. Stairway treads and landings shall have a solid surface. Finish floor surfaces shall be securely attached.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173666\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173666\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173667\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Openings in stair walking surfaces shall be a size that does not permit the passage of 1\/2-inch (12.7 mm) diameter sphere. Elongated openings shall be placed so that the long dimension is perpendicular to the direction of travel.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173668\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173668\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;In Group F, H and S occupancies, other than areas of parking structures accessible to the public, openings in treads and landings shall not be prohibited provided a sphere with a diameter of 1 1\/8 inches (28.6 mm) cannot pass through the opening.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16150-html-1",
+      "kind" : "html",
+      "plainText" : "The walking surface of treads and landings of a stairway shall not be sloped steeper than one unit vertical in 48 units horizontal (2-percent slope) in any direction. Stairway treads and landings shall have a solid surface. Finish floor surfaces shall be securely attached.\n\n Exceptions: \n\n 1. Openings in stair walking surfaces shall be a size that does not permit the passage of 1\/2-inch (12.7 mm) diameter sphere. Elongated openings shall be placed so that the long dimension is perpendicular to the direction of travel.\n\n 2. In Group F, H and S occupancies, other than areas of parking structures accessible to the public, openings in treads and landings shall not be prohibited provided a sphere with a diameter of 1 1\/8 inches (28.6 mm) cannot pass through the opening."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16150
+}

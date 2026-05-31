@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175191\"><\/AnnotationDrawer><div>Where no elevator service is provided in a structure or required by other sections of this code, only the dwelling units and sleeping units that are located on stories indicated in Sections 1107.7.1.1 and 1107.7.1.2 are required to be Type B units.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16593-html-1",
+      "kind" : "html",
+      "plainText" : "Where no elevator service is provided in a structure or required by other sections of this code, only the dwelling units and sleeping units that are located on stories indicated in Sections 1107.7.1.1 and 1107.7.1.2 are required to be Type B units."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16593
+}

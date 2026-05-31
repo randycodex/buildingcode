@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174895\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174895\"><\/AnnotationDrawer><div>Accessible routes shall coincide with or be located in the same area as a general circulation path. Where the circulation path is interior, the accessible route shall also be interior. Where only one accessible route is provided, the accessible route shall not pass through kitchens, storage rooms, restrooms, closets or similar spaces.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174896\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174896\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> A single accessible route is permitted to pass through a kitchen in an Accessible unit, Type B+NYC unit, or Type B unit. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2664-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible routes shall coincide with or be located in the same area as a general circulation path. Where the circulation path is interior, the accessible route shall also be interior. Where only one accessible route is provided, the accessible route shall not pass through kitchens, storage rooms, restrooms, closets or similar spaces.\n\n Exception: A single accessible route is permitted to pass through a kitchen in an Accessible unit, Type B+NYC unit, or Type B unit."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2664
+}

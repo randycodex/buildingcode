@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178435\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178435\"><\/AnnotationDrawer><div>Periodic special inspection is required for the anchorage of storage racks that are 8 feet (2438.4 mm) or greater in height in structures assigned to Seismic Design Category D.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3757-html-1",
+      "kind" : "html",
+      "plainText" : "Periodic special inspection is required for the anchorage of storage racks that are 8 feet (2438.4 mm) or greater in height in structures assigned to Seismic Design Category D."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3757
+}

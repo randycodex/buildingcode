@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230011\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230011\"><\/AnnotationDrawer><div>Where the ADU is detached from the primary dwelling, both the ADU and the primary dwelling unit shall be classified as Group R-3 occupancy and shall comply with all applicable requirements of Group R-3 occupancy in this code. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13826-html-1",
+      "kind" : "html",
+      "plainText" : "Where the ADU is detached from the primary dwelling, both the ADU and the primary dwelling unit shall be classified as Group R-3 occupancy and shall comply with all applicable requirements of Group R-3 occupancy in this code."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 13826
+}

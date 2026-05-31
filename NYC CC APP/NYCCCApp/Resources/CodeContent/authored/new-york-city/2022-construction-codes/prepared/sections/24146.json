@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196024\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196024\"><\/AnnotationDrawer><div>Solder joints in a metal pipe shall not occur within 18 inches (457.2 mm) of a transition from such metal pipe to PE-RT pipe.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24146-html-1",
+      "kind" : "html",
+      "plainText" : "Solder joints in a metal pipe shall not occur within 18 inches (457.2 mm) of a transition from such metal pipe to PE-RT pipe."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24146
+}

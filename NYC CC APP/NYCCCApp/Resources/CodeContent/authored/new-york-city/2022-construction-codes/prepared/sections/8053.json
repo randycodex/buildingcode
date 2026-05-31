@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197597\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197597\"><\/AnnotationDrawer><div>Appliances installed in enclosed, basement and underground parking structures shall be installed in accordance with NFPA 88A.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8053-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances installed in enclosed, basement and underground parking structures shall be installed in accordance with NFPA 88A."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8053
+}

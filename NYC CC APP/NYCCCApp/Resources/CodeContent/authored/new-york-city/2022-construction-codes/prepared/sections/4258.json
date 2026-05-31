@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179914\"><\/AnnotationDrawer><div>At the time of foundation plan approval, an engineer shall submit an evaluation report to the department assessing the condition of the existing building and the subsurface conditions of the construction site and adjacent property. The report shall also identify acceptable method(s) of support, including underpinning or alternate methods of support, for the building. This evaluation shall be performed in accordance with the requirements of Section 1817.3.1 through 1817.3.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4258-html-1",
+      "kind" : "html",
+      "plainText" : "At the time of foundation plan approval, an engineer shall submit an evaluation report to the department assessing the condition of the existing building and the subsurface conditions of the construction site and adjacent property. The report shall also identify acceptable method(s) of support, including underpinning or alternate methods of support, for the building. This evaluation shall be performed in accordance with the requirements of Section 1817.3.1 through 1817.3.6."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4258
+}

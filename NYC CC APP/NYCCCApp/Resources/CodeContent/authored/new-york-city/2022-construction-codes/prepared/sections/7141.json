@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188864\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188864\"><\/AnnotationDrawer><div>Temporary structures shall be erected for a period of less than 180 days. Temporary structures shall be anchored to prevent flotation, collapse or lateral movement resulting from hydrostatic loads, including the effects of buoyancy, during conditions of the base flood. Fully enclosed temporary structures shall have flood openings that are in accordance with ASCE 24 to allow for the automatic entry and exit of floodwaters.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7141-html-1",
+      "kind" : "html",
+      "plainText" : "Temporary structures shall be erected for a period of less than 180 days. Temporary structures shall be anchored to prevent flotation, collapse or lateral movement resulting from hydrostatic loads, including the effects of buoyancy, during conditions of the base flood. Fully enclosed temporary structures shall have flood openings that are in accordance with ASCE 24 to allow for the automatic entry and exit of floodwaters."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7141
+}

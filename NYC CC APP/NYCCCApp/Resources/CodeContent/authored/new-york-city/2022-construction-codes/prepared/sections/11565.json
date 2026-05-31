@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196632\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196632\"><\/AnnotationDrawer><div>Plates for rectangular tanks of more than 330 gallon (1249.2 L) capacity shall be at least 5\/16 inches (7.9 mm) thick.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11565-html-1",
+      "kind" : "html",
+      "plainText" : "Plates for rectangular tanks of more than 330 gallon (1249.2 L) capacity shall be at least 5\/16 inches (7.9 mm) thick."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11565
+}

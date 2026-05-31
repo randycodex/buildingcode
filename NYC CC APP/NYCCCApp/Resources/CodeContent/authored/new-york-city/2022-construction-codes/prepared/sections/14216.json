@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167031\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167031\"><\/AnnotationDrawer><div>Repair garage floors shall be of concrete or similar noncombustible and nonabsorbent materials.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167032\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167032\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Slip-resistant, nonabsorbent, interior floor finishes having a critical radiant flux not more than 0.45 W\/cm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t, as determined by NFPA 253, shall be permitted. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14216-html-1",
+      "kind" : "html",
+      "plainText" : "Repair garage floors shall be of concrete or similar noncombustible and nonabsorbent materials.\n\n Exception: Slip-resistant, nonabsorbent, interior floor finishes having a critical radiant flux not more than 0.45 W\/cm\n\n 2 \n\n , as determined by NFPA 253, shall be permitted."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14216
+}

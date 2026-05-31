@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174671\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174671\"><\/AnnotationDrawer><div>Where permitted by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174005', hash: '#JD_BC1019' }}\">1019<\/Link>, exit access stairways or ramps leading directly from one safe area to another, or leading from a safe area directly to an open exterior space, need not be enclosed. Travel distance on such unenclosed exit access stairway or ramp shall be in accordance with the primary travel distance in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174480', hash: '#JD_BCTable1029.7' }}\">Table 1029.7<\/Link>, and shall be measured in accordance with Section 1017.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2598-html-1",
+      "kind" : "html",
+      "plainText" : "Where permitted by Section 1019 , exit access stairways or ramps leading directly from one safe area to another, or leading from a safe area directly to an open exterior space, need not be enclosed. Travel distance on such unenclosed exit access stairway or ramp shall be in accordance with the primary travel distance in Table 1029.7 , and shall be measured in accordance with Section 1017.3.1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2598
+}

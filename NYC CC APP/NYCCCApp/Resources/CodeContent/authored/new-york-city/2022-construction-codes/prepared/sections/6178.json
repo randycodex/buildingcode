@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185774\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185774\"><\/AnnotationDrawer><div>A signed and sealed reshoring schedule shall be provided and maintained at the construction site whenever reshoring is employed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185775\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185775\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> A separate reshoring schedule is not required when the required reshoring information is covered on the approved construction documents prepared by the applicant of record.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6178-html-1",
+      "kind" : "html",
+      "plainText" : "A signed and sealed reshoring schedule shall be provided and maintained at the construction site whenever reshoring is employed.\n\n Exception: A separate reshoring schedule is not required when the required reshoring information is covered on the approved construction documents prepared by the applicant of record."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6178
+}

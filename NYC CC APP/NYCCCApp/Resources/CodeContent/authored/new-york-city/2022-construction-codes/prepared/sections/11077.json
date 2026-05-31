@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195351\"><\/AnnotationDrawer><div>Circulating air for fuel-burning, forced-air-type, warm-air furnaces shall be conducted into the blower housing from outside the furnace enclosure by continuous air-tight ducts.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11077-html-1",
+      "kind" : "html",
+      "plainText" : "Circulating air for fuel-burning, forced-air-type, warm-air furnaces shall be conducted into the blower housing from outside the furnace enclosure by continuous air-tight ducts."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11077
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197577\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197577\"><\/AnnotationDrawer><div>In residential garages where appliances are installed in a separate, enclosed space having access only from outside of the garage, such appliances shall be permitted to be installed at floor level, provided that the required combustion air is taken from the exterior of the garage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20871-html-1",
+      "kind" : "html",
+      "plainText" : "In residential garages where appliances are installed in a separate, enclosed space having access only from outside of the garage, such appliances shall be permitted to be installed at floor level, provided that the required combustion air is taken from the exterior of the garage."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20871
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180333\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180333\"><\/AnnotationDrawer><div>Field-cured test cylinders shall be molded at the same time and from the same samples as laboratory-cured test cylinders.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18227-html-1",
+      "kind" : "html",
+      "plainText" : "Field-cured test cylinders shall be molded at the same time and from the same samples as laboratory-cured test cylinders."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18227
+}

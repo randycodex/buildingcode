@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162213\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162213\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A water distribution system having one or more recirculation pumps that pump water from a heated water supply pipe back to the heated water source through a cold water supply pipe shall be a demand recirculation water system. Pumps shall have controls that comply with both of the following:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162214\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162214\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;1.&#160;&#160;&#160;The control shall start the pump upon receiving a signal from the action of a user of a fixture or appliance, sensing the presence of a user of a fixture, or sensing the flow of hot or tempered water to a fixture fitting or appliance.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162215\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162215\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;2.&#160;&#160;&#160;The control shall limit the temperature of the water entering the cold water piping to 104&#176;F (40&#176;C).<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24975-html-1",
+      "kind" : "html",
+      "plainText" : "A water distribution system having one or more recirculation pumps that pump water from a heated water supply pipe back to the heated water source through a cold water supply pipe shall be a demand recirculation water system. Pumps shall have controls that comply with both of the following: \n\n 1. The control shall start the pump upon receiving a signal from the action of a user of a fixture or appliance, sensing the presence of a user of a fixture, or sensing the flow of hot or tempered water to a fixture fitting or appliance. \n\n 2. The control shall limit the temperature of the water entering the cold water piping to 104°F (40°C)."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24975
+}

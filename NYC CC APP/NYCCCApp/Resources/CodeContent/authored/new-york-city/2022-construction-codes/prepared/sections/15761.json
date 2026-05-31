@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172323\"><\/AnnotationDrawer><div>Control air tubing shall be of sufficient size to meet the required response times. Tubing shall be flushed clean and dry prior to final connections and shall be adequately supported and protected from damage. Tubing passing through concrete or masonry shall be sleeved and protected from abrasion and electrolytic action.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15761-html-1",
+      "kind" : "html",
+      "plainText" : "Control air tubing shall be of sufficient size to meet the required response times. Tubing shall be flushed clean and dry prior to final connections and shall be adequately supported and protected from damage. Tubing passing through concrete or masonry shall be sleeved and protected from abrasion and electrolytic action."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15761
+}

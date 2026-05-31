@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172392\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172392\"><\/AnnotationDrawer><div>Charts, drawings and other documents identifying and locating each component of the smoke control system, and describing its proper function and maintenance requirements, shall be maintained on file at the building as an attachment to the report required by Section 909.18.8.3. Devices shall have an approved identifying tag or mark on them consistent with the other required documentation and shall be dated indicating the last time they were successfully tested and by whom.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1957-html-1",
+      "kind" : "html",
+      "plainText" : "Charts, drawings and other documents identifying and locating each component of the smoke control system, and describing its proper function and maintenance requirements, shall be maintained on file at the building as an attachment to the report required by Section 909.18.8.3. Devices shall have an approved identifying tag or mark on them consistent with the other required documentation and shall be dated indicating the last time they were successfully tested and by whom."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1957
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195551\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195551\"><\/AnnotationDrawer><div>When a boiler or pressure vessel has exceeded its useful life or has been subjected to an event that may have impacted the integrity of the pressure vessel, the department may require that a fitness for service study be completed. The study shall be completed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">National Board Inspection Code<\/span> Part 2, Section 4, and documented in accordance with the National Board 403 form.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11147-html-1",
+      "kind" : "html",
+      "plainText" : "When a boiler or pressure vessel has exceeded its useful life or has been subjected to an event that may have impacted the integrity of the pressure vessel, the department may require that a fitness for service study be completed. The study shall be completed in accordance with the National Board Inspection Code Part 2, Section 4, and documented in accordance with the National Board 403 form."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11147
+}

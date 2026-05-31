@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170753\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170753\"><\/AnnotationDrawer><div>Except as provided for in Section 722.5.2.2, structural steel beams in approved fire-resistance-rated assemblies shall be considered the minimum permissible size. Other beam or girder shapes shall be permitted to be substituted provided that the weight-to-heated-perimeter ratio <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">(W\/D)<\/span> of the substitute beam is equal to or greater than that of the beam specified in the approved assembly.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15290-html-1",
+      "kind" : "html",
+      "plainText" : "Except as provided for in Section 722.5.2.2, structural steel beams in approved fire-resistance-rated assemblies shall be considered the minimum permissible size. Other beam or girder shapes shall be permitted to be substituted provided that the weight-to-heated-perimeter ratio (W\/D) of the substitute beam is equal to or greater than that of the beam specified in the approved assembly."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15290
+}

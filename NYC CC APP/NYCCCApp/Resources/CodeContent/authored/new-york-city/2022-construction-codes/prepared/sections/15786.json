@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172394\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172394\"><\/AnnotationDrawer><div>The smoke control system shall require a reacceptance test after any modifications to the system or physical changes to the building that may affect system performance. Reacceptance testing shall be a retest of the entire system in accordance with Sections 909.18.1 through 909.18.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15786-html-1",
+      "kind" : "html",
+      "plainText" : "The smoke control system shall require a reacceptance test after any modifications to the system or physical changes to the building that may affect system performance. Reacceptance testing shall be a retest of the entire system in accordance with Sections 909.18.1 through 909.18.9."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15786
+}

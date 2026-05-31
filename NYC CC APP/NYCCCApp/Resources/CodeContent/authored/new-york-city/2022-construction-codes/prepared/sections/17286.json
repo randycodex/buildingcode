@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177267\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177267\"><\/AnnotationDrawer><div>Loads and load combinations on storm shelters shall be determined in accordance with ICC 500.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-177268\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-177268\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-177268\"><\/AnnotationDrawer><h6><a name=\"JD_BC1605\" id=\"JD_BC1605\" title=\"BC 1605\"><\/a>Section BC 1605: Load Combinations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17286-html-1",
+      "kind" : "html",
+      "plainText" : "Loads and load combinations on storm shelters shall be determined in accordance with ICC 500.\n\n Section BC 1605: Load Combinations"
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17286
+}

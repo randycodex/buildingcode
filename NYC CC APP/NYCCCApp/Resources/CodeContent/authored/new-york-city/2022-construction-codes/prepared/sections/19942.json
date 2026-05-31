@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185617\"><\/AnnotationDrawer><div>The permanent floors of such buildings or other structures shall be installed as soon as possible as the erection of structural steel members progresses. In no case shall there be more than eight stories, floors or equivalent levels or 120 feet (36 576 mm), whichever is less, between the working deck and the uppermost permanent floor.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185618\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where otherwise designed, in accordance with the approved construction documents, by the registered design professional of record.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19942-html-1",
+      "kind" : "html",
+      "plainText" : "The permanent floors of such buildings or other structures shall be installed as soon as possible as the erection of structural steel members progresses. In no case shall there be more than eight stories, floors or equivalent levels or 120 feet (36 576 mm), whichever is less, between the working deck and the uppermost permanent floor.\n\n Exception: Where otherwise designed, in accordance with the approved construction documents, by the registered design professional of record."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19942
+}

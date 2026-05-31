@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172298\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172298\"><\/AnnotationDrawer><div>Elements of the smoke control system relying on electronic volatile memories or similar systems shall be supplied with uninterruptable power sources of sufficient duration to span a 15-minute primary power interruption. Elements of the smoke control system susceptible to power surges shall be suitably protected by conditioners, suppressors or other approved means.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1924-html-1",
+      "kind" : "html",
+      "plainText" : "Elements of the smoke control system relying on electronic volatile memories or similar systems shall be supplied with uninterruptable power sources of sufficient duration to span a 15-minute primary power interruption. Elements of the smoke control system susceptible to power surges shall be suitably protected by conditioners, suppressors or other approved means."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1924
+}

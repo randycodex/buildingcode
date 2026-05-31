@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168141\"><\/AnnotationDrawer><div>Where required by the<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\"> New York City Fire Code<\/span>, hydrogen fuel gas rooms shall be designed and constructed in accordance with Sections 421.1 through 421.7 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "750-html-1",
+      "kind" : "html",
+      "plainText" : "Where required by the New York City Fire Code , hydrogen fuel gas rooms shall be designed and constructed in accordance with Sections 421.1 through 421.7 of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 750
+}

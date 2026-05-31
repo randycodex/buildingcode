@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174916\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174916\"><\/AnnotationDrawer><div>If a service entrance is the only entrance to a building or a tenant space in a facility, that entrance shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2671-html-1",
+      "kind" : "html",
+      "plainText" : "If a service entrance is the only entrance to a building or a tenant space in a facility, that entrance shall be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2671
+}

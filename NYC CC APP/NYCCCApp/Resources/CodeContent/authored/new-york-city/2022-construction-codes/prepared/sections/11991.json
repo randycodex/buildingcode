@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161806\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161806\"><\/AnnotationDrawer><div>Sanitary floor sinks shall conform to the requirements of ASME A112.6.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161807\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161807\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161807\"><\/AnnotationDrawer><h6><a name=\"JD_PC428\" id=\"JD_PC428\" title=\"PC 428\"><\/a>Section PC 428: Prohibited Water Uses<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11991-html-1",
+      "kind" : "html",
+      "plainText" : "Sanitary floor sinks shall conform to the requirements of ASME A112.6.7.\n\n Section PC 428: Prohibited Water Uses"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11991
+}

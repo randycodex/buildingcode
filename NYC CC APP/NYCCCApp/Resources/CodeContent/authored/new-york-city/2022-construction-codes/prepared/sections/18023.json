@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179742\"><\/AnnotationDrawer><div>For micropiles or portions thereof grouted inside a temporary or permanent casing or a hole drilled with grout, the steel pipe or steel reinforcement shall be designed to carry at least 40 percent of the design compression load. Micropiles or portions thereof grouted in an open hole in soil without temporary or permanent casing and without suitable means of verifying the hole diameter during grouting shall be designed to carry the entire compression load in the reinforcing steel. Where a steel pipe is used for reinforcement, the portion of the grout enclosed within the pipe is permitted to be included in the determination of the allowable stress in the grout.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18023-html-1",
+      "kind" : "html",
+      "plainText" : "For micropiles or portions thereof grouted inside a temporary or permanent casing or a hole drilled with grout, the steel pipe or steel reinforcement shall be designed to carry at least 40 percent of the design compression load. Micropiles or portions thereof grouted in an open hole in soil without temporary or permanent casing and without suitable means of verifying the hole diameter during grouting shall be designed to carry the entire compression load in the reinforcing steel. Where a steel pipe is used for reinforcement, the portion of the grout enclosed within the pipe is permitted to be included in the determination of the allowable stress in the grout."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18023
+}

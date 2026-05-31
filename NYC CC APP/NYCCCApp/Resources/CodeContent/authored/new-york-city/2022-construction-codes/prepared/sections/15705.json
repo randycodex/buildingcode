@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172154\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172154\"><\/AnnotationDrawer><div class=\"EdNoteSm\">* <span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> there are two sections designated as &#167; 908.10. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-234096\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-234096\"><\/AnnotationDrawer><div>Rooms and spaces containing flammable gas distribution piping operating at or above 15 pounds per square inch gauge (psig) (103.4 kPa) shall be provided with an approved flammable gas detection-alarm system and shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15705-html-1",
+      "kind" : "html",
+      "plainText" : "* Editor's note: there are two sections designated as &#167; 908.10. \n\n Rooms and spaces containing flammable gas distribution piping operating at or above 15 pounds per square inch gauge (psig) (103.4 kPa) shall be provided with an approved flammable gas detection-alarm system and shall comply with the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15705
+}

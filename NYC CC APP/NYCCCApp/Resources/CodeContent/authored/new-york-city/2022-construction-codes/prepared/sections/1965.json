@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172413\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172413\"><\/AnnotationDrawer><div>Where access to the stairway or ramp is by way of an open exterior balcony, the door assembly into the enclosure shall be a fire door assembly in accordance with Section 716.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1965-html-1",
+      "kind" : "html",
+      "plainText" : "Where access to the stairway or ramp is by way of an open exterior balcony, the door assembly into the enclosure shall be a fire door assembly in accordance with Section 716.5."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1965
+}

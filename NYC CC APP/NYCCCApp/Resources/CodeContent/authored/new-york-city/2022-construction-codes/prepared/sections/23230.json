@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193406\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193406\"><\/AnnotationDrawer><div>Exhaust openings that terminate outdoors shall be protected with corrosion-resistant screens, louvers or grilles. Openings in screens, louvers and grilles shall be sized not less than 1\/4 inch (6.4 mm) and not larger than 1\/2 inch (12.7 mm). Openings shall be protected against local weather conditions. Louvers that protect exhaust openings shall comply with AMCA Standard 550. Outdoor openings located in exterior walls shall meet the provisions for exterior wall opening protective in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23230-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust openings that terminate outdoors shall be protected with corrosion-resistant screens, louvers or grilles. Openings in screens, louvers and grilles shall be sized not less than 1\/4 inch (6.4 mm) and not larger than 1\/2 inch (12.7 mm). Openings shall be protected against local weather conditions. Louvers that protect exhaust openings shall comply with AMCA Standard 550. Outdoor openings located in exterior walls shall meet the provisions for exterior wall opening protective in accordance with the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23230
+}

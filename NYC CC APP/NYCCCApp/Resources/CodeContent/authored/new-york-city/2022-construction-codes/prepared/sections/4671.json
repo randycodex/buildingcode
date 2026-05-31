@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181061\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181061\"><\/AnnotationDrawer><div>A masonry heater is a heating appliance constructed of concrete or solid masonry, hereinafter referred to as \"masonry,\" which is designed to absorb and store heat from a solid fuel fire built in the firebox by routing the exhaust gases through internal heat exchange channels in which the flow path downstream of the firebox may include flow in a horizontal or downward direction before entering the chimney and which delivers heat by radiation from the masonry surface of the heater.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4671-html-1",
+      "kind" : "html",
+      "plainText" : "A masonry heater is a heating appliance constructed of concrete or solid masonry, hereinafter referred to as \"masonry,\" which is designed to absorb and store heat from a solid fuel fire built in the firebox by routing the exhaust gases through internal heat exchange channels in which the flow path downstream of the firebox may include flow in a horizontal or downward direction before entering the chimney and which delivers heat by radiation from the masonry surface of the heater."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4671
+}

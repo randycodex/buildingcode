@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186015\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186015\"><\/AnnotationDrawer><div>The safeguards of Sections 3306.9.10.1 through 3306.9.10.3 shall apply to demolition operations involving floors.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6265-html-1",
+      "kind" : "html",
+      "plainText" : "The safeguards of Sections 3306.9.10.1 through 3306.9.10.3 shall apply to demolition operations involving floors."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6265
+}

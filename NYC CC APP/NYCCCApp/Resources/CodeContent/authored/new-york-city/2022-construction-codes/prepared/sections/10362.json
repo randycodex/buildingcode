@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193287\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193287\"><\/AnnotationDrawer><div>The outdoor air required to be supplied by each ventilation system shall be determined in accordance with Sections 403.3.1.1.2.1 through 403.3.1.1.2.3 as a function of system type and zone outdoor airflow rates.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10362-html-1",
+      "kind" : "html",
+      "plainText" : "The outdoor air required to be supplied by each ventilation system shall be determined in accordance with Sections 403.3.1.1.2.1 through 403.3.1.1.2.3 as a function of system type and zone outdoor airflow rates."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 10362
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198366\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198366\"><\/AnnotationDrawer><div>The fittings, pipe and openings located between the system to be protected and the pressure-relieving device shall be sized to prevent hammering of the valve and to prevent impairment of relief capacity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21148-html-1",
+      "kind" : "html",
+      "plainText" : "The fittings, pipe and openings located between the system to be protected and the pressure-relieving device shall be sized to prevent hammering of the valve and to prevent impairment of relief capacity."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21148
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175061\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175061\"><\/AnnotationDrawer><div>Where provided, a bathtub shall comply with Section 1107.2.2.8.1, and a shower compartment shall comply with Section 1107.2.2.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2721-html-1",
+      "kind" : "html",
+      "plainText" : "Where provided, a bathtub shall comply with Section 1107.2.2.8.1, and a shower compartment shall comply with Section 1107.2.2.8.2."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2721
+}

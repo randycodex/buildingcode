@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186982\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186982\"><\/AnnotationDrawer><div>The installation and removal of a supported scaffold shall be supervised by a competent person designated by the contractor installing or removing the scaffold.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20395-html-1",
+      "kind" : "html",
+      "plainText" : "The installation and removal of a supported scaffold shall be supervised by a competent person designated by the contractor installing or removing the scaffold."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20395
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172751\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172751\"><\/AnnotationDrawer><div>The system shall have an air supply and smoke exhaust capability that will provide a minimum of 6 air changes per hour or 1 cubic foot per minute per square foot (cfm\/ft\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t) (0.00508 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s &#8226; m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t), whichever is greater. The system need not exhaust from all areas at the same time, but is permitted to be zoned based on the largest fire area served. For the purpose of calculating system size, the height of a compartment shall be considered to run from slab to slab and include the volume above suspended ceilings. Provisions shall be made for sufficient make-up air. The provisions may include operable windows, doors, building leakage, or mechanical systems. In buildings having occupied floors located less than 75 feet (22 860 mm) above the lowest level of fire department vehicle access, breakable windows may be utilized.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15923-html-1",
+      "kind" : "html",
+      "plainText" : "The system shall have an air supply and smoke exhaust capability that will provide a minimum of 6 air changes per hour or 1 cubic foot per minute per square foot (cfm\/ft\n 2 \n ) (0.00508 m\n 3 \n \/s &#8226; m\n 2 \n ), whichever is greater. The system need not exhaust from all areas at the same time, but is permitted to be zoned based on the largest fire area served. For the purpose of calculating system size, the height of a compartment shall be considered to run from slab to slab and include the volume above suspended ceilings. Provisions shall be made for sufficient make-up air. The provisions may include operable windows, doors, building leakage, or mechanical systems. In buildings having occupied floors located less than 75 feet (22 860 mm) above the lowest level of fire department vehicle access, breakable windows may be utilized."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15923
+}

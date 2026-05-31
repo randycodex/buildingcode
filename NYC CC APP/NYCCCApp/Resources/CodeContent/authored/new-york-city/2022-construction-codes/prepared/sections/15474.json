@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171430\"><\/AnnotationDrawer><div>Limited area sprinkler systems shall not exceed six sprinklers in any single fire area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15474-html-1",
+      "kind" : "html",
+      "plainText" : "Limited area sprinkler systems shall not exceed six sprinklers in any single fire area."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15474
+}

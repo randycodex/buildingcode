@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198549\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198549\"><\/AnnotationDrawer><div>Ventilating hoods and exhaust systems shall be permitted to be used to vent appliances installed in commercial applications. Where automatically operated appliances, other than commercial cooking appliances, are vented through a ventilating hood or exhaust system equipped with a damper or with a power means of exhaust, provisions shall be made to allow the flow of gas to the main burners only when the damper is open to a position to properly vent the appliance and when the power means of exhaust is in operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21214-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilating hoods and exhaust systems shall be permitted to be used to vent appliances installed in commercial applications. Where automatically operated appliances, other than commercial cooking appliances, are vented through a ventilating hood or exhaust system equipped with a damper or with a power means of exhaust, provisions shall be made to allow the flow of gas to the main burners only when the damper is open to a position to properly vent the appliance and when the power means of exhaust is in operation."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21214
+}

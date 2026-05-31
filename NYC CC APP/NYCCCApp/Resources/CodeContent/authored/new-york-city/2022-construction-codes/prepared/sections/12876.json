@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188220\"><\/AnnotationDrawer><div>In detention and correctional facilities, where a public pay telephone is provided in a secured area used only by detainees or incarcerated individuals and security personnel, then at least one TTY shall be provided in at least one secured area.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188221\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188221\"><\/AnnotationDrawer><div>(Am. 2022 N.Y. Laws Ch. 486, 8\/8\/2022, eff. 11\/7\/2022) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12876-html-1",
+      "kind" : "html",
+      "plainText" : "In detention and correctional facilities, where a public pay telephone is provided in a secured area used only by detainees or incarcerated individuals and security personnel, then at least one TTY shall be provided in at least one secured area.\n\n (Am. 2022 N.Y. Laws Ch. 486, 8\/8\/2022, eff. 11\/7\/2022)"
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12876
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163302\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163302\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A mixture of treated or untreated light and heavy liquids with various specific gravities shall be separated in an approved receptacle.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12566-html-1",
+      "kind" : "html",
+      "plainText" : "A mixture of treated or untreated light and heavy liquids with various specific gravities shall be separated in an approved receptacle."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 12566
+}

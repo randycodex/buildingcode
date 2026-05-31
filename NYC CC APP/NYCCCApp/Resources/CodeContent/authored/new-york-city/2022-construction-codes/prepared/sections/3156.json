@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176316\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176316\"><\/AnnotationDrawer><div>Combustible exterior wall coverings, including architectural trim, shall comply with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176317\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176317\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176318\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176318\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Plastics complying with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183091', hash: '#JD_BCCh.26' }}\">Chapter 26<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176319\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176319\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Metal composite materials (MCM) complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176372', hash: '#JD_BC1407' }}\">1407<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176320\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176320\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;High-pressure decorative exterior-grade compact laminates (HPL) complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176438', hash: '#JD_BC1409' }}\">1409<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3156-html-1",
+      "kind" : "html",
+      "plainText" : "Combustible exterior wall coverings, including architectural trim, shall comply with this section.\n\n Exceptions: \n\n 1. Plastics complying with Chapter 26 .\n\n 2. Metal composite materials (MCM) complying with Section 1407 .\n\n 3. High-pressure decorative exterior-grade compact laminates (HPL) complying with Section 1409 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3156
+}

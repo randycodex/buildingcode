@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186836\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186836\"><\/AnnotationDrawer><div>Projectile tools shall comply with the requirements of Sections 3311.2.1 through 3311.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6518-html-1",
+      "kind" : "html",
+      "plainText" : "Projectile tools shall comply with the requirements of Sections 3311.2.1 through 3311.2.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6518
+}

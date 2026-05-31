@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185595\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185595\"><\/AnnotationDrawer><div>Connections of individual open web steel joists to steel structures in bays of 40 feet (12 192 mm) or more shall be fabricated to allow for field bolting of connections during erection.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185596\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185596\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Open web steel-joists that have been pre-assembled into panels.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19931-html-1",
+      "kind" : "html",
+      "plainText" : "Connections of individual open web steel joists to steel structures in bays of 40 feet (12 192 mm) or more shall be fabricated to allow for field bolting of connections during erection.\n\n Exception: Open web steel-joists that have been pre-assembled into panels."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19931
+}

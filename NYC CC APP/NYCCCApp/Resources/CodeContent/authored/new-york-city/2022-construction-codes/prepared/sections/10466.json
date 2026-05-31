@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193556\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193556\"><\/AnnotationDrawer><div>Squirrel cage blowers shall not be used for exhausting hazardous fumes, vapors or gases in operating buildings and rooms for the manufacture, assembly or testing of explosives. Only nonferrous fan blades shall be used for fans located within the ductwork and through which hazardous materials are exhausted. Motors shall be located outside the duct.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10466-html-1",
+      "kind" : "html",
+      "plainText" : "Squirrel cage blowers shall not be used for exhausting hazardous fumes, vapors or gases in operating buildings and rooms for the manufacture, assembly or testing of explosives. Only nonferrous fan blades shall be used for fans located within the ductwork and through which hazardous materials are exhausted. Motors shall be located outside the duct."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10466
+}

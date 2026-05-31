@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194871\"><\/AnnotationDrawer><div>Connectors shall connect to a chimney flue at a point not less than 12 inches (304.8 mm) above the lowest portion of the interior of the chimney flue.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23728-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors shall connect to a chimney flue at a point not less than 12 inches (304.8 mm) above the lowest portion of the interior of the chimney flue."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23728
+}

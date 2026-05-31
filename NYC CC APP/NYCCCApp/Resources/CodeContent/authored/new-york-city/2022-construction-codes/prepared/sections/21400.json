@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199140\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199140\"><\/AnnotationDrawer><div>Vented gas fireplaces shall be tested in accordance with ANSI Z21.50\/CSA 2.22, shall be installed in accordance with the manufacturer's instructions and shall be designed and equipped as specified in Section 602.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21400-html-1",
+      "kind" : "html",
+      "plainText" : "Vented gas fireplaces shall be tested in accordance with ANSI Z21.50\/CSA 2.22, shall be installed in accordance with the manufacturer's instructions and shall be designed and equipped as specified in Section 602.2."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21400
+}

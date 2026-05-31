@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197949\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197949\"><\/AnnotationDrawer><div>Fittings installed in concealed locations shall be limited to the following types:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197950\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197950\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Threaded elbows, tees and couplings.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197951\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197951\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Welded fittings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20989-html-1",
+      "kind" : "html",
+      "plainText" : "Fittings installed in concealed locations shall be limited to the following types:\n\n 1. Threaded elbows, tees and couplings.\n\n 2. Welded fittings."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20989
+}

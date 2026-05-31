@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199434\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199434\"><\/AnnotationDrawer><div>Boilers shall be listed in accordance with the requirements of ANSI Z21.13\/CSA 4.9 or UL 795. If applicable, the boiler shall be designed and constructed in accordance with the requirements of ASME CSD-1 and as applicable, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code,<\/span> Sections I, II, IV, V, VI and IX and NFPA 85. Low pressure boilers shall conform to the requirements of 12 NYCRR Part 4 and high pressure boilers shall conform to the requirements of 12 NYCRR Part 14.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8694-html-1",
+      "kind" : "html",
+      "plainText" : "Boilers shall be listed in accordance with the requirements of ANSI Z21.13\/CSA 4.9 or UL 795. If applicable, the boiler shall be designed and constructed in accordance with the requirements of ASME CSD-1 and as applicable, the ASME Boiler and Pressure Vessel Code, Sections I, II, IV, V, VI and IX and NFPA 85. Low pressure boilers shall conform to the requirements of 12 NYCRR Part 4 and high pressure boilers shall conform to the requirements of 12 NYCRR Part 14."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8694
+}

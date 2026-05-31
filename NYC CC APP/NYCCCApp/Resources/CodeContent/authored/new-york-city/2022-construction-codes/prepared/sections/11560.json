@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196617\"><\/AnnotationDrawer><div>Cylindrical tanks, including oval, elongated oval, or round tanks, exceeding 330 gallons (1249.2 L) shall comply with the requirements of Section 1305.14.2.1 through 1305.14.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196618\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Such above-ground vertical tanks that are outside of buildings shall comply with Section 1305.14.1 and 1305.14.5. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11560-html-1",
+      "kind" : "html",
+      "plainText" : "Cylindrical tanks, including oval, elongated oval, or round tanks, exceeding 330 gallons (1249.2 L) shall comply with the requirements of Section 1305.14.2.1 through 1305.14.2.3.\n\n Exception: Such above-ground vertical tanks that are outside of buildings shall comply with Section 1305.14.1 and 1305.14.5."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11560
+}

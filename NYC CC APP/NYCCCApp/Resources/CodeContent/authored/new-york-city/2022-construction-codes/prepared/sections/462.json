@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167273\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167273\"><\/AnnotationDrawer><div>Exits are permitted to discharge into a fenced or walled courtyard. Enclosed yards or courts shall be of a size to accommodate all occupants, be located not less than 50 feet (15 240 mm) from the building and have an area of not less than 15 square feet (1.4 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) per person.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "462-html-1",
+      "kind" : "html",
+      "plainText" : "Exits are permitted to discharge into a fenced or walled courtyard. Enclosed yards or courts shall be of a size to accommodate all occupants, be located not less than 50 feet (15 240 mm) from the building and have an area of not less than 15 square feet (1.4 m\n\n 2 \n\n ) per person."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 462
+}

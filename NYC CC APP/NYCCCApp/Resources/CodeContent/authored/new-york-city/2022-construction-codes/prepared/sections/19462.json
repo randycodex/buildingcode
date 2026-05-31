@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184227\"><\/AnnotationDrawer><div>The use of personal immersion alarms shall not be construed as compliance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19462-html-1",
+      "kind" : "html",
+      "plainText" : "The use of personal immersion alarms shall not be construed as compliance with this section."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19462
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197992\"><\/AnnotationDrawer><div>The trench shall be graded so that the pipe has a firm, substantially continuous bearing on the bottom of the trench.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21005-html-1",
+      "kind" : "html",
+      "plainText" : "The trench shall be graded so that the pipe has a firm, substantially continuous bearing on the bottom of the trench."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21005
+}

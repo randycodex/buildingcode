@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188756\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188756\"><\/AnnotationDrawer><div>In addition to the other requirements of this appendix, connections for temporary external generators, boilers and chillers shall be provided in accordance with Sections G304.5.1 through G304.5.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13067-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the other requirements of this appendix, connections for temporary external generators, boilers and chillers shall be provided in accordance with Sections G304.5.1 through G304.5.4."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13067
+}

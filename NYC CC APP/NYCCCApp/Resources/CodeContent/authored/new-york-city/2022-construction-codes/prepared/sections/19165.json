@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183443\"><\/AnnotationDrawer><div>Plastic composites containing wood, cellulosic or any other biodegradable materials shall be termite and decay resistant as determined in accordance with ASTM D 7032.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19165-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic composites containing wood, cellulosic or any other biodegradable materials shall be termite and decay resistant as determined in accordance with ASTM D 7032."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19165
+}

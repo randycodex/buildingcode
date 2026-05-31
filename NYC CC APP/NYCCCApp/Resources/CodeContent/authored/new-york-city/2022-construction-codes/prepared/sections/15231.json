@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170428\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170428\"><\/AnnotationDrawer><div>The concrete cover for an individual tendon is the minimum thickness of concrete between the surface of the tendon and the fire-exposed surface of the beam, except that for ungrouted ducts, the assumed cover thickness is the minimum thickness of concrete between the surface of the duct and the fire-exposed surface of the beam. For beams in which two or more tendons are used, the cover is assumed to be the average of the minimum cover of the individual tendons. For corner tendons (tendons equal distance from the bottom and side), the minimum cover used in the calculation shall be one-half the actual value. For stemmed members with two or more prestressing tendons located along the vertical centerline of the stem, the average cover shall be the distance from the bottom of the member to the centroid of the tendons. The actual cover for any individual tendon shall be not less than one-half the smaller value shown in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170395', hash: '#JD_BCTable722.2.3(4)' }}\">Tables 722.2.3(4)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170395', hash: '#JD_BCTable722.2.3(5)' }}\">722.2.3(5)<\/Link>, or 1 inch (25.4 mm), whichever is greater.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15231-html-1",
+      "kind" : "html",
+      "plainText" : "The concrete cover for an individual tendon is the minimum thickness of concrete between the surface of the tendon and the fire-exposed surface of the beam, except that for ungrouted ducts, the assumed cover thickness is the minimum thickness of concrete between the surface of the duct and the fire-exposed surface of the beam. For beams in which two or more tendons are used, the cover is assumed to be the average of the minimum cover of the individual tendons. For corner tendons (tendons equal distance from the bottom and side), the minimum cover used in the calculation shall be one-half the actual value. For stemmed members with two or more prestressing tendons located along the vertical centerline of the stem, the average cover shall be the distance from the bottom of the member to the centroid of the tendons. The actual cover for any individual tendon shall be not less than one-half the smaller value shown in Tables 722.2.3(4) and 722.2.3(5) , or 1 inch (25.4 mm), whichever is greater."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15231
+}

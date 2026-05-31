@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198641\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198641\"><\/AnnotationDrawer><div>A listed combination gas- and oil fuel-burning appliance shall be permitted to be connected to a single chimney flue. The chimney flue shall be sized to properly vent the appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21243-html-1",
+      "kind" : "html",
+      "plainText" : "A listed combination gas- and oil fuel-burning appliance shall be permitted to be connected to a single chimney flue. The chimney flue shall be sized to properly vent the appliance."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21243
+}

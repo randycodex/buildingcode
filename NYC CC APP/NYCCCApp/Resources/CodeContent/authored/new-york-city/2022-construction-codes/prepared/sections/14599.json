@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168187\"><\/AnnotationDrawer><div>A fire alarm system shall be provided for ambulatory care facilities in accordance with Section 907.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168188\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168188\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168188\"><\/AnnotationDrawer><h6><a name=\"JD_BC423\" id=\"JD_BC423\" title=\"BC 423\"><\/a>Section BC 423: Storm Shelters<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14599-html-1",
+      "kind" : "html",
+      "plainText" : "A fire alarm system shall be provided for ambulatory care facilities in accordance with Section 907.2.2.\n\n Section BC 423: Storm Shelters"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14599
+}

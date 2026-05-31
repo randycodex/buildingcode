@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168634\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168634\"><\/AnnotationDrawer><div>The area of a Group E building of Type IIA, IIIA or IV construction shall not be limited where the building is protected throughout with an approved automatic sprinkler system in accordance with Section 903.3.1.1. The area of a one-story Group E building of Type IIB construction shall not be limited when the following criteria are met:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168635\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168635\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Each classroom shall have not less than two means of egress, with one of the means of egress being a direct exit to the outside of the building complying with Section 1022.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168636\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168636\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168637\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168637\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The building is surrounded and adjoined on all sides by public ways or yards not less than 60 feet (18 288 mm) in width.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14727-html-1",
+      "kind" : "html",
+      "plainText" : "The area of a Group E building of Type IIA, IIIA or IV construction shall not be limited where the building is protected throughout with an approved automatic sprinkler system in accordance with Section 903.3.1.1. The area of a one-story Group E building of Type IIB construction shall not be limited when the following criteria are met:\n\n 1. Each classroom shall have not less than two means of egress, with one of the means of egress being a direct exit to the outside of the building complying with Section 1022.\n\n 2. The building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.\n\n 3. The building is surrounded and adjoined on all sides by public ways or yards not less than 60 feet (18 288 mm) in width."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14727
+}

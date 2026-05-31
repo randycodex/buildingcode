@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176419\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176419\"><\/AnnotationDrawer><div>EIFS shall be constructed such that it meets the performance characteristics required in ASTM E 2568.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17017-html-1",
+      "kind" : "html",
+      "plainText" : "EIFS shall be constructed such that it meets the performance characteristics required in ASTM E 2568."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 17017
+}

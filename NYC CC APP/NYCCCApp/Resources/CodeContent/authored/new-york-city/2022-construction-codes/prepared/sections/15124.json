@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169934\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169934\"><\/AnnotationDrawer><div>The operating temperature of a ceiling radiation damper actuation device shall be 50&#176;F (10&#176;C) above the normal temperature within the duct system, but not less than 160&#176;F (71.1&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15124-html-1",
+      "kind" : "html",
+      "plainText" : "The operating temperature of a ceiling radiation damper actuation device shall be 50°F (10°C) above the normal temperature within the duct system, but not less than 160°F (71.1°C)."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15124
+}

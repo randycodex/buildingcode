@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197394\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197394\"><\/AnnotationDrawer><div>When piping is placed in or partly in an exterior wall or interior load-bearing wall, necessitating cutting, drilling or notching of the top plate by more than 50 percent of its width, a galvanized metal tie not less than 0.054 inch thick (1.37 mm) (No. 16 gage) and 1 1\/2 inches (38.1 mm) wide shall be fastened across and to the plate at each side of the opening with not less than eight 10d (0.148 inch diameter) nails having a minimum length of 1 1\/2 inches (38.1 mm) at each side or equivalent. The metal tie must extend a minimum of 6 inches (152.4 mm) past the opening. See <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182278', hash: '#JD_BCFIgure2308.5.8' }}\">Figure 2308.5.8<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197395\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197395\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> When the entire side of the wall with the notch or cut is covered by wood structural panel sheathing, additional fastening is not required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20807-html-1",
+      "kind" : "html",
+      "plainText" : "When piping is placed in or partly in an exterior wall or interior load-bearing wall, necessitating cutting, drilling or notching of the top plate by more than 50 percent of its width, a galvanized metal tie not less than 0.054 inch thick (1.37 mm) (No. 16 gage) and 1 1\/2 inches (38.1 mm) wide shall be fastened across and to the plate at each side of the opening with not less than eight 10d (0.148 inch diameter) nails having a minimum length of 1 1\/2 inches (38.1 mm) at each side or equivalent. The metal tie must extend a minimum of 6 inches (152.4 mm) past the opening. See Figure 2308.5.8 of the New York City Building Code .\n\n Exception: When the entire side of the wall with the notch or cut is covered by wood structural panel sheathing, additional fastening is not required."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20807
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178518\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178518\"><\/AnnotationDrawer><div>Testing of smoke control systems shall be witnessed in its entirety by a special inspector in accordance with Sections 1705.18.1 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-234097', hash: '#JD_BC909' }}\">909<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178519\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178519\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Post-fire smoke purge systems that are not required to function as a smoke control system shall be permitted to be inspected pursuant to the special inspection requirements of Section 1705.21.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3792-html-1",
+      "kind" : "html",
+      "plainText" : "Testing of smoke control systems shall be witnessed in its entirety by a special inspector in accordance with Sections 1705.18.1 and 909 .\n\n Exception: Post-fire smoke purge systems that are not required to function as a smoke control system shall be permitted to be inspected pursuant to the special inspection requirements of Section 1705.21."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3792
+}

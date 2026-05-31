@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172635\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172635\"><\/AnnotationDrawer><div>Fire pump test outlet control valves shall be supervised in the closed position. Individual hose valves on the test header are not required to be monitored.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2057-html-1",
+      "kind" : "html",
+      "plainText" : "Fire pump test outlet control valves shall be supervised in the closed position. Individual hose valves on the test header are not required to be monitored."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2057
+}

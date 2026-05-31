@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184100\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184100\"><\/AnnotationDrawer><div>Pedestrian walkways shall be designed and constructed in accordance with Sections 3104.2 through 3104.9. Tunnels shall be designed and constructed in accordance with Sections 3104.2 and 3104.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19415-html-1",
+      "kind" : "html",
+      "plainText" : "Pedestrian walkways shall be designed and constructed in accordance with Sections 3104.2 through 3104.9. Tunnels shall be designed and constructed in accordance with Sections 3104.2 and 3104.10."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19415
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169217\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169217\"><\/AnnotationDrawer><div>Fire walls shall be designed and constructed to allow collapse of the structure on either side without collapse of the wall under fire conditions. Fire walls designed and constructed in accordance with NFPA 221 shall be deemed to comply with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1044-html-1",
+      "kind" : "html",
+      "plainText" : "Fire walls shall be designed and constructed to allow collapse of the structure on either side without collapse of the wall under fire conditions. Fire walls designed and constructed in accordance with NFPA 221 shall be deemed to comply with this section."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1044
+}

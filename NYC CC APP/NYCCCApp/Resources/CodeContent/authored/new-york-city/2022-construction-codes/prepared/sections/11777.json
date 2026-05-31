@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161258\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where rock is encountered in trenching, the rock shall be removed to not less than 3 inches (76 mm) below the installation level of the bottom of the pipe, and the trench shall be backfilled to the installation level of the bottom of the pipe with sand tamped in place so as to provide uniform load- bearing support for the pipe between joints. The pipe, including the joints, shall not rest on rock at any point.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11777-html-1",
+      "kind" : "html",
+      "plainText" : "Where rock is encountered in trenching, the rock shall be removed to not less than 3 inches (76 mm) below the installation level of the bottom of the pipe, and the trench shall be backfilled to the installation level of the bottom of the pipe with sand tamped in place so as to provide uniform load- bearing support for the pipe between joints. The pipe, including the joints, shall not rest on rock at any point."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11777
+}

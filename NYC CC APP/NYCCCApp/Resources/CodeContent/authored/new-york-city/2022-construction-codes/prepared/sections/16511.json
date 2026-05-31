@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174955\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174955\"><\/AnnotationDrawer><div>Where passenger loading zones are provided, at least one accessible passenger loading zone shall be provided within each continuous 100 linear feet (30.4 m) of loading zone space, or fraction thereof, so that travel between accessible passenger loading zones will not exceed 100 linear feet (30.4 m).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16511-html-1",
+      "kind" : "html",
+      "plainText" : "Where passenger loading zones are provided, at least one accessible passenger loading zone shall be provided within each continuous 100 linear feet (30.4 m) of loading zone space, or fraction thereof, so that travel between accessible passenger loading zones will not exceed 100 linear feet (30.4 m)."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16511
+}

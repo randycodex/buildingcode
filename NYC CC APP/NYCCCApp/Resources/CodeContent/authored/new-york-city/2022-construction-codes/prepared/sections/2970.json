@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175785\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175785\"><\/AnnotationDrawer><div>The minimum openable area to the outdoors shall be 5 percent of the floor area of the space being ventilated. Every window or other opening providing required natural ventilation shall be at least 1 foot (304.8 mm) wide and at least 3 square feet (0.28 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in total area, providing a minimum of 1 1\/2 square feet (0.14 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of openable area.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175786\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175786\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Skylights shall comply with the exception of Section 1203.5.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2970-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum openable area to the outdoors shall be 5 percent of the floor area of the space being ventilated. Every window or other opening providing required natural ventilation shall be at least 1 foot (304.8 mm) wide and at least 3 square feet (0.28 m\n\n 2 \n\n ) in total area, providing a minimum of 1 1\/2 square feet (0.14 m\n\n 2 \n\n ) of openable area.\n\n Exception: Skylights shall comply with the exception of Section 1203.5.1.4."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 2970
+}

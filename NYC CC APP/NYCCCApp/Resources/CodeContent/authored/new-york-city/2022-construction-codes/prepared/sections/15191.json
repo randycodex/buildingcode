@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170183\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170183\"><\/AnnotationDrawer><div>Insulation and covering on pipe and tubing shall comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code,<\/span> the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code,<\/span> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-170184\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-170184\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-170184\"><\/AnnotationDrawer><h6><a name=\"JD_BC721\" id=\"JD_BC721\" title=\"BC 721\"><\/a>Section BC 721: Prescriptive Fire Resistance<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15191-html-1",
+      "kind" : "html",
+      "plainText" : "Insulation and covering on pipe and tubing shall comply with the requirements of the New York City Mechanical Code, the New York City Plumbing Code, and the New York City Energy Conservation Code. \n\n Section BC 721: Prescriptive Fire Resistance"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15191
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168248\"><\/AnnotationDrawer><div>It shall be unlawful in any nonproduction laboratory to: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168249\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168249\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Store or use any explosive. <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168250\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Store or use any unclassified detonable organic peroxide, detonable pyrophoric material, detonable unstable (reactive) material or detonable water-reactive material.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168251\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168251\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Store or use any Class 4 unstable (reactive) material.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168252\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168252\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Store or use any Class 4 oxidizing material.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168253\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168253\"><\/AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Store or use any flammable gas below grade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14619-html-1",
+      "kind" : "html",
+      "plainText" : "It shall be unlawful in any nonproduction laboratory to: \n\n 1. Store or use any explosive. \n\n 2. Store or use any unclassified detonable organic peroxide, detonable pyrophoric material, detonable unstable (reactive) material or detonable water-reactive material.\n\n 3. Store or use any Class 4 unstable (reactive) material.\n\n 4. Store or use any Class 4 oxidizing material.\n\n 5. Store or use any flammable gas below grade."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14619
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181211\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181211\"><\/AnnotationDrawer><div>A minimum clearance of 4 inches (102 mm) shall be provided between the exterior surfaces of a masonry chimney for medium-heat appliances and combustible material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4721-html-1",
+      "kind" : "html",
+      "plainText" : "A minimum clearance of 4 inches (102 mm) shall be provided between the exterior surfaces of a masonry chimney for medium-heat appliances and combustible material."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4721
+}

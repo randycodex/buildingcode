@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175079\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175079\"><\/AnnotationDrawer><div>Where kitchens and kitchenettes are provided in a Type B+NYC dwelling unit or sleeping unit, the primary kitchen or kitchenette shall be constructed in accordance with the kitchen requirements of Section 1003.12 (Kitchen) and 1003.3.2 (Turning Space) of ICC A117.1, including any modifications made by Sections 1107.2.3.1 through 1107.2.3.5 of this code. Secondary kitchens and kitchenettes within the same dwelling unit or sleeping unit shall be required to comply only with Section 1004.12 (Kitchens) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16555-html-1",
+      "kind" : "html",
+      "plainText" : "Where kitchens and kitchenettes are provided in a Type B+NYC dwelling unit or sleeping unit, the primary kitchen or kitchenette shall be constructed in accordance with the kitchen requirements of Section 1003.12 (Kitchen) and 1003.3.2 (Turning Space) of ICC A117.1, including any modifications made by Sections 1107.2.3.1 through 1107.2.3.5 of this code. Secondary kitchens and kitchenettes within the same dwelling unit or sleeping unit shall be required to comply only with Section 1004.12 (Kitchens) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16555
+}

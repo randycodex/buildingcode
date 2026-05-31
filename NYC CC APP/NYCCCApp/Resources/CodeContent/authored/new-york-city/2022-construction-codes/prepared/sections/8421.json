@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198647\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198647\"><\/AnnotationDrawer><div>The remaining space surrounding a chimney liner, gas vent, special gas vent or plastic piping installed within a masonry chimney flue shall not be used to vent another appliance. The insertion of another liner or vent within the chimney as provided in this code and the liner or vent manufacturer's instructions shall not be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198648\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198648\"><\/AnnotationDrawer><div>The remaining space surrounding a chimney liner, gas vent, special gas vent or plastic piping installed within a masonry, metal or factory-built chimney, shall not be used to supply combustion air. Such space shall not be prohibited from supplying combustion air to direct-vent appliances designed for installation in a solid fuel-burning fireplace and installed in accordance with the listing and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8421-html-1",
+      "kind" : "html",
+      "plainText" : "The remaining space surrounding a chimney liner, gas vent, special gas vent or plastic piping installed within a masonry chimney flue shall not be used to vent another appliance. The insertion of another liner or vent within the chimney as provided in this code and the liner or vent manufacturer's instructions shall not be prohibited.\n\n The remaining space surrounding a chimney liner, gas vent, special gas vent or plastic piping installed within a masonry, metal or factory-built chimney, shall not be used to supply combustion air. Such space shall not be prohibited from supplying combustion air to direct-vent appliances designed for installation in a solid fuel-burning fireplace and installed in accordance with the listing and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8421
+}

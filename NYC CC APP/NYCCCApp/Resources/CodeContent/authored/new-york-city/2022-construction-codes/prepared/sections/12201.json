@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162347\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162347\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where systems under continuous pressure contain chemical additives or antifreeze, or where systems are connected to a nonpotable secondary water supply, the potable water supply shall be protected against backflow by a reduced pressure principle backflow prevention assembly or a reduced pressure detector fire protection backflow prevention assembly. Where chemical additives or antifreeze are added to only a portion of an automatic fire sprinkler or standpipe system, the reduced pressure principle backflow prevention assembly or the reduced pressure detector fire protection backflow prevention assembly shall be permitted to be located so as to isolate that portion of the system. Where systems are not under continuous pressure, the potable water supply shall be protected against backflow by an air gap or an atmospheric vacuum breaker conforming to ASSE 1001 or CSA B64.1.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12201-html-1",
+      "kind" : "html",
+      "plainText" : "Where systems under continuous pressure contain chemical additives or antifreeze, or where systems are connected to a nonpotable secondary water supply, the potable water supply shall be protected against backflow by a reduced pressure principle backflow prevention assembly or a reduced pressure detector fire protection backflow prevention assembly. Where chemical additives or antifreeze are added to only a portion of an automatic fire sprinkler or standpipe system, the reduced pressure principle backflow prevention assembly or the reduced pressure detector fire protection backflow prevention assembly shall be permitted to be located so as to isolate that portion of the system. Where systems are not under continuous pressure, the potable water supply shall be protected against backflow by an air gap or an atmospheric vacuum breaker conforming to ASSE 1001 or CSA B64.1.1."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12201
+}

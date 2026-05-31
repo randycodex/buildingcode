@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183781\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183781\"><\/AnnotationDrawer><div>Sprinklers are not permitted in elevator machine rooms, machine spaces, control rooms and control spaces. Where elevator hoistways are protected with automatic sprinklers, a means installed in accordance with Section 21.4 of NFPA 72 as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-191144', hash: '#JD_BCAppQ' }}\">Appendix Q<\/Link> shall be provided, where required, to disconnect automatically the main line power supply to the affected elevator prior to the application of water. This means shall not be self-resetting. The activation of automatic sprinklers outside the hoistway, machine room, machinery space, control room or control space shall not disconnect the main line power supply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5468-html-1",
+      "kind" : "html",
+      "plainText" : "Sprinklers are not permitted in elevator machine rooms, machine spaces, control rooms and control spaces. Where elevator hoistways are protected with automatic sprinklers, a means installed in accordance with Section 21.4 of NFPA 72 as modified by Appendix Q shall be provided, where required, to disconnect automatically the main line power supply to the affected elevator prior to the application of water. This means shall not be self-resetting. The activation of automatic sprinklers outside the hoistway, machine room, machinery space, control room or control space shall not disconnect the main line power supply."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5468
+}

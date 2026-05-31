@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183404\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183404\"><\/AnnotationDrawer><div>Flat or corrugated light-transmitting plastic skylights shall slope not less than four units vertical in 12 units horizontal (4:12). Dome-shaped skylights shall rise above the mounting flange a minimum distance equal to 10 percent of the maximum width of the dome but not less than 3 inches (76 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183405\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183405\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Skylights that pass the Class B Burning Brand Test specified in ASTM E 108 or UL 790 shall have no minimum slope requirement.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19150-html-1",
+      "kind" : "html",
+      "plainText" : "Flat or corrugated light-transmitting plastic skylights shall slope not less than four units vertical in 12 units horizontal (4:12). Dome-shaped skylights shall rise above the mounting flange a minimum distance equal to 10 percent of the maximum width of the dome but not less than 3 inches (76 mm).\n\n Exception: Skylights that pass the Class B Burning Brand Test specified in ASTM E 108 or UL 790 shall have no minimum slope requirement."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19150
+}

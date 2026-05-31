@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168491\"><\/AnnotationDrawer><div>A single basement or cellar need not be included in the total allowable building area, provided such basement or cellar does not exceed the area permitted for a building with no more than one story above grade plane.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "864-html-1",
+      "kind" : "html",
+      "plainText" : "A single basement or cellar need not be included in the total allowable building area, provided such basement or cellar does not exceed the area permitted for a building with no more than one story above grade plane."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 864
+}

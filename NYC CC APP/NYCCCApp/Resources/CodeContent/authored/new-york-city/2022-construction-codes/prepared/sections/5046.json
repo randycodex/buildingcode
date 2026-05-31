@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182357\"><\/AnnotationDrawer><div>Cripple walls shall be braced in accordance with Section 2308.6.6.1 or 2308.6.6.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5046-html-1",
+      "kind" : "html",
+      "plainText" : "Cripple walls shall be braced in accordance with Section 2308.6.6.1 or 2308.6.6.2."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 5046
+}

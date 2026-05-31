@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167216\"><\/AnnotationDrawer><div>Areas not containing sleeping rooms, but only treatment areas and the associated rooms, spaces or circulation space, shall be permitted to be grouped into care suites and shall conform to the limitations in Sections 407.4.4.6.1 and 407.4.4.6.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "441-html-1",
+      "kind" : "html",
+      "plainText" : "Areas not containing sleeping rooms, but only treatment areas and the associated rooms, spaces or circulation space, shall be permitted to be grouped into care suites and shall conform to the limitations in Sections 407.4.4.6.1 and 407.4.4.6.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 441
+}

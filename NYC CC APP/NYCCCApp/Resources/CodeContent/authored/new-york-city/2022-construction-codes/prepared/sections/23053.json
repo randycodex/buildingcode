@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192891\"><\/AnnotationDrawer><div>Mechanical equipment, appliances and supports that are exposed to wind shall be designed and installed to resist the wind pressures determined in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23053-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical equipment, appliances and supports that are exposed to wind shall be designed and installed to resist the wind pressures determined in accordance with the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23053
+}

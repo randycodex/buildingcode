@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178250\"><\/AnnotationDrawer><div>Welding inspection and welding inspector qualification for structural steel shall be in accordance with AWS D1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3703-html-1",
+      "kind" : "html",
+      "plainText" : "Welding inspection and welding inspector qualification for structural steel shall be in accordance with AWS D1.1."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3703
+}

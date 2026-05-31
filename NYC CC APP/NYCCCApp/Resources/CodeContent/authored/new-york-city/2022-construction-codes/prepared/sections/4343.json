@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180178\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180178\"><\/AnnotationDrawer><div>Concrete that will be exposed to freezing and thawing, in the presence of moisture, with or without deicing chemicals being present, shall comply with ACI 318, Section 19.3.3, and Sections 1904.4.1 and 1904.4.2 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4343-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete that will be exposed to freezing and thawing, in the presence of moisture, with or without deicing chemicals being present, shall comply with ACI 318, Section 19.3.3, and Sections 1904.4.1 and 1904.4.2 of this code."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4343
+}

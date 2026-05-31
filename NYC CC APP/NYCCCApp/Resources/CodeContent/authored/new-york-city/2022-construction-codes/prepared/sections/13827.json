@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230009\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230009\"><\/AnnotationDrawer><div>The ADU shall provide all vertical circulation and exit systems required by this code without entering the primary dwelling. The construction of an ADU shall not alter the egress requirements for the primary dwelling pursuant to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230008\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230008\"><\/AnnotationDrawer><div>(L.L. 2024\/127, 12\/18\/2024, eff. 6\/16\/2025) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-230207\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-230207\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-230207\"><\/AnnotationDrawer><h6><a name=\"JD_BCU205\" id=\"JD_BCU205\" title=\"BC U205\"><\/a>Section BC U205: Use of Manufactured Homes as ADUs<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13827-html-1",
+      "kind" : "html",
+      "plainText" : "The ADU shall provide all vertical circulation and exit systems required by this code without entering the primary dwelling. The construction of an ADU shall not alter the egress requirements for the primary dwelling pursuant to Chapter 10 . \n\n (L.L. 2024\/127, 12\/18\/2024, eff. 6\/16\/2025) \n\n Section BC U205: Use of Manufactured Homes as ADUs"
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 13827
+}

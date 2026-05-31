@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163261\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163261\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A reclaimed or gray water-supplied trap seal primer valve shall supply water to the trap. Water-supplied trap seal primer valves shall conform to ASSE 1018. The quality of reclaimed or gray water supplied to trap seal primer valves shall be in accordance with the requirements of the manufacturer of the trap seal primer valve and this code. The discharge pipe from the trap seal primer valve shall connect to the trap above the trap seal, on the inlet side of the trap.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12546-html-1",
+      "kind" : "html",
+      "plainText" : "A reclaimed or gray water-supplied trap seal primer valve shall supply water to the trap. Water-supplied trap seal primer valves shall conform to ASSE 1018. The quality of reclaimed or gray water supplied to trap seal primer valves shall be in accordance with the requirements of the manufacturer of the trap seal primer valve and this code. The discharge pipe from the trap seal primer valve shall connect to the trap above the trap seal, on the inlet side of the trap."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 12546
+}

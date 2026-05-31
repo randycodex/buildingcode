@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162693\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162693\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Building sewers smaller than 8 inches (203 mm) shall have cleanouts located at intervals of not more than 100 feet (30 480 mm). Building sewers 8 inches (203 mm) and larger shall have a manhole located not more than 200 feet (60 960 mm) from the junction of the building drain and building sewer and at intervals of not more than 400 feet (122 m). The interval length shall be measured from the cleanout or manhole opening, along the developed length of the piping to the next drainage fitting providing access for cleaning, a manhole or the end of the building sewer.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25162-html-1",
+      "kind" : "html",
+      "plainText" : "Building sewers smaller than 8 inches (203 mm) shall have cleanouts located at intervals of not more than 100 feet (30 480 mm). Building sewers 8 inches (203 mm) and larger shall have a manhole located not more than 200 feet (60 960 mm) from the junction of the building drain and building sewer and at intervals of not more than 400 feet (122 m). The interval length shall be measured from the cleanout or manhole opening, along the developed length of the piping to the next drainage fitting providing access for cleaning, a manhole or the end of the building sewer."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25162
+}

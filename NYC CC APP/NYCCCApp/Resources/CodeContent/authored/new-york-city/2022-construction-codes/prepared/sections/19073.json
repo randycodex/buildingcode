@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183147\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183147\"><\/AnnotationDrawer><div>For one-story buildings, foam plastic having a flame spread index of 25 or less, and a smoke-developed index of not more than 450, shall be permitted without thermal barriers in or on exterior walls in a thickness not more than 4 inches (102 mm) where the foam plastic is covered by a thickness of not less than 0.032-inch-thick (0.81 mm) aluminum or corrosion-resistant steel having a base metal thickness of 0.0160 inch (0.41 mm) and the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19073-html-1",
+      "kind" : "html",
+      "plainText" : "For one-story buildings, foam plastic having a flame spread index of 25 or less, and a smoke-developed index of not more than 450, shall be permitted without thermal barriers in or on exterior walls in a thickness not more than 4 inches (102 mm) where the foam plastic is covered by a thickness of not less than 0.032-inch-thick (0.81 mm) aluminum or corrosion-resistant steel having a base metal thickness of 0.0160 inch (0.41 mm) and the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19073
+}

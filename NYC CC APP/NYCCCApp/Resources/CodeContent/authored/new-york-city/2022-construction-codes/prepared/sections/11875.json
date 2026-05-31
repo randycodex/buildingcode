@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161543\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161543\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Wall-hung water closet bowls shall be supported by a concealed metal carrier that is attached to the building structure so that strain is not transmitted to the closet connector or any other part of the plumbing system. The carrier shall conform to ASME A112.6.1M or ASME A112.6.2.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11875-html-1",
+      "kind" : "html",
+      "plainText" : "Wall-hung water closet bowls shall be supported by a concealed metal carrier that is attached to the building structure so that strain is not transmitted to the closet connector or any other part of the plumbing system. The carrier shall conform to ASME A112.6.1M or ASME A112.6.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11875
+}

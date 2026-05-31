@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-198324\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-198324\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-198324\"><\/AnnotationDrawer><h6><a name=\"JD_FGC414\" id=\"JD_FGC414\" title=\"FGC 414\"><\/a>Section FGC 414: Reserved<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-198325\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-198325\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-198325\"><\/AnnotationDrawer><h6><a name=\"JD_FGC415\" id=\"JD_FGC415\" title=\"FGC 415\"><\/a>Section FGC 415: Piping Support Intervals<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8308-html-1",
+      "kind" : "html",
+      "plainText" : "Section FGC 414: Reserved\n\n Section FGC 415: Piping Support Intervals"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8308
+}

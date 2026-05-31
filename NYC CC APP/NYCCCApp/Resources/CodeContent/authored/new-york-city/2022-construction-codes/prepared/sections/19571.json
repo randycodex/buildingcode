@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184514\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184514\"><\/AnnotationDrawer><div>Marquees shall receive structural support only from the building, and shall be at least 10 feet (3048 mm) above the ground level or sidewalk.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19571-html-1",
+      "kind" : "html",
+      "plainText" : "Marquees shall receive structural support only from the building, and shall be at least 10 feet (3048 mm) above the ground level or sidewalk."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19571
+}

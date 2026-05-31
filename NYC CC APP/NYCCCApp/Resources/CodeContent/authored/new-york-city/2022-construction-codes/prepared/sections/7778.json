@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192231\"><\/AnnotationDrawer><div>Delete Section 2.1.6 and replace as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192232\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192232\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">2.1.6<\/span> Existing hangers shall not be used unless they comply, or are made to comply, with all of the provisions of this code relating to hangers.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7778-html-1",
+      "kind" : "html",
+      "plainText" : "Delete Section 2.1.6 and replace as follows:\n\n 2.1.6 Existing hangers shall not be used unless they comply, or are made to comply, with all of the provisions of this code relating to hangers."
+    }
+  ],
+  "chapterNumber" : "R",
+  "schemaVersion" : 1,
+  "sectionID" : 7778
+}

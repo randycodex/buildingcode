@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178265\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178265\"><\/AnnotationDrawer><div>Inspection of bolt installation for pretensioning using the calibrated wrench method or the turn-of-nut method without matchmarking shall be performed on a continuous basis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3710-html-1",
+      "kind" : "html",
+      "plainText" : "Inspection of bolt installation for pretensioning using the calibrated wrench method or the turn-of-nut method without matchmarking shall be performed on a continuous basis."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3710
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172952\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172952\"><\/AnnotationDrawer><div>Other than for the egress components designed for convergence in accordance with Section 1005.6, the occupant load from separate stories shall not be added.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15970-html-1",
+      "kind" : "html",
+      "plainText" : "Other than for the egress components designed for convergence in accordance with Section 1005.6, the occupant load from separate stories shall not be added."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 15970
+}

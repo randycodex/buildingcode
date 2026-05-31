@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185187\"><\/AnnotationDrawer><div>No material, debris, or equipment shall be intentionally dropped or thrown from a building or structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5952-html-1",
+      "kind" : "html",
+      "plainText" : "No material, debris, or equipment shall be intentionally dropped or thrown from a building or structure."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5952
+}

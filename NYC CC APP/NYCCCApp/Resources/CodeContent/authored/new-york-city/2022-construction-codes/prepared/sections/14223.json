@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167049\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167049\"><\/AnnotationDrawer><div>A repair garage shall be equipped with an automatic sprinkler system in accordance with Section 903.2.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14223-html-1",
+      "kind" : "html",
+      "plainText" : "A repair garage shall be equipped with an automatic sprinkler system in accordance with Section 903.2.4.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14223
+}

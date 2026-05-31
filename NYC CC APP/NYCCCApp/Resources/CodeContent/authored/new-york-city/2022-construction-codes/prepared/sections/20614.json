@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187666\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187666\"><\/AnnotationDrawer><div>Personnel hoists and their components shall be designed and inspected in accordance with rules promulgated by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20614-html-1",
+      "kind" : "html",
+      "plainText" : "Personnel hoists and their components shall be designed and inspected in accordance with rules promulgated by the commissioner."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20614
+}

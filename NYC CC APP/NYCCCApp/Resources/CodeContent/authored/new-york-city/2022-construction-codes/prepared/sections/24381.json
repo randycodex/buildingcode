@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196609\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196609\"><\/AnnotationDrawer><div>All openings shall be through the top of the storage tank, except that storage tanks of 330 gallon (1249.2 L) capacity or less, located above ground on the lowest story, may be provided with a 1\/2-inch (12.7 mm) opening for gravity discharge in the bottom of the storage tank.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24381-html-1",
+      "kind" : "html",
+      "plainText" : "All openings shall be through the top of the storage tank, except that storage tanks of 330 gallon (1249.2 L) capacity or less, located above ground on the lowest story, may be provided with a 1\/2-inch (12.7 mm) opening for gravity discharge in the bottom of the storage tank."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24381
+}

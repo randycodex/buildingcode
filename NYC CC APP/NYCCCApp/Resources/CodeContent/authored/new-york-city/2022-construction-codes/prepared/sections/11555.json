@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196607\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196607\"><\/AnnotationDrawer><div>At the time of installation all storage tanks shall bear a permanently-fixed plate, spot welded or equivalent, bearing the name of the tank manufacturer, the gage of the material, and capacity of the tank. Shop-fabricated storage tanks shall be installed without structural alteration.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11555-html-1",
+      "kind" : "html",
+      "plainText" : "At the time of installation all storage tanks shall bear a permanently-fixed plate, spot welded or equivalent, bearing the name of the tank manufacturer, the gage of the material, and capacity of the tank. Shop-fabricated storage tanks shall be installed without structural alteration."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11555
+}

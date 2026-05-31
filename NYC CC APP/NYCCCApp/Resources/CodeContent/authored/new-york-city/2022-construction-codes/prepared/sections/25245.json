@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162925\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162925\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The air gap between the indirect waste pipe and the flood level rim of the waste receptor shall be not less than twice the effective opening of the indirect waste pipe.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25245-html-1",
+      "kind" : "html",
+      "plainText" : "The air gap between the indirect waste pipe and the flood level rim of the waste receptor shall be not less than twice the effective opening of the indirect waste pipe."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 25245
+}

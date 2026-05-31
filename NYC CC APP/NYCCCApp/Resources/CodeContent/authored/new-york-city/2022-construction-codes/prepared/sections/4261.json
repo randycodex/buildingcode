@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179940\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179940\"><\/AnnotationDrawer><div>Where the building being supported is of unreinforced masonry construction, the lateral stability of the masonry walls and their ability to resist the loads imposed shall be verified.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179941\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179941\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> If it is not possible to verify the lateral stability of the masonry walls, lateral support shall be provided at the floor levels of the adjacent building prior to installation of the underpinning or alternate method of support. Such lateral support shall be shown on the construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4261-html-1",
+      "kind" : "html",
+      "plainText" : "Where the building being supported is of unreinforced masonry construction, the lateral stability of the masonry walls and their ability to resist the loads imposed shall be verified.\n\n Exception: If it is not possible to verify the lateral stability of the masonry walls, lateral support shall be provided at the floor levels of the adjacent building prior to installation of the underpinning or alternate method of support. Such lateral support shall be shown on the construction documents."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4261
+}

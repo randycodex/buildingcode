@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199379\"><\/AnnotationDrawer><div>Refrigerators shall be tested in accordance with ANSI Z21.19\/CSA 1.4 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199380\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199380\"><\/AnnotationDrawer><div>Refrigerators shall be provided with adequate clearances for ventilation at the top and back, and shall be installed in accordance with the manufacturer's instructions. If such instructions are not available, not less than 2 inches (50.8 mm) shall be provided between the back of the refrigerator and the wall and not less than 12 inches (304.8 mm) above the top. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199381\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199381\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199381\"><\/AnnotationDrawer><h6><a name=\"JD_FGC626\" id=\"JD_FGC626\" title=\"FGC 626\"><\/a>Section FGC 626: Gas-Fired Toilets<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8672-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigerators shall be tested in accordance with ANSI Z21.19\/CSA 1.4 and shall be installed in accordance with the manufacturer's instructions.\n\n Refrigerators shall be provided with adequate clearances for ventilation at the top and back, and shall be installed in accordance with the manufacturer's instructions. If such instructions are not available, not less than 2 inches (50.8 mm) shall be provided between the back of the refrigerator and the wall and not less than 12 inches (304.8 mm) above the top. \n\n Section FGC 626: Gas-Fired Toilets"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8672
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196443\"><\/AnnotationDrawer><div>Each primary tank, the interstitial space of a secondary containment tank and each compartment of a compartment tank complying with UL 142 shall be provided with emergency relief venting. A tank's emergency relief vent piping and normal vent piping may be combined. The design and installation of the combined normal and emergency relief vent shall be in accordance with Section 1305.7 and Sections 1305.8.1 through 1305.8.4. Tanks designed in accordance with Section 1305.14 shall not require emergency relief vent piping. The use of a self-closing manway cover, a manway cover provided with long bolts that permit the cover to lift under internal pressure, or other type of emergency relief vent device inside the building, shall be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11507-html-1",
+      "kind" : "html",
+      "plainText" : "Each primary tank, the interstitial space of a secondary containment tank and each compartment of a compartment tank complying with UL 142 shall be provided with emergency relief venting. A tank's emergency relief vent piping and normal vent piping may be combined. The design and installation of the combined normal and emergency relief vent shall be in accordance with Section 1305.7 and Sections 1305.8.1 through 1305.8.4. Tanks designed in accordance with Section 1305.14 shall not require emergency relief vent piping. The use of a self-closing manway cover, a manway cover provided with long bolts that permit the cover to lift under internal pressure, or other type of emergency relief vent device inside the building, shall be prohibited."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11507
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169513\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169513\"><\/AnnotationDrawer><div>Vertical openings for elevator hoistways in open and enclosed parking garages that serve only the parking garage, and complying with Sections 406.5 and 406.6, respectively, shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14981-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical openings for elevator hoistways in open and enclosed parking garages that serve only the parking garage, and complying with Sections 406.5 and 406.6, respectively, shall be permitted."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14981
+}

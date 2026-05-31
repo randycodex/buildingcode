@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185352\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185352\"><\/AnnotationDrawer><div>Existing elevators serving publicly accessible floors in a building undergoing construction or demolition work shall be maintained in accordance with Section 3303.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19848-html-1",
+      "kind" : "html",
+      "plainText" : "Existing elevators serving publicly accessible floors in a building undergoing construction or demolition work shall be maintained in accordance with Section 3303.9."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19848
+}

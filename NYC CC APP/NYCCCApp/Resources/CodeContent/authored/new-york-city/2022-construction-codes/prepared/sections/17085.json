@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176639\"><\/AnnotationDrawer><div>Roof coverings shall be applied in accordance with the applicable provisions of this section and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17085-html-1",
+      "kind" : "html",
+      "plainText" : "Roof coverings shall be applied in accordance with the applicable provisions of this section and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17085
+}

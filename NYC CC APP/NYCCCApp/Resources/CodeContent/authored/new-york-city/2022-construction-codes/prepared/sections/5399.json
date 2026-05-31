@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183585\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183585\"><\/AnnotationDrawer><div>Emergency power systems shall be provided for gas detection systems in accordance with Section 918.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5399-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency power systems shall be provided for gas detection systems in accordance with Section 918.5."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5399
+}

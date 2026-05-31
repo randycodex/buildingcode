@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198721\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198721\"><\/AnnotationDrawer><div>Single-wall metal pipe shall not originate in any unoccupied attic or concealed space and shall not pass through any attic, inside wall, concealed space, or floor. The installation of a single-wall metal pipe through an exterior combustible wall shall comply with Section 503.7.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21273-html-1",
+      "kind" : "html",
+      "plainText" : "Single-wall metal pipe shall not originate in any unoccupied attic or concealed space and shall not pass through any attic, inside wall, concealed space, or floor. The installation of a single-wall metal pipe through an exterior combustible wall shall comply with Section 503.7.7."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21273
+}

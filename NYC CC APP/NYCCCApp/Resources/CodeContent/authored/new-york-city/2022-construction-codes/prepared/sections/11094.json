@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195397\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195397\"><\/AnnotationDrawer><div>Radiant heating systems installed in concrete or masonry shall conform to the following requirements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195398\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195398\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Radiant heating systems shall be identified as being suitable for the installation, and shall be secured in place as specified in the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195399\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195399\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Radiant heating panels and radiant heating panel sets shall not be installed where they bridge expansion joints unless they are protected from expansion and contraction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11094-html-1",
+      "kind" : "html",
+      "plainText" : "Radiant heating systems installed in concrete or masonry shall conform to the following requirements:\n\n 1. Radiant heating systems shall be identified as being suitable for the installation, and shall be secured in place as specified in the manufacturer's instructions.\n\n 2. Radiant heating panels and radiant heating panel sets shall not be installed where they bridge expansion joints unless they are protected from expansion and contraction."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11094
+}

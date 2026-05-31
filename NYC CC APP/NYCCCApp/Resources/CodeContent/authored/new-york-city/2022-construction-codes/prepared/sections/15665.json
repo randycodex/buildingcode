@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172037\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172037\"><\/AnnotationDrawer><div>Audible alarm notification appliances shall be provided and emit a distinctive sound that is not to be used for any purpose other than that of a fire alarm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172038\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172038\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172039\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Visible alarm notification appliances shall be allowed in lieu of audible alarm notification appliances in critical care areas of Group I-2 occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172040\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172040\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Where provided, audible notification appliances located in each occupant evacuation elevator lobby in accordance with Section 3008.10.1 shall be connected to a separate notification zone for manual paging only.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15665-html-1",
+      "kind" : "html",
+      "plainText" : "Audible alarm notification appliances shall be provided and emit a distinctive sound that is not to be used for any purpose other than that of a fire alarm.\n\n Exceptions: \n\n 1. Visible alarm notification appliances shall be allowed in lieu of audible alarm notification appliances in critical care areas of Group I-2 occupancies.\n\n 2. Where provided, audible notification appliances located in each occupant evacuation elevator lobby in accordance with Section 3008.10.1 shall be connected to a separate notification zone for manual paging only."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15665
+}

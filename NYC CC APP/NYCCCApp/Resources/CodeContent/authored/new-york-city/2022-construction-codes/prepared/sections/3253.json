@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176629\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176629\"><\/AnnotationDrawer><div>Roof gardens and landscaped roofs shall comply with Section 1507.16.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-176630\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-176630\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-176630\"><\/AnnotationDrawer><h6><a name=\"JD_BC1506\" id=\"JD_BC1506\" title=\"BC 1506\"><\/a>Section BC 1506: Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3253-html-1",
+      "kind" : "html",
+      "plainText" : "Roof gardens and landscaped roofs shall comply with Section 1507.16.\n\n Section BC 1506: Materials"
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3253
+}

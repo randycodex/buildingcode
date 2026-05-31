@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174528\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174528\"><\/AnnotationDrawer><div>A stairway that connects a stepped aisle or a vomitory to a cross aisle, concourse, or to another aisle shall be permitted to comply with the assembly aisle walking surface requirements of Section 1029.13. Transitions between stairways and stepped aisles shall comply with Section 1029.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16379-html-1",
+      "kind" : "html",
+      "plainText" : "A stairway that connects a stepped aisle or a vomitory to a cross aisle, concourse, or to another aisle shall be permitted to comply with the assembly aisle walking surface requirements of Section 1029.13. Transitions between stairways and stepped aisles shall comply with Section 1029.10."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16379
+}

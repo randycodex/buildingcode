@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188814\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188814\"><\/AnnotationDrawer><div>Fuel-oil storage capacity in special flood hazard areas and shaded X-Zones shall comply with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188815\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;In special flood hazard areas, fuel oil on the lowest story having its floor above the applicable design flood elevation shall be limited to 3,000 gallons (11 356 L) and no storage tank may exceed the lesser of 1,500 gallons (5678 L) or the quantity of fuel-oil needed to operate the emergency or standby generator(s) served by such tank for 24 hours and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188816\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188816\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;In shaded X-Zones, fuel oil on the lowest story having its floor above the 500-year flood elevation shall be limited to 3,000 gallons (11 356 L) and no storage tank may exceed the lesser of 1,500 gallons (5678 L) or the quantity of fuel-oil needed to operate the emergency or standby generator(s) served by such tank for 24 hours. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13086-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-oil storage capacity in special flood hazard areas and shaded X-Zones shall comply with the following:\n\n 1. In special flood hazard areas, fuel oil on the lowest story having its floor above the applicable design flood elevation shall be limited to 3,000 gallons (11 356 L) and no storage tank may exceed the lesser of 1,500 gallons (5678 L) or the quantity of fuel-oil needed to operate the emergency or standby generator(s) served by such tank for 24 hours and\n\n 2. In shaded X-Zones, fuel oil on the lowest story having its floor above the 500-year flood elevation shall be limited to 3,000 gallons (11 356 L) and no storage tank may exceed the lesser of 1,500 gallons (5678 L) or the quantity of fuel-oil needed to operate the emergency or standby generator(s) served by such tank for 24 hours."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13086
+}

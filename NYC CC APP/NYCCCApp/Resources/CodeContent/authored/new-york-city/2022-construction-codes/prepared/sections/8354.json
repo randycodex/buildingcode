@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198463\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198463\"><\/AnnotationDrawer><div>Connectors shall connect to a masonry chimney flue at a point not less than 12 inches (304.8 mm) or one chimney diameter above the lowest portion of the interior of the chimney flue.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8354-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors shall connect to a masonry chimney flue at a point not less than 12 inches (304.8 mm) or one chimney diameter above the lowest portion of the interior of the chimney flue."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8354
+}

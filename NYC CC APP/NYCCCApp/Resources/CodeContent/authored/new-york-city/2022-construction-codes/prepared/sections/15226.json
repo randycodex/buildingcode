@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170394\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170394\"><\/AnnotationDrawer><div>Joints between adjacent precast concrete slabs need not be considered in calculating the slab thickness provided that a concrete topping not less than 1 inch (25.4 mm) thick is used. Where no concrete topping is used, joints must be grouted to a depth of not less than one-third the slab thickness at the joint, but not less than 1 inch (25.4 mm), or the joints must be made fire resistant by other approved methods.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15226-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between adjacent precast concrete slabs need not be considered in calculating the slab thickness provided that a concrete topping not less than 1 inch (25.4 mm) thick is used. Where no concrete topping is used, joints must be grouted to a depth of not less than one-third the slab thickness at the joint, but not less than 1 inch (25.4 mm), or the joints must be made fire resistant by other approved methods."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15226
+}

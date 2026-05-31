@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195802\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195802\"><\/AnnotationDrawer><div>The design of refrigerant piping shall be in accordance with ASME B31.5. Refrigerant piping shall be installed, tested and placed in operation in accordance with this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11224-html-1",
+      "kind" : "html",
+      "plainText" : "The design of refrigerant piping shall be in accordance with ASME B31.5. Refrigerant piping shall be installed, tested and placed in operation in accordance with this chapter."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11224
+}

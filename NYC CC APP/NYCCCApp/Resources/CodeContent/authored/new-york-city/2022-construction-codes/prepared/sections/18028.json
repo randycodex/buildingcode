@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179756\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179756\"><\/AnnotationDrawer><div>Micropiles shall be installed with a pressure grouted bond zone. The bond zone shall be formed entirely in soil of Class 4 or better and the grout shall be placed under pressure exceeding 1.5 times the existing total stress at the midpoint of the bond zone. The bond zone shall be formed by extending the casing to the bottom of the bond zone and withdrawing the casing while the grout is being pumped under pressure. The casing above the bond zone shall remain in place permanently. Reinforcing to the bond zone shall be placed in the casing to the depth of the bond zone prior to placing grout.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-179757\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-179757\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-179757\"><\/AnnotationDrawer><h6><a name=\"JD_BC1813\" id=\"JD_BC1813\" title=\"BC 1813\"><\/a>Section BC 1813: Composite Piles<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18028-html-1",
+      "kind" : "html",
+      "plainText" : "Micropiles shall be installed with a pressure grouted bond zone. The bond zone shall be formed entirely in soil of Class 4 or better and the grout shall be placed under pressure exceeding 1.5 times the existing total stress at the midpoint of the bond zone. The bond zone shall be formed by extending the casing to the bottom of the bond zone and withdrawing the casing while the grout is being pumped under pressure. The casing above the bond zone shall remain in place permanently. Reinforcing to the bond zone shall be placed in the casing to the depth of the bond zone prior to placing grout.\n\n Section BC 1813: Composite Piles"
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18028
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183520\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183520\"><\/AnnotationDrawer><div>Equipment located within the automatic transfer device room shall be limited to equipment associated with the emergency or standby power systems. Piping within the room shall be limited to sprinkler piping.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5373-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment located within the automatic transfer device room shall be limited to equipment associated with the emergency or standby power systems. Piping within the room shall be limited to sprinkler piping."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5373
+}

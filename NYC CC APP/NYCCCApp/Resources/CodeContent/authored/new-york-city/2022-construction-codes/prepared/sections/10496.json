@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193634\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193634\"><\/AnnotationDrawer><div>Motion picture projectors shall be exhausted in accordance with Section 502.11.1 or 502.11.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10496-html-1",
+      "kind" : "html",
+      "plainText" : "Motion picture projectors shall be exhausted in accordance with Section 502.11.1 or 502.11.2."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10496
+}

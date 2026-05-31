@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189121\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189121\"><\/AnnotationDrawer><div>Signs that contain moving sections or ornaments shall have fail-safe provisions to prevent the section or ornament from releasing and falling or shifting its center of gravity more than 15 inches (381 mm). The fail-safe device shall be in addition to the mechanism and the mechanism's housing that operate the movable section or ornament. The fail-safe device shall be capable of supporting the full dead weight of the section or ornament when the moving mechanism releases.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-189122\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-189122\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-189122\"><\/AnnotationDrawer><h6><a name=\"JD_BCH109\" id=\"JD_BCH109\" title=\"BC H109\"><\/a>Section BC H109: Ground Signs<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7220-html-1",
+      "kind" : "html",
+      "plainText" : "Signs that contain moving sections or ornaments shall have fail-safe provisions to prevent the section or ornament from releasing and falling or shifting its center of gravity more than 15 inches (381 mm). The fail-safe device shall be in addition to the mechanism and the mechanism's housing that operate the movable section or ornament. The fail-safe device shall be capable of supporting the full dead weight of the section or ornament when the moving mechanism releases.\n\n Section BC H109: Ground Signs"
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7220
+}

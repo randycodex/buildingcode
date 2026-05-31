@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195606\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195606\"><\/AnnotationDrawer><div>Refrigerant circuit access ports located outdoors shall be fitted with locking-type tamper-resistant caps requiring a special tool or key to open.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195607\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195607\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195607\"><\/AnnotationDrawer><h6><a name=\"JD_MC1102\" id=\"JD_MC1102\" title=\"MC 1102\"><\/a>Section MC 1102: System Requirements<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23989-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigerant circuit access ports located outdoors shall be fitted with locking-type tamper-resistant caps requiring a special tool or key to open.\n\n Section MC 1102: System Requirements"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 23989
+}

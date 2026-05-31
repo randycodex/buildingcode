@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194698\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194698\"><\/AnnotationDrawer><div>Where exhaust fans are installed, makeup air shall be provided to replace the exhausted air. Calculations shall be provided on the construction documents to validate the use of the exhaust fan(s) and compliance with this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23665-html-1",
+      "kind" : "html",
+      "plainText" : "Where exhaust fans are installed, makeup air shall be provided to replace the exhausted air. Calculations shall be provided on the construction documents to validate the use of the exhaust fan(s) and compliance with this chapter."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 23665
+}

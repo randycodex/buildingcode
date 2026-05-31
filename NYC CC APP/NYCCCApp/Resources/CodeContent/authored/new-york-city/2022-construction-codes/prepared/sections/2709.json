@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175027\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175027\"><\/AnnotationDrawer><div>Water closets shall comply with Sections 1107.2.2.7.1 through 1107.2.2.7.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2709-html-1",
+      "kind" : "html",
+      "plainText" : "Water closets shall comply with Sections 1107.2.2.7.1 through 1107.2.2.7.6."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2709
+}

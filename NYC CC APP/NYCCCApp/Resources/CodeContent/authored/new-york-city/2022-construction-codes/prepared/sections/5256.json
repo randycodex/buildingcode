@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183174\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183174\"><\/AnnotationDrawer><div>The thermal barrier specified in Section 2603.4 is not required to be installed on the walking surface of a structural floor system that contains foam plastic insulation when the foam is covered by a minimum nominal 1\/2-inch-thick (12.7 mm) wood structural panel or approved equivalent. The thermal barrier specified in Section 2603.4 is required on the underside of the structural floor system that contains foam plastic insulation when the underside of the structural floor system is exposed to the interior of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183175\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183175\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Foam plastic used as part of an interior floor finish.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5256-html-1",
+      "kind" : "html",
+      "plainText" : "The thermal barrier specified in Section 2603.4 is not required to be installed on the walking surface of a structural floor system that contains foam plastic insulation when the foam is covered by a minimum nominal 1\/2-inch-thick (12.7 mm) wood structural panel or approved equivalent. The thermal barrier specified in Section 2603.4 is required on the underside of the structural floor system that contains foam plastic insulation when the underside of the structural floor system is exposed to the interior of the building.\n\n Exception: Foam plastic used as part of an interior floor finish."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5256
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169714\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169714\"><\/AnnotationDrawer><div>Fire-resistant joint systems shall be tested in accordance with the requirements of either ASTM E 1966 or UL 2079. Nonsymmetrical wall joint systems shall be tested with both faces exposed to the furnace, and the assigned fire-resistance rating shall be the shortest duration obtained from the two tests. Where evidence is furnished to show that the wall was tested with the least fire-resistant side exposed to the furnace, subject to acceptance of the commissioner, the wall need not be subjected to tests from the opposite side.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169715\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169715\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> For exterior walls with a horizontal fire separation distance greater than 5 feet (1524 mm), the joint system shall be required to be tested for interior fire exposure only.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15047-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-resistant joint systems shall be tested in accordance with the requirements of either ASTM E 1966 or UL 2079. Nonsymmetrical wall joint systems shall be tested with both faces exposed to the furnace, and the assigned fire-resistance rating shall be the shortest duration obtained from the two tests. Where evidence is furnished to show that the wall was tested with the least fire-resistant side exposed to the furnace, subject to acceptance of the commissioner, the wall need not be subjected to tests from the opposite side.\n\n Exception: For exterior walls with a horizontal fire separation distance greater than 5 feet (1524 mm), the joint system shall be required to be tested for interior fire exposure only."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15047
+}

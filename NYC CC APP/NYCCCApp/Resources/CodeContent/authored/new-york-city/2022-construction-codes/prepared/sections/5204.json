@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183019\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183019\"><\/AnnotationDrawer><div>Plastering gypsum plaster or cement plaster shall not be less than three coats where applied over metal lath or wire fabric lath and not less than two coats where applied over other bases permitted by this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183020\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183020\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Gypsum veneer plaster and cement plaster specifically designed and approved for one-coat applications. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5204-html-1",
+      "kind" : "html",
+      "plainText" : "Plastering gypsum plaster or cement plaster shall not be less than three coats where applied over metal lath or wire fabric lath and not less than two coats where applied over other bases permitted by this chapter.\n\n Exception: Gypsum veneer plaster and cement plaster specifically designed and approved for one-coat applications."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5204
+}

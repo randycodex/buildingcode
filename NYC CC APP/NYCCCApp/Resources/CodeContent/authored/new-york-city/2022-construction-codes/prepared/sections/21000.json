@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197976\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197976\"><\/AnnotationDrawer><div>Ferrous metal installed in buried locations shall be protected from corrosion by one of the following methods:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197977\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197977\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Bonded coatings in accordance with Section 404.11.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197978\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197978\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Protective wrappings in accordance with Section 404.11.6.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197979\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197979\"><\/AnnotationDrawer><div>Where dissimilar metals are joined underground, an insulating coupling or fitting shall be used. Piping shall not be laid in contact with cinders.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21000-html-1",
+      "kind" : "html",
+      "plainText" : "Ferrous metal installed in buried locations shall be protected from corrosion by one of the following methods:\n\n 1. Bonded coatings in accordance with Section 404.11.4.\n\n 2. Protective wrappings in accordance with Section 404.11.6.\n\n Where dissimilar metals are joined underground, an insulating coupling or fitting shall be used. Piping shall not be laid in contact with cinders."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21000
+}

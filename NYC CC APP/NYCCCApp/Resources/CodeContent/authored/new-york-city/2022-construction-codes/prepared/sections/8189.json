@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198016\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198016\"><\/AnnotationDrawer><div>The use of a flammable or combustible gas to clean or remove debris from the interior of a piping system shall be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8189-html-1",
+      "kind" : "html",
+      "plainText" : "The use of a flammable or combustible gas to clean or remove debris from the interior of a piping system shall be prohibited."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8189
+}

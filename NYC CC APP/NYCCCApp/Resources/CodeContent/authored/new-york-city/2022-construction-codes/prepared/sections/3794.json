@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178525\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178525\"><\/AnnotationDrawer><div>Special inspection shall be performed in accordance with Section 1705.4 for vertical masonry foundation elements.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178526\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178526\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Piers for support of lightweight fences, recreational equipment, site furnishings and similar construction, unless special inspection is specifically noted as required on the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3794-html-1",
+      "kind" : "html",
+      "plainText" : "Special inspection shall be performed in accordance with Section 1705.4 for vertical masonry foundation elements.\n\n Exception: Piers for support of lightweight fences, recreational equipment, site furnishings and similar construction, unless special inspection is specifically noted as required on the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3794
+}

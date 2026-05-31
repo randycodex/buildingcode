@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179692\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179692\"><\/AnnotationDrawer><div>Steel pipe and tube sections used for concrete-filled steel pipe and tube piles shall conform to ASTM A 252 or ASTM A 283. Concrete shall conform to Section 1812.1.1. The maximum coarse aggregate size shall be 3\/4 inch (19.1 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4170-html-1",
+      "kind" : "html",
+      "plainText" : "Steel pipe and tube sections used for concrete-filled steel pipe and tube piles shall conform to ASTM A 252 or ASTM A 283. Concrete shall conform to Section 1812.1.1. The maximum coarse aggregate size shall be 3\/4 inch (19.1 mm)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4170
+}

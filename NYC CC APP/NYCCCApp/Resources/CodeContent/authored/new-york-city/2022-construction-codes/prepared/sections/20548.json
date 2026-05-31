@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187459\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187459\"><\/AnnotationDrawer><div>All runways and ramps shall be constructed, braced and supported to resist lateral displacement and all vertical loads, including impact.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20548-html-1",
+      "kind" : "html",
+      "plainText" : "All runways and ramps shall be constructed, braced and supported to resist lateral displacement and all vertical loads, including impact."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20548
+}

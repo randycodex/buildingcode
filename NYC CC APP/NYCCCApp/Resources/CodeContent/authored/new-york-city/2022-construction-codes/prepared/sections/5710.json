@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184422\"><\/AnnotationDrawer><div>Access to a small wind turbine shall be limited as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184423\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184423\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Access to electrical components of a small wind turbine shall be prevented by a lock.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184424\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184424\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;A small wind turbine tower shall not be climbable, except by authorized personnel, up to a height of 10 feet (3048 mm) measured from the base of such tower.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5710-html-1",
+      "kind" : "html",
+      "plainText" : "Access to a small wind turbine shall be limited as follows:\n\n 1. Access to electrical components of a small wind turbine shall be prevented by a lock.\n\n 2. A small wind turbine tower shall not be climbable, except by authorized personnel, up to a height of 10 feet (3048 mm) measured from the base of such tower."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5710
+}

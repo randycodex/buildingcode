@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198382\"><\/AnnotationDrawer><div>Applications for a new or altered building shall include a chimney and vent plan submitted pursuant to Section 107.18 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8328-html-1",
+      "kind" : "html",
+      "plainText" : "Applications for a new or altered building shall include a chimney and vent plan submitted pursuant to Section 107.18 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8328
+}

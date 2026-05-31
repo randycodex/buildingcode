@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197380\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197380\"><\/AnnotationDrawer><div>Alterations resulting in the addition of loads to any member, such as HVAC equipment and water heaters, shall not be permitted without verification that the members are capable of supporting such additional loading.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20800-html-1",
+      "kind" : "html",
+      "plainText" : "Alterations resulting in the addition of loads to any member, such as HVAC equipment and water heaters, shall not be permitted without verification that the members are capable of supporting such additional loading."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20800
+}

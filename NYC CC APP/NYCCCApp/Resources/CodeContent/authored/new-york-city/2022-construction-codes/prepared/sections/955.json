@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168866\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168866\"><\/AnnotationDrawer><div>Type V construction is that type of construction in which the structural elements, exterior walls and interior walls are of any materials permitted by this code. Type V construction shall not be permitted inside the fire district unless otherwise permitted by Section D105.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168867\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168867\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> In Group F occupancies subject to Section 270(1) of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York State Labor Law,<\/span> all exterior wall assemblies and all structural elements shall meet the requirements for a \"fireproof building\" as defined in Section 264 of such law.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168868\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168868\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168868\"><\/AnnotationDrawer><h6><a name=\"JD_BC603\" id=\"JD_BC603\" title=\"BC 603\"><\/a>Section BC 603: Combustible Material in Types I and II Construction<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "955-html-1",
+      "kind" : "html",
+      "plainText" : "Type V construction is that type of construction in which the structural elements, exterior walls and interior walls are of any materials permitted by this code. Type V construction shall not be permitted inside the fire district unless otherwise permitted by Section D105.1.\n\n Exception: In Group F occupancies subject to Section 270(1) of the New York State Labor Law, all exterior wall assemblies and all structural elements shall meet the requirements for a \"fireproof building\" as defined in Section 264 of such law.\n\n Section BC 603: Combustible Material in Types I and II Construction"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 955
+}

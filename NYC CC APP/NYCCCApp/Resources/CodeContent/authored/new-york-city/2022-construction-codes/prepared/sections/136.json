@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165926\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165926\"><\/AnnotationDrawer><div>Group A-4 occupancy includes assembly uses intended for viewing of indoor sporting events and activities with spectator seating including, but not limited to:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165927\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165927\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Arenas <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165928\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165928\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Skating rinks <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165929\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165929\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Swimming pools <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165930\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165930\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Tennis courts <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "136-html-1",
+      "kind" : "html",
+      "plainText" : "Group A-4 occupancy includes assembly uses intended for viewing of indoor sporting events and activities with spectator seating including, but not limited to:\n\n Arenas \n\n Skating rinks \n\n Swimming pools \n\n Tennis courts"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 136
+}

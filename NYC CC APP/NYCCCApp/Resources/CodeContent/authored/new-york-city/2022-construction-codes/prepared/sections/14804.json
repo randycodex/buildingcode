@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168991\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168991\"><\/AnnotationDrawer><div>Materials having a structural base of noncombustible material as determined in accordance with Section 703.5.1 of this code with a surfacing not more than 0.125 inch (3.18 mm) thick that has a flame spread index not greater than 50 when tested in accordance with ASTM E 84 or UL 723 shall be acceptable as noncombustible materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14804-html-1",
+      "kind" : "html",
+      "plainText" : "Materials having a structural base of noncombustible material as determined in accordance with Section 703.5.1 of this code with a surfacing not more than 0.125 inch (3.18 mm) thick that has a flame spread index not greater than 50 when tested in accordance with ASTM E 84 or UL 723 shall be acceptable as noncombustible materials."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14804
+}

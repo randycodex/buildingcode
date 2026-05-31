@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162378\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Potable water wells shall be equipped with an overlapping water-tight cover at the top of the well casing or pipe sleeve such that contaminated water or other substances are prevented from entering the well through the annular opening at the top of the well casing, wall or pipe sleeve. Covers shall extend downward not less than 2 inches (51 mm) over the outside of the well casing or wall. A dug well cover shall be provided with a pipe sleeve permitting the withdrawal of the pump suction pipe, cylinder or jet body without disturbing the cover. Where pump sections or discharge pipes enter or leave a well through the side of the casing, the circle of contact shall be water tight.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25040-html-1",
+      "kind" : "html",
+      "plainText" : "Potable water wells shall be equipped with an overlapping water-tight cover at the top of the well casing or pipe sleeve such that contaminated water or other substances are prevented from entering the well through the annular opening at the top of the well casing, wall or pipe sleeve. Covers shall extend downward not less than 2 inches (51 mm) over the outside of the well casing or wall. A dug well cover shall be provided with a pipe sleeve permitting the withdrawal of the pump suction pipe, cylinder or jet body without disturbing the cover. Where pump sections or discharge pipes enter or leave a well through the side of the casing, the circle of contact shall be water tight."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25040
+}

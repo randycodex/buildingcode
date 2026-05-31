@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194652\"><\/AnnotationDrawer><div>Air supplied to any space shall not contain flammable vapors, flyings, or dust in quantities and concentrations that would introduce a hazardous condition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10826-html-1",
+      "kind" : "html",
+      "plainText" : "Air supplied to any space shall not contain flammable vapors, flyings, or dust in quantities and concentrations that would introduce a hazardous condition."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10826
+}

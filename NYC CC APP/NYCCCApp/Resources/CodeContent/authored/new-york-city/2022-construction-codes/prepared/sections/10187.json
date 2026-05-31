@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192433\"><\/AnnotationDrawer><div>Except as otherwise specified, inspections required by this code or by the department during the progress of work may be performed on behalf of the owner by approved agencies or, if applicable, by special inspectors. However, in the interest of public safety, the commissioner may direct that any of such inspections be performed by the department. All inspections shall be performed at the sole cost and expense of the owner. Refer to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156867', hash: '#JD_28-116' }}\">Article 116 of Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> for additional provisions relating to inspections.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10187-html-1",
+      "kind" : "html",
+      "plainText" : "Except as otherwise specified, inspections required by this code or by the department during the progress of work may be performed on behalf of the owner by approved agencies or, if applicable, by special inspectors. However, in the interest of public safety, the commissioner may direct that any of such inspections be performed by the department. All inspections shall be performed at the sole cost and expense of the owner. Refer to Article 116 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to inspections."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 10187
+}

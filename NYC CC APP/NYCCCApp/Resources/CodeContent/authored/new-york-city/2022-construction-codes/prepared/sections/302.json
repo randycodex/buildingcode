@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166790\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166790\"><\/AnnotationDrawer><div>In buildings with an occupied floor more than 120 feet (36 576 mm) above the lowest level of fire department vehicle access, a minimum of one fire service access elevator shall be provided in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183836', hash: '#JD_BC3007' }}\">3007<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "302-html-1",
+      "kind" : "html",
+      "plainText" : "In buildings with an occupied floor more than 120 feet (36 576 mm) above the lowest level of fire department vehicle access, a minimum of one fire service access elevator shall be provided in accordance with Section 3007 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 302
+}

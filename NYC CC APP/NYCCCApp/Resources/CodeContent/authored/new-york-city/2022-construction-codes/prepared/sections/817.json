@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168331\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168331\"><\/AnnotationDrawer><div>All floors shall comply with the fire resistance requirements for the class of construction, and provide the degree of radioactive resistance required by applicable city, state, and federal regulations. A finished material shall be applied to provide a continuous nonporous surface, which may be readily removed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "817-html-1",
+      "kind" : "html",
+      "plainText" : "All floors shall comply with the fire resistance requirements for the class of construction, and provide the degree of radioactive resistance required by applicable city, state, and federal regulations. A finished material shall be applied to provide a continuous nonporous surface, which may be readily removed."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 817
+}

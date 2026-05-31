@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169775\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169775\"><\/AnnotationDrawer><div>Glazing material in any other part of the door assembly, including transom lights and sidelights, shall be tested in accordance with NFPA 257 or UL 9, including the hose stream test, in accordance with Section 716.6 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15065-html-1",
+      "kind" : "html",
+      "plainText" : "Glazing material in any other part of the door assembly, including transom lights and sidelights, shall be tested in accordance with NFPA 257 or UL 9, including the hose stream test, in accordance with Section 716.6 of this code."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15065
+}

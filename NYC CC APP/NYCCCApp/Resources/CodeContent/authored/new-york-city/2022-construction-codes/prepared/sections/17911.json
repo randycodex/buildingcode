@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179406\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179406\"><\/AnnotationDrawer><div>Where the vertical, lateral-force-resisting elements are columns, the grade beam or pile cap flexural strengths shall exceed the column flexural strength.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17911-html-1",
+      "kind" : "html",
+      "plainText" : "Where the vertical, lateral-force-resisting elements are columns, the grade beam or pile cap flexural strengths shall exceed the column flexural strength."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17911
+}

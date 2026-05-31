@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169793\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169793\"><\/AnnotationDrawer><div>Smoke and draft control doors complying with UL 1784 shall be labeled in accordance with Section 716.5.7.1 and shall show the letter \"S\" on the fire rating label of the door. This marking shall indicate that the door and frame assembly are in compliance where listed or labeled gasketing is installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15074-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke and draft control doors complying with UL 1784 shall be labeled in accordance with Section 716.5.7.1 and shall show the letter \"S\" on the fire rating label of the door. This marking shall indicate that the door and frame assembly are in compliance where listed or labeled gasketing is installed."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15074
+}

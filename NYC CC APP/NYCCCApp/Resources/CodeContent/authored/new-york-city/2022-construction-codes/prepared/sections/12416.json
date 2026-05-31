@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162915\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162915\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Domestic dishwashing machines shall discharge indirectly through an air gap or air break into a waste receptor in accordance with Section 802.2, or discharge into a wye branch fitting on the tailpiece of the kitchen sink or the dishwasher connection of a food waste disposer. The waste line of a domestic dishwashing machine discharging into a kitchen sink tailpiece or food waste disposer shall connect to a deck-mounted air gap or the waste line shall rise and be securely fastened to the underside of the sink rim or counter.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12416-html-1",
+      "kind" : "html",
+      "plainText" : "Domestic dishwashing machines shall discharge indirectly through an air gap or air break into a waste receptor in accordance with Section 802.2, or discharge into a wye branch fitting on the tailpiece of the kitchen sink or the dishwasher connection of a food waste disposer. The waste line of a domestic dishwashing machine discharging into a kitchen sink tailpiece or food waste disposer shall connect to a deck-mounted air gap or the waste line shall rise and be securely fastened to the underside of the sink rim or counter."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 12416
+}

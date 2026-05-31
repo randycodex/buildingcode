@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196338\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196338\"><\/AnnotationDrawer><div>All joints shall be brazed in accordance with <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code,<\/span> Section IX Welding and Brazing Qualifications or in accordance with American Welding Society AWS B2.2 Standard for Brazing Procedure and Performance Qualification.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11461-html-1",
+      "kind" : "html",
+      "plainText" : "All joints shall be brazed in accordance with ASME Boiler and Pressure Vessel Code, Section IX Welding and Brazing Qualifications or in accordance with American Welding Society AWS B2.2 Standard for Brazing Procedure and Performance Qualification."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11461
+}

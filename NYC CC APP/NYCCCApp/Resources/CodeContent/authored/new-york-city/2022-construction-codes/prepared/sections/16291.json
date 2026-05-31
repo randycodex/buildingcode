@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174216\"><\/AnnotationDrawer><div>Stair landings and other floor areas within interior exit stairways, interior exit ramps and exit passageways, with the exception of the sides of steps, shall be provided with solid and continuous demarcation lines on the floor or on the walls or a combination of both. The stripes shall be 1 to 2 inches (25.4 mm to 50.8 mm) wide with interruptions not exceeding 4 inches (101.6 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174217\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174217\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The minimum width of 1 inch (25.4 mm) shall not apply to outlining stripes listed in accordance with UL 1994.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16291-html-1",
+      "kind" : "html",
+      "plainText" : "Stair landings and other floor areas within interior exit stairways, interior exit ramps and exit passageways, with the exception of the sides of steps, shall be provided with solid and continuous demarcation lines on the floor or on the walls or a combination of both. The stripes shall be 1 to 2 inches (25.4 mm to 50.8 mm) wide with interruptions not exceeding 4 inches (101.6 mm).\n\n Exception: The minimum width of 1 inch (25.4 mm) shall not apply to outlining stripes listed in accordance with UL 1994."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16291
+}

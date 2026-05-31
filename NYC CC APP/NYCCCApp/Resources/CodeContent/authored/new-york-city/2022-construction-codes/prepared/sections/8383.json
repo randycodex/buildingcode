@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198531\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198531\"><\/AnnotationDrawer><div>An appliance incorporating integral venting means shall be considered properly vented where installed in accordance with its listing, the manufacturer's instructions and Section 503.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8383-html-1",
+      "kind" : "html",
+      "plainText" : "An appliance incorporating integral venting means shall be considered properly vented where installed in accordance with its listing, the manufacturer's instructions and Section 503.8."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8383
+}

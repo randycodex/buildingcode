@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195193\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195193\"><\/AnnotationDrawer><div>All fireplace stoves and room heaters shall comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code<\/span> concerning combustion air supply.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195194\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195194\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205686', hash: '#JD_L.L.2009\/085' }}\">L.L. 2009\/085<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23834-html-1",
+      "kind" : "html",
+      "plainText" : "All fireplace stoves and room heaters shall comply with the requirements of the New York City Energy Conservation Code concerning combustion air supply.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085 ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23834
+}

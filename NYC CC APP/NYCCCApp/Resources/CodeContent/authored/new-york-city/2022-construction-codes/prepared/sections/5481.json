@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183819\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183819\"><\/AnnotationDrawer><div>A separate fan system shall be used for each elevator hoistway.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5481-html-1",
+      "kind" : "html",
+      "plainText" : "A separate fan system shall be used for each elevator hoistway."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5481
+}

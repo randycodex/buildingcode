@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168010\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168010\"><\/AnnotationDrawer><div>Piping, tubing and HPM waste lines shall be identified in accordance with ANSI A13.1 to indicate the material being transported.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14532-html-1",
+      "kind" : "html",
+      "plainText" : "Piping, tubing and HPM waste lines shall be identified in accordance with ANSI A13.1 to indicate the material being transported."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14532
+}

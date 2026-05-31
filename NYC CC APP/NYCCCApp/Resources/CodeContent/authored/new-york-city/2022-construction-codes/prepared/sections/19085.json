@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183177\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183177\"><\/AnnotationDrawer><div>Exterior walls of buildings of Type I, II, III or IV construction of any height shall comply with 2603.5.1 through 2603.5.7. Exterior walls of cold storage buildings required to be constructed of noncombustible materials, where the building is more than one story in height, shall comply with the provisions of Sections 2603.5.1 through 2603.5.7. Exterior walls of buildings of Type V construction shall comply with Sections 2603.2, 2603.3 and 2603.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19085-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior walls of buildings of Type I, II, III or IV construction of any height shall comply with 2603.5.1 through 2603.5.7. Exterior walls of cold storage buildings required to be constructed of noncombustible materials, where the building is more than one story in height, shall comply with the provisions of Sections 2603.5.1 through 2603.5.7. Exterior walls of buildings of Type V construction shall comply with Sections 2603.2, 2603.3 and 2603.4."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19085
+}

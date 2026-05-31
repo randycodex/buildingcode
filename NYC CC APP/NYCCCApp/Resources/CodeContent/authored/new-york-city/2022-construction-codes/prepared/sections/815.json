@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168327\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168327\"><\/AnnotationDrawer><div>All laboratories utilizing radioactive materials or radiation-producing equipment required to register under the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Health Code<\/span> shall comply with the requirements of Sections 428.3.1 through 428.3.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "815-html-1",
+      "kind" : "html",
+      "plainText" : "All laboratories utilizing radioactive materials or radiation-producing equipment required to register under the requirements of the New York City Health Code shall comply with the requirements of Sections 428.3.1 through 428.3.7."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 815
+}

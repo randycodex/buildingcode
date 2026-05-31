@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195097\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195097\"><\/AnnotationDrawer><div>Exterior metal chimneys shall be stainless steel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195098\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195098\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195098\"><\/AnnotationDrawer><h6><a name=\"JD_MC807\" id=\"JD_MC807\" title=\"MC 807\"><\/a>Section MC 807: Changes In Appliance Fuels<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10975-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior metal chimneys shall be stainless steel.\n\n Section MC 807: Changes In Appliance Fuels"
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10975
+}

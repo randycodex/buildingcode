@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178995\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178995\"><\/AnnotationDrawer><div>Excavations for any purpose shall not reduce vertical or lateral support for any foundation without first evaluating if underpinning or protecting the foundation against detrimental lateral or vertical movement, or both, is required. Where required, underpinning or shoring shall be provided in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179904', hash: '#JD_BC1817' }}\">1817<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3946-html-1",
+      "kind" : "html",
+      "plainText" : "Excavations for any purpose shall not reduce vertical or lateral support for any foundation without first evaluating if underpinning or protecting the foundation against detrimental lateral or vertical movement, or both, is required. Where required, underpinning or shoring shall be provided in accordance with Section 1817 ."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3946
+}

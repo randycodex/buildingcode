@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163224\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163224\"><\/AnnotationDrawer><div>The sizing, design and layout of the vent system shall be permitted to be determined by computer program design methods which shall be approved by the commissioner to insure compliance with the minimum standards of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12536-html-1",
+      "kind" : "html",
+      "plainText" : "The sizing, design and layout of the vent system shall be permitted to be determined by computer program design methods which shall be approved by the commissioner to insure compliance with the minimum standards of this code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12536
+}

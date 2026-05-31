@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193768\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193768\"><\/AnnotationDrawer><div>Commercial kitchen hood ventilation ducts and exhaust equipment shall comply with the requirements of this section. Commercial kitchen grease ducts shall be designed for the type of cooking appliance and hood served. All ducts shall lead directly to the exterior of the building and terminate as required by Section 506.3.13 for Type 1 hoods and Section 506.4.2 for Type II hoods.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193769\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193769\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Recirculating hoods that comply with Exception 2 of Section 507.1 do not require ducting in accordance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23367-html-1",
+      "kind" : "html",
+      "plainText" : "Commercial kitchen hood ventilation ducts and exhaust equipment shall comply with the requirements of this section. Commercial kitchen grease ducts shall be designed for the type of cooking appliance and hood served. All ducts shall lead directly to the exterior of the building and terminate as required by Section 506.3.13 for Type 1 hoods and Section 506.4.2 for Type II hoods.\n\n Exception: Recirculating hoods that comply with Exception 2 of Section 507.1 do not require ducting in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23367
+}

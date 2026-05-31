@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194869\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194869\"><\/AnnotationDrawer><div>A solid fuel-burning appliance or fireplace shall not connect to a chimney passageway venting another appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23727-html-1",
+      "kind" : "html",
+      "plainText" : "A solid fuel-burning appliance or fireplace shall not connect to a chimney passageway venting another appliance."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23727
+}

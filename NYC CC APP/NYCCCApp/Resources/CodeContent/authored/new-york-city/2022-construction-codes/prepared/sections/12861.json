@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188184\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188184\"><\/AnnotationDrawer><div>At least one of each type of depository, vending machine, change machine and similar equipment shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188185\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188185\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Drive-up-only depositories are not required to comply with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12861-html-1",
+      "kind" : "html",
+      "plainText" : "At least one of each type of depository, vending machine, change machine and similar equipment shall be accessible.\n\n Exception: Drive-up-only depositories are not required to comply with this section."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12861
+}

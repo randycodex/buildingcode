@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169803\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169803\"><\/AnnotationDrawer><div>Fire-rated glazing tested to ASTM E 119 or UL 263 and NFPA 252, UL 10B or UL 10C shall be permitted in fire door assemblies located in fire walls and in fire barriers in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169749', hash: '#JD_BCTable716.5' }}\">Table 716.5<\/Link> of this code to the maximum size tested and in accordance with their listings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1251-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-rated glazing tested to ASTM E 119 or UL 263 and NFPA 252, UL 10B or UL 10C shall be permitted in fire door assemblies located in fire walls and in fire barriers in accordance with Table 716.5 of this code to the maximum size tested and in accordance with their listings."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1251
+}

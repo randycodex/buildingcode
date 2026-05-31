@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179382\"><\/AnnotationDrawer><div>Where a structure is assigned to Seismic Design Category C in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177795', hash: '#JD_BC1613' }}\">1613<\/Link>, individual pile caps or deep foundations shall be interconnected by ties. Ties shall be capable of carrying, in tension and compression, a force equal to the lesser of: (i) the product of the larger of the pile cap or column design gravity load times the seismic coefficient, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">S<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">DS<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t, divided by 10, or (ii) 25 percent of the smaller of the deep foundation or column design gravity load, unless it can be demonstrated that equivalent restraint is provided by reinforced concrete beams within slabs on grade, reinforced concrete slabs on grade, or confinement by competent rock, hard cohesive soils or very dense granular soils.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17905-html-1",
+      "kind" : "html",
+      "plainText" : "Where a structure is assigned to Seismic Design Category C in accordance with Section 1613 , individual pile caps or deep foundations shall be interconnected by ties. Ties shall be capable of carrying, in tension and compression, a force equal to the lesser of: (i) the product of the larger of the pile cap or column design gravity load times the seismic coefficient, S DS \n\n , divided by 10, or (ii) 25 percent of the smaller of the deep foundation or column design gravity load, unless it can be demonstrated that equivalent restraint is provided by reinforced concrete beams within slabs on grade, reinforced concrete slabs on grade, or confinement by competent rock, hard cohesive soils or very dense granular soils."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17905
+}

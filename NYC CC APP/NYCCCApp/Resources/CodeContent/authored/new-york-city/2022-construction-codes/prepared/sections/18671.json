@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181594\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181594\"><\/AnnotationDrawer><div>Where installed and fireblocked to comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168909', hash: '#JD_BCCh.7' }}\">Chapter 7<\/Link>, fiberboards are permitted as wall insulation in all types of construction. In fire walls and fire barriers, unless treated to comply with Section 803.1 for Class A materials, the boards shall be cemented directly to the concrete, masonry or other noncombustible base and shall be protected with an approved noncombustible veneer anchored to the base without intervening airspaces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18671-html-1",
+      "kind" : "html",
+      "plainText" : "Where installed and fireblocked to comply with Chapter 7 , fiberboards are permitted as wall insulation in all types of construction. In fire walls and fire barriers, unless treated to comply with Section 803.1 for Class A materials, the boards shall be cemented directly to the concrete, masonry or other noncombustible base and shall be protected with an approved noncombustible veneer anchored to the base without intervening airspaces."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18671
+}

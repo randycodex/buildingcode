@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178621\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178621\"><\/AnnotationDrawer><div>Where full or partial demolition of a weakened structure as specified in Section 3306.7 or the demolition of a masonry wall with a height to thickness ratio of 16 or greater is proposed, or the demolition of a floor structure directly supported by such wall, such demolition operation shall be subject to special inspection in accordance with Sections 1705.25.7 through 1705.25.10. The special inspector shall visit the site a minimum of three times: before demolition operations start, during demolition, and at the conclusion of demolition. Additionally, the special inspector shall visit the site at minimum intervals identified in the design documents and set forth in Section 1705.25.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17656-html-1",
+      "kind" : "html",
+      "plainText" : "Where full or partial demolition of a weakened structure as specified in Section 3306.7 or the demolition of a masonry wall with a height to thickness ratio of 16 or greater is proposed, or the demolition of a floor structure directly supported by such wall, such demolition operation shall be subject to special inspection in accordance with Sections 1705.25.7 through 1705.25.10. The special inspector shall visit the site a minimum of three times: before demolition operations start, during demolition, and at the conclusion of demolition. Additionally, the special inspector shall visit the site at minimum intervals identified in the design documents and set forth in Section 1705.25.8.2."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17656
+}

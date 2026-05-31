@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174385\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174385\"><\/AnnotationDrawer><div>Exit discharge components shall be sufficiently open to the exterior so as to minimize the accumulation of smoke and toxic gases.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16343-html-1",
+      "kind" : "html",
+      "plainText" : "Exit discharge components shall be sufficiently open to the exterior so as to minimize the accumulation of smoke and toxic gases."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16343
+}

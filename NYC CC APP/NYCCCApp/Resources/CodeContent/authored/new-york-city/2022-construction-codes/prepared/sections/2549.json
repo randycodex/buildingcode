@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174522\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174522\"><\/AnnotationDrawer><div>The clear width for aisles shall be measured to walls, edges of seating and tread edges except for permitted projections.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174523\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174523\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The clear width of aisles adjacent to seating at tables shall be permitted to be measured in accordance with Section 1029.12.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2549-html-1",
+      "kind" : "html",
+      "plainText" : "The clear width for aisles shall be measured to walls, edges of seating and tread edges except for permitted projections.\n\n Exception: The clear width of aisles adjacent to seating at tables shall be permitted to be measured in accordance with Section 1029.12.1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2549
+}

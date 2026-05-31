@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167846\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167846\"><\/AnnotationDrawer><div>Occupancies in Group H-2 shall be constructed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and Sections 415.9.1 through 415.9.3 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14469-html-1",
+      "kind" : "html",
+      "plainText" : "Occupancies in Group H-2 shall be constructed in accordance with the New York City Fire Code and Sections 415.9.1 through 415.9.3 of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14469
+}

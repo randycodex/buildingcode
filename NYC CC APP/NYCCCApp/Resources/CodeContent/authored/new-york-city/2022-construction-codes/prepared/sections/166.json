@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166306\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166306\"><\/AnnotationDrawer><div>Adult homes and enriched housing facilities operated pursuant to and meeting the additional construction requirements of Section 460 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York State Social Services Law<\/span> and regulations of the New York State Department of Health offering care on a 24-hour basis to persons not capable of self-preservation, in the same building, shall be classified as Group I-2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "166-html-1",
+      "kind" : "html",
+      "plainText" : "Adult homes and enriched housing facilities operated pursuant to and meeting the additional construction requirements of Section 460 of the New York State Social Services Law and regulations of the New York State Department of Health offering care on a 24-hour basis to persons not capable of self-preservation, in the same building, shall be classified as Group I-2."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 166
+}

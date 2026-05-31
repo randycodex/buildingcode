@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198960\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198960\"><\/AnnotationDrawer><div>In a single run of vent or vent connector, different diameters and types of vent and connector components shall be permitted to be used, provided that all such sizes and types are permitted by the tables.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8523-html-1",
+      "kind" : "html",
+      "plainText" : "In a single run of vent or vent connector, different diameters and types of vent and connector components shall be permitted to be used, provided that all such sizes and types are permitted by the tables."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8523
+}

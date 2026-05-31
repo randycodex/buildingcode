@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172370\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172370\"><\/AnnotationDrawer><div>Dampers shall be tested for function in their installed condition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1947-html-1",
+      "kind" : "html",
+      "plainText" : "Dampers shall be tested for function in their installed condition."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1947
+}

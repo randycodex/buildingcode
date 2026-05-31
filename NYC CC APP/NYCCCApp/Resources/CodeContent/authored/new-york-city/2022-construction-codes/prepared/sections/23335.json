@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193672\"><\/AnnotationDrawer><div>Manicure and pedicure stations shall be provided with an exhaust system in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193237', hash: '#JD_MCTable403.3.1.1' }}\">Table 403.3.1.1<\/Link>, Note h. Manicure tables and pedicure stations not provided with factory-installed exhaust inlets shall be provided with exhaust inlets located not more than 12 inches (304.8 mm) horizontally and vertically from the point of chemical application.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23335-html-1",
+      "kind" : "html",
+      "plainText" : "Manicure and pedicure stations shall be provided with an exhaust system in accordance with Table 403.3.1.1 , Note h. Manicure tables and pedicure stations not provided with factory-installed exhaust inlets shall be provided with exhaust inlets located not more than 12 inches (304.8 mm) horizontally and vertically from the point of chemical application."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23335
+}

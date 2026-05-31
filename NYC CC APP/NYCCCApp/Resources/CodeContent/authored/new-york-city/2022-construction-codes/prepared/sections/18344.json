@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180605\"><\/AnnotationDrawer><div>Shotcrete is mortar or concrete that is pneumatically projected at high velocity onto a surface. Except as specified in this section, shotcrete shall conform to the requirements of this chapter for plain or reinforced concrete.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18344-html-1",
+      "kind" : "html",
+      "plainText" : "Shotcrete is mortar or concrete that is pneumatically projected at high velocity onto a surface. Except as specified in this section, shotcrete shall conform to the requirements of this chapter for plain or reinforced concrete."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18344
+}

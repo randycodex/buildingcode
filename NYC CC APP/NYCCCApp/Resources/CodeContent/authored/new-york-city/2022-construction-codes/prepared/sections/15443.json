@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171346\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171346\"><\/AnnotationDrawer><div>Such access shall be by stairs, doors, windows or other means that provide an opening 48 inches (1220 mm) high and 32 inches (812.8 mm) wide, the sill of which shall not be higher than 36 inches (914.4 mm) above the inside floor. If an areaway is used to provide below grade access, the minimum horizontal dimension shall be at least one-third the depth of the areaway or 6 feet (1828.8 mm), whichever is less.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15443-html-1",
+      "kind" : "html",
+      "plainText" : "Such access shall be by stairs, doors, windows or other means that provide an opening 48 inches (1220 mm) high and 32 inches (812.8 mm) wide, the sill of which shall not be higher than 36 inches (914.4 mm) above the inside floor. If an areaway is used to provide below grade access, the minimum horizontal dimension shall be at least one-third the depth of the areaway or 6 feet (1828.8 mm), whichever is less."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15443
+}

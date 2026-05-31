@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174973\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174973\"><\/AnnotationDrawer><div>Electrical vehicle charging stations shall comply with Sections 1106.8.1 through 1106.8.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174974\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Electrical vehicle charging stations intended for use by a designated vehicle or driver shall not be required to comply with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16519-html-1",
+      "kind" : "html",
+      "plainText" : "Electrical vehicle charging stations shall comply with Sections 1106.8.1 through 1106.8.5.\n\n Exception: Electrical vehicle charging stations intended for use by a designated vehicle or driver shall not be required to comply with this section."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16519
+}

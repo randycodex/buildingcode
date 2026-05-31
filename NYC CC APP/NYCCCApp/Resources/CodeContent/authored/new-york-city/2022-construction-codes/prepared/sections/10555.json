@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193815\"><\/AnnotationDrawer><div>Grease duct systems serving a Type I hood shall be designed and installed to provide an air velocity within the duct system of not less than 500 feet per minute (2.5 m\/s).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193816\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193816\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The velocity limitations shall not apply within duct transitions utilized to connect ducts to differently sized or shaped openings in hoods and fans, provided that such transitions do not exceed 3 feet (914.4 mm) in length and are designed to prevent the trapping of grease.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10555-html-1",
+      "kind" : "html",
+      "plainText" : "Grease duct systems serving a Type I hood shall be designed and installed to provide an air velocity within the duct system of not less than 500 feet per minute (2.5 m\/s).\n\n Exception: The velocity limitations shall not apply within duct transitions utilized to connect ducts to differently sized or shaped openings in hoods and fans, provided that such transitions do not exceed 3 feet (914.4 mm) in length and are designed to prevent the trapping of grease."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10555
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195438\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195438\"><\/AnnotationDrawer><div>Potable water-heating devices that utilize refrigerant-to-water heat exchangers shall be approved and installed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>, the applicable provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code<\/span> and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195439\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195439\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195439\"><\/AnnotationDrawer><h6><a name=\"JD_MC1003\" id=\"JD_MC1003\" title=\"MC 1003\"><\/a>Section MC 1003: Pressure Vessels<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11105-html-1",
+      "kind" : "html",
+      "plainText" : "Potable water-heating devices that utilize refrigerant-to-water heat exchangers shall be approved and installed in accordance with the New York City Plumbing Code , the applicable provisions of the New York City Energy Conservation Code and the manufacturer's instructions.\n\n Section MC 1003: Pressure Vessels"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11105
+}

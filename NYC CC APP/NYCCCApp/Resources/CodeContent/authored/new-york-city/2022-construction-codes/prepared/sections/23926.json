@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195430\"><\/AnnotationDrawer><div>Water heaters utilized for space heating. Water heaters utilized both to supply potable hot water and provide hot water for space-heating applications shall be listed and labeled for such applications by the manufacturer and shall be built in accordance with Section IV of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> with an \"H\" code stamp. Water heaters shall be installed in accordance with the manufacturer's instructions, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>. Oil-fired heaters shall comply with UL 732 and shall have an \"HW\" stamp.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23926-html-1",
+      "kind" : "html",
+      "plainText" : "Water heaters utilized for space heating. Water heaters utilized both to supply potable hot water and provide hot water for space-heating applications shall be listed and labeled for such applications by the manufacturer and shall be built in accordance with Section IV of the ASME Boiler and Pressure Vessel Code with an \"H\" code stamp. Water heaters shall be installed in accordance with the manufacturer's instructions, the ASME Boiler and Pressure Vessel Code and the New York City Plumbing Code . Oil-fired heaters shall comply with UL 732 and shall have an \"HW\" stamp."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 23926
+}

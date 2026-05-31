@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184333\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184333\"><\/AnnotationDrawer><div>Enclosed sidewalk cafes shall be constructed of noncombustible material. The walls of such enclosures shall not extend more than 8 feet (2438 mm) above the sidewalk. Light transmitting plastic glazing complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183294', hash: '#JD_BC2606' }}\">2606<\/Link> shall be permitted as glazing within such walls. Light-transmitting plastic skylight glazing complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183394', hash: '#JD_BC2610' }}\">2610<\/Link> may be installed in the roofs of such enclosures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5679-html-1",
+      "kind" : "html",
+      "plainText" : "Enclosed sidewalk cafes shall be constructed of noncombustible material. The walls of such enclosures shall not extend more than 8 feet (2438 mm) above the sidewalk. Light transmitting plastic glazing complying with Section 2606 shall be permitted as glazing within such walls. Light-transmitting plastic skylight glazing complying with Section 2610 may be installed in the roofs of such enclosures."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5679
+}

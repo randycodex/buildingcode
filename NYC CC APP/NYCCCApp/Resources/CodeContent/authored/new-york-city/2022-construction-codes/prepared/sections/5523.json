@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183920\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183920\"><\/AnnotationDrawer><div>The occupant evacuation elevator lobby shall be enclosed with a smoke barrier having a fire-resistance rating of not less than 1 hour, except that lobby doorways shall comply with Section 3008.7.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183921\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183921\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Enclosed occupant evacuation elevator lobbies are not required at the levels of exit discharge.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5523-html-1",
+      "kind" : "html",
+      "plainText" : "The occupant evacuation elevator lobby shall be enclosed with a smoke barrier having a fire-resistance rating of not less than 1 hour, except that lobby doorways shall comply with Section 3008.7.3.\n\n Exception: Enclosed occupant evacuation elevator lobbies are not required at the levels of exit discharge."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5523
+}

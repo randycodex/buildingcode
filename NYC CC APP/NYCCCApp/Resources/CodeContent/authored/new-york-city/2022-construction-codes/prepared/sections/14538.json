@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168022\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168022\"><\/AnnotationDrawer><div>Where gases are transported in piping placed within the space defined by the walls of a corridor and the floor or roof above the corridor, a continuous gas detection system shall be provided where piping is located and in the corridor.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168023\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> A continuous gas detection system is not required for occasional transverse crossings of the corridors by supply piping that is enclosed in a ferrous pipe or tube for the width of the corridor. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14538-html-1",
+      "kind" : "html",
+      "plainText" : "Where gases are transported in piping placed within the space defined by the walls of a corridor and the floor or roof above the corridor, a continuous gas detection system shall be provided where piping is located and in the corridor.\n\n Exception: A continuous gas detection system is not required for occasional transverse crossings of the corridors by supply piping that is enclosed in a ferrous pipe or tube for the width of the corridor."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14538
+}

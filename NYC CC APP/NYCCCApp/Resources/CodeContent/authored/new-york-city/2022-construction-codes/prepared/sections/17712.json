@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178767\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178767\"><\/AnnotationDrawer><div>For materials that are not specifically provided for in this code, the design strengths and permissible stresses shall be established by tests as provided for in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178768', hash: '#JD_BC1707' }}\">1707<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-178768\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-178768\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-178768\"><\/AnnotationDrawer><h6><a name=\"JD_BC1707\" id=\"JD_BC1707\" title=\"BC 1707\"><\/a>Section BC 1707: Alternative Test Procedure<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17712-html-1",
+      "kind" : "html",
+      "plainText" : "For materials that are not specifically provided for in this code, the design strengths and permissible stresses shall be established by tests as provided for in Section 1707 .\n\n Section BC 1707: Alternative Test Procedure"
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17712
+}

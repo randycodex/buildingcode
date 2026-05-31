@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173801\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173801\"><\/AnnotationDrawer><div>Where exit signs are required in Group R-1 occupancies by Section 1013.1, additional low-level exit signs shall be provided in all areas serving guest rooms in Group R-1 occupancies and shall comply with Section 1013.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173802\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173802\"><\/AnnotationDrawer><div>The bottom of the sign shall be not less than 10 inches (254 mm) nor more than 12 inches (304.8 mm) above the floor level. The sign shall be flush mounted to the door or wall. Where mounted on the wall, the edge of the sign shall be within 4 inches (101.6 mm) of the door frame on the latch side.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16192-html-1",
+      "kind" : "html",
+      "plainText" : "Where exit signs are required in Group R-1 occupancies by Section 1013.1, additional low-level exit signs shall be provided in all areas serving guest rooms in Group R-1 occupancies and shall comply with Section 1013.5.\n\n The bottom of the sign shall be not less than 10 inches (254 mm) nor more than 12 inches (304.8 mm) above the floor level. The sign shall be flush mounted to the door or wall. Where mounted on the wall, the edge of the sign shall be within 4 inches (101.6 mm) of the door frame on the latch side."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16192
+}

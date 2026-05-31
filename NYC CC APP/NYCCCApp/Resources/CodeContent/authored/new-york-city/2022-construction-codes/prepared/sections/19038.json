@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183035\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183035\"><\/AnnotationDrawer><div>Plastering with cement plaster shall be not less than three coats when applied over metal lath or wire fabric lath or gypsum board backing as specified in Section 2510.5 and shall be not less than two coats when applied over masonry or concrete. If the plaster surface is to be completely covered by veneer or other facing material, or is completely concealed by another wall, plaster application need be only two coats, provided the total thickness is as set forth in ASTM C 926.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19038-html-1",
+      "kind" : "html",
+      "plainText" : "Plastering with cement plaster shall be not less than three coats when applied over metal lath or wire fabric lath or gypsum board backing as specified in Section 2510.5 and shall be not less than two coats when applied over masonry or concrete. If the plaster surface is to be completely covered by veneer or other facing material, or is completely concealed by another wall, plaster application need be only two coats, provided the total thickness is as set forth in ASTM C 926."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 19038
+}

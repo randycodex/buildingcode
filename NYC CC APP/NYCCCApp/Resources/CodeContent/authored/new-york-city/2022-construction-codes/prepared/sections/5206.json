@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183026\"><\/AnnotationDrawer><div>Plaster shall not be applied directly to fiber insulation board. Cement plaster shall not be applied directly to gypsum lath or gypsum plaster except as specified in Sections 2510.5.1 and 2510.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5206-html-1",
+      "kind" : "html",
+      "plainText" : "Plaster shall not be applied directly to fiber insulation board. Cement plaster shall not be applied directly to gypsum lath or gypsum plaster except as specified in Sections 2510.5.1 and 2510.5.2."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5206
+}

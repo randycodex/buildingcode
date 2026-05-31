@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178225\"><\/AnnotationDrawer><div>Special inspections shall be required for proposed work that is, in the opinion of the commissioner, unusual in its nature, including, but not limited to:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178226\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178226\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Construction materials and systems that are alternatives to materials and systems prescribed by this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178227\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Unusual design applications of materials described in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178228\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178228\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Materials and systems required to be installed in accordance with manufacturer's instructions that prescribe additional requirements not contained in this code or in standards referenced by this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17523-html-1",
+      "kind" : "html",
+      "plainText" : "Special inspections shall be required for proposed work that is, in the opinion of the commissioner, unusual in its nature, including, but not limited to:\n\n 1. Construction materials and systems that are alternatives to materials and systems prescribed by this code.\n\n 2. Unusual design applications of materials described in this code.\n\n 3. Materials and systems required to be installed in accordance with manufacturer's instructions that prescribe additional requirements not contained in this code or in standards referenced by this code."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17523
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184057\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184057\"><\/AnnotationDrawer><div>The primary inflation system shall consist of one or more blowers and shall include provisions for automatic control to maintain the required inflation pressures. Such system shall be so designed as to prevent overpressurization of the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5572-html-1",
+      "kind" : "html",
+      "plainText" : "The primary inflation system shall consist of one or more blowers and shall include provisions for automatic control to maintain the required inflation pressures. Such system shall be so designed as to prevent overpressurization of the system."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5572
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171785\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171785\"><\/AnnotationDrawer><div>An automatic smoke detection system shall be installed in corridors, waiting areas open to corridors and habitable spaces other than sleeping units and kitchens. The system shall be activated in accordance with Section 907.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171786\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171786\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Smoke detection is not required for exterior balconies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1760-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic smoke detection system shall be installed in corridors, waiting areas open to corridors and habitable spaces other than sleeping units and kitchens. The system shall be activated in accordance with Section 907.5.\n\n Exception: Smoke detection is not required for exterior balconies."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1760
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187104\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187104\"><\/AnnotationDrawer><div>Debris shall not be allowed to accumulate on platforms.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20432-html-1",
+      "kind" : "html",
+      "plainText" : "Debris shall not be allowed to accumulate on platforms."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20432
+}

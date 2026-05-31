@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186284\"><\/AnnotationDrawer><div>Only signage, including parapet information panels, allowed by Section 3301.9, and indicated on the sidewalk shed design drawings in accordance with Section 3307.6.4.1, shall be installed on the sidewalk shed. Sidewalk shed signage shall only be installed, adjusted, maintained, repaired, and removed by the permit holder for the shed or an entity authorized by the permit holder.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6356-html-1",
+      "kind" : "html",
+      "plainText" : "Only signage, including parapet information panels, allowed by Section 3301.9, and indicated on the sidewalk shed design drawings in accordance with Section 3307.6.4.1, shall be installed on the sidewalk shed. Sidewalk shed signage shall only be installed, adjusted, maintained, repaired, and removed by the permit holder for the shed or an entity authorized by the permit holder."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6356
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177696\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177696\"><\/AnnotationDrawer><div>The roof deck shall be designed to withstand the wind pressures determined in accordance with Section 1609.1.1 for buildings of any height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17394-html-1",
+      "kind" : "html",
+      "plainText" : "The roof deck shall be designed to withstand the wind pressures determined in accordance with Section 1609.1.1 for buildings of any height."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17394
+}

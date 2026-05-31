@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175804\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175804\"><\/AnnotationDrawer><div>Ventilation and exhaust systems for occupancies and operations involving flammable or combustible hazards or other contaminant sources as covered in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> or the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> shall be provided as required by both codes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-175805\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-175805\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-175805\"><\/AnnotationDrawer><h6><a name=\"JD_BC1204\" id=\"JD_BC1204\" title=\"BC 1204\"><\/a>Section BC 1204: Temperature and Humidity Control<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16805-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation and exhaust systems for occupancies and operations involving flammable or combustible hazards or other contaminant sources as covered in the New York City Mechanical Code or the New York City Fire Code shall be provided as required by both codes.\n\n Section BC 1204: Temperature and Humidity Control"
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16805
+}

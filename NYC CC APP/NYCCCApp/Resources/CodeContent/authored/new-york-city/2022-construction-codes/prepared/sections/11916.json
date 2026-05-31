@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161639\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Tempered water shall be delivered from lavatories and group wash fixtures located in public toilet facilities provided for customers, patrons and visitors. Tempered water shall be delivered through an approved water-temperature limiting device that conforms to ASSE 1070.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161640\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161640\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where point of use heaters are installed, outlet water temperature shall be regulated to provide tempered water.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161641\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161641\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161641\"><\/AnnotationDrawer><h6><a name=\"JD_PC417\" id=\"JD_PC417\" title=\"PC 417\"><\/a>Section PC 417: Showers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11916-html-1",
+      "kind" : "html",
+      "plainText" : "Tempered water shall be delivered from lavatories and group wash fixtures located in public toilet facilities provided for customers, patrons and visitors. Tempered water shall be delivered through an approved water-temperature limiting device that conforms to ASSE 1070. \n\n Exception: Where point of use heaters are installed, outlet water temperature shall be regulated to provide tempered water.\n\n Section PC 417: Showers"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11916
+}

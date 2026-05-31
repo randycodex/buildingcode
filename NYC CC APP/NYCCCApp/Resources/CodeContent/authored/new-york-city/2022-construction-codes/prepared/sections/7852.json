@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230037\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230037\"><\/AnnotationDrawer><div>The department may issue an authorization for temporary residence in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-160650', hash: '#JD_28-507' }}\">Article 507 of Chapter 5 of Title 28<\/Link> of the Administrative Code. An eligible basement or cellar residence in the program area shall comply with the provisions of such article and the rules of the department. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230036\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230036\"><\/AnnotationDrawer><div>(L.L. 2024\/127, 12\/18\/2024, eff. 6\/16\/2025) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-230209\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-230209\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-230209\"><\/AnnotationDrawer><h6><a name=\"JD_BCU203\" id=\"JD_BCU203\" title=\"BC U203\"><\/a>Section BC U203: ADU Separated by a Fire Wall from a Two-Family Primary Dwelling<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7852-html-1",
+      "kind" : "html",
+      "plainText" : "The department may issue an authorization for temporary residence in accordance with Article 507 of Chapter 5 of Title 28 of the Administrative Code. An eligible basement or cellar residence in the program area shall comply with the provisions of such article and the rules of the department. \n\n (L.L. 2024\/127, 12\/18\/2024, eff. 6\/16\/2025) \n\n Section BC U203: ADU Separated by a Fire Wall from a Two-Family Primary Dwelling"
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7852
+}

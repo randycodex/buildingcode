@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167984\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167984\"><\/AnnotationDrawer><div>Mechanical exhaust ventilation shall be provided in liquid storage rooms, HPM rooms and gas rooms at the rate of not less than 1 cubic foot per minute per square foot (0.044 L\/s\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of floor area or six air changes per hour.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167985\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167985\"><\/AnnotationDrawer><div>Exhaust ventilation for gas rooms shall be designed to operate at a negative pressure in relation to the surrounding areas and direct the exhaust ventilation to an exhaust system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "695-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical exhaust ventilation shall be provided in liquid storage rooms, HPM rooms and gas rooms at the rate of not less than 1 cubic foot per minute per square foot (0.044 L\/s\/m\n\n 2 \n\n ) of floor area or six air changes per hour.\n\n Exhaust ventilation for gas rooms shall be designed to operate at a negative pressure in relation to the surrounding areas and direct the exhaust ventilation to an exhaust system."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 695
+}

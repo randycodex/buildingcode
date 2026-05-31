@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178555\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178555\"><\/AnnotationDrawer><div>Tests of mechanical systems shall be performed in accordance with applicable sections of the code including Sections 507.6, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195547', hash: '#JD_MC1011' }}\">1011<\/Link>, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195892', hash: '#JD_MC1108' }}\">1108<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-196091', hash: '#JD_MC1208' }}\">1208<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>. The special inspector shall witness all required tests.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3799-html-1",
+      "kind" : "html",
+      "plainText" : "Tests of mechanical systems shall be performed in accordance with applicable sections of the code including Sections 507.6, 1011 , 1108 and 1208 of the New York City Mechanical Code . The special inspector shall witness all required tests."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3799
+}

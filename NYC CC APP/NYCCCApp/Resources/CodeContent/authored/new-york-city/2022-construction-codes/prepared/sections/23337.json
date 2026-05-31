@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193676\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193676\"><\/AnnotationDrawer><div>Nonproduction chemical laboratories shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and NFPA 45.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193677\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193677\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193677\"><\/AnnotationDrawer><h6><a name=\"JD_MC503\" id=\"JD_MC503\" title=\"MC 503\"><\/a>Section MC 503: Motors and Fans<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23337-html-1",
+      "kind" : "html",
+      "plainText" : "Nonproduction chemical laboratories shall comply with the New York City Building Code and NFPA 45.\n\n Section MC 503: Motors and Fans"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23337
+}

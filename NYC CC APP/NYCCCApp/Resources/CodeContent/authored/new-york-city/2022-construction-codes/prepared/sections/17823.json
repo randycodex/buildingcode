@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179160\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179160\"><\/AnnotationDrawer><div>Concrete shallow foundations shall not be placed through water unless a tremie or other method approved by the commissioner is used. Where placed under or in the presence of water, the concrete shall be deposited by approved means to ensure minimum segregation of the mix and negligible turbulence of the water.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17823-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete shallow foundations shall not be placed through water unless a tremie or other method approved by the commissioner is used. Where placed under or in the presence of water, the concrete shall be deposited by approved means to ensure minimum segregation of the mix and negligible turbulence of the water."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17823
+}

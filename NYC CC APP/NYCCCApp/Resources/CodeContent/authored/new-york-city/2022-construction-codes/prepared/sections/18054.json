@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179815\"><\/AnnotationDrawer><div>Where a moment is transmitted to a single helical pile, a structural analysis shall be conducted to verify that the shaft is capable of resisting the moment with acceptable deflection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18054-html-1",
+      "kind" : "html",
+      "plainText" : "Where a moment is transmitted to a single helical pile, a structural analysis shall be conducted to verify that the shaft is capable of resisting the moment with acceptable deflection."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18054
+}

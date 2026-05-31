@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166515\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166515\"><\/AnnotationDrawer><div>A fire protection plan shall be provided to the Fire Department pursuant to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156559', hash: '#JD_28-109' }}\">Article 109 of Title 28<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166516\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166516\"><\/AnnotationDrawer><div>(Am. L.L. 2018\/195, 12\/1\/2018, eff. 5\/30\/2019) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166517\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166517\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-129017', hash: '#JD_L.L.2018\/195' }}\">L.L. 2018\/195<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "194-html-1",
+      "kind" : "html",
+      "plainText" : "A fire protection plan shall be provided to the Fire Department pursuant to Article 109 of Title 28 . \n\n (Am. L.L. 2018\/195, 12\/1\/2018, eff. 5\/30\/2019) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018\/195 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 194
+}

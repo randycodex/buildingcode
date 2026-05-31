@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185632\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185632\"><\/AnnotationDrawer><div>Ramps, runways, and platforms utilized in connection with concrete placement shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-187455', hash: '#JD_BC3315' }}\">3315<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19949-html-1",
+      "kind" : "html",
+      "plainText" : "Ramps, runways, and platforms utilized in connection with concrete placement shall comply with Section 3315 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19949
+}

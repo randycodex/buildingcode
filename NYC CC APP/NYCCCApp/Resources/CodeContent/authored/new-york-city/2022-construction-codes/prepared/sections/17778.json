@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179005\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179005\"><\/AnnotationDrawer><div>In an excavation where soil and groundwater conditions are such that an inward or upward seepage might be produced in materials intended to provide vertical or lateral support for foundation elements or for adjacent foundations, excavating methods shall control or prevent the inflow of ground water to prevent disturbance of the soil material in the excavation or beneath existing buildings. No foundation shall be placed on soil that has been disturbed by seepage unless remedial measures have been taken.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17778-html-1",
+      "kind" : "html",
+      "plainText" : "In an excavation where soil and groundwater conditions are such that an inward or upward seepage might be produced in materials intended to provide vertical or lateral support for foundation elements or for adjacent foundations, excavating methods shall control or prevent the inflow of ground water to prevent disturbance of the soil material in the excavation or beneath existing buildings. No foundation shall be placed on soil that has been disturbed by seepage unless remedial measures have been taken."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17778
+}

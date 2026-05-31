@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175371\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175371\"><\/AnnotationDrawer><div>Where provided, saunas and steam rooms shall be accessible. Such saunas and steam rooms shall comply with Section 612 of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175372\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where saunas or steam rooms are clustered at a single location, at least 5 percent of the saunas and steam rooms, but not less than one, of each type in each cluster shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16657-html-1",
+      "kind" : "html",
+      "plainText" : "Where provided, saunas and steam rooms shall be accessible. Such saunas and steam rooms shall comply with Section 612 of ICC A117.1.\n\n Exception: Where saunas or steam rooms are clustered at a single location, at least 5 percent of the saunas and steam rooms, but not less than one, of each type in each cluster shall be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16657
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171996\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171996\"><\/AnnotationDrawer><div>All hold-open devices used in automatic-closing doors pursuant to the exception to Section 713.7 shall be electrically supervised to monitor the integrity of the wiring connections among the fire alarm system, the smoke detection system, and the hold-open devices.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171997\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171997\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-202241', hash: '#JD_L.L.2014\/017' }}\">L.L. 2014\/017<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15649-html-1",
+      "kind" : "html",
+      "plainText" : "All hold-open devices used in automatic-closing doors pursuant to the exception to Section 713.7 shall be electrically supervised to monitor the integrity of the wiring connections among the fire alarm system, the smoke detection system, and the hold-open devices.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014\/017 ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15649
+}

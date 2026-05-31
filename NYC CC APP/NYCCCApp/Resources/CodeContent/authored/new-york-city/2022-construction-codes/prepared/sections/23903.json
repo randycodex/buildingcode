@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195353\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195353\"><\/AnnotationDrawer><div>Outdoor intake openings shall be located in accordance with Section 401.4. Return air openings shall be located in accordance with Section 618.4 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23903-html-1",
+      "kind" : "html",
+      "plainText" : "Outdoor intake openings shall be located in accordance with Section 401.4. Return air openings shall be located in accordance with Section 618.4 of the New York City Fuel Gas Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23903
+}

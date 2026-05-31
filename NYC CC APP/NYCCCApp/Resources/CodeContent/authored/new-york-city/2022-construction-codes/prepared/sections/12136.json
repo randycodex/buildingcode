@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162181\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162181\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Every pressure tank in a hydropneumatic pressure booster system shall be protected with a pressure relief valve. The pressure relief valve shall be set at a maximum pressure equal to the rating of the tank. The relief valve shall be installed on the supply pipe to the tank or on the tank. The relief valve shall discharge by gravity to a safe place of disposal.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12136-html-1",
+      "kind" : "html",
+      "plainText" : "Every pressure tank in a hydropneumatic pressure booster system shall be protected with a pressure relief valve. The pressure relief valve shall be set at a maximum pressure equal to the rating of the tank. The relief valve shall be installed on the supply pipe to the tank or on the tank. The relief valve shall discharge by gravity to a safe place of disposal."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12136
+}

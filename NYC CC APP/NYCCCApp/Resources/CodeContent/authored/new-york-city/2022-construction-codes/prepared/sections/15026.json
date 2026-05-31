@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169639\"><\/AnnotationDrawer><div>Through-penetrations shall be protected by an approved penetration firestop system installed as tested in accordance with ASTM E 814 or UL 1479, with a minimum positive pressure differential of 0.01 inch (2.49 Pa) of water and shall have an F rating of not less than the required fire-resistance rating of the wall penetrated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15026-html-1",
+      "kind" : "html",
+      "plainText" : "Through-penetrations shall be protected by an approved penetration firestop system installed as tested in accordance with ASTM E 814 or UL 1479, with a minimum positive pressure differential of 0.01 inch (2.49 Pa) of water and shall have an F rating of not less than the required fire-resistance rating of the wall penetrated."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15026
+}

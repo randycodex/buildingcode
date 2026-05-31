@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176694\"><\/AnnotationDrawer><div>Tile fasteners shall be corrosion resistant and not less than 11 gage, 5\/16-inch (8.0 mm) head, and of sufficient length to penetrate the deck a minimum of 3\/4 inch (19.1 mm) or through the thickness of the deck, whichever is less. Attaching wire for clay or concrete tile shall be not less than 0.083 inch (2.1 mm). Perimeter fastening areas include three tile courses but not less than 36 inches (914.4 mm) from either side of hips or ridges and edges of eaves and gable rakes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17108-html-1",
+      "kind" : "html",
+      "plainText" : "Tile fasteners shall be corrosion resistant and not less than 11 gage, 5\/16-inch (8.0 mm) head, and of sufficient length to penetrate the deck a minimum of 3\/4 inch (19.1 mm) or through the thickness of the deck, whichever is less. Attaching wire for clay or concrete tile shall be not less than 0.083 inch (2.1 mm). Perimeter fastening areas include three tile courses but not less than 36 inches (914.4 mm) from either side of hips or ridges and edges of eaves and gable rakes."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17108
+}

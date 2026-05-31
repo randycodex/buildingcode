@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162942\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162942\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A chemical drainage and vent system shall be designed and installed in accordance with this code. Chemical drainage and vent systems shall be completely separated from the sanitary systems. Chemical waste shall not discharge to a sanitary drainage system until such waste has been treated in accordance with Section 803.2.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12428-html-1",
+      "kind" : "html",
+      "plainText" : "A chemical drainage and vent system shall be designed and installed in accordance with this code. Chemical drainage and vent systems shall be completely separated from the sanitary systems. Chemical waste shall not discharge to a sanitary drainage system until such waste has been treated in accordance with Section 803.2."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 12428
+}

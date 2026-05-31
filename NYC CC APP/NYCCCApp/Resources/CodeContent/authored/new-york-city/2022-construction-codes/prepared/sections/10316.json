@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193134\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193134\"><\/AnnotationDrawer><div>Mechanical equipment located outside of the building in a yard or court or on a roof, or located inside a building but open to the exterior of the building, shall comply with the requirements of Sections 313.2.1 and 313.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10316-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical equipment located outside of the building in a yard or court or on a roof, or located inside a building but open to the exterior of the building, shall comply with the requirements of Sections 313.2.1 and 313.2.2."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 10316
+}

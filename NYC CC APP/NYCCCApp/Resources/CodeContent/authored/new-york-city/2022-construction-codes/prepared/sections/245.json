@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166634\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166634\"><\/AnnotationDrawer><div>Assembly occupancies with an occupant load of 500 or more shall be so located in the covered mall building such that their entrance will be immediately adjacent to a principal entrance to the mall and shall have not less than one-half of their required means of egress opening directly to the exterior of the covered mall building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "245-html-1",
+      "kind" : "html",
+      "plainText" : "Assembly occupancies with an occupant load of 500 or more shall be so located in the covered mall building such that their entrance will be immediately adjacent to a principal entrance to the mall and shall have not less than one-half of their required means of egress opening directly to the exterior of the covered mall building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 245
+}

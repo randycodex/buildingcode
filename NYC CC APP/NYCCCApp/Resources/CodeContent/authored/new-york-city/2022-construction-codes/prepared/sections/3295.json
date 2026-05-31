@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176752\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176752\"><\/AnnotationDrawer><div>Metal roof shingles shall be secured to the roof in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3295-html-1",
+      "kind" : "html",
+      "plainText" : "Metal roof shingles shall be secured to the roof in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3295
+}

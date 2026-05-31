@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188744\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188744\"><\/AnnotationDrawer><div>In shaded X-Zones, flood design class 4 buildings, as defined in ASCE 24, Table 1-1, shall comply with the requirements of this appendix and the applicable provisions of ASCE 24 for A-Zone construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13061-html-1",
+      "kind" : "html",
+      "plainText" : "In shaded X-Zones, flood design class 4 buildings, as defined in ASCE 24, Table 1-1, shall comply with the requirements of this appendix and the applicable provisions of ASCE 24 for A-Zone construction."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13061
+}

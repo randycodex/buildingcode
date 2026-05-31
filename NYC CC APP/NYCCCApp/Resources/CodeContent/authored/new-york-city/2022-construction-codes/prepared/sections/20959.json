@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197882\"><\/AnnotationDrawer><div>Pipe joints shall be threaded, flanged, or welded.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20959-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe joints shall be threaded, flanged, or welded."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20959
+}

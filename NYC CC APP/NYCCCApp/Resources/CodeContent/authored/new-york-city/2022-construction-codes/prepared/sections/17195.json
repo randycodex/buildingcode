@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176929\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176929\"><\/AnnotationDrawer><div>Fasteners for photovoltaic shingles shall be galvanized, stainless steel, aluminum or copper roofing nails, minimum 12-gage (0.105 inch (2.67 mm)) shank with a minimum 3\/8-inch (9.5 mm) diameter head, of a length to penetrate through the roofing materials and a minimum of 3\/4 inch (19.1 mm) into the roof sheathing. Where the roof sheathing is less than 3\/4 inch (19.1 mm) thick, the nails shall penetrate through the sheathing. Fasteners shall comply with ASTM F 1667.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17195-html-1",
+      "kind" : "html",
+      "plainText" : "Fasteners for photovoltaic shingles shall be galvanized, stainless steel, aluminum or copper roofing nails, minimum 12-gage (0.105 inch (2.67 mm)) shank with a minimum 3\/8-inch (9.5 mm) diameter head, of a length to penetrate through the roofing materials and a minimum of 3\/4 inch (19.1 mm) into the roof sheathing. Where the roof sheathing is less than 3\/4 inch (19.1 mm) thick, the nails shall penetrate through the sheathing. Fasteners shall comply with ASTM F 1667."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17195
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162787\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162787\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A check valve and a full open valve located on the discharge side of the check valve shall be installed in the pump or ejector discharge piping between the pump or ejector and the gravity drainage system. Access shall be provided to such valves. Such valves shall be located above the sump cover required by Section 712.1 or, where the discharge pipe from the ejector is below grade, the valves shall be accessibly located outside the sump below grade in an access pit with a removable access cover.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25190-html-1",
+      "kind" : "html",
+      "plainText" : "A check valve and a full open valve located on the discharge side of the check valve shall be installed in the pump or ejector discharge piping between the pump or ejector and the gravity drainage system. Access shall be provided to such valves. Such valves shall be located above the sump cover required by Section 712.1 or, where the discharge pipe from the ejector is below grade, the valves shall be accessibly located outside the sump below grade in an access pit with a removable access cover."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25190
+}

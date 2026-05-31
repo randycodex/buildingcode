@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164299\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164299\"><\/AnnotationDrawer><div>In addition to the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-237170', hash: '#JD_T28C001' }}\">Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184649', hash: '#JD_BCCh.33' }}\">Chapter 33<\/Link> of this code, applications for foundation and earthwork permits shall include:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164300\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Notice to adjoining owners.<\/span> Proof of notice to adjoining owners as required by Section 3304.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164301\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Liens.<\/span> Satisfactory evidence that the property is free from any lien for unpaid city taxes, assessments, water rates, bail bonds, or judgments obtained by the city, together with consent in writing of the mortgagee, if there is a mortgage upon the property, and the consent in writing of the surrogate's court or supreme court, if the owner of the property is a minor or incompetent.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13853-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of Chapter 1 of Title 28 of the Administrative Code and Chapter 33 of this code, applications for foundation and earthwork permits shall include:\n\n 1. Notice to adjoining owners. Proof of notice to adjoining owners as required by Section 3304.3.2.\n\n 2. Liens. Satisfactory evidence that the property is free from any lien for unpaid city taxes, assessments, water rates, bail bonds, or judgments obtained by the city, together with consent in writing of the mortgagee, if there is a mortgage upon the property, and the consent in writing of the surrogate's court or supreme court, if the owner of the property is a minor or incompetent."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13853
+}

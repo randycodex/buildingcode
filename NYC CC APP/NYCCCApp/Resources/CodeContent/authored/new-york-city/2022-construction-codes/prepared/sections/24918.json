@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162084\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joint surfaces shall be cleaned. An approved flux shall be applied where required. The joint shall be brazed with a filler metal conforming to AWS A5.8.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24918-html-1",
+      "kind" : "html",
+      "plainText" : "Joint surfaces shall be cleaned. An approved flux shall be applied where required. The joint shall be brazed with a filler metal conforming to AWS A5.8."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24918
+}

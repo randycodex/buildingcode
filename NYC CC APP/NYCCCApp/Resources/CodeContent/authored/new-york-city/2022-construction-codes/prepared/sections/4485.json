@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180538\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180538\"><\/AnnotationDrawer><div>Modify ACI 318 by adding Section 15.3.2 to read as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180539\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">15.3.2 &#8211; When the specified compressive strength of concrete in a column is greater than 1.4 times that specified for a floor system, the following additional requirements shall be adhered to:<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180540\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180540\"><\/AnnotationDrawer><div><div style=\"margin-left:108pt;text-indent:-36pt;\">1.&#160;&#160;&#160;All of the design provisions of Section 15.3 (unmodified) are adhered to.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180541\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180541\"><\/AnnotationDrawer><div><div style=\"margin-left:108pt;text-indent:-36pt;\">2.&#160;&#160;&#160;The concrete construction is supervised and inspected continuously by a full-time professional engineer responsible for the concrete placement special inspection. Such professional engineer shall not delegate this responsibility to any subordinates.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4485-html-1",
+      "kind" : "html",
+      "plainText" : "Modify ACI 318 by adding Section 15.3.2 to read as follows:\n\n 15.3.2 - When the specified compressive strength of concrete in a column is greater than 1.4 times that specified for a floor system, the following additional requirements shall be adhered to:\n\n 1. All of the design provisions of Section 15.3 (unmodified) are adhered to.\n\n 2. The concrete construction is supervised and inspected continuously by a full-time professional engineer responsible for the concrete placement special inspection. Such professional engineer shall not delegate this responsibility to any subordinates."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4485
+}

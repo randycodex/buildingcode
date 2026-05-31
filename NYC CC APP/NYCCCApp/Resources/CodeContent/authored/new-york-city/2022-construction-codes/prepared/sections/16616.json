@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175258\"><\/AnnotationDrawer><div>Where electronic signs are provided and have the capability to display prerecorded text messages containing information that is the same, or substantially equivalent, to information that is provided audibly, signs shall display text that is equivalent to audible announcements.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175259\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175259\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Announcements that cannot be prerecorded in advance of the event shall not be required to be displayed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16616-html-1",
+      "kind" : "html",
+      "plainText" : "Where electronic signs are provided and have the capability to display prerecorded text messages containing information that is the same, or substantially equivalent, to information that is provided audibly, signs shall display text that is equivalent to audible announcements.\n\n Exception: Announcements that cannot be prerecorded in advance of the event shall not be required to be displayed."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16616
+}

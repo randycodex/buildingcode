@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166491\"><\/AnnotationDrawer><div>A mall in compliance with the provisions of this section shall be classified as occupancy Group M.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "188-html-1",
+      "kind" : "html",
+      "plainText" : "A mall in compliance with the provisions of this section shall be classified as occupancy Group M."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 188
+}

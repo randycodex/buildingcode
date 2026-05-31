@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172362\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172362\"><\/AnnotationDrawer><div>Smoke-control system activation shall be initiated immediately after receipt of an appropriate automatic or manual activation command. Smoke control systems shall activate individual components (such as dampers and fans) in the sequence necessary to prevent physical damage to the fans, dampers, ducts and other equipment. For purposes of smoke control, the firefighter's control panel response time shall be the same for automatic or manual smoke control action initiated from any other building control point. The total response time, including that necessary for detection, shutdown of operating equipment and smoke control system startup, shall allow for full operational mode to be achieved before the conditions in the space exceed the design smoke condition. The system response time for each component and their sequential relationships shall be detailed in the required rational analysis and verification of their installed condition reported in the required final report.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15771-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke-control system activation shall be initiated immediately after receipt of an appropriate automatic or manual activation command. Smoke control systems shall activate individual components (such as dampers and fans) in the sequence necessary to prevent physical damage to the fans, dampers, ducts and other equipment. For purposes of smoke control, the firefighter's control panel response time shall be the same for automatic or manual smoke control action initiated from any other building control point. The total response time, including that necessary for detection, shutdown of operating equipment and smoke control system startup, shall allow for full operational mode to be achieved before the conditions in the space exceed the design smoke condition. The system response time for each component and their sequential relationships shall be detailed in the required rational analysis and verification of their installed condition reported in the required final report."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15771
+}

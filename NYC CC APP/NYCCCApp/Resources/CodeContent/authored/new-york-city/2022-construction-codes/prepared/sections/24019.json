@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195715\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195715\"><\/AnnotationDrawer><div>Open flames that use combustion air from the machinery room shall not be installed in a machinery room.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195716\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195716\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195717\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195717\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Where the refrigerant is carbon dioxide or water.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195718\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Fuel-burning appliances shall not be prohibited in the same machinery room with refrigerant-containing equipment or appliances where combustion air is ducted from outside the machinery room and sealed in such a manner as to prevent any refrigerant leakage from entering the combustion chamber, or where a refrigerant vapor detector is employed to automatically shut off the combustion process in the event of refrigerant leakage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24019-html-1",
+      "kind" : "html",
+      "plainText" : "Open flames that use combustion air from the machinery room shall not be installed in a machinery room.\n\n Exceptions: \n\n 1. Where the refrigerant is carbon dioxide or water.\n\n 2. Fuel-burning appliances shall not be prohibited in the same machinery room with refrigerant-containing equipment or appliances where combustion air is ducted from outside the machinery room and sealed in such a manner as to prevent any refrigerant leakage from entering the combustion chamber, or where a refrigerant vapor detector is employed to automatically shut off the combustion process in the event of refrigerant leakage."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24019
+}

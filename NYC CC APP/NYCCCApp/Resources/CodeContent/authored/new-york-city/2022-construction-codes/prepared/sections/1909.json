@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172266\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172266\"><\/AnnotationDrawer><div>The height of the lowest horizontal surface of the accumulating smoke layer shall be maintained not less than 6 feet (1828.8 mm) above any walking surface that forms a portion of a required egress system within the smoke zone.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1909-html-1",
+      "kind" : "html",
+      "plainText" : "The height of the lowest horizontal surface of the accumulating smoke layer shall be maintained not less than 6 feet (1828.8 mm) above any walking surface that forms a portion of a required egress system within the smoke zone."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1909
+}

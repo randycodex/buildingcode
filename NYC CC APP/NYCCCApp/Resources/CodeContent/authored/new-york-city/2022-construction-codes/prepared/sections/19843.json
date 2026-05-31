@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185338\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185338\"><\/AnnotationDrawer><div>Stairs shall meet the requirements of Section 3303.11.1 through 3303.11.3 during construction or demolition work.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19843-html-1",
+      "kind" : "html",
+      "plainText" : "Stairs shall meet the requirements of Section 3303.11.1 through 3303.11.3 during construction or demolition work."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19843
+}

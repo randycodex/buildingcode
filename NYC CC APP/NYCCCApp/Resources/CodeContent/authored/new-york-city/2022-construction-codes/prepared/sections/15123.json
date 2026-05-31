@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169932\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169932\"><\/AnnotationDrawer><div>Combination fire\/smoke damper actuation shall be in accordance with Sections 717.3.3.1 and 717.3.3.2. Combination fire\/smoke dampers installed in smoke control system shaft penetrations shall not be activated by local area smoke detection unless it is secondary to the smoke management system controls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15123-html-1",
+      "kind" : "html",
+      "plainText" : "Combination fire\/smoke damper actuation shall be in accordance with Sections 717.3.3.1 and 717.3.3.2. Combination fire\/smoke dampers installed in smoke control system shaft penetrations shall not be activated by local area smoke detection unless it is secondary to the smoke management system controls."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15123
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196865\"><\/AnnotationDrawer><div>The requirements for the design, installation, maintenance, alteration and inspection of mechanical systems operating with fuels other than fuel gas shall be regulated by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20704-html-1",
+      "kind" : "html",
+      "plainText" : "The requirements for the design, installation, maintenance, alteration and inspection of mechanical systems operating with fuels other than fuel gas shall be regulated by the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 20704
+}

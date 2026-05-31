@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199113\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199113\"><\/AnnotationDrawer><div>The exhaust system from internal combustion engines and turbines shall be constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195121', hash: '#JD_MC811' }}\">811<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "21391-html-1",
+      "kind" : "html",
+      "plainText" : "The exhaust system from internal combustion engines and turbines shall be constructed in accordance with Section 811 of the New York City Mechanical Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21391
+}

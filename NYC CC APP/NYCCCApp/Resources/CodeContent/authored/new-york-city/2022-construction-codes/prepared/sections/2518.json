@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174393\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174393\"><\/AnnotationDrawer><div>Where an egress court serving a building or portion thereof is less than 10 feet (3048 mm) in width, the egress court walls shall have not less than 1-hour fire-resistance-rated construction for a distance of 10 feet (3048 mm) above the floor of the egress court. Openings within such walls shall be protected by opening protectives having a fire protection rating of not less than 3\/4 hour.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174394\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174394\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Protection of exterior walls shall not be required where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174395\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174395\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Egress courts serving an occupant load of less than 10.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174396\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174396\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Egress courts serving Group R-3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2518-html-1",
+      "kind" : "html",
+      "plainText" : "Where an egress court serving a building or portion thereof is less than 10 feet (3048 mm) in width, the egress court walls shall have not less than 1-hour fire-resistance-rated construction for a distance of 10 feet (3048 mm) above the floor of the egress court. Openings within such walls shall be protected by opening protectives having a fire protection rating of not less than 3\/4 hour.\n\n Exception: Protection of exterior walls shall not be required where:\n\n 1. Egress courts serving an occupant load of less than 10.\n\n 2. Egress courts serving Group R-3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2518
+}

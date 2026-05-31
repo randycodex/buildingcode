@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178521\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178521\"><\/AnnotationDrawer><div>The test scope shall be as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178522\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178522\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;During erection of ductwork and prior to concealment for the purposes of leakage testing and recording of device location.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178523\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178523\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Prior to occupancy and after sufficient completion for the purposes of pressure difference testing, flow measurements and detection and control verification.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17621-html-1",
+      "kind" : "html",
+      "plainText" : "The test scope shall be as follows:\n\n 1. During erection of ductwork and prior to concealment for the purposes of leakage testing and recording of device location.\n\n 2. Prior to occupancy and after sufficient completion for the purposes of pressure difference testing, flow measurements and detection and control verification."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17621
+}

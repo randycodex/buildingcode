@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162940\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162940\"><\/AnnotationDrawer><div>All discharges into the public sewers are subject to regulation by the Department of Environmental Protection. The Department of Environmental Protection may prohibit the discharge of any corrosive liquids, including but not limited to spent acids or other harmful chemicals that may destroy or injure a drain, sewer, soil or waste pipe, or create noxious or toxic fumes or interfere with sewage treatment processes or may require that such liquids be neutralized or treated prior to discharge in accordance with Department of Environmental Protection regulations. Where treatment prior to discharge is required by the Department of Environmental Protection, liquids shall not be discharged into the plumbing system without being thoroughly neutralized or treated in compliance with the rules of the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12427-html-1",
+      "kind" : "html",
+      "plainText" : "All discharges into the public sewers are subject to regulation by the Department of Environmental Protection. The Department of Environmental Protection may prohibit the discharge of any corrosive liquids, including but not limited to spent acids or other harmful chemicals that may destroy or injure a drain, sewer, soil or waste pipe, or create noxious or toxic fumes or interfere with sewage treatment processes or may require that such liquids be neutralized or treated prior to discharge in accordance with Department of Environmental Protection regulations. Where treatment prior to discharge is required by the Department of Environmental Protection, liquids shall not be discharged into the plumbing system without being thoroughly neutralized or treated in compliance with the rules of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 12427
+}

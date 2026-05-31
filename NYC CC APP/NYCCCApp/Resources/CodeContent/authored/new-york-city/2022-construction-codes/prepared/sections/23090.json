@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192976\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192976\"><\/AnnotationDrawer><div>Appliances located in public garages, motor fueling-dispensing facilities, repair garages or other areas frequented by motor vehicles, shall be installed not less than 8 feet (2438.4 mm) above the floor. Where motor vehicles are capable of passing under an appliance, the appliance shall be installed at the clearances required by the appliance manufacturer and not less than 1 foot (304.8 mm) higher than the tallest vehicle garage door opening.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192977\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192977\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with NFPA 30A and Section 304.3 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23090-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances located in public garages, motor fueling-dispensing facilities, repair garages or other areas frequented by motor vehicles, shall be installed not less than 8 feet (2438.4 mm) above the floor. Where motor vehicles are capable of passing under an appliance, the appliance shall be installed at the clearances required by the appliance manufacturer and not less than 1 foot (304.8 mm) higher than the tallest vehicle garage door opening.\n\n Exception: The requirements of this section shall not apply where the appliances are protected from motor vehicle impact and installed in accordance with NFPA 30A and Section 304.3 of this code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23090
+}

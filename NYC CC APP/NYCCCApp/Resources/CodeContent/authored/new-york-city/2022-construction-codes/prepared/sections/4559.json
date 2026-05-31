@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180711\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180711\"><\/AnnotationDrawer><div>Aluminum used for structural purposes in buildings and structures shall comply with AA ASM 35 and AA ADM unless otherwise restricted by this code. The nominal loads shall be the minimum design loads required by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180712\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180712\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180712\"><\/AnnotationDrawer><h6><a name=\"JD_BC2003\" id=\"JD_BC2003\" title=\"BC 2003\"><\/a>Section BC 2003: Additional Requirements<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4559-html-1",
+      "kind" : "html",
+      "plainText" : "Aluminum used for structural purposes in buildings and structures shall comply with AA ASM 35 and AA ADM unless otherwise restricted by this code. The nominal loads shall be the minimum design loads required by Chapter 16 of this code.\n\n Section BC 2003: Additional Requirements"
+    }
+  ],
+  "chapterNumber" : "20",
+  "schemaVersion" : 1,
+  "sectionID" : 4559
+}

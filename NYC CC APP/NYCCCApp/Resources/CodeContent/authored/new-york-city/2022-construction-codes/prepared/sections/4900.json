@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181738\"><\/AnnotationDrawer><div>Wall sheathing on the outside of exterior walls, including gables, and the connection of the sheathing to framing shall be designed in accordance with the general provisions of this code and shall be capable of resisting wind pressures in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177562', hash: '#JD_BC1609' }}\">1609<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4900-html-1",
+      "kind" : "html",
+      "plainText" : "Wall sheathing on the outside of exterior walls, including gables, and the connection of the sheathing to framing shall be designed in accordance with the general provisions of this code and shall be capable of resisting wind pressures in accordance with Section 1609 ."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4900
+}

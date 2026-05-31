@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174771\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174771\"><\/AnnotationDrawer><div>Directional signage shall be provided in accordance with Section 1111.2 at or in close proximity to inaccessible building entrances, inaccessible public toilets and bathing facilities, and elevators not serving an accessible route, indicating the route to the nearest like accessible element where such accessible element is provided, such that an individual with disabilities will not be required to retrace the approach route from the inaccessible element.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2630-html-1",
+      "kind" : "html",
+      "plainText" : "Directional signage shall be provided in accordance with Section 1111.2 at or in close proximity to inaccessible building entrances, inaccessible public toilets and bathing facilities, and elevators not serving an accessible route, indicating the route to the nearest like accessible element where such accessible element is provided, such that an individual with disabilities will not be required to retrace the approach route from the inaccessible element."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2630
+}

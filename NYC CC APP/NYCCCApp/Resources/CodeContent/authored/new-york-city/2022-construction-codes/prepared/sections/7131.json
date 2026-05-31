@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188843\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188843\"><\/AnnotationDrawer><div>Retaining walls, sidewalks and driveways shall meet the requirements of Sections G303.6 and G303.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7131-html-1",
+      "kind" : "html",
+      "plainText" : "Retaining walls, sidewalks and driveways shall meet the requirements of Sections G303.6 and G303.7."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7131
+}

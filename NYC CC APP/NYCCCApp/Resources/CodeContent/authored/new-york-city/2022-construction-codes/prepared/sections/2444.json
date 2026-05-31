@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174148\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174148\"><\/AnnotationDrawer><div>Floor level identification signs in visual characters, raised characters and braille complying with ICC A117.1 shall be located at each floor level landing adjacent to the door on the stair side.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2444-html-1",
+      "kind" : "html",
+      "plainText" : "Floor level identification signs in visual characters, raised characters and braille complying with ICC A117.1 shall be located at each floor level landing adjacent to the door on the stair side."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2444
+}

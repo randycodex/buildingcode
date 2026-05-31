@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185842\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185842\"><\/AnnotationDrawer><div>Bracing and shoring shall be provided for all temporary loading areas and shall be designed to support the maximum load allowed in the temporary loading area. In no case shall the required shoring be designed for a construction load of less than 100 psf. Bracing and shoring shall ultimately bear upon permanent structure or earth capable of sustaining the loads transmitted. The design shall also specify the criteria for the removal of any temporary bracing or shoring.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20031-html-1",
+      "kind" : "html",
+      "plainText" : "Bracing and shoring shall be provided for all temporary loading areas and shall be designed to support the maximum load allowed in the temporary loading area. In no case shall the required shoring be designed for a construction load of less than 100 psf. Bracing and shoring shall ultimately bear upon permanent structure or earth capable of sustaining the loads transmitted. The design shall also specify the criteria for the removal of any temporary bracing or shoring."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20031
+}

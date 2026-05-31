@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164449\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164449\"><\/annotationdrawer><div>Construction documents for gas piping, heating, ventilation, refrigeration and other mechanical work to be performed shall be submitted as per <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical and Fuel Gas Codes.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "76-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents for gas piping, heating, ventilation, refrigeration and other mechanical work to be performed shall be submitted as per New York City Mechanical and Fuel Gas Codes."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 76
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195539\"><\/AnnotationDrawer><div>Open-type expansion tanks shall be located not less than 4 feet (1219.2 mm) above the highest heating element. The tank shall be adequately sized for the hot water system. An overflow with a minimum diameter of 1 inch (25.4 mm) shall be installed at the top of the tank. The overflow shall discharge to the drainage system in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195540\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195540\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195540\"><\/AnnotationDrawer><h6><a name=\"JD_MC1010\" id=\"JD_MC1010\" title=\"MC 1010\"><\/a>Section MC 1010: Gauges<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23967-html-1",
+      "kind" : "html",
+      "plainText" : "Open-type expansion tanks shall be located not less than 4 feet (1219.2 mm) above the highest heating element. The tank shall be adequately sized for the hot water system. An overflow with a minimum diameter of 1 inch (25.4 mm) shall be installed at the top of the tank. The overflow shall discharge to the drainage system in accordance with the New York City Plumbing Code. \n\n Section MC 1010: Gauges"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 23967
+}

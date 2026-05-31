@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181642\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181642\"><\/AnnotationDrawer><div>Design values for untreated lumber and wood structural panels, as specified in Section 2303.1, shall be adjusted for fire-retardant-treated wood. Adjustments to design values shall be based on an approved method of investigation that takes into consideration the effects of the anticipated temperature and humidity to which the fire-retardant-treated wood will be subjected, the type of treatment and redrying procedures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18688-html-1",
+      "kind" : "html",
+      "plainText" : "Design values for untreated lumber and wood structural panels, as specified in Section 2303.1, shall be adjusted for fire-retardant-treated wood. Adjustments to design values shall be based on an approved method of investigation that takes into consideration the effects of the anticipated temperature and humidity to which the fire-retardant-treated wood will be subjected, the type of treatment and redrying procedures."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18688
+}

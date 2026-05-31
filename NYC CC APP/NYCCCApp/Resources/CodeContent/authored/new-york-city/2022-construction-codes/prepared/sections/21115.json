@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198297\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198297\"><\/AnnotationDrawer><div>A union fitting shall be provided for appliances connected by rigid metallic pipe. Such unions shall be accessible and located within 6 feet (1828.8 mm) of the appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21115-html-1",
+      "kind" : "html",
+      "plainText" : "A union fitting shall be provided for appliances connected by rigid metallic pipe. Such unions shall be accessible and located within 6 feet (1828.8 mm) of the appliance."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21115
+}

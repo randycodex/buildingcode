@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185833\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185833\"><\/AnnotationDrawer><div>Floor joists shall be laterally braced. Types of bracing to maintain structural integrity include but are not limited to steel straps screwed to top and bottom flanges, bridging between joists, web reinforcement, cross bracing, diagonal strap bracing, wall anchorage or any other details as specified on the approved drawings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6200-html-1",
+      "kind" : "html",
+      "plainText" : "Floor joists shall be laterally braced. Types of bracing to maintain structural integrity include but are not limited to steel straps screwed to top and bottom flanges, bridging between joists, web reinforcement, cross bracing, diagonal strap bracing, wall anchorage or any other details as specified on the approved drawings."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6200
+}

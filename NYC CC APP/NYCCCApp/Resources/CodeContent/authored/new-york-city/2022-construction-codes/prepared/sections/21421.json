@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199190\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199190\"><\/AnnotationDrawer><div>Floor furnace enclosures shall be constructed of non-combustible materials with a fire-resistance rating of at least one-hour. Means shall be provided for supporting the furnace when the grille is removed. Clearances shall be provided as per NFPA 54.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199191\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199191\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199191\"><\/AnnotationDrawer><h6><a name=\"JD_FGC610\" id=\"JD_FGC610\" title=\"FGC 610\"><\/a>Section FGC 610: Duct Furnaces<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21421-html-1",
+      "kind" : "html",
+      "plainText" : "Floor furnace enclosures shall be constructed of non-combustible materials with a fire-resistance rating of at least one-hour. Means shall be provided for supporting the furnace when the grille is removed. Clearances shall be provided as per NFPA 54.\n\n Section FGC 610: Duct Furnaces"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21421
+}

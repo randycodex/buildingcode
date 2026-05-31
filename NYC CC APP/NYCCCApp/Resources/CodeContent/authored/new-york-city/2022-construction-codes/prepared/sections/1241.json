@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169783\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169783\"><\/AnnotationDrawer><div>Door frames with transom lights, sidelights, or both, shall be permitted where a 3\/4-hour fire protection rating or less is required in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169749', hash: '#JD_BCTable716.5' }}\">Table 716.5<\/Link>. Fire door frames with transom lights, sidelights, or both, installed with fire-resistance-rated glazing tested as an assembly in accordance with ASTM E 119 or UL 263 shall be permitted where a fire protection rating exceeding 3\/4 hour is required in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169749', hash: '#JD_BCTable716.5' }}\">Table 716.5<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1241-html-1",
+      "kind" : "html",
+      "plainText" : "Door frames with transom lights, sidelights, or both, shall be permitted where a 3\/4-hour fire protection rating or less is required in accordance with Table 716.5 . Fire door frames with transom lights, sidelights, or both, installed with fire-resistance-rated glazing tested as an assembly in accordance with ASTM E 119 or UL 263 shall be permitted where a fire protection rating exceeding 3\/4 hour is required in accordance with Table 716.5 of this code."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1241
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174022\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174022\"><\/AnnotationDrawer><div>In Group I-2 and I-3 occupancies, floor openings between stories containing exit access stairways or ramps are required to be enclosed with a shaft enclosure constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169532', hash: '#JD_BC713' }}\">713<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174023\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> In Group I-3 occupancies, exit access stairways or ramps constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-167246', hash: '#JD_BC408' }}\">408<\/Link> are not required to be enclosed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-174024\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-174024\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-174024\"><\/AnnotationDrawer><h6><a name=\"JD_BC1020\" id=\"JD_BC1020\" title=\"BC 1020\"><\/a>Section BC 1020: Corridors<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2413-html-1",
+      "kind" : "html",
+      "plainText" : "In Group I-2 and I-3 occupancies, floor openings between stories containing exit access stairways or ramps are required to be enclosed with a shaft enclosure constructed in accordance with Section 713 .\n\n Exception: In Group I-3 occupancies, exit access stairways or ramps constructed in accordance with Section 408 are not required to be enclosed.\n\n Section BC 1020: Corridors"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2413
+}

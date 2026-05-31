@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176565\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176565\"><\/AnnotationDrawer><div>Built-up, modified bitumen, fully adhered or mechanically attached single-ply roof systems, metal panel roof systems applied to a solid or closely fitted deck and other types of membrane roof coverings shall be tested in accordance with FM 4474, UL 580 or UL 1897.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3236-html-1",
+      "kind" : "html",
+      "plainText" : "Built-up, modified bitumen, fully adhered or mechanically attached single-ply roof systems, metal panel roof systems applied to a solid or closely fitted deck and other types of membrane roof coverings shall be tested in accordance with FM 4474, UL 580 or UL 1897."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3236
+}

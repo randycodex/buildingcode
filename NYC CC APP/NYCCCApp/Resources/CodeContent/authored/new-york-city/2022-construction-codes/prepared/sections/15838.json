@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172530\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172530\"><\/AnnotationDrawer><div>Exhaust fans that are part of a mechanical smoke removal system shall be rated for operation at 221&#176;F (105&#176;C). Exhaust fan motors shall be located outside of the exhaust fan air stream.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15838-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust fans that are part of a mechanical smoke removal system shall be rated for operation at 221°F (105°C). Exhaust fan motors shall be located outside of the exhaust fan air stream."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15838
+}

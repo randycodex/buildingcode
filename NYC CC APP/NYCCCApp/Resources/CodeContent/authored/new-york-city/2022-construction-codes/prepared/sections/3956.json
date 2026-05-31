@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179031\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179031\"><\/AnnotationDrawer><div>Where hydrostatic pressure will not occur as determined by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178872', hash: '#JD_BC1803' }}\">1803<\/Link>, floors and walls for other than wood foundation systems shall be dampproofed in accordance with this section. Wood foundation systems shall be constructed in accordance with AWC TR7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3956-html-1",
+      "kind" : "html",
+      "plainText" : "Where hydrostatic pressure will not occur as determined by Section 1803 , floors and walls for other than wood foundation systems shall be dampproofed in accordance with this section. Wood foundation systems shall be constructed in accordance with AWC TR7."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3956
+}

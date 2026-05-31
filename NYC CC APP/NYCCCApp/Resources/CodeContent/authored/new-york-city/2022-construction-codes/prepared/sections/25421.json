@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163382\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Except as otherwise permitted by this code, no person shall perform site grading or land contour work, as defined in Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-128166', hash: '#JD_19-137' }}\">19-137<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Administrative Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">, that would cause storm water to flow across sidewalks or onto an adjacent property. Site grading or land contour work performed on the site of a covered development project shall comply with the rules of the Department of Environmental Protection and this code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163383\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163383\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163383\"><\/AnnotationDrawer><h6><a name=\"JD_PC1102\" id=\"JD_PC1102\" title=\"PC 1102\"><\/a>Section PC 1102: Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25421-html-1",
+      "kind" : "html",
+      "plainText" : "Except as otherwise permitted by this code, no person shall perform site grading or land contour work, as defined in Section 19-137 of the Administrative Code , that would cause storm water to flow across sidewalks or onto an adjacent property. Site grading or land contour work performed on the site of a covered development project shall comply with the rules of the Department of Environmental Protection and this code. \n\n Section PC 1102: Materials"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25421
+}

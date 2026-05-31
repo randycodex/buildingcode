@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163700\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163700\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where collected on site, water shall be collected in an approved tank constructed of durable, nonabsorbent and corrosion-resistant materials. The storage tank shall be constructed of materials compatible with any disinfection systems used to treat water upstream of the tank and with any systems used to maintain water quality in the tank. Wooden storage tanks that are not equipped with a makeup water source shall be provided with a flexible liner.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12696-html-1",
+      "kind" : "html",
+      "plainText" : "Where collected on site, water shall be collected in an approved tank constructed of durable, nonabsorbent and corrosion-resistant materials. The storage tank shall be constructed of materials compatible with any disinfection systems used to treat water upstream of the tank and with any systems used to maintain water quality in the tank. Wooden storage tanks that are not equipped with a makeup water source shall be provided with a flexible liner."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12696
+}

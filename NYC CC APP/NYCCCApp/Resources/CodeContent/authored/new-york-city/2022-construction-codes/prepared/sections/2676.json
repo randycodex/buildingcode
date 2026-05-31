@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174935\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174935\"><\/AnnotationDrawer><div>Where parking is provided for occupancies in Groups R-2 and R-3, which are required to have Accessible, Type B+NYC, or Type B units, the number of accessible parking spaces shall be in compliance with Section 1106.1 and such number of accessible parking spaces shall be dispersed in accordance with Section 1106.6. Where parking is provided within or beneath a building, accessible parking spaces shall also be provided within or beneath the building. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2676-html-1",
+      "kind" : "html",
+      "plainText" : "Where parking is provided for occupancies in Groups R-2 and R-3, which are required to have Accessible, Type B+NYC, or Type B units, the number of accessible parking spaces shall be in compliance with Section 1106.1 and such number of accessible parking spaces shall be dispersed in accordance with Section 1106.6. Where parking is provided within or beneath a building, accessible parking spaces shall also be provided within or beneath the building."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2676
+}

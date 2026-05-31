@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197623\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197623\"><\/AnnotationDrawer><div>A luminaire controlled by a switch located at the required passageway opening and a receptacle outlet shall be provided at or near the appliance location in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20887-html-1",
+      "kind" : "html",
+      "plainText" : "A luminaire controlled by a switch located at the required passageway opening and a receptacle outlet shall be provided at or near the appliance location in accordance with the New York City Electrical Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20887
+}

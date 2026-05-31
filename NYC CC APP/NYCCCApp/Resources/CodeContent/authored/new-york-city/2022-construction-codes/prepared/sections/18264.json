@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180425\"><\/AnnotationDrawer><div>The removal of forms and shores, including from slabs and beams (except where cast on the ground), and the installation of reshores shall comply with ACI 318, Section 26.11.2 and Section 3305.3 of this code<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18264-html-1",
+      "kind" : "html",
+      "plainText" : "The removal of forms and shores, including from slabs and beams (except where cast on the ground), and the installation of reshores shall comply with ACI 318, Section 26.11.2 and Section 3305.3 of this code"
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18264
+}

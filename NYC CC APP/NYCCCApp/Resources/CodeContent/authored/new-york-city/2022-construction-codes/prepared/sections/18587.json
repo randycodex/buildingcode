@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181329\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181329\"><\/AnnotationDrawer><div>Anchor rods shall be set in accordance with the approved construction documents. The protrusion of the threaded ends through the connected material shall fully engage the threads of the nuts.The entire projection of the rod beyond the connected material shall be fully threaded.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181330\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181330\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181330\"><\/AnnotationDrawer><h6><a name=\"JD_BC2205\" id=\"JD_BC2205\" title=\"BC 2205\"><\/a>Section BC 2205: Structural Steel<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18587-html-1",
+      "kind" : "html",
+      "plainText" : "Anchor rods shall be set in accordance with the approved construction documents. The protrusion of the threaded ends through the connected material shall fully engage the threads of the nuts.The entire projection of the rod beyond the connected material shall be fully threaded.\n\n Section BC 2205: Structural Steel"
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18587
+}

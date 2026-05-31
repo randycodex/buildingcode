@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194088\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194088\"><\/AnnotationDrawer><div>Penetrations of structural elements by a hazardous exhaust system shall conform to Sections 510.7.1 through 510.7.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194089\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194089\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Duct penetrations within Group H-5 occupancies as allowed by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10646-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations of structural elements by a hazardous exhaust system shall conform to Sections 510.7.1 through 510.7.4.\n\n Exception: Duct penetrations within Group H-5 occupancies as allowed by the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10646
+}

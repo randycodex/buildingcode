@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168574\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168574\"><\/AnnotationDrawer><div>Accessory occupancies shall be permitted in unlimited area buildings in accordance with the provisions of Section 508.2, otherwise the requirements of Sections 507.3 through 507.18 shall be applied, where applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "877-html-1",
+      "kind" : "html",
+      "plainText" : "Accessory occupancies shall be permitted in unlimited area buildings in accordance with the provisions of Section 508.2, otherwise the requirements of Sections 507.3 through 507.18 shall be applied, where applicable."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 877
+}

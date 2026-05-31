@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180687\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180687\"><\/AnnotationDrawer><div>For design of the connections, the transverse shear force and the axial tensile force need not be considered to act simultaneously.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18381-html-1",
+      "kind" : "html",
+      "plainText" : "For design of the connections, the transverse shear force and the axial tensile force need not be considered to act simultaneously."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18381
+}

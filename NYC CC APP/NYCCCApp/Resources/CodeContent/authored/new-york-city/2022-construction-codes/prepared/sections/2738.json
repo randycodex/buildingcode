@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175117\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175117\"><\/AnnotationDrawer><div>Rooms and spaces available to the general public or available for common use by residents and serving Accessible units, Type B+NYC units or Type B units shall be accessible. Accessible spaces shall include, but not be limited to, spaces for residents' use, such as laundry rooms, refuse disposal and storage locations, mailbox areas, recreational facilities, assembly and tenants' meeting rooms, storage rooms, management offices, parking areas, toilet and bathing rooms, kitchen, living and dining areas and any exterior spaces, including patios, terraces and balconies.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175118\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175118\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Stories and mezzanines exempted by Section 1107.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2738-html-1",
+      "kind" : "html",
+      "plainText" : "Rooms and spaces available to the general public or available for common use by residents and serving Accessible units, Type B+NYC units or Type B units shall be accessible. Accessible spaces shall include, but not be limited to, spaces for residents' use, such as laundry rooms, refuse disposal and storage locations, mailbox areas, recreational facilities, assembly and tenants' meeting rooms, storage rooms, management offices, parking areas, toilet and bathing rooms, kitchen, living and dining areas and any exterior spaces, including patios, terraces and balconies.\n\n Exception: Stories and mezzanines exempted by Section 1107.4."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2738
+}

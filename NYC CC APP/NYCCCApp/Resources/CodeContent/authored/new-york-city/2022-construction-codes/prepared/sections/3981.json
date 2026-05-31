@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179122\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179122\"><\/AnnotationDrawer><div>The top surface of footings shall be level. The bottom surface of footings shall be permitted to have a slope not exceeding one unit vertical in 10 units horizontal (10-percent slope). Footings shall be stepped where necessary to change the elevation of the top surface of the footing or where the surface of the ground slopes more than one unit vertical in 10 units horizontal (10-percent slope).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3981-html-1",
+      "kind" : "html",
+      "plainText" : "The top surface of footings shall be level. The bottom surface of footings shall be permitted to have a slope not exceeding one unit vertical in 10 units horizontal (10-percent slope). Footings shall be stepped where necessary to change the elevation of the top surface of the footing or where the surface of the ground slopes more than one unit vertical in 10 units horizontal (10-percent slope)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3981
+}

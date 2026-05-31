@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183540\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183540\"><\/AnnotationDrawer><div>Standby power shall be provided for auxiliary inflation systems in accordance with Section 3102.8.2. Emergency power shall be provided for exit signs in tents and membrane structures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5383-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power shall be provided for auxiliary inflation systems in accordance with Section 3102.8.2. Emergency power shall be provided for exit signs in tents and membrane structures."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5383
+}

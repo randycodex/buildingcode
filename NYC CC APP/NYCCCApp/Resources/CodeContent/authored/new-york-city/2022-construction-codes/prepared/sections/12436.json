@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162962\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162962\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Threads shall conform to ASME B1.20.1. Schedule 80 or heavier pipe shall be permitted to be threaded with dies specifically designed for plastic pipe, but the pressure rating of the pipe shall be reduced by 50 percent. Thread by socket molded fittings shall be permitted. Approved thread lubricant or tape shall be applied on the male threads only.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12436-html-1",
+      "kind" : "html",
+      "plainText" : "Threads shall conform to ASME B1.20.1. Schedule 80 or heavier pipe shall be permitted to be threaded with dies specifically designed for plastic pipe, but the pressure rating of the pipe shall be reduced by 50 percent. Thread by socket molded fittings shall be permitted. Approved thread lubricant or tape shall be applied on the male threads only."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 12436
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173260\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173260\"><\/AnnotationDrawer><div>Each area of rescue assistance shall be sized to accommodate one wheelchair space of 30 inches by 48 inches (762 mm by 1220 mm) for each 200 occupants or portion thereof, based on the occupant load of the area of rescue assistance and areas served by the area of rescue assistance. Such wheelchair spaces shall not reduce the means of egress minimum width or required capacity. Access to any of the required wheelchair spaces in an area of rescue assistance shall not be obstructed by more than one adjoining wheelchair space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2230-html-1",
+      "kind" : "html",
+      "plainText" : "Each area of rescue assistance shall be sized to accommodate one wheelchair space of 30 inches by 48 inches (762 mm by 1220 mm) for each 200 occupants or portion thereof, based on the occupant load of the area of rescue assistance and areas served by the area of rescue assistance. Such wheelchair spaces shall not reduce the means of egress minimum width or required capacity. Access to any of the required wheelchair spaces in an area of rescue assistance shall not be obstructed by more than one adjoining wheelchair space."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2230
+}

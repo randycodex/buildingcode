@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196107\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196107\"><\/AnnotationDrawer><div>Radiant piping utilized in slab-on-grade applications shall be provided with insulating materials installed beneath the piping having a minimum <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">R<\/span>-value of 5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24183-html-1",
+      "kind" : "html",
+      "plainText" : "Radiant piping utilized in slab-on-grade applications shall be provided with insulating materials installed beneath the piping having a minimum R -value of 5."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24183
+}

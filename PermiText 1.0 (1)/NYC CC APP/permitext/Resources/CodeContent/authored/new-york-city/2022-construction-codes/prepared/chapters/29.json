@@ -1,0 +1,21 @@
+{
+  "chapterID": 29,
+  "chapterNumber": "29",
+  "groups": [
+    {
+      "headerLine": "SECTION BC 2901",
+      "headingLine": "GENERAL",
+      "id": "SECTION BC 2901",
+      "sections": [
+        {
+          "id": 5408,
+          "kind": "title",
+          "sectionNumber": "2901.1",
+          "title": "2901.1 Scope."
+        }
+      ]
+    }
+  ],
+  "rawDraftText": "#- Chapter 29: Plumbing Systems\n\n#-- Section BC 2901: General\n\n#--- 2901.1 Scope.\n\nThe New York City Plumbing Code shall govern the construction, erection, installation, alteration, repairs, relocation, replacement, addition to, use or maintenance of plumbing equipment and systems. Toilet and bathing rooms shall be constructed in accordance with Section 1210.",
+  "schemaVersion": 1
+}

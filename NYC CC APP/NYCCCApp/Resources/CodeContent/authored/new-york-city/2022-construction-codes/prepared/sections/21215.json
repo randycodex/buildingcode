@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198551\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198551\"><\/AnnotationDrawer><div>Venting systems shall not extend into or pass through any fabricated air duct or furnace plenum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21215-html-1",
+      "kind" : "html",
+      "plainText" : "Venting systems shall not extend into or pass through any fabricated air duct or furnace plenum."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21215
+}

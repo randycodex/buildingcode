@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176378\"><\/AnnotationDrawer><div>The use of MCM in exterior wall coverings is subject to the following limitations:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176379\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;MCM is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176380\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176380\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;MCM is prohibited in exterior wall coverings at exterior balconies in accordance with Section 1406.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3171-html-1",
+      "kind" : "html",
+      "plainText" : "The use of MCM in exterior wall coverings is subject to the following limitations:\n\n 1. MCM is prohibited in exterior wall coverings in Type IV construction utilizing cross-laminated timer (CLT) or structural composite lumber (SCL) complying with Section 602.4.\n\n 2. MCM is prohibited in exterior wall coverings at exterior balconies in accordance with Section 1406.3."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3171
+}

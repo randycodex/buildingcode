@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195979\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195979\"><\/AnnotationDrawer><div>Mechanically extracted outlets shall have a height not less than three times the thickness of the branch tube wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11298-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanically extracted outlets shall have a height not less than three times the thickness of the branch tube wall."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11298
+}

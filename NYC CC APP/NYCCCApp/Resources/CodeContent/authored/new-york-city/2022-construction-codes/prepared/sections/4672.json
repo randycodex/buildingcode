@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181063\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181063\"><\/AnnotationDrawer><div>Masonry heaters may be installed only when their use is permitted by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Air Pollution Control Code.<\/span> When such use is permitted, such appliances shall be operated in compliance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Air Pollution Control Code.<\/span> Masonry heaters shall also be installed in accordance with this section and comply with one of the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181064\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181064\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Masonry heaters shall comply with the requirements of ASTM E 1602.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181065\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181065\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Masonry heaters shall be listed and labeled in accordance with UL 1482 or EN 15250 and installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4672-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry heaters may be installed only when their use is permitted by the New York City Air Pollution Control Code. When such use is permitted, such appliances shall be operated in compliance with the New York City Air Pollution Control Code. Masonry heaters shall also be installed in accordance with this section and comply with one of the following:\n\n 1. Masonry heaters shall comply with the requirements of ASTM E 1602.\n\n 2. Masonry heaters shall be listed and labeled in accordance with UL 1482 or EN 15250 and installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4672
+}

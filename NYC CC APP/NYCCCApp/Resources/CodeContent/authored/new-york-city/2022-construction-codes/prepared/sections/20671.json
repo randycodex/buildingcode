@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187919\"><\/AnnotationDrawer><div>Lift and fork trucks shall meet the requirements of Sections 3320.8.1 through 3320.8.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20671-html-1",
+      "kind" : "html",
+      "plainText" : "Lift and fork trucks shall meet the requirements of Sections 3320.8.1 through 3320.8.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20671
+}

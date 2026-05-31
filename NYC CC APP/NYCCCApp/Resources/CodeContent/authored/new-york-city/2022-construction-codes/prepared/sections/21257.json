@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198684\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198684\"><\/AnnotationDrawer><div>A gas vent extending through an exterior wall shall not terminate adjacent to the wall or below eaves or parapets, except as provided in Sections 503.2.4 and 503.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21257-html-1",
+      "kind" : "html",
+      "plainText" : "A gas vent extending through an exterior wall shall not terminate adjacent to the wall or below eaves or parapets, except as provided in Sections 503.2.4 and 503.3.3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21257
+}

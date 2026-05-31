@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180399\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180399\"><\/AnnotationDrawer><div>After concreting has started, it shall be carried on as a continuous operation until placing of a panel or section, as defined by its boundaries or predetermined joints, is completed, except as permitted or prohibited by Section 1906.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18253-html-1",
+      "kind" : "html",
+      "plainText" : "After concreting has started, it shall be carried on as a continuous operation until placing of a panel or section, as defined by its boundaries or predetermined joints, is completed, except as permitted or prohibited by Section 1906.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18253
+}

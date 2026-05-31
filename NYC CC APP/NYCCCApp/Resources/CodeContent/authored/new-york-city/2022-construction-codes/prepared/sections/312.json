@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166817\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166817\"><\/AnnotationDrawer><div>A smoke control system shall be installed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-234097', hash: '#JD_BC909' }}\">909<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166818\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166818\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> In other than Groups I-1 and I-2, and covered mall buildings containing an atrium pursuant to Section 402.7.2, smoke control is not required for atriums that connect only two stories.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "312-html-1",
+      "kind" : "html",
+      "plainText" : "A smoke control system shall be installed in accordance with Section 909 .\n\n Exception: In other than Groups I-1 and I-2, and covered mall buildings containing an atrium pursuant to Section 402.7.2, smoke control is not required for atriums that connect only two stories."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 312
+}

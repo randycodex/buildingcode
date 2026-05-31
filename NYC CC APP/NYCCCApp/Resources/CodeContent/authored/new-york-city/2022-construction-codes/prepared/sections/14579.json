@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168143\"><\/AnnotationDrawer><div>Hydrogen fuel gas rooms shall be separately ventilated, fully enclosed, and shall contain all equipment and piping for the immediate on-premises use of hydrogen in indoor fuel cells or other energy production process, and incidental indoor storage of gaseous hydrogen in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>. A hydrogen fuel gas room shall not be used to house production or dispensing of hydrogen motor fuel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14579-html-1",
+      "kind" : "html",
+      "plainText" : "Hydrogen fuel gas rooms shall be separately ventilated, fully enclosed, and shall contain all equipment and piping for the immediate on-premises use of hydrogen in indoor fuel cells or other energy production process, and incidental indoor storage of gaseous hydrogen in accordance with the New York City Fire Code . A hydrogen fuel gas room shall not be used to house production or dispensing of hydrogen motor fuel."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14579
+}

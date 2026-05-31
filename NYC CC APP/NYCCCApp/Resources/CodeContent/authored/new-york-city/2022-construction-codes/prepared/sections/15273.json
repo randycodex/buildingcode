@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170672\"><\/AnnotationDrawer><div><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170586', hash: '#JD_BCTable722.5.1(1)' }}\">Table 722.5.1(1)<\/Link> contains weight-to-heated-perimeter ratios <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">(W\/D)<\/span> for both contour and box fire-resistant profiles, for the wide flange shapes most often used as columns. For different fire-resistant protection profiles or column cross sections, the weight-to-heated-perimeter ratios <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">(W\/D)<\/span> shall be determined in accordance with the definitions given in this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15273-html-1",
+      "kind" : "html",
+      "plainText" : "Table 722.5.1(1) contains weight-to-heated-perimeter ratios (W\/D) for both contour and box fire-resistant profiles, for the wide flange shapes most often used as columns. For different fire-resistant protection profiles or column cross sections, the weight-to-heated-perimeter ratios (W\/D) shall be determined in accordance with the definitions given in this section."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15273
+}

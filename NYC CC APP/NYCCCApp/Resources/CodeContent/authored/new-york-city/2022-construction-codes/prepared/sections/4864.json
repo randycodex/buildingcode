@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181650\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181650\"><\/AnnotationDrawer><div>Interior fire-retardant-treated wood shall have moisture content of not over 28 percent when tested in accordance with ASTM D 3201 procedures at 92-percent relative humidity. Interior fire-retardant-treated wood shall be tested in accordance with Section 2303.2.5.1 or 2303.2.5.2. Interior fire-retardant-treated wood designated as Type A shall be tested in accordance with the provisions of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4864-html-1",
+      "kind" : "html",
+      "plainText" : "Interior fire-retardant-treated wood shall have moisture content of not over 28 percent when tested in accordance with ASTM D 3201 procedures at 92-percent relative humidity. Interior fire-retardant-treated wood shall be tested in accordance with Section 2303.2.5.1 or 2303.2.5.2. Interior fire-retardant-treated wood designated as Type A shall be tested in accordance with the provisions of this section."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4864
+}

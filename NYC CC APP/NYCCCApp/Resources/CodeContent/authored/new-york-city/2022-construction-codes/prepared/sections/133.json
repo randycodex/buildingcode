@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165889\"><\/AnnotationDrawer><div>Group A-1 occupancy includes assembly uses, usually with fixed seating, intended for the production and viewing of the performing arts or motion pictures including, but not limited to:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165890\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165890\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Motion picture theaters <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165891\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Symphony and concert halls <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165892\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165892\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Television and radio studios admitting an audience <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165893\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165893\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Theaters <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "133-html-1",
+      "kind" : "html",
+      "plainText" : "Group A-1 occupancy includes assembly uses, usually with fixed seating, intended for the production and viewing of the performing arts or motion pictures including, but not limited to:\n\n Motion picture theaters \n\n Symphony and concert halls \n\n Television and radio studios admitting an audience \n\n Theaters"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 133
+}

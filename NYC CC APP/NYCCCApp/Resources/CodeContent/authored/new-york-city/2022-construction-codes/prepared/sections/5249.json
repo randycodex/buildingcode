@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183157\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183157\"><\/AnnotationDrawer><div>In occupancies classified as Group R-2 or R-3, foam-filled exterior entrance doors to individual dwelling units that do not require a fire-resistance rating shall be permitted without a thermal barrier, provided that the doors are faced with aluminum, steel, fiberglass, wood or other approved materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5249-html-1",
+      "kind" : "html",
+      "plainText" : "In occupancies classified as Group R-2 or R-3, foam-filled exterior entrance doors to individual dwelling units that do not require a fire-resistance rating shall be permitted without a thermal barrier, provided that the doors are faced with aluminum, steel, fiberglass, wood or other approved materials."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5249
+}

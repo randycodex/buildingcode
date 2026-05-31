@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168521\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168521\"><\/AnnotationDrawer><div>The allowable area of a mixed-occupancy building with no more than one story above grade plane shall be determined in accordance with the applicable provisions of Section 508.1 based on Equation 5-1 for each applicable occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14695-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable area of a mixed-occupancy building with no more than one story above grade plane shall be determined in accordance with the applicable provisions of Section 508.1 based on Equation 5-1 for each applicable occupancy."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14695
+}

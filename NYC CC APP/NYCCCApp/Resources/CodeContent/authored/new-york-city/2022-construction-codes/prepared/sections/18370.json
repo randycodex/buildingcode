@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180661\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180661\"><\/AnnotationDrawer><div>The structural integrity requirements of ACI 318, Sections 4.10 and 8.7.4.2, shall apply. In addition, the following requirements shall be met.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18370-html-1",
+      "kind" : "html",
+      "plainText" : "The structural integrity requirements of ACI 318, Sections 4.10 and 8.7.4.2, shall apply. In addition, the following requirements shall be met."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18370
+}

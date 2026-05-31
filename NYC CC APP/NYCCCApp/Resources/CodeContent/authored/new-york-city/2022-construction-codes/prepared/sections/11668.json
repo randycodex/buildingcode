@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160672\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Except as otherwise specifically provided, plumbing systems lawfully in existence on July 1, 2008 or on the effective date of a subsequent amendment of this code shall be permitted to have their use and maintenance continued if the use, maintenance or repair is in accordance with the original design and no hazard to life, health or property is created by such plumbing system.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11668-html-1",
+      "kind" : "html",
+      "plainText" : "Except as otherwise specifically provided, plumbing systems lawfully in existence on July 1, 2008 or on the effective date of a subsequent amendment of this code shall be permitted to have their use and maintenance continued if the use, maintenance or repair is in accordance with the original design and no hazard to life, health or property is created by such plumbing system."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 11668
+}

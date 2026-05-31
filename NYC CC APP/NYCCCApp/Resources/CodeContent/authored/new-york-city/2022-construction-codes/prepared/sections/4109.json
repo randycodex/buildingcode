@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179486\"><\/AnnotationDrawer><div>The minimum amount of longitudinal reinforcement shall be 0.8 percent of the concrete section and consist of at least four bars.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4109-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum amount of longitudinal reinforcement shall be 0.8 percent of the concrete section and consist of at least four bars."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4109
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172071\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172071\"><\/AnnotationDrawer><div>Visible alarm notification appliances shall be provided in public use areas and common use areas, as defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172072\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172072\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where employee work areas have audible alarm coverage, the notification appliance circuits serving the employee work areas shall be initially designed with not less than 20-percent spare capacity to account for the potential of adding visible notification appliances in the future to accommodate hearing impaired employee(s).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15676-html-1",
+      "kind" : "html",
+      "plainText" : "Visible alarm notification appliances shall be provided in public use areas and common use areas, as defined in Chapter 2 .\n\n Exception: Where employee work areas have audible alarm coverage, the notification appliance circuits serving the employee work areas shall be initially designed with not less than 20-percent spare capacity to account for the potential of adding visible notification appliances in the future to accommodate hearing impaired employee(s)."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15676
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162919\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Sinks, in other than dwelling units, used for the washing, rinsing or sanitizing of utensils, dishes, pots, pans or service ware used in the preparation, serving or eating of food shall discharge indirectly through an air gap or an air break.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162920\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162920\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception: <\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Hand sinks may be directly connected to the drainage system.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12418-html-1",
+      "kind" : "html",
+      "plainText" : "Sinks, in other than dwelling units, used for the washing, rinsing or sanitizing of utensils, dishes, pots, pans or service ware used in the preparation, serving or eating of food shall discharge indirectly through an air gap or an air break. \n\n Exception: Hand sinks may be directly connected to the drainage system."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 12418
+}

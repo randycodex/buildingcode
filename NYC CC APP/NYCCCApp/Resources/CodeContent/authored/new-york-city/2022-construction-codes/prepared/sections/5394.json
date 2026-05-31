@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183562\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183562\"><\/AnnotationDrawer><div>Standby power shall be provided for smokeproof enclosures as required by Section 909.20.6.2 and for pressurized elevator shafts provided in accordance with Section 3006.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5394-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power shall be provided for smokeproof enclosures as required by Section 909.20.6.2 and for pressurized elevator shafts provided in accordance with Section 3006.1."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5394
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187307\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187307\"><\/AnnotationDrawer><div>The suspension wire rope shall be covered with insulating material extending at least 4 feet (1219 mm) above the hoist. If there is a tail line below the hoist, it shall be insulated to prevent contact with the platform. The portion of the tail line that hangs free below the scaffold shall be guided or retained or both so that it does not become grounded.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6670-html-1",
+      "kind" : "html",
+      "plainText" : "The suspension wire rope shall be covered with insulating material extending at least 4 feet (1219 mm) above the hoist. If there is a tail line below the hoist, it shall be insulated to prevent contact with the platform. The portion of the tail line that hangs free below the scaffold shall be guided or retained or both so that it does not become grounded."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6670
+}

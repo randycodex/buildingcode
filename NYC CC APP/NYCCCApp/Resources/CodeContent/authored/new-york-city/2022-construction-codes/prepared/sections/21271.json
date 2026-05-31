@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198717\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198717\"><\/AnnotationDrawer><div>Single-wall metal pipe shall be used only for runs directly from the space in which the appliance is located through the roof or exterior wall to the outdoor atmosphere.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21271-html-1",
+      "kind" : "html",
+      "plainText" : "Single-wall metal pipe shall be used only for runs directly from the space in which the appliance is located through the roof or exterior wall to the outdoor atmosphere."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21271
+}

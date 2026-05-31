@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185667\"><\/AnnotationDrawer><div>The formwork shall be designed for any special conditions of construction likely to occur, such as unsymmetrical placement of concrete, impact of machine-delivered concrete, uplift and concentrated loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6129-html-1",
+      "kind" : "html",
+      "plainText" : "The formwork shall be designed for any special conditions of construction likely to occur, such as unsymmetrical placement of concrete, impact of machine-delivered concrete, uplift and concentrated loads."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6129
+}

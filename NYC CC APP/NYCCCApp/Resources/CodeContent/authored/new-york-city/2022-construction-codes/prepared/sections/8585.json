@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199164\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199164\"><\/AnnotationDrawer><div>Vented wall furnaces shall be located so that a door cannot swing within 12 inches (304.8 mm) of an air inlet or air outlet of such furnace measured at right angles to the opening. Doorstops or door closers shall not be installed to obtain this clearance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8585-html-1",
+      "kind" : "html",
+      "plainText" : "Vented wall furnaces shall be located so that a door cannot swing within 12 inches (304.8 mm) of an air inlet or air outlet of such furnace measured at right angles to the opening. Doorstops or door closers shall not be installed to obtain this clearance."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8585
+}

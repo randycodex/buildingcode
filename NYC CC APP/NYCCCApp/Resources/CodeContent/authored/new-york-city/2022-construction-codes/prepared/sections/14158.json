@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166869\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166869\"><\/AnnotationDrawer><div>Where compartmentation is required, each compartment shall have an independent smoke control system. The system shall be automatically activated and capable of manual operation in accordance with Sections 907.2.18 and 907.2.19.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14158-html-1",
+      "kind" : "html",
+      "plainText" : "Where compartmentation is required, each compartment shall have an independent smoke control system. The system shall be automatically activated and capable of manual operation in accordance with Sections 907.2.18 and 907.2.19."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14158
+}

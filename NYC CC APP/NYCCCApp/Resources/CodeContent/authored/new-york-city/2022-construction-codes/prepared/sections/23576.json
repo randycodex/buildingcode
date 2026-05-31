@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194402\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194402\"><\/AnnotationDrawer><div>Service openings shall not be concealed by duct coverings unless the exact location of the opening is properly identified.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23576-html-1",
+      "kind" : "html",
+      "plainText" : "Service openings shall not be concealed by duct coverings unless the exact location of the opening is properly identified."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23576
+}

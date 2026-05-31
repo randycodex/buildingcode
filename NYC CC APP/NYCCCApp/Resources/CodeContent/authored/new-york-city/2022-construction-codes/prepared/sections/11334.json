@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196053\"><\/AnnotationDrawer><div>Shutoff valves shall be installed on both sides of a pressure-reducing valve.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11334-html-1",
+      "kind" : "html",
+      "plainText" : "Shutoff valves shall be installed on both sides of a pressure-reducing valve."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11334
+}

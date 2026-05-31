@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173293\"><\/AnnotationDrawer><div>Signage indicating special accessibility pro-visions shall be provided as shown:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173294\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173294\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Each door providing access to an area of rescue assistance from an adjacent floor area shall be identified by a sign stating: AREA OF RESCUE ASSISTANCE.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173295\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Each door providing access to an exterior area for assisted rescue shall be identified by a sign stating: EXTERIOR AREA FOR ASSISTED RESCUE.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173296\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173296\"><\/AnnotationDrawer><div>Signage shall comply with the ICC A117.1 requirements for visual characters and include the International Symbol of Accessibility. Where exit sign illumination is required by Section 1013.3, the signs shall be illuminated. Additionally, visual character, raised character and braille signage complying with ICC A117.1 shall be located at each door to an area of rescue assistance and exterior area for assisted rescue in accordance with Section 1013.4 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2241-html-1",
+      "kind" : "html",
+      "plainText" : "Signage indicating special accessibility pro-visions shall be provided as shown:\n\n 1. Each door providing access to an area of rescue assistance from an adjacent floor area shall be identified by a sign stating: AREA OF RESCUE ASSISTANCE.\n\n 2. Each door providing access to an exterior area for assisted rescue shall be identified by a sign stating: EXTERIOR AREA FOR ASSISTED RESCUE.\n\n Signage shall comply with the ICC A117.1 requirements for visual characters and include the International Symbol of Accessibility. Where exit sign illumination is required by Section 1013.3, the signs shall be illuminated. Additionally, visual character, raised character and braille signage complying with ICC A117.1 shall be located at each door to an area of rescue assistance and exterior area for assisted rescue in accordance with Section 1013.4 of this code."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2241
+}

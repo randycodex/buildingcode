@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188244\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188244\"><\/AnnotationDrawer><div>Signage indicating special accessibility provisions shall be provided at fixed facilities and stations, signage must be provided in accordance with Sections E109.2.2 through E109.2.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188245\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188245\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188245\"><\/AnnotationDrawer><h6><a name=\"JD_BCE108\" id=\"JD_BCE108\" title=\"BC E108\"><\/a>Section BC E108: Reserved<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188246\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188246\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188246\"><\/AnnotationDrawer><h6><a name=\"JD_BCE109\" id=\"JD_BCE109\" title=\"BC E109\"><\/a>Section BC E109: Transportation Facilities and Stations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6919-html-1",
+      "kind" : "html",
+      "plainText" : "Signage indicating special accessibility provisions shall be provided at fixed facilities and stations, signage must be provided in accordance with Sections E109.2.2 through E109.2.2.3.\n\n Section BC E108: Reserved\n\n Section BC E109: Transportation Facilities and Stations"
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6919
+}

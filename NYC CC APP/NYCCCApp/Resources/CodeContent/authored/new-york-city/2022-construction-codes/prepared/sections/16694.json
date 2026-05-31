@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175466\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175466\"><\/AnnotationDrawer><div>A turning space shall be provided and comply with Section 304 (Turning Space) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16694-html-1",
+      "kind" : "html",
+      "plainText" : "A turning space shall be provided and comply with Section 304 (Turning Space) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16694
+}

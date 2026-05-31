@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188270\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188270\"><\/AnnotationDrawer><div>Where a public pay telephone is provided in a transit facility (as defined by the Department of Transportation) at least one public TTY complying with ICC A117.1, Sections 704.4 through 704.7, shall be provided in the station. In addition, where one or more public pay telephones serve a particular entrance to a transportation facility, at least one TTY telephone complying with ICC A117.1, Sections 704.4 through 704.7 shall be provided to serve that entrance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6929-html-1",
+      "kind" : "html",
+      "plainText" : "Where a public pay telephone is provided in a transit facility (as defined by the Department of Transportation) at least one public TTY complying with ICC A117.1, Sections 704.4 through 704.7, shall be provided in the station. In addition, where one or more public pay telephones serve a particular entrance to a transportation facility, at least one TTY telephone complying with ICC A117.1, Sections 704.4 through 704.7 shall be provided to serve that entrance."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6929
+}

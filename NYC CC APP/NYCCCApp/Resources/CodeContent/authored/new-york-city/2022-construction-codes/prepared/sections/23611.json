@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194498\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194498\"><\/AnnotationDrawer><div>Dampers shall be listed and bear the label of an approved testing agency indicating compliance with the standards in this section. Fire dampers shall comply with the requirements of UL 555. Only fire dampers and ceiling radiation dampers labeled for use in dynamic systems shall be installed in heating, ventilating and air-conditioning systems designed to operate with fans on during a fire. Smoke dampers shall comply with the requirements of UL 555S. Combination fire\/smoke dampers shall comply with the requirements of both UL 555 and UL 555S. Ceiling radiation dampers shall comply with the requirements of UL 555C-Ceiling Dampers. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23611-html-1",
+      "kind" : "html",
+      "plainText" : "Dampers shall be listed and bear the label of an approved testing agency indicating compliance with the standards in this section. Fire dampers shall comply with the requirements of UL 555. Only fire dampers and ceiling radiation dampers labeled for use in dynamic systems shall be installed in heating, ventilating and air-conditioning systems designed to operate with fans on during a fire. Smoke dampers shall comply with the requirements of UL 555S. Combination fire\/smoke dampers shall comply with the requirements of both UL 555 and UL 555S. Ceiling radiation dampers shall comply with the requirements of UL 555C-Ceiling Dampers."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23611
+}

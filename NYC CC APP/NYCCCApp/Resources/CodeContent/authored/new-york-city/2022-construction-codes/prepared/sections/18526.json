@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181145\"><\/AnnotationDrawer><div>Masonry chimneys and foundations shall be anchored at each floor, ceiling or roof line more than 6 feet (1829 mm) above grade with two 3\/16-inch by 1-inch (4.8 mm by 25 mm) straps embedded not less than 12 inches (305 mm) into the chimney. Straps shall be hooked around the outer bars and extend 6 inches (152 mm) beyond the bend. Each strap shall be fastened to not less than four floor joists with two 1\/2-inch (12.7 mm) bolts.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181146\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181146\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Seismic anchorage is not required for the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181147\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181147\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;In structures assigned to Seismic Design Category A or B.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181148\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181148\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Where the masonry fireplace is constructed completely within the exterior walls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18526-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry chimneys and foundations shall be anchored at each floor, ceiling or roof line more than 6 feet (1829 mm) above grade with two 3\/16-inch by 1-inch (4.8 mm by 25 mm) straps embedded not less than 12 inches (305 mm) into the chimney. Straps shall be hooked around the outer bars and extend 6 inches (152 mm) beyond the bend. Each strap shall be fastened to not less than four floor joists with two 1\/2-inch (12.7 mm) bolts.\n\n Exception: Seismic anchorage is not required for the following:\n\n 1. In structures assigned to Seismic Design Category A or B.\n\n 2. Where the masonry fireplace is constructed completely within the exterior walls."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18526
+}

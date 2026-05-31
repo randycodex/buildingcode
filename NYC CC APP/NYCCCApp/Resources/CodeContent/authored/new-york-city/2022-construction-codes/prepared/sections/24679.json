@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161491\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">In occupancies other than covered and open mall buildings, the required public and employee toilet facilities shall be located not more than one story above or below the space required to be provided with toilet facilities, and the path of travel to such facilities shall not exceed a distance of 500 feet (152 m).<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161492\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161492\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception: <\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The location and maximum distances of travel to required employee facilities in factory and industrial occupancies are permitted to exceed that required by this section, provided that the location and maximum distance of travel are approved.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24679-html-1",
+      "kind" : "html",
+      "plainText" : "In occupancies other than covered and open mall buildings, the required public and employee toilet facilities shall be located not more than one story above or below the space required to be provided with toilet facilities, and the path of travel to such facilities shall not exceed a distance of 500 feet (152 m). \n\n Exception: The location and maximum distances of travel to required employee facilities in factory and industrial occupancies are permitted to exceed that required by this section, provided that the location and maximum distance of travel are approved."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24679
+}

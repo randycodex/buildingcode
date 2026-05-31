@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194551\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194551\"><\/AnnotationDrawer><div>A listed smoke damper designed to resist the passage of smoke shall be provided at each point that a duct or air transfer opening penetrates a fire barrier that serves as a horizontal exit.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194552\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194552\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Smoke dampers shall not be required in ducts where the air continues to move and the air-handling system installed is arranged to prevent recirculation of exhaust or return air under fire emergency conditions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10801-html-1",
+      "kind" : "html",
+      "plainText" : "A listed smoke damper designed to resist the passage of smoke shall be provided at each point that a duct or air transfer opening penetrates a fire barrier that serves as a horizontal exit.\n\n Exception: Smoke dampers shall not be required in ducts where the air continues to move and the air-handling system installed is arranged to prevent recirculation of exhaust or return air under fire emergency conditions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10801
+}

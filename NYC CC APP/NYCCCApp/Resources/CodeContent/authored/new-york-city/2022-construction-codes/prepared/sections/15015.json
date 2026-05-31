@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169612\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169612\"><\/AnnotationDrawer><div>Waste or linen chutes shall discharge into an enclosed room separated by not less than 3-hour fire barriers constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169272', hash: '#JD_BC707' }}\">707<\/Link> or by horizontal assemblies constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169425', hash: '#JD_BC711' }}\">711<\/Link>, or both. Openings into the discharge room from the remainder of the building shall be protected by opening protectives having a fire protection rating equal to the protection required for the shaft enclosure. Doors shall be self- or automatic-closing upon the detection of smoke in accordance with Section 716.5.9.3. Waste chutes shall not terminate in an incinerator room. Waste and linen rooms that are not provided with chutes need only comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168725', hash: '#JD_BCTable509' }}\">Table 509<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169613\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169613\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Opening protectives shall not be required at a waste or linen chute opening to a discharge room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15015-html-1",
+      "kind" : "html",
+      "plainText" : "Waste or linen chutes shall discharge into an enclosed room separated by not less than 3-hour fire barriers constructed in accordance with Section 707 or by horizontal assemblies constructed in accordance with Section 711 , or both. Openings into the discharge room from the remainder of the building shall be protected by opening protectives having a fire protection rating equal to the protection required for the shaft enclosure. Doors shall be self- or automatic-closing upon the detection of smoke in accordance with Section 716.5.9.3. Waste chutes shall not terminate in an incinerator room. Waste and linen rooms that are not provided with chutes need only comply with Table 509 .\n\n Exception: Opening protectives shall not be required at a waste or linen chute opening to a discharge room."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15015
+}

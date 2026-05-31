@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164486\"><\/AnnotationDrawer><div>Inspections shall be performed for wood structural framing to determine compliance with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164487\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164487\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Prefabricated wood structural elements and assemblies subject to Section 1705.5.1 through 1705.5.3 shall not be subject to progress inspection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13920-html-1",
+      "kind" : "html",
+      "plainText" : "Inspections shall be performed for wood structural framing to determine compliance with the approved construction documents.\n\n Exception: Prefabricated wood structural elements and assemblies subject to Section 1705.5.1 through 1705.5.3 shall not be subject to progress inspection."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13920
+}

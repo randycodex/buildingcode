@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162351\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where a potable water connection is made to a nonpotable line, fixture, tank, vat, pump, cooling tower or other equipment subject to high-hazard backpressure, the potable water connection shall be protected by a reduced pressure principle backflow prevention assembly.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25028-html-1",
+      "kind" : "html",
+      "plainText" : "Where a potable water connection is made to a nonpotable line, fixture, tank, vat, pump, cooling tower or other equipment subject to high-hazard backpressure, the potable water connection shall be protected by a reduced pressure principle backflow prevention assembly."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25028
+}

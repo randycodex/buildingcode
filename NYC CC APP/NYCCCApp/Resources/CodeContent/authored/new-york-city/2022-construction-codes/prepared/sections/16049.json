@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173226\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173226\"><\/AnnotationDrawer><div>Where an exit stairway is open to the exterior, the accessible means of egress shall include either an area of rescue assistance in accordance with Section 1009.6 or an exterior area for assisted rescue in accordance with Section 1009.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16049-html-1",
+      "kind" : "html",
+      "plainText" : "Where an exit stairway is open to the exterior, the accessible means of egress shall include either an area of rescue assistance in accordance with Section 1009.6 or an exterior area for assisted rescue in accordance with Section 1009.7."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16049
+}

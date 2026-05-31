@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163293\"><\/AnnotationDrawer><div>Grease interceptors shall be equipped with devices to control the rate of water flow so that the water flow does not exceed the rated flow. The flow-control device shall be vented and terminate not less than 6 inches (152 mm) above the flood rim level or be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25387-html-1",
+      "kind" : "html",
+      "plainText" : "Grease interceptors shall be equipped with devices to control the rate of water flow so that the water flow does not exceed the rated flow. The flow-control device shall be vented and terminate not less than 6 inches (152 mm) above the flood rim level or be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 25387
+}

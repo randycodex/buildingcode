@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172599\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172599\"><\/AnnotationDrawer><div>On existing buildings, wherever the Fire Department connection is not visible to approaching fire apparatus, the Fire Department connection shall be indicated by an approved sign mounted on the street front or on the side of the building. Such sign shall have the letters \"FDC\" not less than 6 inches (152.4 mm) high and words in letters not less than 2 inches (50.8 mm) high or an arrow to indicate the location. Such signs shall be subject to the approval of the Fire Department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2042-html-1",
+      "kind" : "html",
+      "plainText" : "On existing buildings, wherever the Fire Department connection is not visible to approaching fire apparatus, the Fire Department connection shall be indicated by an approved sign mounted on the street front or on the side of the building. Such sign shall have the letters \"FDC\" not less than 6 inches (152.4 mm) high and words in letters not less than 2 inches (50.8 mm) high or an arrow to indicate the location. Such signs shall be subject to the approval of the Fire Department."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2042
+}

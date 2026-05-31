@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180728\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180728\"><\/AnnotationDrawer><div>Where this code makes reference to the nationally recognized standard TMS 402, such standard shall be as modified for New York City in accordance with this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18393-html-1",
+      "kind" : "html",
+      "plainText" : "Where this code makes reference to the nationally recognized standard TMS 402, such standard shall be as modified for New York City in accordance with this chapter."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18393
+}

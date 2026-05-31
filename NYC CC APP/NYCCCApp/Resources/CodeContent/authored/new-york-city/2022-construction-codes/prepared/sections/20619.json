@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187693\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187693\"><\/AnnotationDrawer><div>Personnel shall comply with Sections 3319.2.1 through 3319.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187694\"><\/AnnotationDrawer><div>(Am. L.L. 2018\/014, 12\/31\/2017, eff. 12\/31\/2017) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187695\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187695\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-128693', hash: '#JD_L.L.2018\/014' }}\">L.L. 2018\/014<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20619-html-1",
+      "kind" : "html",
+      "plainText" : "Personnel shall comply with Sections 3319.2.1 through 3319.2.3.\n\n (Am. L.L. 2018\/014, 12\/31\/2017, eff. 12\/31\/2017) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018\/014 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20619
+}

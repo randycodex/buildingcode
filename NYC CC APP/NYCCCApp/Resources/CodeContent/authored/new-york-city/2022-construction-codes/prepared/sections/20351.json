@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186852\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186852\"><\/AnnotationDrawer><div>The text of ANSI A10.3 shall be modified as indicated in Sections 3311.4.1 through 3311.4.12.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20351-html-1",
+      "kind" : "html",
+      "plainText" : "The text of ANSI A10.3 shall be modified as indicated in Sections 3311.4.1 through 3311.4.12."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20351
+}

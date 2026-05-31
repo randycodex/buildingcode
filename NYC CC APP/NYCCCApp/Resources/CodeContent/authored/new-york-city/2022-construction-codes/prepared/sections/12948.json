@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188404\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188404\"><\/AnnotationDrawer><div>Flood elevations shall be determined in accordance with Sections G103.3.1 through G103.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12948-html-1",
+      "kind" : "html",
+      "plainText" : "Flood elevations shall be determined in accordance with Sections G103.3.1 through G103.3.2."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 12948
+}

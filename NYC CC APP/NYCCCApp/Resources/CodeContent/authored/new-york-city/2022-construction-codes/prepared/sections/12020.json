@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161875\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161875\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Temperature and pressure relief valves, or combinations thereof, and energy cutoff devices shall bear the label of an approved<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">agency and shall have a temperature setting of not more than 210&#176;F (99&#176;C) and a pressure setting not exceeding the tank or water heater manufacturer's rated working pressure. The relieving capacity of each pressure relief valve and each temperature relief valve shall equal or exceed the heat input to the water heater or storage tank.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12020-html-1",
+      "kind" : "html",
+      "plainText" : "Temperature and pressure relief valves, or combinations thereof, and energy cutoff devices shall bear the label of an approved agency and shall have a temperature setting of not more than 210°F (99°C) and a pressure setting not exceeding the tank or water heater manufacturer's rated working pressure. The relieving capacity of each pressure relief valve and each temperature relief valve shall equal or exceed the heat input to the water heater or storage tank."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 12020
+}

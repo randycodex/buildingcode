@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185234\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185234\"><\/AnnotationDrawer><div>For a building that has a footprint of 100,000 square feet (30 480 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) or more, regardless of the height of the building, and the building is substantially enclosed, permanent or temporary fire hydrants available for fire department use shall be provided during the course of construction:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185235\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Within 50 feet (15 240 mm) of the main entrance; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185236\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185236\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Along the perimeter of the building, with the hydrants located so that there is at least one hydrant along every 250 feet (76 200 mm) of building perimeter, and with no hydrant more than 50 feet (15 240 mm) from the exterior wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5966-html-1",
+      "kind" : "html",
+      "plainText" : "For a building that has a footprint of 100,000 square feet (30 480 m\n\n 2 \n\n ) or more, regardless of the height of the building, and the building is substantially enclosed, permanent or temporary fire hydrants available for fire department use shall be provided during the course of construction:\n\n 1. Within 50 feet (15 240 mm) of the main entrance; and\n\n 2. Along the perimeter of the building, with the hydrants located so that there is at least one hydrant along every 250 feet (76 200 mm) of building perimeter, and with no hydrant more than 50 feet (15 240 mm) from the exterior wall."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5966
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175292\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175292\"><\/AnnotationDrawer><div>Wheelchair spaces complying with ICC A117.1 shall be provided in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175221', hash: '#JD_BCTable1108.2.2.1' }}\">Table 1108.2.2.1<\/Link> of this code. Designated aisle seats shall be provided in accordance with Section 1108.2.5 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16627-html-1",
+      "kind" : "html",
+      "plainText" : "Wheelchair spaces complying with ICC A117.1 shall be provided in accordance with Table 1108.2.2.1 of this code. Designated aisle seats shall be provided in accordance with Section 1108.2.5 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16627
+}

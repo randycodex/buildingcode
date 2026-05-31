@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197847\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197847\"><\/AnnotationDrawer><div>Carbon steel and wrought-iron pipe shall be not less than standard weight and shall comply with one of the following standards:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197848\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197848\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;ASME B36.10M<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197849\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197849\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;ASTM A 53\/A53M.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197850\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197850\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;ASTM A 106 \/ A 106M.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20944-html-1",
+      "kind" : "html",
+      "plainText" : "Carbon steel and wrought-iron pipe shall be not less than standard weight and shall comply with one of the following standards:\n\n 1. ASME B36.10M\n\n 2. ASTM A 53\/A53M.\n\n 3. ASTM A 106 \/ A 106M."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20944
+}

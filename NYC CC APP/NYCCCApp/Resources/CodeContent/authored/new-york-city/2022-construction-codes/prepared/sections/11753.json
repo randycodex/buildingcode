@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161206\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">In instances where conflicts occur between this code and the manufacturer's instructions, the more restrictive provisions shall apply.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161207\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161207\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161207\"><\/AnnotationDrawer><h6><a name=\"JD_PC302\" id=\"JD_PC302\" title=\"PC 302\"><\/a>Section PC 302: Exclusion of Materials Detrimental to the Sewer System<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11753-html-1",
+      "kind" : "html",
+      "plainText" : "In instances where conflicts occur between this code and the manufacturer's instructions, the more restrictive provisions shall apply. \n\n Section PC 302: Exclusion of Materials Detrimental to the Sewer System"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11753
+}

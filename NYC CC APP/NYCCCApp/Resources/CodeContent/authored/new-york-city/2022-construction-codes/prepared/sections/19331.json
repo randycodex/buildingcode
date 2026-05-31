@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183870\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183870\"><\/AnnotationDrawer><div>The enclosed fire service access elevator lobby shall be a not less than 120 square feet (11 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in an area with a minimum dimension of 6 feet (1828 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19331-html-1",
+      "kind" : "html",
+      "plainText" : "The enclosed fire service access elevator lobby shall be a not less than 120 square feet (11 m\n\n 2 \n\n ) in an area with a minimum dimension of 6 feet (1828 mm)."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 19331
+}

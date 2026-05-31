@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180902\"><\/AnnotationDrawer><div>Masonry structures and components shall comply with the requirements in Chapter 7 of TMS 402 depending on the structure's seismic design category as determined in Section 1613 of this code. All masonry walls, unless isolated on three edges from in-plane motion of the basic structural systems, shall be considered to be part of the seismic-force-resisting system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18438-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry structures and components shall comply with the requirements in Chapter 7 of TMS 402 depending on the structure's seismic design category as determined in Section 1613 of this code. All masonry walls, unless isolated on three edges from in-plane motion of the basic structural systems, shall be considered to be part of the seismic-force-resisting system."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18438
+}

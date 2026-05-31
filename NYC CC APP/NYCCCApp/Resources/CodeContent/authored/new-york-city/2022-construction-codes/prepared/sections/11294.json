@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195968\"><\/AnnotationDrawer><div>Joint surfaces shall be clean and free of moisture. A primer, compatible with both the piping material and the cement shall be applied to pipe-joint surfaces, in accordance with the manufacturer's requirements. Joints shall be made while the cement is wet. Solvent cement conforming to the following standards shall be applied to all joint surfaces:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195969\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195969\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;ASTM D 2235 for ABS joints.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195970\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195970\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;ASTM F 493 for CPVC joints.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195971\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195971\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;ASTM D 2564 for PVC joints.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11294-html-1",
+      "kind" : "html",
+      "plainText" : "Joint surfaces shall be clean and free of moisture. A primer, compatible with both the piping material and the cement shall be applied to pipe-joint surfaces, in accordance with the manufacturer's requirements. Joints shall be made while the cement is wet. Solvent cement conforming to the following standards shall be applied to all joint surfaces:\n\n 1. ASTM D 2235 for ABS joints.\n\n 2. ASTM F 493 for CPVC joints.\n\n 3. ASTM D 2564 for PVC joints."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11294
+}

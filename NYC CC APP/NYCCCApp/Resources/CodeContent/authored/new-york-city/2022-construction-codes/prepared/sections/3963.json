@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179045\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179045\"><\/AnnotationDrawer><div>Where it is determined that there is a potential for infiltration or seepage, a subsoil drainage system shall be permitted to be used to control this inflow, provided that:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179046\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179046\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The below ground space is waterproofed or dampproofed per Sections 1805.2 and 1805.3; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179047\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The estimated discharge from the drainage system is less than or equal to the amount allowed by the agency having jurisdiction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3963-html-1",
+      "kind" : "html",
+      "plainText" : "Where it is determined that there is a potential for infiltration or seepage, a subsoil drainage system shall be permitted to be used to control this inflow, provided that:\n\n 1. The below ground space is waterproofed or dampproofed per Sections 1805.2 and 1805.3; and\n\n 2. The estimated discharge from the drainage system is less than or equal to the amount allowed by the agency having jurisdiction."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3963
+}

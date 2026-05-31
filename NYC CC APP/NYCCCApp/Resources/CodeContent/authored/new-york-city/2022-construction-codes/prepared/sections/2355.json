@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173770\"><\/AnnotationDrawer><div>Ramps shall be built of materials consistent with the types permitted for the type of construction of the building, except that wood handrails shall be permitted for all types of construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2355-html-1",
+      "kind" : "html",
+      "plainText" : "Ramps shall be built of materials consistent with the types permitted for the type of construction of the building, except that wood handrails shall be permitted for all types of construction."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2355
+}

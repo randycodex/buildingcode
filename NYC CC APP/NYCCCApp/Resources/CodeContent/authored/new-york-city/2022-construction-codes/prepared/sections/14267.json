@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167211\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167211\"><\/AnnotationDrawer><div>Care suites containing sleeping rooms shall be not greater than 7,500 square feet (696 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167212\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167212\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Care suites containing sleeping rooms shall be permitted to be not greater than 10,000 square feet (929 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area where an automatic smoke detection system is provided throughout the care suite and installed in accordance with NFPA 72 as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-191144', hash: '#JD_BCAppQ' }}\">Appendix Q<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14267-html-1",
+      "kind" : "html",
+      "plainText" : "Care suites containing sleeping rooms shall be not greater than 7,500 square feet (696 m\n\n 2 \n\n ) in area.\n\n Exception: Care suites containing sleeping rooms shall be permitted to be not greater than 10,000 square feet (929 m\n\n 2 \n\n ) in area where an automatic smoke detection system is provided throughout the care suite and installed in accordance with NFPA 72 as modified by Appendix Q of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14267
+}

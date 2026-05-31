@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197432\"><\/AnnotationDrawer><div>The appliance shall be hard-wired to the carbon monoxide detector in a supervisory signaling mode. If the carbon monoxide detector connection is not sensed, the appliance shall not initiate a startup sequence and shall alert the operator to the fault condition. The appliance shall be supplied with a carbon monoxide fault indicator easily visible and recognizable to the operator. The appliance shall be equipped with a manual restart control. Automatic reset is not permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20823-html-1",
+      "kind" : "html",
+      "plainText" : "The appliance shall be hard-wired to the carbon monoxide detector in a supervisory signaling mode. If the carbon monoxide detector connection is not sensed, the appliance shall not initiate a startup sequence and shall alert the operator to the fault condition. The appliance shall be supplied with a carbon monoxide fault indicator easily visible and recognizable to the operator. The appliance shall be equipped with a manual restart control. Automatic reset is not permitted."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20823
+}

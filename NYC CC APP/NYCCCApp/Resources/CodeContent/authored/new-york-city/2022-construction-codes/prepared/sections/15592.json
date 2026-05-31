@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171797\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171797\"><\/AnnotationDrawer><div>Actuation of an automatic fire-extinguishing system, automatic sprinkler system, a manual fire alarm box, a fire detector, or a smoke detector shall initiate an approved alarm signal that automatically notifies staff.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15592-html-1",
+      "kind" : "html",
+      "plainText" : "Actuation of an automatic fire-extinguishing system, automatic sprinkler system, a manual fire alarm box, a fire detector, or a smoke detector shall initiate an approved alarm signal that automatically notifies staff."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15592
+}

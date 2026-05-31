@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-231496\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-231496\"><\/AnnotationDrawer><div>The department shall promulgate rules for the use of containment netting as an alternative to a sidewalk shed for areas with no public access or for use on a building exposure adjoining the exposure where facade work is to occur. <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-231495\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-231495\"><\/AnnotationDrawer><div>(L.L. 2025\/047, 4\/17\/2025, eff. 8\/15\/2025) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186162\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186162\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-231299', hash: '#JD_L.L.2025\/047' }}\">L.L. 2025\/047<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20152-html-1",
+      "kind" : "html",
+      "plainText" : "The department shall promulgate rules for the use of containment netting as an alternative to a sidewalk shed for areas with no public access or for use on a building exposure adjoining the exposure where facade work is to occur. \n\n (L.L. 2025\/047, 4\/17\/2025, eff. 8\/15\/2025) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2025\/047 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20152
+}

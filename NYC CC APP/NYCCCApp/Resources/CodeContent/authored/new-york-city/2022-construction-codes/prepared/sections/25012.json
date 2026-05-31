@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162305\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162305\"><\/AnnotationDrawer><div>Backflow preventers shall not be located in areas subject to freezing except where they can be removed by means of unions or are protected from freezing by heat, insulation or both.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25012-html-1",
+      "kind" : "html",
+      "plainText" : "Backflow preventers shall not be located in areas subject to freezing except where they can be removed by means of unions or are protected from freezing by heat, insulation or both."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25012
+}

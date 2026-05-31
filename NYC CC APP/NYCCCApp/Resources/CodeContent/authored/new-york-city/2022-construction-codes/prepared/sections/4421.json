@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180391\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180391\"><\/AnnotationDrawer><div>Concrete shall be deposited as nearly as practicable to its final position to avoid segregation due to rehandling or flowing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4421-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete shall be deposited as nearly as practicable to its final position to avoid segregation due to rehandling or flowing."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4421
+}

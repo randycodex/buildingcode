@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166700\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166700\"><\/AnnotationDrawer><div>A secondary on-site water supply equal to the hydraulically calculated sprinkler demand, including the hose stream requirement, shall be provided for high-rise buildings in Seismic Design Category C or D as determined by this code, and in any high-rise building with occupied floors located more than 500 feet (152 m) above the lowest level of fire department vehicle access. The secondary on-site water supply shall have a duration of not less than 30 minutes as determined by the occupancy hazard classification in accordance with NFPA 13 as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-191144', hash: '#JD_BCAppQ' }}\">Appendix Q<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "268-html-1",
+      "kind" : "html",
+      "plainText" : "A secondary on-site water supply equal to the hydraulically calculated sprinkler demand, including the hose stream requirement, shall be provided for high-rise buildings in Seismic Design Category C or D as determined by this code, and in any high-rise building with occupied floors located more than 500 feet (152 m) above the lowest level of fire department vehicle access. The secondary on-site water supply shall have a duration of not less than 30 minutes as determined by the occupancy hazard classification in accordance with NFPA 13 as modified by Appendix Q of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 268
+}

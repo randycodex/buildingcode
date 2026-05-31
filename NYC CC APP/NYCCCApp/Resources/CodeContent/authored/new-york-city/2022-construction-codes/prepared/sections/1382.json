@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170323\"><\/AnnotationDrawer><div>Joints between precast concrete wall panels that are not insulated as required by this section shall be considered as openings in walls. Uninsulated joints shall be included in determining the percentage of openings permitted by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169105', hash: '#JD_BCTable705.8' }}\">Table 705.8<\/Link>. Where openings are not permitted or are required by this code to be protected, the provisions of this section shall be used to determine the amount of joint insulation required. Insulated joints shall not be considered openings for purposes of determining compliance with the allowable percentage of openings in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169105', hash: '#JD_BCTable705.8' }}\">Table 705.8<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1382-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between precast concrete wall panels that are not insulated as required by this section shall be considered as openings in walls. Uninsulated joints shall be included in determining the percentage of openings permitted by Table 705.8 . Where openings are not permitted or are required by this code to be protected, the provisions of this section shall be used to determine the amount of joint insulation required. Insulated joints shall not be considered openings for purposes of determining compliance with the allowable percentage of openings in Table 705.8 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1382
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195782\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195782\"><\/AnnotationDrawer><div>Where required by Section 1104.2, the machinery room shall meet the requirements of this section in addition to the requirements of Section 1105.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11216-html-1",
+      "kind" : "html",
+      "plainText" : "Where required by Section 1104.2, the machinery room shall meet the requirements of this section in addition to the requirements of Section 1105."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11216
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179763\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179763\"><\/AnnotationDrawer><div>The maximum allowable load shall be limited by the capacity of the weakest section incorporated in the composite pile.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18031-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum allowable load shall be limited by the capacity of the weakest section incorporated in the composite pile."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18031
+}

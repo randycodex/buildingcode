@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171953\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171953\"><\/AnnotationDrawer><div>Activation of the smoke exhaust system shall activate an audible alarm at a constantly attended location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15636-html-1",
+      "kind" : "html",
+      "plainText" : "Activation of the smoke exhaust system shall activate an audible alarm at a constantly attended location."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15636
+}

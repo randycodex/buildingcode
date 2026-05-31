@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188861\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188861\"><\/AnnotationDrawer><div>Where alterations to pre-FIRM buildings within the flood hazard area, other than substantial improvements or horizontal enlargements, include the installation of flood protective works, compliance with ASCE 24, Section 6.2.2 shall be required. Flood protective works shall be located and arranged so as to allow hose lines to be attached to the inlets of fire department connections without interference in accordance with Section 6.4.5 of NFPA 14, as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-191144', hash: '#JD_BCAppQ' }}\">Appendix Q<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188862\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188862\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188862\"><\/AnnotationDrawer><h6><a name=\"JD_BCG309\" id=\"JD_BCG309\" title=\"BC G309\"><\/a>Section BC G309: Temporary Structures and Temporary Storage<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13103-html-1",
+      "kind" : "html",
+      "plainText" : "Where alterations to pre-FIRM buildings within the flood hazard area, other than substantial improvements or horizontal enlargements, include the installation of flood protective works, compliance with ASCE 24, Section 6.2.2 shall be required. Flood protective works shall be located and arranged so as to allow hose lines to be attached to the inlets of fire department connections without interference in accordance with Section 6.4.5 of NFPA 14, as modified by Appendix Q of this code.\n\n Section BC G309: Temporary Structures and Temporary Storage"
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13103
+}

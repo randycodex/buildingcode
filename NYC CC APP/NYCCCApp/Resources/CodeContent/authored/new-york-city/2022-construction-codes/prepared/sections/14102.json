@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166712\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166712\"><\/AnnotationDrawer><div>An emergency voice\/alarm communication system shall be provided in accordance with Section 907.5.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14102-html-1",
+      "kind" : "html",
+      "plainText" : "An emergency voice\/alarm communication system shall be provided in accordance with Section 907.5.2.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14102
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193608\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193608\"><\/AnnotationDrawer><div>Effluent from indoor and outdoor process equipment containing highly toxic or toxic compressed gases which could be discharged to the atmosphere shall be processed through an exhaust scrubber or other processing system. Such systems shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23313-html-1",
+      "kind" : "html",
+      "plainText" : "Effluent from indoor and outdoor process equipment containing highly toxic or toxic compressed gases which could be discharged to the atmosphere shall be processed through an exhaust scrubber or other processing system. Such systems shall be in accordance with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23313
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195936\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195936\"><\/AnnotationDrawer><div>Materials shall be rated for the operating temperature and pressure of the hydronic system. Materials shall be suitable for the type of fluid in the hydronic system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11281-html-1",
+      "kind" : "html",
+      "plainText" : "Materials shall be rated for the operating temperature and pressure of the hydronic system. Materials shall be suitable for the type of fluid in the hydronic system."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11281
+}

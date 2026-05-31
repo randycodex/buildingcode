@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179490\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179490\"><\/AnnotationDrawer><div>Where a structure is assigned to Seismic Design Category D in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177795', hash: '#JD_BC1613' }}\">1613<\/Link>, the requirements of Seismic Design Category C shall apply, except that transverse reinforcement shall comply with requirements of Section 1812.1.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17939-html-1",
+      "kind" : "html",
+      "plainText" : "Where a structure is assigned to Seismic Design Category D in accordance with Section 1613 , the requirements of Seismic Design Category C shall apply, except that transverse reinforcement shall comply with requirements of Section 1812.1.2.5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17939
+}

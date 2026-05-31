@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198238\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198238\"><\/AnnotationDrawer><div>An outside gas service line valve or other outside shutoff device or method acceptable to the commissioner shall be provided in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-199504', hash: '#JD_FGC_AppE.2' }}\">E.2<\/Link> of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-199501', hash: '#JD_FGC_AppE' }}\">Appendix E<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21096-html-1",
+      "kind" : "html",
+      "plainText" : "An outside gas service line valve or other outside shutoff device or method acceptable to the commissioner shall be provided in accordance with Section E.2 of Appendix E ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21096
+}

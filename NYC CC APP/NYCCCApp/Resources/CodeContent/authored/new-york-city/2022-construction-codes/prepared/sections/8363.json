@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198487\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198487\"><\/AnnotationDrawer><div>Masonry chimney flues shall be provided with a cleanout opening having a minimum height of 6 inches (152.4 mm). The upper edge of the opening shall be located not less than 6 inches (152.4 mm) below the lowest chimney inlet opening. The cleanout shall be provided with a tight-fitting, noncombustible cover of a minimum size of 8 inches by 8 inches (203.2 mm by 203.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8363-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry chimney flues shall be provided with a cleanout opening having a minimum height of 6 inches (152.4 mm). The upper edge of the opening shall be located not less than 6 inches (152.4 mm) below the lowest chimney inlet opening. The cleanout shall be provided with a tight-fitting, noncombustible cover of a minimum size of 8 inches by 8 inches (203.2 mm by 203.2 mm)."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8363
+}

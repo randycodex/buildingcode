@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197984\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197984\"><\/AnnotationDrawer><div>Pipe protective coatings shall be approved for the application and shall be factory applied or field applied in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197985\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197985\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where installed in accordance with the manufacturer's instructions, field application of coatings shall be permitted for pipe, fittings and locations where the factory coating has been damaged or necessarily removed at joints.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8177-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe protective coatings shall be approved for the application and shall be factory applied or field applied in accordance with the manufacturer's instructions.\n\n Exception: Where installed in accordance with the manufacturer's instructions, field application of coatings shall be permitted for pipe, fittings and locations where the factory coating has been damaged or necessarily removed at joints."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8177
+}

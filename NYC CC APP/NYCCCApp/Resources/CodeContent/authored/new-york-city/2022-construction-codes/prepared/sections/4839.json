@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181586\"><\/AnnotationDrawer><div>Wood structural panels, when used structurally (including those used for siding, roof and wall sheathing, subflooring, diaphragms and built-up members), shall conform to the requirements for their type in DOC PS 1, DOC PS 2 or ANSI\/APA PRP 210. Each panel or member shall be identified for grade, bond classification, and Performance Category by the trademarks of an approved testing and grading agency. The Performance Category value shall be used as the \"nominal panel thickness\" or \"panel thickness\" whenever referenced in this code. Wood structural panel components shall be designed and fabricated in accordance with the applicable standards listed in Section 2306.1 and identified by the trademarks of an approved testing and inspection agency indicating conformance to the applicable standard. In addition, wood structural panels when permanently exposed in outdoor applications shall be of Exterior type, except that wood structural panel roof sheathing exposed to the outdoors on the underside is permitted to be Exposure 1 type.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4839-html-1",
+      "kind" : "html",
+      "plainText" : "Wood structural panels, when used structurally (including those used for siding, roof and wall sheathing, subflooring, diaphragms and built-up members), shall conform to the requirements for their type in DOC PS 1, DOC PS 2 or ANSI\/APA PRP 210. Each panel or member shall be identified for grade, bond classification, and Performance Category by the trademarks of an approved testing and grading agency. The Performance Category value shall be used as the \"nominal panel thickness\" or \"panel thickness\" whenever referenced in this code. Wood structural panel components shall be designed and fabricated in accordance with the applicable standards listed in Section 2306.1 and identified by the trademarks of an approved testing and inspection agency indicating conformance to the applicable standard. In addition, wood structural panels when permanently exposed in outdoor applications shall be of Exterior type, except that wood structural panel roof sheathing exposed to the outdoors on the underside is permitted to be Exposure 1 type."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4839
+}

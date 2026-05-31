@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193522\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193522\"><\/AnnotationDrawer><div>Indoor storage areas and storage buildings for hazardous materials in amounts exceeding the maximum allowable quantity per control area, as defined by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>, shall be provided with mechanical exhaust ventilation or natural ventilation where natural ventilation can be shown to be acceptable for the materials as stored.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193523\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193523\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193524\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193524\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Storage areas for flammable solids complying with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193525\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193525\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Storage areas and storage buildings for fireworks and explosives complying with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23281-html-1",
+      "kind" : "html",
+      "plainText" : "Indoor storage areas and storage buildings for hazardous materials in amounts exceeding the maximum allowable quantity per control area, as defined by the New York City Fire Code , shall be provided with mechanical exhaust ventilation or natural ventilation where natural ventilation can be shown to be acceptable for the materials as stored.\n\n Exceptions: \n\n 1. Storage areas for flammable solids complying with the New York City Fire Code. \n\n 2. Storage areas and storage buildings for fireworks and explosives complying with the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23281
+}

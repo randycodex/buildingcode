@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179641\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179641\"><\/AnnotationDrawer><div>The maximum size of coarse aggregate for concrete shall be 3\/4 inch (19.1 mm). Concrete to be compacted shall have a zero slump.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4147-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum size of coarse aggregate for concrete shall be 3\/4 inch (19.1 mm). Concrete to be compacted shall have a zero slump."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4147
+}

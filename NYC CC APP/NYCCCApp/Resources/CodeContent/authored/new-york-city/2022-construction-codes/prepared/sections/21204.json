@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198524\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198524\"><\/AnnotationDrawer><div>Except as permitted in Sections 503.2.1 through 503.2.4 and 501.8, all appliances shall be connected to venting systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21204-html-1",
+      "kind" : "html",
+      "plainText" : "Except as permitted in Sections 503.2.1 through 503.2.4 and 501.8, all appliances shall be connected to venting systems."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21204
+}

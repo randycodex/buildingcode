@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175919\"><\/AnnotationDrawer><div>Walls, partitions and floor\/ceiling assemblies separating dwelling units from each other, from adjacent occupancies, from public or service areas, from stairs or from mechanical equipment spaces, including boiler rooms, or elevator or other shafts shall have a sound transmission class (STC) for air-borne noise of not less than 50 based upon laboratory measurements made in accordance with ASTM E 90, or not less than 45 if field tested in accordance with ASTM E 336. Dwelling unit entrance doors shall be installed of assemblies having an STC of not less than 30 based upon laboratory measurements made in accordance with ASTM E 90. Penetrations or openings in construction assemblies for piping; electrical devices; recessed cabinets; bathtubs; soffits; or heating, ventilating or exhaust ducts shall be sealed, lined, insulated or otherwise treated to maintain the required ratings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3014-html-1",
+      "kind" : "html",
+      "plainText" : "Walls, partitions and floor\/ceiling assemblies separating dwelling units from each other, from adjacent occupancies, from public or service areas, from stairs or from mechanical equipment spaces, including boiler rooms, or elevator or other shafts shall have a sound transmission class (STC) for air-borne noise of not less than 50 based upon laboratory measurements made in accordance with ASTM E 90, or not less than 45 if field tested in accordance with ASTM E 336. Dwelling unit entrance doors shall be installed of assemblies having an STC of not less than 30 based upon laboratory measurements made in accordance with ASTM E 90. Penetrations or openings in construction assemblies for piping; electrical devices; recessed cabinets; bathtubs; soffits; or heating, ventilating or exhaust ducts shall be sealed, lined, insulated or otherwise treated to maintain the required ratings."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 3014
+}

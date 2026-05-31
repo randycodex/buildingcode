@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176237\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176237\"><\/AnnotationDrawer><div>Flashing shall comply with this section and the applicable requirements of Section 1405.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16945-html-1",
+      "kind" : "html",
+      "plainText" : "Flashing shall comply with this section and the applicable requirements of Section 1405.4."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 16945
+}

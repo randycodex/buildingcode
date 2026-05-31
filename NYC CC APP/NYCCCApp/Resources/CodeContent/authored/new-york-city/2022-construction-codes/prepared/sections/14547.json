@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168057\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168057\"><\/AnnotationDrawer><div>An emergency power system shall be provided in Group H-5 occupancies in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183487', hash: '#JD_BC2702' }}\">2702<\/Link>. The emergency power system shall supply power automatically to the electrical systems specified in Section 415.11.10.1 when the normal electrical supply system is interrupted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14547-html-1",
+      "kind" : "html",
+      "plainText" : "An emergency power system shall be provided in Group H-5 occupancies in accordance with Section 2702 . The emergency power system shall supply power automatically to the electrical systems specified in Section 415.11.10.1 when the normal electrical supply system is interrupted."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14547
+}

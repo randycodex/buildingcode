@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175891\"><\/AnnotationDrawer><div>Yards shall be not less than the dimensions prescribed by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Zoning Resolution<\/span> and other applicable laws, rules, and regulations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16833-html-1",
+      "kind" : "html",
+      "plainText" : "Yards shall be not less than the dimensions prescribed by the New York City Zoning Resolution and other applicable laws, rules, and regulations."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16833
+}

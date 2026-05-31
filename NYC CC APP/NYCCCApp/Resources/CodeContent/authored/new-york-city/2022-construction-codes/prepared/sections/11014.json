@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195206\"><\/AnnotationDrawer><div>A cooling tower used in conjunction with an air-conditioning appliance shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11014-html-1",
+      "kind" : "html",
+      "plainText" : "A cooling tower used in conjunction with an air-conditioning appliance shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11014
+}

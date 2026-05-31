@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196493\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196493\"><\/AnnotationDrawer><div>In systems with appliances above the lowest floor where such appliances are designed to operate utilizing fuel stored above the lowest floor, piping diameters shall not exceed 4 inches (101.6 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196494\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196494\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where an applicant demonstrates, by calculations in the construction documents, that a greater diameter is necessary to ensure the proper flow for the functioning of the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11527-html-1",
+      "kind" : "html",
+      "plainText" : "In systems with appliances above the lowest floor where such appliances are designed to operate utilizing fuel stored above the lowest floor, piping diameters shall not exceed 4 inches (101.6 mm).\n\n Exception: Where an applicant demonstrates, by calculations in the construction documents, that a greater diameter is necessary to ensure the proper flow for the functioning of the system."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11527
+}

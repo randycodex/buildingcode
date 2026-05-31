@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186808\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186808\"><\/AnnotationDrawer><div>Inspections shall be recorded by the end of the day by the site safety manager or coordinator who performed the inspection. The site safety log, or where there is more than one log, each individual log, shall be completed and signed by the site safety manager or coordinator, and if the inspection is performed by another individual, by the site safety manager or coordinator who performed the inspection.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186809\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186809\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where a part time site safety manager or coordinator is approved by the commissioner in accordance with Section 3310.11, the site safety manager or coordinator shall sign the log when he or she arrives at the site and leaves the site, and all entries in the site safety log shall be completed and signed prior to leaving the site.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6506-html-1",
+      "kind" : "html",
+      "plainText" : "Inspections shall be recorded by the end of the day by the site safety manager or coordinator who performed the inspection. The site safety log, or where there is more than one log, each individual log, shall be completed and signed by the site safety manager or coordinator, and if the inspection is performed by another individual, by the site safety manager or coordinator who performed the inspection.\n\n Exception: Where a part time site safety manager or coordinator is approved by the commissioner in accordance with Section 3310.11, the site safety manager or coordinator shall sign the log when he or she arrives at the site and leaves the site, and all entries in the site safety log shall be completed and signed prior to leaving the site."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6506
+}

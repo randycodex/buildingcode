@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164084\"><\/AnnotationDrawer><div>Estimate the supply demand of the building main and the principal branches and risers of the system by totaling the corresponding demand from the applicable part of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164109', hash: '#JD_PCTableE103.3(3)' }}\">Table E103.3(3)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24470-html-1",
+      "kind" : "html",
+      "plainText" : "Estimate the supply demand of the building main and the principal branches and risers of the system by totaling the corresponding demand from the applicable part of Table E103.3(3) ."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 24470
+}

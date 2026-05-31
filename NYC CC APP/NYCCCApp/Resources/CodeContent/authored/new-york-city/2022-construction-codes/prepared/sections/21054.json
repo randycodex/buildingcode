@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198123\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198123\"><\/AnnotationDrawer><div>Leakage checking of systems and equipment shall be in accordance with Sections 406.6.1 through 406.6.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21054-html-1",
+      "kind" : "html",
+      "plainText" : "Leakage checking of systems and equipment shall be in accordance with Sections 406.6.1 through 406.6.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21054
+}

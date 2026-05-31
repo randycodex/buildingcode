@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164282\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164282\"><\/AnnotationDrawer><div>Refer to the New York City Charter and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-237170', hash: '#JD_T28C001' }}\">Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-164283\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-164283\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-164283\"><\/AnnotationDrawer><h6><a name=\"JD_BC104\" id=\"JD_BC104\" title=\"BC 104\"><\/a>Section BC 104: Duties and Powers of Commissioner of Buildings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13846-html-1",
+      "kind" : "html",
+      "plainText" : "Refer to the New York City Charter and Chapter 1 of Title 28 of the Administrative Code .\n\n Section BC 104: Duties and Powers of Commissioner of Buildings"
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13846
+}

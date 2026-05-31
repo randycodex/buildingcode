@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187559\"><\/AnnotationDrawer><div>Hoisting equipment located on the roof or setback of a building, exterior to a building or structure, on a working deck, or in an area with an unenclosed perimeter, is subject to the following wind and weather restrictions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187560\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187560\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Cranes and derricks shall not be subject to the requirements of this section. Wind and weather restrictions for cranes and derricks shall be in accordance with the requirements of Section 3319.13 and rules promulgated by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6747-html-1",
+      "kind" : "html",
+      "plainText" : "Hoisting equipment located on the roof or setback of a building, exterior to a building or structure, on a working deck, or in an area with an unenclosed perimeter, is subject to the following wind and weather restrictions.\n\n Exception: Cranes and derricks shall not be subject to the requirements of this section. Wind and weather restrictions for cranes and derricks shall be in accordance with the requirements of Section 3319.13 and rules promulgated by the commissioner."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6747
+}

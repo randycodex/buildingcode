@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183058\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183058\"><\/AnnotationDrawer><div>The second coat is permitted to be applied as soon as the first coat has attained sufficiently rigidity to receive the second coat.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5219-html-1",
+      "kind" : "html",
+      "plainText" : "The second coat is permitted to be applied as soon as the first coat has attained sufficiently rigidity to receive the second coat."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5219
+}

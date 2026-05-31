@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179976\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179976\"><\/AnnotationDrawer><div>Where the evaluation of Section 1817.3 is unable to visually confirm the load path from the existing building, pit-pier underpinning where all horizontal loads are transferred directly to a raker or tension anchor bracing system that braces every pit-pier is permissible.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179977\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179977\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Raker bracing or tension anchors need not be installed where it is demonstrated by calculation, according to data provided by the investigation per Section 1817.3.1, that the underpinning system, analyzed independently as a retaining wall that supports the soil and water behind it, calculated both (i) with and (ii) without accounting for vertical loads from the structure above, has satisfactory bearing pressures and is stable with a 1.5 factor of safety against overturning and sliding. This exception shall not be utilized in unreinforced masonry buildings in which access to verify the lateral stability of masonry walls is not possible as per Section 1817.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18103-html-1",
+      "kind" : "html",
+      "plainText" : "Where the evaluation of Section 1817.3 is unable to visually confirm the load path from the existing building, pit-pier underpinning where all horizontal loads are transferred directly to a raker or tension anchor bracing system that braces every pit-pier is permissible.\n\n Exception: Raker bracing or tension anchors need not be installed where it is demonstrated by calculation, according to data provided by the investigation per Section 1817.3.1, that the underpinning system, analyzed independently as a retaining wall that supports the soil and water behind it, calculated both (i) with and (ii) without accounting for vertical loads from the structure above, has satisfactory bearing pressures and is stable with a 1.5 factor of safety against overturning and sliding. This exception shall not be utilized in unreinforced masonry buildings in which access to verify the lateral stability of masonry walls is not possible as per Section 1817.3.3."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18103
+}

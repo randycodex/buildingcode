@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-236562\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-236562\"><\/AnnotationDrawer><div>A covered room, as defined in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-60416', hash: '#JD_27-2030' }}\">27-2030<\/Link> of the Administrative Code, shall be provided with active or passive systems that are capable of maintaining a maximum space temperature in accordance with the requirements of ASHRAE 55 and a maximum space relative humidity in accordance with the requirements of ASHRAE 62.1. Interior spaces without air conditioning that are not intended for human occupancy shall be provided with mechanical or natural ventilation in compliance with other subsections of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-236561\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-236561\"><\/AnnotationDrawer><div>(L.L. 2026\/023, 1\/17\/2026, eff. 6\/1\/2030) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-236559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-236559\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\"><span style=\"display: none;\"><\/span>Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-236457', hash: '#JD_L.L.2026\/023' }}\">L.L. 2026\/023<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16808-html-1",
+      "kind" : "html",
+      "plainText" : "A covered room, as defined in Section 27-2030 of the Administrative Code, shall be provided with active or passive systems that are capable of maintaining a maximum space temperature in accordance with the requirements of ASHRAE 55 and a maximum space relative humidity in accordance with the requirements of ASHRAE 62.1. Interior spaces without air conditioning that are not intended for human occupancy shall be provided with mechanical or natural ventilation in compliance with other subsections of this code.\n\n (L.L. 2026\/023, 1\/17\/2026, eff. 6\/1\/2030) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2026\/023 ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16808
+}

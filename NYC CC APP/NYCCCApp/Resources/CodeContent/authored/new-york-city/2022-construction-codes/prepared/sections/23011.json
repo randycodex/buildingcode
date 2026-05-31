@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192430\"><\/AnnotationDrawer><div>Refer to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156197', hash: '#JD_28-104.12' }}\">28-104.12<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-192431\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-192431\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-192431\"><\/AnnotationDrawer><h6><a name=\"JD_MC108\" id=\"JD_MC108\" title=\"MC 108\"><\/a>Section MC 108: Inspections and Testing<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23011-html-1",
+      "kind" : "html",
+      "plainText" : "Refer to Section 28-104.12 of the Administrative Code .\n\n Section MC 108: Inspections and Testing"
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 23011
+}

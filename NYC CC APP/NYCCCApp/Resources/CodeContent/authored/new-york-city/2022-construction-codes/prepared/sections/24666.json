@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161435\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161435\"><\/AnnotationDrawer><div>Materials for specialty fixtures not otherwise covered in this code shall be of stainless steel, soapstone, chemical stoneware or plastic, or shall be lined with lead, copper-base alloy, nickel-copper alloy, corrosion-resistant steel or other material especially suited to the application for which the fixture is intended.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24666-html-1",
+      "kind" : "html",
+      "plainText" : "Materials for specialty fixtures not otherwise covered in this code shall be of stainless steel, soapstone, chemical stoneware or plastic, or shall be lined with lead, copper-base alloy, nickel-copper alloy, corrosion-resistant steel or other material especially suited to the application for which the fixture is intended."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24666
+}

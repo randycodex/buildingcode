@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195619\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195619\"><\/AnnotationDrawer><div>Refrigerants, including refrigerant blends, with different designations in ASHRAE 34 shall not be mixed in a system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195620\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195620\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Addition of a second refrigerant is allowed where permitted by the equipment or appliance manufacturer to improve oil return at low temperatures. The refrigerant and amount added shall be in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23992-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigerants, including refrigerant blends, with different designations in ASHRAE 34 shall not be mixed in a system.\n\n Exception: Addition of a second refrigerant is allowed where permitted by the equipment or appliance manufacturer to improve oil return at low temperatures. The refrigerant and amount added shall be in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 23992
+}

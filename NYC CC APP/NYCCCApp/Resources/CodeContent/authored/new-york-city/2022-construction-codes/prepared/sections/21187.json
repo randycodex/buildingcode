@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198485\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198485\"><\/AnnotationDrawer><div>The flue gas passageway shall be free of obstructions and combustible deposits and shall be cleaned if previously used for venting a solid or liquid fuel-burning appliance or fireplace. The flue liner, chimney inner wall or vent inner wall shall be continuous and shall be free of cracks, gaps, perforations or other damage or deterioration that would allow the escape of combustion products, including gases, moisture and creosote.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21187-html-1",
+      "kind" : "html",
+      "plainText" : "The flue gas passageway shall be free of obstructions and combustible deposits and shall be cleaned if previously used for venting a solid or liquid fuel-burning appliance or fireplace. The flue liner, chimney inner wall or vent inner wall shall be continuous and shall be free of cracks, gaps, perforations or other damage or deterioration that would allow the escape of combustion products, including gases, moisture and creosote."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21187
+}

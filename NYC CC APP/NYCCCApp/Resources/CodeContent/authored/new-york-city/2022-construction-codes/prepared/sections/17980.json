@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179652\"><\/AnnotationDrawer><div>Drilled, drilled displacement, or augered uncased piles shall conform to Sections 1812.3.1 through 1812.3.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17980-html-1",
+      "kind" : "html",
+      "plainText" : "Drilled, drilled displacement, or augered uncased piles shall conform to Sections 1812.3.1 through 1812.3.5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17980
+}

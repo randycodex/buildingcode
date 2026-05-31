@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160740\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160740\"><\/AnnotationDrawer><div>The applicant shall submit all of the documents specified in Sections 107.3 through 107.10 as appropriate to the nature and extent of the work proposed. Construction documents shall indicate the plumbing work to be performed, so drawn as to conform to the architectural and structural aspects of the building and to show in detail compliance with this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11698-html-1",
+      "kind" : "html",
+      "plainText" : "The applicant shall submit all of the documents specified in Sections 107.3 through 107.10 as appropriate to the nature and extent of the work proposed. Construction documents shall indicate the plumbing work to be performed, so drawn as to conform to the architectural and structural aspects of the building and to show in detail compliance with this code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 11698
+}

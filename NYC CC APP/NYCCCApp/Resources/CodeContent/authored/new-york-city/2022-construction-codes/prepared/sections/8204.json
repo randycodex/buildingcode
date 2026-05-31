@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198060\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198060\"><\/AnnotationDrawer><div>In the event repairs or additions are made after the pressure test, the affected piping shall be tested. All sections of de-energized piping shall be pressure tested in accordance with Section 406.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8204-html-1",
+      "kind" : "html",
+      "plainText" : "In the event repairs or additions are made after the pressure test, the affected piping shall be tested. All sections of de-energized piping shall be pressure tested in accordance with Section 406.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8204
+}

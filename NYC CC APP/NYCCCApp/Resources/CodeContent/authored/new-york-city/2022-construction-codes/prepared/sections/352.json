@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166935\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166935\"><\/AnnotationDrawer><div>Ramps shall have a gradient not exceeding one in seven, with non-slip surfaces. A level landing having a minimum dimension of 20 feet (6096 mm) shall be provided at the discharge point of all ramps at the street level, within the property line. Ramps used for the movement of motor vehicles need not be enclosed when serving tiers above grade. Vehicle ramps may serve as part of a means of egress in accordance with Section 1006.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "352-html-1",
+      "kind" : "html",
+      "plainText" : "Ramps shall have a gradient not exceeding one in seven, with non-slip surfaces. A level landing having a minimum dimension of 20 feet (6096 mm) shall be provided at the discharge point of all ramps at the street level, within the property line. Ramps used for the movement of motor vehicles need not be enclosed when serving tiers above grade. Vehicle ramps may serve as part of a means of egress in accordance with Section 1006.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 352
+}

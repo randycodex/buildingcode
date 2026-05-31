@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161832\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161832\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Drain valves for emptying shall be installed at the bottom of each tank-type water heater and hot water storage tank. The drain valve inlet shall be not less than 3\/4-inch (19 mm) nominal iron pipe size and the outlet shall be provided with male garden hose threads.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24825-html-1",
+      "kind" : "html",
+      "plainText" : "Drain valves for emptying shall be installed at the bottom of each tank-type water heater and hot water storage tank. The drain valve inlet shall be not less than 3\/4-inch (19 mm) nominal iron pipe size and the outlet shall be provided with male garden hose threads."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 24825
+}

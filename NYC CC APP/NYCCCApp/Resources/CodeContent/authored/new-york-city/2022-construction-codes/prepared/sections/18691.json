@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181648\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181648\"><\/AnnotationDrawer><div>Where fire-retardant-treated wood is exposed to weather, or damp or wet locations, it shall be identified as \"Exterior\" to indicate there is no increase in the listed flame spread index as defined in Section 2303.2 when subjected to ASTM D 2898.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18691-html-1",
+      "kind" : "html",
+      "plainText" : "Where fire-retardant-treated wood is exposed to weather, or damp or wet locations, it shall be identified as \"Exterior\" to indicate there is no increase in the listed flame spread index as defined in Section 2303.2 when subjected to ASTM D 2898."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18691
+}

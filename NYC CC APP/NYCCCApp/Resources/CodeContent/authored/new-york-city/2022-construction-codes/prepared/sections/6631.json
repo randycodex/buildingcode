@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187185\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187185\"><\/AnnotationDrawer><div>Vertical lifelines shall be fastened to a fixed safe point of anchorage and shall be independent of the scaffold. Horizontal lifelines shall only be utilized where the individual who designed the scaffold in accordance with Section 3314.3 has determined vertical lifelines are not feasible (for example, lower platforms of a multi-level suspended scaffold). Where utilized, horizontal lifelines shall be secured to two or more structural members of the scaffold, or they may be looped around both suspension and independent suspension lines (on scaffolds so equipped) above the hoist and brake attached to the end of the scaffold. Horizontal lifelines shall not be attached only to the suspension ropes. Vertical and horizontal lifelines shall be protected from sharp edges and abrasion.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6631-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical lifelines shall be fastened to a fixed safe point of anchorage and shall be independent of the scaffold. Horizontal lifelines shall only be utilized where the individual who designed the scaffold in accordance with Section 3314.3 has determined vertical lifelines are not feasible (for example, lower platforms of a multi-level suspended scaffold). Where utilized, horizontal lifelines shall be secured to two or more structural members of the scaffold, or they may be looped around both suspension and independent suspension lines (on scaffolds so equipped) above the hoist and brake attached to the end of the scaffold. Horizontal lifelines shall not be attached only to the suspension ropes. Vertical and horizontal lifelines shall be protected from sharp edges and abrasion."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6631
+}

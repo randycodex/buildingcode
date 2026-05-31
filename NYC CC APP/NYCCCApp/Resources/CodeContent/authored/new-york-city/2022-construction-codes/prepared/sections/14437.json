@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167729\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167729\"><\/AnnotationDrawer><div>Rooms, buildings or areas occupied for the storage of solid and liquid hazardous materials shall be provided with a means to control spillage and to contain or drain off spillage and fire protection water discharged in the storage area where required in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span> The methods of spill control shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14437-html-1",
+      "kind" : "html",
+      "plainText" : "Rooms, buildings or areas occupied for the storage of solid and liquid hazardous materials shall be provided with a means to control spillage and to contain or drain off spillage and fire protection water discharged in the storage area where required in the New York City Fire Code. The methods of spill control shall be in accordance with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14437
+}

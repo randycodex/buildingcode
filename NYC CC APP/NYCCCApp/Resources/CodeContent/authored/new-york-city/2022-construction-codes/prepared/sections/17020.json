@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176425\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;<\/span>EIFS with drainage shall have an average minimum drainage efficiency of 90 percent when tested in accordance the requirements of ASTM E 2273 and is required on framed walls of Type V construction, Residential Group R occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17020-html-1",
+      "kind" : "html",
+      "plainText" : "EIFS with drainage shall have an average minimum drainage efficiency of 90 percent when tested in accordance the requirements of ASTM E 2273 and is required on framed walls of Type V construction, Residential Group R occupancies."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 17020
+}

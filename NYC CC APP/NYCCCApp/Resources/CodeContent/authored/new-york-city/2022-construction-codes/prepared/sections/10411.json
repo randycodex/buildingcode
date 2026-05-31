@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193424\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193424\"><\/AnnotationDrawer><div>The inlet to an exhaust system shall be located in the area of heaviest concentration of contaminants.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10411-html-1",
+      "kind" : "html",
+      "plainText" : "The inlet to an exhaust system shall be located in the area of heaviest concentration of contaminants."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10411
+}

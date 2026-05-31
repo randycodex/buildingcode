@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172433\"><\/AnnotationDrawer><div>Where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, the vestibule is not required, provided each interior exit stairway or ramp is pressurized to not less than 0.10 inch of water (24.9 Pa) and not more than 0.35 inches of water (87.2 Pa) in the shaft relative to the building measured with all interior exit stairway and ramp doors closed under maximum anticipated conditions of stack effect and wind effect.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15803-html-1",
+      "kind" : "html",
+      "plainText" : "Where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, the vestibule is not required, provided each interior exit stairway or ramp is pressurized to not less than 0.10 inch of water (24.9 Pa) and not more than 0.35 inches of water (87.2 Pa) in the shaft relative to the building measured with all interior exit stairway and ramp doors closed under maximum anticipated conditions of stack effect and wind effect."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15803
+}

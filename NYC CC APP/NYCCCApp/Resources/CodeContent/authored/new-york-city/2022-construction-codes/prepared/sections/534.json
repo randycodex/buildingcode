@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167478\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167478\"><\/AnnotationDrawer><div>Special amusement buildings having an occupant load of 75 or more shall comply with the requirements for the appropriate Group A occupancy and Sections 411.1 through 411.8. Special amusement buildings having an occupant load of less than 75 shall comply with the requirements for a Group B occupancy and Sections 411.1 through 411.8.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167479\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167479\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Special amusement buildings or portions thereof that are without walls or a roof and constructed to prevent the accumulation of smoke. All decorative material shall be noncombustible or composed of flame-retardant fabric.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "534-html-1",
+      "kind" : "html",
+      "plainText" : "Special amusement buildings having an occupant load of 75 or more shall comply with the requirements for the appropriate Group A occupancy and Sections 411.1 through 411.8. Special amusement buildings having an occupant load of less than 75 shall comply with the requirements for a Group B occupancy and Sections 411.1 through 411.8.\n\n Exception: Special amusement buildings or portions thereof that are without walls or a roof and constructed to prevent the accumulation of smoke. All decorative material shall be noncombustible or composed of flame-retardant fabric."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 534
+}

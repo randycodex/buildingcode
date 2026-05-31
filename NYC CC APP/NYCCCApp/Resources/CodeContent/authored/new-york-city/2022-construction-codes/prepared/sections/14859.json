@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169186\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169186\"><\/AnnotationDrawer><div>The analysis shall demonstrate that all portions of the building that cantilever will withstand the anticipated effects of a design fire in accordance with generally accepted fire engineering principles with respect to at least all of the following building elements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169187\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The structural supports and frame of the cantilevered portion of the building;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169188\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169188\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The underside projecting assemblies of the cantilevered portion of the building; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169189\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The exterior walls and openings on all sides of the cantilevered portion of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14859-html-1",
+      "kind" : "html",
+      "plainText" : "The analysis shall demonstrate that all portions of the building that cantilever will withstand the anticipated effects of a design fire in accordance with generally accepted fire engineering principles with respect to at least all of the following building elements:\n\n 1. The structural supports and frame of the cantilevered portion of the building;\n\n 2. The underside projecting assemblies of the cantilevered portion of the building; and\n\n 3. The exterior walls and openings on all sides of the cantilevered portion of the building."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14859
+}

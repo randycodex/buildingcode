@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172948\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172948\"><\/AnnotationDrawer><div>Where occupants egress from one or more rooms, areas or spaces through others, the design occupant load shall be the combined occupant load of interconnected accessory or intervening spaces. Design of egress path capacity shall be based on the cumulative portion of occupant loads of all rooms, areas or spaces to that point along the path of egress travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15968-html-1",
+      "kind" : "html",
+      "plainText" : "Where occupants egress from one or more rooms, areas or spaces through others, the design occupant load shall be the combined occupant load of interconnected accessory or intervening spaces. Design of egress path capacity shall be based on the cumulative portion of occupant loads of all rooms, areas or spaces to that point along the path of egress travel."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 15968
+}

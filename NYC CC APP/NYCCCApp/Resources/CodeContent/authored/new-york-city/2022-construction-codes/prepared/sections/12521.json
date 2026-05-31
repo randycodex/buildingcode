@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163166\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163166\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The relief vent is permitted to be a fixture drain or fixture branch for fixtures located within the same branch interval as the circuit-vented horizontal branch. The maximum discharge to a relief vent shall be four fixture units.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12521-html-1",
+      "kind" : "html",
+      "plainText" : "The relief vent is permitted to be a fixture drain or fixture branch for fixtures located within the same branch interval as the circuit-vented horizontal branch. The maximum discharge to a relief vent shall be four fixture units."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12521
+}

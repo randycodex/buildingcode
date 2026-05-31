@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195519\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195519\"><\/AnnotationDrawer><div>Every boiler shall be equipped with blowoff \/ blowdown valve(s). The valve(s) shall be installed in the openings provided on the boiler. The minimum quantity and size of the valve(s) and associated piping shall be the quantity and size specified by the boiler manufacturer or the quantity and size of the boiler blowoff \/ blowdown valve opening. Where the maximum allowable working pressure of the boiler exceeds 15 psig (103.4 kPa), two bottom blowoff valves shall be provided consisting of either two slow-opening valves in series or one quick-opening valve and one slow-opening valve in series, with the quick-opening valve installed closest to the boiler.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11137-html-1",
+      "kind" : "html",
+      "plainText" : "Every boiler shall be equipped with blowoff \/ blowdown valve(s). The valve(s) shall be installed in the openings provided on the boiler. The minimum quantity and size of the valve(s) and associated piping shall be the quantity and size specified by the boiler manufacturer or the quantity and size of the boiler blowoff \/ blowdown valve opening. Where the maximum allowable working pressure of the boiler exceeds 15 psig (103.4 kPa), two bottom blowoff valves shall be provided consisting of either two slow-opening valves in series or one quick-opening valve and one slow-opening valve in series, with the quick-opening valve installed closest to the boiler."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11137
+}

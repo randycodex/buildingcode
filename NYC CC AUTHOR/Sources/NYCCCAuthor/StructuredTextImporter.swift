@@ -245,6 +245,7 @@ enum StructuredTextImporter {
         var groups: [StructuredTextDocument.Group] = []
         var currentHeaderLine: String?
         var currentHeaderAttributedText: NSAttributedString?
+        var currentHeaderWasInferred = false
         var currentHeadingLine: String?
         var currentHeadingAttributedText: NSAttributedString?
         var currentSections: [StructuredTextDocument.Section] = []
@@ -318,6 +319,7 @@ enum StructuredTextImporter {
 
             currentHeaderLine = nil
             currentHeaderAttributedText = nil
+            currentHeaderWasInferred = false
             currentHeadingLine = nil
             currentHeadingAttributedText = nil
             currentSections = []
@@ -342,6 +344,14 @@ enum StructuredTextImporter {
                 guard let sectionNumber = parseSectionNumber(from: customTitleLine, currentGroupHeaderLine: currentHeaderLine) else {
                     throw StructuredTextImportError.invalidTitleLine(customTitleLine)
                 }
+                if currentHeaderWasInferred,
+                   let existingHeaderLine = currentHeaderLine,
+                   inferredGroupHeader(from: sectionNumber, codeSectionName: codeSectionName) != existingHeaderLine {
+                    try finishCurrentGroup()
+                    currentHeaderLine = inferredGroupHeader(from: sectionNumber, codeSectionName: codeSectionName)
+                    currentHeaderWasInferred = true
+                    currentHeadingLine = inferredGroupHeading
+                }
 
                 currentTitleLine = customTitleLine
                 currentTitleAttributedText = attributedContent(
@@ -361,6 +371,14 @@ enum StructuredTextImporter {
                 guard let sectionNumber = parseSectionNumber(from: titleLine, currentGroupHeaderLine: currentHeaderLine) else {
                     throw StructuredTextImportError.invalidTitleLine(titleLine)
                 }
+                if currentHeaderWasInferred,
+                   let existingHeaderLine = currentHeaderLine,
+                   inferredGroupHeader(from: sectionNumber, codeSectionName: codeSectionName) != existingHeaderLine {
+                    try finishCurrentGroup()
+                    currentHeaderLine = inferredGroupHeader(from: sectionNumber, codeSectionName: codeSectionName)
+                    currentHeaderWasInferred = true
+                    currentHeadingLine = inferredGroupHeading
+                }
 
                 currentTitleLine = titleLine
                 currentTitleAttributedText = line.trimmedText.hasPrefix("#### ")
@@ -376,6 +394,7 @@ enum StructuredTextImporter {
                       let naturalGroup = parseSectionGroupDefinition(from: customGroupLine, codeSectionName: codeSectionName) {
                 try finishCurrentGroup()
                 currentHeaderLine = naturalGroup.headerLine
+                currentHeaderWasInferred = false
                 currentHeaderAttributedText = metadataAttributedText(
                     matching: naturalGroup.headerLine,
                     from: line.attributedText
@@ -388,10 +407,12 @@ enum StructuredTextImporter {
             } else if line.trimmedText.hasPrefix("## ") {
                 try finishCurrentGroup()
                 currentHeaderLine = String(line.trimmedText.dropFirst(3)).trimmingCharacters(in: .whitespacesAndNewlines)
+                currentHeaderWasInferred = false
                 currentHeaderAttributedText = line.attributedContent(afterMarkerPrefixLength: 3)
             } else if let naturalGroup = parseSectionGroupDefinition(from: line.trimmedText, codeSectionName: codeSectionName) {
                 try finishCurrentGroup()
                 currentHeaderLine = naturalGroup.headerLine
+                currentHeaderWasInferred = false
                 currentHeaderAttributedText = metadataAttributedText(
                     matching: naturalGroup.headerLine,
                     from: line.attributedText
@@ -434,6 +455,7 @@ enum StructuredTextImporter {
 
         var currentGroupHeaderLine: String?
         var currentGroupHeaderAttributedText: NSAttributedString?
+        var currentGroupHeaderWasInferred = false
         var currentGroupHeadingLine: String?
         var currentGroupHeadingAttributedText: NSAttributedString?
         var currentGroupBodyLines: [ParsedLine] = []
@@ -513,6 +535,7 @@ enum StructuredTextImporter {
 
             currentGroupHeaderLine = nil
             currentGroupHeaderAttributedText = nil
+            currentGroupHeaderWasInferred = false
             currentGroupHeadingLine = nil
             currentGroupHeadingAttributedText = nil
             currentGroupBodyLines = []
@@ -656,6 +679,7 @@ enum StructuredTextImporter {
                 }
                 try finishCurrentGroup()
                 currentGroupHeaderLine = naturalGroup.headerLine
+                currentGroupHeaderWasInferred = false
                 currentGroupHeaderAttributedText = metadataAttributedText(
                     matching: naturalGroup.headerLine,
                     from: line.attributedText
@@ -671,6 +695,7 @@ enum StructuredTextImporter {
                 }
                 try finishCurrentGroup()
                 currentGroupHeaderLine = String(line.trimmedText.dropFirst(5)).trimmingCharacters(in: .whitespacesAndNewlines)
+                currentGroupHeaderWasInferred = false
                 currentGroupHeaderAttributedText = line.attributedContent(afterMarker: "#### ")
             } else if uppercased.hasPrefix("##### ") {
                 if currentGroupHeaderLine == nil {
@@ -681,6 +706,7 @@ enum StructuredTextImporter {
                         from: currentChapterNumber ?? "",
                         codeSectionName: currentCodeSectionName
                     )
+                    currentGroupHeaderWasInferred = true
                     currentGroupHeadingLine = inferredGroupHeading
                 }
                 try finishCurrentSection()
@@ -696,11 +722,23 @@ enum StructuredTextImporter {
                 guard let sectionNumber = parseSectionNumber(from: titleLine, currentGroupHeaderLine: currentGroupHeaderLine) else {
                     throw StructuredTextImportError.invalidTitleLine(titleLine)
                 }
+                if currentGroupHeaderWasInferred,
+                   let existingGroupHeaderLine = currentGroupHeaderLine,
+                   inferredGroupHeader(from: sectionNumber, codeSectionName: currentCodeSectionName) != existingGroupHeaderLine {
+                    try finishCurrentGroup()
+                    currentGroupHeaderLine = inferredGroupHeader(
+                        from: sectionNumber,
+                        codeSectionName: currentCodeSectionName
+                    )
+                    currentGroupHeaderWasInferred = true
+                    currentGroupHeadingLine = inferredGroupHeading
+                }
                 if currentGroupHeaderLine == nil {
                     currentGroupHeaderLine = inferredGroupHeader(
                         from: sectionNumber,
                         codeSectionName: currentCodeSectionName
                     )
+                    currentGroupHeaderWasInferred = true
                     currentGroupHeadingLine = inferredGroupHeading
                 }
                 currentTitleLine = titleLine

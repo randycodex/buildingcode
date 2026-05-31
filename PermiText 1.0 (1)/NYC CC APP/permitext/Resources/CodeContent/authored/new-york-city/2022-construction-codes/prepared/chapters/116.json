@@ -1,0 +1,735 @@
+{
+  "chapterID": 116,
+  "chapterNumber": "13",
+  "groups": [
+    {
+      "headerLine": "SECTION PC 1301",
+      "headingLine": "General",
+      "id": "SECTION PC 1301",
+      "sections": [
+        {
+          "id": 12743,
+          "kind": "title",
+          "sectionNumber": "1301.1",
+          "title": "1301.1 Scope."
+        },
+        {
+          "id": 12744,
+          "kind": "title",
+          "sectionNumber": "1301.1.1",
+          "title": "1301.1.1 Uses of nonpotable water."
+        },
+        {
+          "id": 12745,
+          "kind": "title",
+          "sectionNumber": "1301.2",
+          "title": "1301.2 Water quality."
+        },
+        {
+          "id": 12746,
+          "kind": "title",
+          "sectionNumber": "1301.3",
+          "title": "1301.3 Identification required."
+        },
+        {
+          "id": 12747,
+          "kind": "title",
+          "sectionNumber": "1301.3.1",
+          "title": "1301.3.1 Spigots and hose bibs."
+        },
+        {
+          "id": 12748,
+          "kind": "title",
+          "sectionNumber": "1301.3.2",
+          "title": "1301.3.2 Signage required."
+        },
+        {
+          "id": 12749,
+          "kind": "title",
+          "sectionNumber": "1301.4",
+          "title": "1301.4 Permits."
+        },
+        {
+          "id": 12750,
+          "kind": "title",
+          "sectionNumber": "1301.5",
+          "title": "1301.5 Potable water connections."
+        },
+        {
+          "id": 12751,
+          "kind": "title",
+          "sectionNumber": "1301.6",
+          "title": "1301.6 Approved components and materials."
+        },
+        {
+          "id": 12752,
+          "kind": "title",
+          "sectionNumber": "1301.6.1",
+          "title": "1301.6.1 Above-ground piping."
+        },
+        {
+          "id": 12753,
+          "kind": "title",
+          "sectionNumber": "1301.6.2",
+          "title": "1301.6.2 Underground piping."
+        },
+        {
+          "id": 12754,
+          "kind": "title",
+          "sectionNumber": "1301.6.3",
+          "title": "1301.6.3 Conveyance piping."
+        },
+        {
+          "id": 12755,
+          "kind": "title",
+          "sectionNumber": "1301.7",
+          "title": "1301.7 Insect and vermin control."
+        },
+        {
+          "id": 12756,
+          "kind": "title",
+          "sectionNumber": "1301.8",
+          "title": "1301.8 Freeze protection."
+        },
+        {
+          "id": 12757,
+          "kind": "title",
+          "sectionNumber": "1301.9",
+          "title": "1301.9 Nonpotable water storage tanks."
+        },
+        {
+          "id": 12758,
+          "kind": "title",
+          "sectionNumber": "1301.9.1",
+          "title": "1301.9.1 Sizing."
+        },
+        {
+          "id": 12759,
+          "kind": "title",
+          "sectionNumber": "1301.9.2",
+          "title": "1301.9.2 Location."
+        },
+        {
+          "id": 12760,
+          "kind": "title",
+          "sectionNumber": "1301.9.2.1",
+          "title": "1301.9.2.1 Separate nonpotable water storage tanks from multiple sources."
+        },
+        {
+          "id": 12761,
+          "kind": "title",
+          "sectionNumber": "1301.9.3",
+          "title": "1301.9.3 Materials."
+        },
+        {
+          "id": 12762,
+          "kind": "title",
+          "sectionNumber": "1301.9.4",
+          "title": "1301.9.4 Foundation and supports."
+        },
+        {
+          "id": 12763,
+          "kind": "title",
+          "sectionNumber": "1301.9.4.1",
+          "title": "1301.9.4.1 Ballast."
+        },
+        {
+          "id": 12764,
+          "kind": "title",
+          "sectionNumber": "1301.9.4.2",
+          "title": "1301.9.4.2 Structural support."
+        },
+        {
+          "id": 12765,
+          "kind": "title",
+          "sectionNumber": "1301.9.5",
+          "title": "1301.9.5 Makeup water."
+        },
+        {
+          "id": 12766,
+          "kind": "title",
+          "sectionNumber": "1301.9.6",
+          "title": "1301.9.6 Overflow."
+        },
+        {
+          "id": 12767,
+          "kind": "title",
+          "sectionNumber": "1301.9.7",
+          "title": "1301.9.7 Access."
+        },
+        {
+          "id": 12768,
+          "kind": "title",
+          "sectionNumber": "1301.9.7.1",
+          "title": "1301.9.7.1 Tanks accessed from within buildings."
+        },
+        {
+          "id": 12769,
+          "kind": "title",
+          "sectionNumber": "1301.9.8",
+          "title": "1301.9.8 Venting."
+        },
+        {
+          "id": 12770,
+          "kind": "title",
+          "sectionNumber": "1301.9.9",
+          "title": "1301.9.9 Draining of tanks."
+        },
+        {
+          "id": 12771,
+          "kind": "title",
+          "sectionNumber": "1301.9.10",
+          "title": "1301.9.10 Marking and signage."
+        },
+        {
+          "id": 12772,
+          "kind": "title",
+          "sectionNumber": "1301.9.11",
+          "title": "1301.9.11 Storage tank tests."
+        },
+        {
+          "id": 12773,
+          "kind": "title",
+          "sectionNumber": "1301.10",
+          "title": "1301.10 System abandonment."
+        },
+        {
+          "id": 12774,
+          "kind": "title",
+          "sectionNumber": "1301.11",
+          "title": "1301.11 Trenching requirements for nonpotable water piping."
+        },
+        {
+          "id": 12775,
+          "kind": "title",
+          "sectionNumber": "1301.12",
+          "title": "1301.12 Outdoor outlet access."
+        },
+        {
+          "id": 12776,
+          "kind": "title",
+          "sectionNumber": "1302.1",
+          "title": "1302.1 General."
+        },
+        {
+          "id": 12777,
+          "kind": "title",
+          "sectionNumber": "1302.2",
+          "title": "1302.2 Sources."
+        },
+        {
+          "id": 12778,
+          "kind": "title",
+          "sectionNumber": "1302.3",
+          "title": "1302.3 Traps."
+        },
+        {
+          "id": 12779,
+          "kind": "title",
+          "sectionNumber": "1302.4",
+          "title": "1302.4 Collection pipe."
+        },
+        {
+          "id": 12780,
+          "kind": "title",
+          "sectionNumber": "1302.4.1",
+          "title": "1302.4.1 Installation."
+        },
+        {
+          "id": 12781,
+          "kind": "title",
+          "sectionNumber": "1302.4.2",
+          "title": "1302.4.2 Joints."
+        },
+        {
+          "id": 12782,
+          "kind": "title",
+          "sectionNumber": "1302.4.3",
+          "title": "1302.4.3 Size."
+        },
+        {
+          "id": 12783,
+          "kind": "title",
+          "sectionNumber": "1302.4.4",
+          "title": "1302.4.4 Labeling and marking."
+        },
+        {
+          "id": 12784,
+          "kind": "title",
+          "sectionNumber": "1302.5",
+          "title": "1302.5 Filtration."
+        },
+        {
+          "id": 12785,
+          "kind": "title",
+          "sectionNumber": "1302.5.1",
+          "title": "1302.5.1 Filtration required."
+        },
+        {
+          "id": 12786,
+          "kind": "title",
+          "sectionNumber": "1302.6",
+          "title": "1302.6 Disinfection and treatment."
+        },
+        {
+          "id": 12787,
+          "kind": "title",
+          "sectionNumber": "1302.7",
+          "title": "1302.7 Storage tanks."
+        },
+        {
+          "id": 12788,
+          "kind": "title",
+          "sectionNumber": "1302.7.1",
+          "title": "1302.7.1 Location."
+        },
+        {
+          "id": 12789,
+          "kind": "title",
+          "sectionNumber": "1302.7.2",
+          "title": "1302.7.2 Design and construction."
+        },
+        {
+          "id": 12790,
+          "kind": "title",
+          "sectionNumber": "1302.7.3",
+          "title": "1302.7.3 Inlets."
+        },
+        {
+          "id": 12791,
+          "kind": "title",
+          "sectionNumber": "1302.7.4",
+          "title": "1302.7.4 Outlets."
+        },
+        {
+          "id": 12792,
+          "kind": "title",
+          "sectionNumber": "1302.8",
+          "title": "1302.8 Valves."
+        },
+        {
+          "id": 12793,
+          "kind": "title",
+          "sectionNumber": "1302.8.1",
+          "title": "1302.8.1 Collection piping bypass valve."
+        },
+        {
+          "id": 12794,
+          "kind": "title",
+          "sectionNumber": "1302.8.2",
+          "title": "1302.8.2 Backwater valve."
+        },
+        {
+          "id": 12795,
+          "kind": "title",
+          "sectionNumber": "1302.8.3",
+          "title": "1302.8.3 Conveyance piping bypass valve."
+        },
+        {
+          "id": 12796,
+          "kind": "title",
+          "sectionNumber": "1302.9",
+          "title": "1302.9 Pumping and control system."
+        },
+        {
+          "id": 12797,
+          "kind": "title",
+          "sectionNumber": "1302.10",
+          "title": "1302.10 Water pressure-reducing valve or regulator."
+        },
+        {
+          "id": 12798,
+          "kind": "title",
+          "sectionNumber": "1302.11",
+          "title": "1302.11 Conveyance pipe."
+        },
+        {
+          "id": 12799,
+          "kind": "title",
+          "sectionNumber": "1302.11.1",
+          "title": "1302.11.1 Materials, joints and connections."
+        },
+        {
+          "id": 12800,
+          "kind": "title",
+          "sectionNumber": "1302.11.2",
+          "title": "1302.11.2 Design."
+        },
+        {
+          "id": 12801,
+          "kind": "title",
+          "sectionNumber": "1302.11.3",
+          "title": "1302.11.3 Marking."
+        },
+        {
+          "id": 12802,
+          "kind": "title",
+          "sectionNumber": "1302.12",
+          "title": "1302.12 Tests and inspections."
+        },
+        {
+          "id": 12803,
+          "kind": "title",
+          "sectionNumber": "1302.12.1",
+          "title": "1302.12.1 Collection pipe and vent test."
+        },
+        {
+          "id": 12804,
+          "kind": "title",
+          "sectionNumber": "1302.12.2",
+          "title": "1302.12.2 Storage tank test."
+        },
+        {
+          "id": 12805,
+          "kind": "title",
+          "sectionNumber": "1302.12.3",
+          "title": "1302.12.3 Water supply system test."
+        },
+        {
+          "id": 12806,
+          "kind": "title",
+          "sectionNumber": "1302.12.4",
+          "title": "1302.12.4 Inspection and testing of backflow prevention assemblies."
+        },
+        {
+          "id": 12807,
+          "kind": "title",
+          "sectionNumber": "1302.12.5",
+          "title": "1302.12.5 Inspection of vermin and insect protection."
+        },
+        {
+          "id": 12808,
+          "kind": "title",
+          "sectionNumber": "1302.12.6",
+          "title": "1302.12.6 Water quality test."
+        },
+        {
+          "id": 12809,
+          "kind": "title",
+          "sectionNumber": "1302.12.7",
+          "title": "1302.12.7 Inspection and testing of cross connection control."
+        },
+        {
+          "id": 12810,
+          "kind": "title",
+          "sectionNumber": "1302.13",
+          "title": "1302.13 Operation and maintenance manuals."
+        },
+        {
+          "id": 12811,
+          "kind": "title",
+          "sectionNumber": "1302.13.1",
+          "title": "1302.13.1 Manual."
+        },
+        {
+          "id": 12812,
+          "kind": "title",
+          "sectionNumber": "1302.13.2",
+          "title": "1302.13.2 Schematics."
+        },
+        {
+          "id": 12813,
+          "kind": "title",
+          "sectionNumber": "1302.13.3",
+          "title": "1302.13.3 Maintenance procedures."
+        },
+        {
+          "id": 12814,
+          "kind": "title",
+          "sectionNumber": "1302.13.4",
+          "title": "1302.13.4 Operations procedures."
+        },
+        {
+          "id": 12815,
+          "kind": "title",
+          "sectionNumber": "1303.1",
+          "title": "1303.1 General."
+        },
+        {
+          "id": 12816,
+          "kind": "title",
+          "sectionNumber": "1303.2",
+          "title": "1303.2 Collection surface."
+        },
+        {
+          "id": 12817,
+          "kind": "title",
+          "sectionNumber": "1303.2.1",
+          "title": "1303.2.1 Prohibited sources."
+        },
+        {
+          "id": 12818,
+          "kind": "title",
+          "sectionNumber": "1303.3",
+          "title": "1303.3 Debris excluders."
+        },
+        {
+          "id": 12819,
+          "kind": "title",
+          "sectionNumber": "1303.4",
+          "title": "1303.4 Roof washer."
+        },
+        {
+          "id": 12820,
+          "kind": "title",
+          "sectionNumber": "1303.5",
+          "title": "1303.5 Roof gutters and downspouts."
+        },
+        {
+          "id": 12821,
+          "kind": "title",
+          "sectionNumber": "1303.5.1",
+          "title": "1303.5.1 Slope."
+        },
+        {
+          "id": 12822,
+          "kind": "title",
+          "sectionNumber": "1303.5.2",
+          "title": "1303.5.2 Size."
+        },
+        {
+          "id": 12823,
+          "kind": "title",
+          "sectionNumber": "1303.5.3",
+          "title": "1303.5.3 Cleanouts."
+        },
+        {
+          "id": 12824,
+          "kind": "title",
+          "sectionNumber": "1303.6",
+          "title": "1303.6 Drainage."
+        },
+        {
+          "id": 12825,
+          "kind": "title",
+          "sectionNumber": "1303.7",
+          "title": "1303.7 Collection pipe."
+        },
+        {
+          "id": 12826,
+          "kind": "title",
+          "sectionNumber": "1303.7.1",
+          "title": "1303.7.1 Installation."
+        },
+        {
+          "id": 12827,
+          "kind": "title",
+          "sectionNumber": "1303.7.2",
+          "title": "1303.7.2 Joints."
+        },
+        {
+          "id": 12828,
+          "kind": "title",
+          "sectionNumber": "1303.7.3",
+          "title": "1303.7.3 Size."
+        },
+        {
+          "id": 12829,
+          "kind": "title",
+          "sectionNumber": "1303.7.4",
+          "title": "1303.7.4 Labeling and marking."
+        },
+        {
+          "id": 12830,
+          "kind": "title",
+          "sectionNumber": "1303.8",
+          "title": "1303.8 Filtration."
+        },
+        {
+          "id": 12831,
+          "kind": "title",
+          "sectionNumber": "1303.8.1",
+          "title": "1303.8.1 Filtration required."
+        },
+        {
+          "id": 12832,
+          "kind": "title",
+          "sectionNumber": "1303.9",
+          "title": "1303.9 Disinfection."
+        },
+        {
+          "id": 12833,
+          "kind": "title",
+          "sectionNumber": "1303.10",
+          "title": "1303.10 Storage tanks."
+        },
+        {
+          "id": 12834,
+          "kind": "title",
+          "sectionNumber": "1303.10.1",
+          "title": "1303.10.1 Location."
+        },
+        {
+          "id": 12835,
+          "kind": "title",
+          "sectionNumber": "1303.10.2.",
+          "title": "1303.10.2. Design and construction."
+        },
+        {
+          "id": 12836,
+          "kind": "title",
+          "sectionNumber": "1303.10.3",
+          "title": "1303.10.3 Inlets."
+        },
+        {
+          "id": 12837,
+          "kind": "title",
+          "sectionNumber": "1303.10.4",
+          "title": "1303.10.4 Outlets."
+        },
+        {
+          "id": 12838,
+          "kind": "title",
+          "sectionNumber": "1303.11",
+          "title": "1303.11 Valves."
+        },
+        {
+          "id": 12839,
+          "kind": "title",
+          "sectionNumber": "1303.11.1",
+          "title": "1303.11.1 Collection piping bypass valve."
+        },
+        {
+          "id": 12840,
+          "kind": "title",
+          "sectionNumber": "1303.11.2",
+          "title": "1303.11.2 Backwater valve."
+        },
+        {
+          "id": 12841,
+          "kind": "title",
+          "sectionNumber": "1303.11.3",
+          "title": "1303.11.3 Conveyance piping bypass valve."
+        },
+        {
+          "id": 12842,
+          "kind": "title",
+          "sectionNumber": "1303.12",
+          "title": "1303.12 Pumping and control system."
+        },
+        {
+          "id": 12843,
+          "kind": "title",
+          "sectionNumber": "1303.13",
+          "title": "1303.13 Water pressure-reducing valve or regulator."
+        },
+        {
+          "id": 12844,
+          "kind": "title",
+          "sectionNumber": "1303.14",
+          "title": "1303.14 Conveyance pipe."
+        },
+        {
+          "id": 12845,
+          "kind": "title",
+          "sectionNumber": "1303.14.1",
+          "title": "1303.14.1 Materials, joints and connections."
+        },
+        {
+          "id": 12846,
+          "kind": "title",
+          "sectionNumber": "1303.14.2",
+          "title": "1303.14.2 Design."
+        },
+        {
+          "id": 12847,
+          "kind": "title",
+          "sectionNumber": "1303.14.3",
+          "title": "1303.14.3 Marking."
+        },
+        {
+          "id": 12848,
+          "kind": "title",
+          "sectionNumber": "1303.15",
+          "title": "1303.15 Tests and inspections."
+        },
+        {
+          "id": 12849,
+          "kind": "title",
+          "sectionNumber": "1303.15.1",
+          "title": "1303.15.1 Reserved."
+        },
+        {
+          "id": 12850,
+          "kind": "title",
+          "sectionNumber": "1303.15.2",
+          "title": "1303.15.2 Roofwasher test."
+        },
+        {
+          "id": 12851,
+          "kind": "title",
+          "sectionNumber": "1303.15.3",
+          "title": "1303.15.3 Collection pipe and vent test."
+        },
+        {
+          "id": 12852,
+          "kind": "title",
+          "sectionNumber": "1303.15.4",
+          "title": "1303.15.4 Storage tank test."
+        },
+        {
+          "id": 12853,
+          "kind": "title",
+          "sectionNumber": "1303.15.5",
+          "title": "1303.15.5 Water supply system test."
+        },
+        {
+          "id": 12854,
+          "kind": "title",
+          "sectionNumber": "1303.15.6",
+          "title": "1303.15.6 Inspection and testing of backflow prevention assemblies."
+        },
+        {
+          "id": 12855,
+          "kind": "title",
+          "sectionNumber": "1303.15.7",
+          "title": "1303.15.7 Inspection of vermin and insect protection."
+        },
+        {
+          "id": 12856,
+          "kind": "title",
+          "sectionNumber": "1303.15.8",
+          "title": "1303.15.8 Water quality test."
+        },
+        {
+          "id": 12857,
+          "kind": "title",
+          "sectionNumber": "1303.15.9",
+          "title": "1303.15.9 Inspection and testing of cross connection control."
+        },
+        {
+          "id": 12858,
+          "kind": "title",
+          "sectionNumber": "1303.16",
+          "title": "1303.16 Operation and maintenance manuals."
+        },
+        {
+          "id": 12859,
+          "kind": "title",
+          "sectionNumber": "1303.16.1",
+          "title": "1303.16.1 Manual."
+        },
+        {
+          "id": 12860,
+          "kind": "title",
+          "sectionNumber": "1303.16.2",
+          "title": "1303.16.2 Schematics."
+        },
+        {
+          "id": 12861,
+          "kind": "title",
+          "sectionNumber": "1303.16.3",
+          "title": "1303.16.3 Maintenance procedures."
+        },
+        {
+          "id": 12862,
+          "kind": "title",
+          "sectionNumber": "1303.16.4",
+          "title": "1303.16.4 Operations procedures."
+        }
+      ]
+    }
+  ],
+  "rawDraftText": "#- Chapter 13: Nonpotable Water Systems\n\nSection PC 1301: General\n\n#--- 1301.1 Scope.\n\nThe provisions of Chapter 13 shall govern the materials, design, construction and installation of systems for the collection, storage, treatment and conveyance of nonpotable water. The use and application of nonpotable water shall comply with the New York City Construction Codes, and all applicable laws, and rules, including but not limited to those of the Department of Environmental Protection and the Department of Health and Mental Hygiene. Water from nonpotable systems shall be collected, stored, treated, conveyed and used on the same tax lot unless otherwise approved by the commissioner. The following water recycling uses are not addressed in this chapter:\n\n1. Rainwater collected utilizing a retention system through rain barrels complying with the requirements of the Department of Environmental Protection;\n\n2. Commercial car washing facilities; and\n\n3. Water closet-sink combinations. A fixture that enables wastewater from a lavatory to discharge directly into the flushing tank of a water closet may be utilized provided it complies with the New York City Construction Codes, including all accessibility requirements. The water closet and lavatory shall be located in the same room.\n\n#---- 1301.1.1 Uses of nonpotable water.\n\nNonpotable water end use applications shall be in accordance with the requirements established by the Department of Health and Mental Hygiene.\n\n#--- 1301.2 Water quality.\n\nNonpotable water for each end use application shall meet the minimum water quality and treatment standards and requirements established by the Department of Health and Mental Hygiene.\n\n#--- 1301.3 Identification required.\n\nConveyance piping shall be identified as containing nonpotable water. Piping identification shall be in accordance with Section 608.8.\n\n#---- 1301.3.1 Spigots and hose bibs.\n\nSpigots and hose bibs dispensing nonpotable water shall be secured from unauthorized use by a locking mechanism.\n\n#---- 1301.3.2 Signage required.\n\nNonpotable water outlets such as hose connections, open ended pipes and faucets shall be identified at the point of use for each outlet with signage that reads as follows: \"Nonpotable water is utilized for. CAUTION: NONPOTABLE WATER – DO NOT DRINK.\" The words shall be legibly and indelibly printed on a tag or sign constructed of corrosion-resistant waterproof material or shall be indelibly printed on the fixture. The letters of the words shall be not less than 0.5 inch (12.7 mm) in height and in colors in contrast to the background on which they are applied. In addition to the required wordage, the pictograph shown in Figure 1301.3 shall appear on the signage required by this section.\n\nFigure 1301.3 Pictograph – Do Not Drink\n\n#--- 1301.4 Permits.\n\nPermits shall be required for the construction, installation, and alteration of nonpotable water systems, and shall be required by the Department of Health and Mental Hygiene for review, commissioning and operation of nonpotable water systems.\n\nException: Work outlined in Article 105.4 of Chapter 1 of Title 28 of the Administrative Code.\n\n#--- 1301.5 Potable water connections.\n\nWhere a potable system is connected to a nonpotable water system, the potable water supply shall be protected against backflow by an air gap.\n\n#--- 1301.6 Approved components and materials.\n\nPiping, plumbing components and materials used in collection and conveyance systems shall be manufactured of material approved for the intended application and compatible with any disinfection and treatment systems used. Components and material shall comply with Sections 1301.6.1 through 1301.6.3.\n\n#---- 1301.6.1 Above-ground piping.\n\nAbove-ground drain, waste and vent piping for nonpotable water systems shall conform to one of the standards listed in Table 702.1.\n\n#---- 1301.6.2 Underground piping.\n\nUnderground building drainage and vent piping for nonpotable water systems shall conform to one of the standards listed in Table 702.2.\n\n#---- 1301.6.3 Conveyance piping.\n\nConveyance piping for nonpotable water systems shall conform to one of the standards listed in Table 1301.6 and shall be purple in color, either manufactured, painted, or covered in a purple jacket and labeled in accordance with Section 1301.3.\n\nTable 1301.6 Conveyance Pipe\n\na. Limited to residential buildings five stories or less in height.\n\n#--- 1301.7 Insect and vermin control.\n\nThe system shall be protected to prevent the entrance of insects and vermin into storage tanks and piping systems. Screen materials shall be compatible with contacting system components and shall not accelerate the corrosion of system components.\n\n#--- 1301.8 Freeze protection.\n\nWhere installations are subject to freezing temperatures, provisions shall be made to keep storage tanks and the related piping from freezing.\n\n#--- 1301.9 Nonpotable water storage tanks.\n\nNonpotable water storage tanks shall comply with Sections 1301.9.1 through 1301.9.11. Nonpotable water storage tanks receiving multiple sources shall also comply with requirements established by the Department of Environmental Protection and the Department of Health and Mental Hygiene.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 1301.9.1 Sizing.\n\nThe holding capacity of the storage tank shall be sized in accordance with the anticipated demand.\n\nException: Storage tanks also used for rainwater detention may be sized for the combined volume of detained water and the anticipated demand.\n\n#---- 1301.9.2 Location.\n\nStorage tanks shall be installed above or below grade. Above-grade storage tanks shall be protected from direct sunlight and shall be constructed using opaque, UV-resistant materials such as, but not limited to, heavily tinted plastic, fiberglass, lined metal, concrete, wood, or painted to prevent algae growth, or shall have specially constructed sun barriers including, but not limited to, installation in garages, crawl spaces or sheds. Storage tanks and their manholes shall not be located directly under soil piping, waste piping or any source of contamination.\n\n#----- 1301.9.2.1 Separate nonpotable water storage tanks from multiple sources.\n\nSeparate collection tanks or compartments shall be provided for influent wastewater and rainwater sources.\n\n#---- 1301.9.3 Materials.\n\nWhere collected on site, water shall be collected in an approved tank constructed of durable, nonabsorbent and corrosion-resistant materials. The storage tank shall be constructed of materials compatible with any disinfection systems used to treat water upstream of the tank and with any systems used to maintain water quality in the tank. Wooden storage tanks that are not equipped with a makeup water source shall be provided with a flexible liner.\n\n#---- 1301.9.4 Foundation and supports.\n\nStorage tanks shall be supported on a firm base capable of withstanding the weight of the storage tank when filled to capacity. Storage tanks shall be supported in accordance with the New York City Building Code. Tanks within an area of special flood hazard shall be designed, constructed and installed in accordance with Appendix G of the New York City Building Code.\n\n#----- 1301.9.4.1 Ballast.\n\nWhere the soil can become saturated, an underground storage tank shall be ballasted, or otherwise secured, to prevent the tank from floating out of the ground when empty. The combined weight of the tank and hold down ballast shall meet or exceed the buoyancy force of the tank. Where the installation requires a foundation, the foundation shall be flat and shall be designed to support the weight of the storage tank when full, consistent with the bearing capability of adjacent soil.\n\n#----- 1301.9.4.2 Structural support.\n\nWhere installed below grade, storage tank installations shall be designed to withstand earth and surface structural loads without damage and with minimal deformation when empty or filled with water.\n\n#---- 1301.9.5 Makeup water.\n\nWhere an uninterrupted supply is required for the intended application, potable water shall be provided as a source of makeup water for the storage tank. The makeup water supply shall be protected against backflow by an air gap. A full-open valve located on the makeup water supply line to the storage tank shall be provided. Inlets to the storage tank shall be controlled by fill valves or other automatic supply valves installed to prevent the tank from overflowing and to prevent the water level from dropping below a predetermined point. Where makeup water is provided, the water level shall not be permitted to drop below the source water inlet or the intake of any attached pump.\n\nException: Makeup water shall not be required for drip or subsurface landscape irrigation systems.\n\n#---- 1301.9.6 Overflow.\n\nThe storage tank shall be equipped with an overflow pipe having a diameter not less than that shown in Table 606.5.4. The overflow pipe shall be protected from insects or vermin. The overflow pipe shall be connected to the appropriate building drainage system in accordance with this code and the requirements of the Department of Environmental Protection. Overflow from a stormwater storage tank shall not discharge to the sanitary drainage system. Drainage from overflow pipes shall be directed to prevent freezing on roof walkways. The overflow drain shall not be equipped with a shutoff valve. A cleanout shall be provided on each overflow pipe in accordance with Section 708.\n\n#---- 1301.9.7 Access.\n\nNot less than one access opening shall be provided to allow inspection and cleaning of the tank interior. Access openings shall have an approved locking device or other approved method of securing access. Below-grade storage tanks, located outside of the building, shall be provided with a manhole either not less than 24 inches (610 mm) square or with an inside diameter not less than 24 inches (610 mm). Manholes shall extend not less than 4 inches (102 mm) above ground or shall be designed to prevent water infiltration. Finished grade shall be sloped away from the manhole to divert surface water. Manhole covers shall be secured to prevent unauthorized access. Service ports in manhole covers shall be not less than 8 inches (203 mm) in diameter and shall be not less than 4 inches (102 mm) above the finished grade level. The service port shall be secured to prevent unauthorized access.\n\nException: Storage tanks less than 800 gallons (3028 L) in volume and installed below grade shall not be required to be equipped with a manhole, but shall have a service port not less than 8 inches (203 mm) in diameter.\n\n#----- 1301.9.7.1 Tanks accessed from within buildings.\n\nWhere access to a storage tank is provided from within a building, the tank access opening shall be gasketed and gas-tight.\n\n#---- 1301.9.8 Venting.\n\nStorage tanks shall be provided with a vent sized in accordance with Chapter 9 and based on the aggregate diameter of all tank influent pipes. The reservoir vent shall not be connected to sanitary drainage system vents. Vents shall be protected from contamination by means of an approved cap or U-bend installed with the opening directed downward. Vent outlets shall extend not less than 4 inches (102 mm) above grade or as necessary to prevent surface water from entering the storage tank. Vent openings shall be protected against the entrance of vermin and insects in accordance with the requirements of Section 1301.7.\n\n#---- 1301.9.9 Draining of tanks.\n\nWhere tanks require draining for service or cleaning, tanks shall be drained by using a pump or by a drain located at the lowest point in the tank. The tank drain pipe shall be indirectly connected to the appropriate building drainage system and discharge as required for overflow pipes and shall not be smaller in size than specified in Table 606.5.7. Not less than one cleanout shall be provided on each drain pipe in accordance with Section 708.\n\n#---- 1301.9.10 Marking and signage.\n\nEach nonpotable water storage tank shall be labeled with its rated capacity. The contents of storage tanks shall be identified with the words \"CAUTION: NONPOTABLE WATER – DO NOT DRINK.\" Where an opening is provided that could allow the entry of personnel, the opening shall be marked with the words, \"DANGER – CONFINED SPACE.\" Markings shall be indelibly printed on the tank or on a tag or sign constructed of corrosion-resistant waterproof material that is mounted on the tank. The letters of the words shall be not less than 0.5 inch (12.7 mm) in height and shall be of a color in contrast with the background on which they are applied.\n\n#---- 1301.9.11 Storage tank tests.\n\nStorage tanks shall be tested in accordance with the following:\n\nStorage tanks shall be filled with water to the overflow line prior to and during inspection. All seams and joints shall be left exposed and the tank shall remain water tight without leakage for a period of 24 hours.\n\n1. After 24 hours, supplemental water shall be introduced for a period of 15 minutes to verify proper drainage of the overflow system and that there are no leaks.\n\n2. The tank drain shall be observed for proper operation.\n\n3. The makeup water system shall be observed for proper operation and successful automatic shutoff of the system at the refill threshold shall be verified.\n\n#--- 1301.10 System abandonment.\n\nIf the owner of an on-site nonpotable water reuse system or rainwater collection and conveyance system elects to cease use of, or fails to properly maintain such system and is so ordered by the Department of Health and Mental Hygiene, the system shall be abandoned and shall comply with the following:\n\n1. The conveyance piping system shall be replaced with an approved potable water supply piping system.\n\nException: Where an existing conveyance pipe system is already in place, the fixtures may remain connected to the existing piping and supplied by the potable water system, in accordance with all of the following requirements:\n\n1. The piping material, design and size comply with the requirements of Chapter 6.\n\n2. The piping system is disinfected in accordance with the requirements of Chapter 6.\n\n3. All piping connections between the potable and conveyance piping system shall be protected against backflow by an approved method in accordance with Chapter 6.\n\n4. The piping identification required by Section 1301.6.3 shall be maintained to identify the piping as nonpotable.\n\n5. All piping connections to the abandoned components of the collection and treatment system shall be permanently disabled by removing a section of pipe.\n\n2. The storage tank shall be secured from accidental access by sealing or locking tank inlets and access points, or filling with sand or equivalent.\n\n3. Notification shall be provided to the Department and to the Department of Health and Mental Hygiene.\n\n#--- 1301.11 Trenching requirements for nonpotable water piping.\n\nNonpotable water collection and conveyance piping shall be separated from the building sewer and potable water piping underground by 5 feet (1524 mm) of undisturbed or compacted earth. Nonpotable water collection and conveyance piping shall not be located in, under or above cesspools, septic tanks, septic tank drainage fields or seepage pits. Buried nonpotable water piping shall comply with the requirements of Section 306.\n\nExceptions:\n\n1. The required separation distance shall not apply where the bottom of the nonpotable water pipe within 5 feet (1524 mm) of the sewer is not less than 12 inches (305 mm) above the top of the highest point of the sewer and the pipe materials conform to Table 702.3.\n\n2. The required separation distance shall not apply where the bottom of the potable water service pipe within 5 feet (1524 mm) of the nonpotable water pipe is a minimum of 12 inches (305 mm) above the top of the highest point of the nonpotable water pipe and the pipe materials comply with the requirements of Table 605.4.\n\n3. Nonpotable water pipe is permitted to be located in the same trench with a building sewer, provided that such sewer is constructed of materials that comply with the requirements of Table 702.2.\n\n4. The required separation distance shall not apply where a nonpotable water pipe crosses a sewer pipe, provided that the pipe is sleeved to at least 5 feet (1524 mm) horizontally from the sewer pipe centerline on both sides of such crossing, with pipe materials that comply with Table 702.2.\n\n5. The required separation distance shall not apply where a potable water service pipe crosses a nonpotable water pipe, provided that the potable water service pipe is sleeved for a distance of at least 5 feet (1524 mm) horizontally from the centerline of the nonpotable pipe on both sides of such crossing, with pipe materials that comply with Table 702.2.\n\n6. Irrigation piping located outside of a building and downstream of the backflow preventer is not required to meet the trenching requirements where nonpotable water is used for outdoor applications.\n\n#--- 1301.12 Outdoor outlet access.\n\nSillcocks, hose bibbs, wall hydrants, yard hydrants and other outdoor outlets supplied by nonpotable water shall be located in a locked vault and shall also be operable only by means of a removable key. Such outlets shall comply with Section 1301.3.\n\nSection PC 1302: On-Site Nonpotable Water Reuse Systems\n\n#--- 1302.1 General.\n\nThe provisions of Section 1302 shall govern the construction, installation, alteration and repair of on-site nonpotable water reuse systems for the collection, storage, treatment conveyance and application of on-site sources of nonpotable water as permitted by the New York City Construction Codes, and all applicable laws, and rules, including but not limited to those of the Department of Environmental Protection and the Department of Health and Mental Hygiene.\n\n#--- 1302.2 Sources.\n\nOn-site nonpotable water reuse systems shall be permitted to collect waste discharge from only the allowed sources as established by the Department of Health and Mental Hygiene.\n\n#--- 1302.3 Traps.\n\nTraps serving fixtures and devices discharging waste water to on-site nonpotable water reuse systems shall comply with Section 1002.4.\n\n#--- 1302.4 Collection pipe.\n\nOn-site nonpotable water reuse systems shall utilize drainage piping approved for use in plumbing drainage systems to collect and convey untreated water for reuse. Vent piping approved for use in plumbing venting systems shall be utilized for vents in the nonpotable system. Collection and vent piping materials shall comply with Section 702, Table 702.1 and Table 702.2.\n\n#---- 1302.4.1 Installation.\n\nCollection piping conveying untreated water for reuse shall be installed in accordance with Section 704.\n\n#---- 1302.4.2 Joints.\n\nCollection piping conveying untreated water for reuse shall utilize joints approved for use with the conveyance piping and appropriate for the intended applications as specified in Section 705.\n\n#---- 1302.4.3 Size.\n\nCollection piping conveying untreated water for reuse shall be sized in accordance with drainage sizing requirements specified in Section 710.\n\n#---- 1302.4.4 Labeling and marking.\n\nAdditional marking of collection piping containing untreated water for reuse shall be identified in accordance with Section 704.7.\n\n#--- 1302.5 Filtration.\n\nUntreated water collected for reuse shall be filtered as required for the intended nonpotable end use as established by the Department of Health and Mental Hygiene. Filters shall be accessible for inspection and maintenance. Filters shall utilize a pressure gauge or other approved method to provide indication when a filter requires servicing or replacement. Filters shall be installed with shutoff valves immediately upstream and downstream to allow for isolation during maintenance.\n\n#---- 1302.5.1 Filtration required.\n\nNonpotable water utilized for water closet and urinal flushing applications shall be filtered by a 100-micron or finer filter.\n\n#--- 1302.6 Disinfection and treatment.\n\nUntreated water collected for reuse shall be disinfected and treated as required for the intended nonpotable end use as established by the Department of Health and Mental Hygiene.\n\n#--- 1302.7 Storage tanks.\n\nStorage tanks utilized in on-site nonpotable water reuse systems shall comply with Sections 1301.9 and 1302.7.1 through 1302.7.4.\n\n#---- 1302.7.1 Location.\n\nStorage tanks shall be located with a minimum horizontal distance between various elements as indicated in Table 1302.7.1.\n\nTable 1302.7.1 Location of Nonpotable Water Reuse Storage Tanks\n\nFor SI: 1 foot = 304.8 mm.\n\n#---- 1302.7.2 Design and construction.\n\nStorage tanks shall be designed and constructed in accordance with Chapters 16 through 22 of the New York City Building Code and in accordance with the following standards, as appropriate for the material of the storage tank: AWWA D100, AWWA D115, AWWA D120, UL 58, UL 1746, UL 1316, UL 142, API 12F or API 12D.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 1302.7.3 Inlets.\n\nStorage tank inlets shall be designed to introduce collected water into the tank with minimum turbulence, and shall be located and designed to avoid agitating the contents of the storage tank.\n\n#---- 1302.7.4 Outlets.\n\nOutlets shall be located not less than 4 inches (102 mm) above the bottom of the storage tank and shall not skim water from the surface.\n\n#--- 1302.8 Valves.\n\nValves shall be provided in accordance with Sections 1302.8.1 through 1302.8.3.\n\n#---- 1302.8.1 Collection piping bypass valve.\n\nOne full-size three-way diverter valve shall be installed on collection piping upstream of each storage tank, or drainfield, as applicable, to divert untreated on-site reuse sources to the sanitary sewer to allow servicing and inspection of the system. Bypass valves shall be installed downstream of fixture traps and vent connections. Bypass valves shall be marked to indicate the direction of flow, connection and storage tank or drainfield connection. Bypass valves shall be installed in accessible locations. Two shutoff valves shall not be installed to serve as a bypass valve.\n\n#---- 1302.8.2 Backwater valve.\n\nOne or more backwater valves shall be installed on each overflow and tank drain pipe. Backwater valves shall be in accordance with Section 715.\n\n#---- 1302.8.3 Conveyance piping bypass valve.\n\nOne full-size three-way diverter valve shall be installed on the conveyance piping system upstream and downstream of all treated storage tanks, as applicable, to divert treated on-site nonpotable reuse water to the sanitary sewer to allow system testing, commissioning and bypass conditions.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 1302.9 Pumping and control system.\n\nMechanical equipment including pumps, valves and filters shall be easily accessible and removable in order to perform repair, maintenance and cleaning. The minimum flow rate and flow pressure delivered by the pumping system shall be appropriate for the application and in accordance with Section 604.\n\n#--- 1302.10 Water pressure-reducing valve or regulator.\n\nWhere the water pressure supplied by the pumping system exceeds 85 psi (587 kPa) static, a pressure-reducing valve shall be installed to reduce the pressure in the nonpotable water conveyance system piping to 85 psi (587 kPa) static or less. Pressure-reducing valves shall be specified and installed in accordance with Section 604.8.\n\n#--- 1302.11 Conveyance pipe.\n\nConveyance piping utilized in on-site nonpotable water reuse systems shall comply with Sections 1302.11.1 through 1302.11.3.\n\nException: Irrigation piping located outside of the building and downstream of a backflow preventer.\n\n#---- 1302.11.1 Materials, joints and connections.\n\nConveyance piping shall conform to the standards and requirements specified in Section 1301.6.\n\n#---- 1302.11.2 Design.\n\nOn-site nonpotable water reuse conveyance piping systems shall be designed and sized in accordance with Section 604 for the intended application.\n\n#---- 1302.11.3 Marking.\n\nOn-site nonpotable water conveyance piping labeling and marking shall comply with Section 1301.6.\n\n#--- 1302.12 Tests and inspections.\n\nTests and inspections shall be performed in accordance with Sections 108, 312, and Sections 1302.12.1 through 1302.12.7. Special inspections of the nonpotable water systems shall be conducted in accordance with Chapter 17 of the New York City Building Code.\n\n#---- 1302.12.1 Collection pipe and vent test.\n\nDrain, waste and vent piping used for on-site water reuse systems shall be tested in accordance with Section 312.\n\n#---- 1302.12.2 Storage tank test.\n\nStorage tanks shall be tested in accordance with Section 1301.9.11.\n\n#---- 1302.12.3 Water supply system test.\n\nThe testing of makeup water supply piping and conveyance piping shall be conducted in accordance with Section 312.5.\n\n#---- 1302.12.4 Inspection and testing of backflow prevention assemblies.\n\nThe testing of backflow preventers and backwater valves shall be conducted in accordance with Section 312.10.\n\n#---- 1302.12.5 Inspection of vermin and insect protection.\n\nInlets and vents to the system shall be inspected to verify that each is protected to prevent the entrance of insects and vermin into the storage tank and piping systems in accordance with Section 1301.7.\n\n#---- 1302.12.6 Water quality test.\n\nWater quality testing and monitoring shall be conducted in accordance with requirements of the Department of Health and Mental Hygiene.\n\n#---- 1302.12.7 Inspection and testing of cross connection control.\n\nCross connection control inspection and testing shall be conducted in accordance with the requirements of the Department of Health and Mental Hygiene.\n\n#--- 1302.13 Operation and maintenance manuals.\n\nOperation and maintenance materials shall be supplied with nonpotable on-site water reuse systems in accordance with Sections 1302.13.1 through 1302.13.4 and in accordance with the requirements of the Department of Health and Mental Hygiene.\n\n#---- 1302.13.1 Manual.\n\nA detailed operations and maintenance manual shall be supplied in hardcopy form with all systems.\n\n#---- 1302.13.2 Schematics.\n\nThe manual shall include a detailed system schematic, and the locations and a list of all system components, including manufacturer and model number.\n\n#---- 1302.13.3 Maintenance procedures.\n\nThe manual shall provide a schedule and procedures for all system components requiring periodic maintenance. Consumable parts, including filters, shall be noted along with part numbers.\n\n#---- 1302.13.4 Operations procedures.\n\nThe manual shall include system startup and shutdown procedures. The manual shall include detailed operating procedures for the system.\n\nSection PC 1303: Nonpotable Rainwater Collection and Conveyance Systems\n\n#--- 1303.1 General.\n\nThe provisions of Section 1303 shall govern the construction, installation, alteration and repair of rainwater collection and conveyance systems for the collection, storage, treatment and conveyance of rainwater for nonpotable applications, as permitted by the New York City Construction Codes, and all applicable laws, and rules, including but not limited to those of the Department of Environmental Protection and the Department of Health and Mental Hygiene.\n\n#--- 1303.2 Collection surface.\n\nRainwater shall be collected only from above-ground impervious roofing surfaces constructed from approved materials. Collection of water from vehicular parking or pedestrian surfaces shall be prohibited except where the water is used exclusively for landscape irrigation.\n\n#---- 1303.2.1 Prohibited sources.\n\nRoof mounted appliances and equipment including but not limited to evaporative coolers, cooling towers, water heaters, and solar water heaters shall not discharge onto rainwater collection surfaces.\n\n#--- 1303.3 Debris excluders.\n\nDownspouts and leaders shall be connected to a roof washer and shall be equipped with a debris excluder or equivalent device to prevent the contamination of collected rainwater with leaves, sticks, pine needles and similar material. Debris excluders and equivalent devices shall be self-cleaning.\n\n#--- 1303.4 Roof washer.\n\nA sufficient amount of rainwater shall be diverted at the beginning of each rain event, and not allowed to enter the storage tank, to wash accumulated debris from the collection surface. The amount of rainfall to be diverted shall be field adjustable as necessary to minimize storage tank water contamination. The roof washer shall not rely on manually operated valves or devices, and shall operate automatically. Diverted rainwater shall not be drained to the roof surface, and shall be discharged in a manner consistent with the storm water runoff requirements of the Department of Environmental Protection and this code. Roof washers shall be accessible for maintenance and service.\n\n#--- 1303.5 Roof gutters and downspouts.\n\nGutters and downspouts shall be constructed of materials that are compatible with the collection surface and the rainwater quality for the desired end use. Joints shall be water tight.\n\n#---- 1303.5.1 Slope.\n\nRoof gutters, leaders and rainwater collection piping shall slope continuously toward collection inlets. Gutters and downspouts shall have a slope of not less than 1/8 inch per foot (10.4 mm/m) along their entire length, and shall not permit the collection or pooling of water at any point.\n\nException: Siphonic drainage systems installed in accordance with the manufacturer's instructions shall not be required to have a slope.\n\n#---- 1303.5.2 Size.\n\nGutters and downspouts shall be installed and sized in accordance with Section 1106.\n\n#---- 1303.5.3 Cleanouts.\n\nCleanouts shall be provided in accordance with Chapter 11 of this code in the water conveyance system and to allow access to all filters, flushes, pipes and downspouts.\n\n#--- 1303.6 Drainage.\n\nWater drained from the roof washer or debris excluder shall not be drained to the sanitary sewer. Such water shall be diverted from the storage tank and discharge in a location that will not cause erosion or damage to property in accordance with the New York City Building Code. Roof washers and debris excluders shall be provided with an automatic means of self-draining between rain events, and shall not drain onto roof surfaces.\n\n#--- 1303.7 Collection pipe.\n\nRainwater collection and conveyance systems shall utilize drainage piping approved for use within plumbing drainage systems to collect and convey captured rainwater. Vent piping approved for use within plumbing venting systems shall be utilized for vents within the rainwater system. Collection and vent piping materials shall comply with Section 1102.\n\n#---- 1303.7.1 Installation.\n\nCollection piping conveying captured rainwater shall be installed in accordance with Chapter 11.\n\n#---- 1303.7.2 Joints.\n\nCollection piping conveying captured rainwater shall utilize joints approved for use with the piping and appropriate for the intended applications as specified in Chapter 11.\n\n#---- 1303.7.3 Size.\n\nCollection piping conveying captured rainwater shall be sized in accordance with drainage sizing requirements specified in Section 1106.\n\n#---- 1303.7.4 Labeling and marking.\n\nAdditional marking of collection piping containing captured rainwater for reuse shall be identified in accordance with Section 704.7.\n\n#--- 1303.8 Filtration.\n\nUntreated rainwater collected for reuse shall be filtered as required for the intended nonpotable end use as established by the Department of Health and Mental Hygiene. Filters shall be accessible for inspection and maintenance. Filters shall utilize a pressure gauge or other approved method to provide indication when a filter requires servicing or replacement. Filters shall be installed with shutoff valves installed immediately upstream and downstream to allow for isolation during maintenance.\n\n#---- 1303.8.1 Filtration required.\n\nNonpotable water utilized for water closet and urinal flushing applications shall be filtered by a 100-micron or finer filter.\n\n#--- 1303.9 Disinfection.\n\nUntreated rainwater collected for reuse shall be disinfected and treated as required for the intended nonpotable end use as established by the Department of Health and Mental Hygiene.\n\n#--- 1303.10 Storage tanks.\n\nStorage tanks utilized in nonpotable rainwater collection and conveyance systems shall comply with Sections 1301.9 and 1303.10.1 through 1303.10.4.\n\n#---- 1303.10.1 Location.\n\nStorage tanks shall be located with a minimum horizontal distance between various elements as indicated in Table 1303.10.1.\n\nTable 1303.10.1 Location of Rainwater Storage Tanks\n\nFor SI: 1 foot = 304.8 mm.\n\n#---- 1303.10.2. Design and construction.\n\nStorage tanks shall be designed and constructed in accordance with Chapters 16 through 22 of the New York City Building Code and in accordance with the following standards, as appropriate for the material of the storage tank: AWWA D100, AWWA D115, AWWA D120, UL 58, UL 1746, UL 1316, UL 142, API 12F or API 12D.\n\n#---- 1303.10.3 Inlets.\n\nStorage tank inlets shall be designed to introduce collected rainwater into the tank with minimum turbulence, and shall be located and designed to avoid agitating the contents of the storage tank.\n\n#---- 1303.10.4 Outlets.\n\nOutlets shall be located at least 4 inches (102 mm) above the bottom of the storage tank and shall not skim water from the surface.\n\n#--- 1303.11 Valves.\n\nValves shall be provided in accordance with Sections 1303.11.1 through 1303.11.3.\n\n#---- 1303.11.1 Collection piping bypass valve.\n\nOne full-size three-way diverter valve shall be installed on collection piping upstream of each storage tank, or drainfield, as applicable, to divert untreated rainwater to the storm or combined sewer to allow servicing and inspection of the system. Bypass valves shall be marked to indicate the direction of flow, connection and storage tank or drainfield connection. Bypass valves shall be installed in accessible locations. Two shutoff valves shall not be installed to serve as a bypass valve.\n\n#---- 1303.11.2 Backwater valve.\n\nOne or more backwater valves shall be installed on each overflow and tank drain pipe. Backwater valves shall be in accordance with Section 1101.\n\n#---- 1303.11.3 Conveyance piping bypass valve.\n\nOne full-size three-way diverter valve shall be installed on the conveyance piping system upstream and downstream of all treated storage tanks, as applicable, to divert treated on-site nonpotable reuse water to the sanitary sewer to allow system testing, commissioning and bypass conditions.\n\n#--- 1303.12 Pumping and control system.\n\nMechanical equipment including pumps, valves and filters shall be easily accessible and removable in order to perform repair, maintenance and cleaning. The minimum flow rate and flow pressure delivered by the pumping system shall be appropriate for the application and in accordance with Section 604.\n\n#--- 1303.13 Water pressure-reducing valve or regulator.\n\nWhere the water pressure supplied by the pumping system exceeds 85 psi (587 kPa) static, a pressure-reducing valve shall be installed to reduce the pressure in the rainwater conveyance system piping to 85 psi (587 kPa) static or less. Pressure- reducing valves shall be specified and installed in accordance with Section 604.8.\n\n#--- 1303.14 Conveyance pipe.\n\nConveyance piping utilized in rainwater collection and conveyance systems shall comply with Sections 1303.14.1 through 1303.14.3.\n\nException: Irrigation piping located outside of the building and downstream of a backflow preventer.\n\n#---- 1303.14.1 Materials, joints and connections.\n\nConveyance piping shall conform to the standards and requirements specified in Section 1301.6.\n\n#---- 1303.14.2 Design.\n\nRainwater reuse conveyance piping systems shall be designed and sized in accordance with Section 604 for the intended application.\n\n#---- 1303.14.3 Marking.\n\nNonpotable rainwater conveyance piping labeling and marking shall comply with Section 1301.6.\n\n#--- 1303.15 Tests and inspections.\n\nTests and inspections shall be performed in accordance with Sections 108, 312, and Sections 1303.15.1 through 1303.15.9. Special inspections of the nonpotable water systems shall be conducted in accordance with Chapter 17 of the New York City Building Code.\n\n#---- 1303.15.1 Reserved.\n\n#---- 1303.15.2 Roofwasher test.\n\nRoofwashers shall be tested by introducing water into the gutters. Proper diversion of the first quantity of water in accordance with the requirements of Section 1303.4 shall be verified.\n\n#---- 1303.15.3 Collection pipe and vent test.\n\nDrain, waste and vent piping used for rainwater collection and conveyance systems shall be tested in accordance with Section 312.\n\n#---- 1303.15.4 Storage tank test.\n\nStorage tanks shall be tested in accordance with Section 1301.9.11.\n\n#---- 1303.15.5 Water supply system test.\n\nThe testing of makeup water supply piping and conveyance piping shall be conducted in accordance with Section 312.5.\n\n#---- 1303.15.6 Inspection and testing of backflow prevention assemblies.\n\nThe testing of backflow preventers and backwater valves shall be conducted in accordance with Section 312.10.\n\n#---- 1303.15.7 Inspection of vermin and insect protection.\n\nInlets and vents to the system shall be inspected to verify that each is protected to prevent the entrance of insects and vermin into the storage tank and piping systems in accordance with Section 1301.7.\n\n#---- 1303.15.8 Water quality test.\n\nWater quality testing and monitoring shall be conducted in accordance with requirements of the Department of Health and Mental Hygiene.\n\n#---- 1303.15.9 Inspection and testing of cross connection control.\n\nCross connection control inspection and testing shall be conducted in accordance with the requirements of the Department of Health and Mental Hygiene.\n\n#--- 1303.16 Operation and maintenance manuals.\n\nOperation and maintenance manuals shall be supplied with rainwater collection and conveyance systems in accordance with Sections 1303.16.1 through 1303.16.4.\n\n#---- 1303.16.1 Manual.\n\nA detailed operations and maintenance manual shall be supplied in hardcopy form with all systems.\n\n#---- 1303.16.2 Schematics.\n\nThe manual shall include a detailed system schematic, and locations and a list of all system components, including manufacturer and model number.\n\n#---- 1303.16.3 Maintenance procedures.\n\nThe manual shall provide a maintenance schedule and procedures for all system components requiring periodic maintenance. Consumable parts, including filters, shall be noted along with part numbers.\n\n#---- 1303.16.4 Operations procedures.\n\nThe manual shall include system startup and shutdown procedures. The manual shall include detailed operating procedures for the system.\n\nSection PC 1304: Reserved",
+  "schemaVersion": 1
+}

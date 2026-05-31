@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197460\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197460\"><\/AnnotationDrawer><div>Appliances installed in outdoor locations shall be either listed for outdoor installation or provided with protection from outdoor environmental factors that influence the operability, durability and safety of the appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8007-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances installed in outdoor locations shall be either listed for outdoor installation or provided with protection from outdoor environmental factors that influence the operability, durability and safety of the appliances."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8007
+}

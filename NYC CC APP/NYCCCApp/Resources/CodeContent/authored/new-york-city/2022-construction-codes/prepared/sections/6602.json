@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187100\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187100\"><\/AnnotationDrawer><div>Suspended scaffold motors shall contain a plate from the manufacturer of the motor indicating the rated load of the motor. Swaged attachments or spliced eyes on wire suspension ropes shall be tagged in accordance with the requirements of Section 3314.11.8. Identification required by this section shall be maintained so as to be legible during the life of the element. Missing or illegible identification shall be replaced by a qualified person in accordance with the requirements of the manufacturer of the component or the testing entity authorized by Section 3314.11.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6602-html-1",
+      "kind" : "html",
+      "plainText" : "Suspended scaffold motors shall contain a plate from the manufacturer of the motor indicating the rated load of the motor. Swaged attachments or spliced eyes on wire suspension ropes shall be tagged in accordance with the requirements of Section 3314.11.8. Identification required by this section shall be maintained so as to be legible during the life of the element. Missing or illegible identification shall be replaced by a qualified person in accordance with the requirements of the manufacturer of the component or the testing entity authorized by Section 3314.11.8."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6602
+}

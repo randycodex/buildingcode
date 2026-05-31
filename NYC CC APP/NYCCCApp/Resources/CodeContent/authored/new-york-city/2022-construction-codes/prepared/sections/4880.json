@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181694\"><\/AnnotationDrawer><div>Each individual truss design drawing shall bear the seal and signature of the truss designer.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181695\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181695\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181696\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181696\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Where a cover sheet and truss index sheet are combined into a single sheet and attached to the set of truss design drawings, the single cover\/truss index sheet is the only document required to be signed and sealed by the truss designer.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181697\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181697\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;When a cover sheet and a truss index sheet are separately provided and attached to the set of truss design drawings, the cover sheet and the truss index sheet are the only documents required to be signed and sealed by the truss designer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4880-html-1",
+      "kind" : "html",
+      "plainText" : "Each individual truss design drawing shall bear the seal and signature of the truss designer.\n\n Exceptions: \n\n 1. Where a cover sheet and truss index sheet are combined into a single sheet and attached to the set of truss design drawings, the single cover\/truss index sheet is the only document required to be signed and sealed by the truss designer.\n\n 2. When a cover sheet and a truss index sheet are separately provided and attached to the set of truss design drawings, the cover sheet and the truss index sheet are the only documents required to be signed and sealed by the truss designer."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4880
+}

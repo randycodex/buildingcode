@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180844\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180844\"><\/AnnotationDrawer><div>Mortar for use with adhered masonry veneer shall conform to ASTM C 270 for Type N or S, or shall comply with ANSI A118.4 for latex-modified portland cement mortar.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18411-html-1",
+      "kind" : "html",
+      "plainText" : "Mortar for use with adhered masonry veneer shall conform to ASTM C 270 for Type N or S, or shall comply with ANSI A118.4 for latex-modified portland cement mortar."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18411
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168095\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168095\"><\/AnnotationDrawer><div>Mechanical ventilation and interlocks with the spraying operation shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14557-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical ventilation and interlocks with the spraying operation shall be in accordance with the New York City Mechanical Code ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14557
+}

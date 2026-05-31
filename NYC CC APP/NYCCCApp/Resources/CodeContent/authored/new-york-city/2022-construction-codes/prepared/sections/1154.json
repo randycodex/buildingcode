@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169515\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169515\"><\/AnnotationDrawer><div>Vertical openings for mechanical exhaust or supply duct systems in open or enclosed parking garages complying with Sections 406.5 and 406.6, respectively, shall be permitted to be unenclosed where such duct system is contained within and serves only the parking garage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1154-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical openings for mechanical exhaust or supply duct systems in open or enclosed parking garages complying with Sections 406.5 and 406.6, respectively, shall be permitted to be unenclosed where such duct system is contained within and serves only the parking garage."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1154
+}

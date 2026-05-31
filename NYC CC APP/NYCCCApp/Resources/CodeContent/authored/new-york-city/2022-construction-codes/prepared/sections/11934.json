@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161681\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Sinks shall be provided with waste outlets having a diameter not less than 1 1\/2 inches (38 mm). A strainer or crossbar shall be provided to restrict the clear opening of the waste outlet.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11934-html-1",
+      "kind" : "html",
+      "plainText" : "Sinks shall be provided with waste outlets having a diameter not less than 1 1\/2 inches (38 mm). A strainer or crossbar shall be provided to restrict the clear opening of the waste outlet."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11934
+}

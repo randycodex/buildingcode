@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171663\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171663\"><\/AnnotationDrawer><div>In buildings where more than one standpipe is provided, the standpipes shall be interconnected in accordance with NFPA 14.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15553-html-1",
+      "kind" : "html",
+      "plainText" : "In buildings where more than one standpipe is provided, the standpipes shall be interconnected in accordance with NFPA 14."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15553
+}

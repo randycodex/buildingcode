@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183983\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183983\"><\/AnnotationDrawer><div>Other devices regulated by this code shall, when deemed necessary by the commissioner to protect public safety, be in the charge of a designated competent operator conforming to such qualifications as the commissioner may prescribe, except that operators for workers' hoists shall be assigned as required by the applicable provisions of ANSI A10.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5544-html-1",
+      "kind" : "html",
+      "plainText" : "Other devices regulated by this code shall, when deemed necessary by the commissioner to protect public safety, be in the charge of a designated competent operator conforming to such qualifications as the commissioner may prescribe, except that operators for workers' hoists shall be assigned as required by the applicable provisions of ANSI A10.4."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5544
+}

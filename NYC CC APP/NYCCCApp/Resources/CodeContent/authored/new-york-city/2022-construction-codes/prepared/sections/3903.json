@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178817\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178817\"><\/AnnotationDrawer><div>Test standards for joist handlers and connectors shall be in accordance with Sections 1711.1.1 through 1711.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3903-html-1",
+      "kind" : "html",
+      "plainText" : "Test standards for joist handlers and connectors shall be in accordance with Sections 1711.1.1 through 1711.2.2."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3903
+}

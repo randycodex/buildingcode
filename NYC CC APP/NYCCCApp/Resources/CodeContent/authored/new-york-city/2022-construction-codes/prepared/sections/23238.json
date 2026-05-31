@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193428\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193428\"><\/AnnotationDrawer><div>Equipment, appliance and system service rooms that house sources of odors, fumes, noxious gases, smoke, steam, dust, spray or other contaminants shall be designed and constructed so as to prevent spreading of such contaminants to other occupied parts of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23238-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment, appliance and system service rooms that house sources of odors, fumes, noxious gases, smoke, steam, dust, spray or other contaminants shall be designed and constructed so as to prevent spreading of such contaminants to other occupied parts of the building."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23238
+}

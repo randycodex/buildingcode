@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169290\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169290\"><\/AnnotationDrawer><div>The fire-resistance rating of the fire barriers separating atriums shall comply with Section 404.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14896-html-1",
+      "kind" : "html",
+      "plainText" : "The fire-resistance rating of the fire barriers separating atriums shall comply with Section 404.6."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14896
+}

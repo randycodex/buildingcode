@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187156\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187156\"><\/AnnotationDrawer><div>Platforms on all working levels of a scaffold shall be fully planked or decked between the front uprights and the guardrail system supports in accordance with Sections 3314.5.1 through 3314.5.7.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187157\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187157\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Platforms used solely as walkways or used solely by workers installing or removing the scaffold shall be planked to the extent necessary to ensure the safety of the public and property.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6619-html-1",
+      "kind" : "html",
+      "plainText" : "Platforms on all working levels of a scaffold shall be fully planked or decked between the front uprights and the guardrail system supports in accordance with Sections 3314.5.1 through 3314.5.7.\n\n Exception: Platforms used solely as walkways or used solely by workers installing or removing the scaffold shall be planked to the extent necessary to ensure the safety of the public and property."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6619
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183039\"><\/AnnotationDrawer><div>A minimum 0.019-inch (0.48 mm) (No. 26 galvanized sheet gage), corrosion-resistant weep screed with a minimum vertical attachment flange of 3 1\/2 inches (89 mm) shall be provided at or below the foundation plate line on exterior stud walls in accordance with ASTM C 926. The weep screed shall be placed a minimum of 4 inches (102 mm) above the earth or 2 inches (51 mm) above paved areas and be of a type that will allow trapped water to drain to the exterior of the building. The water-resistive barrier shall lap the attachment flange. The exterior lath shall cover and terminate on the attachment flange of the weep screed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5212-html-1",
+      "kind" : "html",
+      "plainText" : "A minimum 0.019-inch (0.48 mm) (No. 26 galvanized sheet gage), corrosion-resistant weep screed with a minimum vertical attachment flange of 3 1\/2 inches (89 mm) shall be provided at or below the foundation plate line on exterior stud walls in accordance with ASTM C 926. The weep screed shall be placed a minimum of 4 inches (102 mm) above the earth or 2 inches (51 mm) above paved areas and be of a type that will allow trapped water to drain to the exterior of the building. The water-resistive barrier shall lap the attachment flange. The exterior lath shall cover and terminate on the attachment flange of the weep screed."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5212
+}

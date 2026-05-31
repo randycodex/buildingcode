@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172473\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172473\"><\/AnnotationDrawer><div>The supply fan system shall be equipped with a smoke detector that will automatically shut down the supply fan system when smoke is detected within the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15818-html-1",
+      "kind" : "html",
+      "plainText" : "The supply fan system shall be equipped with a smoke detector that will automatically shut down the supply fan system when smoke is detected within the system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15818
+}

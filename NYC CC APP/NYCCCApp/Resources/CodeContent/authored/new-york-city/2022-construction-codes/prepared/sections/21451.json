@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199257\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199257\"><\/AnnotationDrawer><div>Sauna heaters of other than the direct-vent type shall be installed with the draft hood and combustion air intake located outside the sauna room. Where the combustion air inlet and the draft hood are in a dressing room adjacent to the sauna room, there shall be provisions to prevent physically blocking the combustion air inlet and the draft hood inlet, and to prevent physical contact with the draft hood and vent assembly, or warning notices shall be posted to avoid such contact. Any warning notice shall be easily readable, shall contrast with its background and the wording shall be in letters not less than 1\/4 inch (6.4 mm) high.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21451-html-1",
+      "kind" : "html",
+      "plainText" : "Sauna heaters of other than the direct-vent type shall be installed with the draft hood and combustion air intake located outside the sauna room. Where the combustion air inlet and the draft hood are in a dressing room adjacent to the sauna room, there shall be provisions to prevent physically blocking the combustion air inlet and the draft hood inlet, and to prevent physical contact with the draft hood and vent assembly, or warning notices shall be posted to avoid such contact. Any warning notice shall be easily readable, shall contrast with its background and the wording shall be in letters not less than 1\/4 inch (6.4 mm) high."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21451
+}

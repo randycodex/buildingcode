@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183079\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183079\"><\/AnnotationDrawer><div>Cement plaster base coats shall be cured in accordance with ASTM C 926. Cement plaster bedding coats shall retain sufficient moisture for hydration (hardening) for 24 hours minimum or, where necessary, shall be kept damp for 24 hours by light water spraying.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183080\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183080\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183080\"><\/AnnotationDrawer><h6><a name=\"JD_BC2514\" id=\"JD_BC2514\" title=\"BC 2514\"><\/a>Section BC 2514: Reinforced Gypsum Concrete<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5229-html-1",
+      "kind" : "html",
+      "plainText" : "Cement plaster base coats shall be cured in accordance with ASTM C 926. Cement plaster bedding coats shall retain sufficient moisture for hydration (hardening) for 24 hours minimum or, where necessary, shall be kept damp for 24 hours by light water spraying.\n\n Section BC 2514: Reinforced Gypsum Concrete"
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5229
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175468\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175468\"><\/AnnotationDrawer><div>A clear floor space shall be located on the long side of the accessible cycle storage and shall comply with Section 305 (Clear Floor Space) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16695-html-1",
+      "kind" : "html",
+      "plainText" : "A clear floor space shall be located on the long side of the accessible cycle storage and shall comply with Section 305 (Clear Floor Space) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16695
+}

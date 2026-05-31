@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198761\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198761\"><\/AnnotationDrawer><div>Vent connectors for Category I appliances shall comply with Sections 503.10.1 through 503.10.14.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8467-html-1",
+      "kind" : "html",
+      "plainText" : "Vent connectors for Category I appliances shall comply with Sections 503.10.1 through 503.10.14."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8467
+}

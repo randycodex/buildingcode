@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184189\"><\/AnnotationDrawer><div>Towers shall be constructed of approved corrosion-resistant noncombustible material. The minimum type of construction of isolated radio towers not more than 100 feet (30 480 mm) in height shall be Type IIB.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19447-html-1",
+      "kind" : "html",
+      "plainText" : "Towers shall be constructed of approved corrosion-resistant noncombustible material. The minimum type of construction of isolated radio towers not more than 100 feet (30 480 mm) in height shall be Type IIB."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19447
+}

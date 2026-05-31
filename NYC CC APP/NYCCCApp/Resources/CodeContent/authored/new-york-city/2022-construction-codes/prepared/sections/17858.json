@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179267\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179267\"><\/AnnotationDrawer><div>The allowable load determined in Section 1810.3.1 shall account for group effects on deep foundations. The analysis of group effects shall be performed by an engineer experienced in geotechnical engineering and calculated using recognized methods of analysis. This analysis shall include a bearing capacity and settlement analysis of the anticipated group(s) of deep foundations and shall consider the presence of weaker soil strata that may be present below the deep foundation element.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17858-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable load determined in Section 1810.3.1 shall account for group effects on deep foundations. The analysis of group effects shall be performed by an engineer experienced in geotechnical engineering and calculated using recognized methods of analysis. This analysis shall include a bearing capacity and settlement analysis of the anticipated group(s) of deep foundations and shall consider the presence of weaker soil strata that may be present below the deep foundation element."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17858
+}

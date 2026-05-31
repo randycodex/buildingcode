@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161545\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161545\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints formed where fixtures come in contact with walls or floors shall be sealed.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11876-html-1",
+      "kind" : "html",
+      "plainText" : "Joints formed where fixtures come in contact with walls or floors shall be sealed."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11876
+}

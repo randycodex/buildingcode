@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168365\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168365\"><\/AnnotationDrawer><div>Buildings shall be provided with address numbers or letters in accordance with section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-1194', hash: '#JD_3-505' }}\">3-505<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> and the rules issued thereunder by the borough president of the borough in which the property is located. Except as otherwise provided by the rules of the borough president in which the property is located, characters shall be a minimum 4 inches (102 mm) high and a minimum of 0.5 inch (12.7 mm) wide. They shall be installed on a contrasting background and be plainly visible from the street or road fronting the property. Where access is by means of a private road and the building address cannot be viewed from the public way, an appropriately placed monument, pole or sign or any other means authorized by the borough president of the borough in which the property is located shall be used to identify the structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14661-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings shall be provided with address numbers or letters in accordance with section 3-505 of the Administrative Code and the rules issued thereunder by the borough president of the borough in which the property is located. Except as otherwise provided by the rules of the borough president in which the property is located, characters shall be a minimum 4 inches (102 mm) high and a minimum of 0.5 inch (12.7 mm) wide. They shall be installed on a contrasting background and be plainly visible from the street or road fronting the property. Where access is by means of a private road and the building address cannot be viewed from the public way, an appropriately placed monument, pole or sign or any other means authorized by the borough president of the borough in which the property is located shall be used to identify the structure."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14661
+}

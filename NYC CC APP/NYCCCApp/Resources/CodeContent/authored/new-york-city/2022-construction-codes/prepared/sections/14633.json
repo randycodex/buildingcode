@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168295\"><\/AnnotationDrawer><div>The total quantity of solid or liquid pyrophoric material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 0.5 pounds (0.227 kg).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168296\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168296\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The total quantity of pyrophoric material allowed within a laboratory unit that is provided with walls, floors and ceilings that separate the laboratory unit from all adjoining areas by 2-hour fire-rated construction shall not exceed 1 pound (0.454 kg). \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168297\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168297\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224220\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14633-html-1",
+      "kind" : "html",
+      "plainText" : "The total quantity of solid or liquid pyrophoric material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 0.5 pounds (0.227 kg).\n\n Exception: The total quantity of pyrophoric material allowed within a laboratory unit that is provided with walls, floors and ceilings that separate the laboratory unit from all adjoining areas by 2-hour fire-rated construction shall not exceed 1 pound (0.454 kg). \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14633
+}

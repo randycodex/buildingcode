@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197508\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197508\"><\/AnnotationDrawer><div>The volumes of spaces in different stories shall be considered as communicating spaces where such spaces are connected by one or more openings in doors or floors having a total minimum free area of 2 square inches per 1,000 Btu\/h (4402 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/kW) of total input rating of all appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8024-html-1",
+      "kind" : "html",
+      "plainText" : "The volumes of spaces in different stories shall be considered as communicating spaces where such spaces are connected by one or more openings in doors or floors having a total minimum free area of 2 square inches per 1,000 Btu\/h (4402 mm\n\n 2 \n\n \/kW) of total input rating of all appliances."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8024
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171276\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171276\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be provided in buildings, or portions thereof, where cellulose nitrate film or pyroxylin plastics are manufactured, stored or handled in quantities exceeding 100 pounds (45.4 kg).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1592-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be provided in buildings, or portions thereof, where cellulose nitrate film or pyroxylin plastics are manufactured, stored or handled in quantities exceeding 100 pounds (45.4 kg)."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1592
+}

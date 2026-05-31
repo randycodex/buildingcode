@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162309\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162309\"><\/AnnotationDrawer><div>All potable water openings and outlets shall be protected against backflow in accordance with Section 608.15.1, 608.15.2, 608.15.3, 608.15.4, 608.15.4.1 or 608.15.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12189-html-1",
+      "kind" : "html",
+      "plainText" : "All potable water openings and outlets shall be protected against backflow in accordance with Section 608.15.1, 608.15.2, 608.15.3, 608.15.4, 608.15.4.1 or 608.15.4.2."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12189
+}

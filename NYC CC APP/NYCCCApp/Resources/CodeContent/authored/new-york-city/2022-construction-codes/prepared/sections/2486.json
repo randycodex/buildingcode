@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174282\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174282\"><\/AnnotationDrawer><div>Where luminous egress path markings are not required but are voluntarily installed in the exit path, such markings shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174198', hash: '#JD_BC1025' }}\">1025<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2486-html-1",
+      "kind" : "html",
+      "plainText" : "Where luminous egress path markings are not required but are voluntarily installed in the exit path, such markings shall comply with Section 1025 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2486
+}

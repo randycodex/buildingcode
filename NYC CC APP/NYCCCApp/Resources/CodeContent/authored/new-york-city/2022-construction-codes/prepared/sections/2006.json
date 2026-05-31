@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172512\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172512\"><\/AnnotationDrawer><div>Smoke and heat vents shall be located 20 feet (6096 mm) or more from adjacent lot lines and fire walls and 10 feet (3048 mm) or more from fire barriers. Vents shall be uniformly located within the roof in the areas of the building where the vents are required to be installed by Section 910.2 with consideration given to roof pitch, sprinkler location and structural members.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2006-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke and heat vents shall be located 20 feet (6096 mm) or more from adjacent lot lines and fire walls and 10 feet (3048 mm) or more from fire barriers. Vents shall be uniformly located within the roof in the areas of the building where the vents are required to be installed by Section 910.2 with consideration given to roof pitch, sprinkler location and structural members."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2006
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196879\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196879\"><\/AnnotationDrawer><div>Installations, both existing and new, and parts thereof shall be maintained in proper operating condition in accordance with the original design and in a safe condition. Devices or safeguards that are required by this code shall be maintained in compliance with the applicable provisions under which they were installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7886-html-1",
+      "kind" : "html",
+      "plainText" : "Installations, both existing and new, and parts thereof shall be maintained in proper operating condition in accordance with the original design and in a safe condition. Devices or safeguards that are required by this code shall be maintained in compliance with the applicable provisions under which they were installed."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 7886
+}

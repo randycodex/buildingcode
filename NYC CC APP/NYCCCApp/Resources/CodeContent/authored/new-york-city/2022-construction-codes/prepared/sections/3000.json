@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175882\"><\/AnnotationDrawer><div>The means of egress shall be illuminated in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173147', hash: '#JD_BC1008' }}\">1008<\/Link>. Exterior lights near entranceways to multiple dwellings shall also comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205264', hash: '#JD_27-2040' }}\">27-2040<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Housing Maintenance Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3000-html-1",
+      "kind" : "html",
+      "plainText" : "The means of egress shall be illuminated in accordance with Section 1008 . Exterior lights near entranceways to multiple dwellings shall also comply with Section 27-2040 of the New York City Housing Maintenance Code ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 3000
+}

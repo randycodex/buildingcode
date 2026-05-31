@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182382\"><\/AnnotationDrawer><div>Where foundations are required by Section 2308.6.8, braced wall line sills shall be anchored to concrete or masonry foundations. Such anchorage shall conform to the requirements of Section 2308.3. The anchors shall be distributed along the length of the braced wall line. Other anchorage devices having equivalent capacity are permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5052-html-1",
+      "kind" : "html",
+      "plainText" : "Where foundations are required by Section 2308.6.8, braced wall line sills shall be anchored to concrete or masonry foundations. Such anchorage shall conform to the requirements of Section 2308.3. The anchors shall be distributed along the length of the braced wall line. Other anchorage devices having equivalent capacity are permitted."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 5052
+}

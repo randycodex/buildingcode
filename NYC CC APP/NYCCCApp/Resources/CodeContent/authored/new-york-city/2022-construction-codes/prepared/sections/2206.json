@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173149\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173149\"><\/AnnotationDrawer><div>Illumination shall be provided in the means of egress in accordance with Section 1008.2. Under emergency power, means of egress illumination shall comply with Section 1008.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2206-html-1",
+      "kind" : "html",
+      "plainText" : "Illumination shall be provided in the means of egress in accordance with Section 1008.2. Under emergency power, means of egress illumination shall comply with Section 1008.3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2206
+}

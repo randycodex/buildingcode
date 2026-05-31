@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193950\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193950\"><\/AnnotationDrawer><div>Domestic cooking appliances utilized for commercial purposes and all domestic cooking appliances installed in cafeterias and Group A-1, A-2, A-4, A-5, and M occupancies shall be provided with Type I, Type II, or UL 710B hoods as required for the type of appliances and processes in accordance with Sections 507.2 and 507.3. Refer to Section 505.4 for qualifying non-commercial uses.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23419-html-1",
+      "kind" : "html",
+      "plainText" : "Domestic cooking appliances utilized for commercial purposes and all domestic cooking appliances installed in cafeterias and Group A-1, A-2, A-4, A-5, and M occupancies shall be provided with Type I, Type II, or UL 710B hoods as required for the type of appliances and processes in accordance with Sections 507.2 and 507.3. Refer to Section 505.4 for qualifying non-commercial uses."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23419
+}

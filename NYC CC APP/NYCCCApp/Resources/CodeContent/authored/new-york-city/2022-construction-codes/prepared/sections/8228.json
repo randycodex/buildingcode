@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198121\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198121\"><\/AnnotationDrawer><div>Where leakage or other defects are located, the affected portion of the piping system shall be repaired or replaced and retested.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8228-html-1",
+      "kind" : "html",
+      "plainText" : "Where leakage or other defects are located, the affected portion of the piping system shall be repaired or replaced and retested."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8228
+}

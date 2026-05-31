@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183149\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183149\"><\/AnnotationDrawer><div>A thermal barrier is not required for foam plastic insulation that is a part of a Class A, B or C roof-covering assembly that is installed in accordance with the code and the manufacturer's instructions and is either constructed as described in Item 1 or tested as described in Item 2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183150\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183150\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The roof assembly is separated from the interior of the building by wood structural panel sheathing not less than 0.47 inch (11.9 mm) in thickness bonded with exterior glue, with edges supported by blocking, tongue-and-groove joints or other approved type of edge support, or an equivalent material.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183151\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183151\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The assembly with the foam plastic insulation satisfactorily passes NFPA 276 or UL 1256.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19074-html-1",
+      "kind" : "html",
+      "plainText" : "A thermal barrier is not required for foam plastic insulation that is a part of a Class A, B or C roof-covering assembly that is installed in accordance with the code and the manufacturer's instructions and is either constructed as described in Item 1 or tested as described in Item 2.\n\n 1. The roof assembly is separated from the interior of the building by wood structural panel sheathing not less than 0.47 inch (11.9 mm) in thickness bonded with exterior glue, with edges supported by blocking, tongue-and-groove joints or other approved type of edge support, or an equivalent material.\n\n 2. The assembly with the foam plastic insulation satisfactorily passes NFPA 276 or UL 1256."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19074
+}

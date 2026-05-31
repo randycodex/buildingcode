@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172417\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172417\"><\/AnnotationDrawer><div>Each vestibule shall have a minimum net area of 16 square feet (1.5 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of opening in a wall facing an outer court, yard or public way that is not less than 20 feet (6096 mm) in width.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15795-html-1",
+      "kind" : "html",
+      "plainText" : "Each vestibule shall have a minimum net area of 16 square feet (1.5 m\n\n 2 \n\n ) of opening in a wall facing an outer court, yard or public way that is not less than 20 feet (6096 mm) in width."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15795
+}

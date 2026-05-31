@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173023\"><\/AnnotationDrawer><div>Where more than one exit, or access to more than one exit, is required, the means of egress shall be configured such that the loss of any one exit, or access to one exit, shall not reduce the available capacity or width to less than 50 percent of the required capacity or width.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2165-html-1",
+      "kind" : "html",
+      "plainText" : "Where more than one exit, or access to more than one exit, is required, the means of egress shall be configured such that the loss of any one exit, or access to one exit, shall not reduce the available capacity or width to less than 50 percent of the required capacity or width."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2165
+}

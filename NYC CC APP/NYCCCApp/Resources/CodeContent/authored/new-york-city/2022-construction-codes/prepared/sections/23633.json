@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194579\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194579\"><\/AnnotationDrawer><div>The smoke damper shall close upon actuation of a listed smoke detector or detectors installed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and Section 607.3.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23633-html-1",
+      "kind" : "html",
+      "plainText" : "The smoke damper shall close upon actuation of a listed smoke detector or detectors installed in accordance with the New York City Building Code and Section 607.3.3.2."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23633
+}

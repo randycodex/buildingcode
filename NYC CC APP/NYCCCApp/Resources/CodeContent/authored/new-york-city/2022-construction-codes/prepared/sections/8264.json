@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198223\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198223\"><\/AnnotationDrawer><div>In a common system serving more than one building, shutoff valves shall be installed outdoors at each building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8264-html-1",
+      "kind" : "html",
+      "plainText" : "In a common system serving more than one building, shutoff valves shall be installed outdoors at each building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8264
+}

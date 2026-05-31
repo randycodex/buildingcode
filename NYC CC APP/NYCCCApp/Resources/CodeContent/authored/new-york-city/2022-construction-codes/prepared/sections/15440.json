@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171336\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be installed throughout every above-grade story of buildings below a height of 100 feet (30 480 mm), other than the first story or ground floor, on which access is not provided directly from the outdoors by at least one window or readily identifiable access panel within each 50 feet (15 240 mm) or fraction thereof of horizontal length of every wall that fronts on a street or frontage space required pursuant to Section 501.3.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15440-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be installed throughout every above-grade story of buildings below a height of 100 feet (30 480 mm), other than the first story or ground floor, on which access is not provided directly from the outdoors by at least one window or readily identifiable access panel within each 50 feet (15 240 mm) or fraction thereof of horizontal length of every wall that fronts on a street or frontage space required pursuant to Section 501.3.1."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15440
+}

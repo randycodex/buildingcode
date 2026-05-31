@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173862\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173862\"><\/AnnotationDrawer><div>Stairways shall have intermediate handrails located in such a manner that all portions of the stairway minimum width or required capacity are within 30 inches (762 mm) of a handrail. On monumental stairs, handrails shall be located along the most direct path of egress travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-173863\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-173863\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-173863\"><\/AnnotationDrawer><h6><a name=\"JD_BC1015\" id=\"JD_BC1015\" title=\"BC 1015\"><\/a>Section BC 1015: Guards<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16211-html-1",
+      "kind" : "html",
+      "plainText" : "Stairways shall have intermediate handrails located in such a manner that all portions of the stairway minimum width or required capacity are within 30 inches (762 mm) of a handrail. On monumental stairs, handrails shall be located along the most direct path of egress travel.\n\n Section BC 1015: Guards"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16211
+}

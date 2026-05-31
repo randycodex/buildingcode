@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196930\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196930\"><\/AnnotationDrawer><div>In addition to any permits required by the provisions of this code, permits for sidewalk and street openings shall be obtained from the Department of Transportation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7912-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to any permits required by the provisions of this code, permits for sidewalk and street openings shall be obtained from the Department of Transportation."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 7912
+}

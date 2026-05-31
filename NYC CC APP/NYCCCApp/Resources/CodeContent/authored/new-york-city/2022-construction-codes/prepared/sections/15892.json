@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172652\"><\/AnnotationDrawer><div>Listed carbon monoxide alarms or detectors shall be installed as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172653\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172653\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Group I-1, Group R-1, and Group R-2 where the main use or dominant occupancy of a building is classified as Group R-2 student apartments. Carbon monoxide detectors and audible notification appliances shall be installed in affected dwelling units in accordance with Section 915.1.1.1 and shall be annunciated by dwelling unit at a constantly attended location from which the fire alarm system is capable of being manually activated.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172654\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172654\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Groups R-2 (other than occupancies covered by Item 1) and R-3. Carbon monoxide alarms shall be installed in affected dwelling units in accordance with Section 915.1.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15892-html-1",
+      "kind" : "html",
+      "plainText" : "Listed carbon monoxide alarms or detectors shall be installed as follows:\n\n 1. Group I-1, Group R-1, and Group R-2 where the main use or dominant occupancy of a building is classified as Group R-2 student apartments. Carbon monoxide detectors and audible notification appliances shall be installed in affected dwelling units in accordance with Section 915.1.1.1 and shall be annunciated by dwelling unit at a constantly attended location from which the fire alarm system is capable of being manually activated.\n\n 2. Groups R-2 (other than occupancies covered by Item 1) and R-3. Carbon monoxide alarms shall be installed in affected dwelling units in accordance with Section 915.1.1.1."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15892
+}

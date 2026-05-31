@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187323\"><\/AnnotationDrawer><div>The clips shall be retightened to the manufacturer's specifications after initial loading. Clips shall be inspected and retightened to the manufacturer's specifications at the start of each work shift thereafter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6678-html-1",
+      "kind" : "html",
+      "plainText" : "The clips shall be retightened to the manufacturer's specifications after initial loading. Clips shall be inspected and retightened to the manufacturer's specifications at the start of each work shift thereafter."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6678
+}

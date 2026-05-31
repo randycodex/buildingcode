@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175853\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175853\"><\/AnnotationDrawer><div>Where openings provide natural light to habitable spaces located in basements or cellars, such openings shall comply with Sections 1205.2.3.1 through 1205.2.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16815-html-1",
+      "kind" : "html",
+      "plainText" : "Where openings provide natural light to habitable spaces located in basements or cellars, such openings shall comply with Sections 1205.2.3.1 through 1205.2.3.2."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16815
+}

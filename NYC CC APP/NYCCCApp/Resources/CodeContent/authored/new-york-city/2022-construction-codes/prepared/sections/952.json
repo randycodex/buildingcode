@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168856\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168856\"><\/AnnotationDrawer><div>Fire-retardant-treated wood framing and sheathing complying with Section 2303.2 shall be permitted within exterior wall assemblies not less than 6 inches (152.4 mm) in thickness with a 2-hour rating or less.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "952-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-retardant-treated wood framing and sheathing complying with Section 2303.2 shall be permitted within exterior wall assemblies not less than 6 inches (152.4 mm) in thickness with a 2-hour rating or less."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 952
+}

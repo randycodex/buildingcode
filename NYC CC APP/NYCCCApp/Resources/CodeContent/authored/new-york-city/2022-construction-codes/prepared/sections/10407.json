@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193412\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193412\"><\/AnnotationDrawer><div>Mechanical exhaust systems shall be sized to remove the quantity of air required by this chapter to be exhausted. The system shall operate when air is required to be exhausted. Where mechanical exhaust is required in a room or space in other than occupancies in R-3, such space shall be maintained with a neutral or negative pressure. If a greater quantity of air is supplied by a mechanical ventilating supply system than is removed by a mechanical exhaust for a room, adequate means shall be provided for the natural or mechanical exhaust of the excess air supplied. If only a mechanical exhaust system is installed for a room or if a greater quantity of air is removed by a mechanical exhaust system than is supplied by a mechanical ventilating supply system for a room, adequate makeup air consisting of supply air, transfer air or outdoor air shall be provided to satisfy the deficiency. The calculated building infiltration rate and openable area shall not be used to satisfy the requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10407-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical exhaust systems shall be sized to remove the quantity of air required by this chapter to be exhausted. The system shall operate when air is required to be exhausted. Where mechanical exhaust is required in a room or space in other than occupancies in R-3, such space shall be maintained with a neutral or negative pressure. If a greater quantity of air is supplied by a mechanical ventilating supply system than is removed by a mechanical exhaust for a room, adequate means shall be provided for the natural or mechanical exhaust of the excess air supplied. If only a mechanical exhaust system is installed for a room or if a greater quantity of air is removed by a mechanical exhaust system than is supplied by a mechanical ventilating supply system for a room, adequate makeup air consisting of supply air, transfer air or outdoor air shall be provided to satisfy the deficiency. The calculated building infiltration rate and openable area shall not be used to satisfy the requirements of this section."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10407
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169738\"><\/AnnotationDrawer><div>For fire-rated glazing, the label shall bear the identification required in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169732', hash: '#JD_BCTable716.3' }}\">Tables 716.3<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169749', hash: '#JD_BCTable716.5' }}\">716.5<\/Link>. \"D\" indicates that the glazing is permitted to be used in fire door assemblies and that the glazing meets the fire protection requirements of NFPA 252. \"H\" shall indicate that the glazing meets the hose stream requirements of NFPA 252. \"T\" shall indicate that the glazing meets the temperature requirements of Section 716.5.5.1. The placeholder \"XXX\" represents the fire-rating period, in minutes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15056-html-1",
+      "kind" : "html",
+      "plainText" : "For fire-rated glazing, the label shall bear the identification required in Tables 716.3 and 716.5 . \"D\" indicates that the glazing is permitted to be used in fire door assemblies and that the glazing meets the fire protection requirements of NFPA 252. \"H\" shall indicate that the glazing meets the hose stream requirements of NFPA 252. \"T\" shall indicate that the glazing meets the temperature requirements of Section 716.5.5.1. The placeholder \"XXX\" represents the fire-rating period, in minutes."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15056
+}

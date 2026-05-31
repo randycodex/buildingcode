@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177421\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177421\"><\/AnnotationDrawer><div>Members, elements and components subject to dynamic loads from elevators shall be designed for impact loads and deflection limits prescribed by ASME A17.1, as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-189236', hash: '#JD_BCAppK' }}\">Appendix K<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3498-html-1",
+      "kind" : "html",
+      "plainText" : "Members, elements and components subject to dynamic loads from elevators shall be designed for impact loads and deflection limits prescribed by ASME A17.1, as modified by Appendix K of this code."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3498
+}

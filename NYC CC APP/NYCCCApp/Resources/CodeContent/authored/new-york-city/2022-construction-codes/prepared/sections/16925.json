@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176178\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176178\"><\/AnnotationDrawer><div>Exterior wall coverings shall be designed and constructed in accordance with the applicable provisions of this section. Installations not prescribed herein shall be permitted, provided that such alternative has been approved. Installations shall be in accordance with approved construction documents where a permit is required. Installations of exterior wall coverings shall comply with the special inspection requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16925-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior wall coverings shall be designed and constructed in accordance with the applicable provisions of this section. Installations not prescribed herein shall be permitted, provided that such alternative has been approved. Installations shall be in accordance with approved construction documents where a permit is required. Installations of exterior wall coverings shall comply with the special inspection requirements of Chapter 17 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 16925
+}

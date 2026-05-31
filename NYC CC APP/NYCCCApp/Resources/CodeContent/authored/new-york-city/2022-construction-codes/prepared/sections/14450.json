@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167781\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167781\"><\/AnnotationDrawer><div>Where hazardous materials having a hazard ranking of 3 or 4 in accordance with NFPA 704 are transported through corridors, interior exit stairways or ramps, or exit passageways, there shall be an emergency telephone system, a local manual alarm station or an approved alarm-initiating device at not more than 150-foot (45 720 mm) intervals and at each exit and exit access doorway throughout the transport route. The signal shall be relayed to an approved central, proprietary or remote station service or constantly attended on-site location and shall initiate a local audible alarm.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14450-html-1",
+      "kind" : "html",
+      "plainText" : "Where hazardous materials having a hazard ranking of 3 or 4 in accordance with NFPA 704 are transported through corridors, interior exit stairways or ramps, or exit passageways, there shall be an emergency telephone system, a local manual alarm station or an approved alarm-initiating device at not more than 150-foot (45 720 mm) intervals and at each exit and exit access doorway throughout the transport route. The signal shall be relayed to an approved central, proprietary or remote station service or constantly attended on-site location and shall initiate a local audible alarm."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14450
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195934\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195934\"><\/AnnotationDrawer><div>Reused pipe, fittings, valves or other materials shall be clean and free of foreign materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24105-html-1",
+      "kind" : "html",
+      "plainText" : "Reused pipe, fittings, valves or other materials shall be clean and free of foreign materials."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24105
+}

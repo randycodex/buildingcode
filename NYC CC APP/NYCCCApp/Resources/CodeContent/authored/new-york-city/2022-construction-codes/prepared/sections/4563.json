@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180720\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180720\"><\/AnnotationDrawer><div>Welding operations performed on aluminum used for structural purposes shall comply with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180721\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180721\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The provisions of AWS D1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180722\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180722\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Welding work shall be performed only by persons who have obtained a license from the commissioner. Where manual welding work on structural members is not performed in the City of New York, welds shall be made by welders certified by the American Welding Society in accordance with AWS D1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "4563-html-1",
+      "kind" : "html",
+      "plainText" : "Welding operations performed on aluminum used for structural purposes shall comply with the following:\n\n 1. The provisions of AWS D1.2.\n\n 2. Welding work shall be performed only by persons who have obtained a license from the commissioner. Where manual welding work on structural members is not performed in the City of New York, welds shall be made by welders certified by the American Welding Society in accordance with AWS D1.2."
+    }
+  ],
+  "chapterNumber" : "20",
+  "schemaVersion" : 1,
+  "sectionID" : 4563
+}

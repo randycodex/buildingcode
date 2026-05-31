@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176952\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176952\"><\/AnnotationDrawer><div>Radiant barriers shall be permitted for use above decks where the radiant barrier is covered with an approved roof covering and the system consisting of the radiant barrier and the roof covering complies with the requirements of either FM 4550 or UL 1256.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3375-html-1",
+      "kind" : "html",
+      "plainText" : "Radiant barriers shall be permitted for use above decks where the radiant barrier is covered with an approved roof covering and the system consisting of the radiant barrier and the roof covering complies with the requirements of either FM 4550 or UL 1256."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3375
+}

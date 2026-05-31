@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167267\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167267\"><\/AnnotationDrawer><div>A hatch or trap door not less than 16 square feet (1.49 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area through the floor and having dimensions of not less than 2 feet (610 mm) in any direction shall be permitted to be used as a portion of the means of egress from guard towers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14287-html-1",
+      "kind" : "html",
+      "plainText" : "A hatch or trap door not less than 16 square feet (1.49 m\n\n 2 \n\n ) in area through the floor and having dimensions of not less than 2 feet (610 mm) in any direction shall be permitted to be used as a portion of the means of egress from guard towers."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14287
+}

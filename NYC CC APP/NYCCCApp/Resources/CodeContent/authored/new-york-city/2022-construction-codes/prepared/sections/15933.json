@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172775\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172775\"><\/AnnotationDrawer><div>Gas detection system devices and equipment shall be designed for use with the particular gas being detected.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15933-html-1",
+      "kind" : "html",
+      "plainText" : "Gas detection system devices and equipment shall be designed for use with the particular gas being detected."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15933
+}

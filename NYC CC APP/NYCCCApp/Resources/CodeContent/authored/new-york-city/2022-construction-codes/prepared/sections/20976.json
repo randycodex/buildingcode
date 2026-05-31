@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197919\"><\/AnnotationDrawer><div>Flange bolts and associated hardware shall be manufactured from corrosion-resistant materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-197920\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-197920\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-197920\"><\/AnnotationDrawer><h6><a name=\"JD_FGC404\" id=\"JD_FGC404\" title=\"FGC 404\"><\/a>Section FGC 404: Piping System Installation<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20976-html-1",
+      "kind" : "html",
+      "plainText" : "Flange bolts and associated hardware shall be manufactured from corrosion-resistant materials.\n\n Section FGC 404: Piping System Installation"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20976
+}

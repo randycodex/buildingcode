@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186562\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186562\"><\/AnnotationDrawer><div>Areas in the vicinity of operations related to the installation, reinstallation, adjustment, maintenance, repair, temporary removal, or permanent removal of unenclosed perimeter protection systems that produce or typically produce small debris shall be vacuumed as the operation progresses. Examples of operations that produce small debris include, but are not limited to, the installation or removal of fasteners for a vertical netting system, chipping to expose curtain wall clips, preparation of the slab to install or receive exterior walls, and chopping or core drilling at perimeter for mechanical risers. Vacuum equipment shall be tethered or otherwise secured to prevent the equipment from falling.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20275-html-1",
+      "kind" : "html",
+      "plainText" : "Areas in the vicinity of operations related to the installation, reinstallation, adjustment, maintenance, repair, temporary removal, or permanent removal of unenclosed perimeter protection systems that produce or typically produce small debris shall be vacuumed as the operation progresses. Examples of operations that produce small debris include, but are not limited to, the installation or removal of fasteners for a vertical netting system, chipping to expose curtain wall clips, preparation of the slab to install or receive exterior walls, and chopping or core drilling at perimeter for mechanical risers. Vacuum equipment shall be tethered or otherwise secured to prevent the equipment from falling."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20275
+}

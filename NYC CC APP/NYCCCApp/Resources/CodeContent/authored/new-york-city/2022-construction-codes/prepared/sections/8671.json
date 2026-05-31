@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199376\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199376\"><\/AnnotationDrawer><div>Water heaters utilized both to supply potable hot water and provide hot water for space-heating applications shall be listed and labeled for such applications by the manufacturer, and shall be built in accordance with Section IV of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> with an \"H\" code stamp. They shall be installed in accordance with the manufacturer's instructions, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199377\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199377\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199377\"><\/AnnotationDrawer><h6><a name=\"JD_FGC625\" id=\"JD_FGC625\" title=\"FGC 625\"><\/a>Section FGC 625: Refrigerators<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8671-html-1",
+      "kind" : "html",
+      "plainText" : "Water heaters utilized both to supply potable hot water and provide hot water for space-heating applications shall be listed and labeled for such applications by the manufacturer, and shall be built in accordance with Section IV of the ASME Boiler and Pressure Vessel Code with an \"H\" code stamp. They shall be installed in accordance with the manufacturer's instructions, the ASME Boiler and Pressure Vessel Code and the New York City Plumbing Code. \n\n Section FGC 625: Refrigerators"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8671
+}

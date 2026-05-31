@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180462\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180462\"><\/AnnotationDrawer><div>Welded wire reinforcement with wire size not greater than W5 or D5 used in slabs not exceeding 10 feet (3048 mm) in span is permitted to be curved from a point near the top of the slab over the support to a point near the bottom of the slab at midspan, provided such reinforcement is either continuous over, or securely anchored at support.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18281-html-1",
+      "kind" : "html",
+      "plainText" : "Welded wire reinforcement with wire size not greater than W5 or D5 used in slabs not exceeding 10 feet (3048 mm) in span is permitted to be curved from a point near the top of the slab over the support to a point near the bottom of the slab at midspan, provided such reinforcement is either continuous over, or securely anchored at support."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18281
+}

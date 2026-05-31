@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198615\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198615\"><\/AnnotationDrawer><div>Before replacing an existing appliance or connecting a vent connector to a chimney, the chimney passageway shall be examined to ascertain that it is clear and free of obstructions and it shall be cleaned if previously used for venting solid or liquid fuel-burning appliances or fireplaces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21232-html-1",
+      "kind" : "html",
+      "plainText" : "Before replacing an existing appliance or connecting a vent connector to a chimney, the chimney passageway shall be examined to ascertain that it is clear and free of obstructions and it shall be cleaned if previously used for venting solid or liquid fuel-burning appliances or fireplaces."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21232
+}

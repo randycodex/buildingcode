@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175981\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175981\"><\/AnnotationDrawer><div>In other than dwelling units, toilet, bathing and shower room floor finish materials shall have a smooth, hard, nonabsorbent surface. The intersections of such floors with walls shall have a smooth, hard, nonabsorbent vertical base that extends upward onto the walls not less than 4 inches (101.6 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175982\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175982\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Group I-1, R-1 and R-2 occupancies shall have a vertical base that extends upward onto walls at least 6 inches (152.4 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16862-html-1",
+      "kind" : "html",
+      "plainText" : "In other than dwelling units, toilet, bathing and shower room floor finish materials shall have a smooth, hard, nonabsorbent surface. The intersections of such floors with walls shall have a smooth, hard, nonabsorbent vertical base that extends upward onto the walls not less than 4 inches (101.6 mm).\n\n Exception: Group I-1, R-1 and R-2 occupancies shall have a vertical base that extends upward onto walls at least 6 inches (152.4 mm)."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16862
+}

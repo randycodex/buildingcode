@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193440\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193440\"><\/AnnotationDrawer><div>For flooded lead acid, flooded nickel cadmium and VRLA batteries, the ventilation system shall be designed to limit the maximum concentration of hydrogen to 1.0 percent of the total volume of the room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10418-html-1",
+      "kind" : "html",
+      "plainText" : "For flooded lead acid, flooded nickel cadmium and VRLA batteries, the ventilation system shall be designed to limit the maximum concentration of hydrogen to 1.0 percent of the total volume of the room."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10418
+}

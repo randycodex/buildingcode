@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169872\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169872\"><\/AnnotationDrawer><div>The total area of the glazing in fire-protection-rated window assemblies shall not exceed 25 percent of the area of a common wall with any room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1275-html-1",
+      "kind" : "html",
+      "plainText" : "The total area of the glazing in fire-protection-rated window assemblies shall not exceed 25 percent of the area of a common wall with any room."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1275
+}

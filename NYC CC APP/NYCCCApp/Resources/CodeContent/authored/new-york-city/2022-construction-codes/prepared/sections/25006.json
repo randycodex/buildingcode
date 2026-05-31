@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162293\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Double check backflow prevention assemblies shall conform to ASSE 1015, CSA B64.5, CSA B64.5.1 or AWWA C510. Double check detector fire protection backflow prevention assemblies shall conform to ASSE 1048. These assemblies shall be capable of operating under continuous pressure conditions.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25006-html-1",
+      "kind" : "html",
+      "plainText" : "Double check backflow prevention assemblies shall conform to ASSE 1015, CSA B64.5, CSA B64.5.1 or AWWA C510. Double check detector fire protection backflow prevention assemblies shall conform to ASSE 1048. These assemblies shall be capable of operating under continuous pressure conditions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25006
+}

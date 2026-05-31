@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193176\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193176\"><\/AnnotationDrawer><div>Equipment such as heat pumps, air-conditioning units, or similar equipment, that is suspended from a structure shall be resiliently supported from or on the building structure. Vibration isolators shall have a minimum isolation efficiency of 90 percent at the lowest disturbing frequency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "10333-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment such as heat pumps, air-conditioning units, or similar equipment, that is suspended from a structure shall be resiliently supported from or on the building structure. Vibration isolators shall have a minimum isolation efficiency of 90 percent at the lowest disturbing frequency."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 10333
+}

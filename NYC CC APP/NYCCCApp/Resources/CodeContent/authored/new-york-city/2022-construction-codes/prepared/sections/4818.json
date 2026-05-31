@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181463\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181463\"><\/AnnotationDrawer><div>The truss design drawings shall conform to the requirements of Section I1 of AISI S202 and shall be provided with the shipment of trusses delivered to the job site. The truss design drawings shall include the details of permanent individual truss member restraint\/bracing in accordance with Section I1.6 of AISI S202 where these methods are utilized to provide restraint\/bracing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4818-html-1",
+      "kind" : "html",
+      "plainText" : "The truss design drawings shall conform to the requirements of Section I1 of AISI S202 and shall be provided with the shipment of trusses delivered to the job site. The truss design drawings shall include the details of permanent individual truss member restraint\/bracing in accordance with Section I1.6 of AISI S202 where these methods are utilized to provide restraint\/bracing."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4818
+}

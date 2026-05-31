@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175482\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175482\"><\/AnnotationDrawer><div>Accessible fixed or built-in seating at tables, counters or work surfaces shall be distributed throughout the space or facility containing such elements and located on a level accessed by an accessible route.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16701-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible fixed or built-in seating at tables, counters or work surfaces shall be distributed throughout the space or facility containing such elements and located on a level accessed by an accessible route."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16701
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167082\"><\/AnnotationDrawer><div>Openings in required perimeter curbs and bumpers shall be permitted only for drainage, for motor vehicle entrances and exits, and for pedestrian entrances and exits. The width of an opening for motor vehicle access shall not exceed the length of the curb cut, not including the lengths of the splays. When an opening for pedestrian access is adjacent to a motor vehicle access opening, the two openings shall be separated by a permanent and substantial post. In no case shall any pedestrian entrance or exit exceed 5 feet (1524 mm) in width.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "405-html-1",
+      "kind" : "html",
+      "plainText" : "Openings in required perimeter curbs and bumpers shall be permitted only for drainage, for motor vehicle entrances and exits, and for pedestrian entrances and exits. The width of an opening for motor vehicle access shall not exceed the length of the curb cut, not including the lengths of the splays. When an opening for pedestrian access is adjacent to a motor vehicle access opening, the two openings shall be separated by a permanent and substantial post. In no case shall any pedestrian entrance or exit exceed 5 feet (1524 mm) in width."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 405
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180047\"><\/AnnotationDrawer><div>If underpinning piles are to be used as excavation support elements, a calculation of the anticipated pile deflection shall be performed and its impacts on the supported building shall be assessed by the engineer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4301-html-1",
+      "kind" : "html",
+      "plainText" : "If underpinning piles are to be used as excavation support elements, a calculation of the anticipated pile deflection shall be performed and its impacts on the supported building shall be assessed by the engineer."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4301
+}

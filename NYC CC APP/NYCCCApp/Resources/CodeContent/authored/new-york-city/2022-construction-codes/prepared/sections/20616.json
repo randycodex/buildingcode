@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187671\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187671\"><\/AnnotationDrawer><div>Personnel hoists and their components shall be operated in accordance with this code and rules promulgated by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187672\"><\/AnnotationDrawer><div>When the hoist is equipped with manual controls, the hoist shall be operated by a qualified operator. Only the operator authorized by the equipment user shall operate the hoist.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20616-html-1",
+      "kind" : "html",
+      "plainText" : "Personnel hoists and their components shall be operated in accordance with this code and rules promulgated by the commissioner.\n\n When the hoist is equipped with manual controls, the hoist shall be operated by a qualified operator. Only the operator authorized by the equipment user shall operate the hoist."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20616
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180274\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180274\"><\/AnnotationDrawer><div>Concrete proportioning determined without field experience or trial mixtures shall be done in accordance with ACI 318, Section 26.4.4.1(b). This method of proportioning shall not be permitted for:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180275\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180275\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Load-carrying structural concrete where the total volume of concrete on a given project exceeds 50 cubic yards (38 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t); or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180276\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180276\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Structural or non-structural concrete mix proportions that will be exposed to exposure classes S1, P1, or C2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4374-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete proportioning determined without field experience or trial mixtures shall be done in accordance with ACI 318, Section 26.4.4.1(b). This method of proportioning shall not be permitted for:\n\n 1. Load-carrying structural concrete where the total volume of concrete on a given project exceeds 50 cubic yards (38 m\n 3 \n ); or\n\n 2. Structural or non-structural concrete mix proportions that will be exposed to exposure classes S1, P1, or C2."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4374
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172147\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172147\"><\/AnnotationDrawer><div>The emergency alarm system for a carbon dioxide system, including detection, pre-discharge and discharge alarms, shall be provided in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15702-html-1",
+      "kind" : "html",
+      "plainText" : "The emergency alarm system for a carbon dioxide system, including detection, pre-discharge and discharge alarms, shall be provided in accordance with the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15702
+}

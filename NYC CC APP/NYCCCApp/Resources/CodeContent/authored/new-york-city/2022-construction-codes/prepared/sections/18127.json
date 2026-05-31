@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180043\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180043\"><\/AnnotationDrawer><div>Piles used for underpinning shall be designed to sustain all moments that are generated due to any eccentricities of the load on the pile.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18127-html-1",
+      "kind" : "html",
+      "plainText" : "Piles used for underpinning shall be designed to sustain all moments that are generated due to any eccentricities of the load on the pile."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18127
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162749\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162749\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where waste receptors such as funnel drains, floor sinks and hub drains receive only clear-water waste from display cases, refrigerated display cases, ice bins, coolers and freezers, such receptors shall have a drainage fixture unit value of one-half.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162750\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162750\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162750\"><\/AnnotationDrawer><h6><a name=\"JD_PC710\" id=\"JD_PC710\" title=\"PC 710\"><\/a>Section PC 710: Drainage System Sizing<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25179-html-1",
+      "kind" : "html",
+      "plainText" : "Where waste receptors such as funnel drains, floor sinks and hub drains receive only clear-water waste from display cases, refrigerated display cases, ice bins, coolers and freezers, such receptors shall have a drainage fixture unit value of one-half. \n\n Section PC 710: Drainage System Sizing"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25179
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195570\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195570\"><\/AnnotationDrawer><div>Maximum indoor temperature in spaces surrounding boilers, water heaters, and pressure vessels shall not exceed the operational temperature of the installed equipment or 104&#176;F (40&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "11152-html-1",
+      "kind" : "html",
+      "plainText" : "Maximum indoor temperature in spaces surrounding boilers, water heaters, and pressure vessels shall not exceed the operational temperature of the installed equipment or 104°F (40°C)."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11152
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196605\"><\/AnnotationDrawer><div>All buried storage tanks shall be constructed of at least 1\/4-inch (6.4 mm) thick metal and shall be designed to withstand any external loads to which the tank may be subjected.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11554-html-1",
+      "kind" : "html",
+      "plainText" : "All buried storage tanks shall be constructed of at least 1\/4-inch (6.4 mm) thick metal and shall be designed to withstand any external loads to which the tank may be subjected."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11554
+}

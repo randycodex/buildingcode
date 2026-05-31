@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167777\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167777\"><\/AnnotationDrawer><div>Emergency alarms for the detection and notification of an emergency condition in Group H occupancies shall be provided as set forth herein.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "620-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency alarms for the detection and notification of an emergency condition in Group H occupancies shall be provided as set forth herein."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 620
+}

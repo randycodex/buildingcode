@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193575\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193575\"><\/AnnotationDrawer><div>Containers of Class I liquids shall not be drawn from or filled within buildings unless a provision is made to prevent the accumulation of flammable vapors in hazardous concentrations. Where mechanical ventilation is required, it shall be kept in operation while flammable vapors could be present.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23300-html-1",
+      "kind" : "html",
+      "plainText" : "Containers of Class I liquids shall not be drawn from or filled within buildings unless a provision is made to prevent the accumulation of flammable vapors in hazardous concentrations. Where mechanical ventilation is required, it shall be kept in operation while flammable vapors could be present."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23300
+}

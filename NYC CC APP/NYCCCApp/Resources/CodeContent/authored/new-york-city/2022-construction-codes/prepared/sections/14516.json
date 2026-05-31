@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167966\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167966\"><\/AnnotationDrawer><div>HPM rooms and gas rooms shall be separated from other areas by fire barriers constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169272', hash: '#JD_BC707' }}\">707<\/Link> or horizontal assemblies constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169425', hash: '#JD_BC711' }}\">711<\/Link>, or both. The fire-resistance rating shall be not less than 2 hours where the area is 300 square feet (27.9 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) or more and not less than 1 hour where the area is less than 300 square feet (27.9 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14516-html-1",
+      "kind" : "html",
+      "plainText" : "HPM rooms and gas rooms shall be separated from other areas by fire barriers constructed in accordance with Section 707 or horizontal assemblies constructed in accordance with Section 711 , or both. The fire-resistance rating shall be not less than 2 hours where the area is 300 square feet (27.9 m\n\n 2 \n\n ) or more and not less than 1 hour where the area is less than 300 square feet (27.9 m\n\n 2 \n\n )."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14516
+}

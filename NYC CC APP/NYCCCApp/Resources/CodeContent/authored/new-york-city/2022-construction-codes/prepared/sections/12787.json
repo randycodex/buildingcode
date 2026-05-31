@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163914\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Storage tanks shall be tested in accordance with Section 1301.9.11.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12787-html-1",
+      "kind" : "html",
+      "plainText" : "Storage tanks shall be tested in accordance with Section 1301.9.11."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12787
+}

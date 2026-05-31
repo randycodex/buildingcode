@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181457\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181457\"><\/AnnotationDrawer><div>In cold-formed steel light-frame construction assigned to Seismic Design Category D, the seismic force-resisting system shall be designed and detailed in accordance with AISI S400.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18643-html-1",
+      "kind" : "html",
+      "plainText" : "In cold-formed steel light-frame construction assigned to Seismic Design Category D, the seismic force-resisting system shall be designed and detailed in accordance with AISI S400."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18643
+}

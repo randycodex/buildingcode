@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194005\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194005\"><\/AnnotationDrawer><div>Commercial food service hoods shall exhaust a minimum net quantity of air determined in accordance with this section and Sections 507.5.1 through 507.5.5. The net quantity of exhaust air shall be calculated by subtracting any airflow supplied directly to a hood cavity from the total exhaust flow rate of a hood. Where any combination of heavy-duty, medium-duty and light-duty cooking appliances are utilized under a single hood, the exhaust rate required by this section for the heaviest duty appliance covered by the hood shall be used for the entire hood.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10617-html-1",
+      "kind" : "html",
+      "plainText" : "Commercial food service hoods shall exhaust a minimum net quantity of air determined in accordance with this section and Sections 507.5.1 through 507.5.5. The net quantity of exhaust air shall be calculated by subtracting any airflow supplied directly to a hood cavity from the total exhaust flow rate of a hood. Where any combination of heavy-duty, medium-duty and light-duty cooking appliances are utilized under a single hood, the exhaust rate required by this section for the heaviest duty appliance covered by the hood shall be used for the entire hood."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10617
+}

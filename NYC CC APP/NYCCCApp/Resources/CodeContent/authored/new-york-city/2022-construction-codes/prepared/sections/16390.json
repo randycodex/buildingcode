@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174551\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174551\"><\/AnnotationDrawer><div>Where seating is located at a table or counter and is adjacent to an aisle or aisle accessway, the measurement of required clear width of the aisle or aisle accessway shall be made to a line 19 inches (482.6 mm) away from and parallel to the edge of the table or counter. The 19-inch (482.6 mm) distance shall be measured perpendicular to the side of the table or counter. In the case of other side boundaries for aisles or aisle accessways, the clear width shall be measured to walls, edges of seating and tread edges.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174552\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174552\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where tables or counters are served by fixed seats, the width of the aisle or aisle accessway shall be measured from the back of the seat.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16390-html-1",
+      "kind" : "html",
+      "plainText" : "Where seating is located at a table or counter and is adjacent to an aisle or aisle accessway, the measurement of required clear width of the aisle or aisle accessway shall be made to a line 19 inches (482.6 mm) away from and parallel to the edge of the table or counter. The 19-inch (482.6 mm) distance shall be measured perpendicular to the side of the table or counter. In the case of other side boundaries for aisles or aisle accessways, the clear width shall be measured to walls, edges of seating and tread edges.\n\n Exception: Where tables or counters are served by fixed seats, the width of the aisle or aisle accessway shall be measured from the back of the seat."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16390
+}

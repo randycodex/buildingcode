@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193992\"><\/AnnotationDrawer><div>Type II hoods shall be constructed of steel having a minimum thickness of 0.0296 inch (0.7534 mm) (No. 22 gage) or stainless steel not less than 0.0220 inch (0.5550 mm) (No. 24 gage) in thickness, copper sheets weighing not less than 24 ounces per square foot (7.3 kg\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) or of other approved material and gage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10611-html-1",
+      "kind" : "html",
+      "plainText" : "Type II hoods shall be constructed of steel having a minimum thickness of 0.0296 inch (0.7534 mm) (No. 22 gage) or stainless steel not less than 0.0220 inch (0.5550 mm) (No. 24 gage) in thickness, copper sheets weighing not less than 24 ounces per square foot (7.3 kg\/m\n\n 2 \n\n ) or of other approved material and gage."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10611
+}

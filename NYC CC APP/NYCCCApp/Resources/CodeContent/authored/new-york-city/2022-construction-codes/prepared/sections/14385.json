@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167546\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167546\"><\/AnnotationDrawer><div>Aircraft hangars shall be in accordance with Sections 412.4.1 through 412.4.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14385-html-1",
+      "kind" : "html",
+      "plainText" : "Aircraft hangars shall be in accordance with Sections 412.4.1 through 412.4.6."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14385
+}

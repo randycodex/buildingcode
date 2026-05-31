@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195652\"><\/AnnotationDrawer><div>Refrigeration systems shall be classified according to the degree of probability that refrigerant leaked from a failed connection, seal or component could enter an occupied area. The distinction is based on the basic design or location of the components.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24000-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigeration systems shall be classified according to the degree of probability that refrigerant leaked from a failed connection, seal or component could enter an occupied area. The distinction is based on the basic design or location of the components."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24000
+}

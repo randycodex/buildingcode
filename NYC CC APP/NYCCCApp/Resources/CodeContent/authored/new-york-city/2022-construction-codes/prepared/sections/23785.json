@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195058\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195058\"><\/AnnotationDrawer><div>Power exhausters serving automatically fired appliances shall be electrically connected to each appliance to prevent operation of the appliance when the power exhauster is not in operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23785-html-1",
+      "kind" : "html",
+      "plainText" : "Power exhausters serving automatically fired appliances shall be electrically connected to each appliance to prevent operation of the appliance when the power exhauster is not in operation."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23785
+}

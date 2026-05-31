@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179113\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179113\"><\/AnnotationDrawer><div>Retaining walls shall be designed to resist the lateral action of soil to produce sliding and overturning with a minimum safety factor of 1.5 in each case. The load combinations of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177268', hash: '#JD_BC1605' }}\">1605<\/Link> shall not apply to this requirement. Instead, design shall be based on 0.7 times nominal earthquake loads, 1.0 times other nominal loads, and investigation with one or more of the variable loads set to zero. The safety factor against lateral sliding shall be taken as the available soil resistance at the base of the retaining wall foundation divided by the net lateral force applied to the retaining wall.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179114\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179114\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where earthquake loads are included, the minimum safety factor for retaining wall sliding and overturning shall be 1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17806-html-1",
+      "kind" : "html",
+      "plainText" : "Retaining walls shall be designed to resist the lateral action of soil to produce sliding and overturning with a minimum safety factor of 1.5 in each case. The load combinations of Section 1605 shall not apply to this requirement. Instead, design shall be based on 0.7 times nominal earthquake loads, 1.0 times other nominal loads, and investigation with one or more of the variable loads set to zero. The safety factor against lateral sliding shall be taken as the available soil resistance at the base of the retaining wall foundation divided by the net lateral force applied to the retaining wall.\n\n Exception: Where earthquake loads are included, the minimum safety factor for retaining wall sliding and overturning shall be 1.1."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17806
+}

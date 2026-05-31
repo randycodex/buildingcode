@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195284\"><\/AnnotationDrawer><div>Infrared radiant heaters shall be fixed in a position independent of fuel and electric supply lines. Hangers and brackets shall be noncombustible material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11050-html-1",
+      "kind" : "html",
+      "plainText" : "Infrared radiant heaters shall be fixed in a position independent of fuel and electric supply lines. Hangers and brackets shall be noncombustible material."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11050
+}

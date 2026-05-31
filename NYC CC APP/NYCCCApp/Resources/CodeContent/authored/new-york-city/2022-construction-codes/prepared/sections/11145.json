@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195546\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195546\"><\/AnnotationDrawer><div>The gauge glass shall be installed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code<\/span> or ASME CSD-1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195547\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195547\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195547\"><\/AnnotationDrawer><h6><a name=\"JD_MC1011\" id=\"JD_MC1011\" title=\"MC 1011\"><\/a>Section MC 1011: Tests<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11145-html-1",
+      "kind" : "html",
+      "plainText" : "The gauge glass shall be installed in accordance with the ASME Boiler and Pressure Vessel Code or ASME CSD-1.\n\n Section MC 1011: Tests"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11145
+}

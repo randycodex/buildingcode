@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169874\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169874\"><\/AnnotationDrawer><div>Fire-protection-rated glazing shall bear a label or other identification showing the name of the manufacturer, the test standard and information required in Section 716.3.2 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169848', hash: '#JD_BCTable716.6' }}\">Table 716.6<\/Link> that shall be issued by an approved agency and permanently identified on the glazing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-169875\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-169875\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-169875\"><\/AnnotationDrawer><h6><a name=\"JD_BC717\" id=\"JD_BC717\" title=\"BC 717\"><\/a>Section BC 717: Ducts and Air Transfer Openings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1276-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-protection-rated glazing shall bear a label or other identification showing the name of the manufacturer, the test standard and information required in Section 716.3.2 and Table 716.6 that shall be issued by an approved agency and permanently identified on the glazing.\n\n Section BC 717: Ducts and Air Transfer Openings"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1276
+}

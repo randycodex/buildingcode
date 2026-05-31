@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185444\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185444\"><\/AnnotationDrawer><div>The depth of all soil and foundation work shall be measured from the level of the adjacent ground surface to the lowest point of the soil and foundation work. The height of all soil and foundation work shall be measured from the level of the adjacent ground surface to the highest point of the soil and foundation work. Where soil and foundation work occurs within a basement or cellar, the soil and foundation work shall be measured from the level of the adjacent slab.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6055-html-1",
+      "kind" : "html",
+      "plainText" : "The depth of all soil and foundation work shall be measured from the level of the adjacent ground surface to the lowest point of the soil and foundation work. The height of all soil and foundation work shall be measured from the level of the adjacent ground surface to the highest point of the soil and foundation work. Where soil and foundation work occurs within a basement or cellar, the soil and foundation work shall be measured from the level of the adjacent slab."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6055
+}

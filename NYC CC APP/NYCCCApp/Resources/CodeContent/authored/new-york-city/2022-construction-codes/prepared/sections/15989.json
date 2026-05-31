@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173009\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173009\"><\/AnnotationDrawer><div>The required capacity, in inches (mm), of the means of egress for any room, area, space or story shall be not less than that determined in accordance with Sections 1005.3.1 and 1005.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15989-html-1",
+      "kind" : "html",
+      "plainText" : "The required capacity, in inches (mm), of the means of egress for any room, area, space or story shall be not less than that determined in accordance with Sections 1005.3.1 and 1005.3.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 15989
+}

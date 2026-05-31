@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198645\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198645\"><\/AnnotationDrawer><div>Where a chimney that formerly carried flue products from liquid or solid fuel-burning appliances is used with an appliance using fuel gas, an accessible cleanout shall be provided. The cleanout shall have a tight-fitting cover and shall be installed at the base of all chimneys in accordance with the rules of the New York City Department of Environmental Protection. The cleanout shall be gas tight if the chimney is to be of positive pressure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21245-html-1",
+      "kind" : "html",
+      "plainText" : "Where a chimney that formerly carried flue products from liquid or solid fuel-burning appliances is used with an appliance using fuel gas, an accessible cleanout shall be provided. The cleanout shall have a tight-fitting cover and shall be installed at the base of all chimneys in accordance with the rules of the New York City Department of Environmental Protection. The cleanout shall be gas tight if the chimney is to be of positive pressure."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21245
+}

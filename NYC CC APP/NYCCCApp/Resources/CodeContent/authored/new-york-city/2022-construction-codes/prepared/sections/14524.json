@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167987\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167987\"><\/AnnotationDrawer><div>An approved emergency alarm system shall be provided for HPM rooms, liquid storage rooms and gas rooms.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167988\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167988\"><\/AnnotationDrawer><div>Emergency alarm-initiating devices shall be installed outside of each interior exit door of such rooms.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167989\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167989\"><\/AnnotationDrawer><div>Activation of an emergency alarm-initiating device shall sound a local alarm and transmit a signal to the emergency control station.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167990\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167990\"><\/AnnotationDrawer><div>An approved emergency telephone system, local alarm manual pull stations or other approved alarm-initiating devices are allowed to be used as emergency alarm-initiating devices.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14524-html-1",
+      "kind" : "html",
+      "plainText" : "An approved emergency alarm system shall be provided for HPM rooms, liquid storage rooms and gas rooms.\n\n Emergency alarm-initiating devices shall be installed outside of each interior exit door of such rooms.\n\n Activation of an emergency alarm-initiating device shall sound a local alarm and transmit a signal to the emergency control station.\n\n An approved emergency telephone system, local alarm manual pull stations or other approved alarm-initiating devices are allowed to be used as emergency alarm-initiating devices."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14524
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172491\"><\/AnnotationDrawer><div>Hoistway pressurization systems shall comply with the requirements for smoke control system response time in Section 909.17.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-172492\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-172492\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-172492\"><\/AnnotationDrawer><h6><a name=\"JD_BC910\" id=\"JD_BC910\" title=\"BC 910\"><\/a>Section BC 910: Smoke and Heat Removal<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1999-html-1",
+      "kind" : "html",
+      "plainText" : "Hoistway pressurization systems shall comply with the requirements for smoke control system response time in Section 909.17.\n\n Section BC 910: Smoke and Heat Removal"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1999
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185696\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185696\"><\/AnnotationDrawer><div>Formwork shall be observed at intervals permitting observation of representative configurations throughout the project duration. The formwork designer shall maintain a log of such observations at the construction site. At a minimum, observations shall be made:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185697\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185697\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Immediately after formwork related incidents or violations are issued; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185698\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185698\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;When concrete construction operations are significantly modified such as changes to form materials, concrete placement cycle, or form and support layout prior to use of the change.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19968-html-1",
+      "kind" : "html",
+      "plainText" : "Formwork shall be observed at intervals permitting observation of representative configurations throughout the project duration. The formwork designer shall maintain a log of such observations at the construction site. At a minimum, observations shall be made:\n\n 1. Immediately after formwork related incidents or violations are issued; and\n\n 2. When concrete construction operations are significantly modified such as changes to form materials, concrete placement cycle, or form and support layout prior to use of the change."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19968
+}

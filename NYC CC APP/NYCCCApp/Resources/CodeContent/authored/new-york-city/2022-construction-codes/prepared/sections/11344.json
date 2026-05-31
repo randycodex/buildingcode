@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196075\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196075\"><\/AnnotationDrawer><div>The flow velocity of the hydronic piping system shall be controlled to reduce the possibility of water hammer. Where a quick-closing valve creates water hammer, an engineered water-hammer arrestor shall be installed. The arrestor shall be located within a range as specified by the manufacturer of the quick-closing valve.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11344-html-1",
+      "kind" : "html",
+      "plainText" : "The flow velocity of the hydronic piping system shall be controlled to reduce the possibility of water hammer. Where a quick-closing valve creates water hammer, an engineered water-hammer arrestor shall be installed. The arrestor shall be located within a range as specified by the manufacturer of the quick-closing valve."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11344
+}

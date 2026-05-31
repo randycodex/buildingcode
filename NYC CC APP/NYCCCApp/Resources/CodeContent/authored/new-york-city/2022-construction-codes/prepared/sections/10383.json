@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193360\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193360\"><\/AnnotationDrawer><div>Mechanical ventilation for ambulatory care facilities (Group B) and Group I-2 occupancies shall be designed and installed in accordance with all applicable federal, state and local regulations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193361\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193361\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193361\"><\/AnnotationDrawer><h6><a name=\"JD_MC408\" id=\"JD_MC408\" title=\"MC 408\"><\/a>Section MC 408: Ventilation of Non-Production Chemical Laboratories<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10383-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical ventilation for ambulatory care facilities (Group B) and Group I-2 occupancies shall be designed and installed in accordance with all applicable federal, state and local regulations.\n\n Section MC 408: Ventilation of Non-Production Chemical Laboratories"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 10383
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183293\"><\/AnnotationDrawer><div>Plastic veneers shall be subject to special inspection in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183294\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183294\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183294\"><\/AnnotationDrawer><h6><a name=\"JD_BC2606\" id=\"JD_BC2606\" title=\"BC 2606\"><\/a>Section BC 2606: Light-Transmitting Plastics<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5290-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic veneers shall be subject to special inspection in accordance with Chapter 17 .\n\n Section BC 2606: Light-Transmitting Plastics"
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5290
+}

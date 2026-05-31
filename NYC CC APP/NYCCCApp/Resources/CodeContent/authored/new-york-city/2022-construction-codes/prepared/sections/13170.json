@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189092\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189092\"><\/AnnotationDrawer><div>Wiring for electric lighting shall be entirely enclosed in the sign cabinet with a clearance of not less than 2 inches (51 mm) from the facing material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13170-html-1",
+      "kind" : "html",
+      "plainText" : "Wiring for electric lighting shall be entirely enclosed in the sign cabinet with a clearance of not less than 2 inches (51 mm) from the facing material."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 13170
+}

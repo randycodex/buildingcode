@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186113\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186113\"><\/AnnotationDrawer><div>A flagperson shall be provided whenever intermittent operations are conducted on, or adjacent to, areas open to use by persons other than workers, or when dangerous operations, such as blasting, may affect such areas. Where required by the Department of Transportation, designated personnel shall also be provided in addition to flag persons.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20130-html-1",
+      "kind" : "html",
+      "plainText" : "A flagperson shall be provided whenever intermittent operations are conducted on, or adjacent to, areas open to use by persons other than workers, or when dangerous operations, such as blasting, may affect such areas. Where required by the Department of Transportation, designated personnel shall also be provided in addition to flag persons."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20130
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163119\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163119\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Each trap and trapped fixture is permitted to be provided with an individual vent. The individual vent shall connect to the fixture drain of the trap or trapped fixture being vented in accordance with Section 909.1, but at a distance not to exceed 16 feet (4876 mm).<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12503-html-1",
+      "kind" : "html",
+      "plainText" : "Each trap and trapped fixture is permitted to be provided with an individual vent. The individual vent shall connect to the fixture drain of the trap or trapped fixture being vented in accordance with Section 909.1, but at a distance not to exceed 16 feet (4876 mm)."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12503
+}

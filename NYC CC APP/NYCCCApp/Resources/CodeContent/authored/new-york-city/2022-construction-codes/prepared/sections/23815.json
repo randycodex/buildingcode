@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195144\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195144\"><\/AnnotationDrawer><div>This chapter shall govern the approval, design, installation, construction, maintenance, alteration and repair of the appliances and equipment specifically identified herein and factory-built fireplaces. The approval, design, installation, construction, maintenance, alteration and repair of gas-fired appliances shall be regulated by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23815-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern the approval, design, installation, construction, maintenance, alteration and repair of the appliances and equipment specifically identified herein and factory-built fireplaces. The approval, design, installation, construction, maintenance, alteration and repair of gas-fired appliances shall be regulated by the New York City Fuel Gas Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23815
+}

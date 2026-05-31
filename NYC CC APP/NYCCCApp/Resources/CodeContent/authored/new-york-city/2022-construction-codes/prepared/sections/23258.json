@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193474\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193474\"><\/AnnotationDrawer><div>Mechanical ventilation shall be kept in operation at all times while spraying operations are being conducted and for a sufficient time thereafter to allow vapors from drying coated articles and finishing material residue to be exhausted. Spraying equipment shall be interlocked with the ventilation of the flammable vapor area such that spraying operations cannot be conducted unless the ventilation system is in operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23258-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical ventilation shall be kept in operation at all times while spraying operations are being conducted and for a sufficient time thereafter to allow vapors from drying coated articles and finishing material residue to be exhausted. Spraying equipment shall be interlocked with the ventilation of the flammable vapor area such that spraying operations cannot be conducted unless the ventilation system is in operation."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23258
+}

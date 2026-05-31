@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162323\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Approved deck-mounted or equipment mounted vacuum breakers and faucets with integral atmospheric vacuum breakers or spill-resistant vacuum breaker assemblies shall be installed in accordance with the manufacturer's instructions and the requirements for labeling with the critical level not less than 1 inch (25 mm) above the flood level rim.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25019-html-1",
+      "kind" : "html",
+      "plainText" : "Approved deck-mounted or equipment mounted vacuum breakers and faucets with integral atmospheric vacuum breakers or spill-resistant vacuum breaker assemblies shall be installed in accordance with the manufacturer's instructions and the requirements for labeling with the critical level not less than 1 inch (25 mm) above the flood level rim."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25019
+}

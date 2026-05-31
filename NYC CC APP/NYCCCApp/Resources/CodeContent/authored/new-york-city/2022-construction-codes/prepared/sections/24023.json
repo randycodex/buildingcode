@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195735\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195735\"><\/AnnotationDrawer><div>For other than ammonia systems, the mechanical ventilation systems shall be capable of exhausting the minimum quantity of air both at normal operating and emergency conditions, as required by Sections 1105.6.3.1 and 1105.6.3.2. The minimum required ventilation rate for ammonia shall be 30 air changes per hour in accordance with IIAR2. Multiple fans or multispeed fans shall be allowed to produce the emergency ventilation rate and to obtain a reduced airflow for normal ventilation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24023-html-1",
+      "kind" : "html",
+      "plainText" : "For other than ammonia systems, the mechanical ventilation systems shall be capable of exhausting the minimum quantity of air both at normal operating and emergency conditions, as required by Sections 1105.6.3.1 and 1105.6.3.2. The minimum required ventilation rate for ammonia shall be 30 air changes per hour in accordance with IIAR2. Multiple fans or multispeed fans shall be allowed to produce the emergency ventilation rate and to obtain a reduced airflow for normal ventilation."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24023
+}

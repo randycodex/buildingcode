@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194084\"><\/AnnotationDrawer><div>The minimum clearance between hoods and combustible construction shall be the clearance required by the duct system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23469-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum clearance between hoods and combustible construction shall be the clearance required by the duct system."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23469
+}

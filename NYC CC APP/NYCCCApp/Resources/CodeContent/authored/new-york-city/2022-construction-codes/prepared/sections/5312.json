@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183357\"><\/AnnotationDrawer><div>Where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, the maximum percentage area of exterior wall in any story in light-transmitting plastic wall panels and the maximum square footage of a single area given in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183345', hash: '#JD_BCTable2607.4' }}\">Table 2607.4<\/Link> shall be increased 100 percent, but the area of light-transmitting plastic wall panels shall not exceed 50 percent of the wall area in any story, or the area permitted by Section 705.8 for unprotected openings, whichever is smaller. These installations shall be exempt from height limitations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5312-html-1",
+      "kind" : "html",
+      "plainText" : "Where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, the maximum percentage area of exterior wall in any story in light-transmitting plastic wall panels and the maximum square footage of a single area given in Table 2607.4 shall be increased 100 percent, but the area of light-transmitting plastic wall panels shall not exceed 50 percent of the wall area in any story, or the area permitted by Section 705.8 for unprotected openings, whichever is smaller. These installations shall be exempt from height limitations."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5312
+}

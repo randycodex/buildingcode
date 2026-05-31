@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185954\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185954\"><\/AnnotationDrawer><div>The approved set of submittal documents shall be kept at the site at all times and be accessible for inspection in accordance with Section 3301.7. It shall be a violation of this code to use mechanical equipment, whether handheld or other than handheld, to perform full or partial demolitions unless the approved submittal documents required by Section 3306.5.1 are available for inspection. Failure to make submittal documents available on site may result in the issuance of a stop work order.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6240-html-1",
+      "kind" : "html",
+      "plainText" : "The approved set of submittal documents shall be kept at the site at all times and be accessible for inspection in accordance with Section 3301.7. It shall be a violation of this code to use mechanical equipment, whether handheld or other than handheld, to perform full or partial demolitions unless the approved submittal documents required by Section 3306.5.1 are available for inspection. Failure to make submittal documents available on site may result in the issuance of a stop work order."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6240
+}

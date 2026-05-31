@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179415\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179415\"><\/AnnotationDrawer><div>The hammer to be used to drive deep foundations shall deliver a maximum energy consistent with the size, strength and weight of the driven deep foundations. The hammer shall travel freely in the leads. The hammer shall deliver its rated energy, and measurements shall be made of the fall of the ram or other suitable data shall be obtained at intervals necessary to verify the actual energy delivered during the final 20 blows of the hammer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4087-html-1",
+      "kind" : "html",
+      "plainText" : "The hammer to be used to drive deep foundations shall deliver a maximum energy consistent with the size, strength and weight of the driven deep foundations. The hammer shall travel freely in the leads. The hammer shall deliver its rated energy, and measurements shall be made of the fall of the ram or other suitable data shall be obtained at intervals necessary to verify the actual energy delivered during the final 20 blows of the hammer."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4087
+}

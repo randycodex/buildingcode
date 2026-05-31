@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164402\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164402\"><\/annotationdrawer><div>Applications for construction document approval shall include submittal documents relating to the availability and feasibility of a public sanitary or public combined sewer and\/or other approved discharge for sewage in accordance with Sections 107.11.1.1 and 107.11.1.2 for the following types of applications:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164403\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164403\"><\/annotationdrawer><div>&nbsp;&nbsp;&nbsp;1.&nbsp;&nbsp;&nbsp;New buildings that include any fixtures that produce sewage;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164404\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164404\"><\/annotationdrawer><div>&nbsp;&nbsp;&nbsp;2.&nbsp;&nbsp;&nbsp;Alterations that require an increase in size to an existing sanitary or combined sewer connection; and\/or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164405\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164405\"><\/annotationdrawer><div>&nbsp;&nbsp;&nbsp;3.&nbsp;&nbsp;&nbsp;Alterations requiring a new connection to a sanitary or combined sewer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "64-html-1",
+      "kind" : "html",
+      "plainText" : "Applications for construction document approval shall include submittal documents relating to the availability and feasibility of a public sanitary or public combined sewer and\/or other approved discharge for sewage in accordance with Sections 107.11.1.1 and 107.11.1.2 for the following types of applications:\n\n 1. New buildings that include any fixtures that produce sewage;\n\n 2. Alterations that require an increase in size to an existing sanitary or combined sewer connection; and\/or\n\n 3. Alterations requiring a new connection to a sanitary or combined sewer."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 64
+}

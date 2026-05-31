@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179938\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179938\"><\/AnnotationDrawer><div>For buildings with rubble foundation elements, an assessment of the condition of the rubble element shall be performed. If the rubble foundation elements are in poor condition, recommendations for addressing the poor conditions shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18088-html-1",
+      "kind" : "html",
+      "plainText" : "For buildings with rubble foundation elements, an assessment of the condition of the rubble element shall be performed. If the rubble foundation elements are in poor condition, recommendations for addressing the poor conditions shall be provided."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18088
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163472\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163472\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where roof drains are required, secondary (emergency overflow) roof drains or scuppers shall be provided where the roof perimeter construction extends above the roof in such a manner that water will be entrapped if the primary drains allow buildup for any reason. The inlet elevation of secondary (overflow) drains and the invert elevation of overflow scuppers should be not less than 2 inches (51 mm) or more than 4 inches (102 mm) above the low point of the (adjacent to) roof surface unless a safer water depth loading, including the required hydraulic head to maintain required flow rate out of the overflow drainage system that has been determined by the structural design. Where primary and secondary roof drains are manufactured as a single assembly, the inlet and outlet for each drain shall be independent.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25450-html-1",
+      "kind" : "html",
+      "plainText" : "Where roof drains are required, secondary (emergency overflow) roof drains or scuppers shall be provided where the roof perimeter construction extends above the roof in such a manner that water will be entrapped if the primary drains allow buildup for any reason. The inlet elevation of secondary (overflow) drains and the invert elevation of overflow scuppers should be not less than 2 inches (51 mm) or more than 4 inches (102 mm) above the low point of the (adjacent to) roof surface unless a safer water depth loading, including the required hydraulic head to maintain required flow rate out of the overflow drainage system that has been determined by the structural design. Where primary and secondary roof drains are manufactured as a single assembly, the inlet and outlet for each drain shall be independent."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25450
+}

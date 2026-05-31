@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194400\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194400\"><\/AnnotationDrawer><div>Where a duct liner required for thermal insulation or condensation control has been interrupted, a duct covering of equal thermal performance shall be installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23575-html-1",
+      "kind" : "html",
+      "plainText" : "Where a duct liner required for thermal insulation or condensation control has been interrupted, a duct covering of equal thermal performance shall be installed."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23575
+}

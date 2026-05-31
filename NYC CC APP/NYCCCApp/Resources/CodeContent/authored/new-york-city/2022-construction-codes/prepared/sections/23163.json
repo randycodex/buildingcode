@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193191\"><\/AnnotationDrawer><div>Ventilation shall be provided during the periods that the room or space is occupied or during operation of gas appliances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23163-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation shall be provided during the periods that the room or space is occupied or during operation of gas appliances."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 23163
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193536\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193536\"><\/AnnotationDrawer><div>The ventilation system for gas rooms, exhausted enclosures and gas cabinets for any quantity of hazardous material shall be designed to operate at a negative pressure in relation to the surrounding area. Highly toxic and toxic gases shall comply with Sections 502.9.7.1, 502.9.7.2 and 502.9.8.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23283-html-1",
+      "kind" : "html",
+      "plainText" : "The ventilation system for gas rooms, exhausted enclosures and gas cabinets for any quantity of hazardous material shall be designed to operate at a negative pressure in relation to the surrounding area. Highly toxic and toxic gases shall comply with Sections 502.9.7.1, 502.9.7.2 and 502.9.8.4."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23283
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195900\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195900\"><\/AnnotationDrawer><div>Where a compressor is used as a booster to obtain an intermediate pressure and discharges into the suction side of another compressor, the booster compressor shall be considered a part of the low side, provided that it is protected by a pressure relief device.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11269-html-1",
+      "kind" : "html",
+      "plainText" : "Where a compressor is used as a booster to obtain an intermediate pressure and discharges into the suction side of another compressor, the booster compressor shall be considered a part of the low side, provided that it is protected by a pressure relief device."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11269
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180130\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180130\"><\/AnnotationDrawer><div>Special inspections and tests of concrete elements of buildings and structures, and concreting operations, shall be as required by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180131\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180131\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180131\"><\/AnnotationDrawer><h6><a name=\"JD_BC1902\" id=\"JD_BC1902\" title=\"BC 1902\"><\/a>Section BC 1902: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18154-html-1",
+      "kind" : "html",
+      "plainText" : "Special inspections and tests of concrete elements of buildings and structures, and concreting operations, shall be as required by Chapter 17 .\n\n Section BC 1902: Definitions"
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18154
+}

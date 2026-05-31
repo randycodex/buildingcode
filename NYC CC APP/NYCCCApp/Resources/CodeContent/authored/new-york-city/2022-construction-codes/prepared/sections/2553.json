@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174532\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174532\"><\/AnnotationDrawer><div>Stepped aisles, transitions and stairways that maintain riser and tread dimensions shall comply with Section 1029.13 as one exit access component.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2553-html-1",
+      "kind" : "html",
+      "plainText" : "Stepped aisles, transitions and stairways that maintain riser and tread dimensions shall comply with Section 1029.13 as one exit access component."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2553
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196667\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196667\"><\/AnnotationDrawer><div>Nonmetallic tanks shall be constructed per Sections 7, 8, 9, 10, 11 and 12 of UL 2258 and Chapter 7 of NFPA 31 and shall consist of a non-metallic primary tank and a metallic secondary tank.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196668\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196668\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224693\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224693\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24404-html-1",
+      "kind" : "html",
+      "plainText" : "Nonmetallic tanks shall be constructed per Sections 7, 8, 9, 10, 11 and 12 of UL 2258 and Chapter 7 of NFPA 31 and shall consist of a non-metallic primary tank and a metallic secondary tank.\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24404
+}

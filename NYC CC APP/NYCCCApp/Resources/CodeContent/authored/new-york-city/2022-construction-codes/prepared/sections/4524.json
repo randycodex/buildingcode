@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180622\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180622\"><\/AnnotationDrawer><div>Shotcrete shall not be applied to spirally tied columns.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4524-html-1",
+      "kind" : "html",
+      "plainText" : "Shotcrete shall not be applied to spirally tied columns."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4524
+}

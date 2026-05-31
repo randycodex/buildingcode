@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185348\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185348\"><\/AnnotationDrawer><div>All stairs in a building undergoing construction or demolition shall be lighted at all times, and shall be kept free of equipment, debris, and material in accordance with Section 3303.4.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6018-html-1",
+      "kind" : "html",
+      "plainText" : "All stairs in a building undergoing construction or demolition shall be lighted at all times, and shall be kept free of equipment, debris, and material in accordance with Section 3303.4.10."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6018
+}

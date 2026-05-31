@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163182\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The combination waste and vent system shall be provided with a dry vent connected at any point within the system or the system shall connect to a horizontal drain that serves vented fixtures located on the same floor. Combination waste and vent systems connecting to building drains receiving only the discharge from one or more stacks shall be provided with a dry vent. The vent connection to the combination waste and vent pipe shall extend vertically to a point not less than 6 inches (152 mm) above the flood level rim of the highest fixture being vented before offsetting horizontally.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12527-html-1",
+      "kind" : "html",
+      "plainText" : "The combination waste and vent system shall be provided with a dry vent connected at any point within the system or the system shall connect to a horizontal drain that serves vented fixtures located on the same floor. Combination waste and vent systems connecting to building drains receiving only the discharge from one or more stacks shall be provided with a dry vent. The vent connection to the combination waste and vent pipe shall extend vertically to a point not less than 6 inches (152 mm) above the flood level rim of the highest fixture being vented before offsetting horizontally."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12527
+}

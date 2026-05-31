@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175832\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175832\"><\/AnnotationDrawer><div>The minimum net glazed area shall be not less than 10 percent of the floor area of the room served. Every opening providing required natural light shall be at least 12 square feet (1.1 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of glazed area.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175833\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175833\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> For Group R-3 occupancies, the net glazed area shall be not less than 10 percent of the floor area of the room served, or 12 square feet (1.1 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t), whichever is greater.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16813-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum net glazed area shall be not less than 10 percent of the floor area of the room served. Every opening providing required natural light shall be at least 12 square feet (1.1 m\n\n 2 \n\n ) of glazed area.\n\n Exception: For Group R-3 occupancies, the net glazed area shall be not less than 10 percent of the floor area of the room served, or 12 square feet (1.1 m\n\n 2 \n\n ), whichever is greater."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16813
+}

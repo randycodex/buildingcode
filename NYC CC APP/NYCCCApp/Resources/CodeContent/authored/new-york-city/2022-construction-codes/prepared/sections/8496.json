@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198849\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198849\"><\/AnnotationDrawer><div>Vented appliances shall be installed with draft hoods.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198850\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198850\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Direct-vent appliances, fan-assisted combustion system appliances, appliances requiring chimney draft for operation, appliances equipped with blast, power, or pressure burners that are not listed for use with draft hoods, and appliances designed for forced venting.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8496-html-1",
+      "kind" : "html",
+      "plainText" : "Vented appliances shall be installed with draft hoods.\n\n Exception: Direct-vent appliances, fan-assisted combustion system appliances, appliances requiring chimney draft for operation, appliances equipped with blast, power, or pressure burners that are not listed for use with draft hoods, and appliances designed for forced venting."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8496
+}

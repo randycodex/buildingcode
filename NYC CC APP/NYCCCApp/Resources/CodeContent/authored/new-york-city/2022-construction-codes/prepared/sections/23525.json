@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194260\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194260\"><\/AnnotationDrawer><div>Where discrete plumbing and mechanical products and appurtenances are located in a plenum and have exposed combustible material, they shall be listed and labeled for such use in accordance with UL 2043.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23525-html-1",
+      "kind" : "html",
+      "plainText" : "Where discrete plumbing and mechanical products and appurtenances are located in a plenum and have exposed combustible material, they shall be listed and labeled for such use in accordance with UL 2043."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23525
+}

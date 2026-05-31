@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168622\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168622\"><\/AnnotationDrawer><div>Group H occupancies shall be separated from the remainder of the unlimited area building and from each other in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168698', hash: '#JD_BCTable508.4' }}\">Table 508.4<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "895-html-1",
+      "kind" : "html",
+      "plainText" : "Group H occupancies shall be separated from the remainder of the unlimited area building and from each other in accordance with Table 508.4 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 895
+}

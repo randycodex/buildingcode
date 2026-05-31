@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197891\"><\/AnnotationDrawer><div>Metallic fittings shall comply with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197892\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197892\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Threaded fittings in sizes larger than 4 inches (101.6 mm) shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197893\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197893\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Fittings used with steel or wrought-iron pipe shall be steel or malleable iron.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197894\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197894\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Bushings shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20963-html-1",
+      "kind" : "html",
+      "plainText" : "Metallic fittings shall comply with the following:\n\n 1. Threaded fittings in sizes larger than 4 inches (101.6 mm) shall not be used.\n\n 2. Fittings used with steel or wrought-iron pipe shall be steel or malleable iron.\n\n 3. Bushings shall not be used."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20963
+}

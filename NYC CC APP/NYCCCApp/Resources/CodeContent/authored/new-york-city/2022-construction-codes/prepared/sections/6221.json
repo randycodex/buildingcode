@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185885\"><\/AnnotationDrawer><div>The permit holder, or where there is no permit holder, the person causing the demolition work to be performed, shall institute and maintain measures to prevent persons other than workers from entering areas where demolition work is occurring, debris is stored, or equipment is located.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6221-html-1",
+      "kind" : "html",
+      "plainText" : "The permit holder, or where there is no permit holder, the person causing the demolition work to be performed, shall institute and maintain measures to prevent persons other than workers from entering areas where demolition work is occurring, debris is stored, or equipment is located."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6221
+}

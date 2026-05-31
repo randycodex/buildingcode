@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167076\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167076\"><\/AnnotationDrawer><div>Where the surface paving of an open parking lot is non-porous, such lot shall be drained as required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14230-html-1",
+      "kind" : "html",
+      "plainText" : "Where the surface paving of an open parking lot is non-porous, such lot shall be drained as required by the New York City Plumbing Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14230
+}

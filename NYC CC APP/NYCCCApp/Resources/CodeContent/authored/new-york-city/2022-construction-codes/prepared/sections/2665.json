@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174898\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174898\"><\/AnnotationDrawer><div>Security barriers including, but not limited to, security bollards and security check points shall not obstruct a required accessible route or accessible means of egress.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174899\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174899\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where security barriers incorporate elements that cannot comply with these requirements, such as certain metal detectors, fluoroscopes or other similar devices, the accessible route shall be permitted to be provided adjacent to security screening devices. The accessible route shall permit individuals with disabilities passing around security barriers to maintain visual contact with their personal items to the same extent provided others passing through the security barrier.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-174900\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-174900\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-174900\"><\/AnnotationDrawer><h6><a name=\"JD_BC1105\" id=\"JD_BC1105\" title=\"BC 1105\"><\/a>Section BC 1105: Accessible Entrances<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2665-html-1",
+      "kind" : "html",
+      "plainText" : "Security barriers including, but not limited to, security bollards and security check points shall not obstruct a required accessible route or accessible means of egress.\n\n Exception: Where security barriers incorporate elements that cannot comply with these requirements, such as certain metal detectors, fluoroscopes or other similar devices, the accessible route shall be permitted to be provided adjacent to security screening devices. The accessible route shall permit individuals with disabilities passing around security barriers to maintain visual contact with their personal items to the same extent provided others passing through the security barrier.\n\n Section BC 1105: Accessible Entrances"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2665
+}

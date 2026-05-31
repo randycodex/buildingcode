@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195904\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195904\"><\/AnnotationDrawer><div>Tests shall be performed with an inert-dried gas including, but not limited to, nitrogen and carbon dioxide. Oxygen, air, flammable gases and mixtures containing such gases shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195905\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195905\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195906\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195906\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The use of air is allowed to test R-717, ammonia, systems provided that they are subsequently evacuated before charging with refrigerant.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195907\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Mixtures of dry nitrogen, inert gases, or a combination of them with nonflammable refrigerants in concentrations of a refrigerant weight fraction (mass fraction) not exceeding 5 are allowed for tests.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24096-html-1",
+      "kind" : "html",
+      "plainText" : "Tests shall be performed with an inert-dried gas including, but not limited to, nitrogen and carbon dioxide. Oxygen, air, flammable gases and mixtures containing such gases shall not be used.\n\n Exceptions: \n\n 1. The use of air is allowed to test R-717, ammonia, systems provided that they are subsequently evacuated before charging with refrigerant.\n\n 2. Mixtures of dry nitrogen, inert gases, or a combination of them with nonflammable refrigerants in concentrations of a refrigerant weight fraction (mass fraction) not exceeding 5 are allowed for tests."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24096
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196487\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196487\"><\/AnnotationDrawer><div>Pipe connections to the main header (supply or return) shall be made from the top of the header.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196488\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196488\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Systems with appliances above the lowest floor where such appliances are designed to operate utilizing fuel pumped as needed from the lowest floor and without utilizing fuel oil stored via header above the lowest floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24349-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe connections to the main header (supply or return) shall be made from the top of the header.\n\n Exception: Systems with appliances above the lowest floor where such appliances are designed to operate utilizing fuel pumped as needed from the lowest floor and without utilizing fuel oil stored via header above the lowest floor."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24349
+}

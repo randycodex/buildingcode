@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172678\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172678\"><\/AnnotationDrawer><div>Where a fire alarm system is required or provided, carbon monoxide detectors with sounder bases shall be installed within any room containing carbon monoxide-producing equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15899-html-1",
+      "kind" : "html",
+      "plainText" : "Where a fire alarm system is required or provided, carbon monoxide detectors with sounder bases shall be installed within any room containing carbon monoxide-producing equipment."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15899
+}

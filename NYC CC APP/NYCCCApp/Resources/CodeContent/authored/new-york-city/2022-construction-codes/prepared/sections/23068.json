@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192923\"><\/AnnotationDrawer><div>The cutting, notching and boring of steel framing members shall comply with Sections 302.5.1 through 302.5.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23068-html-1",
+      "kind" : "html",
+      "plainText" : "The cutting, notching and boring of steel framing members shall comply with Sections 302.5.1 through 302.5.4."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23068
+}

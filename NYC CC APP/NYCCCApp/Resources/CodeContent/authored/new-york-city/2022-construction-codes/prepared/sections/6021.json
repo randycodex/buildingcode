@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185354\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185354\"><\/AnnotationDrawer><div>When required by Sections 3303.12.2.1 through 3303.12.2.4, floors closed to the public in a new or existing building undergoing construction or demolition work shall be served by, at least, either:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185355\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185355\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;An elevator provided with Phase I and Phase II recall meeting the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183610', hash: '#JD_BCCh.30' }}\">Chapter 30<\/Link>, which shall be kept in readiness at all times for Fire Department use; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185356\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185356\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;A hoist meeting the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-187659', hash: '#JD_BC3318' }}\">3318<\/Link>, which shall be available at all times for Fire Department use.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185357\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> An elevator or hoist is not required during the course of construction or demolition of a building that does not require a permanent elevator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6021-html-1",
+      "kind" : "html",
+      "plainText" : "When required by Sections 3303.12.2.1 through 3303.12.2.4, floors closed to the public in a new or existing building undergoing construction or demolition work shall be served by, at least, either:\n\n 1. An elevator provided with Phase I and Phase II recall meeting the requirements of Chapter 30 , which shall be kept in readiness at all times for Fire Department use; or\n\n 2. A hoist meeting the requirements of Section 3318 , which shall be available at all times for Fire Department use.\n\n Exception: An elevator or hoist is not required during the course of construction or demolition of a building that does not require a permanent elevator."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6021
+}

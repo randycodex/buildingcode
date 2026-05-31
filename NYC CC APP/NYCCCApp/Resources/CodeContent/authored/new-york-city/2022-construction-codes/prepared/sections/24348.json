@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196485\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196485\"><\/AnnotationDrawer><div>The piping shall be located and secured from movement so as to prevent undue stress on the piping and to isolate the piping from vibrations from any equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24348-html-1",
+      "kind" : "html",
+      "plainText" : "The piping shall be located and secured from movement so as to prevent undue stress on the piping and to isolate the piping from vibrations from any equipment."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24348
+}

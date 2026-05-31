@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198054\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198054\"><\/AnnotationDrawer><div>Prior to acceptance and initial operation, all piping installations shall be inspected and pressure tested to determine that the materials, design, fabrication and installation practices comply with the requirements of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8201-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to acceptance and initial operation, all piping installations shall be inspected and pressure tested to determine that the materials, design, fabrication and installation practices comply with the requirements of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8201
+}

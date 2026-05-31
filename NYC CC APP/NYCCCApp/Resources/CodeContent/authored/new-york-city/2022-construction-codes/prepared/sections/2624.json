@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174753\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174753\"><\/AnnotationDrawer><div>Buildings and facilities shall be designed and constructed to be accessible in accordance with ICC A117.1 and this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2624-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings and facilities shall be designed and constructed to be accessible in accordance with ICC A117.1 and this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2624
+}

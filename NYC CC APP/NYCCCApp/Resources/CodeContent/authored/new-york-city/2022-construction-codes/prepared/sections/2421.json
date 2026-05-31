@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174067\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174067\"><\/AnnotationDrawer><div>Use of the space between the corridor ceiling and the floor or roof structure above as a return air plenum shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2421-html-1",
+      "kind" : "html",
+      "plainText" : "Use of the space between the corridor ceiling and the floor or roof structure above as a return air plenum shall be in accordance with the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2421
+}

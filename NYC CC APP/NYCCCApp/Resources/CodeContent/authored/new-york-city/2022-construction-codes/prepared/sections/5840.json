@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184672\"><\/AnnotationDrawer><div>The permit holder, or where there is no permit holder, the contractor or other entity causing the work to be performed, shall ensure compliance with manufacturer specifications, design documents, and capacity restrictions in accordance with Sections 3301.6.1 through 3301.6.5 and other applicable sections of the code. Where there is a discrepancy between a manufacturer specification, design document, capacity restriction, or other applicable code section, the more stringent requirement shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5840-html-1",
+      "kind" : "html",
+      "plainText" : "The permit holder, or where there is no permit holder, the contractor or other entity causing the work to be performed, shall ensure compliance with manufacturer specifications, design documents, and capacity restrictions in accordance with Sections 3301.6.1 through 3301.6.5 and other applicable sections of the code. Where there is a discrepancy between a manufacturer specification, design document, capacity restriction, or other applicable code section, the more stringent requirement shall apply."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5840
+}

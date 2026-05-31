@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197599\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197599\"><\/AnnotationDrawer><div>Appliances installed in repair garages shall be installed in accordance with NFPA 30A.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20879-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances installed in repair garages shall be installed in accordance with NFPA 30A."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20879
+}

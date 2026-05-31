@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198568\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198568\"><\/AnnotationDrawer><div>Before replacing an existing appliance or connecting a vent connector to a special gas vent, the special gas vent shall be examined to ascertain that it is clear and free of obstructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8396-html-1",
+      "kind" : "html",
+      "plainText" : "Before replacing an existing appliance or connecting a vent connector to a special gas vent, the special gas vent shall be examined to ascertain that it is clear and free of obstructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8396
+}

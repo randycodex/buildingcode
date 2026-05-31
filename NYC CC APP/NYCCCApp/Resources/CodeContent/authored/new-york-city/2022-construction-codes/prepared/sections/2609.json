@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174708\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174708\"><\/AnnotationDrawer><div>Signage shall be provided in accordance with this section and the rules of the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2609-html-1",
+      "kind" : "html",
+      "plainText" : "Signage shall be provided in accordance with this section and the rules of the department."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2609
+}

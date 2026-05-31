@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185275\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185275\"><\/AnnotationDrawer><div>A watchperson meeting the requirements of Section 3303.3 shall be on duty during all times specified by Section 3303.3, even if the building has a footprint of less than 5,000 sq ft (1524 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19812-html-1",
+      "kind" : "html",
+      "plainText" : "A watchperson meeting the requirements of Section 3303.3 shall be on duty during all times specified by Section 3303.3, even if the building has a footprint of less than 5,000 sq ft (1524 m\n\n 2 \n\n )."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19812
+}

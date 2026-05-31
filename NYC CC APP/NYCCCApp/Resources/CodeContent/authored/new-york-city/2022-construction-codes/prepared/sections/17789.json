@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179041\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179041\"><\/AnnotationDrawer><div>Walls required to be waterproofed shall be designed and constructed to withstand the hydrostatic pressures and other lateral loads to which the walls will be subjected. Waterproofing shall be applied from the bottom of the wall to not less than 12 inches (304.8 mm) above the maximum elevation of the groundwater table or as directed by the registered design professional. The remainder of the wall shall be dampproofed in accordance with Section 1805.2.2. Joints, penetrations and other interruptions shall be sealed in accordance with manufacturer's recommendations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17789-html-1",
+      "kind" : "html",
+      "plainText" : "Walls required to be waterproofed shall be designed and constructed to withstand the hydrostatic pressures and other lateral loads to which the walls will be subjected. Waterproofing shall be applied from the bottom of the wall to not less than 12 inches (304.8 mm) above the maximum elevation of the groundwater table or as directed by the registered design professional. The remainder of the wall shall be dampproofed in accordance with Section 1805.2.2. Joints, penetrations and other interruptions shall be sealed in accordance with manufacturer's recommendations."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17789
+}

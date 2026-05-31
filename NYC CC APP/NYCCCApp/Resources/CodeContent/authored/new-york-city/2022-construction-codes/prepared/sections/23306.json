@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193591\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193591\"><\/AnnotationDrawer><div>Exhausted enclosures containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.8.2 and the following requirements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193592\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193592\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The average ventilation velocity at the face of the enclosure shall be not less than 200 feet per minute (1.02 m\/s) with a minimum velocity of 150 feet per minute (0.76 m\/s).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193593\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193593\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Exhausted enclosures shall be connected to an exhaust system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193594\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193594\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Exhausted enclosures shall not be used as the sole means of exhaust for any room or area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23306-html-1",
+      "kind" : "html",
+      "plainText" : "Exhausted enclosures containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.8.2 and the following requirements:\n\n 1. The average ventilation velocity at the face of the enclosure shall be not less than 200 feet per minute (1.02 m\/s) with a minimum velocity of 150 feet per minute (0.76 m\/s).\n\n 2. Exhausted enclosures shall be connected to an exhaust system.\n\n 3. Exhausted enclosures shall not be used as the sole means of exhaust for any room or area."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23306
+}

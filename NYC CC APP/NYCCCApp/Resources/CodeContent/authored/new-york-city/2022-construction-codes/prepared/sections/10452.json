@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193513\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193513\"><\/AnnotationDrawer><div>Exhaust ventilation for powder-coating operations shall be sufficient to maintain the atmosphere below one-half of the minimum explosive concentration for the material being applied. Nondeposited, air-suspended powders shall be removed through exhaust ducts to the powder recovery system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10452-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust ventilation for powder-coating operations shall be sufficient to maintain the atmosphere below one-half of the minimum explosive concentration for the material being applied. Nondeposited, air-suspended powders shall be removed through exhaust ducts to the powder recovery system."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10452
+}

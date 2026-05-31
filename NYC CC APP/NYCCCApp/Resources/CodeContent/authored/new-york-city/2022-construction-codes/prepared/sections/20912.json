@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197720\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197720\"><\/AnnotationDrawer><div>Where the furnace plenum is adjacent to plaster on metal lath or noncombustible material attached to combustible material, the clearance shall be measured to the surface of the plaster or other noncombustible finish where the clearance specified is 2 inches (50.8 mm) or less.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20912-html-1",
+      "kind" : "html",
+      "plainText" : "Where the furnace plenum is adjacent to plaster on metal lath or noncombustible material attached to combustible material, the clearance shall be measured to the surface of the plaster or other noncombustible finish where the clearance specified is 2 inches (50.8 mm) or less."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20912
+}

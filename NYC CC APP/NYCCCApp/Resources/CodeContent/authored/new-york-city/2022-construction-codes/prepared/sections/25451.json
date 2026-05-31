@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163474\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163474\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Secondary roof drain systems shall have the end point of discharge separate from the primary system. Discharge shall be above grade, in a location that would normally be observed by the building occupants or maintenance personnel.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163475\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163475\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Secondary drainage system may tie into the primary drainage system in the vertical conductors where separate systems are impractical or to prevent water from flowing over sidewalk or pedestrian walkways.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25451-html-1",
+      "kind" : "html",
+      "plainText" : "Secondary roof drain systems shall have the end point of discharge separate from the primary system. Discharge shall be above grade, in a location that would normally be observed by the building occupants or maintenance personnel. \n\n Exception: Secondary drainage system may tie into the primary drainage system in the vertical conductors where separate systems are impractical or to prevent water from flowing over sidewalk or pedestrian walkways."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25451
+}

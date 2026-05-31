@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173744\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173744\"><\/AnnotationDrawer><div>The rise for any ramp run shall be 30 inches (762 mm) maximum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2344-html-1",
+      "kind" : "html",
+      "plainText" : "The rise for any ramp run shall be 30 inches (762 mm) maximum."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2344
+}

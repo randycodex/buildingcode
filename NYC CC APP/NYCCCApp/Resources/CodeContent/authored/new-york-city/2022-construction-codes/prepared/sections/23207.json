@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193357\"><\/AnnotationDrawer><div>The design and materials used in the installation of the methane and radon vent systems shall be approved by the commissioner and shall comply with all applicable rules of the Fire Department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193358\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193358\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193358\"><\/AnnotationDrawer><h6><a name=\"JD_MC407\" id=\"JD_MC407\" title=\"MC 407\"><\/a>Section MC 407: Ambulatory Care Facilities and Group I-2 Occupancies<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23207-html-1",
+      "kind" : "html",
+      "plainText" : "The design and materials used in the installation of the methane and radon vent systems shall be approved by the commissioner and shall comply with all applicable rules of the Fire Department.\n\n Section MC 407: Ambulatory Care Facilities and Group I-2 Occupancies"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 23207
+}

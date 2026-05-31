@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196093\"><\/AnnotationDrawer><div>Hydronic piping systems other than ground-source heat pump loop systems shall be tested hydrostatically at one and one half times the system design operating pressure, but not less than 100 psi (689 kPa). The duration of each test shall be not less than 2 hours. Ground-source heat pump loop systems shall be tested in accordance with Section 1210.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196094\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196094\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196094\"><\/AnnotationDrawer><h6><a name=\"JD_MC1209\" id=\"JD_MC1209\" title=\"MC 1209\"><\/a>Section MC 1209: Embedded Piping<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24177-html-1",
+      "kind" : "html",
+      "plainText" : "Hydronic piping systems other than ground-source heat pump loop systems shall be tested hydrostatically at one and one half times the system design operating pressure, but not less than 100 psi (689 kPa). The duration of each test shall be not less than 2 hours. Ground-source heat pump loop systems shall be tested in accordance with Section 1210.10.\n\n Section MC 1209: Embedded Piping"
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24177
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163838\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163838\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Rainwater shall be collected only from above-ground impervious roofing surfaces constructed from approved materials. Collection of water from vehicular parking or pedestrian surfaces shall be prohibited except where the water is used exclusively for landscape irrigation.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12751-html-1",
+      "kind" : "html",
+      "plainText" : "Rainwater shall be collected only from above-ground impervious roofing surfaces constructed from approved materials. Collection of water from vehicular parking or pedestrian surfaces shall be prohibited except where the water is used exclusively for landscape irrigation."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12751
+}

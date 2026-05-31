@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173992\"><\/AnnotationDrawer><div>Travel distance on exit access stairways or ramps shall be included in the exit access travel distance measurement. The measurement along stairways shall be made on a plane parallel and tangent to the stair tread nosings in the center of the stair and landings. The measurement along ramps shall be made on the walking surface in the center of the ramp and landings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-173993\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-173993\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-173993\"><\/AnnotationDrawer><h6><a name=\"JD_BC1018\" id=\"JD_BC1018\" title=\"BC 1018\"><\/a>Section BC 1018: Aisles<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16233-html-1",
+      "kind" : "html",
+      "plainText" : "Travel distance on exit access stairways or ramps shall be included in the exit access travel distance measurement. The measurement along stairways shall be made on a plane parallel and tangent to the stair tread nosings in the center of the stair and landings. The measurement along ramps shall be made on the walking surface in the center of the ramp and landings.\n\n Section BC 1018: Aisles"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16233
+}

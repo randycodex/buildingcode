@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166796\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166796\"><\/AnnotationDrawer><div>For high-rise buildings, outdoor air intakes serving spaces above the second story and serving spaces greater than 10,000 square feet (929 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of floor area shall be located in accordance with Section 401.5 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166797\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166797\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Group R-2 occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14133-html-1",
+      "kind" : "html",
+      "plainText" : "For high-rise buildings, outdoor air intakes serving spaces above the second story and serving spaces greater than 10,000 square feet (929 m\n\n 2 \n\n ) of floor area shall be located in accordance with Section 401.5 of the New York City Mechanical Code .\n\n Exception: Group R-2 occupancy."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14133
+}

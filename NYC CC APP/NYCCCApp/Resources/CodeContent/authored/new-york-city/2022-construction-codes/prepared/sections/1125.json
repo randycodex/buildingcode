@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169445\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169445\"><\/AnnotationDrawer><div>Where the horizontal assembly separates mixed occupancies, the assembly shall have a fire-resistance rating of not less than that required by Section 508.4 based on the occupancies being separated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1125-html-1",
+      "kind" : "html",
+      "plainText" : "Where the horizontal assembly separates mixed occupancies, the assembly shall have a fire-resistance rating of not less than that required by Section 508.4 based on the occupancies being separated."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1125
+}

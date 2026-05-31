@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193877\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193877\"><\/AnnotationDrawer><div>Where cleanout openings are located in ducts within a fire-resistance-rated enclosure, access openings shall be provided in the enclosure at each cleanout point. Access openings shall be equipped with tight-fitting sliding or hinged doors that are equal in fire-resistive protection to that of the shaft or enclosure. An approved sign shall be placed on access opening panels with wording as follows: \"ACCESS PANEL. DO NOT OBSTRUCT.\" Cleanout openings provided in ducts that are not located within a fire-resistance-rated enclosure shall be provided with signage at the required opening that contains the same wording.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10571-html-1",
+      "kind" : "html",
+      "plainText" : "Where cleanout openings are located in ducts within a fire-resistance-rated enclosure, access openings shall be provided in the enclosure at each cleanout point. Access openings shall be equipped with tight-fitting sliding or hinged doors that are equal in fire-resistive protection to that of the shaft or enclosure. An approved sign shall be placed on access opening panels with wording as follows: \"ACCESS PANEL. DO NOT OBSTRUCT.\" Cleanout openings provided in ducts that are not located within a fire-resistance-rated enclosure shall be provided with signage at the required opening that contains the same wording."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10571
+}

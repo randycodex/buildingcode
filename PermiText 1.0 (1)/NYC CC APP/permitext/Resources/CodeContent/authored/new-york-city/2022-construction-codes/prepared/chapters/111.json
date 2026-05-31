@@ -1,0 +1,291 @@
+{
+  "chapterID": 111,
+  "chapterNumber": "8",
+  "groups": [
+    {
+      "headerLine": "SECTION PC 801",
+      "headingLine": "General",
+      "id": "SECTION PC 801",
+      "sections": [
+        {
+          "id": 12473,
+          "kind": "title",
+          "sectionNumber": "801.1",
+          "title": "801.1 Scope."
+        },
+        {
+          "id": 12474,
+          "kind": "title",
+          "sectionNumber": "801.2",
+          "title": "801.2 Protection."
+        },
+        {
+          "id": 12475,
+          "kind": "title",
+          "sectionNumber": "802.1",
+          "title": "802.1 Where required."
+        },
+        {
+          "id": 12476,
+          "kind": "title",
+          "sectionNumber": "802.1.1",
+          "title": "802.1.1 Food handling."
+        },
+        {
+          "id": 12477,
+          "kind": "title",
+          "sectionNumber": "802.1.2",
+          "title": "802.1.2 Floor drains in food storage areas."
+        },
+        {
+          "id": 12478,
+          "kind": "title",
+          "sectionNumber": "802.1.3",
+          "title": "802.1.3 Potable clear-water waste."
+        },
+        {
+          "id": 12479,
+          "kind": "title",
+          "sectionNumber": "802.1.4",
+          "title": "802.1.4 Swimming pools."
+        },
+        {
+          "id": 12480,
+          "kind": "title",
+          "sectionNumber": "802.1.5",
+          "title": "802.1.5 Nonpotable clear-water waste."
+        },
+        {
+          "id": 12481,
+          "kind": "title",
+          "sectionNumber": "802.1.6",
+          "title": "802.1.6 Domestic dishwashing machines."
+        },
+        {
+          "id": 12482,
+          "kind": "title",
+          "sectionNumber": "802.1.7",
+          "title": "802.1.7 Commercial dishwashing machines."
+        },
+        {
+          "id": 12483,
+          "kind": "title",
+          "sectionNumber": "802.1.8",
+          "title": "802.1.8 Food utensils, dishes, pots and pans sinks."
+        },
+        {
+          "id": 12484,
+          "kind": "title",
+          "sectionNumber": "802.2",
+          "title": "802.2 Installation."
+        },
+        {
+          "id": 12485,
+          "kind": "title",
+          "sectionNumber": "802.2.1",
+          "title": "802.2.1 Air gap."
+        },
+        {
+          "id": 12486,
+          "kind": "title",
+          "sectionNumber": "802.2.2",
+          "title": "802.2.2 Air break."
+        },
+        {
+          "id": 12487,
+          "kind": "title",
+          "sectionNumber": "802.3",
+          "title": "802.3 Waste receptors."
+        },
+        {
+          "id": 12488,
+          "kind": "title",
+          "sectionNumber": "802.3.1",
+          "title": "802.3.1 Size of receptors."
+        },
+        {
+          "id": 12489,
+          "kind": "title",
+          "sectionNumber": "802.3.2",
+          "title": "802.3.2 Hub drains."
+        },
+        {
+          "id": 12490,
+          "kind": "title",
+          "sectionNumber": "802.3.3",
+          "title": "802.3.3 Standpipes."
+        },
+        {
+          "id": 12491,
+          "kind": "title",
+          "sectionNumber": "803.1",
+          "title": "803.1 Wastewater temperature."
+        },
+        {
+          "id": 12492,
+          "kind": "title",
+          "sectionNumber": "803.2",
+          "title": "803.2 Neutralizing device required for corrosive wastes."
+        },
+        {
+          "id": 12493,
+          "kind": "title",
+          "sectionNumber": "803.3",
+          "title": "803.3 Chemical waste system design."
+        },
+        {
+          "id": 12494,
+          "kind": "title",
+          "sectionNumber": "803.3.1",
+          "title": "803.3.1 Chemical drainage and vent pipe."
+        },
+        {
+          "id": 12495,
+          "kind": "title",
+          "sectionNumber": "803.3.2",
+          "title": "803.3.2 Chemical drainage and vent pipe fittings."
+        },
+        {
+          "id": 12496,
+          "kind": "title",
+          "sectionNumber": "803.3.3",
+          "title": "803.3.3 Chemical drainage and vent pipe installation."
+        },
+        {
+          "id": 12497,
+          "kind": "title",
+          "sectionNumber": "803.3.4",
+          "title": "803.3.4 Chemical drainage and vent pipe joints."
+        },
+        {
+          "id": 12498,
+          "kind": "title",
+          "sectionNumber": "803.3.4.1",
+          "title": "803.3.4.1 CPVC plastic."
+        },
+        {
+          "id": 12499,
+          "kind": "title",
+          "sectionNumber": "803.3.4.1.1",
+          "title": "803.3.4.1.1 Mechanical joints."
+        },
+        {
+          "id": 12500,
+          "kind": "title",
+          "sectionNumber": "803.3.4.1.2",
+          "title": "803.3.4.1.2 Solvent cementing."
+        },
+        {
+          "id": 12501,
+          "kind": "title",
+          "sectionNumber": "803.3.4.1.3",
+          "title": "803.3.4.1.3 Threaded joints."
+        },
+        {
+          "id": 12502,
+          "kind": "title",
+          "sectionNumber": "803.3.4.2",
+          "title": "803.3.4.2 Borosilicate glass joints."
+        },
+        {
+          "id": 12503,
+          "kind": "title",
+          "sectionNumber": "803.3.4.2.1",
+          "title": "803.3.4.2.1 Mechanical joints."
+        },
+        {
+          "id": 12504,
+          "kind": "title",
+          "sectionNumber": "803.3.4.2.2",
+          "title": "803.3.4.2.2 Caulked joints."
+        },
+        {
+          "id": 12505,
+          "kind": "title",
+          "sectionNumber": "803.3.4.3",
+          "title": "803.3.4.3 High silicon cast iron."
+        },
+        {
+          "id": 12506,
+          "kind": "title",
+          "sectionNumber": "803.3.4.4",
+          "title": "803.3.4.4 Polyolefin."
+        },
+        {
+          "id": 12507,
+          "kind": "title",
+          "sectionNumber": "803.3.4.4.1",
+          "title": "803.3.4.4.1 Heat-fusion joints."
+        },
+        {
+          "id": 12508,
+          "kind": "title",
+          "sectionNumber": "803.3.4.4.2",
+          "title": "803.3.4.4.2 Mechanical and compression sleeve joints."
+        },
+        {
+          "id": 12509,
+          "kind": "title",
+          "sectionNumber": "803.3.4.5",
+          "title": "803.3.4.5 Polypropylene (PP) plastic."
+        },
+        {
+          "id": 12510,
+          "kind": "title",
+          "sectionNumber": "803.3.4.5.1",
+          "title": "803.3.4.5.1 Heat-fusion joints."
+        },
+        {
+          "id": 12511,
+          "kind": "title",
+          "sectionNumber": "803.3.4.5.2",
+          "title": "803.3.4.5.2 Mechanical and compression sleeve joints."
+        },
+        {
+          "id": 12512,
+          "kind": "title",
+          "sectionNumber": "803.3.4.6",
+          "title": "803.3.4.6 Polyvinylidene fluoride plastic."
+        },
+        {
+          "id": 12513,
+          "kind": "title",
+          "sectionNumber": "803.3.4.6.1",
+          "title": "803.3.4.6.1 Heat-fusion joints."
+        },
+        {
+          "id": 12514,
+          "kind": "title",
+          "sectionNumber": "803.3.4.6.2",
+          "title": "803.3.4.6.2 Mechanical and compression sleeve joints."
+        },
+        {
+          "id": 12515,
+          "kind": "title",
+          "sectionNumber": "803.3.5",
+          "title": "803.3.5 Chemical drainage and vent pipe cleanouts."
+        },
+        {
+          "id": 12516,
+          "kind": "title",
+          "sectionNumber": "803.3.6",
+          "title": "803.3.6 Chemical drainage and vent pipe sizing."
+        },
+        {
+          "id": 12517,
+          "kind": "title",
+          "sectionNumber": "803.3.7",
+          "title": "803.3.7 Offsets in chemical drainage and vent pipe sizing."
+        },
+        {
+          "id": 12518,
+          "kind": "title",
+          "sectionNumber": "804.1",
+          "title": "804.1 General."
+        }
+      ]
+    }
+  ],
+  "rawDraftText": "#- Chapter 8: Indirect/special Waste\n\nSection PC 801: General\n\n#--- 801.1 Scope.\n\nThis chapter shall govern matters concerning indirect waste piping and special wastes. This chapter shall further control matters concerning food-handling establishments, sterilizers, clear-water waste, swimming pools, methods of providing air breaks or air gaps, and neutralizing devices for corrosive wastes.\n\n#--- 801.2 Protection.\n\nDevices, appurtenances, appliances and apparatus intended to serve some special function, such as sterilization, distillation, processing, cooling, or storage of ice or foods, and that discharge to the drainage system, shall be provided with protection against backflow, flooding, fouling, contamination and stoppage of the drain.\n\nSection PC 802: Indirect Wastes\n\n#--- 802.1 Where required.\n\nFood-handling equipment, in other than dwelling units, clear-water waste, dishwashing machines and utensils, pots, pans and dishwashing sinks shall discharge through an indirect waste pipe as specified in Sections 802.1.1 through 802.1.8. Health-care related fixtures, devices and equipment shall discharge to the drainage system through an indirect waste pipe by means of an air gap in accordance with this chapter and Section 713.3. Fixtures not required by this section to be indirectly connected shall be directly connected to the plumbing system in accordance with Chapter 7.\n\n#---- 802.1.1 Food handling.\n\nEquipment and fixtures utilized for the storage, preparation and handling of food shall discharge through an indirect waste pipe by means of an air gap. Each well of a multiple-compartment sink shall discharge independently to a waste receptor.\n\n#---- 802.1.2 Floor drains in food storage areas.\n\nFloor drains located within walk-in refrigerators or freezers in food service and food establishments shall be indirectly connected to the sanitary drainage system by means of an air gap. Where a floor drain is located within an area subject to freezing, the waste line serving the floor drain shall not be trapped and shall indirectly discharge into a waste receptor located outside of the area subject to freezing.\n\nException: Where protected against backflow by a backwater valve, such floor drains shall be indirectly connected to the sanitary drainage system by means of an air break or an air gap.\n\n#---- 802.1.3 Potable clear-water waste.\n\nWhere devices and equipment, such as sterilizers and relief valves, discharge potable water to the building drainage system, the discharge shall be through an indirect waste pipe by means of an air gap.\n\n#---- 802.1.4 Swimming pools.\n\nWhere waste water from swimming pools, backwash from filters and water from pool deck drains discharge to the building drainage system, the discharge shall be through an indirect waste pipe by means of an air gap to a waste outlet.\n\n#---- 802.1.5 Nonpotable clear-water waste.\n\nWhere devices and equipment such as process tanks, filters, drips and boilers discharge nonpotable water to the building drainage system, the discharge shall be through an indirect waste pipe by means of an air break or an air gap.\n\n#---- 802.1.6 Domestic dishwashing machines.\n\nDomestic dishwashing machines shall discharge indirectly through an air gap or air break into a waste receptor in accordance with Section 802.2, or discharge into a wye branch fitting on the tailpiece of the kitchen sink or the dishwasher connection of a food waste disposer. The waste line of a domestic dishwashing machine discharging into a kitchen sink tailpiece or food waste disposer shall connect to a deck-mounted air gap or the waste line shall rise and be securely fastened to the underside of the sink rim or counter.\n\n#---- 802.1.7 Commercial dishwashing machines.\n\nThe discharge from a commercial dishwashing machine shall be through an air gap or air break into a waste receptor in accordance with Section 802.2.\n\n#---- 802.1.8 Food utensils, dishes, pots and pans sinks.\n\nSinks, in other than dwelling units, used for the washing, rinsing or sanitizing of utensils, dishes, pots, pans or service ware used in the preparation, serving or eating of food shall discharge indirectly through an air gap or an air break.\n\nException: Hand sinks may be directly connected to the drainage system.\n\n#--- 802.2 Installation.\n\nIndirect waste piping shall discharge through an air gap or air break into a waste receptor. Waste receptors shall be trapped and vented and shall connect to the building drainage system. Indirect waste piping that exceeds 30 inches (762 mm) in developed length measured horizontally, or 54 inches (1372 mm) in total developed length, shall be trapped.\n\nException: Where a waste receptor receives only clear-water waste and does not directly connect to a sanitary drainage system, the receptor shall not require a trap.\n\n#---- 802.2.1 Air gap.\n\nThe air gap between the indirect waste pipe and the flood level rim of the waste receptor shall be not less than twice the effective opening of the indirect waste pipe.\n\n#---- 802.2.2 Air break.\n\nAn air break shall be provided between the indirect waste pipe and the trap seal of the waste receptor.\n\n#--- 802.3 Waste receptors.\n\nFor other than hub drains that receive only clear-water waste and standpipes, a removable strainer or basket shall cover the outlet of waste receptors. Waste receptors shall not be installed in concealed spaces. Waste receptors shall not be installed in plenums, crawl spaces, attics, interstitial spaces above ceilings and below floors. Ready access shall be provided to waste receptors.\n\n#---- 802.3.1 Size of receptors.\n\nA waste receptor shall be sized for the maximum discharge of all indirect waste pipes served by the receptor. Receptors shall be installed to prevent splashing or flooding.\n\n#---- 802.3.2 Hub drains.\n\nA hub drain shall be in the form of a hub or a pipe extending not less than 1 inch (25 mm) above a water-impervious floor.\n\n#---- 802.3.3 Standpipes.\n\nStandpipes shall be individually trapped. Standpipes shall extend not less than 18 inches (457 mm) but not greater than 42 inches (1066 mm) above the trap weir. Access shall be provided to standpipes and drains for rodding.\n\nSection PC 803: Special Wastes\n\n#--- 803.1 Wastewater temperature.\n\nSteam pipes shall not connect to any part of a drainage or plumbing system and water above 150°F (66°C) shall not be discharged into any part of a drainage system. Such pipes shall discharge into an indirect waste receptor connected to the drainage system.\n\n#--- 803.2 Neutralizing device required for corrosive wastes.\n\nAll discharges into the public sewers are subject to regulation by the Department of Environmental Protection. The Department of Environmental Protection may prohibit the discharge of any corrosive liquids, including but not limited to spent acids or other harmful chemicals that may destroy or injure a drain, sewer, soil or waste pipe, or create noxious or toxic fumes or interfere with sewage treatment processes or may require that such liquids be neutralized or treated prior to discharge in accordance with Department of Environmental Protection regulations. Where treatment prior to discharge is required by the Department of Environmental Protection, liquids shall not be discharged into the plumbing system without being thoroughly neutralized or treated in compliance with the rules of the Department of Environmental Protection.\n\n#--- 803.3 Chemical waste system design.\n\nA chemical drainage and vent system shall be designed and installed in accordance with this code. Chemical drainage and vent systems shall be completely separated from the sanitary systems. Chemical waste shall not discharge to a sanitary drainage system until such waste has been treated in accordance with Section 803.2.\n\n#---- 803.3.1 Chemical drainage and vent pipe.\n\nChemical waste and vent pipe shall conform to one of the standards listed in Table 803.3.1.\n\nTable 803.3.1 Chemical Waste and Vent Pipe\n\n#---- 803.3.2 Chemical drainage and vent pipe fittings.\n\nChemical waste and vent pipe fittings shall conform to one of the standards listed in Table 803.3.2.\n\nTable 803.3.2 Chemical Waste and Vent Pipe Fittings\n\n#---- 803.3.3 Chemical drainage and vent pipe installation.\n\nThe installation of chemical waste and vent pipe shall conform to Sections 704.1, 704.2, 704.3, 704.4, and 704.5.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 803.3.4 Chemical drainage and vent pipe joints.\n\nThis section contains provisions applicable to joints specific to chemical drainage and vent piping. Joints between different materials shall conform to Section 705.\n\n#----- 803.3.4.1 CPVC plastic.\n\nJoints between CPVC plastic pipe or fittings shall comply with Sections 803.3.4.1.1, 803.3.4.1.2 and 803.3.4.1.3.\n\n#------ 803.3.4.1.1 Mechanical joints.\n\nMechanical joints shall be installed in accordance with the manufacturer's instructions.\n\n#------ 803.3.4.1.2 Solvent cementing.\n\nJoint surfaces shall be clean and free from moisture. Joints shall be made in accordance with the pipe manufacturer's installation instructions. Where such instructions require that a primer be used, the primer shall be applied to the joint surfaces and a solvent cement orange in color and conforming to ASTM F 2618 shall be applied to the joint surfaces. Where such instructions allow for a one-step solvent cement, yellow in color and conforming to ASTM F 2618, to be used, the joint surfaces shall not require application of a primer before the solvent cement is applied. The joint shall be made while the cement is wet and in accordance with ASTM F 2618. Solvent cement joints shall be permitted above or below ground.\n\n#------ 803.3.4.1.3 Threaded joints.\n\nThreads shall conform to ASME B1.20.1. Schedule 80 or heavier pipe shall be permitted to be threaded with dies specifically designed for plastic pipe, but the pressure rating of the pipe shall be reduced by 50 percent. Thread by socket molded fittings shall be permitted. Approved thread lubricant or tape shall be applied on the male threads only.\n\n#----- 803.3.4.2 Borosilicate glass joints.\n\nJoints between Borosilicate glass pipe and fittings shall comply with Sections 803.3.4.2.1 and 803.3.4.2.2.\n\n#------ 803.3.4.2.1 Mechanical joints.\n\nGlass-to-glass connections shall be made with a bolted compression- type, 300 series stainless steel coupling with contoured acid-resistant elastomeric compression ring and a fluorocarbon polymer inner seal ring; or with caulked joints in accordance with Section 803.3.4.2.2.\n\n#------ 803.3.4.2.2 Caulked joints.\n\nLead-caulked joints for hub and spigot soil pipe shall be firmly packed with oakum or hemp and filled with molten lead not less than 1 inch (25 mm) in depth and not to recede more than inch (3.2 mm) below the rim of the hub. Paint, varnish or other coatings shall not be permitted on the jointing material until after the joint has been tested and approved. Lead shall be run in one pouring and shall be caulked tight. Acid-resistant rope and acidproof cement shall be permitted.\n\n#----- 803.3.4.3 High silicon cast iron.\n\nJoints in high silicon cast iron system shall be in accordance with Section 705.4.\n\n#----- 803.3.4.4 Polyolefin.\n\nJoints between polyolefin plastic pipe and fittings shall comply with Sections 803.3.4.4.1 and 803.3.4.4.2.\n\n#------ 803.3.4.4.1 Heat-fusion joints.\n\nHeat-fusion joints for polyolefin pipe and tubing joints shall be installed with socket-type heat-fused polyolefin fittings or electrofusion polyolefin fittings. Joint surfaces shall be clean and free from moisture. The joint shall be undisturbed until cool. Joints shall be made in accordance with ASTM F 1412 or CSA B181.3.\n\n#------ 803.3.4.4.2 Mechanical and compression sleeve joints.\n\nMechanical and compression sleeve joints shall be installed in accordance with the manufacturer's instructions, and in conformance with acceptance criteria established by the commissioner.\n\n#----- 803.3.4.5 Polypropylene (PP) plastic.\n\nJoints between PP plastic pipe and fittings shall comply with Section 803.3.4.5.1 or 803.3.4.5.2.\n\n#------ 803.3.4.5.1 Heat-fusion joints.\n\nHeat-fusion joints for polypropylene pipe and tubing joints shall be installed with socket-type heat-fused polypropylene fittings, butt-fusion polypropylene fittings or electrofusion polypropylene fittings. Joint surfaces shall be clean and free from moisture. The joint shall be undisturbed until cool. Joints shall be made in accordance with ASTM F 1412.\n\n#------ 803.3.4.5.2 Mechanical and compression sleeve joints.\n\nMechanical and compression sleeve joints shall be installed in accordance with the manufacturer's instructions.\n\n#----- 803.3.4.6 Polyvinylidene fluoride plastic.\n\nJoints between polyvinylidene plastic pipe and fittings shall comply with Sections 803.3.4.6.1 and 803.3.4.6.2.\n\n#------ 803.3.4.6.1 Heat-fusion joints.\n\nHeat-fusion joints for polyvinylidene fluoride pipe and tubing joints shall be installed with socket-type heat-fused polyvinylidene fluoride fittings or electrofusion polyvinylidene fittings and couplings. Joint surfaces shall be clean and free from moisture. The joint shall be undisturbed until cool. Joints shall be made in accordance with ASTM F 1673.\n\n#------ 803.3.4.6.2 Mechanical and compression sleeve joints.\n\nMechanical and compression sleeve joints shall be installed in accordance with the manufacturer's instructions, and in conformance with acceptance criteria established by the commissioner.\n\n#---- 803.3.5 Chemical drainage and vent pipe cleanouts.\n\nChemical waste and vent pipe cleanouts shall conform to Sections 708.1.1, 708.1.4, 708.1.5, 708.1.6, 708.1.8, 708.1.9, 708.1.10 and 708.1.11.\n\n#---- 803.3.6 Chemical drainage and vent pipe sizing.\n\nSizing of chemical waste and vent pipe shall conform to Sections 709 and 710.\n\n#---- 803.3.7 Offsets in chemical drainage and vent pipe sizing.\n\nOffsets of chemical waste and vent pipe shall conform to Section 711.\n\nSection PC 804: Materials, Joints and Connections\n\n#--- 804.1 General.\n\nThe materials and methods utilized for the construction and installation of indirect waste pipes and systems shall comply with the applicable provisions of Chapter 7.",
+  "schemaVersion": 1
+}

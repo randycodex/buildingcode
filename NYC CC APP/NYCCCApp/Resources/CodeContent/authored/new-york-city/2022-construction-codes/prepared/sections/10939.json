@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194968\"><\/AnnotationDrawer><div>The connector shall not be smaller than the size of the flue collar supplied by the manufacturer of the appliance. Where the appliance has more than one flue outlet, and in the absence of the manufacturer's specific instructions, the connector area shall be not less than the combined area of the flue outlets for which it acts as a common connector.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10939-html-1",
+      "kind" : "html",
+      "plainText" : "The connector shall not be smaller than the size of the flue collar supplied by the manufacturer of the appliance. Where the appliance has more than one flue outlet, and in the absence of the manufacturer's specific instructions, the connector area shall be not less than the combined area of the flue outlets for which it acts as a common connector."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10939
+}

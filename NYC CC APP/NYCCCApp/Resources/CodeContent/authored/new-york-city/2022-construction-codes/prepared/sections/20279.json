@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186584\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186584\"><\/AnnotationDrawer><div>An inspection shall be performed immediately prior to the removal of unenclosed perimeter protection to verify compliance with the provisions of Section 3308.10. An inspection shall be performed immediately prior to restoring a guardrail system, vertical netting system, or equivalent alternative system to verify compliance with the cleaning provisions of Section 3308.10.1. An inspection shall be performed immediately after unenclosed perimeter protection is restored to verify compliance with this code, manufacturer specifications, and required drawings. These inspections shall be performed by the site safety manager, site safety coordinator, or competent person in accordance with Section 3308.9.3, and recorded in accordance with Section 3308.9.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-186585\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-186585\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-186585\"><\/AnnotationDrawer><h6><a name=\"JD_BC3309\" id=\"JD_BC3309\" title=\"BC 3309\"><\/a>Section BC 3309: Protection of Adjoining Property<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20279-html-1",
+      "kind" : "html",
+      "plainText" : "An inspection shall be performed immediately prior to the removal of unenclosed perimeter protection to verify compliance with the provisions of Section 3308.10. An inspection shall be performed immediately prior to restoring a guardrail system, vertical netting system, or equivalent alternative system to verify compliance with the cleaning provisions of Section 3308.10.1. An inspection shall be performed immediately after unenclosed perimeter protection is restored to verify compliance with this code, manufacturer specifications, and required drawings. These inspections shall be performed by the site safety manager, site safety coordinator, or competent person in accordance with Section 3308.9.3, and recorded in accordance with Section 3308.9.3.\n\n Section BC 3309: Protection of Adjoining Property"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20279
+}

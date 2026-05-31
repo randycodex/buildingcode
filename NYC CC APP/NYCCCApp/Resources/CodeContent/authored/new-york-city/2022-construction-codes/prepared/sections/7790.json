@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192249\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192249\"><\/AnnotationDrawer><div>Delete Section 2.3.3 and replace as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192250\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">2.3.3<\/span> Main runners shall be attached to the carrying channels in a manner that will prevent any vertical movement or rotation.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7790-html-1",
+      "kind" : "html",
+      "plainText" : "Delete Section 2.3.3 and replace as follows:\n\n 2.3.3 Main runners shall be attached to the carrying channels in a manner that will prevent any vertical movement or rotation."
+    }
+  ],
+  "chapterNumber" : "R",
+  "schemaVersion" : 1,
+  "sectionID" : 7790
+}

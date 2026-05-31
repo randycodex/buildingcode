@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189090\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189090\"><\/AnnotationDrawer><div>A sign shall not be illuminated by other than electrical means, and electrical devices and wiring shall be installed in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span> Any open spark or flame shall not be used for display purposes unless specifically approved.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13169-html-1",
+      "kind" : "html",
+      "plainText" : "A sign shall not be illuminated by other than electrical means, and electrical devices and wiring shall be installed in accordance with the requirements of the New York City Electrical Code. Any open spark or flame shall not be used for display purposes unless specifically approved."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 13169
+}

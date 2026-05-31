@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199227\"><\/AnnotationDrawer><div>Recirculating direct-fired industrial air heaters shall be installed only in industrial and commercial occupancies. Recirculating direct-fired air heaters shall not serve any area containing sleeping quarters. Recirculating direct-fired industrial air heaters shall not be installed in hazardous locations or in buildings that contain flammable solids, liquids or gases, explosive materials or substances that can become toxic when exposed to flame or heat.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21438-html-1",
+      "kind" : "html",
+      "plainText" : "Recirculating direct-fired industrial air heaters shall be installed only in industrial and commercial occupancies. Recirculating direct-fired air heaters shall not serve any area containing sleeping quarters. Recirculating direct-fired industrial air heaters shall not be installed in hazardous locations or in buildings that contain flammable solids, liquids or gases, explosive materials or substances that can become toxic when exposed to flame or heat."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21438
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195960\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195960\"><\/AnnotationDrawer><div>Where required by Sections 1203.4 through 1203.14, the preparation and installation of brazed, mechanical, soldered, solvent-cemented, threaded and welded joints shall comply with Sections 1203.3.1 through 1203.3.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11290-html-1",
+      "kind" : "html",
+      "plainText" : "Where required by Sections 1203.4 through 1203.14, the preparation and installation of brazed, mechanical, soldered, solvent-cemented, threaded and welded joints shall comply with Sections 1203.3.1 through 1203.3.8."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11290
+}

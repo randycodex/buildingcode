@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180994\"><\/AnnotationDrawer><div>Footings for masonry fireplaces and their chimneys shall be constructed of reinforced concrete or solid masonry at least 12 inches (305 mm) thick and shall extend at least 6 inches (152 mm) beyond the face of the fireplace or foundation wall on all sides. Footings shall be founded on natural undisturbed earth or engineered fill below frost depth. In areas not subjected to freezing, footings shall be at least 12 inches (305 mm) below finished grade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18471-html-1",
+      "kind" : "html",
+      "plainText" : "Footings for masonry fireplaces and their chimneys shall be constructed of reinforced concrete or solid masonry at least 12 inches (305 mm) thick and shall extend at least 6 inches (152 mm) beyond the face of the fireplace or foundation wall on all sides. Footings shall be founded on natural undisturbed earth or engineered fill below frost depth. In areas not subjected to freezing, footings shall be at least 12 inches (305 mm) below finished grade."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18471
+}

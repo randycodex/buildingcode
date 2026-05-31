@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172757\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172757\"><\/AnnotationDrawer><div>Post-fire smoke purge systems in Group R-2 occupancies shall comply with either Section 917.3.1 or 917.3.2. Smoke removed must be discharged to a safe location outside the building and shall not be recirculated into the building in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2098-html-1",
+      "kind" : "html",
+      "plainText" : "Post-fire smoke purge systems in Group R-2 occupancies shall comply with either Section 917.3.1 or 917.3.2. Smoke removed must be discharged to a safe location outside the building and shall not be recirculated into the building in accordance with the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2098
+}

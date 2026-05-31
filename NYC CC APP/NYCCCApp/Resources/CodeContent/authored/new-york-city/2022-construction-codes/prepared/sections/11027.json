@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195231\"><\/AnnotationDrawer><div>Cooling towers, both open circuit and closed circuit type, and evaporative condensers shall comply with Sections 908.8.1 and 908.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11027-html-1",
+      "kind" : "html",
+      "plainText" : "Cooling towers, both open circuit and closed circuit type, and evaporative condensers shall comply with Sections 908.8.1 and 908.8.2."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11027
+}

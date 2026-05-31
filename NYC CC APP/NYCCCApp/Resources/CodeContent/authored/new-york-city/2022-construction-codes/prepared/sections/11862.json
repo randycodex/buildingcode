@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161509\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161509\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Accessible plumbing fixtures shall be installed with the clearances, heights, spacings and arrangements in accordance with ICC A117.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11862-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible plumbing fixtures shall be installed with the clearances, heights, spacings and arrangements in accordance with ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11862
+}

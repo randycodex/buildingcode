@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193538\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193538\"><\/AnnotationDrawer><div>Indoor dispensing and use areas for hazardous materials in amounts exceeding the maximum allowable quantity per control area shall be provided with exhaust ventilation in accordance with Section 502.8.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193539\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Ventilation is not required for dispensing and use of flammable solids other than finely divided particles.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10459-html-1",
+      "kind" : "html",
+      "plainText" : "Indoor dispensing and use areas for hazardous materials in amounts exceeding the maximum allowable quantity per control area shall be provided with exhaust ventilation in accordance with Section 502.8.1.\n\n Exception: Ventilation is not required for dispensing and use of flammable solids other than finely divided particles."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10459
+}

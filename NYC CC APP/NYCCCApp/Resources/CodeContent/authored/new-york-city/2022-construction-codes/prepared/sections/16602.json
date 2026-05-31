@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175216\"><\/AnnotationDrawer><div>Assembly areas with seating shall comply with Sections 1108.2.1 through 1108.2.5. Lawn seating shall comply with Section 1108.2.6. Assistive listening systems shall comply with Section 1108.2.7. Performance areas viewed from assembly seating areas shall comply with Section 1108.2.8. Dining and drinking areas shall comply with Section 1108.2.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16602-html-1",
+      "kind" : "html",
+      "plainText" : "Assembly areas with seating shall comply with Sections 1108.2.1 through 1108.2.5. Lawn seating shall comply with Section 1108.2.6. Assistive listening systems shall comply with Section 1108.2.7. Performance areas viewed from assembly seating areas shall comply with Section 1108.2.8. Dining and drinking areas shall comply with Section 1108.2.9."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16602
+}

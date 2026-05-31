@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194125\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194125\"><\/AnnotationDrawer><div>Ducts shall be supported at intervals not exceeding 10 feet (3048 mm). Supports shall be constructed of noncombustible material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194126\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194126\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194126\"><\/AnnotationDrawer><h6><a name=\"JD_MC511\" id=\"JD_MC511\" title=\"MC 511\"><\/a>Section MC 511: Dust, Stock and Refuse Conveying Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23482-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts shall be supported at intervals not exceeding 10 feet (3048 mm). Supports shall be constructed of noncombustible material.\n\n Section MC 511: Dust, Stock and Refuse Conveying Systems"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23482
+}

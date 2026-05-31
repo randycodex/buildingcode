@@ -1,0 +1,29 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193458\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193458\"><\/AnnotationDrawer><div>Type IV and V dry cleaning systems shall be provided with an automatically activated exhaust ventilation system to maintain an air velocity of not less than 100 feet per minute (0.51 m\/s) through the loading door when the door is opened.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193459\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193459\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Dry cleaning units are not required to be provided with exhaust ventilation where an exhaust hood is installed immediately outside of and above the loading door which operates at an airflow rate as follows: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193460\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193460\"><\/AnnotationDrawer><div style=\"margin-bottom=10pt\">&#160;<div class=\"xsl-table\">",
+      "id" : "10427-html-1",
+      "kind" : "html",
+      "plainText" : "Type IV and V dry cleaning systems shall be provided with an automatically activated exhaust ventilation system to maintain an air velocity of not less than 100 feet per minute (0.51 m\/s) through the loading door when the door is opened.\n\n Exception: Dry cleaning units are not required to be provided with exhaust ventilation where an exhaust hood is installed immediately outside of and above the loading door which operates at an airflow rate as follows:"
+    },
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: &#10;                  700px&#10;                ;\"><colgroup><col width=\"27.429%&#10;              \"><\/col><col width=\"20.571%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div>&#160;<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Q<\/span> = 100 &#215; <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">A<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">LD<\/span><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">(Equation 5-1) <\/span><\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "10427-table-2",
+      "kind" : "table"
+    },
+    {
+      "html" : "<\/div><\/div><div>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193461\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193461\"><\/AnnotationDrawer><div>where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193462\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193462\"><\/AnnotationDrawer><div style=\"margin-bottom=10pt\">&#160;<div class=\"xsl-table\">",
+      "id" : "10427-html-3",
+      "kind" : "html",
+      "plainText" : "where:"
+    },
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: &#10;                  700px&#10;                ;\"><colgroup><col width=\"5.333%&#10;              \"><\/col><col width=\"3.429%&#10;              \"><\/col><col width=\"54.857%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div><span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Q<\/span><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div>=<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div>Flow rate exhausted through the hood, cubic feet per minute.<\/div><\/td><\/tr><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div><span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">A<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">LD<\/span><\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div>=<\/div><\/td><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;\"><div>Area of the loading door, square feet.<\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "10427-table-4",
+      "kind" : "table"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10427
+}

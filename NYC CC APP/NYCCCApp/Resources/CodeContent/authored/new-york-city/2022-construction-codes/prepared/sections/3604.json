@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177892\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177892\"><\/AnnotationDrawer><div>Where the alternate simplified design procedure of ASCE 7 is used, the seismic design category shall be determined in accordance with ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3604-html-1",
+      "kind" : "html",
+      "plainText" : "Where the alternate simplified design procedure of ASCE 7 is used, the seismic design category shall be determined in accordance with ASCE 7."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3604
+}

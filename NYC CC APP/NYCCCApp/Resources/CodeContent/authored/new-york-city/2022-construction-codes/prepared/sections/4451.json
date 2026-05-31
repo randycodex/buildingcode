@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180458\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180458\"><\/AnnotationDrawer><div>Tolerance for <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">d<\/span> and concrete cover shall be as required in ACI 318, Section 26.6.2.1(a).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4451-html-1",
+      "kind" : "html",
+      "plainText" : "Tolerance for d and concrete cover shall be as required in ACI 318, Section 26.6.2.1(a)."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4451
+}

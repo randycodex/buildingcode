@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180379\"><\/AnnotationDrawer><div>A copy of each batch ticket shall be given to the licensed concrete testing laboratory special inspector performing the acceptance testing at the delivery of each load. The licensed laboratory shall maintain copies of the batch tickets along with other inspection reports required by Section 1704.1, and make them available to the department upon request.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4415-html-1",
+      "kind" : "html",
+      "plainText" : "A copy of each batch ticket shall be given to the licensed concrete testing laboratory special inspector performing the acceptance testing at the delivery of each load. The licensed laboratory shall maintain copies of the batch tickets along with other inspection reports required by Section 1704.1, and make them available to the department upon request."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4415
+}

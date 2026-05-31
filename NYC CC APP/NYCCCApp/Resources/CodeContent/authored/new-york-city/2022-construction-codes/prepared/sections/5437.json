@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183707\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183707\"><\/AnnotationDrawer><div>Where an elevator is installed in a single blind hoistway or on the outside of a building, there shall be installed in the blind portion of the hoistway or blank face of the building, an emergency door in accordance with ASME A17.1\/CSA B44.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5437-html-1",
+      "kind" : "html",
+      "plainText" : "Where an elevator is installed in a single blind hoistway or on the outside of a building, there shall be installed in the blind portion of the hoistway or blank face of the building, an emergency door in accordance with ASME A17.1\/CSA B44."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5437
+}

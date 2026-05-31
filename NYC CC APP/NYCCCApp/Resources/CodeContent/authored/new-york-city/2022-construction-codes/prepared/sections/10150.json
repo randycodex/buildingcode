@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192320\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192320\"><\/AnnotationDrawer><div>The owner shall be responsible for maintenance of mechanical systems. To determine compliance with this provision, the commissioner shall have the authority to require existing mechanical systems to be inspected.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10150-html-1",
+      "kind" : "html",
+      "plainText" : "The owner shall be responsible for maintenance of mechanical systems. To determine compliance with this provision, the commissioner shall have the authority to require existing mechanical systems to be inspected."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 10150
+}

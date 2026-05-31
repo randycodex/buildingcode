@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185613\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185613\"><\/AnnotationDrawer><div>Trusses shall be braced or guyed, as necessary, for the safety of the structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6112-html-1",
+      "kind" : "html",
+      "plainText" : "Trusses shall be braced or guyed, as necessary, for the safety of the structure."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6112
+}

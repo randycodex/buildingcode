@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162189\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Tank systems containing water and air in combination under pressure exceeding 15 psi (103.4 kPa) above atmospheric pressure, where the pressure is supplied and maintained by pumps connected directly to the tanks, shall comply with the requirements of this section.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12140-html-1",
+      "kind" : "html",
+      "plainText" : "Tank systems containing water and air in combination under pressure exceeding 15 psi (103.4 kPa) above atmospheric pressure, where the pressure is supplied and maintained by pumps connected directly to the tanks, shall comply with the requirements of this section."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12140
+}

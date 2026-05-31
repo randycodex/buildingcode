@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186056\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186056\"><\/AnnotationDrawer><div>Where brick or masonry chimneys cannot be safely toppled or dropped, all materials shall be dropped down on the inside of such chimneys.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6281-html-1",
+      "kind" : "html",
+      "plainText" : "Where brick or masonry chimneys cannot be safely toppled or dropped, all materials shall be dropped down on the inside of such chimneys."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6281
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187170\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187170\"><\/AnnotationDrawer><div>The end of a platform 10 feet (3048 mm) or less in length shall not extend over the centerline of its support more than 12 inches (305 mm) unless the platform and its tiedown are designed by a qualified person or the platform has guardrails to prevent access to the cantilevered end.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6624-html-1",
+      "kind" : "html",
+      "plainText" : "The end of a platform 10 feet (3048 mm) or less in length shall not extend over the centerline of its support more than 12 inches (305 mm) unless the platform and its tiedown are designed by a qualified person or the platform has guardrails to prevent access to the cantilevered end."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6624
+}

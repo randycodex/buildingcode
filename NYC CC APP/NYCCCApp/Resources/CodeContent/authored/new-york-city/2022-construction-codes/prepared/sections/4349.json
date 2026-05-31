@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180200\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180200\"><\/AnnotationDrawer><div>Requirements for <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t shall be based on tests of cylinders made and tested in accordance with Section 1905.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4349-html-1",
+      "kind" : "html",
+      "plainText" : "Requirements for f ' c \n\n shall be based on tests of cylinders made and tested in accordance with Section 1905.6.3."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4349
+}

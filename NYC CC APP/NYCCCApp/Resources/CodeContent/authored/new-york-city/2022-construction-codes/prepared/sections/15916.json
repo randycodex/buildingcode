@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172720\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172720\"><\/AnnotationDrawer><div>Operating, testing and maintenance instructions and record drawings (\"as-builts\") and detailed specifications of all the components shall be provided at an approved location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15916-html-1",
+      "kind" : "html",
+      "plainText" : "Operating, testing and maintenance instructions and record drawings (\"as-builts\") and detailed specifications of all the components shall be provided at an approved location."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15916
+}

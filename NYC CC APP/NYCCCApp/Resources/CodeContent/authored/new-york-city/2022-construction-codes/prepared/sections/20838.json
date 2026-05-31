@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197474\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197474\"><\/AnnotationDrawer><div>Appliances shall be located so as not to interfere with proper circulation of combustion, ventilation and dilution air.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20838-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances shall be located so as not to interfere with proper circulation of combustion, ventilation and dilution air."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20838
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182227\"><\/AnnotationDrawer><div>Bearing partitions parallel to joists shall be supported on beams, girders, doubled joists, walls or other bearing partitions. Bearing partitions perpendicular to joists shall not be offset from supporting girders, walls or partitions more than the joist depth unless such joists are of sufficient size to carry the additional load.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18843-html-1",
+      "kind" : "html",
+      "plainText" : "Bearing partitions parallel to joists shall be supported on beams, girders, doubled joists, walls or other bearing partitions. Bearing partitions perpendicular to joists shall not be offset from supporting girders, walls or partitions more than the joist depth unless such joists are of sufficient size to carry the additional load."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18843
+}

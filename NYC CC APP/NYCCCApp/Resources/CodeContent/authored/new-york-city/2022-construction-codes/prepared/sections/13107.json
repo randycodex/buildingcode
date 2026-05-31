@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188871\"><\/AnnotationDrawer><div>Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188869', hash: '#JD_BCG310' }}\">G310<\/Link> shall govern utility and miscellaneous Group U, including buildings that are accessory in character and miscellaneous structures not classified in any specific occupancy in this code, including, but not limited to, agricultural buildings, aircraft hangars (accessory to a one- or two-family residence), barns, carports, fences more than 6 feet (1829 mm) high, grain silos (accessory to a residential occupancy), greenhouses, livestock shelters, private garages, retaining walls, sheds, stables and towers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13107-html-1",
+      "kind" : "html",
+      "plainText" : "Section G310 shall govern utility and miscellaneous Group U, including buildings that are accessory in character and miscellaneous structures not classified in any specific occupancy in this code, including, but not limited to, agricultural buildings, aircraft hangars (accessory to a one- or two-family residence), barns, carports, fences more than 6 feet (1829 mm) high, grain silos (accessory to a residential occupancy), greenhouses, livestock shelters, private garages, retaining walls, sheds, stables and towers."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13107
+}

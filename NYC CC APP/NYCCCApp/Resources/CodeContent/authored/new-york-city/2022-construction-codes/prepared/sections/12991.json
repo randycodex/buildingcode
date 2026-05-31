@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188538\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188538\"><\/AnnotationDrawer><div>All work applications other than new buildings, horizontal enlargements and substantial improvements, shall be subject to the following special inspection:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188539\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Flood zone compliance special inspection.<\/span> Prior to sign-off of work, a special inspector or special inspection agency shall inspect during the course of construction and certify that: \"the structure was constructed\" or \"alterations were performed,\" \"with methods and practices that minimize flood damage and that are in accordance with approved plans, and with any applicable provisions of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and ASCE 24.\"<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12991-html-1",
+      "kind" : "html",
+      "plainText" : "All work applications other than new buildings, horizontal enlargements and substantial improvements, shall be subject to the following special inspection:\n\n 1. Flood zone compliance special inspection. Prior to sign-off of work, a special inspector or special inspection agency shall inspect during the course of construction and certify that: \"the structure was constructed\" or \"alterations were performed,\" \"with methods and practices that minimize flood damage and that are in accordance with approved plans, and with any applicable provisions of Appendix G of the New York City Building Code and ASCE 24.\""
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 12991
+}

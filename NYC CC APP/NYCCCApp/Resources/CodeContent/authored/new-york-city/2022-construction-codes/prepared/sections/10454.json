@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193517\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193517\"><\/AnnotationDrawer><div>Exhaust ventilation for resin application areas shall comply with Section 502.7.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193518\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193518\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Mechanical ventilation is not required for buildings that are unenclosed for at least 75 percent of the perimeter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10454-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust ventilation for resin application areas shall comply with Section 502.7.3.\n\n Exception: Mechanical ventilation is not required for buildings that are unenclosed for at least 75 percent of the perimeter."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10454
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161284\"><\/AnnotationDrawer><div>Where earthquake loads are applicable in accordance with the building code, plumbing piping supports shall be designed and installed for the seismic forces in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York city building code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11789-html-1",
+      "kind" : "html",
+      "plainText" : "Where earthquake loads are applicable in accordance with the building code, plumbing piping supports shall be designed and installed for the seismic forces in accordance with the New York city building code ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11789
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176173\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176173\"><\/AnnotationDrawer><div>The distance between a building with polypropylene siding and the adjacent building shall be not less than 10 feet (3048 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16923-html-1",
+      "kind" : "html",
+      "plainText" : "The distance between a building with polypropylene siding and the adjacent building shall be not less than 10 feet (3048 mm)."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 16923
+}

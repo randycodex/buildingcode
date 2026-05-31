@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195762\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195762\"><\/AnnotationDrawer><div>Automatic crossover valves shall be capable of manual operation for refrigerating systems containing more than 200 pounds (90.8 kg) of refrigerant.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11208-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic crossover valves shall be capable of manual operation for refrigerating systems containing more than 200 pounds (90.8 kg) of refrigerant."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11208
+}

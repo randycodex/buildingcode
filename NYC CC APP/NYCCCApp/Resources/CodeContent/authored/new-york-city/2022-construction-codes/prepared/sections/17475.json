@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178065\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178065\"><\/AnnotationDrawer><div>The structural peer reviewer's report states his or her opinion regarding the design by the engineer of record. The standard of care to which the structural peer reviewer shall be held in the performance of the structural peer review and report is that the level of skill and care consistent with structural peer review services performed by professional engineers licensed in the State of New York for similar types of projects. The structural peer reviewer shall not be responsible for the conclusions of the wind and geotechnical peer review reports.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17475-html-1",
+      "kind" : "html",
+      "plainText" : "The structural peer reviewer's report states his or her opinion regarding the design by the engineer of record. The standard of care to which the structural peer reviewer shall be held in the performance of the structural peer review and report is that the level of skill and care consistent with structural peer review services performed by professional engineers licensed in the State of New York for similar types of projects. The structural peer reviewer shall not be responsible for the conclusions of the wind and geotechnical peer review reports."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17475
+}

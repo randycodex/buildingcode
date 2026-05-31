@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166694\"><\/AnnotationDrawer><div>Each sprinkler system zone in buildings that are more than 300 feet (91 440 mm) in building height shall be supplied by no fewer than two risers. Each riser shall supply sprinklers on alternate floors. If more than two risers are provided for a zone, sprinklers on adjacent floors shall not be supplied from the same riser.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14093-html-1",
+      "kind" : "html",
+      "plainText" : "Each sprinkler system zone in buildings that are more than 300 feet (91 440 mm) in building height shall be supplied by no fewer than two risers. Each riser shall supply sprinklers on alternate floors. If more than two risers are provided for a zone, sprinklers on adjacent floors shall not be supplied from the same riser."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14093
+}

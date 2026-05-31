@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195920\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195920\"><\/AnnotationDrawer><div>Operating permits and qualification of operators for refrigeration systems shall comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "24100-html-1",
+      "kind" : "html",
+      "plainText" : "Operating permits and qualification of operators for refrigeration systems shall comply with the requirements of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24100
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174323\"><\/AnnotationDrawer><div>Exterior exit stairways and ramps serving as an element of a required means of egress shall be open on not less than one side, except for required structural columns, beams, handrails and guards. An open side shall have not less than 35 square feet (3.3 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of aggregate open area adjacent to each floor level and the level of each intermediate landing. The required open area shall be located not less than 42 inches (1066.8 mm) above the adjacent floor or landing level.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2500-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior exit stairways and ramps serving as an element of a required means of egress shall be open on not less than one side, except for required structural columns, beams, handrails and guards. An open side shall have not less than 35 square feet (3.3 m\n\n 2 \n\n ) of aggregate open area adjacent to each floor level and the level of each intermediate landing. The required open area shall be located not less than 42 inches (1066.8 mm) above the adjacent floor or landing level."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2500
+}

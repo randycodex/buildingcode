@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166957\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166957\"><\/AnnotationDrawer><div>Open parking garages shall comply with Sections 406.5.1 through 406.5.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "361-html-1",
+      "kind" : "html",
+      "plainText" : "Open parking garages shall comply with Sections 406.5.1 through 406.5.11."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 361
+}

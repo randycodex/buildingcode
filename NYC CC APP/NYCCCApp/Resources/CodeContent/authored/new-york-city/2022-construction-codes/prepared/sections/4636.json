@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180967\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180967\"><\/AnnotationDrawer><div>All concrete framed buildings to be constructed over 35 feet (10 668 mm) in height (as measured from adjoining grade to the main roof level), whose exterior wythe are of cavity wall construction with steel lintels, shall have horizontal joints in the exterior wythe to prevent masonry distress induced by vertical shortening of the structural frame.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4636-html-1",
+      "kind" : "html",
+      "plainText" : "All concrete framed buildings to be constructed over 35 feet (10 668 mm) in height (as measured from adjoining grade to the main roof level), whose exterior wythe are of cavity wall construction with steel lintels, shall have horizontal joints in the exterior wythe to prevent masonry distress induced by vertical shortening of the structural frame."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4636
+}

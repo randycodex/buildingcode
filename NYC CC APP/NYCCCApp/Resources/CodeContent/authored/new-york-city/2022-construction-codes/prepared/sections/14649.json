@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168339\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168339\"><\/AnnotationDrawer><div>Exhaust air from areas in which radioactive materials are used or stored shall be exhausted to the outdoors in such manner as not to create a health hazard, and shall not be recirculated to other areas of the building. Air pressure in rooms in which radioactive materials are used or stored shall be maintained below the air pressure of adjoining rooms, so that there is no flow of radioactive gases or dusts into adjoining rooms.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14649-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust air from areas in which radioactive materials are used or stored shall be exhausted to the outdoors in such manner as not to create a health hazard, and shall not be recirculated to other areas of the building. Air pressure in rooms in which radioactive materials are used or stored shall be maintained below the air pressure of adjoining rooms, so that there is no flow of radioactive gases or dusts into adjoining rooms."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14649
+}

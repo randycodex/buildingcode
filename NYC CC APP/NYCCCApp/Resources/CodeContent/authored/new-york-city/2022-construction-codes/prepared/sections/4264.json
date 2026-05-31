@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179953\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179953\"><\/AnnotationDrawer><div>If more than one engineer participates in performing the required assessments of the building and subsurface conditions, and the author of the evaluation report is relying on the work of these additional engineer(s) in preparing the evaluation report, the findings of the additional engineer(s) shall be included as signed and sealed appendices to the evaluation report.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4264-html-1",
+      "kind" : "html",
+      "plainText" : "If more than one engineer participates in performing the required assessments of the building and subsurface conditions, and the author of the evaluation report is relying on the work of these additional engineer(s) in preparing the evaluation report, the findings of the additional engineer(s) shall be included as signed and sealed appendices to the evaluation report."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4264
+}

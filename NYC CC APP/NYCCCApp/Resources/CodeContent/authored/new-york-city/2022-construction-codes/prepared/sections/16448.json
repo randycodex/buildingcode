@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174743\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174743\"><\/AnnotationDrawer><div>A sign shall be posted on the inside of every door opening onto a corridor giving access to a sleeping room in all Group R- 1 occupancies. The sign shall contain a diagram showing the location where it is posted and the location and letter identification of the exit stairs on the floor. The diagram shall indicate the number of doors opening onto the public corridor which must be passed to reach each exit stair. The sign shall be at least 8 inches by 10 inches (203.2 mm by 254 mm), located on the inside of the door and securely attached. The top of such sign shall not be more than 6 feet (1828.8 mm) from the floor level. Such sign shall contain such additional information as the Fire Department may require.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16448-html-1",
+      "kind" : "html",
+      "plainText" : "A sign shall be posted on the inside of every door opening onto a corridor giving access to a sleeping room in all Group R- 1 occupancies. The sign shall contain a diagram showing the location where it is posted and the location and letter identification of the exit stairs on the floor. The diagram shall indicate the number of doors opening onto the public corridor which must be passed to reach each exit stair. The sign shall be at least 8 inches by 10 inches (203.2 mm by 254 mm), located on the inside of the door and securely attached. The top of such sign shall not be more than 6 feet (1828.8 mm) from the floor level. Such sign shall contain such additional information as the Fire Department may require."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16448
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185472\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185472\"><\/AnnotationDrawer><div>Whenever an excavation of any depth is proposed within 200 feet (60 960 mm) of any facility, infrastructure, or property under the jurisdiction of the New York City Transit Authority, the Metropolitan Transportation Authority, or the Port Authority of New York and New Jersey, including but not limited to rail and subway lines, stations, station entrance and access points, bridges, tunnels, bus depots, access roads, fan plants, pump rooms, substations, shops and yards, duct lines, and easements, an approval shall be obtained from such authority having jurisdiction. The owner of the premises or the contractor shall notify the authority having jurisdiction prior to commencement of any such activity. The issuance of any permit or approval by the department shall not relieve the applicant of the obligation to comply with any approval requirements of the New York City Transit Authority, the Metropolitan Transportation Authority, or the Port Authority of New York and New Jersey.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6063-html-1",
+      "kind" : "html",
+      "plainText" : "Whenever an excavation of any depth is proposed within 200 feet (60 960 mm) of any facility, infrastructure, or property under the jurisdiction of the New York City Transit Authority, the Metropolitan Transportation Authority, or the Port Authority of New York and New Jersey, including but not limited to rail and subway lines, stations, station entrance and access points, bridges, tunnels, bus depots, access roads, fan plants, pump rooms, substations, shops and yards, duct lines, and easements, an approval shall be obtained from such authority having jurisdiction. The owner of the premises or the contractor shall notify the authority having jurisdiction prior to commencement of any such activity. The issuance of any permit or approval by the department shall not relieve the applicant of the obligation to comply with any approval requirements of the New York City Transit Authority, the Metropolitan Transportation Authority, or the Port Authority of New York and New Jersey."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6063
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194382\"><\/AnnotationDrawer><div>Ducts that operate at temperatures exceeding 120&#176;F (48.9&#176;C) shall have sufficient thermal insulation to limit the exposed surface temperature to 120&#176;F (48.9&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23568-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts that operate at temperatures exceeding 120°F (48.9°C) shall have sufficient thermal insulation to limit the exposed surface temperature to 120°F (48.9°C)."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23568
+}

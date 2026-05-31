@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196348\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196348\"><\/AnnotationDrawer><div>Joints between copper or copper-alloy pipe or fittings shall be brazed, threaded or welded joints complying with Section 1303.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11467-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between copper or copper-alloy pipe or fittings shall be brazed, threaded or welded joints complying with Section 1303.3."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11467
+}

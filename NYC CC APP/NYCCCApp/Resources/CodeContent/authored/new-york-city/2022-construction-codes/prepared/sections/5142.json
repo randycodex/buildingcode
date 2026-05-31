@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182817\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182817\"><\/AnnotationDrawer><div>Glazing materials shall not be installed in handrails or guards in parking garages except for pedestrian areas not exposed to impact from vehicles.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5142-html-1",
+      "kind" : "html",
+      "plainText" : "Glazing materials shall not be installed in handrails or guards in parking garages except for pedestrian areas not exposed to impact from vehicles."
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 5142
+}

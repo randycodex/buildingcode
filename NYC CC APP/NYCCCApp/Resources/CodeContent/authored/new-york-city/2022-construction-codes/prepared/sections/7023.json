@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188527\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188527\"><\/AnnotationDrawer><div>The certificate of occupancy shall describe all enclosed areas below the design flood elevation that are not dry floodproofed as \"subject to flooding\". The certificate of occupancy shall indicate the use of spaces enclosed by open lattice breakaway walls below the design flood elevation as either unconditioned parking, unconditioned storage, or unconditioned building access. The certificate of occupancy shall be issued with the following restriction: \"Levels subject to flooding shall not be used for any other use except as stated on this certificate.\"<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7023-html-1",
+      "kind" : "html",
+      "plainText" : "The certificate of occupancy shall describe all enclosed areas below the design flood elevation that are not dry floodproofed as \"subject to flooding\". The certificate of occupancy shall indicate the use of spaces enclosed by open lattice breakaway walls below the design flood elevation as either unconditioned parking, unconditioned storage, or unconditioned building access. The certificate of occupancy shall be issued with the following restriction: \"Levels subject to flooding shall not be used for any other use except as stated on this certificate.\""
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7023
+}

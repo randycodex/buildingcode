@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174976\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174976\"><\/AnnotationDrawer><div>Where provided for common use, at least five percent of the total number of electrical vehicle charging stations per facility, but not less than one for each type of electric vehicle charging station, shall be accessible. Where a multiport electric vehicle charging station can simultaneously charge more than one vehicle, the number of electric vehicle charging stations shall be counted as the number of electric vehicles that can be simultaneously charged. The number of accessible vehicle charging stations are in addition to the required accessible parking spaces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2692-html-1",
+      "kind" : "html",
+      "plainText" : "Where provided for common use, at least five percent of the total number of electrical vehicle charging stations per facility, but not less than one for each type of electric vehicle charging station, shall be accessible. Where a multiport electric vehicle charging station can simultaneously charge more than one vehicle, the number of electric vehicle charging stations shall be counted as the number of electric vehicles that can be simultaneously charged. The number of accessible vehicle charging stations are in addition to the required accessible parking spaces."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2692
+}

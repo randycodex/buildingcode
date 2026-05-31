@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170340\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170340\"><\/AnnotationDrawer><div>Where the finish of gypsum wallboard or plaster is applied to the side of the wall not exposed to fire, the contribution of the finish to the total fire-resistance rating shall be determined as follows: The thickness of the finish shall first be corrected by multiplying the actual thickness of the finish by the applicable factor determined from <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170329', hash: '#JD_BCTable722.2.1.4(1)' }}\">Table 722.2.1.4(1)<\/Link> based on the type of aggregate in the concrete. The corrected thickness of finish shall then be added to the actual or equivalent thickness of concrete and fire-resistance rating of the concrete and finish determined from <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170279', hash: '#JD_BCTable722.2.1.1' }}\">Tables 722.2.1.1<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170305', hash: '#JD_BCTable722.2.1.2(1)' }}\">722.2.1.2(1)<\/Link>, and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170300', hash: '#JD_BCFigure722.2.1.2' }}\">Figure 722.2.1.2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15213-html-1",
+      "kind" : "html",
+      "plainText" : "Where the finish of gypsum wallboard or plaster is applied to the side of the wall not exposed to fire, the contribution of the finish to the total fire-resistance rating shall be determined as follows: The thickness of the finish shall first be corrected by multiplying the actual thickness of the finish by the applicable factor determined from Table 722.2.1.4(1) based on the type of aggregate in the concrete. The corrected thickness of finish shall then be added to the actual or equivalent thickness of concrete and fire-resistance rating of the concrete and finish determined from Tables 722.2.1.1 and 722.2.1.2(1) , and Figure 722.2.1.2 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15213
+}

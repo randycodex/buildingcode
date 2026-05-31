@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162397\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162397\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Each water sterilizer filled with water through directly connected piping shall be equipped with an approved leakage diverter or bleed line on the water supply control valve to indicate and conduct any leakage of unsterile water away from the sterile zone.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162398\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162398\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162398\"><\/AnnotationDrawer><h6><a name=\"JD_PC610\" id=\"JD_PC610\" title=\"PC 610\"><\/a>Section PC 610: Disinfection of Potable Water System<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25049-html-1",
+      "kind" : "html",
+      "plainText" : "Each water sterilizer filled with water through directly connected piping shall be equipped with an approved leakage diverter or bleed line on the water supply control valve to indicate and conduct any leakage of unsterile water away from the sterile zone. \n\n Section PC 610: Disinfection of Potable Water System"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25049
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185651\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185651\"><\/AnnotationDrawer><div>Vertical loads shall include the total dead and live loads. Dead load shall include the weight of the formwork plus the weight of the reinforcement and fresh concrete. Live load shall allow for the weight of the workers and equipment, with allowance for impact, but in no case shall be less than 20 pounds per square foot (98 kg\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6126-html-1",
+      "kind" : "html",
+      "plainText" : "Vertical loads shall include the total dead and live loads. Dead load shall include the weight of the formwork plus the weight of the reinforcement and fresh concrete. Live load shall allow for the weight of the workers and equipment, with allowance for impact, but in no case shall be less than 20 pounds per square foot (98 kg\/m\n\n 2 \n\n )."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6126
+}

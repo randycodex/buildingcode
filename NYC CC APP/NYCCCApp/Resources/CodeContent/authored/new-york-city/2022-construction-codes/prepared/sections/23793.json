@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195078\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195078\"><\/AnnotationDrawer><div>Factory-built chimneys installed in dwelling units with solid fuel-burning appliances shall comply with the Type HT requirements of UL 103 and shall be marked \"Type HT\" and \"Residential Type and Building Heating Appliance Chimney\".<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195079\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195079\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195080\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195080\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Chimneys for use with open combustion chamber fireplaces shall comply with the requirements of UL 103 and shall be marked \"Residential Type and Building Heating Appliance Chimney\".<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195081\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195081\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Chimneys for use with open combustion chamber appliances installed in buildings other than dwelling units shall comply with the requirements of UL 103 and shall be marked \"Building Heating Appliance Chimney\" or \"Residential Type and Building Heating Appliance Chimney.\" <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23793-html-1",
+      "kind" : "html",
+      "plainText" : "Factory-built chimneys installed in dwelling units with solid fuel-burning appliances shall comply with the Type HT requirements of UL 103 and shall be marked \"Type HT\" and \"Residential Type and Building Heating Appliance Chimney\".\n\n Exceptions: \n\n 1. Chimneys for use with open combustion chamber fireplaces shall comply with the requirements of UL 103 and shall be marked \"Residential Type and Building Heating Appliance Chimney\".\n\n 2. Chimneys for use with open combustion chamber appliances installed in buildings other than dwelling units shall comply with the requirements of UL 103 and shall be marked \"Building Heating Appliance Chimney\" or \"Residential Type and Building Heating Appliance Chimney.\""
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23793
+}

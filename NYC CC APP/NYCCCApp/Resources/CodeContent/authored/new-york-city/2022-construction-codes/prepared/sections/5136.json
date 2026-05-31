@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182797\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182797\"><\/AnnotationDrawer><div>Glazing where the bottom exposed edge of the glazing is less than 60 inches (1524 mm) above the plane of the adjacent walking surface of stairways, landings between flights of stairs and ramps shall be considered a hazardous location.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182798\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182798\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182799\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182799\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The side of a stairway, landing or ramp that has a guard complying with the provisions of Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173863', hash: '#JD_BC1015' }}\">1015<\/Link> and 1607.8, and the plane of the glass is greater than 18 inches (457 mm) from the railing.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182800\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182800\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Glazing 36 inches (914 mm) or more measured horizontally from the walking surface.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5136-html-1",
+      "kind" : "html",
+      "plainText" : "Glazing where the bottom exposed edge of the glazing is less than 60 inches (1524 mm) above the plane of the adjacent walking surface of stairways, landings between flights of stairs and ramps shall be considered a hazardous location.\n\n Exceptions: \n\n 1. The side of a stairway, landing or ramp that has a guard complying with the provisions of Sections 1015 and 1607.8, and the plane of the glass is greater than 18 inches (457 mm) from the railing.\n\n 2. Glazing 36 inches (914 mm) or more measured horizontally from the walking surface."
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 5136
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172448\"><\/AnnotationDrawer><div>Before the mechanical equipment is approved, the system shall be tested in the presence of the department or approved agency to confirm that the system is operating in compliance with these requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15807-html-1",
+      "kind" : "html",
+      "plainText" : "Before the mechanical equipment is approved, the system shall be tested in the presence of the department or approved agency to confirm that the system is operating in compliance with these requirements."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15807
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195345\"><\/AnnotationDrawer><div>Oil-fired furnaces shall be tested in accordance with UL 727. Electric furnaces shall be tested in accordance with UL 1995. Solid fuel furnaces shall be tested in accordance with UL 391. Forced-air furnaces shall be installed in accordance with the listings and the manufacturer's instructions. Forced-air warm-air furnaces shall be installed in accordance with the requirements of NFPA 31 and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span> Unvented fuel-fired furnaces are prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23899-html-1",
+      "kind" : "html",
+      "plainText" : "Oil-fired furnaces shall be tested in accordance with UL 727. Electric furnaces shall be tested in accordance with UL 1995. Solid fuel furnaces shall be tested in accordance with UL 391. Forced-air furnaces shall be installed in accordance with the listings and the manufacturer's instructions. Forced-air warm-air furnaces shall be installed in accordance with the requirements of NFPA 31 and the New York City Fuel Gas Code. Unvented fuel-fired furnaces are prohibited."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23899
+}

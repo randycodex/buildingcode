@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199182\"><\/AnnotationDrawer><div>The lowest portion of the floor furnace shall have not less than a 6-inch (152.4 mm) clearance from the grade level; except where the lower 6 inch (152.4 mm) portion of the floor furnace is sealed by the manufacturer to prevent entrance of water, the minimum clearance shall be not less than 2 inches (50.8 mm). Where such clearances cannot be provided, the ground below and to the sides shall be excavated to form a pit under the furnace so that the required clearance is provided beneath the lowest portion of the furnace. A 12 inch (304.8 mm) minimum clearance shall be provided on all sides except the control side, which shall have an 18 inch (457.2 mm) minimum clearance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8591-html-1",
+      "kind" : "html",
+      "plainText" : "The lowest portion of the floor furnace shall have not less than a 6-inch (152.4 mm) clearance from the grade level; except where the lower 6 inch (152.4 mm) portion of the floor furnace is sealed by the manufacturer to prevent entrance of water, the minimum clearance shall be not less than 2 inches (50.8 mm). Where such clearances cannot be provided, the ground below and to the sides shall be excavated to form a pit under the furnace so that the required clearance is provided beneath the lowest portion of the furnace. A 12 inch (304.8 mm) minimum clearance shall be provided on all sides except the control side, which shall have an 18 inch (457.2 mm) minimum clearance."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8591
+}

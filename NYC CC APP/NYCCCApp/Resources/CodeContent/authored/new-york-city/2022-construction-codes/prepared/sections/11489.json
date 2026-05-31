@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196396\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196396\"><\/AnnotationDrawer><div>The system shall be designed for the maximum pressure required by the fuel-oil-burning appliance. Air or other gases shall not be used to pressurize tanks. Pressure in a storage tank for the purpose of discharging oil shall be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11489-html-1",
+      "kind" : "html",
+      "plainText" : "The system shall be designed for the maximum pressure required by the fuel-oil-burning appliance. Air or other gases shall not be used to pressurize tanks. Pressure in a storage tank for the purpose of discharging oil shall be prohibited."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11489
+}

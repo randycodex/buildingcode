@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169413\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169413\"><\/AnnotationDrawer><div>Where required elsewhere in the code, doors in smoke partitions shall meet the requirements for a smoke and draft control door assembly tested in accordance with UL 1784. The air leakage rate of the door assembly shall not exceed 3.0 cubic feet per minute per square foot (0.015424 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s \/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of door opening at 0.10 inch (24.9 Pa) of water for both the ambient temperature test and the elevated temperature exposure test. Installation of smoke doors shall be in accordance with NFPA 105.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1112-html-1",
+      "kind" : "html",
+      "plainText" : "Where required elsewhere in the code, doors in smoke partitions shall meet the requirements for a smoke and draft control door assembly tested in accordance with UL 1784. The air leakage rate of the door assembly shall not exceed 3.0 cubic feet per minute per square foot (0.015424 m\n 3 \n \/s \/m\n\n 2 \n\n ) of door opening at 0.10 inch (24.9 Pa) of water for both the ambient temperature test and the elevated temperature exposure test. Installation of smoke doors shall be in accordance with NFPA 105."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1112
+}

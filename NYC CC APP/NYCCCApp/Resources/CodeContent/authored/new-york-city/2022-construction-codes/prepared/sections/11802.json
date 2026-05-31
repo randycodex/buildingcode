@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161326\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161326\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Structures located in coastal high-hazard areas and coastal A zones shall meet the requirements of Section 309.2. The plumbing systems, pipes and fixtures shall not be mounted on or penetrate through walls intended to break away under flood loads.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161327\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161327\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161327\"><\/AnnotationDrawer><h6><a name=\"JD_PC310\" id=\"JD_PC310\" title=\"PC 310\"><\/a>Section PC 310: Washroom and Toilet Room Requirements<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11802-html-1",
+      "kind" : "html",
+      "plainText" : "Structures located in coastal high-hazard areas and coastal A zones shall meet the requirements of Section 309.2. The plumbing systems, pipes and fixtures shall not be mounted on or penetrate through walls intended to break away under flood loads. \n\n Section PC 310: Washroom and Toilet Room Requirements"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11802
+}

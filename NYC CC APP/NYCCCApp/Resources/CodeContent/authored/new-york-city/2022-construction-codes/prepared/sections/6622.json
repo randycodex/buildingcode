@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187166\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187166\"><\/AnnotationDrawer><div>The end of a platform shall extend over the centerline of its support a minimum of 6 inches (152 mm) unless cleated or otherwise restrained by hooks or equivalent means.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6622-html-1",
+      "kind" : "html",
+      "plainText" : "The end of a platform shall extend over the centerline of its support a minimum of 6 inches (152 mm) unless cleated or otherwise restrained by hooks or equivalent means."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6622
+}

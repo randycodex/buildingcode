@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180632\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180632\"><\/AnnotationDrawer><div>The shotcrete test panel strength shall be deemed acceptable if the mean compressive strength of the set of three cores shall equal or exceed <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t with no individual core less than 0.75 <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18356-html-1",
+      "kind" : "html",
+      "plainText" : "The shotcrete test panel strength shall be deemed acceptable if the mean compressive strength of the set of three cores shall equal or exceed f ' c \n\n with no individual core less than 0.75 f ' c \n\n ."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18356
+}

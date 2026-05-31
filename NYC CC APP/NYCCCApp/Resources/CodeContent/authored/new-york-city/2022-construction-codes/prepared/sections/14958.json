@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169455\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169455\"><\/AnnotationDrawer><div>Where a horizontal assembly is required by other sections of this code, the most restrictive fire-resistance rating shall govern.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14958-html-1",
+      "kind" : "html",
+      "plainText" : "Where a horizontal assembly is required by other sections of this code, the most restrictive fire-resistance rating shall govern."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14958
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163121\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163121\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">No vents will be required for piping serving floor drains when the floor drain is located not more than 15 feet (4572 mm) from the vented line to which it connects.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163122\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163122\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163122\"><\/AnnotationDrawer><h6><a name=\"JD_PC911\" id=\"JD_PC911\" title=\"PC 911\"><\/a>Section PC 911: Common Vent<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12504-html-1",
+      "kind" : "html",
+      "plainText" : "No vents will be required for piping serving floor drains when the floor drain is located not more than 15 feet (4572 mm) from the vented line to which it connects. \n\n Section PC 911: Common Vent"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12504
+}

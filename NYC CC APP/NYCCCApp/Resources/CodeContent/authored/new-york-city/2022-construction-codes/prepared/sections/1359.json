@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170174\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170174\"><\/AnnotationDrawer><div>Exposed insulation materials installed on attic floors shall have a critical radiant flux of not less than 0.12 watt per square centimeter when tested in accordance with ASTM E 970.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1359-html-1",
+      "kind" : "html",
+      "plainText" : "Exposed insulation materials installed on attic floors shall have a critical radiant flux of not less than 0.12 watt per square centimeter when tested in accordance with ASTM E 970."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1359
+}

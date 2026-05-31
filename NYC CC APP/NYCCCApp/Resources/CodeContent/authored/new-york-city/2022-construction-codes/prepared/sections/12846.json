@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188144\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188144\"><\/AnnotationDrawer><div>The following terms are defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188145\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;CLOSED-CIRCUIT TELEPHONE.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188146\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188146\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;MAILBOXES.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188147\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188147\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;TRANSIENT LODGING.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188148\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188148\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188148\"><\/AnnotationDrawer><h6><a name=\"JD_BCE103\" id=\"JD_BCE103\" title=\"BC E103\"><\/a>Section BC E103: Accessible Route<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12846-html-1",
+      "kind" : "html",
+      "plainText" : "The following terms are defined in Chapter 2 :\n\n CLOSED-CIRCUIT TELEPHONE. \n\n MAILBOXES. \n\n TRANSIENT LODGING. \n\n Section BC E103: Accessible Route"
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12846
+}

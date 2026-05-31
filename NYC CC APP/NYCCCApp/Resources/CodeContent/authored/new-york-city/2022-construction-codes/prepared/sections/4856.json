@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181626\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181626\"><\/AnnotationDrawer><div>For wood products impregnated with chemicals by a pressure process, the process shall be performed in closed vessels under pressures not less than 50 pounds per square inch gauge (psig) (345 kPa).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4856-html-1",
+      "kind" : "html",
+      "plainText" : "For wood products impregnated with chemicals by a pressure process, the process shall be performed in closed vessels under pressures not less than 50 pounds per square inch gauge (psig) (345 kPa)."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4856
+}

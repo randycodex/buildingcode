@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176169\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176169\"><\/AnnotationDrawer><div>Polypropylene siding shall be certified and labeled as conforming to the requirements of ASTM D 7254 and those of Section 1404.12.1 or 1404.12.2 of this code by an approved agency. Polypropylene siding shall be installed in accordance with manufacturer's instructions and the requirements of Section 1405.18 of this code. Polypropylene siding shall be secured to the building so as to provide weather protection for the exterior walls of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3093-html-1",
+      "kind" : "html",
+      "plainText" : "Polypropylene siding shall be certified and labeled as conforming to the requirements of ASTM D 7254 and those of Section 1404.12.1 or 1404.12.2 of this code by an approved agency. Polypropylene siding shall be installed in accordance with manufacturer's instructions and the requirements of Section 1405.18 of this code. Polypropylene siding shall be secured to the building so as to provide weather protection for the exterior walls of the building."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3093
+}

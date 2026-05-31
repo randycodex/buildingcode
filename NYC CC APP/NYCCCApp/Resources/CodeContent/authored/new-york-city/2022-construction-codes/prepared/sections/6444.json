@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186555\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186555\"><\/AnnotationDrawer><div>Unenclosed perimeter protection shall be inspected for compliance with this code, manufacturer specifications, and required drawings at least daily, as well as before and after each removal and restoration in accordance with Section 3308.10.3, and after each impact loading event, installation, reinstallation, adjustment, maintenance, or repair of the unenclosed perimeter protection or any part or component of such. Where the job requires a site safety manager or coordinator in accordance with Section 3310, the inspection shall be performed by the site safety manager or coordinator, and a written record of such inspection maintained as part of the site safety log. Where the job does not require a site safety manager or coordinator, the inspection shall be performed by a competent person designated by the permit holder in accordance with Section 3308.4, with a record of such inspection prepared, initialed, and dated by such competent person.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6444-html-1",
+      "kind" : "html",
+      "plainText" : "Unenclosed perimeter protection shall be inspected for compliance with this code, manufacturer specifications, and required drawings at least daily, as well as before and after each removal and restoration in accordance with Section 3308.10.3, and after each impact loading event, installation, reinstallation, adjustment, maintenance, or repair of the unenclosed perimeter protection or any part or component of such. Where the job requires a site safety manager or coordinator in accordance with Section 3310, the inspection shall be performed by the site safety manager or coordinator, and a written record of such inspection maintained as part of the site safety log. Where the job does not require a site safety manager or coordinator, the inspection shall be performed by a competent person designated by the permit holder in accordance with Section 3308.4, with a record of such inspection prepared, initialed, and dated by such competent person."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6444
+}

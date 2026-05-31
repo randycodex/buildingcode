@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188746\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188746\"><\/AnnotationDrawer><div>Where existing emergency vehicle garages and fire, rescue, ambulance, and police stations located within shaded X-Zones are undergoing either a substantial improvement or an increase in the degree of noncompliance as such term is described in Item 10 of Section G102.1, they shall comply with this appendix to the maximum extent practicable as described in Sections G304.4.1.1 through G304.4.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7099-html-1",
+      "kind" : "html",
+      "plainText" : "Where existing emergency vehicle garages and fire, rescue, ambulance, and police stations located within shaded X-Zones are undergoing either a substantial improvement or an increase in the degree of noncompliance as such term is described in Item 10 of Section G102.1, they shall comply with this appendix to the maximum extent practicable as described in Sections G304.4.1.1 through G304.4.1.4."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7099
+}

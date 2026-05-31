@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166664\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166664\"><\/AnnotationDrawer><div>The construction of high-rise buildings shall comply with the provisions of Sections 403.2.1 through 403.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14083-html-1",
+      "kind" : "html",
+      "plainText" : "The construction of high-rise buildings shall comply with the provisions of Sections 403.2.1 through 403.2.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14083
+}

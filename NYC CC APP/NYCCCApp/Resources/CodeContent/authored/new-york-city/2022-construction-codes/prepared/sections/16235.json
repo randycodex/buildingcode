@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173998\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173998\"><\/AnnotationDrawer><div>Aisles and aisle accessways serving a room or space used for assembly purposes shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174405', hash: '#JD_BC1029' }}\">1029<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16235-html-1",
+      "kind" : "html",
+      "plainText" : "Aisles and aisle accessways serving a room or space used for assembly purposes shall comply with Section 1029 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16235
+}

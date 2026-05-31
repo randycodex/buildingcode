@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188231\"><\/AnnotationDrawer><div>Required accessible portable toilets and bathing facilities shall be identified by the dynamic accessibility symbol, in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175613', hash: '#JD_BCFigure1111.1' }}\">Figure 1111.1<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12879-html-1",
+      "kind" : "html",
+      "plainText" : "Required accessible portable toilets and bathing facilities shall be identified by the dynamic accessibility symbol, in accordance with Figure 1111.1 ."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12879
+}

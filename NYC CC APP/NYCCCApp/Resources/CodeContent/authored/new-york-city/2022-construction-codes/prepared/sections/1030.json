@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169184\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169184\"><\/AnnotationDrawer><div>Where a portion of a building is cantilevered over an adjacent building or tax lot by a horizontal distance greater than 1 foot (304.8 mm), the cantilevered portions shall be protected with construction that conforms to a fire engineering analysis acceptable to the commissioner that conforms to Section 705.12.1. In no case shall the protection for structural elements and horizontal assemblies be less than that required by the building type of construction. In no case shall the fire-resistance rating of exterior walls or any other cantilevered exterior surfaces be less than that required by the building type of construction, and in no case shall the limitations for openings on such exterior surfaces be less than that required for a lot line condition pursuant to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169105', hash: '#JD_BCTable705.8' }}\">Table 705.8<\/Link>, including footnote \"m\".<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1030-html-1",
+      "kind" : "html",
+      "plainText" : "Where a portion of a building is cantilevered over an adjacent building or tax lot by a horizontal distance greater than 1 foot (304.8 mm), the cantilevered portions shall be protected with construction that conforms to a fire engineering analysis acceptable to the commissioner that conforms to Section 705.12.1. In no case shall the protection for structural elements and horizontal assemblies be less than that required by the building type of construction. In no case shall the fire-resistance rating of exterior walls or any other cantilevered exterior surfaces be less than that required by the building type of construction, and in no case shall the limitations for openings on such exterior surfaces be less than that required for a lot line condition pursuant to Table 705.8 , including footnote \"m\"."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1030
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186049\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186049\"><\/AnnotationDrawer><div>In any building more than 25 feet high (7620 mm), any window or other exterior wall opening that is within 20 feet (6096 mm) of a floor opening used for the passage of debris from levels above shall be solidly boarded up or otherwise substantially covered, unless such window or opening is so located as to preclude the possibility of any person being injured by material that may fall from such window or opening.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20106-html-1",
+      "kind" : "html",
+      "plainText" : "In any building more than 25 feet high (7620 mm), any window or other exterior wall opening that is within 20 feet (6096 mm) of a floor opening used for the passage of debris from levels above shall be solidly boarded up or otherwise substantially covered, unless such window or opening is so located as to preclude the possibility of any person being injured by material that may fall from such window or opening."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20106
+}

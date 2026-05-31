@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166852\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166852\"><\/AnnotationDrawer><div>The underground portion of the building shall be of Type I construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14150-html-1",
+      "kind" : "html",
+      "plainText" : "The underground portion of the building shall be of Type I construction."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14150
+}

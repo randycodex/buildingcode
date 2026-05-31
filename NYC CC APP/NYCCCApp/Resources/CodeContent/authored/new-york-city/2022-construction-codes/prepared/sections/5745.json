@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184518\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184518\"><\/AnnotationDrawer><div>Marquees shall be no thicker nor shall the fascia be higher than 3 feet (914 mm) when measured vertically from its lowest to its highest point.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5745-html-1",
+      "kind" : "html",
+      "plainText" : "Marquees shall be no thicker nor shall the fascia be higher than 3 feet (914 mm) when measured vertically from its lowest to its highest point."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5745
+}

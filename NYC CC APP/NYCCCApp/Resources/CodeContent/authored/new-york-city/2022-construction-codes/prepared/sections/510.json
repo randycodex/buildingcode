@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167406\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167406\"><\/AnnotationDrawer><div>Emergency ventilation shall be provided for stages larger than 1,000 square feet (93 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in floor area, or with a stage height greater than 40 feet (12 192 mm). Such ventilation shall comply with Section 410.3.7.1 or 410.3.7.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "510-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency ventilation shall be provided for stages larger than 1,000 square feet (93 m\n\n 2 \n\n ) in floor area, or with a stage height greater than 40 feet (12 192 mm). Such ventilation shall comply with Section 410.3.7.1 or 410.3.7.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 510
+}

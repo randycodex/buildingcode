@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184254\"><\/AnnotationDrawer><div>The top of the barrier enclosing a private swimming pool shall be not less than 48 inches (1219 mm) above grade measured on the side of the barrier that faces away from the swimming pool. The vertical clearance between grade and the bottom of the barrier shall be not greater than 2 inches (51 mm) measured on the side of the barrier that faces away from the swimming pool. Where the top of the pool structure is above grade, the barrier is authorized to be erected at grade level or mounted on top of the pool structure, and the vertical clearance between the top of the pool structure and the bottom of the barrier shall be not greater than 4 inches (102 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19474-html-1",
+      "kind" : "html",
+      "plainText" : "The top of the barrier enclosing a private swimming pool shall be not less than 48 inches (1219 mm) above grade measured on the side of the barrier that faces away from the swimming pool. The vertical clearance between grade and the bottom of the barrier shall be not greater than 2 inches (51 mm) measured on the side of the barrier that faces away from the swimming pool. Where the top of the pool structure is above grade, the barrier is authorized to be erected at grade level or mounted on top of the pool structure, and the vertical clearance between the top of the pool structure and the bottom of the barrier shall be not greater than 4 inches (102 mm)."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19474
+}

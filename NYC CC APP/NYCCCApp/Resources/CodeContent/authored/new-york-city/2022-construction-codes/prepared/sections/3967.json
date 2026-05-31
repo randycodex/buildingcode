@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179055\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179055\"><\/AnnotationDrawer><div>In situ walls (such as slurry walls, tangent pile walls, and secant pile walls) with joints sealed by grouting or other methods acceptable to the engineer shall not require waterproofing or dampproofing unless required by the engineer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-179056\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-179056\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-179056\"><\/AnnotationDrawer><h6><a name=\"JD_BC1806\" id=\"JD_BC1806\" title=\"BC 1806\"><\/a>Section BC 1806: Allowable Load-bearing Values of Soils and Rock<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3967-html-1",
+      "kind" : "html",
+      "plainText" : "In situ walls (such as slurry walls, tangent pile walls, and secant pile walls) with joints sealed by grouting or other methods acceptable to the engineer shall not require waterproofing or dampproofing unless required by the engineer.\n\n Section BC 1806: Allowable Load-bearing Values of Soils and Rock"
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3967
+}

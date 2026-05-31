@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173683\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173683\"><\/AnnotationDrawer><div>Curved stairways with winder treads shall have treads and risers in accordance with Section 1011.5 and the smallest radius shall be not less than twice the minimum width or required capacity of the stairway, whichever is greater.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173684\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173684\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The radius restriction shall not apply to curved stairways in Group R-3 and within individual dwelling units in Group R-2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16155-html-1",
+      "kind" : "html",
+      "plainText" : "Curved stairways with winder treads shall have treads and risers in accordance with Section 1011.5 and the smallest radius shall be not less than twice the minimum width or required capacity of the stairway, whichever is greater.\n\n Exception: The radius restriction shall not apply to curved stairways in Group R-3 and within individual dwelling units in Group R-2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16155
+}

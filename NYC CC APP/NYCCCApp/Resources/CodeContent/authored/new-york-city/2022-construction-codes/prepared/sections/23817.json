@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195148\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195148\"><\/AnnotationDrawer><div>All solid fuel-burning fireplaces and appliances shall be installed, altered and maintained in buildings in conformity with the applicable provisions of the<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\"> New York City Air Pollution Control Code<\/span> and no new solid fuel-burning fireplaces or appliances shall be permitted except those that burn the types of fuel allowed by such code. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195149\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195149\"><\/AnnotationDrawer><div>(L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23817-html-1",
+      "kind" : "html",
+      "plainText" : "All solid fuel-burning fireplaces and appliances shall be installed, altered and maintained in buildings in conformity with the applicable provisions of the New York City Air Pollution Control Code and no new solid fuel-burning fireplaces or appliances shall be permitted except those that burn the types of fuel allowed by such code. \n\n (L.L. 2015\/038, 5\/6\/2015, eff. 5\/6\/2016)"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23817
+}

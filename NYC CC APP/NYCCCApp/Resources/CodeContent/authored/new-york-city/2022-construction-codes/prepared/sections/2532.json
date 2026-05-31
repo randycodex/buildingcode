@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174451\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174451\"><\/AnnotationDrawer><div>At least one accessible means of egress is required from a balcony, gallery or press box level containing accessible seating locations in accordance with Section 1009.3 or 1009.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2532-html-1",
+      "kind" : "html",
+      "plainText" : "At least one accessible means of egress is required from a balcony, gallery or press box level containing accessible seating locations in accordance with Section 1009.3 or 1009.4."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2532
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170116\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170116\"><\/AnnotationDrawer><div>Openings in draftstop partitions provided in accordance with Section 1209.2 shall be protected by self-closing doors with automatic latches constructed as required for the partitions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1344-html-1",
+      "kind" : "html",
+      "plainText" : "Openings in draftstop partitions provided in accordance with Section 1209.2 shall be protected by self-closing doors with automatic latches constructed as required for the partitions."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1344
+}

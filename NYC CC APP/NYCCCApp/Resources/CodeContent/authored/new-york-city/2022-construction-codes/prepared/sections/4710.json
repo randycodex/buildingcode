@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181185\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181185\"><\/AnnotationDrawer><div>Flue lining systems shall comply with one of the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181186\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181186\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Clay flue lining complying with the requirements of ASTM C 315.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181187\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Listed chimney lining systems complying with UL 1777.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181188\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181188\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Factory-built chimneys or chimney units listed for installation within masonry chimneys.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181189\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Other approved materials that will resist corrosion, erosion, softening or cracking from flue gases and condensate at temperatures up to 1,800&#176;F (982&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4710-html-1",
+      "kind" : "html",
+      "plainText" : "Flue lining systems shall comply with one of the following:\n\n 1. Clay flue lining complying with the requirements of ASTM C 315.\n\n 2. Listed chimney lining systems complying with UL 1777.\n\n 3. Factory-built chimneys or chimney units listed for installation within masonry chimneys.\n\n 4. Other approved materials that will resist corrosion, erosion, softening or cracking from flue gases and condensate at temperatures up to 1,800°F (982°C)."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4710
+}

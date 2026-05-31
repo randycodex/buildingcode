@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195505\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195505\"><\/AnnotationDrawer><div>A remote control shall be provided to stop the flow of oil and\/or gas and combustion air to any burner or fuel-burning internal combustion equipment. Such a control shall be provided along every means of egress from the room in which the burner or equipment is located. Each remote control shall be located outside of, but as close as practicable to the burner or equipment room itself and shall be labeled: \"REMOTE CONTROL FOR BURNER.\"<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195506\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195506\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where an outside location is impracticable, the remote control shutdown may be provided immediately inside the room in which the burner or equipment is located. Such location must be accessible at all times.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11132-html-1",
+      "kind" : "html",
+      "plainText" : "A remote control shall be provided to stop the flow of oil and\/or gas and combustion air to any burner or fuel-burning internal combustion equipment. Such a control shall be provided along every means of egress from the room in which the burner or equipment is located. Each remote control shall be located outside of, but as close as practicable to the burner or equipment room itself and shall be labeled: \"REMOTE CONTROL FOR BURNER.\"\n\n Exception: Where an outside location is impracticable, the remote control shutdown may be provided immediately inside the room in which the burner or equipment is located. Such location must be accessible at all times."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11132
+}

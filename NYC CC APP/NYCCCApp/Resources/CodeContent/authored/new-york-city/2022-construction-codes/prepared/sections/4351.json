@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180204\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180204\"><\/AnnotationDrawer><div>Where design criteria in ACI 318, Section 19.2.4, provides for use of a splitting tensile strength value of concrete (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">ct<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t), laboratory tests shall be made in accordance with ASTM C 330 to establish the value of <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">ct<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t corresponding to the specified value of <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4351-html-1",
+      "kind" : "html",
+      "plainText" : "Where design criteria in ACI 318, Section 19.2.4, provides for use of a splitting tensile strength value of concrete ( f ' ct \n\n ), laboratory tests shall be made in accordance with ASTM C 330 to establish the value of f ' ct \n\n corresponding to the specified value of f ' c \n\n ."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4351
+}

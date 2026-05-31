@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180654\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180654\"><\/AnnotationDrawer><div>When the maximum-size aggregate is larger than 3\/8 inch (9.5 mm), the test panels shall have minimum dimensions of 18 inches by 18 inches (457 mm by 457 mm). When the maximum-size aggregate is 3\/8 inch (9.5 mm) or smaller, the test panels shall have minimum dimensions of 12 inches by 12 inches (305 mm by 305 mm). Panels shall be shot in the same position as the work, during the course of the work and by the nozzlemen doing the work. The conditions under which the panels are cured shall be the same as the work.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18367-html-1",
+      "kind" : "html",
+      "plainText" : "When the maximum-size aggregate is larger than 3\/8 inch (9.5 mm), the test panels shall have minimum dimensions of 18 inches by 18 inches (457 mm by 457 mm). When the maximum-size aggregate is 3\/8 inch (9.5 mm) or smaller, the test panels shall have minimum dimensions of 12 inches by 12 inches (305 mm by 305 mm). Panels shall be shot in the same position as the work, during the course of the work and by the nozzlemen doing the work. The conditions under which the panels are cured shall be the same as the work."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18367
+}

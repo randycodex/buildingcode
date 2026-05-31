@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167927\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167927\"><\/AnnotationDrawer><div>Electrical equipment and devices within the fabrication area shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span> The requirements for hazardous locations need not be applied where the average air change is at least four times that set forth in Section 415.11.1.6 and where the number of air changes at any location is not less than three times that required by Section 415.11.1.6. The use of recirculated air shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14500-html-1",
+      "kind" : "html",
+      "plainText" : "Electrical equipment and devices within the fabrication area shall comply with the New York City Electrical Code. The requirements for hazardous locations need not be applied where the average air change is at least four times that set forth in Section 415.11.1.6 and where the number of air changes at any location is not less than three times that required by Section 415.11.1.6. The use of recirculated air shall be permitted."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14500
+}

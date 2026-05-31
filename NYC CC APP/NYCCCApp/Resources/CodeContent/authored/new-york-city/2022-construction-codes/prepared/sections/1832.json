@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172022\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172022\"><\/AnnotationDrawer><div>For conditions other than specific fire safety functions noted in Section 907.3, in areas where ambient conditions prohibit the installation of smoke detectors, an automatic sprinkler system installed in such areas in accordance with Section 903.3.1.1 or 903.3.1.2 and that is connected to the fire alarm system shall be approved as automatic heat detection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1832-html-1",
+      "kind" : "html",
+      "plainText" : "For conditions other than specific fire safety functions noted in Section 907.3, in areas where ambient conditions prohibit the installation of smoke detectors, an automatic sprinkler system installed in such areas in accordance with Section 903.3.1.1 or 903.3.1.2 and that is connected to the fire alarm system shall be approved as automatic heat detection."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1832
+}

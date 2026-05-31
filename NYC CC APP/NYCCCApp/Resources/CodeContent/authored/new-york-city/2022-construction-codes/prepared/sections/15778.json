@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172376\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172376\"><\/AnnotationDrawer><div>Measurements using inclined manometers or other approved calibrated measuring devices shall be made of the pressure differences across smoke barriers. Such measurements shall be conducted for each possible smoke control condition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15778-html-1",
+      "kind" : "html",
+      "plainText" : "Measurements using inclined manometers or other approved calibrated measuring devices shall be made of the pressure differences across smoke barriers. Such measurements shall be conducted for each possible smoke control condition."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15778
+}

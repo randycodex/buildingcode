@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180675\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180675\"><\/AnnotationDrawer><div>This beam or slab bottom reinforcement shall be distributed around the column perimeter and shall be extended on all sides of the column into the adjacent slab for at least one-third of the span length. Where reinforcing bars cannot be extended beyond the column (e.g., at slab edges and openings), they shall be hooked or otherwise developed within the column.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4547-html-1",
+      "kind" : "html",
+      "plainText" : "This beam or slab bottom reinforcement shall be distributed around the column perimeter and shall be extended on all sides of the column into the adjacent slab for at least one-third of the span length. Where reinforcing bars cannot be extended beyond the column (e.g., at slab edges and openings), they shall be hooked or otherwise developed within the column."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4547
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180023\"><\/AnnotationDrawer><div>Clear distance between open pits shall be determined by the evaluation report and shall not be less than 12 feet (3657.6 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4289-html-1",
+      "kind" : "html",
+      "plainText" : "Clear distance between open pits shall be determined by the evaluation report and shall not be less than 12 feet (3657.6 mm)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4289
+}

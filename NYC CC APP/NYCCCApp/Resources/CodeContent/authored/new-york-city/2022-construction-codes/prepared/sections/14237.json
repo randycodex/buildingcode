@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167090\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167090\"><\/AnnotationDrawer><div>Bumpers shall be situated not less than 1 foot (305 mm) from the perimeter edge of the open parking lot where vehicles are parked parallel to such perimeter edge, and not less than 4 feet (1219 mm) from the perimeter edge where vehicles are parked perpendicular to such perimeter edge. Openings shall be limited as provided for in Section 406.9.5.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167091\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> A steel guardrail or other substantial barrier designed in accordance with the provisions of Section 1607.9, that will prevent any part of a vehicle from extending across a property line, may be accepted in lieu of bumpers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14237-html-1",
+      "kind" : "html",
+      "plainText" : "Bumpers shall be situated not less than 1 foot (305 mm) from the perimeter edge of the open parking lot where vehicles are parked parallel to such perimeter edge, and not less than 4 feet (1219 mm) from the perimeter edge where vehicles are parked perpendicular to such perimeter edge. Openings shall be limited as provided for in Section 406.9.5.1.\n\n Exception: A steel guardrail or other substantial barrier designed in accordance with the provisions of Section 1607.9, that will prevent any part of a vehicle from extending across a property line, may be accepted in lieu of bumpers."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14237
+}

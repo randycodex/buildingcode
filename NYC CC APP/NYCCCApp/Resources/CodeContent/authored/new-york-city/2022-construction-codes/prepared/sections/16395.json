@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174568\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174568\"><\/AnnotationDrawer><div>For rows of seating served by an aisle or doorway at only one end of the row, the minimum clear width of 12 inches (304.8 mm) between rows shall be provided. Not more than eight chairs shall be provided in such row of seating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16395-html-1",
+      "kind" : "html",
+      "plainText" : "For rows of seating served by an aisle or doorway at only one end of the row, the minimum clear width of 12 inches (304.8 mm) between rows shall be provided. Not more than eight chairs shall be provided in such row of seating."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16395
+}

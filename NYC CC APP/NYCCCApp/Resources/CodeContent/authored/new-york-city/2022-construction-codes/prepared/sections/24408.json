@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196675\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196675\"><\/AnnotationDrawer><div>Nonmetallic fuel-oil tanks shall be tested in accordance with UL 2258.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24408-html-1",
+      "kind" : "html",
+      "plainText" : "Nonmetallic fuel-oil tanks shall be tested in accordance with UL 2258."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24408
+}

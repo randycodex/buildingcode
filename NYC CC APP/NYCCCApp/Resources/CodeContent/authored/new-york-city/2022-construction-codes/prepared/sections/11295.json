@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195973\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195973\"><\/AnnotationDrawer><div>Threads shall conform to ASME B 1.20.1. Schedule 80 or heavier plastic pipe shall be threaded with dies specifically designed for plastic pipe. Thread lubricant, pipe-joint compound or tape shall be applied on the male threads only and shall be compatible for application on the piping material and fluid.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11295-html-1",
+      "kind" : "html",
+      "plainText" : "Threads shall conform to ASME B 1.20.1. Schedule 80 or heavier plastic pipe shall be threaded with dies specifically designed for plastic pipe. Thread lubricant, pipe-joint compound or tape shall be applied on the male threads only and shall be compatible for application on the piping material and fluid."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11295
+}

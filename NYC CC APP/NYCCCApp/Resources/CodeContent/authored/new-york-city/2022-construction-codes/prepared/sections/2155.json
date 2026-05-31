@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172989\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172989\"><\/AnnotationDrawer><div>The occupant load permitted in any building, or portion thereof, is permitted to be increased from that number established for the functions in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172973', hash: '#JD_BCTable1004.1.3' }}\">Table 1004.1.3<\/Link> provided that all other requirements of the code are also met based on such modified number and the occupant load shall not exceed one occupant per 5 square feet (0.46 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of occupiable floor space, except for safe areas as specified in Section 1029.19.3 and standee areas as specified in Section 1029.18. Where required by the commissioner, an approved aisle, seating or fixed equipment diagram substantiating any increase in occupant load shall be submitted. Where required by the commissioner, such diagram shall be posted. Capacity signs indicating the increased, stated occupant load in accordance with Sections 1029.1.3 and 1029.1.4 shall be posted where required by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2155-html-1",
+      "kind" : "html",
+      "plainText" : "The occupant load permitted in any building, or portion thereof, is permitted to be increased from that number established for the functions in Table 1004.1.3 provided that all other requirements of the code are also met based on such modified number and the occupant load shall not exceed one occupant per 5 square feet (0.46 m\n\n 2 \n\n ) of occupiable floor space, except for safe areas as specified in Section 1029.19.3 and standee areas as specified in Section 1029.18. Where required by the commissioner, an approved aisle, seating or fixed equipment diagram substantiating any increase in occupant load shall be submitted. Where required by the commissioner, such diagram shall be posted. Capacity signs indicating the increased, stated occupant load in accordance with Sections 1029.1.3 and 1029.1.4 shall be posted where required by the commissioner."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2155
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174525\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174525\"><\/AnnotationDrawer><div>There shall not be obstructions in the minimum width or required capacity of aisles.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174526\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174526\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Handrails are permitted to project into the required width of stepped aisles and ramped aisles in accordance with Section 1014.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16378-html-1",
+      "kind" : "html",
+      "plainText" : "There shall not be obstructions in the minimum width or required capacity of aisles.\n\n Exception: Handrails are permitted to project into the required width of stepped aisles and ramped aisles in accordance with Section 1014.8."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16378
+}

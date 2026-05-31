@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189047\"><\/AnnotationDrawer><div>The signs specified in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156347', hash: '#JD_28-105.4.5' }}\">28-105.4.5<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> are exempt from the requirements to obtain a permit before erection. The changing of moveable parts of an approved sign that is designed for such changes, or the repainting or repositioning of display matter shall not be deemed an alteration requiring a separate permit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-189048\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-189048\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-189048\"><\/AnnotationDrawer><h6><a name=\"JD_BCH102\" id=\"JD_BCH102\" title=\"BC H102\"><\/a>Section BC H102: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7195-html-1",
+      "kind" : "html",
+      "plainText" : "The signs specified in Section 28-105.4.5 of the Administrative Code are exempt from the requirements to obtain a permit before erection. The changing of moveable parts of an approved sign that is designed for such changes, or the repainting or repositioning of display matter shall not be deemed an alteration requiring a separate permit.\n\n Section BC H102: Definitions"
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7195
+}

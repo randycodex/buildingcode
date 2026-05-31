@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192326\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192326\"><\/AnnotationDrawer><div>In addition to the requirements of Sections 102.4 and 102.4.1, the provisions of Sections 102.4.2.1 through 102.4.2.6 shall apply to prior code buildings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10153-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of Sections 102.4 and 102.4.1, the provisions of Sections 102.4.2.1 through 102.4.2.6 shall apply to prior code buildings."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 10153
+}

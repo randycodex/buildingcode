@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196714\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196714\"><\/AnnotationDrawer><div>Fuel-oil storage tanks, other than tanks complying with the alternate tank design and construction standards contained in Section 1305.14, shall be tested in accordance with NFPA 31.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11597-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-oil storage tanks, other than tanks complying with the alternate tank design and construction standards contained in Section 1305.14, shall be tested in accordance with NFPA 31."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11597
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187535\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187535\"><\/AnnotationDrawer><div>Personnel and building materials connected with or related to the building project shall not be moved by the hoisting equipment or material handling equipment while such equipment is being installed, jumped, dismantled, or altered.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20569-html-1",
+      "kind" : "html",
+      "plainText" : "Personnel and building materials connected with or related to the building project shall not be moved by the hoisting equipment or material handling equipment while such equipment is being installed, jumped, dismantled, or altered."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20569
+}

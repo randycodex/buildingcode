@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198132\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198132\"><\/AnnotationDrawer><div>Any gas piping system or part thereof that has been previously energized and has been shut down shall be required to obtain a certificate of approval of gas installation for all appliances served by the affected gas meter(s) prior to the reestablishment of gas into such system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198133\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198133\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> When an existing gas appliance is replaced and no gas piping is replaced upstream of the existing appliance shutoff valve and not more than 6 feet (1828.8 mm) of pipe is installed or replaced downstream of the existing appliance shutoff valve, a certificate of approval of gas installation shall not be required to energize such pipe or replacement appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21058-html-1",
+      "kind" : "html",
+      "plainText" : "Any gas piping system or part thereof that has been previously energized and has been shut down shall be required to obtain a certificate of approval of gas installation for all appliances served by the affected gas meter(s) prior to the reestablishment of gas into such system.\n\n Exception: When an existing gas appliance is replaced and no gas piping is replaced upstream of the existing appliance shutoff valve and not more than 6 feet (1828.8 mm) of pipe is installed or replaced downstream of the existing appliance shutoff valve, a certificate of approval of gas installation shall not be required to energize such pipe or replacement appliance."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21058
+}

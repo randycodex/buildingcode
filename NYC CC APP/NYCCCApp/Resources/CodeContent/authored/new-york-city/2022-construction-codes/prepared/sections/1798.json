@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171921\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171921\"><\/AnnotationDrawer><div>Automatic smoke detectors shall be provided in accordance with this section. Smoke detectors shall be connected to an automatic fire alarm system. The activation of any detector required by this section shall activate the emergency voice\/alarm communication system. Smoke detectors shall be located as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171922\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171922\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;In each mechanical equipment, electrical, transformer, telephone equipment or similar room.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171923\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;In each elevator machine room and in elevator lobbies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1798-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic smoke detectors shall be provided in accordance with this section. Smoke detectors shall be connected to an automatic fire alarm system. The activation of any detector required by this section shall activate the emergency voice\/alarm communication system. Smoke detectors shall be located as follows:\n\n 1. In each mechanical equipment, electrical, transformer, telephone equipment or similar room.\n\n 2. In each elevator machine room and in elevator lobbies."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1798
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162665\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162665\"><\/AnnotationDrawer><div>All connections and changes in direction of the sanitary drainage system shall be made with approved drainage fittings. Connections between drainage piping and fixtures shall conform to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-161512', hash: '#JD_PC405' }}\">405<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12330-html-1",
+      "kind" : "html",
+      "plainText" : "All connections and changes in direction of the sanitary drainage system shall be made with approved drainage fittings. Connections between drainage piping and fixtures shall conform to Section 405 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12330
+}

@@ -1,0 +1,25 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184745\"><\/AnnotationDrawer><div>Sidewalk shed parapet information panels shall be posted on the parapet that runs along the long axis of the sidewalk shed. Where a sidewalk shed extends along multiple street frontages, not including incidental extensions at a street corner, a parapet information panel shall be posted along each long axis. Such sidewalk shed parapet information panel:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184746\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184746\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Shall not be posted above or below the level of the parapet; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184747\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184747\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Shall be posted, as viewed from the perspective of an individual on the sidewalk opposite the long axis of the sidewalk shed and facing the sidewalk shed, in a location that is at least 3 feet (914 mm) but no more than 6 feet (1218 mm) to the right of the left edge of the sidewalk shed parapet, or where the sidewalk shed parapet extends beyond the projection of the property line, in a location that is at least 3 feet (914 mm) but no more than 6 feet (1218 mm) to the right of the projection of the property line through the left side of the sidewalk shed; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184748\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Where a project information panel in accordance with Section 3301.9.1 is posted on the fence, the horizontal center of the sidewalk shed parapet information panel shall be in line with a vertical plane drawn through the horizontal center of the project information panel on the fence in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184744', hash: '#JD_BCFigure3301.9.2.2' }}\">Figure 3301.9.2.2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184749\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184749\"><\/AnnotationDrawer><div>",
+      "id" : "19690-html-1",
+      "kind" : "html",
+      "plainText" : "Sidewalk shed parapet information panels shall be posted on the parapet that runs along the long axis of the sidewalk shed. Where a sidewalk shed extends along multiple street frontages, not including incidental extensions at a street corner, a parapet information panel shall be posted along each long axis. Such sidewalk shed parapet information panel:\n\n 1. Shall not be posted above or below the level of the parapet; and\n\n 2. Shall be posted, as viewed from the perspective of an individual on the sidewalk opposite the long axis of the sidewalk shed and facing the sidewalk shed, in a location that is at least 3 feet (914 mm) but no more than 6 feet (1218 mm) to the right of the left edge of the sidewalk shed parapet, or where the sidewalk shed parapet extends beyond the projection of the property line, in a location that is at least 3 feet (914 mm) but no more than 6 feet (1218 mm) to the right of the projection of the property line through the left side of the sidewalk shed; or\n\n 3. Where a project information panel in accordance with Section 3301.9.1 is posted on the fence, the horizontal center of the sidewalk shed parapet information panel shall be in line with a vertical plane drawn through the horizontal center of the project information panel on the fence in accordance with Figure 3301.9.2.2 ."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/8904af17ab14b8d8ff088ca01a684230774d2ed9.png\" width=\"672\" height=\"460.8\"><\/img><\/span>",
+      "id" : "19690-image-2",
+      "imageID" : "8904af17ab14b8d8ff088ca01a684230774d2ed9.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184750\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184750\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure3301.9.2.2\" id=\"JD_BCFigure3301.9.2.2\" title=\"BC Figure 3301.9.2.2\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 3301.9.2.2<br><\/br>Panel Posting Elevation Diagram<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19690-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 3301.9.2.2\n Panel Posting Elevation Diagram"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19690
+}

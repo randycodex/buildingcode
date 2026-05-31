@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166063\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166063\"><\/AnnotationDrawer><div>Locations of spaces classified in Factory Group F may be restricted within a building containing a Group R occupancy pursuant to Section 510.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-166064\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-166064\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-166064\"><\/AnnotationDrawer><h6><a name=\"JD_BC307\" id=\"JD_BC307\" title=\"BC 307\"><\/a>Section BC 307: High-Hazard Group H<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13974-html-1",
+      "kind" : "html",
+      "plainText" : "Locations of spaces classified in Factory Group F may be restricted within a building containing a Group R occupancy pursuant to Section 510.8.\n\n Section BC 307: High-Hazard Group H"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 13974
+}

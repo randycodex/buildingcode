@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198303\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198303\"><\/AnnotationDrawer><div>Suspended low-intensity infrared tube heaters shall be connected to the building piping system with a connector listed for the application complying with ANSI Z21.24\/CGA 6.10. The connector shall be installed as specified by the tube heater manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-198304\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-198304\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-198304\"><\/AnnotationDrawer><h6><a name=\"JD_FGC412\" id=\"JD_FGC412\" title=\"FGC 412\"><\/a>Section FGC 412: Liquefied Petroleum Gas Motor Vehicle Fuel-Dispensing Facilities<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8292-html-1",
+      "kind" : "html",
+      "plainText" : "Suspended low-intensity infrared tube heaters shall be connected to the building piping system with a connector listed for the application complying with ANSI Z21.24\/CGA 6.10. The connector shall be installed as specified by the tube heater manufacturer's instructions.\n\n Section FGC 412: Liquefied Petroleum Gas Motor Vehicle Fuel-Dispensing Facilities"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8292
+}

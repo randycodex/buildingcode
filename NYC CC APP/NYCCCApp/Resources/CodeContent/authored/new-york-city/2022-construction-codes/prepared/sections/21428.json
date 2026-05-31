@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199206\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199206\"><\/AnnotationDrawer><div>Nonrecirculating direct-fired industrial air heaters shall not be used to supply any area containing sleeping quarters. Nonrecirculating direct-fired industrial air heaters shall be installed only in industrial or commercial occupancies. Nonrecirculating direct-fired industrial air heaters shall be permitted to provide ventilation air.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21428-html-1",
+      "kind" : "html",
+      "plainText" : "Nonrecirculating direct-fired industrial air heaters shall not be used to supply any area containing sleeping quarters. Nonrecirculating direct-fired industrial air heaters shall be installed only in industrial or commercial occupancies. Nonrecirculating direct-fired industrial air heaters shall be permitted to provide ventilation air."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21428
+}

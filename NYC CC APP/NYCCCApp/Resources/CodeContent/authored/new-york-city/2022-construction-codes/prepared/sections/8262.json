@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198219\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198219\"><\/AnnotationDrawer><div>Where a single meter is used to supply gas to more than one building or tenant, a separate shutoff valve shall be provided for each building or tenant.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8262-html-1",
+      "kind" : "html",
+      "plainText" : "Where a single meter is used to supply gas to more than one building or tenant, a separate shutoff valve shall be provided for each building or tenant."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8262
+}

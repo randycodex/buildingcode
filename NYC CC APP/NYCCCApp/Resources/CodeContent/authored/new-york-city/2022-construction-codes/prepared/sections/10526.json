@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193707\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193707\"><\/AnnotationDrawer><div>Exhaust ducts shall have a smooth interior finish and shall be constructed of metal a minimum 0.016 inch (0.4 mm) thick. The exhaust duct size shall be 4 inches (101.6 mm) nominal in diameter, unless a larger duct size is specifically required by the dryer manufacturer. Exhaust ducts larger than 20 square inches (12 903.2 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) shall be individually exhausted.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193708\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193708\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where the make and model of the clothes dryer to be installed is known and the manufacturer's instructions for such dryer are provided, the maximum length of the exhaust duct, including any transition duct, shall be permitted to be in accordance with the dryer manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10526-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust ducts shall have a smooth interior finish and shall be constructed of metal a minimum 0.016 inch (0.4 mm) thick. The exhaust duct size shall be 4 inches (101.6 mm) nominal in diameter, unless a larger duct size is specifically required by the dryer manufacturer. Exhaust ducts larger than 20 square inches (12 903.2 mm\n\n 2 \n\n ) shall be individually exhausted.\n\n Exception: Where the make and model of the clothes dryer to be installed is known and the manufacturer's instructions for such dryer are provided, the maximum length of the exhaust duct, including any transition duct, shall be permitted to be in accordance with the dryer manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10526
+}

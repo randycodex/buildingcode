@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163984\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163984\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Absorption systems shall be installed in accordance with Sections 1403.1.1 through 1403.1.5 to provide landscape irrigation without surfacing of water.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25638-html-1",
+      "kind" : "html",
+      "plainText" : "Absorption systems shall be installed in accordance with Sections 1403.1.1 through 1403.1.5 to provide landscape irrigation without surfacing of water."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 25638
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183425\"><\/AnnotationDrawer><div>The sign shall not exceed 20 percent of the wall area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5329-html-1",
+      "kind" : "html",
+      "plainText" : "The sign shall not exceed 20 percent of the wall area."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5329
+}

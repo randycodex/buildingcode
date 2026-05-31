@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186258\"><\/AnnotationDrawer><div>No item shall be stored or placed upon a sidewalk shed unless such shed has been designed for such storage or placement in accordance with Section 3307.6.4.2.2. Where such shed has been so designed items shall be stored or placed only in the area designated on the drawings for storage. Any item placed or stored upon a sidewalk shed shall be secured in a manner to prevent dislodgement, displacement by wind, and shall be distributed so as not to exceed the design limits of the sidewalk shed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6346-html-1",
+      "kind" : "html",
+      "plainText" : "No item shall be stored or placed upon a sidewalk shed unless such shed has been designed for such storage or placement in accordance with Section 3307.6.4.2.2. Where such shed has been so designed items shall be stored or placed only in the area designated on the drawings for storage. Any item placed or stored upon a sidewalk shed shall be secured in a manner to prevent dislodgement, displacement by wind, and shall be distributed so as not to exceed the design limits of the sidewalk shed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6346
+}

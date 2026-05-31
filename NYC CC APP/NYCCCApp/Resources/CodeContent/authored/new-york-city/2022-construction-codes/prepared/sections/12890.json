@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188265\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188265\"><\/AnnotationDrawer><div>Self-service fare vending, collection and adjustment machines shall comply with Section 707 (ATMs and Fare Machines). Where self-service fare vending, collection or adjustment machines are provided for the use of the general public, at least one accessible machine of each type provided shall be provided at each accessible point of entry and exit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12890-html-1",
+      "kind" : "html",
+      "plainText" : "Self-service fare vending, collection and adjustment machines shall comply with Section 707 (ATMs and Fare Machines). Where self-service fare vending, collection or adjustment machines are provided for the use of the general public, at least one accessible machine of each type provided shall be provided at each accessible point of entry and exit."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12890
+}

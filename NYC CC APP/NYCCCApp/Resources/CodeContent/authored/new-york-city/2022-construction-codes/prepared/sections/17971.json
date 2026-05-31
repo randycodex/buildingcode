@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179633\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179633\"><\/AnnotationDrawer><div>For Site Class A, B, C and D, transverse confinement reinforcement shall be provided in the element in accordance with Sections 18.7.5.2, through 18.7.5.4 of ACI 318 within three times the least element dimension of the bottom of the pile cap. A transverse spiral reinforcement ratio of not less than one-half of that required in Section 18.7.5.4(a) of ACI 318 shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17971-html-1",
+      "kind" : "html",
+      "plainText" : "For Site Class A, B, C and D, transverse confinement reinforcement shall be provided in the element in accordance with Sections 18.7.5.2, through 18.7.5.4 of ACI 318 within three times the least element dimension of the bottom of the pile cap. A transverse spiral reinforcement ratio of not less than one-half of that required in Section 18.7.5.4(a) of ACI 318 shall be permitted."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17971
+}

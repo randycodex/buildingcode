@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175432\"><\/AnnotationDrawer><div>Floor selection controls shall be located above the accessibility function button and shall be no higher than 48 inches (1220 mm) above the finish floor and shall be nominally centered on the console.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16682-html-1",
+      "kind" : "html",
+      "plainText" : "Floor selection controls shall be located above the accessibility function button and shall be no higher than 48 inches (1220 mm) above the finish floor and shall be nominally centered on the console."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16682
+}

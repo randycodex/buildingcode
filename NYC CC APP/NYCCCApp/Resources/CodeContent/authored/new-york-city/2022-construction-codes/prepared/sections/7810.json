@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230155\"><\/AnnotationDrawer><div>A primary dwelling and an ADU shall be provided with: \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230154\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230154\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Return air openings for heating, ventilation, and air-conditioning that are not taken from another dwelling unit. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230153\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230153\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Separate climate controls. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7810-html-1",
+      "kind" : "html",
+      "plainText" : "A primary dwelling and an ADU shall be provided with: \n\n 1. Return air openings for heating, ventilation, and air-conditioning that are not taken from another dwelling unit. \n\n 2. Separate climate controls."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7810
+}

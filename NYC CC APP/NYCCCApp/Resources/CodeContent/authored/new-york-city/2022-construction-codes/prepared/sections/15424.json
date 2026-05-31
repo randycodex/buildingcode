@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171292\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171292\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be provided throughout any Group M occupancy fire area where any one of the following conditions exists:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171293\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171293\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The fire area exceeds 7,500 square feet (696.8 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171294\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171294\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The fire area of any size contains an unenclosed stair or escalator connecting two or more floors. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171295\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224260\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224260\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15424-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be provided throughout any Group M occupancy fire area where any one of the following conditions exists:\n\n 1. The fire area exceeds 7,500 square feet (696.8 m\n\n 2 \n\n ).\n\n 2. The fire area of any size contains an unenclosed stair or escalator connecting two or more floors. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15424
+}

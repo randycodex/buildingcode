@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179856\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179856\"><\/AnnotationDrawer><div>The average ultimate bond strength along the interface between anchor grout and the ground shall be determined by a generally accepted means of analysis and confirmed by load testing performed in accordance with Section 1815.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18070-html-1",
+      "kind" : "html",
+      "plainText" : "The average ultimate bond strength along the interface between anchor grout and the ground shall be determined by a generally accepted means of analysis and confirmed by load testing performed in accordance with Section 1815.5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18070
+}

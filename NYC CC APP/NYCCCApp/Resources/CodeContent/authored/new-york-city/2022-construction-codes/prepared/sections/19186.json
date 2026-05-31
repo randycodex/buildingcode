@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183486\"><\/AnnotationDrawer><div>This chapter governs the electrical components, equipment and systems used in buildings and structures covered by this code. Electrical components, equipment and systems shall be designed and constructed in accordance with the provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183487\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183487\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183487\"><\/AnnotationDrawer><h6><a name=\"JD_BC2702\" id=\"JD_BC2702\" title=\"BC 2702\"><\/a>Section BC 2702: Emergency and Standby Power Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19186-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter governs the electrical components, equipment and systems used in buildings and structures covered by this code. Electrical components, equipment and systems shall be designed and constructed in accordance with the provisions of the New York City Electrical Code. \n\n Section BC 2702: Emergency and Standby Power Systems"
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 19186
+}

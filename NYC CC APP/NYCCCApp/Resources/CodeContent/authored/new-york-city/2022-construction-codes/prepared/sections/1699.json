@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171573\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171573\"><\/AnnotationDrawer><div>A manual actuation device shall be located at or near a means of egress from the cooking area not less than 10 feet (3048 mm) and not more than 20 feet (6096 mm), from the kitchen exhaust system. The manual actuation device shall be installed not more than 48 inches (1220 mm) or less than 42 inches (1066.8 mm) above the finished floor and shall clearly identify the hazard protected. The manual actuation device shall require a maximum force of 40 pounds (177.9 N) and a maximum movement of 14 inches (355.6 mm) to actuate the fire suppression system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171574\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171574\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Automatic sprinkler systems shall not be required to be equipped with manual actuation means. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1699-html-1",
+      "kind" : "html",
+      "plainText" : "A manual actuation device shall be located at or near a means of egress from the cooking area not less than 10 feet (3048 mm) and not more than 20 feet (6096 mm), from the kitchen exhaust system. The manual actuation device shall be installed not more than 48 inches (1220 mm) or less than 42 inches (1066.8 mm) above the finished floor and shall clearly identify the hazard protected. The manual actuation device shall require a maximum force of 40 pounds (177.9 N) and a maximum movement of 14 inches (355.6 mm) to actuate the fire suppression system.\n\n Exception: Automatic sprinkler systems shall not be required to be equipped with manual actuation means."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1699
+}

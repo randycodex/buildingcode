@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196044\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196044\"><\/AnnotationDrawer><div>Shutoff valves shall be installed in hydronic piping systems in the locations indicated in Sections 1205.1.1 through 1205.1.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11330-html-1",
+      "kind" : "html",
+      "plainText" : "Shutoff valves shall be installed in hydronic piping systems in the locations indicated in Sections 1205.1.1 through 1205.1.6."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11330
+}

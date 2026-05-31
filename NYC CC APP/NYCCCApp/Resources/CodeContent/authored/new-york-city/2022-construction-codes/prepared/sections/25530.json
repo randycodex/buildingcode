@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163720\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163720\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where tanks require draining for service or cleaning, tanks shall be drained by using a pump or by a drain located at the lowest point in the tank. The tank drain pipe shall be indirectly connected to the appropriate building drainage system and discharge as required for overflow pipes and shall not be smaller in size than specified in <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162170', hash: '#JD_PCTable606.5.7' }}\">Table 606.5.7<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">. Not less than one cleanout shall be provided on each drain pipe in accordance with Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162686', hash: '#JD_PC708' }}\">708<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25530-html-1",
+      "kind" : "html",
+      "plainText" : "Where tanks require draining for service or cleaning, tanks shall be drained by using a pump or by a drain located at the lowest point in the tank. The tank drain pipe shall be indirectly connected to the appropriate building drainage system and discharge as required for overflow pipes and shall not be smaller in size than specified in Table 606.5.7 . Not less than one cleanout shall be provided on each drain pipe in accordance with Section 708 ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 25530
+}

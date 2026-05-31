@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188908\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188908\"><\/AnnotationDrawer><div>The owner of a building required to comply with the provisions of Section G312.3 shall file with the department, by January 1, 2033, a report prepared by a registered design professional (i) certifying that the requirements of Section G312.3 have been satisfied and detailing how such requirements were satisfied or (ii) certifying that any boiler and chiller plants that serve the spaces specified in Item 2 of Section G304.5.2 are located at or above the design flood elevation specified in Table 7-1 of ASCE 24.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13121-html-1",
+      "kind" : "html",
+      "plainText" : "The owner of a building required to comply with the provisions of Section G312.3 shall file with the department, by January 1, 2033, a report prepared by a registered design professional (i) certifying that the requirements of Section G312.3 have been satisfied and detailing how such requirements were satisfied or (ii) certifying that any boiler and chiller plants that serve the spaces specified in Item 2 of Section G304.5.2 are located at or above the design flood elevation specified in Table 7-1 of ASCE 24."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13121
+}

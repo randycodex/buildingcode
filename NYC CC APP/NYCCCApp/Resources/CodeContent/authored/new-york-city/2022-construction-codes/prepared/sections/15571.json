@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171713\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171713\"><\/AnnotationDrawer><div>For all buildings where standpipe and combination sprinkler and standpipe systems are not subject to a special inspection pursuant to Section 1705.30 of this code, a licensed master plumber, licensed master fire suppression piping contractor, registered design professional or an individual holding an appropriate certificate of fitness from the Fire Department for the operation and\/or maintenance of such system shall certify on forms provided by the department that all required painting has been completed in accordance with Section 905.11. Such certification shall be maintained on the premises and made available for inspection by the department and the Fire Department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-171714\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-171714\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-171714\"><\/AnnotationDrawer><h6><a name=\"JD_BC906\" id=\"JD_BC906\" title=\"BC 906\"><\/a>Section BC 906: Portable Fire Extinguishers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15571-html-1",
+      "kind" : "html",
+      "plainText" : "For all buildings where standpipe and combination sprinkler and standpipe systems are not subject to a special inspection pursuant to Section 1705.30 of this code, a licensed master plumber, licensed master fire suppression piping contractor, registered design professional or an individual holding an appropriate certificate of fitness from the Fire Department for the operation and\/or maintenance of such system shall certify on forms provided by the department that all required painting has been completed in accordance with Section 905.11. Such certification shall be maintained on the premises and made available for inspection by the department and the Fire Department.\n\n Section BC 906: Portable Fire Extinguishers"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15571
+}

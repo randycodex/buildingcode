@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182155\"><\/AnnotationDrawer><div>Ceiling joist and rafter framing constructed in accordance with Section 2308.7 and trusses shall not span more than 40 feet (12 192 mm) between points of vertical support. A ridge board in accordance with Section 2308.7 or 2308.7.3.1 shall not be considered a vertical support.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18826-html-1",
+      "kind" : "html",
+      "plainText" : "Ceiling joist and rafter framing constructed in accordance with Section 2308.7 and trusses shall not span more than 40 feet (12 192 mm) between points of vertical support. A ridge board in accordance with Section 2308.7 or 2308.7.3.1 shall not be considered a vertical support."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18826
+}

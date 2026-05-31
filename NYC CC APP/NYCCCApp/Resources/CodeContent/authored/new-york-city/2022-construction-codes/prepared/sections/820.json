@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168337\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168337\"><\/AnnotationDrawer><div>Electrical controls and equipment shall be installed in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "820-html-1",
+      "kind" : "html",
+      "plainText" : "Electrical controls and equipment shall be installed in accordance with the requirements of the New York City Electrical Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 820
+}

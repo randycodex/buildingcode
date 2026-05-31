@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194704\"><\/AnnotationDrawer><div>Where lower combustion air openings connect with crawl spaces, such spaces shall have unobstructed openings to the outdoors at least twice that required for the combustion air openings. The height of the crawl space shall comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and shall be without obstruction to the free flow of air.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23668-html-1",
+      "kind" : "html",
+      "plainText" : "Where lower combustion air openings connect with crawl spaces, such spaces shall have unobstructed openings to the outdoors at least twice that required for the combustion air openings. The height of the crawl space shall comply with the requirements of the New York City Building Code and shall be without obstruction to the free flow of air."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 23668
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199188\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199188\"><\/AnnotationDrawer><div>The outlet duct temperature of warm air heating furnaces shall not be greater than 250&#176;F (121.1&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8595-html-1",
+      "kind" : "html",
+      "plainText" : "The outlet duct temperature of warm air heating furnaces shall not be greater than 250°F (121.1°C)."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8595
+}

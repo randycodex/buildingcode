@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178623\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178623\"><\/AnnotationDrawer><div>A periodic special inspection shall be required in accordance with Sections 1705.25.7 through 1705.25.10 where the lowest above-grade floor or the lowest subgrade floor of a building is to be raised, lifted, elevated or moved.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17657-html-1",
+      "kind" : "html",
+      "plainText" : "A periodic special inspection shall be required in accordance with Sections 1705.25.7 through 1705.25.10 where the lowest above-grade floor or the lowest subgrade floor of a building is to be raised, lifted, elevated or moved."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17657
+}

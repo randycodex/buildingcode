@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196046\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196046\"><\/AnnotationDrawer><div>Shutoff valves shall be installed on the supply and return side of a heat exchanger.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196047\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Shutoff valves shall not be required where heat exchangers are integral with a boiler; or are a component of a manufacturer's boiler and heat exchanger packaged unit and are capable of being isolated from the hydronic system by the supply and return valves required by Section 1005.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24156-html-1",
+      "kind" : "html",
+      "plainText" : "Shutoff valves shall be installed on the supply and return side of a heat exchanger.\n\n Exception: Shutoff valves shall not be required where heat exchangers are integral with a boiler; or are a component of a manufacturer's boiler and heat exchanger packaged unit and are capable of being isolated from the hydronic system by the supply and return valves required by Section 1005.1."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24156
+}

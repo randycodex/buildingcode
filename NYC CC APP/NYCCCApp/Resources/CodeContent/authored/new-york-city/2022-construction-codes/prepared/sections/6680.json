@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187328\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187328\"><\/AnnotationDrawer><div>Swaged attachments or spliced eyes on wire suspension ropes shall not be used unless they are made by the wire rope manufacturer or a qualified person. Where swaged attachments or spliced eyes are made by a qualified person, a representative sample of the assembly shall be tested under the supervision of a licensed rigger or a registered design professional to confirm the assembly will supply the clamping force specified by the wire rope manufacturer or the manufacturer of the hardware. Swaged attachments or spliced eyes shall be provided with a tag by the wire rope manufacturer or the testing entity indicating the capacity of the assembly.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187329\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187329\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> J-bolts shall be designed by a manufacturer and installed in accordance with the manufacturer's specifications.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6680-html-1",
+      "kind" : "html",
+      "plainText" : "Swaged attachments or spliced eyes on wire suspension ropes shall not be used unless they are made by the wire rope manufacturer or a qualified person. Where swaged attachments or spliced eyes are made by a qualified person, a representative sample of the assembly shall be tested under the supervision of a licensed rigger or a registered design professional to confirm the assembly will supply the clamping force specified by the wire rope manufacturer or the manufacturer of the hardware. Swaged attachments or spliced eyes shall be provided with a tag by the wire rope manufacturer or the testing entity indicating the capacity of the assembly.\n\n Exception: J-bolts shall be designed by a manufacturer and installed in accordance with the manufacturer's specifications."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6680
+}

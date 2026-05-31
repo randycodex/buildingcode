@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179166\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179166\"><\/AnnotationDrawer><div>Grillage footings of structural steel elements shall be separated with approved steel spacers and be entirely encased in concrete with at least 6 inches (152.4 mm) on the bottom and at least 4 inches (101.6 mm) at all other points. The spaces between the elements shall be completely filled with concrete or cement grout.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3998-html-1",
+      "kind" : "html",
+      "plainText" : "Grillage footings of structural steel elements shall be separated with approved steel spacers and be entirely encased in concrete with at least 6 inches (152.4 mm) on the bottom and at least 4 inches (101.6 mm) at all other points. The spaces between the elements shall be completely filled with concrete or cement grout."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3998
+}

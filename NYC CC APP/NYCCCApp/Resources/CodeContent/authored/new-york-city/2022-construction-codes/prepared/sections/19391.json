@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184039\"><\/AnnotationDrawer><div>A noncombustible membrane shall be permitted for use as the roof or as a skylight of any building or atrium of a building of any type of construction provided such membrane is not less than 20 feet (6096 mm) above any floor, balcony or gallery, and meets the fire classification requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-204929', hash: '#JD_BC1505' }}\">1505<\/Link> for roof assemblies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19391-html-1",
+      "kind" : "html",
+      "plainText" : "A noncombustible membrane shall be permitted for use as the roof or as a skylight of any building or atrium of a building of any type of construction provided such membrane is not less than 20 feet (6096 mm) above any floor, balcony or gallery, and meets the fire classification requirements of Section 1505 for roof assemblies."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19391
+}

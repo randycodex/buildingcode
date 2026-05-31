@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184432\"><\/AnnotationDrawer><div>No part of a small wind turbine or small wind turbine tower shall be located within a horizontal distance of a property line that is equal or less than one-half the height of such turbine, including such tower, measured from the base of such tower or, if there is no such tower, the base of such turbine.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184433\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Turbines or towers for which each owner of property adjacent to such property line has entered into a written agreement providing that such turbine or tower or a part thereof may be located closer to such property line than this section allows.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184434\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184434\"><\/AnnotationDrawer><div>(L.L. 2018\/105, 5\/26\/2018, eff. 11\/22\/2018) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "19542-html-1",
+      "kind" : "html",
+      "plainText" : "No part of a small wind turbine or small wind turbine tower shall be located within a horizontal distance of a property line that is equal or less than one-half the height of such turbine, including such tower, measured from the base of such tower or, if there is no such tower, the base of such turbine.\n\n Exception: Turbines or towers for which each owner of property adjacent to such property line has entered into a written agreement providing that such turbine or tower or a part thereof may be located closer to such property line than this section allows.\n\n (L.L. 2018\/105, 5\/26\/2018, eff. 11\/22\/2018)"
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19542
+}

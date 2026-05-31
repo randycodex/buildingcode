@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194903\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194903\"><\/AnnotationDrawer><div>Common venting systems for appliances located on more than one floor level shall be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10916-html-1",
+      "kind" : "html",
+      "plainText" : "Common venting systems for appliances located on more than one floor level shall be prohibited."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10916
+}

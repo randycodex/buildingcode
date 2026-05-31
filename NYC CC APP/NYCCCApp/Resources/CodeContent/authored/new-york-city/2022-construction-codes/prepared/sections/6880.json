@@ -1,0 +1,265 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188091\"><\/AnnotationDrawer><div>Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the \"fire district maps\" as per <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188090', hash: '#JD_BCFigureD106.1(1)' }}\">Figures D106.1(1)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188090', hash: '#JD_BCFigureD106.1(2)' }}\">D106.1(2)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188092\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188092\"><\/AnnotationDrawer><div><a name=\"JD_BCFigureD106.1(1)\" id=\"JD_BCFigureD106.1(1)\" title=\"BC Figure D106.1(1)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure D106.1(1)<br><\/br>Fire District Maps<br><\/br>Borough of Staten Island (Richmond County)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188093\"><\/AnnotationDrawer><div>",
+      "id" : "6880-html-1",
+      "kind" : "html",
+      "plainText" : "Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the \"fire district maps\" as per Figures D106.1(1) and D106.1(2) .\n\n Figure D106.1(1)\n Fire District Maps\n Borough of Staten Island (Richmond County)"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-1.jpg\" width=\"768\" height=\"581\"><\/img><\/span>",
+      "id" : "6880-image-2",
+      "imageID" : "building-code-d-image-1.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-2.jpg\" width=\"672\" height=\"1064.8\"><\/img><\/span>",
+      "id" : "6880-image-3",
+      "imageID" : "building-code-d-image-2.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-3.jpg\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6880-image-4",
+      "imageID" : "building-code-d-image-3.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-4.jpg\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6880-image-5",
+      "imageID" : "building-code-d-image-4.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-5.jpg\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6880-image-6",
+      "imageID" : "building-code-d-image-5.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-6.jpg\" width=\"672\" height=\"991.8\"><\/img><\/span>",
+      "id" : "6880-image-7",
+      "imageID" : "building-code-d-image-6.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-7.jpg\" width=\"672\" height=\"839.4\"><\/img><\/span>",
+      "id" : "6880-image-8",
+      "imageID" : "building-code-d-image-7.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2.jpg\" width=\"672\" height=\"827.333333333333\"><\/img><\/span>",
+      "id" : "6880-image-9",
+      "imageID" : "building-code-figure-d106-1-2.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens.jpg\" width=\"672\" height=\"883.4\"><\/img><\/span>",
+      "id" : "6880-image-10",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-2.jpg\" width=\"672\" height=\"1191.06666666667\"><\/img><\/span>",
+      "id" : "6880-image-11",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-2.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-3.jpg\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6880-image-12",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-3.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-4.jpg\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6880-image-13",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-4.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-5.jpg\" width=\"672\" height=\"879.666666666667\"><\/img><\/span>",
+      "id" : "6880-image-14",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-5.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-6.jpg\" width=\"672\" height=\"871.266666666667\"><\/img><\/span>",
+      "id" : "6880-image-15",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-6.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-7.jpg\" width=\"672\" height=\"880.866666666667\"><\/img><\/span>",
+      "id" : "6880-image-16",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-7.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188108\" class=\"Normal-Level\"><div style=\"margin-bottom=10pt\">&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188109\"><\/AnnotationDrawer><div><a name=\"JD_BCFigureD106.1(2)\" id=\"JD_BCFigureD106.1(2)\" title=\"BC Figure D106.1(2)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure D106.1(2)<br><\/br>Fire District Maps<br><\/br>Borough of Queens<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188110\"><\/AnnotationDrawer><div>",
+      "id" : "6880-html-17",
+      "kind" : "html",
+      "plainText" : "Figure D106.1(2)\n Fire District Maps\n Borough of Queens"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-8.jpg\" width=\"768\" height=\"743.6\"><\/img><\/span>",
+      "id" : "6880-image-18",
+      "imageID" : "building-code-figure-d106-1-2-fire-district-maps-borough-of-queens-8.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-17.jpg\" width=\"672\" height=\"910.866666666667\"><\/img><\/span>",
+      "id" : "6880-image-19",
+      "imageID" : "building-code-d-image-17.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-18.jpg\" width=\"672\" height=\"929.6\"><\/img><\/span>",
+      "id" : "6880-image-20",
+      "imageID" : "building-code-d-image-18.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-19.jpg\" width=\"672\" height=\"856.866666666667\"><\/img><\/span>",
+      "id" : "6880-image-21",
+      "imageID" : "building-code-d-image-19.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-20.jpg\" width=\"672\" height=\"864.933333333333\"><\/img><\/span>",
+      "id" : "6880-image-22",
+      "imageID" : "building-code-d-image-20.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-21.jpg\" width=\"672\" height=\"876.8\"><\/img><\/span>",
+      "id" : "6880-image-23",
+      "imageID" : "building-code-d-image-21.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-22.jpg\" width=\"672\" height=\"868.533333333333\"><\/img><\/span>",
+      "id" : "6880-image-24",
+      "imageID" : "building-code-d-image-22.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-23.jpg\" width=\"672\" height=\"861.4\"><\/img><\/span>",
+      "id" : "6880-image-25",
+      "imageID" : "building-code-d-image-23.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-24.jpg\" width=\"672\" height=\"813.6\"><\/img><\/span>",
+      "id" : "6880-image-26",
+      "imageID" : "building-code-d-image-24.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-25.jpg\" width=\"672\" height=\"924.6\"><\/img><\/span>",
+      "id" : "6880-image-27",
+      "imageID" : "building-code-d-image-25.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-26.jpg\" width=\"672\" height=\"853.466666666667\"><\/img><\/span>",
+      "id" : "6880-image-28",
+      "imageID" : "building-code-d-image-26.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-27.jpg\" width=\"672\" height=\"869.866666666667\"><\/img><\/span>",
+      "id" : "6880-image-29",
+      "imageID" : "building-code-d-image-27.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-28.jpg\" width=\"672\" height=\"854.8\"><\/img><\/span>",
+      "id" : "6880-image-30",
+      "imageID" : "building-code-d-image-28.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-29.jpg\" width=\"672\" height=\"870.533333333333\"><\/img><\/span>",
+      "id" : "6880-image-31",
+      "imageID" : "building-code-d-image-29.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-30.jpg\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6880-image-32",
+      "imageID" : "building-code-d-image-30.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-31.jpg\" width=\"672\" height=\"849.333333333333\"><\/img><\/span>",
+      "id" : "6880-image-33",
+      "imageID" : "building-code-d-image-31.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-32.jpg\" width=\"672\" height=\"850.533333333333\"><\/img><\/span>",
+      "id" : "6880-image-34",
+      "imageID" : "building-code-d-image-32.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-33.jpg\" width=\"672\" height=\"854.333333333333\"><\/img><\/span>",
+      "id" : "6880-image-35",
+      "imageID" : "building-code-d-image-33.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-34.jpg\" width=\"672\" height=\"857.666666666667\"><\/img><\/span>",
+      "id" : "6880-image-36",
+      "imageID" : "building-code-d-image-34.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-35.jpg\" width=\"576\" height=\"926.666666666667\"><\/img><\/span>",
+      "id" : "6880-image-37",
+      "imageID" : "building-code-d-image-35.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-36.jpg\" width=\"576\" height=\"746\"><\/img><\/span>",
+      "id" : "6880-image-38",
+      "imageID" : "building-code-d-image-36.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-37.jpg\" width=\"672\" height=\"874.666666666667\"><\/img><\/span>",
+      "id" : "6880-image-39",
+      "imageID" : "building-code-d-image-37.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-38.jpg\" width=\"480\" height=\"954.933333333333\"><\/img><\/span>",
+      "id" : "6880-image-40",
+      "imageID" : "building-code-d-image-38.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-39.jpg\" width=\"672\" height=\"882.6\"><\/img><\/span>",
+      "id" : "6880-image-41",
+      "imageID" : "building-code-d-image-39.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-40.jpg\" width=\"672\" height=\"898.866666666667\"><\/img><\/span>",
+      "id" : "6880-image-42",
+      "imageID" : "building-code-d-image-40.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-d-image-41.jpg\" width=\"672\" height=\"866.4\"><\/img><\/span>",
+      "id" : "6880-image-43",
+      "imageID" : "building-code-d-image-41.jpg",
+      "kind" : "image"
+    }
+  ],
+  "chapterNumber" : "D",
+  "schemaVersion" : 1,
+  "sectionID" : 6880
+}

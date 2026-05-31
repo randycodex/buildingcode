@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175330\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175330\"><\/AnnotationDrawer><div>Family or assisted-use toilet and bathing rooms shall comply with Sections 1109.2.1.2 through 1109.2.1.7 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16641-html-1",
+      "kind" : "html",
+      "plainText" : "Family or assisted-use toilet and bathing rooms shall comply with Sections 1109.2.1.2 through 1109.2.1.7 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16641
+}

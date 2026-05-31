@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180389\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180389\"><\/AnnotationDrawer><div>The depositing of concrete shall comply with the provisions of Sections 1905.10.1 through 1905.10.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4420-html-1",
+      "kind" : "html",
+      "plainText" : "The depositing of concrete shall comply with the provisions of Sections 1905.10.1 through 1905.10.8."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4420
+}

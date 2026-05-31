@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180393\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180393\"><\/AnnotationDrawer><div>Concreting operations shall be carried on at such a rate that the concrete is at all times plastic and flows readily into spaces between reinforcement.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18250-html-1",
+      "kind" : "html",
+      "plainText" : "Concreting operations shall be carried on at such a rate that the concrete is at all times plastic and flows readily into spaces between reinforcement."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18250
+}

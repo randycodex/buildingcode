@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177820\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177820\"><\/AnnotationDrawer><div>Based on the site soil properties, the site shall be classified as Site Class A, B, C, D, E or F in accordance with Chapter 20 of ASCE 7, and this code. Where the soil properties are not known in sufficient detail to determine the site class, Site Class D shall be used unless the commissioner or geotechnical data determines Site Class E or F soils are present at the site.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3594-html-1",
+      "kind" : "html",
+      "plainText" : "Based on the site soil properties, the site shall be classified as Site Class A, B, C, D, E or F in accordance with Chapter 20 of ASCE 7, and this code. Where the soil properties are not known in sufficient detail to determine the site class, Site Class D shall be used unless the commissioner or geotechnical data determines Site Class E or F soils are present at the site."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3594
+}

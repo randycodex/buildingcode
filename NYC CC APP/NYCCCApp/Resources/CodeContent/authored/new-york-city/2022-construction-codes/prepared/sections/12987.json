@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188529\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188529\"><\/AnnotationDrawer><div>The certificate of occupancy shall describe any dry floodproofed spaces as \"dry floodproofed.\" Where flood shields or other flood control devices are installed, the certificate of occupancy shall also provide notations describing these features. For evacuated buildings or evacuated portions of buildings utilizing the temporary stair or ramp provisions of Section G308.10.1, the certificate of occupancy shall note: \"In portions of this building planned to be evacuated during flood conditions, occupancy shall be prohibited except for maintenance or emergency personnel.\" \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188530\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188530\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224588\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224588\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12987-html-1",
+      "kind" : "html",
+      "plainText" : "The certificate of occupancy shall describe any dry floodproofed spaces as \"dry floodproofed.\" Where flood shields or other flood control devices are installed, the certificate of occupancy shall also provide notations describing these features. For evacuated buildings or evacuated portions of buildings utilizing the temporary stair or ramp provisions of Section G308.10.1, the certificate of occupancy shall note: \"In portions of this building planned to be evacuated during flood conditions, occupancy shall be prohibited except for maintenance or emergency personnel.\" \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 12987
+}

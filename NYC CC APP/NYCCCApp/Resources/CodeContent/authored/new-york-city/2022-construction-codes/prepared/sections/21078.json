@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198193\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198193\"><\/AnnotationDrawer><div>Piping for other than dry gas conditions shall be sloped not less than 1\/4 inch in 15 feet (6.3 mm in 4572 mm) to prevent traps. The local gas supplier\/utility company should be consulted to determine the type of fuel gas available for the intended service.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21078-html-1",
+      "kind" : "html",
+      "plainText" : "Piping for other than dry gas conditions shall be sloped not less than 1\/4 inch in 15 feet (6.3 mm in 4572 mm) to prevent traps. The local gas supplier\/utility company should be consulted to determine the type of fuel gas available for the intended service."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21078
+}

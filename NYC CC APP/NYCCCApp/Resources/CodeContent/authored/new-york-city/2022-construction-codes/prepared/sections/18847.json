@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182235\"><\/AnnotationDrawer><div>Where braced wall panels are supported by cantilevered floors or are set back from the floor joist support, the floor framing shall comply with Section 2308.6.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18847-html-1",
+      "kind" : "html",
+      "plainText" : "Where braced wall panels are supported by cantilevered floors or are set back from the floor joist support, the floor framing shall comply with Section 2308.6.7."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18847
+}

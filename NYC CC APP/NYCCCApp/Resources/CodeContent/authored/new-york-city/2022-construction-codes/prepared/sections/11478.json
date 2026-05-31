@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196371\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196371\"><\/AnnotationDrawer><div>Piping shall comply with the requirements of Sections 1305.3.1 through 1305.3.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11478-html-1",
+      "kind" : "html",
+      "plainText" : "Piping shall comply with the requirements of Sections 1305.3.1 through 1305.3.9."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11478
+}

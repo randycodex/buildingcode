@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166786\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166786\"><\/AnnotationDrawer><div>Emergency escape and rescue openings specified in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174684', hash: '#JD_BC1030' }}\">1030<\/Link> are not required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "300-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency escape and rescue openings specified in Section 1030 are not required."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 300
+}

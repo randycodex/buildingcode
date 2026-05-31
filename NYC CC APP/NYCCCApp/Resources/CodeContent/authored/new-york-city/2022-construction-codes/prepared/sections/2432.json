@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174101\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174101\"><\/AnnotationDrawer><div>Interior exit stairways and ramps serving as an exit component in a means of egress system shall comply with the requirements of this section. Interior exit stairways and ramps shall be enclosed and lead directly to the exterior of the building or shall be extended to the exterior of the building with an exit passageway conforming to the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174173', hash: '#JD_BC1024' }}\">1024<\/Link>, except as permitted in Section 1028.1. An interior exit stairway or ramp shall not be used for any purpose other than as a means of egress and a circulation path.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2432-html-1",
+      "kind" : "html",
+      "plainText" : "Interior exit stairways and ramps serving as an exit component in a means of egress system shall comply with the requirements of this section. Interior exit stairways and ramps shall be enclosed and lead directly to the exterior of the building or shall be extended to the exterior of the building with an exit passageway conforming to the requirements of Section 1024 , except as permitted in Section 1028.1. An interior exit stairway or ramp shall not be used for any purpose other than as a means of egress and a circulation path."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2432
+}

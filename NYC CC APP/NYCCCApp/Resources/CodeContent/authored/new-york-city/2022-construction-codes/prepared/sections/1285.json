@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169893\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169893\"><\/AnnotationDrawer><div>Smoke dampers in supply air-handling systems having a capacity equal to or greater than 15,000 cfm (7.1 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s) shall be installed in accordance with Section 607.2.3 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1285-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke dampers in supply air-handling systems having a capacity equal to or greater than 15,000 cfm (7.1 m\n 3 \n \/s) shall be installed in accordance with Section 607.2.3 of the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1285
+}

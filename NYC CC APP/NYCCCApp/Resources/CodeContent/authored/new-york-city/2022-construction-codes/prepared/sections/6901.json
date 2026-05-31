@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188191\"><\/AnnotationDrawer><div>Where two-way communication systems are provided to gain admittance to a building or facility or to restricted areas within a building or facility, the system shall be accessible and comply with ICC A117.1, including Section 708 (Two-Way Communication Systems).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188192\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188192\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188192\"><\/AnnotationDrawer><h6><a name=\"JD_BCE106\" id=\"JD_BCE106\" title=\"BC E106\"><\/a>Section BC E106: Telephones<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6901-html-1",
+      "kind" : "html",
+      "plainText" : "Where two-way communication systems are provided to gain admittance to a building or facility or to restricted areas within a building or facility, the system shall be accessible and comply with ICC A117.1, including Section 708 (Two-Way Communication Systems).\n\n Section BC E106: Telephones"
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6901
+}

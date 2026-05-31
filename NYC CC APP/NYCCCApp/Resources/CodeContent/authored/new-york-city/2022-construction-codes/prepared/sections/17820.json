@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179153\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179153\"><\/AnnotationDrawer><div>Concrete in shallow foundations shall have a specified compressive strength (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f'<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of not less than 2,500 pounds per square inch (psi) (17.24 MPa) at 28 days.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17820-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete in shallow foundations shall have a specified compressive strength ( f' c \n\n ) of not less than 2,500 pounds per square inch (psi) (17.24 MPa) at 28 days."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17820
+}

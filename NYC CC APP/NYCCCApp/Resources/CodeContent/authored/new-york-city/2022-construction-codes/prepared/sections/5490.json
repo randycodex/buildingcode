@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183838\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183838\"><\/AnnotationDrawer><div>Where required by Section 403.6.1, every floor of the building shall be served by a fire service access elevator complying with Sections 3007.1 through 3007.8. Except as modified in this section, the fire service access elevator shall be installed in accordance with this chapter and ASME A17.1\/CSA B44 as modified by Appendix K, Chapter K1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5490-html-1",
+      "kind" : "html",
+      "plainText" : "Where required by Section 403.6.1, every floor of the building shall be served by a fire service access elevator complying with Sections 3007.1 through 3007.8. Except as modified in this section, the fire service access elevator shall be installed in accordance with this chapter and ASME A17.1\/CSA B44 as modified by Appendix K, Chapter K1."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5490
+}

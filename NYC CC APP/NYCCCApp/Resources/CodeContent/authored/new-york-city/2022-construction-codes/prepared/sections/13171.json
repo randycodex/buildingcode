@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189094\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189094\"><\/AnnotationDrawer><div>Signs that require electrical service shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13171-html-1",
+      "kind" : "html",
+      "plainText" : "Signs that require electrical service shall comply with the New York City Electrical Code."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 13171
+}

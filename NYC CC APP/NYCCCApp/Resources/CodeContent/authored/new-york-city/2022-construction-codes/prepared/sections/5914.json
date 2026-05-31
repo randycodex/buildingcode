@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185099\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185099\"><\/AnnotationDrawer><div>The location of all existing utilities and service lines shall be determined and adequate measures taken, or devices provided, to safeguard the public and property before such utilities are disturbed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5914-html-1",
+      "kind" : "html",
+      "plainText" : "The location of all existing utilities and service lines shall be determined and adequate measures taken, or devices provided, to safeguard the public and property before such utilities are disturbed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5914
+}

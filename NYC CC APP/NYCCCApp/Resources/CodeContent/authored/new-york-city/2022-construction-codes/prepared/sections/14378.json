@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167529\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167529\"><\/AnnotationDrawer><div>Airport traffic control towers shall be provided with an automatic fire detection system installed in accordance with Section 907.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14378-html-1",
+      "kind" : "html",
+      "plainText" : "Airport traffic control towers shall be provided with an automatic fire detection system installed in accordance with Section 907.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14378
+}

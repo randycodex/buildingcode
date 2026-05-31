@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182530\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182530\"><\/AnnotationDrawer><div>Notching at the ends of rafters or ceiling joists shall not exceed one-fourth the depth. Notches in the top or bottom of the rafter or ceiling joist shall not exceed one-sixth the depth and shall not be located in the middle one-third of the span, except that a notch not more than one-third of the depth is permitted in the top of the rafter or ceiling joist not further from the face of the support than the depth of the member. Holes bored in rafters or ceiling joists shall not be within 2 inches (51 mm) of the top and bottom and their diameter shall not exceed one-third the depth of the member.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5077-html-1",
+      "kind" : "html",
+      "plainText" : "Notching at the ends of rafters or ceiling joists shall not exceed one-fourth the depth. Notches in the top or bottom of the rafter or ceiling joist shall not exceed one-sixth the depth and shall not be located in the middle one-third of the span, except that a notch not more than one-third of the depth is permitted in the top of the rafter or ceiling joist not further from the face of the support than the depth of the member. Holes bored in rafters or ceiling joists shall not be within 2 inches (51 mm) of the top and bottom and their diameter shall not exceed one-third the depth of the member."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 5077
+}

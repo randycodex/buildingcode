@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171546\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171546\"><\/AnnotationDrawer><div>Automatic water mist systems shall be permitted in applications that are consistent with the applicable listing or approvals and shall comply with Sections 904.11.1 through 904.11.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15515-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic water mist systems shall be permitted in applications that are consistent with the applicable listing or approvals and shall comply with Sections 904.11.1 through 904.11.3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15515
+}

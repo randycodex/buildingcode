@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164530\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164530\"><\/AnnotationDrawer><div>Refer to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-157215', hash: '#JD_T28C002' }}\">Chapter 2 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-164531\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-164531\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-164531\"><\/AnnotationDrawer><h6><a name=\"JD_BC116\" id=\"JD_BC116\" title=\"BC 116\"><\/a>Section BC 116: Unsafe Structures and Equipment<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13934-html-1",
+      "kind" : "html",
+      "plainText" : "Refer to Chapter 2 of Title 28 of the Administrative Code. \n\n Section BC 116: Unsafe Structures and Equipment"
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13934
+}

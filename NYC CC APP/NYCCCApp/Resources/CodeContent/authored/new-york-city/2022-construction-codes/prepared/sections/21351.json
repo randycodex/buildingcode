@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198966\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198966\"><\/AnnotationDrawer><div>Extrapolation beyond the table entries shall not be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21351-html-1",
+      "kind" : "html",
+      "plainText" : "Extrapolation beyond the table entries shall not be permitted."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21351
+}

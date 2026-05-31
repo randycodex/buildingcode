@@ -1,0 +1,753 @@
+{
+  "chapterID": 92,
+  "chapterNumber": "11",
+  "groups": [
+    {
+      "headerLine": "SECTION MC 1101",
+      "headingLine": "General",
+      "id": "SECTION MC 1101",
+      "sections": [
+        {
+          "id": 11220,
+          "kind": "title",
+          "sectionNumber": "1101.1",
+          "title": "1101.1 Scope."
+        },
+        {
+          "id": 11221,
+          "kind": "title",
+          "sectionNumber": "1101.2",
+          "title": "1101.2 Factory-built equipment and appliances."
+        },
+        {
+          "id": 11222,
+          "kind": "title",
+          "sectionNumber": "1101.3",
+          "title": "1101.3 Protection."
+        },
+        {
+          "id": 11223,
+          "kind": "title",
+          "sectionNumber": "1101.4",
+          "title": "1101.4 Water connection."
+        },
+        {
+          "id": 11224,
+          "kind": "title",
+          "sectionNumber": "1101.5",
+          "title": "1101.5 Fuel-oil and fuel-gas connection."
+        },
+        {
+          "id": 11225,
+          "kind": "title",
+          "sectionNumber": "1101.6",
+          "title": "1101.6 General."
+        },
+        {
+          "id": 11226,
+          "kind": "title",
+          "sectionNumber": "1101.7",
+          "title": "1101.7 Maintenance."
+        },
+        {
+          "id": 11227,
+          "kind": "title",
+          "sectionNumber": "1101.8",
+          "title": "1101.8 Change in refrigerant type."
+        },
+        {
+          "id": 11228,
+          "kind": "title",
+          "sectionNumber": "1101.9",
+          "title": "1101.9 Refrigerant discharge."
+        },
+        {
+          "id": 11229,
+          "kind": "title",
+          "sectionNumber": "1101.10",
+          "title": "1101.10 Gas and oil fired absorption systems."
+        },
+        {
+          "id": 11230,
+          "kind": "title",
+          "sectionNumber": "1101.11",
+          "title": "1101.11 Signs, nameplates, and operation and emergency shutdown instructions."
+        },
+        {
+          "id": 11231,
+          "kind": "title",
+          "sectionNumber": "1101.12",
+          "title": "1101.12 Locking access port caps."
+        },
+        {
+          "id": 11232,
+          "kind": "title",
+          "sectionNumber": "1102.1",
+          "title": "1102.1 General."
+        },
+        {
+          "id": 11233,
+          "kind": "title",
+          "sectionNumber": "1102.2",
+          "title": "1102.2 Refrigerants."
+        },
+        {
+          "id": 11234,
+          "kind": "title",
+          "sectionNumber": "1102.2.1",
+          "title": "1102.2.1 Mixing."
+        },
+        {
+          "id": 11235,
+          "kind": "title",
+          "sectionNumber": "1102.2.2",
+          "title": "1102.2.2 Purity."
+        },
+        {
+          "id": 11236,
+          "kind": "title",
+          "sectionNumber": "1102.2.2.1",
+          "title": "1102.2.2.1 New refrigerants."
+        },
+        {
+          "id": 11237,
+          "kind": "title",
+          "sectionNumber": "1102.2.2.2",
+          "title": "1102.2.2.2 Recovered refrigerants."
+        },
+        {
+          "id": 11238,
+          "kind": "title",
+          "sectionNumber": "1102.2.2.3",
+          "title": "1102.2.2.3 Reclaimed refrigerants."
+        },
+        {
+          "id": 11239,
+          "kind": "title",
+          "sectionNumber": "1102.3",
+          "title": "1102.3 Access port protection."
+        },
+        {
+          "id": 11240,
+          "kind": "title",
+          "sectionNumber": "1103.1",
+          "title": "1103.1 Refrigerant classification."
+        },
+        {
+          "id": 11241,
+          "kind": "title",
+          "sectionNumber": "1103.2",
+          "title": "1103.2 Occupancy classification."
+        },
+        {
+          "id": 11242,
+          "kind": "title",
+          "sectionNumber": "1103.3",
+          "title": "1103.3 System classification."
+        },
+        {
+          "id": 11243,
+          "kind": "title",
+          "sectionNumber": "1103.3.1",
+          "title": "1103.3.1 Low-probability systems."
+        },
+        {
+          "id": 11244,
+          "kind": "title",
+          "sectionNumber": "1103.3.2",
+          "title": "1103.3.2 High-probability systems."
+        },
+        {
+          "id": 11245,
+          "kind": "title",
+          "sectionNumber": "1104.1",
+          "title": "1104.1 General."
+        },
+        {
+          "id": 11246,
+          "kind": "title",
+          "sectionNumber": "1104.2",
+          "title": "1104.2 Machinery room."
+        },
+        {
+          "id": 11247,
+          "kind": "title",
+          "sectionNumber": "1104.2.1",
+          "title": "1104.2.1 Institutional occupancies."
+        },
+        {
+          "id": 11248,
+          "kind": "title",
+          "sectionNumber": "1104.2.2",
+          "title": "1104.2.2 Industrial occupancies and refrigerated rooms."
+        },
+        {
+          "id": 11249,
+          "kind": "title",
+          "sectionNumber": "1104.3",
+          "title": "1104.3 Refrigerant restrictions."
+        },
+        {
+          "id": 11250,
+          "kind": "title",
+          "sectionNumber": "1104.3.1",
+          "title": "1104.3.1 Air-conditioning for human comfort."
+        },
+        {
+          "id": 11251,
+          "kind": "title",
+          "sectionNumber": "1104.3.2",
+          "title": "1104.3.2 All occupancies."
+        },
+        {
+          "id": 11252,
+          "kind": "title",
+          "sectionNumber": "1104.3.3",
+          "title": "1104.3.3 Protection from refrigerant decomposition."
+        },
+        {
+          "id": 11253,
+          "kind": "title",
+          "sectionNumber": "1104.4",
+          "title": "1104.4 Volume calculations."
+        },
+        {
+          "id": 11254,
+          "kind": "title",
+          "sectionNumber": "1104.4.1",
+          "title": "1104.4.1 Noncommunicating spaces."
+        },
+        {
+          "id": 11255,
+          "kind": "title",
+          "sectionNumber": "1104.4.2",
+          "title": "1104.4.2 Communicating spaces."
+        },
+        {
+          "id": 11256,
+          "kind": "title",
+          "sectionNumber": "1104.4.3",
+          "title": "1104.4.3 Plenums."
+        },
+        {
+          "id": 11257,
+          "kind": "title",
+          "sectionNumber": "1105.1",
+          "title": "1105.1 Design and construction."
+        },
+        {
+          "id": 11258,
+          "kind": "title",
+          "sectionNumber": "1105.2",
+          "title": "1105.2 Openings."
+        },
+        {
+          "id": 11259,
+          "kind": "title",
+          "sectionNumber": "1105.3",
+          "title": "1105.3 Refrigerant detector."
+        },
+        {
+          "id": 11260,
+          "kind": "title",
+          "sectionNumber": "1105.4",
+          "title": "1105.4 Tests."
+        },
+        {
+          "id": 11261,
+          "kind": "title",
+          "sectionNumber": "1105.5",
+          "title": "1105.5 Fuel-burning appliances."
+        },
+        {
+          "id": 11262,
+          "kind": "title",
+          "sectionNumber": "1105.6",
+          "title": "1105.6 Ventilation."
+        },
+        {
+          "id": 11263,
+          "kind": "title",
+          "sectionNumber": "1105.6.1",
+          "title": "1105.6.1 Discharge location."
+        },
+        {
+          "id": 11264,
+          "kind": "title",
+          "sectionNumber": "1105.6.2",
+          "title": "1105.6.2 Makeup air."
+        },
+        {
+          "id": 11265,
+          "kind": "title",
+          "sectionNumber": "1105.6.3",
+          "title": "1105.6.3 Ventilation rate."
+        },
+        {
+          "id": 11266,
+          "kind": "title",
+          "sectionNumber": "1105.6.3.1",
+          "title": "1105.6.3.1 Quantity-normal ventilation."
+        },
+        {
+          "id": 11267,
+          "kind": "title",
+          "sectionNumber": "1105.6.3.2",
+          "title": "1105.6.3.2 Quantity-emergency conditions."
+        },
+        {
+          "id": 11268,
+          "kind": "title",
+          "sectionNumber": "1105.7",
+          "title": "1105.7 Termination of relief devices."
+        },
+        {
+          "id": 11269,
+          "kind": "title",
+          "sectionNumber": "1105.7.1",
+          "title": "1105.7.1 Discharge of Group A2, B2, A3 and B3 refrigerants."
+        },
+        {
+          "id": 11270,
+          "kind": "title",
+          "sectionNumber": "1105.7.2",
+          "title": "1105.7.2 Certificate of qualification."
+        },
+        {
+          "id": 11271,
+          "kind": "title",
+          "sectionNumber": "1105.8",
+          "title": "1105.8 Ammonia discharge."
+        },
+        {
+          "id": 11272,
+          "kind": "title",
+          "sectionNumber": "1105.9",
+          "title": "1105.9 Emergency pressure control system."
+        },
+        {
+          "id": 11273,
+          "kind": "title",
+          "sectionNumber": "1105.9.1",
+          "title": "1105.9.1 Automatic crossover valves."
+        },
+        {
+          "id": 11274,
+          "kind": "title",
+          "sectionNumber": "1105.9.1.1",
+          "title": "1105.9.1.1 Overpressure limit setpoint."
+        },
+        {
+          "id": 11275,
+          "kind": "title",
+          "sectionNumber": "1105.9.1.2",
+          "title": "1105.9.1.2 Manual operation."
+        },
+        {
+          "id": 11276,
+          "kind": "title",
+          "sectionNumber": "1105.9.1.3",
+          "title": "1105.9.1.3 System design pressure."
+        },
+        {
+          "id": 11277,
+          "kind": "title",
+          "sectionNumber": "1105.9.2",
+          "title": "1105.9.2 Automatic emergency stop."
+        },
+        {
+          "id": 11278,
+          "kind": "title",
+          "sectionNumber": "1105.9.2.1",
+          "title": "1105.9.2.1 Automatic crossover valves."
+        },
+        {
+          "id": 11279,
+          "kind": "title",
+          "sectionNumber": "1105.9.2.2",
+          "title": "1105.9.2.2 Overpressure in low-pressure zone."
+        },
+        {
+          "id": 11280,
+          "kind": "title",
+          "sectionNumber": "1105.10",
+          "title": "1105.10 Remote control."
+        },
+        {
+          "id": 11281,
+          "kind": "title",
+          "sectionNumber": "1105.11",
+          "title": "1105.11 Emergency signs."
+        },
+        {
+          "id": 11282,
+          "kind": "title",
+          "sectionNumber": "1105.12",
+          "title": "1105.12 Storing refrigerant."
+        },
+        {
+          "id": 11283,
+          "kind": "title",
+          "sectionNumber": "1106.1",
+          "title": "1106.1 General."
+        },
+        {
+          "id": 11284,
+          "kind": "title",
+          "sectionNumber": "1106.2",
+          "title": "1106.2 Elevated temperature."
+        },
+        {
+          "id": 11285,
+          "kind": "title",
+          "sectionNumber": "1106.3",
+          "title": "1106.3 Ammonia room ventilation."
+        },
+        {
+          "id": 11286,
+          "kind": "title",
+          "sectionNumber": "1106.4",
+          "title": "1106.4 Flammable refrigerants."
+        },
+        {
+          "id": 11287,
+          "kind": "title",
+          "sectionNumber": "1106.5",
+          "title": "1106.5 Remote controls."
+        },
+        {
+          "id": 11288,
+          "kind": "title",
+          "sectionNumber": "1106.5.1",
+          "title": "1106.5.1 Refrigeration system emergency shutoff."
+        },
+        {
+          "id": 11289,
+          "kind": "title",
+          "sectionNumber": "1106.5.2",
+          "title": "1106.5.2 Ventilation system."
+        },
+        {
+          "id": 11290,
+          "kind": "title",
+          "sectionNumber": "1106.6",
+          "title": "1106.6 Reserved."
+        },
+        {
+          "id": 11291,
+          "kind": "title",
+          "sectionNumber": "1107.1",
+          "title": "1107.1 General."
+        },
+        {
+          "id": 11292,
+          "kind": "title",
+          "sectionNumber": "1107.1.1",
+          "title": "1107.1.1 Protection of refrigerant piping located inside buildings."
+        },
+        {
+          "id": 11293,
+          "kind": "title",
+          "sectionNumber": "1107.2",
+          "title": "1107.2 Piping location."
+        },
+        {
+          "id": 11294,
+          "kind": "title",
+          "sectionNumber": "1107.2.1",
+          "title": "1107.2.1 Piping in public corridors."
+        },
+        {
+          "id": 11295,
+          "kind": "title",
+          "sectionNumber": "1.1.",
+          "title": "1.1. There is not more than one refrigerant system's piping per tenant; and"
+        },
+        {
+          "id": 11296,
+          "kind": "title",
+          "sectionNumber": "1.2.",
+          "title": "1.2. Refrigerant piping and fittings are concealed or otherwise protected from mechanical damage; and either"
+        },
+        {
+          "id": 11297,
+          "kind": "title",
+          "sectionNumber": "1.3.",
+          "title": "1.3. Refrigerant piping and fittings are installed with brazed joints; or"
+        },
+        {
+          "id": 11298,
+          "kind": "title",
+          "sectionNumber": "1.4.",
+          "title": "1.4. The refrigerant equipment manufacturer provided pre-charged tubing systems installed in accordance with the refrigerant equipment manufacturer's instructions;"
+        },
+        {
+          "id": 11299,
+          "kind": "title",
+          "sectionNumber": "2.1.",
+          "title": "2.1. Such system is provided with fast-acting shutoff valves on both high and low pressure refrigerant line sets, actuated by either local refrigerant monitors in the corridor, or on sensing a drop in pressure on either high or low pressure refrigerant line sets; and"
+        },
+        {
+          "id": 11300,
+          "kind": "title",
+          "sectionNumber": "2.2.",
+          "title": "2.2. Upon accidental discharge, actuation of installed refrigerant shutoff valves shall initiate locally installed alarm; and"
+        },
+        {
+          "id": 11301,
+          "kind": "title",
+          "sectionNumber": "2.3.",
+          "title": "2.3. Installation of fast-acting shutoff valves, refrigerant detectors, and alarms shall be in accordance with Appendix C; and"
+        },
+        {
+          "id": 11302,
+          "kind": "title",
+          "sectionNumber": "2.4.",
+          "title": "2.4. There is not more than one refrigerant system's piping per tenant; and"
+        },
+        {
+          "id": 11303,
+          "kind": "title",
+          "sectionNumber": "2.5.",
+          "title": "2.5. Refrigerant piping and fittings are concealed or otherwise protected from mechanical damage; and either"
+        },
+        {
+          "id": 11304,
+          "kind": "title",
+          "sectionNumber": "2.6.",
+          "title": "2.6. Refrigerant piping and fittings are installed with brazed joints; or"
+        },
+        {
+          "id": 11305,
+          "kind": "title",
+          "sectionNumber": "2.7.",
+          "title": "2.7. The refrigerant equipment manufacturer provided pre-charged tubing systems installed in accordance with the refrigerant equipment manufacturer's instructions."
+        },
+        {
+          "id": 11306,
+          "kind": "title",
+          "sectionNumber": "1107.2.2",
+          "title": "1107.2.2 Piping in concrete floors."
+        },
+        {
+          "id": 11307,
+          "kind": "title",
+          "sectionNumber": "1107.2.3",
+          "title": "1107.2.3 Refrigerant piping penetrations."
+        },
+        {
+          "id": 11308,
+          "kind": "title",
+          "sectionNumber": "6.1.",
+          "title": "6.1. Enclosed by an approved gas-tight, fire- resistive duct or shaft with openings to those floors served by the refrigeration system or"
+        },
+        {
+          "id": 11309,
+          "kind": "title",
+          "sectionNumber": "6.2.",
+          "title": "6.2. Located on the exterior of the building where vented to the outdoors or to the space served by the system and not used as an air shaft, closed court or similar space."
+        },
+        {
+          "id": 11310,
+          "kind": "title",
+          "sectionNumber": "1107.2.3.1",
+          "title": "1107.2.3.1 Direct systems."
+        },
+        {
+          "id": 11311,
+          "kind": "title",
+          "sectionNumber": "1107.3",
+          "title": "1107.3 Pipe enclosures."
+        },
+        {
+          "id": 11312,
+          "kind": "title",
+          "sectionNumber": "1107.4",
+          "title": "1107.4 Condensation."
+        },
+        {
+          "id": 11313,
+          "kind": "title",
+          "sectionNumber": "1107.5",
+          "title": "1107.5 Materials for refrigerant pipe and tubing."
+        },
+        {
+          "id": 11314,
+          "kind": "title",
+          "sectionNumber": "1107.5.1",
+          "title": "1107.5.1 Steel pipe."
+        },
+        {
+          "id": 11315,
+          "kind": "title",
+          "sectionNumber": "1107.5.2",
+          "title": "1107.5.2 Copper and brass pipe."
+        },
+        {
+          "id": 11316,
+          "kind": "title",
+          "sectionNumber": "1107.5.3",
+          "title": "1107.5.3 Copper tube."
+        },
+        {
+          "id": 11317,
+          "kind": "title",
+          "sectionNumber": "1107.5.4",
+          "title": "1107.5.4 Copper tubing joints."
+        },
+        {
+          "id": 11318,
+          "kind": "title",
+          "sectionNumber": "1107.5.5",
+          "title": "1107.5.5 Soldered joints."
+        },
+        {
+          "id": 11319,
+          "kind": "title",
+          "sectionNumber": "1107.5.6",
+          "title": "1107.5.6 Aluminum tube."
+        },
+        {
+          "id": 11320,
+          "kind": "title",
+          "sectionNumber": "1107.5.7",
+          "title": "1107.5.7 Insulation."
+        },
+        {
+          "id": 11321,
+          "kind": "title",
+          "sectionNumber": "1107.6",
+          "title": "1107.6 Joints and refrigerant-containing parts in air ducts."
+        },
+        {
+          "id": 11322,
+          "kind": "title",
+          "sectionNumber": "1107.7",
+          "title": "1107.7 Exposure of refrigerant pipe joints."
+        },
+        {
+          "id": 11323,
+          "kind": "title",
+          "sectionNumber": "1107.8",
+          "title": "1107.8 Stop valves."
+        },
+        {
+          "id": 11324,
+          "kind": "title",
+          "sectionNumber": "1107.8.1",
+          "title": "1107.8.1 Liquid receivers."
+        },
+        {
+          "id": 11325,
+          "kind": "title",
+          "sectionNumber": "1107.8.2",
+          "title": "1107.8.2 Copper tubing."
+        },
+        {
+          "id": 11326,
+          "kind": "title",
+          "sectionNumber": "1107.8.3",
+          "title": "1107.8.3 Identification."
+        },
+        {
+          "id": 11327,
+          "kind": "title",
+          "sectionNumber": "1107.9",
+          "title": "1107.9 Alternative refrigerant piping safety."
+        },
+        {
+          "id": 11328,
+          "kind": "title",
+          "sectionNumber": "1107.9.1",
+          "title": "1107.9.1 Nongas tight enclosures."
+        },
+        {
+          "id": 11329,
+          "kind": "title",
+          "sectionNumber": "1107.9.2",
+          "title": "1107.9.2 Occupied spaces."
+        },
+        {
+          "id": 11330,
+          "kind": "title",
+          "sectionNumber": "1107.9.2.1",
+          "title": "1107.9.2.1 Space volume calculations."
+        },
+        {
+          "id": 11331,
+          "kind": "title",
+          "sectionNumber": "1107.9.2.2",
+          "title": "1107.9.2.2 Dilution transfer openings."
+        },
+        {
+          "id": 11332,
+          "kind": "title",
+          "sectionNumber": "1107.9.3",
+          "title": "1107.9.3 Refrigerant shutoff valves."
+        },
+        {
+          "id": 11333,
+          "kind": "title",
+          "sectionNumber": "1107.9.4",
+          "title": "1107.9.4 Refrigerant safety alarms."
+        },
+        {
+          "id": 11334,
+          "kind": "title",
+          "sectionNumber": "1107.9.5",
+          "title": "1107.9.5 Refrigerant detectors."
+        },
+        {
+          "id": 11335,
+          "kind": "title",
+          "sectionNumber": "1108.1",
+          "title": "1108.1 General."
+        },
+        {
+          "id": 11336,
+          "kind": "title",
+          "sectionNumber": "1108.1.1",
+          "title": "1108.1.1 Booster compressor."
+        },
+        {
+          "id": 11337,
+          "kind": "title",
+          "sectionNumber": "1108.1.2",
+          "title": "1108.1.2 Centrifugal / nonpositive displacement compressors."
+        },
+        {
+          "id": 11338,
+          "kind": "title",
+          "sectionNumber": "1108.2",
+          "title": "1108.2 Test gases."
+        },
+        {
+          "id": 11339,
+          "kind": "title",
+          "sectionNumber": "1108.3",
+          "title": "1108.3 Test apparatus."
+        },
+        {
+          "id": 11340,
+          "kind": "title",
+          "sectionNumber": "1108.4",
+          "title": "1108.4 Declaration."
+        },
+        {
+          "id": 11341,
+          "kind": "title",
+          "sectionNumber": "1109.1",
+          "title": "1109.1 Testing required."
+        },
+        {
+          "id": 11342,
+          "kind": "title",
+          "sectionNumber": "1109.2",
+          "title": "1109.2 Operation."
+        }
+      ]
+    }
+  ],
+  "rawDraftText": "#- Chapter 11: Refrigeration\n\nSection MC 1101: General\n\n#--- 1101.1 Scope.\n\nThis chapter shall govern the design, installation, construction, alteration and repair of refrigeration systems that vaporize and liquefy a fluid during the refrigerating cycle. Refrigerant piping design and installation, including pressure vessels and pressure relief devices, shall conform to this code. Permanently installed refrigerant storage systems and other components shall be considered as part of the refrigeration system to which they are attached. This chapter shall also govern the change of refrigerants in existing refrigerating systems having a different safety group classification.\n\n#--- 1101.2 Factory-built equipment and appliances.\n\nListed and labeled self-contained, factory-built equipment and appliances shall be tested in accordance with UL 207, 412, 471 or 1995. Such equipment and appliances are deemed to meet the design, manufacture and factory test requirements of this code if installed in accordance with their listing and the manufacturer's instructions.\n\n#--- 1101.3 Protection.\n\nAny portion of a refrigeration system that is subject to physical damage shall be protected in an approved manner.\n\n#--- 1101.4 Water connection.\n\nWater supply and discharge connections associated with refrigeration systems shall be made in accordance with this code and the New York City Plumbing Code.\n\n#--- 1101.5 Fuel-oil and fuel-gas connection.\n\nRefrigeration system devices, equipment and appliances utilizing fuel oil or fuel gas for combustion shall be installed in accordance with the applicable provisions of the New York City Fuel Gas Code and this code.\n\n#--- 1101.6 General.\n\nRefrigeration systems shall comply with the requirements of this code and, except as modified by this code, ASHRAE 15. Ammonia-refrigerating systems shall comply with this code and, except as modified by this code, ASHRAE 15 and IIAR 2. Such systems shall be maintained in accordance with the New York City Fire Code.\n\n#--- 1101.7 Maintenance.\n\nMechanical refrigeration systems shall be maintained in proper operating condition, free from accumulations of oil, dirt, waste, excessive corrosion, other debris and leaks.\n\n#--- 1101.8 Change in refrigerant type.\n\nThe type of refrigerant in refrigeration systems having a refrigerant circuit containing more than 220 pounds (99.8 kg) of Group A1 or 30 pounds (13.6 kg) of any other group refrigerant shall not be changed without prior notification to the commissioner and compliance with the applicable code provisions for the new refrigerant type. The refrigerant being considered shall be evaluated for suitability by an engineer. Whenever change in the type of refrigerant is to be done, consideration shall be given to the following:\n\n1. The effects of the substitute refrigerant on materials in the system;\n\n2. The possibility of overloading the liquid receiver, which shall not be more than 80 percent full of liquid;\n\n3. The possibility of exceeding motor rating, design working pressure, or other requirements that would violate any of the provisions of this code;\n\n4. The proper size of refrigerant controls;\n\n5. The effect of the operation and setting of safety devices;\n\n6. The possible hazards created by mixture of the original and the substituted refrigerant; and\n\n7. The effect of the classification of the refrigerant as provided.\n\n#--- 1101.9 Refrigerant discharge.\n\nNotification of refrigerant discharge shall be provided in accordance with the New York City Fire Code.\n\n#--- 1101.10 Gas and oil fired absorption systems.\n\nRefrigeration systems utilizing fuel oil or fuel gas for combustion shall be installed in accordance with the applicable provisions of the New York City Fuel Gas Code and this code.\n\n#--- 1101.11 Signs, nameplates, and operation and emergency shutdown instructions.\n\nSigns, nameplates, and operation and emergency shutdown instructions for refrigeration systems shall comply with the following:\n\n1. Sections 9.15, 11.2.1, 11.2.2, 11.2.4, and 11.7 of ASHRAE 15.\n\n2. Each refrigeration unit or system shall be provided with a nameplate indicating the horsepower of the prime mover or compressor and the equivalent of such horsepower in kilowatts.\n\n3. Section 1105.11 of this code.\n\n#--- 1101.12 Locking access port caps.\n\nRefrigerant circuit access ports located outdoors shall be fitted with locking-type tamper-resistant caps requiring a special tool or key to open.\n\nSection MC 1102: System Requirements\n\n#--- 1102.1 General.\n\nThe system classification, allowable refrigerants, maximum quantity, enclosure requirements, location limitations, and field pressure test requirements shall be determined as follows:\n\n1. Determine the refrigeration system's classification, in accordance with Section 1103.3.\n\n2. Determine the refrigerant classification in accordance with Section 1103.1.\n\n3. Determine the maximum allowable quantity of refrigerant in accordance with Section 1104, based on type of refrigerant, system classification, and occupancy.\n\n4. Determine the system enclosure requirements in accordance with Section 1104.\n\n5. Refrigeration equipment and appliance location and installation shall be subject to the limitations of Chapter 3.\n\n6. Nonfactory-tested, field-erected equipment and appliances shall be pressure tested in accordance with Section 1108.\n\n#--- 1102.2 Refrigerants.\n\nThe refrigerant shall be that which the equipment or appliance was designed to utilize or converted to utilize. Refrigerants not identified in Table 1103.1 shall be approved by the department before use. Refrigerants not identified in Table 1103.1, other than those having a Safety Group Classification of A-1 or A2L, shall also be approved by the Fire Department before use.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 1102.2.1 Mixing.\n\nRefrigerants, including refrigerant blends, with different designations in ASHRAE 34 shall not be mixed in a system.\n\nException: Addition of a second refrigerant is allowed where permitted by the equipment or appliance manufacturer to improve oil return at low temperatures. The refrigerant and amount added shall be in accordance with the manufacturer's instructions.\n\n#---- 1102.2.2 Purity.\n\nRefrigerants used in refrigeration systems shall be new, recovered or reclaimed refrigerants in accordance with Section 1102.2.2.1, 1102.2.2.2 or 1102.2.2.3. Where required by the equipment or appliance owner, the installer shall furnish a signed declaration that the refrigerant used meets the requirements of Section 1102.2.2.1, 1102.2.2.2 or 1102.2.2.3.\n\nException: The refrigerant used shall meet the purity specifications set by the manufacturer of the equipment or appliance in which such refrigerant is used where such specifications are different from that specified in Sections 1102.2.2.1, 1102.2.2.2 and 1102.2.2.3.\n\n#----- 1102.2.2.1 New refrigerants.\n\nRefrigerants shall be of a purity level specified by the equipment or appliance manufacturer.\n\n#----- 1102.2.2.2 Recovered refrigerants.\n\nRefrigerants that are recovered from refrigeration and air-conditioning systems shall not be reused in other than the system from which they were recovered and in other systems of the same owner. Recovered refrigerants shall be filtered and dried before reuse. Recovered refrigerants that show clear signs of contamination shall not be reused unless reclaimed in accordance with Section 1102.2.2.3.\n\n#----- 1102.2.2.3 Reclaimed refrigerants.\n\nUsed refrigerants shall not be reused in a different owner's equipment or appliances unless tested and found to meet the purity requirements of AHRI 700. Contaminated refrigerants shall not be used unless reclaimed and found to meet the purity requirements of AHRI 700.\n\n#--- 1102.3 Access port protection.\n\nRefrigerant access ports shall be protected in accordance with Section 1101.12 whenever refrigerant is added to or recovered from refrigeration or air-conditioning systems.\n\nSection MC 1103: Refrigeration System Classification\n\n#--- 1103.1 Refrigerant classification.\n\nRefrigerants shall be classified in accordance with ASHRAE 34 as listed in Table 1103.1.\n\nTable 1103.1 Refrigerant Data and Safety Classifications a\n\nFor SI: 1 pound = 0.454 kg, 1 cubic foot = 0.0283 m 3 .\n\na. Data based on ASHRAE 34 including Addenda a through o. For more complete data, see ASHRAE 34 and Addenda. Use of Addenda issued after Addendum o is subject to approval as set forth in Section 1102.2.\n\nb. Class I ozone depleting refrigerant. Not permitted for new installations.\n\nc. Refrigerants in Safety Group \"A2L\" shall comply with rules of the department. Refrigerants in Safety Group \"B2L\" shall comply with all applicable requirements for \"B2\" refrigerants.\n\nd. OCCUPATIONAL EXPOSURE LIMIT (OEL). The time-weighted average (TWA) concentration for a normal 8-hour workday and a 40-hour workweek to which nearly all workers can be repeatedly exposed without adverse effect, based on the OSHA PEL, ACGIH TLV-TWA, AIHA WEEL, or consistent value.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 1103.2 Occupancy classification.\n\nLocations of refrigerating systems are described by occupancy classifications that consider the ability of people to respond to potential exposure to refrigerants. Where equipment or appliances, other than piping, are located outside a building and within 20 feet (6096 mm) of any building opening, such equipment or appliances shall be governed by the occupancy classification of the building. Occupancy classifications of buildings shall be in accordance with the building classifications in the New York City Building Code.\n\n1. Institutional occupancy shall include Occupancy Groups I-1, I-2, I-3 and I-4.\n\n2. Public assembly occupancy shall include Occupancy Groups A-1, A-2, A-3, A-4, A-5 and E.\n\n3. Residential occupancy shall include Occupancy Groups R-1, R-2 and R-3.\n\n4. Commercial occupancy shall include Occupancy Groups M and B, except Occupancy Group M with retail stores having an occupant load of more than 100 persons on any floor other than street level.\n\n5. Large mercantile occupancy shall include Occupancy Group M with retail stores having an occupant load of more than 100 persons on any floor other than street level.\n\n6. Industrial occupancy shall include Occupancy Groups F-1, F-2, H-1, H-2, H-3, H-4, H-5, S-1 and S-2.\n\n7. Mixed occupancy occurs where two or more occupancies are located within the same building. Where each occupancy is isolated from the rest of the building by tight walls, floors and ceilings and by self-closing doors, the requirements for each occupancy shall apply to its portion of the building. Where the various occupancies are not so isolated, the occupancy having the most stringent requirements shall be the governing occupancy.\n\n#--- 1103.3 System classification.\n\nRefrigeration systems shall be classified according to the degree of probability that refrigerant leaked from a failed connection, seal or component could enter an occupied area. The distinction is based on the basic design or location of the components.\n\n#---- 1103.3.1 Low-probability systems.\n\nDouble-indirect open-spray systems, indirect closed systems and indirect-vented closed systems shall be classified as low-probability systems, provided that all refrigerant-containing piping and fittings are isolated when the quantities in Table 1103.1 are exceeded.\n\n#---- 1103.3.2 High-probability systems.\n\nDirect systems and indirect open-spray systems shall be classified as high-probability systems.\n\nException: An indirect open-spray system shall not be required to be classified as a high-probability system if the pressure of the secondary coolant is at all times (operating and standby) greater than the pressure of the refrigerant.\n\nSection MC 1104: System Application Requirements\n\n#--- 1104.1 General.\n\nThe refrigerant, occupancy and system classification cited in this section shall be determined in accordance with Sections 1103.1, 1103.2 and 1103.3, respectively. For refrigerant blends assigned dual classifications, as formulated and for the worst case of fractionation, the classifications for the worst case of fractionation shall be used. For blends assigned only a single safety group classification in Table 1103.1 or ASHRAE 34, that classification shall be used. Use of a Group A3 or Group B3 refrigerant is prohibited. In an industrial occupancy, a Group A3 or Group B3 refrigerant may be used in high- or low-probability systems only when approved by the commissioner and the Commissioner of the Fire Department. Such use will be approved only if the applicant can demonstrate to the satisfaction of the commissioner and the Commissioner of the Fire Department that the use of the refrigerant is a necessity and does not represent a substantial risk to life, limb, health or property.\n\n#--- 1104.2 Machinery room.\n\nExcept as provided in Sections 1104.2.1 and 1104.2.2, all components containing the refrigerant shall be located either outdoors or in a machinery room where the quantity of refrigerant in an independent circuit of a system exceeds the amounts shown in Table 1103.1. For refrigerant names not listed in Table 1103.1, the same requirement shall apply when the amount for any named component exceeds that indicated in Table 1103.1 for that component. This requirement shall also apply when the combined amount of the named components exceeds a limit of 69,100 parts per million (ppm) by volume. Machinery rooms required by this section shall be constructed and maintained in accordance with Section 1105 for Group A1 and B1 refrigerants and in accordance with Sections 1105 and 1106 for Group A2, B2, A3 and B3 refrigerants. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\nExceptions:\n\n1. Machinery rooms are not required for listed equipment and appliances containing not more than 6.6 pounds (3 kg) of refrigerant, regardless of the refrigerant's safety classification, where installed in accordance with the equipment's or appliance's listing and the equipment or appliance manufacturer's installation instructions.\n\n2. Piping in conformance with Section 1107 of this chapter and Section 8.10 of ASHRAE 15 is allowed in other locations to connect components installed in a machinery room with those installed outdoors.\n\n#---- 1104.2.1 Institutional occupancies.\n\nThe amounts shown in Table 1103.1 shall be reduced by 50 percent for all areas of institutional occupancies except kitchens, laboratories and mortuaries. The total of all Group A2, B2, A3 and B3 refrigerants shall not exceed 550 pounds (249.4 kg) in occupied areas or machinery rooms. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\n#---- 1104.2.2 Industrial occupancies and refrigerated rooms.\n\nThis section applies only to industrial occupancies and refrigerated rooms for manufacturing, food and beverage preparation, meat cutting, other processes and storage. Machinery rooms are not required where all of the following conditions are met:\n\n1. The space containing the machinery is separated from other occupancies by tight construction with tight-fitting doors.\n\n2. Access is restricted to authorized personnel.\n\n3. The floor area per occupant is not less than 100 square feet (9.3 m 2 ). Where provided with egress directly to the outdoors or into building exits meeting the requirements of the New York City Building Code, the minimum floor area shall not apply.\n\n4. Refrigerant detectors are installed as required for machinery rooms in accordance with Section 1105.3.\n\n5. Surfaces having temperatures exceeding 800°F (426.7°C) and open flames are not present where any Group A2, B2, A3 or B3 refrigerant is used (see Section 1104.3.3). Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\n6. All electrical equipment and appliances conform to Class 1, Division 2, hazardous location classification requirements of the New York City Electrical Code where the quantity of any Group A2, B2, A3 or B3 refrigerant, other than ammonia, in a single independent circuit would exceed 25 percent of the lower flammability limit (LFL) upon release to the space based on the volume determined by Section 1104.4. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\n7. All refrigerant-containing parts in systems exceeding 100 hp (74.6 kW) drive power, except evaporators used for refrigeration or dehumidification; condensers used for heating; control and pressure relief valves for either; and connecting piping, shall be located either outdoors or in a machinery room.\n\n#--- 1104.3 Refrigerant restrictions.\n\nRefrigerant applications, maximum quantities and use shall be restricted in accordance with Sections 1104.3.1 through 1104.3.3.\n\n#---- 1104.3.1 Air-conditioning for human comfort.\n\nGroup A3, B1, B2 and B3 refrigerants shall not be used in high-probability air conditioning systems for human comfort.\n\nExceptions:\n\n1. Sealed absorption and unit air-conditioning systems having refrigerant quantities not exceeding those set forth in Table 1103.1.\n\n2. Industrial occupancies.\n\nNothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\nTable 1104.3.1 Special Quantity Limits for Sealed Ammonia/Water Absorption and Self-Contained Systems\n\nFor SI: 1 pound = 0.454 kg.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#---- 1104.3.2 All occupancies.\n\nThe total of all Group A2, B2, A3 and B3 refrigerants other than R-717, ammonia, shall not exceed 1,100 pounds (499 kg) except where approved. Nothing in this section shall be construed to allow the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\n#---- 1104.3.3 Protection from refrigerant decomposition.\n\nWhere any device having an open flame or surface temperature greater than 800°F (426.7°C) is used in a room containing more than 6.6 pounds (3 kg) of refrigerant in a single independent circuit, a hood and exhaust system shall be provided in accordance with Section 510. Such exhaust system shall exhaust combustion products to the outdoors.\n\nException: A hood and exhaust system shall not be required where any of the following apply:\n\n1. The refrigerant is R-717, R-718 or R-744.\n\n2. The combustion air is ducted from the outdoors in a manner that prevents leaked refrigerant from being combusted.\n\n3. A refrigerant detector is used to stop the combustion in the event of a refrigerant leak (see Sections 1105.3 and 1105.5).\n\n#--- 1104.4 Volume calculations.\n\nVolume calculations shall be in accordance with Sections 1104.4.1 through 1104.4.3.\n\n#---- 1104.4.1 Noncommunicating spaces.\n\nWhere the refrigerant-containing parts of a system are located in one or more spaces that do not communicate through permanent openings or HVAC ducts, the volume of the smallest, enclosed occupied space shall be used to determine the permissible quantity of refrigerant in the system.\n\n#---- 1104.4.2 Communicating spaces.\n\nWhere an evaporator or condenser is located in an air duct system, the volume of the smallest, enclosed occupied space served by the duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.\n\nException: If airflow to any enclosed space cannot be reduced below one-quarter of its maximum, the entire space served by the air duct system shall be used to determine the maximum allowable quantity of refrigerant in the system.\n\n#---- 1104.4.3 Plenums.\n\nWhere the space above a suspended ceiling is continuous and part of the supply or return air plenum system, this space shall be included in calculating the volume of the enclosed space.\n\nSection MC 1105: Machinery Room, General Requirements\n\n#--- 1105.1 Design and construction.\n\nMachinery rooms shall be designed and constructed in accordance with the New York City Building Code and this section.\n\n#--- 1105.2 Openings.\n\nDucts and air handlers in the machinery room that operate at a lower pressure than the room shall be sealed to prevent any refrigerant leakage from entering the airstream.\n\n#--- 1105.3 Refrigerant detector.\n\nRefrigerant detectors in machinery rooms shall be provided as required by ASHRAE 15.\n\n#--- 1105.4 Tests.\n\nPeriodic tests of the mechanical ventilating system shall be performed in accordance with manufacturer's specifications and as required by the Commissioner of the Fire Department.\n\n#--- 1105.5 Fuel-burning appliances.\n\nOpen flames that use combustion air from the machinery room shall not be installed in a machinery room.\n\nExceptions:\n\n1. Where the refrigerant is carbon dioxide or water.\n\n2. Fuel-burning appliances shall not be prohibited in the same machinery room with refrigerant-containing equipment or appliances where combustion air is ducted from outside the machinery room and sealed in such a manner as to prevent any refrigerant leakage from entering the combustion chamber, or where a refrigerant vapor detector is employed to automatically shut off the combustion process in the event of refrigerant leakage.\n\n#--- 1105.6 Ventilation.\n\nMachinery rooms shall be mechanically ventilated to the outdoors. Location of the mechanical ventilation openings within the machinery room shall be based on the relative density of the refrigerant to air. When compressors or self-contained unit system are housed in a machinery space, other than in a machinery room or plenum, the space shall be ventilated in accordance with the requirements of Section 1105.6.3.\n\nException: Where a refrigerating system is located outdoors more than 20 feet (6096 mm) from any building opening and is enclosed by a penthouse, lean-to or other open structure, natural or mechanical ventilation shall be provided. Location of the openings shall be based on the relative density of the refrigerant to air. The free-aperture cross section for the ventilation of the machinery room shall be not less than:\n\nF = √G (Equation 11-1)\n\nFor SI: F = 0.138√G\n\nwhere:\n\nF = The free opening area in square feet (m 2 ).\n\nG = The mass of refrigerant in pounds (kg) in the largest system, any part of which is located in the machinery room\n\n#---- 1105.6.1 Discharge location.\n\nThe discharge of the air shall be to the outdoors in accordance with Chapter 5. Exhaust from mechanical ventilation systems shall be discharged not less than 20 feet (6096 mm) from outdoor air intake or openings into buildings and 10 feet (3048 mm) from a fire escape or exterior stair.\n\n#---- 1105.6.2 Makeup air.\n\nProvisions shall be made for makeup air to replace that being exhausted. Openings for makeup air shall be located to avoid intake of exhaust air. Supply and exhaust ducts serving the machinery room shall not serve any other area, shall be constructed in accordance with Chapter 5 and shall be covered with corrosion-resistant screen of not less than 1/4-inch (6.4 mm) mesh.\n\nException: The requirement for supply and exhaust ducts to the machinery room to serve no other area shall not apply to a change in the type of refrigerant in a lawfully installed existing refrigerating system being maintained and operated in accordance with these approved installation requirements:\n\n1. Where the replacement refrigerant has a safety classification of Group A1; or\n\n2. Where the replacement refrigerant is R123 and the engineer or architect demonstrates to the satisfaction of the commissioner that providing such air supply and exhaust ducts represents a hardship and that the proposed alternative provides an equivalent level of safety.\n\n#---- 1105.6.3 Ventilation rate.\n\nFor other than ammonia systems, the mechanical ventilation systems shall be capable of exhausting the minimum quantity of air both at normal operating and emergency conditions, as required by Sections 1105.6.3.1 and 1105.6.3.2. The minimum required ventilation rate for ammonia shall be 30 air changes per hour in accordance with IIAR2. Multiple fans or multispeed fans shall be allowed to produce the emergency ventilation rate and to obtain a reduced airflow for normal ventilation.\n\n#----- 1105.6.3.1 Quantity-normal ventilation.\n\nDuring occupied conditions, the mechanical ventilation system shall exhaust the larger of the following:\n\n1. Not less than 0.5 cfm per square foot (0.0025 m 3 /s × m 2 ) of machinery room area or 20 cfm (0.009 m 3 /s) per person.\n\n2. A volume required to limit the room temperature rise to18°F (-7.8°C) taking into account the ambient heating effect of all machinery in the room but not above a maximum temperature of 122°F (50°C).\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#----- 1105.6.3.2 Quantity-emergency conditions.\n\nUpon actuation of the refrigerant detector required in Section 1105.3, the mechanical ventilation system shall exhaust air from the machinery room in the following quantity:\n\nQ = 100 x √G (Equation 11-2)\n\nFor SI: Q = 0.07 x √G\n\nWhere:\n\nQ = The airflow in cubic feet per minute (m 3 /s).\n\nG = The design mass of refrigerant in pounds (kg) in the largest system, any part of which is located in the machinery room\n\n#--- 1105.7 Termination of relief devices.\n\nIn addition to the requirements of Section 9.7.8 of ASHRAE 15, pressure relief devices, fusible plugs and purge systems located within the machinery room shall terminate outside of the structure at a location not less than 15 feet (4572 mm) above the adjoining grade level and not less than 20 feet (6096 mm) from any window, ventilation opening or exit.\n\n#---- 1105.7.1 Discharge of Group A2, B2, A3 and B3 refrigerants.\n\nDischarge of systems containing Group A2 or B2 refrigerants shall be acceptable to the commissioner. Discharge of systems containing Group A3 or B3 refrigerants shall be subject to the approval of the commissioner and the Commissioner of the Fire Department. Nothing in this section shall be construed to approve the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\n#---- 1105.7.2 Certificate of qualification.\n\nDischarge of pressure relief devices, fusible plugs and purge systems for refrigerating systems containing flammable, toxic and highly toxic refrigerants and ammonia shall comply with Section 606 of the New York City Fire Code.\n\n#--- 1105.8 Ammonia discharge.\n\nPressure relief valves for ammonia systems shall discharge in accordance with ASHRAE 15.\n\n#--- 1105.9 Emergency pressure control system.\n\nPermanently installed refrigeration systems containing more than 6.6 pounds (3 kg) of a refrigerant other than a Group A1 refrigerant shall be provided with an emergency pressure control system in accordance with Sections 1105.9.1 and 1105.9.2.\n\n#---- 1105.9.1 Automatic crossover valves.\n\nEach high- and intermediate-pressure zone in a refrigerating system shall be provided with a single automatic valve providing a crossover connection to a lower pressure zone. Such automatic crossover valves shall comply with Sections 1105.9.1.1 through 1105.9.1.3.\n\n#----- 1105.9.1.1 Overpressure limit setpoint.\n\nAutomatic crossover valves shall be arranged to automatically relieve excess system pressure to a lower pressure zone if the pressure in a high- or intermediate-pressure zone rises to within 15 psi (108.4 kPa) of the setpoint for pressure-relief devices.\n\n#----- 1105.9.1.2 Manual operation.\n\nAutomatic crossover valves shall be capable of manual operation for refrigerating systems containing more than 200 pounds (90.8 kg) of refrigerant.\n\n#----- 1105.9.1.3 System design pressure.\n\nRefrigerating system zones that are connected to a higher pressure zone by an automatic crossover valve shall be designed to safely contain the maximum pressure that can be achieved by interconnection of the two zones.\n\n#---- 1105.9.2 Automatic emergency stop.\n\nAn automatic emergency stop feature shall be provided in accordance with Sections 1105.9.2.1 and 1105.9.2.2.\n\n#----- 1105.9.2.1 Automatic crossover valves.\n\nA refrigerating system equipped with an automatic crossover valve shall be designed, when such valve is activated, to cause all compressors on the affected system to immediately cease operating. Dedicated pressure-sensing devices located immediately adjacent to crossover valves may be used as a means for activating such crossover valve. To ensure that the automatic crossover valve system provides a redundant means of ceasing operation of the compressors in an overpressure condition, high-pressure cutout sensors associated with compressors shall not be used for purposes of activating such crossover valve.\n\n#----- 1105.9.2.2 Overpressure in low-pressure zone.\n\nThe lowest pressure zone in a refrigerating system shall be provided with a dedicated means of determining a rise in system pressure to within 15 psi (103.4 kPa) of the zone pressure relief device setpoint. Activation of such overpressure sensing device shall cause all compressors on the effected system to immediately cease operation.\n\n#--- 1105.10 Remote control.\n\nA clearly identified switch of the break-glass type shall provide off-only control of the compressors in the machinery room. A second clearly identified switch of the break-glass type shall provide on-only control of the machinery room ventilation fans. Such switches shall be located outside each entrance to the machinery room and as close to the entrance as practicable, except that when an outside location is impracticable, such switches may be located immediately inside the machinery room provided such location is accessible at all times.\n\n#--- 1105.11 Emergency signs.\n\nSigns shall comply with the following:\n\n1. Sections 8.11.8 and 11.2.4 of ASHRAE 15.\n\n2. Refrigeration units or systems having a refrigerant circuit containing more than 220 pounds (99.8 kg) of Group A1 or 30 pounds (13.6 kg) of any other group refrigerant shall be provided with approved emergency signs, charts, and labels in accordance with NFPA 704.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 1105.12 Storing refrigerant.\n\nThe total amount of refrigerant stored in a machinery room shall be the lesser of: (i) not more than twenty percent of the normal charge in the system; or (ii) not more than 330 pounds (149.7 kg) in addition to the charge in the system and the refrigerant contained in a permanently attached receiver. Refrigerant shall be stored in containers meeting the requirements of the New York City Fire Code.\n\nException: Recovery service containers used for storing refrigerant during periods of system maintenance or replacement may exceed 330 pounds (149.7 kg) provided such containers are securely fixed in position and have pressure relief valves piped to the outside in conformance with this code.\n\nSection MC 1106: Machinery Room, Special Requirements\n\n#--- 1106.1 General.\n\nWhere required by Section 1104.2, the machinery room shall meet the requirements of this section in addition to the requirements of Section 1105.\n\n#--- 1106.2 Elevated temperature.\n\nThere shall not be an open flame-producing device or continuously operating hot surface over 800°F (426.7°C) permanently installed in the room.\n\n#--- 1106.3 Ammonia room ventilation.\n\nVentilation systems in ammonia machinery rooms shall be operated continuously at the ventilation rate specified in Section 1105.6.3.\n\nExceptions:\n\n1. Machinery rooms equipped with a vapor detector that will automatically start the ventilation system at the ventilation rate specified in Section 1105.6.3 and that will actuate an alarm at a detection level not to exceed 1,000 ppm.\n\n2. Machinery rooms conforming to the Class 1, Division 2, hazardous location classification requirements of the New York City Electrical Code.\n\n#--- 1106.4 Flammable refrigerants.\n\nWhere refrigerants of Groups A2, A3, B2 or B3 are used, the machinery room shall conform to the Class 1, Division 2, hazardous location classification requirements of the New York City Electrical Code.\n\nExceptions:\n\n1. Ammonia machinery rooms that are provided with ventilation in accordance with Section 1106.3. Nothing in this section shall be construed to approve the use of Group A3 and B3 refrigerants if otherwise prohibited.\n\n2. Machinery rooms for systems containing Group A2L refrigerants that are in accordance with ASHRAE 15.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\n#--- 1106.5 Remote controls.\n\nRemote control of the mechanical equipment and appliances located in the machinery room shall be provided at an accessible location immediately outside the machinery room and adjacent to its principal entrance and shall comply with Sections 1106.5.1 and 1106.5.2.\n\n#---- 1106.5.1 Refrigeration system emergency shutoff.\n\nA clearly identified switch of the break-glass type or an approved tamper-resistant switch shall provide off-only control of refrigerant compressors, refrigerant pumps, and normally closed, automatic refrigerant valves located in the machinery room. Additionally, this equipment shall be automatically shut off whenever the refrigerant vapor concentration in the machinery room exceeds the vapor detector's upper detection limit or 25 percent of the LEL, whichever is lower.\n\n#---- 1106.5.2 Ventilation system.\n\nA clearly identified switch of the break-glass type or an approved tamper-resistant switch shall provide on-only control of the machinery room ventilation fans.\n\n#--- 1106.6 Reserved.\n\nSection MC 1107: Refrigerant Piping\n\n#--- 1107.1 General.\n\nThe design of refrigerant piping shall be in accordance with ASME B31.5. Refrigerant piping shall be installed, tested and placed in operation in accordance with this chapter.\n\n#---- 1107.1.1 Protection of refrigerant piping located inside buildings.\n\nAll refrigerant piping and fittings installed at a height less than 7 feet 3 inches (2209.8 mm) above the floor shall be concealed or otherwise protected from mechanical damage except at the point of connection to terminal equipment.\n\n#--- 1107.2 Piping location.\n\nRefrigerant piping that crosses an open space that affords passageway in any building shall be not less than 7 feet 3 inches (2209.8 mm) above the floor unless the piping is located against the ceiling of such space. Refrigerant piping shall not be placed in any elevator, dumbwaiter or other shaft containing a moving object or in any shaft that has openings to living quarters or to means of egress. Refrigerant piping shall not be installed in an enclosed public stairway, stairway landing or an exit.\n\n#---- 1107.2.1 Piping in public corridors.\n\nRefrigerant piping shall not be installed in public corridors.\n\nException: Refrigerant piping in public corridors that complies with either of the following conditions:\n\n1. Piping containing Group A1 refrigerant may be located in public corridors provided that the complete discharge of any one refrigerant system into the public corridor will not result in a refrigerant density equal to or greater than 50 percent of the allowable density set forth in Table 1103.1; and\n\n#--- 1.1. There is not more than one refrigerant system's piping per tenant; and\n\n#--- 1.2. Refrigerant piping and fittings are concealed or otherwise protected from mechanical damage; and either\n\n#--- 1.3. Refrigerant piping and fittings are installed with brazed joints; or\n\n#--- 1.4. The refrigerant equipment manufacturer provided pre-charged tubing systems installed in accordance with the refrigerant equipment manufacturer's instructions;\n\n2. Piping containing Group A1 refrigerant may be located in public corridors provided that the complete discharge of any one refrigerant system into the public corridor will not result in a refrigerant density of 100 percent of the allowable refrigerant density set forth in Table 1103.1; and\n\n#--- 2.1. Such system is provided with fast-acting shutoff valves on both high and low pressure refrigerant line sets, actuated by either local refrigerant monitors in the corridor, or on sensing a drop in pressure on either high or low pressure refrigerant line sets; and\n\n#--- 2.2. Upon accidental discharge, actuation of installed refrigerant shutoff valves shall initiate locally installed alarm; and\n\n#--- 2.3. Installation of fast-acting shutoff valves, refrigerant detectors, and alarms shall be in accordance with Appendix C; and\n\n#--- 2.4. There is not more than one refrigerant system's piping per tenant; and\n\n#--- 2.5. Refrigerant piping and fittings are concealed or otherwise protected from mechanical damage; and either\n\n#--- 2.6. Refrigerant piping and fittings are installed with brazed joints; or\n\n#--- 2.7. The refrigerant equipment manufacturer provided pre-charged tubing systems installed in accordance with the refrigerant equipment manufacturer's instructions.\n\n#---- 1107.2.2 Piping in concrete floors.\n\nRefrigerant piping installed in concrete floors shall be encased in pipe ducts. The piping shall be isolated and supported to prevent damaging vibration, stress and corrosion.\n\n#---- 1107.2.3 Refrigerant piping penetrations.\n\nRefrigerant piping shall not penetrate floors, ceilings or roofs.\n\nExceptions:\n\n1. Penetrations connecting the basement and the first floor.\n\n2. Penetrations connecting the top floor and a machinery penthouse or roof installation.\n\n3. Penetrations connecting adjacent floors served by the refrigeration system.\n\n4. Penetrations by piping in a direct system where the refrigerant quantity does not exceed Table 1103.1 for the smallest occupied space through which the piping passes.\n\n5. Penetrations by piping in a direct system complying with Section 1107.2.3.1.\n\n6. In other than industrial occupancies and where the refrigerant quantity exceeds Table 1103.1 for the smallest space, penetrations for piping that connects separate pieces of equipment that are either:\n\n#--- 6.1. Enclosed by an approved gas-tight, fire- resistive duct or shaft with openings to those floors served by the refrigeration system or\n\n#--- 6.2. Located on the exterior of the building where vented to the outdoors or to the space served by the system and not used as an air shaft, closed court or similar space.\n\n#----- 1107.2.3.1 Direct systems.\n\nPiping containing a quantity of Group A1 refrigerants in excess of Table 1103.1 for the smallest occupied space through which the piping passes, shall comply with Section 1107.9.\n\n#--- 1107.3 Pipe enclosures.\n\nRigid or flexible metal enclosures or pipe ducts shall be provided for soft, annealed copper tubing used for refrigerant piping erected on the premises and containing other than Group A1 refrigerant. Enclosures shall not be required for connections between condensing units and the nearest riser box(es), provided such connections do not exceed 6 feet (1828.8 mm) in length.\n\n#--- 1107.4 Condensation.\n\nRefrigerating piping and fittings, brine piping and fittings that, during normal operation, will reach a surface temperature below the dew point of the surrounding air, and are located in spaces or areas where condensation will cause a safety hazard to the building occupants, structure, electrical equipment or any other equipment or appliances, shall be protected in an approved manner to prevent such damage.\n\n#--- 1107.5 Materials for refrigerant pipe and tubing.\n\nPiping materials shall be as set forth in Sections 1107.5.1 through 1107.5.7.\n\n#---- 1107.5.1 Steel pipe.\n\nCarbon steel pipe with a wall thickness not less than Schedule 80 shall be used for Group A2, A3, B2 or B3 refrigerant liquid lines for sizes 1.5 inches (38.1 mm) and smaller. Carbon steel pipe with a wall thickness not less than Schedule 40 shall be used for Group A1 or B 1 refrigerant liquid lines 6 inches (152.4 mm) and smaller, Group A2, A3, B2 or B3 refrigerant liquid lines sizes 2 inches (50.8 mm) through 6 inches (152.4 mm) and all refrigerant suction and discharge lines 6 inches (152.4 mm) and smaller. Type F steel pipe shall not be used for refrigerant lines having an operating temperature less than -20°F (-28.9°C).\n\n#---- 1107.5.2 Copper and brass pipe.\n\nStandard iron-pipe size, copper and red brass (not less than 80-percent copper) pipe shall conform to ASTM B 42 and ASTM B 43.\n\n#---- 1107.5.3 Copper tube.\n\nCopper tube used for refrigerant piping erected on the premises shall be seamless copper tube of Type ACR (hard or annealed) complying with ASTM B 280. Where approved, copper tube for refrigerant piping erected on the premises shall be seamless copper tube of Type K or L (drawn or annealed) in accordance with ASTM B 88. Annealed temper copper tube shall not be used in sizes larger than a 2-inch (50.8 mm) nominal size. Mechanical joints shall not be used on annealed temper copper tube in sizes larger than 7/8-inch (22.2 mm) OD size.\n\n#---- 1107.5.4 Copper tubing joints.\n\nCopper tubing joints used in refrigerating systems containing Group A2, A3, B1, B2 or B3 refrigerants shall be brazed. Soldered joints shall not be used in such refrigerating systems. Brazed joints shall be made in accordance with ASME Boiler and Pressure Vessel Code, Section IX Welding and Brazing Qualifications or in accordance with American Welding Society AWS B2.2 Standard for Brazing Procedure and Performance Qualification.\n\n#---- 1107.5.5 Soldered joints.\n\nSoldered joints shall be made as follows: soldered joint surfaces shall be cleaned, a flux conforming to ASTM B 813 shall be applied, and the joint shall be soldered with a solder conforming to ASTM B 32.\n\n#---- 1107.5.6 Aluminum tube.\n\nType 3003-0 aluminum tubing with high-pressure fittings shall not be used with methyl chloride and other refrigerants known to deteriorate aluminum.\n\n#---- 1107.5.7 Insulation.\n\nPipe and other refrigerant-containing components' insulation shall meet the requirements of Section 1204.1 of this code.\n\n#--- 1107.6 Joints and refrigerant-containing parts in air ducts.\n\nJoints and all refrigerant-containing parts of a refrigerating system located in an air duct of an air-conditioning system carrying conditioned air to and from human-occupied space shall be constructed to withstand, without leakage, a pressure of 150 percent of the higher of the design pressure or pressure relief device setting.\n\n#--- 1107.7 Exposure of refrigerant pipe joints.\n\nRefrigerant pipe joints erected on the premises shall be exposed for visual inspection prior to being covered or enclosed.\n\n#--- 1107.8 Stop valves.\n\nSystems containing more than 6.6 pounds (3 kg) of a refrigerant in systems using positive-displacement compressors shall have stop valves installed as follows:\n\n1. At the inlet of each compressor, compressor unit or condensing unit.\n\n2. At the discharge outlet of each compressor, compressor unit or condensing unit and of each liquid receiver.\n\nExceptions:\n\n1. Systems that have a refrigerant pumpout function capable of storing the entire refrigerant charge in a receiver or heat exchanger.\n\n2. Systems that are equipped with provisions for pumpout of the refrigerant using either portable or permanently installed recovery equipment.\n\n3. Self-contained systems.\n\n#---- 1107.8.1 Liquid receivers.\n\nSystems containing 100 pounds (45.4 kg) or more of a refrigerant, other than systems utilizing nonpositive displacement compressors, shall have stop valves, in addition to those required by Section 1107.8, on each inlet of each liquid receiver. Stop valves shall not be required on the inlet of a receiver in a condensing unit, nor on the inlet of a receiver which is an integral part of the condenser.\n\n#---- 1107.8.2 Copper tubing.\n\nStop valves used with soft annealed copper tubing or hard-drawn copper tubing 7/8-inch (22.2 mm) OD standard size or smaller shall be securely mounted, independent of tubing fastenings or supports.\n\n#---- 1107.8.3 Identification.\n\nStop valves shall be identified where their intended purpose is not obvious. Numbers shall not be used to label the valves, unless a key to the numbers is located near the valves.\n\n#--- 1107.9 Alternative refrigerant piping safety.\n\nWhere refrigerant piping penetrates floors, ceilings, or roofs pursuant to Section 1107.2.3, it shall comply with the alternative safety requirements of Sections 1107.9.1 through 1107.9.5.\n\n#---- 1107.9.1 Nongas tight enclosures.\n\nWhere refrigerant piping and fittings pass through public corridors or occupied spaces in shafts or cavities that are not gas tight, such piping and fittings shall comply with the requirements of EN378 Part 1, Section 3.2.3.\n\n#---- 1107.9.2 Occupied spaces.\n\nRefrigerant piping systems in occupied spaces shall comply with the requirements of EN378 Part 1, Section C.3.2.1.\n\n#----- 1107.9.2.1 Space volume calculations.\n\nSpace volume calculations shall comply with EN378 Part 1, Section 7.\n\n#----- 1107.9.2.2 Dilution transfer openings.\n\nWhere required, dilution transfer openings shall be provided in accordance with EN378 Part 3, Section 6.3.2.\n\n#---- 1107.9.3 Refrigerant shutoff valves.\n\nWhere required, refrigerant shutoff valves shall comply with the requirements of EN378 Part 3, Sections 6.4.1 through 6.4.3.\n\n#---- 1107.9.4 Refrigerant safety alarms.\n\nWhere required, refrigerant safety alarms shall comply with the requirements of EN378 Part 3, Sections 8.1 through 8.2.\n\n#---- 1107.9.5 Refrigerant detectors.\n\nWhere required, refrigerant detectors shall comply with the requirements of EN378 Part 3, Section 9.3.1.\n\nSection MC 1108: Field Test\n\n#--- 1108.1 General.\n\nEvery refrigerant-containing part of every system that is erected on the premises, except compressors, condensers, vessels, evaporators, safety devices, pressure gauges and control mechanisms that are listed and factory tested, shall be tested and proved tight after complete installation, and before operation. Tests shall include both the high- and low-pressure sides of each system at not less than the lower of the design pressures or the setting of the pressure relief device(s). The design pressures for testing shall be those listed on the condensing unit, compressor or compressor unit name-plate, as required by ASHRAE 15.\n\nExceptions:\n\n1. Gas bulk storage tanks that are not permanently connected to a refrigeration system.\n\n2. Systems using an A1 refrigerant erected on the premises with copper tubing not exceeding 5/8-inch (15.8 mm) OD, with wall thickness as required by ASHRAE 15, shall be tested in accordance with Section 1108.1, or by means of refrigerant charged into the system at the saturated vapor pressure of the refrigerant at 70°F (21.1°C) or higher.\n\n3. Limited-charge systems equipped with a pressure relief device, erected on the premises, shall be tested at a pressure not less than one and one-half times the pressure setting of the relief device. If the equipment or appliance has been tested by the manufacturer at one and one-half times the design pressure, the test after erection on the premises shall be conducted at the design pressure.\n\n#---- 1108.1.1 Booster compressor.\n\nWhere a compressor is used as a booster to obtain an intermediate pressure and discharges into the suction side of another compressor, the booster compressor shall be considered a part of the low side, provided that it is protected by a pressure relief device.\n\n#---- 1108.1.2 Centrifugal / nonpositive displacement compressors.\n\nIn field-testing systems using centrifugal or other nonpositive displacement compressors, the entire system shall be considered as the low-side pressure for field test purposes.\n\n#--- 1108.2 Test gases.\n\nTests shall be performed with an inert-dried gas including, but not limited to, nitrogen and carbon dioxide. Oxygen, air, flammable gases and mixtures containing such gases shall not be used.\n\nExceptions:\n\n1. The use of air is allowed to test R-717, ammonia, systems provided that they are subsequently evacuated before charging with refrigerant.\n\n2. Mixtures of dry nitrogen, inert gases, or a combination of them with nonflammable refrigerants in concentrations of a refrigerant weight fraction (mass fraction) not exceeding 5 are allowed for tests.\n\n#--- 1108.3 Test apparatus.\n\nThe means used to build up the test pressure shall have either a pressure-limiting device or a pressure-reducing device and a gauge on the outlet side.\n\n#--- 1108.4 Declaration.\n\nA certificate of test shall be provided for all systems containing 55 pounds (24.9 kg) or more of refrigerant. The certificate shall give the name of the refrigerant and the field test pressure applied to the high side and the low side of the system. The certification of test shall be signed by the installer and shall be made part of the public record.\n\nSection MC 1109: Periodic Testing\n\n#--- 1109.1 Testing required.\n\nThe following emergency devices and systems shall be periodically tested and the results logged in accordance with the manufacturer's instructions and as required by the Commissioner of the Fire Department:\n\n1. Treatment and flaring systems.\n\n2. Valves and appurtenances necessary to the operation of emergency refrigeration control boxes.\n\n3. Fans and associated equipment intended to operate emergency purge ventilation systems.\n\n4. Detection and alarm systems.\n\n#--- 1109.2 Operation.\n\nOperating permits and qualification of operators for refrigeration systems shall comply with the requirements of the New York City Fire Code.",
+  "schemaVersion": 1
+}

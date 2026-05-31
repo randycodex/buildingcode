@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195523\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195523\"><\/AnnotationDrawer><div>Blowdown lines shall be inspected annually to verify they are free of deposits and in good working condition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195524\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195524\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195524\"><\/AnnotationDrawer><h6><a name=\"JD_MC1009\" id=\"JD_MC1009\" title=\"MC 1009\"><\/a>Section MC 1009: Hot Water Boiler Expansion Tank<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23964-html-1",
+      "kind" : "html",
+      "plainText" : "Blowdown lines shall be inspected annually to verify they are free of deposits and in good working condition.\n\n Section MC 1009: Hot Water Boiler Expansion Tank"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 23964
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194446\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194446\"><\/AnnotationDrawer><div>Smoke detectors required by this section shall be installed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span> The required smoke detectors shall be installed to monitor the entire airflow conveyed by the system. Access shall be provided to smoke detectors for inspection and maintenance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10767-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke detectors required by this section shall be installed in accordance with the New York City Electrical Code. The required smoke detectors shall be installed to monitor the entire airflow conveyed by the system. Access shall be provided to smoke detectors for inspection and maintenance."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10767
+}

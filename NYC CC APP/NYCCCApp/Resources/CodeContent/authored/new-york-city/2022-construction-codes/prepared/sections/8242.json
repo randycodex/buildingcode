@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198155\"><\/AnnotationDrawer><div>The purging of piping systems shall be in accordance with the provisions of Sections 406.7.1.1 through 406.7.1.4 where the piping system meets either of the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198156\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198156\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The design operating gas pressure is greater than 2 psig (13.8 kPa).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198157\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198157\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The piping being purged contains one or more sections of pipe meeting the size and length criteria of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198158', hash: '#JD_FGCTable406.7.1.1' }}\">Table 406.7.1.1<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8242-html-1",
+      "kind" : "html",
+      "plainText" : "The purging of piping systems shall be in accordance with the provisions of Sections 406.7.1.1 through 406.7.1.4 where the piping system meets either of the following:\n\n 1. The design operating gas pressure is greater than 2 psig (13.8 kPa).\n\n 2. The piping being purged contains one or more sections of pipe meeting the size and length criteria of Table 406.7.1.1 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8242
+}

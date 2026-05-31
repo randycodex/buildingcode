@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164383\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164383\"><\/annotationdrawer><div>Where the application is sought solely for or includes earthwork, excavation or fill operations, including but not limited to site decontamination, soil remediation and grading, the applicant shall submit 1) a lot diagram showing the exact location of the lot and dimensions to the nearest corner; and 2) plans showing the exact location, extent, and depth or height of the proposed earthwork, excavation or fill operation and any existing utilities, foundations or other infrastructure potentially impacted by the earthwork, excavation or fill operation. For excavation operations, the plans shall also indicate the levels of footings of all adjacent structures or, if the adjacent structures are pile supported, this shall be stated. Where applicable, the plans shall also include underpinning details, soil information in accordance with <link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178838', hash: '#JD_BCCh.18' }}\">Chapter 18, and a final grading plan representing the lot after all earthwork, excavation or fill operations have been completed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "56-html-1",
+      "kind" : "html",
+      "plainText" : "Where the application is sought solely for or includes earthwork, excavation or fill operations, including but not limited to site decontamination, soil remediation and grading, the applicant shall submit 1) a lot diagram showing the exact location of the lot and dimensions to the nearest corner; and 2) plans showing the exact location, extent, and depth or height of the proposed earthwork, excavation or fill operation and any existing utilities, foundations or other infrastructure potentially impacted by the earthwork, excavation or fill operation. For excavation operations, the plans shall also indicate the levels of footings of all adjacent structures or, if the adjacent structures are pile supported, this shall be stated. Where applicable, the plans shall also include underpinning details, soil information in accordance with Chapter 18, and a final grading plan representing the lot after all earthwork, excavation or fill operations have been completed."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 56
+}

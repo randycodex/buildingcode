@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173312\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173312\"><\/AnnotationDrawer><div>The minimum width and height of each door opening shall be in accordance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2245-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum width and height of each door opening shall be in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2245
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197865\"><\/AnnotationDrawer><div>Pipe and fittings shall be clear and free from cutting burrs and defects in structure or threading, and shall be thoroughly brushed, and chip and scale blown. Defects in pipe and fittings shall not be repaired. Defective pipe and fittings shall be replaced (see Section 406.1.2).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8127-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe and fittings shall be clear and free from cutting burrs and defects in structure or threading, and shall be thoroughly brushed, and chip and scale blown. Defects in pipe and fittings shall not be repaired. Defective pipe and fittings shall be replaced (see Section 406.1.2)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8127
+}

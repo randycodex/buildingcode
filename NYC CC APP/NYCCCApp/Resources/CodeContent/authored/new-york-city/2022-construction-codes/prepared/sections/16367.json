@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174478\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174478\"><\/AnnotationDrawer><div>The required capacity in inches (mm) of aisles shall be not less than the total occupant load served by the egress element multiplied by 0.08 (2.0 mm) where egress is by stepped aisle and multiplied by 0.06 (1.52 mm) where egress is by ramps, corridors, tunnels, vomitories, level aisles or ramped aisles.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174479\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174479\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The required capacity in inches (mm) of aisles shall be permitted to comply with Section 1029.6.2 for the number of seats in the outdoor smoke-protected assembly seating where Section 1029.6.2 permits less capacity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16367-html-1",
+      "kind" : "html",
+      "plainText" : "The required capacity in inches (mm) of aisles shall be not less than the total occupant load served by the egress element multiplied by 0.08 (2.0 mm) where egress is by stepped aisle and multiplied by 0.06 (1.52 mm) where egress is by ramps, corridors, tunnels, vomitories, level aisles or ramped aisles.\n\n Exception: The required capacity in inches (mm) of aisles shall be permitted to comply with Section 1029.6.2 for the number of seats in the outdoor smoke-protected assembly seating where Section 1029.6.2 permits less capacity."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16367
+}

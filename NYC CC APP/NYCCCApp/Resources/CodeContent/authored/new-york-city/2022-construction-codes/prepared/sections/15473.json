@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171428\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171428\"><\/AnnotationDrawer><div>Limited area sprinkler systems shall be in accordance with the standards listed in Section 903.3.1 except as provided in Sections 903.3.8.1 through 903.3.8.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15473-html-1",
+      "kind" : "html",
+      "plainText" : "Limited area sprinkler systems shall be in accordance with the standards listed in Section 903.3.1 except as provided in Sections 903.3.8.1 through 903.3.8.5."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15473
+}

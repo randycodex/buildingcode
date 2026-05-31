@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196469\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196469\"><\/AnnotationDrawer><div>The containment enclosure shall be two sizes larger than the enclosed pipe for single pipe enclosures. Enclosures containing multiple pipes shall be sized to provide a minimum 1\/2-inch (12.7 mm) clearance around the pipe bundle.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24342-html-1",
+      "kind" : "html",
+      "plainText" : "The containment enclosure shall be two sizes larger than the enclosed pipe for single pipe enclosures. Enclosures containing multiple pipes shall be sized to provide a minimum 1\/2-inch (12.7 mm) clearance around the pipe bundle."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24342
+}

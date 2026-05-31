@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183004\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183004\"><\/AnnotationDrawer><div>Gypsum lath or gypsum wallboard shall not be used as a backing for cement plaster.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183005\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183005\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Gypsum lath or gypsum wallboard is permitted, with a weather-resistive barrier, as a backing for self-furred metal lath or self-furred wire fabric lath and cement plaster where either of the following conditions occur:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183006\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183006\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;On horizontal supports of ceilings or roof soffits.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183007\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183007\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;On interior walls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5199-html-1",
+      "kind" : "html",
+      "plainText" : "Gypsum lath or gypsum wallboard shall not be used as a backing for cement plaster.\n\n Exception: Gypsum lath or gypsum wallboard is permitted, with a weather-resistive barrier, as a backing for self-furred metal lath or self-furred wire fabric lath and cement plaster where either of the following conditions occur:\n\n 1. On horizontal supports of ceilings or roof soffits.\n\n 2. On interior walls."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5199
+}

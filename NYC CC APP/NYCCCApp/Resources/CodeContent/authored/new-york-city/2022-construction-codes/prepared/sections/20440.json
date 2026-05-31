@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187135\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187135\"><\/AnnotationDrawer><div>All training programs or courses required by this section shall be based on the scaffold requirements of this chapter and shall include, but not be limited to, instruction on the type of scaffold the training covers and associated hazards, common causes of scaffold incidents and steps to avoid such incidents, scaffold components, scaffold connections to a structure, scaffold inspection, the maximum intended load and load-handling capacities of scaffolds, and the prevention of overload conditions. Curriculums for scaffold users shall be focused on the proper use of the scaffold. Curriculums for scaffold installers, adjusters, maintainers, repairers, and removers shall be focused on the proper execution of such work. Curriculums in excess of eight hours in length shall include a significant portion of hands-on training.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20440-html-1",
+      "kind" : "html",
+      "plainText" : "All training programs or courses required by this section shall be based on the scaffold requirements of this chapter and shall include, but not be limited to, instruction on the type of scaffold the training covers and associated hazards, common causes of scaffold incidents and steps to avoid such incidents, scaffold components, scaffold connections to a structure, scaffold inspection, the maximum intended load and load-handling capacities of scaffolds, and the prevention of overload conditions. Curriculums for scaffold users shall be focused on the proper use of the scaffold. Curriculums for scaffold installers, adjusters, maintainers, repairers, and removers shall be focused on the proper execution of such work. Curriculums in excess of eight hours in length shall include a significant portion of hands-on training."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20440
+}

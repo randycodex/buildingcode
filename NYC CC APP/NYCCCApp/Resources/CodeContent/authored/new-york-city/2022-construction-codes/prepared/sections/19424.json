@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184123\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184123\"><\/AnnotationDrawer><div>The wall separating the pedestrian walkway and the building shall comply with Section 3104.5.2.1 or 3104.5.2.2 where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184124\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184124\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The distance between the connected buildings is more than 30 feet (9144 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184125\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184125\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The pedestrian walkway and connected buildings are equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, and the roof of the walkway is not more than 55 feet (16 764 mm) above grade connecting to the fifth, or lower, story above grade plane, of each building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184126\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184126\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Pedestrian walkways accessory to open parking garages need not be equipped with an automatic sprinkler system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19424-html-1",
+      "kind" : "html",
+      "plainText" : "The wall separating the pedestrian walkway and the building shall comply with Section 3104.5.2.1 or 3104.5.2.2 where:\n\n 1. The distance between the connected buildings is more than 30 feet (9144 mm).\n\n 2. The pedestrian walkway and connected buildings are equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, and the roof of the walkway is not more than 55 feet (16 764 mm) above grade connecting to the fifth, or lower, story above grade plane, of each building.\n\n Exception: Pedestrian walkways accessory to open parking garages need not be equipped with an automatic sprinkler system."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19424
+}

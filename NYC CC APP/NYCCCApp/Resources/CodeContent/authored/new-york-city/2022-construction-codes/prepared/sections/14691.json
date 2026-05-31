@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168489\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168489\"><\/AnnotationDrawer><div>The special provisions of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168746', hash: '#JD_BC510' }}\">510<\/Link> permit the use of special conditions that are exempt from, or modify, the specific requirements of this chapter regarding the allowable areas of buildings based on the occupancy classification and type of construction, provided the special condition complies with the provisions specified in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168746', hash: '#JD_BC510' }}\">510<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14691-html-1",
+      "kind" : "html",
+      "plainText" : "The special provisions of Section 510 permit the use of special conditions that are exempt from, or modify, the specific requirements of this chapter regarding the allowable areas of buildings based on the occupancy classification and type of construction, provided the special condition complies with the provisions specified in Section 510 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14691
+}

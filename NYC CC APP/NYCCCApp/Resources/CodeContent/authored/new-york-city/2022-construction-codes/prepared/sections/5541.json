@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183976\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183976\"><\/AnnotationDrawer><div>The temporary use certificate shall be posted in a conspicuous location on, or adjacent to, the device covered by the certificate and shall state that the device has not been finally approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183977\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183977\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183977\"><\/AnnotationDrawer><h6><a name=\"JD_BC3010\" id=\"JD_BC3010\" title=\"BC 3010\"><\/a>Section BC 3010: Elevator, Amusement, and Other Device Operators<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5541-html-1",
+      "kind" : "html",
+      "plainText" : "The temporary use certificate shall be posted in a conspicuous location on, or adjacent to, the device covered by the certificate and shall state that the device has not been finally approved by the commissioner.\n\n Section BC 3010: Elevator, Amusement, and Other Device Operators"
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5541
+}

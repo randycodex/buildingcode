@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178466\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178466\"><\/AnnotationDrawer><div>Thickness measurements shall be selected from a square area, 12 inches by 12 inches (304.8 mm by 304.8 mm) in size. A minimum of four measurements shall be made, located symmetrically within the square area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3770-html-1",
+      "kind" : "html",
+      "plainText" : "Thickness measurements shall be selected from a square area, 12 inches by 12 inches (304.8 mm by 304.8 mm) in size. A minimum of four measurements shall be made, located symmetrically within the square area."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3770
+}

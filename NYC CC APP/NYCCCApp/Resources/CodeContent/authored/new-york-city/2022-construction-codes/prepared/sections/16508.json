@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174943\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174943\"><\/AnnotationDrawer><div>For every six or fraction of six accessible parking spaces, at least one shall be a van-accessible parking space. Van-accessible parking spaces shall be designed and constructed in accordance with ICC A117.1, including Section 502 (Parking Spaces).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174944\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174944\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> In Group R-2 and R-3 occupancies, van-accessible spaces located within private garages not exceeding 300 square feet (27.9 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) shall be permitted to have vehicular routes, entrances, parking spaces and access aisles with a minimum vertical clearance of 7 feet (2133.6 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16508-html-1",
+      "kind" : "html",
+      "plainText" : "For every six or fraction of six accessible parking spaces, at least one shall be a van-accessible parking space. Van-accessible parking spaces shall be designed and constructed in accordance with ICC A117.1, including Section 502 (Parking Spaces).\n\n Exception: In Group R-2 and R-3 occupancies, van-accessible spaces located within private garages not exceeding 300 square feet (27.9 m\n\n 2 \n\n ) shall be permitted to have vehicular routes, entrances, parking spaces and access aisles with a minimum vertical clearance of 7 feet (2133.6 mm)."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16508
+}

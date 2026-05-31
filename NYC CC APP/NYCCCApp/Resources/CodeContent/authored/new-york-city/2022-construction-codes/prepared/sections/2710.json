@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175029\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175029\"><\/AnnotationDrawer><div>The water closet shall be positioned with a wall to the rear and to one side. The centerline of the water closet shall be 18 inches (457.2 mm) from the side wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2710-html-1",
+      "kind" : "html",
+      "plainText" : "The water closet shall be positioned with a wall to the rear and to one side. The centerline of the water closet shall be 18 inches (457.2 mm) from the side wall."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2710
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186111\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186111\"><\/AnnotationDrawer><div>Whenever any work is being performed over, on, or in close proximity to a highway, street, or similar public way, control and protection of traffic shall be provided by barriers, signals, signs, flagpersons, or other devices, equipment, and personnel in accordance with the requirements of the Department of Transportation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6301-html-1",
+      "kind" : "html",
+      "plainText" : "Whenever any work is being performed over, on, or in close proximity to a highway, street, or similar public way, control and protection of traffic shall be provided by barriers, signals, signs, flagpersons, or other devices, equipment, and personnel in accordance with the requirements of the Department of Transportation."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6301
+}

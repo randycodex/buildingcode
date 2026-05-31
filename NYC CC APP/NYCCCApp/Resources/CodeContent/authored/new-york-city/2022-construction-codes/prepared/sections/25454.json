@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163484\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163484\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The roof of a structure shall be designed for the storage of water where the storm drainage system is engineered for controlled flow. The controlled flow roof drain system shall be an engineered system in accordance with this section and Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156795', hash: '#JD_28-113.2.2' }}\">28-113.2.2<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Administrative Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">. The controlled flow system shall be designed based on the design rainfall rate in accordance with Section 1106.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25454-html-1",
+      "kind" : "html",
+      "plainText" : "The roof of a structure shall be designed for the storage of water where the storm drainage system is engineered for controlled flow. The controlled flow roof drain system shall be an engineered system in accordance with this section and Section 28-113.2.2 of the Administrative Code . The controlled flow system shall be designed based on the design rainfall rate in accordance with Section 1106.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25454
+}

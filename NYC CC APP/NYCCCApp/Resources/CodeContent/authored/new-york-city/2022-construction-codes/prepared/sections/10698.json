@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194256\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194256\"><\/AnnotationDrawer><div>Electrical equipment with metallic enclosures exposed within a plenum shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10698-html-1",
+      "kind" : "html",
+      "plainText" : "Electrical equipment with metallic enclosures exposed within a plenum shall be permitted."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10698
+}

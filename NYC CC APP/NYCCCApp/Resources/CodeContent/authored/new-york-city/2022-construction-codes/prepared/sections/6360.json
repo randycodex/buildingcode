@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186300\"><\/AnnotationDrawer><div>Gates shall be sliding or shall swing into areas not accessible to the public, and shall be provided only where required for access to the site or to facilitate the work. Gates shall consist of the same material and construction as the rest of the fence. Gates shall be kept closed at all times except during actual loading and unloading operations, when individuals or vehicles are actively entering or leaving the site, or as needed to facilitate active work around the gate.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186301\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where approved by the commissioner, chain link gates may be utilized in a solid fence.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6360-html-1",
+      "kind" : "html",
+      "plainText" : "Gates shall be sliding or shall swing into areas not accessible to the public, and shall be provided only where required for access to the site or to facilitate the work. Gates shall consist of the same material and construction as the rest of the fence. Gates shall be kept closed at all times except during actual loading and unloading operations, when individuals or vehicles are actively entering or leaving the site, or as needed to facilitate active work around the gate.\n\n Exception: Where approved by the commissioner, chain link gates may be utilized in a solid fence."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6360
+}

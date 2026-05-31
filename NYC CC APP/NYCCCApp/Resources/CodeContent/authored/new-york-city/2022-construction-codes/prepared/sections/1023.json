@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169166\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169166\"><\/AnnotationDrawer><div>Penetrations by air ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169875', hash: '#JD_BC717' }}\">717<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169167\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169167\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Foundation vents installed in accordance with this code are permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1023-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations by air ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings shall comply with Section 717 .\n\n Exception: Foundation vents installed in accordance with this code are permitted."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1023
+}

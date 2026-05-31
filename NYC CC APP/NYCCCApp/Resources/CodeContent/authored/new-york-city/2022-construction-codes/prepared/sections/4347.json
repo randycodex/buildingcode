@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180196\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180196\"><\/AnnotationDrawer><div>The required strength and durability of concrete shall be governed by compliance with the proportioning, testing, mixing and placing provisions of Sections 1905.1.1 through 1905.13 of this code and ACI 318.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4347-html-1",
+      "kind" : "html",
+      "plainText" : "The required strength and durability of concrete shall be governed by compliance with the proportioning, testing, mixing and placing provisions of Sections 1905.1.1 through 1905.13 of this code and ACI 318."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4347
+}

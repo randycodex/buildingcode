@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198729\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198729\"><\/AnnotationDrawer><div>Minimum clearances from single-wall metal pipe to combustible material shall be in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198814', hash: '#JD_FGCTable503.10.5' }}\">Table 503.10.5<\/Link>. The clearance from single-wall metal pipe to combustible material shall be permitted to be reduced where the combustible material is protected as specified for vent connectors in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-197674', hash: '#JD_FGCTable308.2' }}\">Table 308.2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8450-html-1",
+      "kind" : "html",
+      "plainText" : "Minimum clearances from single-wall metal pipe to combustible material shall be in accordance with Table 503.10.5 . The clearance from single-wall metal pipe to combustible material shall be permitted to be reduced where the combustible material is protected as specified for vent connectors in Table 308.2 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8450
+}

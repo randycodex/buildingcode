@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175256\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175256\"><\/AnnotationDrawer><div>Where stadiums, arenas and grandstands provide audible public announcements, they shall also provide equivalent text information regarding events and facilities in compliance with Sections 1108.2.7.3.1 and 1108.2.7.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16615-html-1",
+      "kind" : "html",
+      "plainText" : "Where stadiums, arenas and grandstands provide audible public announcements, they shall also provide equivalent text information regarding events and facilities in compliance with Sections 1108.2.7.3.1 and 1108.2.7.3.2."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16615
+}

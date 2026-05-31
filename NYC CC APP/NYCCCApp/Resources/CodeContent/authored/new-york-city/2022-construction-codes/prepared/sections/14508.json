@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167950\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167950\"><\/AnnotationDrawer><div>Emergency alarm systems shall be provided in accordance with this section and Sections 415.5.1 and 415.5.2. The maximum allowable quantity per control area provisions shall not apply to emergency alarm systems required for HPM.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14508-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency alarm systems shall be provided in accordance with this section and Sections 415.5.1 and 415.5.2. The maximum allowable quantity per control area provisions shall not apply to emergency alarm systems required for HPM."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14508
+}

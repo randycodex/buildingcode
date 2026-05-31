@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197755\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197755\"><\/AnnotationDrawer><div>Piping, tubing and fittings shall comply with the applicable referenced standards, specifications and performance criteria of this code and shall be identified in accordance with Section 401.9. Piping, tubing and fittings shall either be tested by an approved third-party testing agency or certified by an approved third-party certification agency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-197756\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-197756\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-197756\"><\/AnnotationDrawer><h6><a name=\"JD_FGC402\" id=\"JD_FGC402\" title=\"FGC 402\"><\/a>Section FGC 402: Pipe Sizing<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20928-html-1",
+      "kind" : "html",
+      "plainText" : "Piping, tubing and fittings shall comply with the applicable referenced standards, specifications and performance criteria of this code and shall be identified in accordance with Section 401.9. Piping, tubing and fittings shall either be tested by an approved third-party testing agency or certified by an approved third-party certification agency.\n\n Section FGC 402: Pipe Sizing"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20928
+}

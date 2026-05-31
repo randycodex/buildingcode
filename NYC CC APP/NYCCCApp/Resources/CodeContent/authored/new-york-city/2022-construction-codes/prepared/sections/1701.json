@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171578\"><\/AnnotationDrawer><div>In Group I-2 occupancies where cooking facilities are installed in accordance with Section 407.2.6 of this code, the domestic cooking hood provided over the cooktop or range shall be equipped with an automatic fire-extinguishing system of a type recognized for protection of domestic cooking equipment. Preengineered automatic extinguishing systems shall be tested in accordance with UL 300A and listed and labeled for the intended application. The system shall be installed in accordance with this code, its listing and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1701-html-1",
+      "kind" : "html",
+      "plainText" : "In Group I-2 occupancies where cooking facilities are installed in accordance with Section 407.2.6 of this code, the domestic cooking hood provided over the cooktop or range shall be equipped with an automatic fire-extinguishing system of a type recognized for protection of domestic cooking equipment. Preengineered automatic extinguishing systems shall be tested in accordance with UL 300A and listed and labeled for the intended application. The system shall be installed in accordance with this code, its listing and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1701
+}

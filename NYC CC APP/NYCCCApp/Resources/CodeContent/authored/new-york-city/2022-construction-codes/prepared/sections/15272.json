@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170670\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170670\"><\/AnnotationDrawer><div>In the absence of substantiating fire-endurance test results, ducts, conduit, piping, and similar mechanical, electrical, and plumbing installations shall not be embedded in any required fire-resistant materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15272-html-1",
+      "kind" : "html",
+      "plainText" : "In the absence of substantiating fire-endurance test results, ducts, conduit, piping, and similar mechanical, electrical, and plumbing installations shall not be embedded in any required fire-resistant materials."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15272
+}

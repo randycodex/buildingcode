@@ -1,0 +1,18 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174423\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174423\"><\/AnnotationDrawer><div>When a space is occupied for multiple purposes involving different occupant loads the sign shall read as follows: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174424\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174424\"><\/AnnotationDrawer><div style=\"margin-bottom=10pt\">&#160;<div class=\"xsl-table\">",
+      "id" : "16353-html-1",
+      "kind" : "html",
+      "plainText" : "When a space is occupied for multiple purposes involving different occupant loads the sign shall read as follows:"
+    },
+    {
+      "html" : "<table cellSpacing=\"0\" style=\"width: &#10;                  700px&#10;                ;\"><colgroup><col width=\"82.286%&#10;              \"><\/col><\/colgroup><tbody><tr><td style=\"word-wrap:break-word;padding-left:.075in;padding-right:.075in;padding-top:.022in;padding-bottom:.022in;border-top:1pt solid #000000;border-bottom:1pt solid #000000;border-left:1pt solid #000000;border-right:1pt solid #000000;\"><div><div style=\"text-align:center;\">OCCUPANCY BY MORE THAN<br><\/br><br><\/br>(number) . . . . . PERSONS AS (type of occupancy) . . . . .<br><\/br><br><\/br>OR BY<br><\/br><br><\/br>(number) . . . . . PERSONS AS (type of occupancy) . . . . .<br><\/br><br><\/br>OR BY<br><\/br><br><\/br>(number) . . . . . PERSONS AS (type of occupancy) . . . . .<br><\/br><br><\/br>IS DANGEROUS AND UNLAWFUL<br><\/br><br><\/br>Certificate of Operation No. . . . . . . (where applicable)<br><\/br><br><\/br>Commissioner, Dept. of Buildings, City of New York<\/div><\/div><\/td><\/tr><\/tbody><\/table>",
+      "id" : "16353-table-2",
+      "kind" : "table"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16353
+}

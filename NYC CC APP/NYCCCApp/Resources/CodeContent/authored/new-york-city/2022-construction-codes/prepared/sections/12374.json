@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162805\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162805\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A sewage pump or sewage ejector shall automatically discharge the contents of the pit to the building drainage system downstream of the house trap<\/span><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162806\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162806\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exceptions: <\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Macerating toilet systems that comply with ASME A112.3.4\/CSA B45.9 and installed in accordance with the manufacturer's instructions. Macerating toilet systems shall be permitted to discharge to a horizontal drain or stack in accordance with Section 712.3.5.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12374-html-1",
+      "kind" : "html",
+      "plainText" : "A sewage pump or sewage ejector shall automatically discharge the contents of the pit to the building drainage system downstream of the house trap . \n\n Exceptions: Macerating toilet systems that comply with ASME A112.3.4\/CSA B45.9 and installed in accordance with the manufacturer's instructions. Macerating toilet systems shall be permitted to discharge to a horizontal drain or stack in accordance with Section 712.3.5."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12374
+}

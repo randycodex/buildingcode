@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192209\"><\/AnnotationDrawer><div>Add section 4.5 as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192210\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192210\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">4.5<\/span> Splines shall not be considered as providing nor shall be used for providing structural support for the ceiling material.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-192211\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-192211\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-192211\"><\/AnnotationDrawer><h6><a name=\"JD_BCR103\" id=\"JD_BCR103\" title=\"BC R103\"><\/a>Section BC R103: Modifications to ASTM C 636 &#8211; Standard Practice for Installation of Metal Ceiling Suspension systems for Acoustical Tile and Lay-in Panels<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13730-html-1",
+      "kind" : "html",
+      "plainText" : "Add section 4.5 as follows:\n\n 4.5 Splines shall not be considered as providing nor shall be used for providing structural support for the ceiling material.\n\n Section BC R103: Modifications to ASTM C 636 - Standard Practice for Installation of Metal Ceiling Suspension systems for Acoustical Tile and Lay-in Panels"
+    }
+  ],
+  "chapterNumber" : "R",
+  "schemaVersion" : 1,
+  "sectionID" : 13730
+}

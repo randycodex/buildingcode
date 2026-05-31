@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187657\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187657\"><\/AnnotationDrawer><div>No person shall at any time make any required safety device or electrical protective device inoperative except when necessary during tests, inspections, and maintenance.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187658\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187658\"><\/AnnotationDrawer><div>Immediately upon completion of the tests, inspections, and maintenance, such devices shall be restored to their normal operating condition in conformance with the applicable requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-187659\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-187659\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-187659\"><\/AnnotationDrawer><h6><a name=\"JD_BC3318\" id=\"JD_BC3318\" title=\"BC 3318\"><\/a>Section BC 3318: Personnel Hoists<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6783-html-1",
+      "kind" : "html",
+      "plainText" : "No person shall at any time make any required safety device or electrical protective device inoperative except when necessary during tests, inspections, and maintenance.\n\n Immediately upon completion of the tests, inspections, and maintenance, such devices shall be restored to their normal operating condition in conformance with the applicable requirements of this section.\n\n Section BC 3318: Personnel Hoists"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6783
+}

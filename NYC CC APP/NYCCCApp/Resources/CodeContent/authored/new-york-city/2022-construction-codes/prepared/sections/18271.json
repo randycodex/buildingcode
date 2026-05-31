@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180440\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180440\"><\/AnnotationDrawer><div>Reinforcement partially embedded in concrete shall not be field bent, except as shown on the construction documents or permitted by the registered design professional of record.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18271-html-1",
+      "kind" : "html",
+      "plainText" : "Reinforcement partially embedded in concrete shall not be field bent, except as shown on the construction documents or permitted by the registered design professional of record."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18271
+}

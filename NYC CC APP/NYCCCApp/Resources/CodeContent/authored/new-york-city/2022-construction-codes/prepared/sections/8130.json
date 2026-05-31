@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197871\"><\/AnnotationDrawer><div>Pipe with threads that are stripped, chipped, corroded or otherwise damaged shall not be used. Where a weld opens during the operation of cutting or threading, that portion of the pipe shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8130-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe with threads that are stripped, chipped, corroded or otherwise damaged shall not be used. Where a weld opens during the operation of cutting or threading, that portion of the pipe shall not be used."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8130
+}

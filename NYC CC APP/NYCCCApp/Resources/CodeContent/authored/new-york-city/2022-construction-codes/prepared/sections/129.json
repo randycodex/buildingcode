@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165880\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165880\"><\/AnnotationDrawer><div>Assembly Group A occupancy includes, among others, the use of a building or structure or a portion thereof, excluding a dwelling unit, for the gathering of any number of persons for purposes such as civic, social or religious functions, recreation, food or drink consumption, awaiting transportation, or similar group activities; or when occupied by 75 persons or more for educational or instructional purposes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "129-html-1",
+      "kind" : "html",
+      "plainText" : "Assembly Group A occupancy includes, among others, the use of a building or structure or a portion thereof, excluding a dwelling unit, for the gathering of any number of persons for purposes such as civic, social or religious functions, recreation, food or drink consumption, awaiting transportation, or similar group activities; or when occupied by 75 persons or more for educational or instructional purposes."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 129
+}

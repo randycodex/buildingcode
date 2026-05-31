@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183532\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183532\"><\/AnnotationDrawer><div>Emergency power shall be provided for means of egress illumination in accordance with Section 1008.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19207-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency power shall be provided for means of egress illumination in accordance with Section 1008.3."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 19207
+}

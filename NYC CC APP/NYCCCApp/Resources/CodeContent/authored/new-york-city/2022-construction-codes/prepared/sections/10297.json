@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193084\"><\/AnnotationDrawer><div>Condensate drain lines shall be configured to permit the clearing of blockages and performance of maintenance without requiring the drain line to be cut.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10297-html-1",
+      "kind" : "html",
+      "plainText" : "Condensate drain lines shall be configured to permit the clearing of blockages and performance of maintenance without requiring the drain line to be cut."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 10297
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185816\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185816\"><\/AnnotationDrawer><div>Each joist, rafter, truss, and structural wall stud (above or below) shall be aligned vertically in accordance with the limits depicted in Figure B1.2.3-1 of AISI S240.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185817\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185817\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The alignment tolerance depicted in Figure B1.2.3-1 of AISI S240 shall not be required to be met when a structural load distribution member is specified in accordance with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6197-html-1",
+      "kind" : "html",
+      "plainText" : "Each joist, rafter, truss, and structural wall stud (above or below) shall be aligned vertically in accordance with the limits depicted in Figure B1.2.3-1 of AISI S240.\n\n Exception: The alignment tolerance depicted in Figure B1.2.3-1 of AISI S240 shall not be required to be met when a structural load distribution member is specified in accordance with the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6197
+}

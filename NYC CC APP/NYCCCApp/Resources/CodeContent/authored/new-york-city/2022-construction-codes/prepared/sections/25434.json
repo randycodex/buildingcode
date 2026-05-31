@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163421\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163421\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">An accessible cleanout shall be installed on the building side of the trap.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163422\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163422\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163422\"><\/AnnotationDrawer><h6><a name=\"JD_PC1104\" id=\"JD_PC1104\" title=\"PC 1104\"><\/a>Section PC 1104: Conductors and Connections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25434-html-1",
+      "kind" : "html",
+      "plainText" : "An accessible cleanout shall be installed on the building side of the trap. \n\n Section PC 1104: Conductors and Connections"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25434
+}

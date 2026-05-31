@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186537\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186537\"><\/AnnotationDrawer><div>The guardrail system shall be installed so that there exists no horizontal gap larger than 1 inch (25 mm) as measured along the perimeter of the building from the edge of the guardrail system to any building column or facade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20263-html-1",
+      "kind" : "html",
+      "plainText" : "The guardrail system shall be installed so that there exists no horizontal gap larger than 1 inch (25 mm) as measured along the perimeter of the building from the edge of the guardrail system to any building column or facade."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20263
+}

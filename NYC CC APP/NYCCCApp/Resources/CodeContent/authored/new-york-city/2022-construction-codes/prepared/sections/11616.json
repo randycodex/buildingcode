@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196759\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196759\"><\/AnnotationDrawer><div>Air transported to occupied spaces through rock or dust-producing materials by means other than natural convection shall be filtered at the outlet from the heat storage system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196760\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196760\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196760\"><\/AnnotationDrawer><h6><a name=\"JD_MC1403\" id=\"JD_MC1403\" title=\"MC 1403\"><\/a>Section MC 1403: Heat Transfer Fluids<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11616-html-1",
+      "kind" : "html",
+      "plainText" : "Air transported to occupied spaces through rock or dust-producing materials by means other than natural convection shall be filtered at the outlet from the heat storage system.\n\n Section MC 1403: Heat Transfer Fluids"
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 11616
+}

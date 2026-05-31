@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171788\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171788\"><\/AnnotationDrawer><div>Smoke detectors and notification appliances shall be installed in dwelling units and such notification appliances shall activate only in the unit in which the alarm originates. Such detectors and appliances shall be annunciated by dwelling unit at a constantly attended location from which the fire alarm system is capable of being manually activated. Smoke detectors are required in the following areas:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171789\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171789\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Sleeping areas;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171790\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171790\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Every room in the path of the means of egress from the sleeping area to the door leading from the dwelling unit; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171791\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171791\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Each story within the unit, including below-grade stories. For dwelling units with split levels and without an intervening door between the adjacent levels, a smoke detector installed on the upper level shall suffice for the adjacent lower level.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15589-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke detectors and notification appliances shall be installed in dwelling units and such notification appliances shall activate only in the unit in which the alarm originates. Such detectors and appliances shall be annunciated by dwelling unit at a constantly attended location from which the fire alarm system is capable of being manually activated. Smoke detectors are required in the following areas:\n\n 1. Sleeping areas;\n\n 2. Every room in the path of the means of egress from the sleeping area to the door leading from the dwelling unit; and\n\n 3. Each story within the unit, including below-grade stories. For dwelling units with split levels and without an intervening door between the adjacent levels, a smoke detector installed on the upper level shall suffice for the adjacent lower level."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15589
+}

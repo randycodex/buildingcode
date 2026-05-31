@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176931\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176931\"><\/AnnotationDrawer><div>Photovoltaic shingles shall be listed and labeled in accordance with UL 1703.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3368-html-1",
+      "kind" : "html",
+      "plainText" : "Photovoltaic shingles shall be listed and labeled in accordance with UL 1703."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3368
+}

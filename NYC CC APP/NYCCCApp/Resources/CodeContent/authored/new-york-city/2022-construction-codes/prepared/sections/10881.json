@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194814\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194814\"><\/AnnotationDrawer><div>If consent is not granted by the owner of the affected building to do the alteration work required by this section, such owner shall signify his or her refusal in writing to the owner of the new or altered building and to the commissioner; and the owner of the new or altered building having provided the notices required by Section 801.1.1.3 shall thereupon be released from any responsibility for the proper operation of the equipment due to loss of draft and for any health hazard or nuisance that may occur as a result of the new or altered building. Such responsibilities shall then be assumed by the owner of the previously constructed building. Similarly, should such owner fail to grant consent within 45 days from the date of the second notice or fail to signify his or her refusal, he or she shall then assume all responsibilities as prescribed above.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10881-html-1",
+      "kind" : "html",
+      "plainText" : "If consent is not granted by the owner of the affected building to do the alteration work required by this section, such owner shall signify his or her refusal in writing to the owner of the new or altered building and to the commissioner; and the owner of the new or altered building having provided the notices required by Section 801.1.1.3 shall thereupon be released from any responsibility for the proper operation of the equipment due to loss of draft and for any health hazard or nuisance that may occur as a result of the new or altered building. Such responsibilities shall then be assumed by the owner of the previously constructed building. Similarly, should such owner fail to grant consent within 45 days from the date of the second notice or fail to signify his or her refusal, he or she shall then assume all responsibilities as prescribed above."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10881
+}

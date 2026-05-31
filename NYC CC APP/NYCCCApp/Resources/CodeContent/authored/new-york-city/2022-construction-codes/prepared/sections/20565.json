@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187526\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187526\"><\/AnnotationDrawer><div>Hoisting equipment and material handling equipment, including supports and runback structures, shall be designed, installed, and inspected in accordance with the manufacturer's specifications, the requirements of this code, and rules promulgated by the commissioner. If there is a discrepancy, the stricter requirement shall be met.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20565-html-1",
+      "kind" : "html",
+      "plainText" : "Hoisting equipment and material handling equipment, including supports and runback structures, shall be designed, installed, and inspected in accordance with the manufacturer's specifications, the requirements of this code, and rules promulgated by the commissioner. If there is a discrepancy, the stricter requirement shall be met."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20565
+}

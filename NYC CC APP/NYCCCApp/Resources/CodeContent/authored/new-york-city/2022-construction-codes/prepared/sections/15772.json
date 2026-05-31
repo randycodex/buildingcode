@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172364\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172364\"><\/AnnotationDrawer><div>Devices, equipment, components and sequences shall be individually tested. These tests, in addition to those required by other provisions of this code, shall consist of determination of function, sequence and, where applicable, capacity of their installed condition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15772-html-1",
+      "kind" : "html",
+      "plainText" : "Devices, equipment, components and sequences shall be individually tested. These tests, in addition to those required by other provisions of this code, shall consist of determination of function, sequence and, where applicable, capacity of their installed condition."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15772
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176938\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176938\"><\/AnnotationDrawer><div>The use of above-deck thermal insulation shall be permitted provided such insulation is covered with an approved roof covering and passes the tests of NFPA 276 or UL 1256 when tested as an assembly.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176939\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176940\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176940\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Foam plastic roof insulation shall conform to the material and installation requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183091', hash: '#JD_BCCh.26' }}\">Chapter 26<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176941\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176941\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Where a concrete roof deck is used and the above-deck thermal insulation is covered with an approved roof covering.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17199-html-1",
+      "kind" : "html",
+      "plainText" : "The use of above-deck thermal insulation shall be permitted provided such insulation is covered with an approved roof covering and passes the tests of NFPA 276 or UL 1256 when tested as an assembly.\n\n Exceptions: \n\n 1. Foam plastic roof insulation shall conform to the material and installation requirements of Chapter 26 of this code.\n\n 2. Where a concrete roof deck is used and the above-deck thermal insulation is covered with an approved roof covering."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17199
+}

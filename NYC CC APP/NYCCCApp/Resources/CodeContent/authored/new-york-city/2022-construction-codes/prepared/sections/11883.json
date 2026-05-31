@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161562\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161562\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The waste from an automatic clothes washer shall discharge through an air break into a standpipe in accordance with Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162900', hash: '#JD_PC802' }}\">802<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> or into a laundry sink. The trap and fixture drain for an automatic clothes washer standpipe shall be not less than 2 inches (51 mm) in diameter. The fixture drain for the standpipe serving an automatic clothes washer shall connect to a 3-inch (76 mm) or larger diameter fixture branch, building drain, or stack. Automatic clothes washers that discharge by gravity shall be permitted to drain to a waste receptor or an approved trench drain.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161563\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161563\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161563\"><\/AnnotationDrawer><h6><a name=\"JD_PC407\" id=\"JD_PC407\" title=\"PC 407\"><\/a>Section PC 407: Bathtubs<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11883-html-1",
+      "kind" : "html",
+      "plainText" : "The waste from an automatic clothes washer shall discharge through an air break into a standpipe in accordance with Section 802 or into a laundry sink. The trap and fixture drain for an automatic clothes washer standpipe shall be not less than 2 inches (51 mm) in diameter. The fixture drain for the standpipe serving an automatic clothes washer shall connect to a 3-inch (76 mm) or larger diameter fixture branch, building drain, or stack. Automatic clothes washers that discharge by gravity shall be permitted to drain to a waste receptor or an approved trench drain. \n\n Section PC 407: Bathtubs"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11883
+}

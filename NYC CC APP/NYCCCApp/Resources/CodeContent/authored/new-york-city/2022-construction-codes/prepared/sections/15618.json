@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171891\"><\/AnnotationDrawer><div>On and after January 1, 2021, smoke alarms and smoke detectors shall not be installed or replaced in an individual dwelling or sleeping unit, including dwellings or units in prior code buildings, within an area of exclusion determined by a 20 foot (6096 mm) radial distance along a horizontal flow path from a stationary or fixed cooking appliance, unless listed in accordance with the 8th edition of UL 217 for smoke alarms or the 7th edition of UL 268 for smoke detectors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171892\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171892\"><\/AnnotationDrawer><div>(L.L. 2018\/113, 6\/9\/2018, eff. 6\/9\/2018) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15618-html-1",
+      "kind" : "html",
+      "plainText" : "On and after January 1, 2021, smoke alarms and smoke detectors shall not be installed or replaced in an individual dwelling or sleeping unit, including dwellings or units in prior code buildings, within an area of exclusion determined by a 20 foot (6096 mm) radial distance along a horizontal flow path from a stationary or fixed cooking appliance, unless listed in accordance with the 8th edition of UL 217 for smoke alarms or the 7th edition of UL 268 for smoke detectors.\n\n (L.L. 2018\/113, 6\/9\/2018, eff. 6\/9\/2018)"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15618
+}

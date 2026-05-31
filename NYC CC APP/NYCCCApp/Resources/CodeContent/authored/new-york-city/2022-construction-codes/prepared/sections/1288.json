@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169903\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169903\"><\/AnnotationDrawer><div>Damper ratings shall be in accordance with Sections 716.3.2.1 through 716.3.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1288-html-1",
+      "kind" : "html",
+      "plainText" : "Damper ratings shall be in accordance with Sections 716.3.2.1 through 716.3.2.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1288
+}

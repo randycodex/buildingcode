@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167301\"><\/AnnotationDrawer><div>Openings in floors within a housing unit are permitted without a shaft enclosure provided all of the following conditions are met:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167302\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167302\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The entire normally occupied areas so interconnected are open and unobstructed so as to enable observation of the areas by supervisory personnel;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167303\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167303\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Means of egress capacity is sufficient for all occupants from all interconnected cell tiers and areas;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167304\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167304\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The height difference between the floor levels of the highest and lowest cell tiers shall not exceed 23 feet (7010 mm); and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167305\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167305\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Egress from any portion of the cell tier to an exit or exit access door shall not require travel on more than one additional floor level within the housing unit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14299-html-1",
+      "kind" : "html",
+      "plainText" : "Openings in floors within a housing unit are permitted without a shaft enclosure provided all of the following conditions are met:\n\n 1. The entire normally occupied areas so interconnected are open and unobstructed so as to enable observation of the areas by supervisory personnel;\n\n 2. Means of egress capacity is sufficient for all occupants from all interconnected cell tiers and areas;\n\n 3. The height difference between the floor levels of the highest and lowest cell tiers shall not exceed 23 feet (7010 mm); and\n\n 4. Egress from any portion of the cell tier to an exit or exit access door shall not require travel on more than one additional floor level within the housing unit."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14299
+}

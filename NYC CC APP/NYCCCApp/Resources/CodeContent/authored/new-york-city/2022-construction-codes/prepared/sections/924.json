@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168715\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168715\"><\/AnnotationDrawer><div>In each story, the building area shall be such that the sum of the ratios of the actual building area of each separated occupancy divided by the allowable building area of each separated occupancy shall not exceed 1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "924-html-1",
+      "kind" : "html",
+      "plainText" : "In each story, the building area shall be such that the sum of the ratios of the actual building area of each separated occupancy divided by the allowable building area of each separated occupancy shall not exceed 1."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 924
+}

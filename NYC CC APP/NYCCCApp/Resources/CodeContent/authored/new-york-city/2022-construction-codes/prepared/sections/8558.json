@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199089\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199089\"><\/AnnotationDrawer><div>Where the actual height of a vent falls between entries in the height column of the applicable table in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198971', hash: '#JD_FGCTable504.3(1)' }}\">Tables 504.3(1)<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198971', hash: '#JD_FGCTable504.3(7b)' }}\">504.3(7b)<\/Link>, either interpolation shall be used or the lower appliance input rating shown in the table shall be used for FAN Max and NAT Max column values and the higher appliance input rating shall be used for the FAN Min column values.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199090\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199090\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199090\"><\/AnnotationDrawer><h6><a name=\"JD_FGC505\" id=\"JD_FGC505\" title=\"FGC 505\"><\/a>Section FGC 505: Direct-Vent, Integral Vent, Mechanical Vent and Ventilation \/ Exhaust Hood Venting<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8558-html-1",
+      "kind" : "html",
+      "plainText" : "Where the actual height of a vent falls between entries in the height column of the applicable table in Tables 504.3(1) through 504.3(7b) , either interpolation shall be used or the lower appliance input rating shown in the table shall be used for FAN Max and NAT Max column values and the higher appliance input rating shall be used for the FAN Min column values.\n\n Section FGC 505: Direct-Vent, Integral Vent, Mechanical Vent and Ventilation \/ Exhaust Hood Venting"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8558
+}

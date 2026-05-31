@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173475\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173475\"><\/AnnotationDrawer><div>In community residences or intermediate-care facilities classified as Group R-1, R-2 or R-3 occupancies pursuant to Section 308.3.2, Exception 1, 2 or 3, within such facilities, closet doors that latch in the closed position shall be openable from inside the closet, and bathroom doors that latch in the closed position shall be capable of being unlocked from the ingress side.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2273-html-1",
+      "kind" : "html",
+      "plainText" : "In community residences or intermediate-care facilities classified as Group R-1, R-2 or R-3 occupancies pursuant to Section 308.3.2, Exception 1, 2 or 3, within such facilities, closet doors that latch in the closed position shall be openable from inside the closet, and bathroom doors that latch in the closed position shall be capable of being unlocked from the ingress side."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2273
+}

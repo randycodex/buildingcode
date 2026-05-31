@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196096\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196096\"><\/AnnotationDrawer><div>Embedded piping shall be plastic pipe or tubing, in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-195929', hash: '#JD_MC1202' }}\">1202<\/Link>, rated at 100 psi (689.5 kPa) at 180&#176;F (82.2&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24178-html-1",
+      "kind" : "html",
+      "plainText" : "Embedded piping shall be plastic pipe or tubing, in accordance with Section 1202 , rated at 100 psi (689.5 kPa) at 180°F (82.2°C)."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24178
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197947\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197947\"><\/AnnotationDrawer><div>Concealed piping shall not be located in solid partitions and solid walls, unless installed in a ventilated chase or casing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20988-html-1",
+      "kind" : "html",
+      "plainText" : "Concealed piping shall not be located in solid partitions and solid walls, unless installed in a ventilated chase or casing."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20988
+}

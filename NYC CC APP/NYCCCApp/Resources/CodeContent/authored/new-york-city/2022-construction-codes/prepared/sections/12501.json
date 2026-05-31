@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163114\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163114\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The vent for a fixture drain, except where serving a fixture with integral traps, such as water closets, shall connect above the weir of the fixture trap being vented.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12501-html-1",
+      "kind" : "html",
+      "plainText" : "The vent for a fixture drain, except where serving a fixture with integral traps, such as water closets, shall connect above the weir of the fixture trap being vented."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12501
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162500\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162500\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where the waste water temperature will be greater than 140&#176;F (60&#176;C), the sanitary drainage piping material shall be rated for the highest temperature of the waste water.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25082-html-1",
+      "kind" : "html",
+      "plainText" : "Where the waste water temperature will be greater than 140°F (60°C), the sanitary drainage piping material shall be rated for the highest temperature of the waste water."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25082
+}

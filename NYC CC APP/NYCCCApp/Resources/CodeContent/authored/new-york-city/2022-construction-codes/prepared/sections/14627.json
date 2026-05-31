@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168275\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168275\"><\/AnnotationDrawer><div>Quantity limitations in nonproduction laboratories shall be provided in accordance with Section 427.7.1 through 427.7.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14627-html-1",
+      "kind" : "html",
+      "plainText" : "Quantity limitations in nonproduction laboratories shall be provided in accordance with Section 427.7.1 through 427.7.10."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14627
+}

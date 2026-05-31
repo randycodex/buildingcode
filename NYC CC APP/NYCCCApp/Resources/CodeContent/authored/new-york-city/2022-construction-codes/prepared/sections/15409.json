@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171232\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171232\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">An automatic sprinkler system shall be installed for Group B occupancies as provided in Sections 903.2.2.1 and 903.2.2.2. \n\t\t\t\t\t\t\t\t\t\t\t\t\t<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171233\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171233\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">(Am. L.L. 2015\/078, 9\/2\/2015, eff. 12\/31\/2015) \n\t\t\t\t\t\t\t\t\t\t\t\t\t<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15409-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be installed for Group B occupancies as provided in Sections 903.2.2.1 and 903.2.2.2. \n\n (Am. L.L. 2015\/078, 9\/2\/2015, eff. 12\/31\/2015)"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15409
+}

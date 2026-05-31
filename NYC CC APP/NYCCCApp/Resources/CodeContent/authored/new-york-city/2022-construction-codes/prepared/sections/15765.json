@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172336\"><\/AnnotationDrawer><div>The detection and control systems shall be clearly marked at all junctions, accesses and terminations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15765-html-1",
+      "kind" : "html",
+      "plainText" : "The detection and control systems shall be clearly marked at all junctions, accesses and terminations."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15765
+}

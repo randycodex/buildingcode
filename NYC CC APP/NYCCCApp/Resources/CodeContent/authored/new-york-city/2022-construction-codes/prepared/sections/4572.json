@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180820\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180820\"><\/AnnotationDrawer><div>Mortar for masonry construction shall comply with Section 2103.2.1, 2103.2.2, 2103.2.3 or 2103.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4572-html-1",
+      "kind" : "html",
+      "plainText" : "Mortar for masonry construction shall comply with Section 2103.2.1, 2103.2.2, 2103.2.3 or 2103.2.4."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4572
+}

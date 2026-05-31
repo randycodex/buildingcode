@@ -1,0 +1,37 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182401\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182401\"><\/AnnotationDrawer><div>In structures assigned to Seismic Design Category D, floor and roof diaphragms shall be laterally supported by braced wall lines on all edges and connected in accordance with Section 2308.6.7 (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182400', hash: '#JD_BCFigure2308.6.8.2(1)' }}\">Figure 2308.6.8.2(1)<\/Link>).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182402\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182402\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Portions of roofs or floors that do not support braced wall panels above are permitted to extend up to 6 feet (1829 mm) beyond a braced wall line (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182400', hash: '#JD_BCFigure2308.6.8.2(2)' }}\">Figure 2308.6.8.2(2)<\/Link>) provided that the framing members are connected to the braced wall line below in accordance with Section 2308.6.7.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182403\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182403\"><\/AnnotationDrawer><div>",
+      "id" : "5062-html-1",
+      "kind" : "html",
+      "plainText" : "In structures assigned to Seismic Design Category D, floor and roof diaphragms shall be laterally supported by braced wall lines on all edges and connected in accordance with Section 2308.6.7 (see Figure 2308.6.8.2(1) ).\n\n Exception: Portions of roofs or floors that do not support braced wall panels above are permitted to extend up to 6 feet (1829 mm) beyond a braced wall line (see Figure 2308.6.8.2(2) ) provided that the framing members are connected to the braced wall line below in accordance with Section 2308.6.7."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-2308-6-8-2-1-roof-in-sdc-d-not-supported-on-all-edges.jpg\" width=\"672\" height=\"368.133333333333\"><\/img><\/span>",
+      "id" : "5062-image-2",
+      "imageID" : "building-code-figure-2308-6-8-2-1-roof-in-sdc-d-not-supported-on-all-edges.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182404\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182404\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure2308.6.8.2(1)\" id=\"JD_BCFigure2308.6.8.2(1)\" title=\"BC Figure 2308.6.8.2(1)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 2308.6.8.2(1)<br><\/br>Roof in SDC D Not Supported on All Edges<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182405\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182405\"><\/AnnotationDrawer><div>",
+      "id" : "5062-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 2308.6.8.2(1)\n Roof in SDC D Not Supported on All Edges"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-2308-6-8-2-1-roof-in-sdc-d-not-supported-on-all-edges-2.jpg\" width=\"672\" height=\"345.2\"><\/img><\/span>",
+      "id" : "5062-image-4",
+      "imageID" : "building-code-figure-2308-6-8-2-1-roof-in-sdc-d-not-supported-on-all-edges-2.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182406\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182406\"><\/AnnotationDrawer><div class=\"Small\">For SI: 1 foot = 304.8 mm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182407\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182407\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure2308.6.8.2(2)\" id=\"JD_BCFigure2308.6.8.2(2)\" title=\"BC Figure 2308.6.8.2(2)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 2308.6.8.2(2)<br><\/br>Roof Extension in SDC D Beyond Braced Wall Line<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5062-html-5",
+      "kind" : "html",
+      "plainText" : "For SI: 1 foot = 304.8 mm.\n\n Figure 2308.6.8.2(2)\n Roof Extension in SDC D Beyond Braced Wall Line"
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 5062
+}

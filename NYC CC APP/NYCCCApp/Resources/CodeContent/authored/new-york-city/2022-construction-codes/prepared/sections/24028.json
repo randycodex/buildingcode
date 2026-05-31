@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195752\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195752\"><\/AnnotationDrawer><div>Discharge of pressure relief devices, fusible plugs and purge systems for refrigerating systems containing flammable, toxic and highly toxic refrigerants and ammonia shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-143165', hash: '#JD_FC606' }}\">606<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24028-html-1",
+      "kind" : "html",
+      "plainText" : "Discharge of pressure relief devices, fusible plugs and purge systems for refrigerating systems containing flammable, toxic and highly toxic refrigerants and ammonia shall comply with Section 606 of the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24028
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167436\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167436\"><\/AnnotationDrawer><div>The exit access travel distance shall be not greater than 300 feet (91 440 mm) for buildings without a sprinkler system and 400 feet (121 900 mm) for buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14351-html-1",
+      "kind" : "html",
+      "plainText" : "The exit access travel distance shall be not greater than 300 feet (91 440 mm) for buildings without a sprinkler system and 400 feet (121 900 mm) for buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14351
+}

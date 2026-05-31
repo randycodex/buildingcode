@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181925\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181925\"><\/AnnotationDrawer><div>Wood joists or wood structural floors that are closer than 18 inches (457 mm) or wood girders that are closer than 12 inches (305 mm) to the exposed ground in crawl spaces or unexcavated areas located within the perimeter of the building foundation shall be of naturally durable or preservative-treated wood.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18785-html-1",
+      "kind" : "html",
+      "plainText" : "Wood joists or wood structural floors that are closer than 18 inches (457 mm) or wood girders that are closer than 12 inches (305 mm) to the exposed ground in crawl spaces or unexcavated areas located within the perimeter of the building foundation shall be of naturally durable or preservative-treated wood."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18785
+}

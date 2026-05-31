@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198678\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198678\"><\/AnnotationDrawer><div>A Type B or L gas vent shall terminate not less than 5 feet (1524 mm) in vertical height above the highest connected appliance draft hood or flue collar. A Type B-W gas vent shall terminate not less than 12 feet (3657.6 mm) in vertical height above the bottom of the wall furnace.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21254-html-1",
+      "kind" : "html",
+      "plainText" : "A Type B or L gas vent shall terminate not less than 5 feet (1524 mm) in vertical height above the highest connected appliance draft hood or flue collar. A Type B-W gas vent shall terminate not less than 12 feet (3657.6 mm) in vertical height above the bottom of the wall furnace."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21254
+}

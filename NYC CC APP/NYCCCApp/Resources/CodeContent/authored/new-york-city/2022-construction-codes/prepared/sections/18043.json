@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179789\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179789\"><\/AnnotationDrawer><div>The number of axial compression load tests shall satisfy Section 1810.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179790\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179790\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Load tests on helical piles shall not be required, provided the following conditions are satisfied:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179791\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179791\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The helical pile has a torque to capacity ratio approved in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156793', hash: '#JD_28-113.2.1' }}\">28-113.2.1<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code;<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179792\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179792\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;The torque correlation shall demonstrate a factor of safety (FS) of 2.5 on the allowable load; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179793\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179793\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;The maximum allowable axial compression load on the helical pile shall be 10 tons (98 kN). <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18043-html-1",
+      "kind" : "html",
+      "plainText" : "The number of axial compression load tests shall satisfy Section 1810.4.\n\n Exception: Load tests on helical piles shall not be required, provided the following conditions are satisfied:\n\n 1. The helical pile has a torque to capacity ratio approved in accordance with Section 28-113.2.1 of the Administrative Code; \n\n 2. The torque correlation shall demonstrate a factor of safety (FS) of 2.5 on the allowable load; and\n\n 3. The maximum allowable axial compression load on the helical pile shall be 10 tons (98 kN)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18043
+}

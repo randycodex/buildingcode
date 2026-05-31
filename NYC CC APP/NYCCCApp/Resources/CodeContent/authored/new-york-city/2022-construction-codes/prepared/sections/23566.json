@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194377\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194377\"><\/AnnotationDrawer><div>Vibration isolation connectors in duct systems shall be made of an approved flame-retardant fabric or shall consist of sleeve joints with packing of approved material, each having a maximum flame spread index\/rating of 25 and a maximum smoke-developed rating of 50. The fabric shall have a maximum length of 10 inches (254 mm) in the direction of airflow.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194378\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194378\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194378\"><\/AnnotationDrawer><h6><a name=\"JD_MC604\" id=\"JD_MC604\" title=\"MC 604\"><\/a>Section MC 604: Insulation<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23566-html-1",
+      "kind" : "html",
+      "plainText" : "Vibration isolation connectors in duct systems shall be made of an approved flame-retardant fabric or shall consist of sleeve joints with packing of approved material, each having a maximum flame spread index\/rating of 25 and a maximum smoke-developed rating of 50. The fabric shall have a maximum length of 10 inches (254 mm) in the direction of airflow.\n\n Section MC 604: Insulation"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23566
+}

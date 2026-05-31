@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189154\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189154\"><\/AnnotationDrawer><div>A projecting sign shall not be erected on the wall of any building so as to project above the roof or cornice wall or above the roof level where there is no cornice wall; except that a sign erected at a right angle to the building, the horizontal width of which sign is perpendicular to such a wall and does not exceed 24 inches (610 mm), is permitted to be erected to a height not exceeding 5 feet (1524 mm) above the roof or cornice wall or above the roof level where there is no cornice wall. A sign attached to a corner of a building and parallel to the vertical line of such corner shall be deemed to be erected at a right angle to the building wall.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189155\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> On buildings 35 feet (10 668 mm) high or less, projecting signs, not exceeding 24 inches (610 mm) in width, may be erected to a maximum height of 40 feet (12 192 mm) above grade but in no case to a height of more than 15 feet (4572 mm) above the main roof level.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7235-html-1",
+      "kind" : "html",
+      "plainText" : "A projecting sign shall not be erected on the wall of any building so as to project above the roof or cornice wall or above the roof level where there is no cornice wall; except that a sign erected at a right angle to the building, the horizontal width of which sign is perpendicular to such a wall and does not exceed 24 inches (610 mm), is permitted to be erected to a height not exceeding 5 feet (1524 mm) above the roof or cornice wall or above the roof level where there is no cornice wall. A sign attached to a corner of a building and parallel to the vertical line of such corner shall be deemed to be erected at a right angle to the building wall.\n\n Exception: On buildings 35 feet (10 668 mm) high or less, projecting signs, not exceeding 24 inches (610 mm) in width, may be erected to a maximum height of 40 feet (12 192 mm) above grade but in no case to a height of more than 15 feet (4572 mm) above the main roof level."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7235
+}

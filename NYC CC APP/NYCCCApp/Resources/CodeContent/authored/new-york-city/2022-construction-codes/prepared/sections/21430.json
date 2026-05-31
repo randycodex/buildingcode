@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199210\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199210\"><\/AnnotationDrawer><div>All air handled by a nonrecirculating direct-fired industrial air heater, including combustion air, shall be ducted directly from the outdoors.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21430-html-1",
+      "kind" : "html",
+      "plainText" : "All air handled by a nonrecirculating direct-fired industrial air heater, including combustion air, shall be ducted directly from the outdoors."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21430
+}

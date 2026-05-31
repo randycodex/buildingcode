@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183090\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183090\"><\/AnnotationDrawer><div>Reinforced gypsum concrete shall not be used where exposed directly to the weather or where subject to frequent or continuous wetting. Precast units shall be protected by coverings or coatings from the weather and from contact with moisture during shipment and during storage at the work site.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "19060-html-1",
+      "kind" : "html",
+      "plainText" : "Reinforced gypsum concrete shall not be used where exposed directly to the weather or where subject to frequent or continuous wetting. Precast units shall be protected by coverings or coatings from the weather and from contact with moisture during shipment and during storage at the work site."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 19060
+}

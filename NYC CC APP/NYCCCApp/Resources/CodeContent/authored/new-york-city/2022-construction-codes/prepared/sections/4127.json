@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179565\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179565\"><\/AnnotationDrawer><div>Structural steel pipe piles driven open ended shall have a nominal outside diameter of not less than 8 inches (203.2 mm). The pipe shall have a minimum of 0.34 square inches (219.4 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of steel in cross section to resist each 1,000 foot-pounds (1356 N<span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;\">&#215;<\/span>m) of energy from the hammer used to install deep foundation elements or the equivalent strength for steels having a yield strength greater than 35,000 psi (241.3 MPa), or the wave equation analysis shall be permitted to be used to assess compression stresses induced by driving to evaluate if the structural steel pipe pile section is appropriate for the selected hammer. Where pipe wall thickness less than 0.188 inch (4.8 mm) is driven open ended, a suitable cutting shoe shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4127-html-1",
+      "kind" : "html",
+      "plainText" : "Structural steel pipe piles driven open ended shall have a nominal outside diameter of not less than 8 inches (203.2 mm). The pipe shall have a minimum of 0.34 square inches (219.4 mm\n\n 2 \n\n ) of steel in cross section to resist each 1,000 foot-pounds (1356 N &#215; m) of energy from the hammer used to install deep foundation elements or the equivalent strength for steels having a yield strength greater than 35,000 psi (241.3 MPa), or the wave equation analysis shall be permitted to be used to assess compression stresses induced by driving to evaluate if the structural steel pipe pile section is appropriate for the selected hammer. Where pipe wall thickness less than 0.188 inch (4.8 mm) is driven open ended, a suitable cutting shoe shall be provided."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4127
+}

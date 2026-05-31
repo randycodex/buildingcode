@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168273\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168273\"><\/AnnotationDrawer><div>A manual fire alarm system shall be installed in accordance with Section 907.2.2, 907.2.3, or 907.2.6, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14626-html-1",
+      "kind" : "html",
+      "plainText" : "A manual fire alarm system shall be installed in accordance with Section 907.2.2, 907.2.3, or 907.2.6, as applicable."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14626
+}

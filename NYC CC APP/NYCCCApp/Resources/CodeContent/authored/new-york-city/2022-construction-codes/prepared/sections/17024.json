@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176433\"><\/AnnotationDrawer><div>EIFS installations containing foam plastic insulation shall be fireblocked in accordance with Section 718.2.6.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17024-html-1",
+      "kind" : "html",
+      "plainText" : "EIFS installations containing foam plastic insulation shall be fireblocked in accordance with Section 718.2.6.1."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 17024
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172542\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172542\"><\/AnnotationDrawer><div>Where building air-handling and mechanical smoke removal systems are combined or where independent building air-handling systems are provided, fans shall automatically shut down in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>. The manual controls provided for the smoke removal system shall have the capability to override the automatic shutdown of fans that are part of the smoke removal system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2016-html-1",
+      "kind" : "html",
+      "plainText" : "Where building air-handling and mechanical smoke removal systems are combined or where independent building air-handling systems are provided, fans shall automatically shut down in accordance with the New York City Mechanical Code . The manual controls provided for the smoke removal system shall have the capability to override the automatic shutdown of fans that are part of the smoke removal system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2016
+}

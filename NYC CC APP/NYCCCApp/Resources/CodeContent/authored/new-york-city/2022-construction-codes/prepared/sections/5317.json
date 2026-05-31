@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183378\"><\/AnnotationDrawer><div>Individual roof panels shall be separated from each other by a distance of not less than 4 feet (1219 mm) measured in a horizontal plane.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183379\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183380\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183380\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The separation between roof panels is not required in a building equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183381\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183381\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;The separation between roof panels is not required in low-hazard occupancy buildings complying with the conditions of Section 2609.4, Exception 2 or 3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5317-html-1",
+      "kind" : "html",
+      "plainText" : "Individual roof panels shall be separated from each other by a distance of not less than 4 feet (1219 mm) measured in a horizontal plane.\n\n Exceptions: \n\n 1. The separation between roof panels is not required in a building equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.\n\n 2. The separation between roof panels is not required in low-hazard occupancy buildings complying with the conditions of Section 2609.4, Exception 2 or 3."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5317
+}

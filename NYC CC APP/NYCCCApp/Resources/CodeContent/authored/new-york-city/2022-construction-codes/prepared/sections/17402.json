@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177742\"><\/AnnotationDrawer><div>The design pressure and suction acting over the entire roof including purlins, roofing, and other roof elements (including their fastenings) shall be not less than 48 psf (2.30 kN\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17402-html-1",
+      "kind" : "html",
+      "plainText" : "The design pressure and suction acting over the entire roof including purlins, roofing, and other roof elements (including their fastenings) shall be not less than 48 psf (2.30 kN\/m\n\n 2 \n\n )."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17402
+}

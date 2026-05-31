@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193681\"><\/AnnotationDrawer><div>Parts of fans in contact with explosive or flammable vapors, fumes or dusts shall be of nonferrous or nonsparking materials, or their casing shall be lined or constructed of such material. Where the size and hardness of materials passing through a fan are capable of producing a spark, both the fan and the casing shall be of nonsparking materials. Where fans are required to be spark resistant, their bearings shall not be within the airstream, and all parts of the fan shall be grounded. Fans in systems-handling materials that are capable of clogging the blades, and fans in buffing or woodworking exhaust systems, shall be of the radial-blade or tube-axial type.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10514-html-1",
+      "kind" : "html",
+      "plainText" : "Parts of fans in contact with explosive or flammable vapors, fumes or dusts shall be of nonferrous or nonsparking materials, or their casing shall be lined or constructed of such material. Where the size and hardness of materials passing through a fan are capable of producing a spark, both the fan and the casing shall be of nonsparking materials. Where fans are required to be spark resistant, their bearings shall not be within the airstream, and all parts of the fan shall be grounded. Fans in systems-handling materials that are capable of clogging the blades, and fans in buffing or woodworking exhaust systems, shall be of the radial-blade or tube-axial type."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10514
+}

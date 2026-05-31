@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186017\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186017\"><\/AnnotationDrawer><div>No bearing partition shall be removed from any floor until the floor framing system on the floor above has been removed and lowered. All header beams and headers at stair openings and chimneys shall be carefully examined and, where required, shall be shored from the cellar floor through successive floors. All operations shall be continually monitored by a qualified person designated by the permit holder as the work progresses to detect any hazards that may develop.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6266-html-1",
+      "kind" : "html",
+      "plainText" : "No bearing partition shall be removed from any floor until the floor framing system on the floor above has been removed and lowered. All header beams and headers at stair openings and chimneys shall be carefully examined and, where required, shall be shored from the cellar floor through successive floors. All operations shall be continually monitored by a qualified person designated by the permit holder as the work progresses to detect any hazards that may develop."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6266
+}

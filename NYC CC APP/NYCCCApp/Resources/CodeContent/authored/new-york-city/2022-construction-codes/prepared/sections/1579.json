@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171227\"><\/AnnotationDrawer><div>Where an occupied roof has an assembly occupancy with an occupant load exceeding 100 for Group A-2 and 300 for other Group A occupancies, all floors between the occupied roof and the level of exit discharge shall be equipped with an automatic sprinkler system in accordance with Section 903.3.1.1 or 903.3.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171228\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171228\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Open parking garages of Type I or Type II construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1579-html-1",
+      "kind" : "html",
+      "plainText" : "Where an occupied roof has an assembly occupancy with an occupant load exceeding 100 for Group A-2 and 300 for other Group A occupancies, all floors between the occupied roof and the level of exit discharge shall be equipped with an automatic sprinkler system in accordance with Section 903.3.1.1 or 903.3.1.2.\n\n Exception: Open parking garages of Type I or Type II construction."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1579
+}

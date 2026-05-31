@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187855\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187855\"><\/AnnotationDrawer><div>Data collected by the event recorder shall be made available to the commissioner upon request.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187856\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187856\"><\/AnnotationDrawer><div>(L.L. 2017\/079, 5\/10\/2017, eff. 1\/1\/2019; Am. L.L. 2018\/013, 12\/31\/2017, eff. 4\/30\/2018) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20647-html-1",
+      "kind" : "html",
+      "plainText" : "Data collected by the event recorder shall be made available to the commissioner upon request.\n\n (L.L. 2017\/079, 5\/10\/2017, eff. 1\/1\/2019; Am. L.L. 2018\/013, 12\/31\/2017, eff. 4\/30\/2018)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20647
+}

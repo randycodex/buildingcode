@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199083\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199083\"><\/AnnotationDrawer><div>Interpolation shall be permitted in calculating capacities for vent dimensions that fall between table entries.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8555-html-1",
+      "kind" : "html",
+      "plainText" : "Interpolation shall be permitted in calculating capacities for vent dimensions that fall between table entries."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8555
+}

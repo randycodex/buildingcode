@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193712\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193712\"><\/AnnotationDrawer><div>Transition ducts used to connect the dryer to the exhaust duct system shall be a single length that is listed and labeled in accordance with UL 2158A. Transition ducts shall be not greater than 8 feet (2438.4 mm) in length and shall not be concealed within construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10528-html-1",
+      "kind" : "html",
+      "plainText" : "Transition ducts used to connect the dryer to the exhaust duct system shall be a single length that is listed and labeled in accordance with UL 2158A. Transition ducts shall be not greater than 8 feet (2438.4 mm) in length and shall not be concealed within construction."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10528
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193573\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193573\"><\/AnnotationDrawer><div>Class I liquids shall not be stored or used within a building having a basement or pit into which flammable vapors can travel, unless such area is provided with ventilation designed to prevent the accumulation of flammable vapors therein.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10474-html-1",
+      "kind" : "html",
+      "plainText" : "Class I liquids shall not be stored or used within a building having a basement or pit into which flammable vapors can travel, unless such area is provided with ventilation designed to prevent the accumulation of flammable vapors therein."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10474
+}

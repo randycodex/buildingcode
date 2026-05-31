@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177428\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177428\"><\/AnnotationDrawer><div>In addition to any other applicable live loads, lifeline anchorages and structural elements that support lifeline anchorages shall be designed for a live load of at least 3,100 pounds (13.8 kN) for each attached lifeline, in every direction that a fall arrest load may be applied.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3501-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to any other applicable live loads, lifeline anchorages and structural elements that support lifeline anchorages shall be designed for a live load of at least 3,100 pounds (13.8 kN) for each attached lifeline, in every direction that a fall arrest load may be applied."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3501
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173765\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173765\"><\/AnnotationDrawer><div>Where changes in direction of travel occur at landings provided between ramp runs, the landing shall be 60 inches by 60 inches (1524 mm by 1524 mm) minimum.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173766\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173766\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> In Group R-2 and R-3 individual dwelling or sleeping units that are not required to be Accessible units, Type B+NYC units or Type B units in &#8211; accordance with Section 1107, landings are permitted to be 36 inches by 36 inches (914.4 mm by 914.4 mm) minimum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2353-html-1",
+      "kind" : "html",
+      "plainText" : "Where changes in direction of travel occur at landings provided between ramp runs, the landing shall be 60 inches by 60 inches (1524 mm by 1524 mm) minimum.\n\n Exception: In Group R-2 and R-3 individual dwelling or sleeping units that are not required to be Accessible units, Type B+NYC units or Type B units in - accordance with Section 1107, landings are permitted to be 36 inches by 36 inches (914.4 mm by 914.4 mm) minimum."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2353
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170254\"><\/AnnotationDrawer><div>The finish coat is not required for plaster protective coatings where such coatings comply with the design mix and thickness requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170185', hash: '#JD_BCTable721.1(1)' }}\">Tables 721.1(1)<\/Link>, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170185', hash: '#JD_BCTable721.1(2)' }}\">721.1(2)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170185', hash: '#JD_BCTable721.1(3)' }}\">721.1(3)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15196-html-1",
+      "kind" : "html",
+      "plainText" : "The finish coat is not required for plaster protective coatings where such coatings comply with the design mix and thickness requirements of Tables 721.1(1) , 721.1(2) and 721.1(3) ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15196
+}

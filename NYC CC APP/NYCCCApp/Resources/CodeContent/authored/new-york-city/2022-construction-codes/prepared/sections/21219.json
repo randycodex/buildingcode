@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198564\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198564\"><\/AnnotationDrawer><div>Plastic pipe and fittings used to vent appliances shall be installed in accordance with the appliance manufacturer's instructions. Where a primer is required, it shall be of a contrasting color.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21219-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic pipe and fittings used to vent appliances shall be installed in accordance with the appliance manufacturer's instructions. Where a primer is required, it shall be of a contrasting color."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21219
+}

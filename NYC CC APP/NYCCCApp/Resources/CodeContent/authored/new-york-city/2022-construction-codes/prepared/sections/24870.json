@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161944\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161944\"><\/AnnotationDrawer><div>The pump room or enclosure around a well pump shall be drained and protected from freezing by heating or other approved means. Where pumps are installed in basements, such pumps shall be mounted on a block or shelf not less than 18 inches (457 mm) above the basement floor. Well pits shall be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161945\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161945\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161945\"><\/AnnotationDrawer><h6><a name=\"JD_PC603\" id=\"JD_PC603\" title=\"PC 603\"><\/a>Section PC 603: Water Service<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24870-html-1",
+      "kind" : "html",
+      "plainText" : "The pump room or enclosure around a well pump shall be drained and protected from freezing by heating or other approved means. Where pumps are installed in basements, such pumps shall be mounted on a block or shelf not less than 18 inches (457 mm) above the basement floor. Well pits shall be prohibited.\n\n Section PC 603: Water Service"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24870
+}

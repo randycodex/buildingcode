@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171414\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171414\"><\/AnnotationDrawer><div>Automatic sprinkler systems shall be automatically actuated unless specifically provided for in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15466-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic sprinkler systems shall be automatically actuated unless specifically provided for in this code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15466
+}

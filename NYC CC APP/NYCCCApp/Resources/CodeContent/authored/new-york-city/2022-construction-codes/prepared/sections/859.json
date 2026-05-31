@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168480\"><\/AnnotationDrawer><div>Where located in a building that is required to be protected by an automatic sprinkler system, equipment platforms shall be fully protected by sprinklers above and below the platform, where required by the standards referenced in Section 903.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "859-html-1",
+      "kind" : "html",
+      "plainText" : "Where located in a building that is required to be protected by an automatic sprinkler system, equipment platforms shall be fully protected by sprinklers above and below the platform, where required by the standards referenced in Section 903.3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 859
+}

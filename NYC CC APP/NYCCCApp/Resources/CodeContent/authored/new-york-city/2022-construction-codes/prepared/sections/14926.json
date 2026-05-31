@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169381\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169381\"><\/AnnotationDrawer><div>Smoke-barrier walls used to enclose areas of refuge in accordance with Section 1009.6.4, or to enclose elevator lobbies in accordance with Sections 405.4.3, 3007.6.2, or 3008.7.2, shall form an effective membrane enclosure that terminates at a fire barrier wall, provided such fire barrier wall has a level of fire protection rating not less than 1 hour, or that terminates at another smoke barrier wall or an outside wall. A smoke and draft control door assembly as specified in Section 716.5.3.1 shall not be required at each elevator hoistway door opening or at each exit doorway between an area of refuge and the enclosure of interior exit stairways or ramps or exit passageways.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14926-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke-barrier walls used to enclose areas of refuge in accordance with Section 1009.6.4, or to enclose elevator lobbies in accordance with Sections 405.4.3, 3007.6.2, or 3008.7.2, shall form an effective membrane enclosure that terminates at a fire barrier wall, provided such fire barrier wall has a level of fire protection rating not less than 1 hour, or that terminates at another smoke barrier wall or an outside wall. A smoke and draft control door assembly as specified in Section 716.5.3.1 shall not be required at each elevator hoistway door opening or at each exit doorway between an area of refuge and the enclosure of interior exit stairways or ramps or exit passageways."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14926
+}

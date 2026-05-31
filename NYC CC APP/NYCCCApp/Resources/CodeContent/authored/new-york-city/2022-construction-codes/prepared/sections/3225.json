@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176534\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176534\"><\/AnnotationDrawer><div>When scuppers are used for secondary (emergency overflow) roof drainage, the quantity, size, location and inlet elevation of the scuppers shall be sized to prevent the depth of ponding water from exceeding that for which the roof was designed as determined by Section 1611.1. Scuppers shall not have an opening dimension of less than 4 inches (101.6 mm). The flow through the primary system shall not be considered when locating and sizing scuppers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3225-html-1",
+      "kind" : "html",
+      "plainText" : "When scuppers are used for secondary (emergency overflow) roof drainage, the quantity, size, location and inlet elevation of the scuppers shall be sized to prevent the depth of ponding water from exceeding that for which the roof was designed as determined by Section 1611.1. Scuppers shall not have an opening dimension of less than 4 inches (101.6 mm). The flow through the primary system shall not be considered when locating and sizing scuppers."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3225
+}

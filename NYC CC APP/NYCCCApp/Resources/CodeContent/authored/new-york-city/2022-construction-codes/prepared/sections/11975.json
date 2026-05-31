@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161770\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The hot water supplied to bathtubs and whirlpool bathtubs, including bathtubs equipped with hand-held showers, shall be limited to a maximum temperature of 120&#176;F (49&#176;C) by a water-temperature limiting device that conforms to ASSE 1070 or CSA B125.3, except where such protection is otherwise provided by a combination tub\/shower valve in accordance with Section 424.3.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11975-html-1",
+      "kind" : "html",
+      "plainText" : "The hot water supplied to bathtubs and whirlpool bathtubs, including bathtubs equipped with hand-held showers, shall be limited to a maximum temperature of 120°F (49°C) by a water-temperature limiting device that conforms to ASSE 1070 or CSA B125.3, except where such protection is otherwise provided by a combination tub\/shower valve in accordance with Section 424.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11975
+}

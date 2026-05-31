@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178484\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178484\"><\/AnnotationDrawer><div>The cohesive\/adhesive bond strength of the cured sprayed fire-resistant material applied to floor, roof and wall assemblies and structural members shall not be less than 150 pounds per square foot (psf) (7.18 kN\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t). The cohesive\/adhesive bond strength shall be determined in accordance with the field test specified in ASTM E 736 by testing in-place samples of the sprayed fire-resistant material selected in accordance with Sections 1705.14.6.1 through 1705.14.6.3 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178485\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178485\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> For high-rise buildings, as described in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166650', hash: '#JD_BC403' }}\">403<\/Link> of this code, refer to the requirements for minimum bond strength in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166685', hash: '#JD_BCTable403.2.4' }}\">Table 403.2.4<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3778-html-1",
+      "kind" : "html",
+      "plainText" : "The cohesive\/adhesive bond strength of the cured sprayed fire-resistant material applied to floor, roof and wall assemblies and structural members shall not be less than 150 pounds per square foot (psf) (7.18 kN\/m\n\n 2 \n\n ). The cohesive\/adhesive bond strength shall be determined in accordance with the field test specified in ASTM E 736 by testing in-place samples of the sprayed fire-resistant material selected in accordance with Sections 1705.14.6.1 through 1705.14.6.3 of this code.\n\n Exception: For high-rise buildings, as described in Section 403 of this code, refer to the requirements for minimum bond strength in Table 403.2.4 of this code."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3778
+}

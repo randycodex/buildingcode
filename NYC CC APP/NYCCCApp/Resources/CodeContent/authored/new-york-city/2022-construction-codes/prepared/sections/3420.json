@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177080\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177080\"><\/AnnotationDrawer><div>Loads indicated in the applicable prior code shall be permitted for structural calculations using engineering formulas from this code provided that the structural safety of the prior code building is not reduced.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3420-html-1",
+      "kind" : "html",
+      "plainText" : "Loads indicated in the applicable prior code shall be permitted for structural calculations using engineering formulas from this code provided that the structural safety of the prior code building is not reduced."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3420
+}

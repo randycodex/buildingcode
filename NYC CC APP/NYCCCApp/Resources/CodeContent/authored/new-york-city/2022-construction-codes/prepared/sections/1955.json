@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172388\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172388\"><\/AnnotationDrawer><div>A complete report of testing shall be prepared by the special inspector or approved agency. The report shall include identification of all devices by manufacturer, nameplate data, design values, measured values and identification tag or mark. The report shall be reviewed by the responsible engineer and, when satisfied that the design intent has been achieved, the engineer shall seal, sign and date the report.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1955-html-1",
+      "kind" : "html",
+      "plainText" : "A complete report of testing shall be prepared by the special inspector or approved agency. The report shall include identification of all devices by manufacturer, nameplate data, design values, measured values and identification tag or mark. The report shall be reviewed by the responsible engineer and, when satisfied that the design intent has been achieved, the engineer shall seal, sign and date the report."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1955
+}

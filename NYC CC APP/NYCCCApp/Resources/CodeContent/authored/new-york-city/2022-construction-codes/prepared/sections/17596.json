@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178462\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178462\"><\/AnnotationDrawer><div>For design thicknesses 1 inch (25.4 mm) or greater, the minimum allowable individual thickness shall be the design thickness minus 1\/4 inch (6.4 mm). For design thicknesses less than 1 inch (25.4 mm), the minimum allowable individual thickness shall be the design thickness minus 25 percent. Thickness shall be determined in accordance with ASTM E 605. Samples of the sprayed fire-resistant materials shall be selected in accordance with Sections 1705.14.4.2 through 1705.14.4.9 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17596-html-1",
+      "kind" : "html",
+      "plainText" : "For design thicknesses 1 inch (25.4 mm) or greater, the minimum allowable individual thickness shall be the design thickness minus 1\/4 inch (6.4 mm). For design thicknesses less than 1 inch (25.4 mm), the minimum allowable individual thickness shall be the design thickness minus 25 percent. Thickness shall be determined in accordance with ASTM E 605. Samples of the sprayed fire-resistant materials shall be selected in accordance with Sections 1705.14.4.2 through 1705.14.4.9 of this code."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17596
+}

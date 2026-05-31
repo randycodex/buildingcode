@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173250\"><\/AnnotationDrawer><div>Platform lifts on an accessible means of egress shall not be installed in a fully enclosed hoistway.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2225-html-1",
+      "kind" : "html",
+      "plainText" : "Platform lifts on an accessible means of egress shall not be installed in a fully enclosed hoistway."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2225
+}

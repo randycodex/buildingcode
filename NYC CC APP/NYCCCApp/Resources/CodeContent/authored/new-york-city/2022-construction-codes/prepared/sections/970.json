@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168974\"><\/AnnotationDrawer><div>Where materials, systems or devices that have not been tested as part of a fire-resistance-rated assembly are incorporated into the building element component or assembly, sufficient data shall be made available to the commissioner to show that the required fire-resistance rating is not reduced. Materials and methods of construction used to protect joints and penetrations in fire-resistance-rated building elements, components or assemblies shall not reduce the required fire-resistance rating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "970-html-1",
+      "kind" : "html",
+      "plainText" : "Where materials, systems or devices that have not been tested as part of a fire-resistance-rated assembly are incorporated into the building element component or assembly, sufficient data shall be made available to the commissioner to show that the required fire-resistance rating is not reduced. Materials and methods of construction used to protect joints and penetrations in fire-resistance-rated building elements, components or assemblies shall not reduce the required fire-resistance rating."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 970
+}

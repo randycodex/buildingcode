@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177974\"><\/AnnotationDrawer><div>Where specifically required by Section 1617.1, elements and components shall be designed to resist the forces calculated using the combination specified in Section 1605.4 or 1605.6 as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3620-html-1",
+      "kind" : "html",
+      "plainText" : "Where specifically required by Section 1617.1, elements and components shall be designed to resist the forces calculated using the combination specified in Section 1605.4 or 1605.6 as applicable."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3620
+}

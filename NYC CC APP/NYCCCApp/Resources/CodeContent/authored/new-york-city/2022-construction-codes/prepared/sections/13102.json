@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188859\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188859\"><\/AnnotationDrawer><div>Temporary stairs and ramps for an existing building or portions thereof shall be permitted to provide elevated ingress and egress in compliance with Item 3 of Section 6.2.2 of ASCE 24, including as a required means of egress for dwelling units or for areas described in Item 2.2.1 of Section G304.1.2 required to be located at or above the design flood elevation, where such temporary stairs and ramps comply with Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173195', hash: '#JD_BC1009' }}\">1009<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173307', hash: '#JD_BC1010' }}\">1010<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13102-html-1",
+      "kind" : "html",
+      "plainText" : "Temporary stairs and ramps for an existing building or portions thereof shall be permitted to provide elevated ingress and egress in compliance with Item 3 of Section 6.2.2 of ASCE 24, including as a required means of egress for dwelling units or for areas described in Item 2.2.1 of Section G304.1.2 required to be located at or above the design flood elevation, where such temporary stairs and ramps comply with Sections 1009 and 1010 ."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13102
+}

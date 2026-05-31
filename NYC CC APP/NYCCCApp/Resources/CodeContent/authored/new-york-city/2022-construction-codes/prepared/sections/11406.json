@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196209\"><\/AnnotationDrawer><div>The transfer fluid shall be compatible with the makeup water supplied to the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11406-html-1",
+      "kind" : "html",
+      "plainText" : "The transfer fluid shall be compatible with the makeup water supplied to the system."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11406
+}

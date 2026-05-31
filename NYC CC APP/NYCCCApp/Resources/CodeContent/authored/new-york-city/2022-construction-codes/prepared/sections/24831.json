@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161844\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161844\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Potable water-heating devices that utilize refrigerant-to-water heat exchangers shall be approved and installed in accordance with this code, the applicable provisions of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> and the manufacturer's instructions.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161845\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161845\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161845\"><\/AnnotationDrawer><h6><a name=\"JD_PC502\" id=\"JD_PC502\" title=\"PC 502\"><\/a>Section PC 502: Installation<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24831-html-1",
+      "kind" : "html",
+      "plainText" : "Potable water-heating devices that utilize refrigerant-to-water heat exchangers shall be approved and installed in accordance with this code, the applicable provisions of the New York City Energy Conservation Code and the manufacturer's instructions. \n\n Section PC 502: Installation"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 24831
+}

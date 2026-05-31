@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161865\"><\/AnnotationDrawer><div>An approved means, such as a cold water \"dip\" tube with a hole at the top or a vacuum relief valve installed in the cold water supply line above the top of the heater or tank, shall be provided to prevent siphoning of any storage water heater or tank.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12015-html-1",
+      "kind" : "html",
+      "plainText" : "An approved means, such as a cold water \"dip\" tube with a hole at the top or a vacuum relief valve installed in the cold water supply line above the top of the heater or tank, shall be provided to prevent siphoning of any storage water heater or tank."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 12015
+}

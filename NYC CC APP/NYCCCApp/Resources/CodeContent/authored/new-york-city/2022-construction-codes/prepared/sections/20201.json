@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186335\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186335\"><\/AnnotationDrawer><div>To the extent permissible under the zoning resolution, approved artwork or alternative artwork, as selected by the owner of a property at which a temporary protective structure has been installed, shall be displayed on such temporary protective structure as provided in this section. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186336\"><\/AnnotationDrawer><div>(L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20201-html-1",
+      "kind" : "html",
+      "plainText" : "To the extent permissible under the zoning resolution, approved artwork or alternative artwork, as selected by the owner of a property at which a temporary protective structure has been installed, shall be displayed on such temporary protective structure as provided in this section. \n\n (L.L. 2021\/163, 12\/24\/2021, eff. 9\/1\/2023)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20201
+}

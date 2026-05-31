@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178585\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178585\"><\/AnnotationDrawer><div>The special inspector shall perform periodic inspection of the pipe joining and welding operations in accordance with the above. Radiographic testing shall be applied to connections as indicated in Section 1211.2.2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>. Unacceptable connections and installations shall be rejected.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3811-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall perform periodic inspection of the pipe joining and welding operations in accordance with the above. Radiographic testing shall be applied to connections as indicated in Section 1211.2.2 of the New York City Mechanical Code . Unacceptable connections and installations shall be rejected."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3811
+}

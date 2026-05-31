@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163968\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The test hole shall be dug or bored. The test hole shall have vertical sides and a horizontal dimension of 4 inches to 8 inches (102 mm to 203 mm). The bottom and sides of the hole shall be scratched with a sharp-pointed instrument to expose the natural soil. All loose material shall be removed from the hole and the bottom shall be covered with 2 inches (51 mm) of gravel or coarse sand.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12807-html-1",
+      "kind" : "html",
+      "plainText" : "The test hole shall be dug or bored. The test hole shall have vertical sides and a horizontal dimension of 4 inches to 8 inches (102 mm to 203 mm). The bottom and sides of the hole shall be scratched with a sharp-pointed instrument to expose the natural soil. All loose material shall be removed from the hole and the bottom shall be covered with 2 inches (51 mm) of gravel or coarse sand."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 12807
+}

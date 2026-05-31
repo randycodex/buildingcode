@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172013\"><\/AnnotationDrawer><div>Where fire alarm systems are not required to be monitored by a supervising station, an approved permanent sign that reads: WHEN ALARM SOUNDS &#8211; CALL 911 shall be installed adjacent to each manual fire alarm box.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172014\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172014\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where the manufacturer has permanently provided this information on the manual fire alarm box.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15656-html-1",
+      "kind" : "html",
+      "plainText" : "Where fire alarm systems are not required to be monitored by a supervising station, an approved permanent sign that reads: WHEN ALARM SOUNDS - CALL 911 shall be installed adjacent to each manual fire alarm box.\n\n Exception: Where the manufacturer has permanently provided this information on the manual fire alarm box."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15656
+}

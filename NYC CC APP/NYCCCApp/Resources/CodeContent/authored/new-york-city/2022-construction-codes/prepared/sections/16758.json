@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175681\"><\/AnnotationDrawer><div>Enclosed attics and enclosed rafter spaces formed where ceilings are applied directly to the underside of roof framing members shall have cross ventilation for each separate space by ventilation openings protected against the entrance of rain and snow. Blocking and bridging shall be arranged so as not to interfere with the movement of air. An airspace of not less than 1 inch (25.4 mm) shall be provided between the insulation and the roof sheathing. The net free ventilating area shall be not less than 1\/150 of the area of the space ventilated. Ventilators shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16758-html-1",
+      "kind" : "html",
+      "plainText" : "Enclosed attics and enclosed rafter spaces formed where ceilings are applied directly to the underside of roof framing members shall have cross ventilation for each separate space by ventilation openings protected against the entrance of rain and snow. Blocking and bridging shall be arranged so as not to interfere with the movement of air. An airspace of not less than 1 inch (25.4 mm) shall be provided between the insulation and the roof sheathing. The net free ventilating area shall be not less than 1\/150 of the area of the space ventilated. Ventilators shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16758
+}

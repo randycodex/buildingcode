@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195909\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195909\"><\/AnnotationDrawer><div>The means used to build up the test pressure shall have either a pressure-limiting device or a pressure-reducing device and a gauge on the outlet side.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11272-html-1",
+      "kind" : "html",
+      "plainText" : "The means used to build up the test pressure shall have either a pressure-limiting device or a pressure-reducing device and a gauge on the outlet side."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11272
+}

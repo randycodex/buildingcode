@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194145\"><\/AnnotationDrawer><div>The relief vent shall be provided with an approved noncombustible cowl or hood, or with a counterbalanced relief valve or cover arranged to prevent the escape of hazardous materials, gases or liquids.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10665-html-1",
+      "kind" : "html",
+      "plainText" : "The relief vent shall be provided with an approved noncombustible cowl or hood, or with a counterbalanced relief valve or cover arranged to prevent the escape of hazardous materials, gases or liquids."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10665
+}

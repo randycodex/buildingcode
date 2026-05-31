@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162361\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162361\"><\/AnnotationDrawer><div>An individual water supply shall be located and constructed so as to be safeguarded against contamination in accordance with Sections 608.17.1 through 608.17.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12208-html-1",
+      "kind" : "html",
+      "plainText" : "An individual water supply shall be located and constructed so as to be safeguarded against contamination in accordance with Sections 608.17.1 through 608.17.8."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12208
+}

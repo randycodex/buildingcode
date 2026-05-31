@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179710\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179710\"><\/AnnotationDrawer><div>Pipe and steel cores for caisson piles shall conform to the material requirements in Section 1811.7. Pipes shall have a minimum wall thickness of 3\/8 inch (9.5 mm) and shall be fitted with a suitable steel-driving shoe or cutting teeth welded to the bottom of the pipe. Concrete or grout shall have a 28-day specified compressive strength (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of not less than 4,000 psi (27.58 MPa).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18007-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe and steel cores for caisson piles shall conform to the material requirements in Section 1811.7. Pipes shall have a minimum wall thickness of 3\/8 inch (9.5 mm) and shall be fitted with a suitable steel-driving shoe or cutting teeth welded to the bottom of the pipe. Concrete or grout shall have a 28-day specified compressive strength ( f ' c \n\n ) of not less than 4,000 psi (27.58 MPa)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18007
+}

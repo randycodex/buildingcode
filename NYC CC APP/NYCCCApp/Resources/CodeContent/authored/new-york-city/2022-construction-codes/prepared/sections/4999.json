@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182157\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182157\"><\/AnnotationDrawer><div>The use of the provisions for conventional light-frame construction in this section shall not be permitted for Risk Category IV buildings assigned to Seismic Design Category B, C, or D, as determined in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177795', hash: '#JD_BC1613' }}\">1613<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4999-html-1",
+      "kind" : "html",
+      "plainText" : "The use of the provisions for conventional light-frame construction in this section shall not be permitted for Risk Category IV buildings assigned to Seismic Design Category B, C, or D, as determined in Section 1613 ."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4999
+}

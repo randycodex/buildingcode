@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196724\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196724\"><\/AnnotationDrawer><div>Potable water supplies to solar systems shall be protected against contamination in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196725\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196725\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where all solar system piping is a part of the potable water distribution system, in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code,<\/span> and all components of the piping system are listed for potable water use, cross-connection protection measures shall not be required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11601-html-1",
+      "kind" : "html",
+      "plainText" : "Potable water supplies to solar systems shall be protected against contamination in accordance with the New York City Plumbing Code. \n\n Exception: Where all solar system piping is a part of the potable water distribution system, in accordance with the requirements of the New York City Plumbing Code, and all components of the piping system are listed for potable water use, cross-connection protection measures shall not be required."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 11601
+}

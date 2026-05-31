@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179765\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179765\"><\/AnnotationDrawer><div>Splices between concrete and steel or wood sections shall be designed to prevent separation both before and after the concrete portion has set, and to ensure the alignment and transmission of the total load on the composite pile. Splices shall be designed to resist uplift caused by upheaval during driving of adjacent deep foundations, and shall develop the full compressive strength and not less than 50 percent of the tension and bending strength of the weaker section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18032-html-1",
+      "kind" : "html",
+      "plainText" : "Splices between concrete and steel or wood sections shall be designed to prevent separation both before and after the concrete portion has set, and to ensure the alignment and transmission of the total load on the composite pile. Splices shall be designed to resist uplift caused by upheaval during driving of adjacent deep foundations, and shall develop the full compressive strength and not less than 50 percent of the tension and bending strength of the weaker section."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18032
+}

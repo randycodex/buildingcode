@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193697\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193697\"><\/AnnotationDrawer><div>Dryer exhaust ducts for clothes dryers shall terminate on the outside of the building. Single dryer installations shall be equipped with a backdraft damper. Multiple dryer installations shall not have a backdraft damper. Screens shall not be installed at the duct termination. Ducts shall not be connected or installed with sheet metal screws or other fasteners that will obstruct the exhaust flow. Clothes dryer exhaust ducts shall not be connected to a vent connector, vent or chimney. Clothes dryer exhaust ducts shall not extend into or through ducts or plenums.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10521-html-1",
+      "kind" : "html",
+      "plainText" : "Dryer exhaust ducts for clothes dryers shall terminate on the outside of the building. Single dryer installations shall be equipped with a backdraft damper. Multiple dryer installations shall not have a backdraft damper. Screens shall not be installed at the duct termination. Ducts shall not be connected or installed with sheet metal screws or other fasteners that will obstruct the exhaust flow. Clothes dryer exhaust ducts shall not be connected to a vent connector, vent or chimney. Clothes dryer exhaust ducts shall not extend into or through ducts or plenums."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10521
+}

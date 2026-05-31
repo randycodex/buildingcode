@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174116\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174116\"><\/AnnotationDrawer><div>Interior exit stairway and ramp opening protectives shall be in accordance with the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169727', hash: '#JD_BC716' }}\">716<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174117\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174117\"><\/AnnotationDrawer><div>Openings in interior exit stairways and ramps other than unprotected exterior openings shall be limited to those necessary for exit access to the enclosure from normally occupied spaces and for egress from the enclosure.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174118\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174118\"><\/AnnotationDrawer><div>Elevators shall not open into interior exit stairways and ramps.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2436-html-1",
+      "kind" : "html",
+      "plainText" : "Interior exit stairway and ramp opening protectives shall be in accordance with the requirements of Section 716 .\n\n Openings in interior exit stairways and ramps other than unprotected exterior openings shall be limited to those necessary for exit access to the enclosure from normally occupied spaces and for egress from the enclosure.\n\n Elevators shall not open into interior exit stairways and ramps."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2436
+}

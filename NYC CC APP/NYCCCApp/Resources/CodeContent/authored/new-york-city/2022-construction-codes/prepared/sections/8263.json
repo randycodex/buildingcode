@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198221\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198221\"><\/AnnotationDrawer><div>In multiple tenant buildings, where a common piping system is installed to supply other than individual dwelling units, shutoff valves shall be provided for each tenant. Each tenant shall have access to the shutoff valve serving that tenant's space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8263-html-1",
+      "kind" : "html",
+      "plainText" : "In multiple tenant buildings, where a common piping system is installed to supply other than individual dwelling units, shutoff valves shall be provided for each tenant. Each tenant shall have access to the shutoff valve serving that tenant's space."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8263
+}

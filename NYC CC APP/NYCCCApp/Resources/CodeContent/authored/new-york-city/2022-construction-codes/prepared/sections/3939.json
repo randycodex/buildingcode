@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178954\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178954\"><\/AnnotationDrawer><div>The soil boring and sampling procedures and apparatus shall be in accordance with ASTM D 1586 and ASTM D 1587 and generally accepted engineering practice. The rock coring, sampling procedure and apparatus shall be in accordance with ASTM D 2113 and generally accepted engineering practice. Rock cores shall be obtained with a double-tube core barrel with a minimum outside diameter of 2 7\/8 inches (73 mm). With the approval of the engineer responsible for the geotechnical investigation, smaller-diameter double-tube core barrels may be used under special circumstances such as telescoping casing to penetrate boulders, or space limitations requiring the use of drill rigs incapable of obtaining large-diameter cores.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3939-html-1",
+      "kind" : "html",
+      "plainText" : "The soil boring and sampling procedures and apparatus shall be in accordance with ASTM D 1586 and ASTM D 1587 and generally accepted engineering practice. The rock coring, sampling procedure and apparatus shall be in accordance with ASTM D 2113 and generally accepted engineering practice. Rock cores shall be obtained with a double-tube core barrel with a minimum outside diameter of 2 7\/8 inches (73 mm). With the approval of the engineer responsible for the geotechnical investigation, smaller-diameter double-tube core barrels may be used under special circumstances such as telescoping casing to penetrate boulders, or space limitations requiring the use of drill rigs incapable of obtaining large-diameter cores."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3939
+}

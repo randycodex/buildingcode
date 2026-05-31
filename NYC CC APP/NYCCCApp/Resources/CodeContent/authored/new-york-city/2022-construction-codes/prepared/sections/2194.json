@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173118\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173118\"><\/AnnotationDrawer><div>Where one exit, or exit access stairway or ramp providing access to exits at other stories, is permitted to serve individual stories, mixed occupancies shall be permitted to be served by single exits provided each individual occupancy complies with the applicable requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173087', hash: '#JD_BCTable1006.3.2' }}\">Table 1006.3.2<\/Link> for that occupancy. Where applicable, cumulative occupant loads from adjacent occupancies shall be considered in accordance with the provisions of Section 1004.1. In each story of a mixed occupancy building, the maximum number of occupants served by a single exit shall be such that the sum of the ratios of the calculated number of occupants of the space divided by the allowable number of occupants indicated in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173087', hash: '#JD_BCTable1006.3.2' }}\">Table 1006.3.2<\/Link> for each occupancy does not exceed one. Where dwelling units are located on a story with other occupancies, the actual number of dwelling units divided by four plus the ratio from the other occupancy does not exceed one.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2194-html-1",
+      "kind" : "html",
+      "plainText" : "Where one exit, or exit access stairway or ramp providing access to exits at other stories, is permitted to serve individual stories, mixed occupancies shall be permitted to be served by single exits provided each individual occupancy complies with the applicable requirements of Table 1006.3.2 for that occupancy. Where applicable, cumulative occupant loads from adjacent occupancies shall be considered in accordance with the provisions of Section 1004.1. In each story of a mixed occupancy building, the maximum number of occupants served by a single exit shall be such that the sum of the ratios of the calculated number of occupants of the space divided by the allowable number of occupants indicated in Table 1006.3.2 for each occupancy does not exceed one. Where dwelling units are located on a story with other occupancies, the actual number of dwelling units divided by four plus the ratio from the other occupancy does not exceed one."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2194
+}

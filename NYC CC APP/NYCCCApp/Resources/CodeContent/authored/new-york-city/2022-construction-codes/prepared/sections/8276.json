@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198256\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198256\"><\/AnnotationDrawer><div>Pressure regulators that require a vent shall be vented directly to the outdoors. The vent terminal shall be a minimum of 18 inches (457.2 mm) above grade, not under a building-opening or overhang, and shall be installed so as to prevent the entrance of water and insects.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198257\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198257\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> A vent to the outdoors is not required for regulators equipped with and labeled for utilization with an approved vent-limiting device installed in accordance with ANSI Z21.18 and the manufacturer's instructions. The vent-limiting device shall be installed in a location sufficiently ventilated to dissipate any gas discharged from the device.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8276-html-1",
+      "kind" : "html",
+      "plainText" : "Pressure regulators that require a vent shall be vented directly to the outdoors. The vent terminal shall be a minimum of 18 inches (457.2 mm) above grade, not under a building-opening or overhang, and shall be installed so as to prevent the entrance of water and insects.\n\n Exception: A vent to the outdoors is not required for regulators equipped with and labeled for utilization with an approved vent-limiting device installed in accordance with ANSI Z21.18 and the manufacturer's instructions. The vent-limiting device shall be installed in a location sufficiently ventilated to dissipate any gas discharged from the device."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8276
+}

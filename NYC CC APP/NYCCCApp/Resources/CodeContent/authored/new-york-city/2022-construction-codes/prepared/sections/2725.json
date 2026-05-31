@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175074\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175074\"><\/AnnotationDrawer><div>Grab bars and seats for showers shall comply with Sections 609 and 610 of ICC A117.1 and shall be provided in accordance with Sections 608.2.3.2 and 608.3 of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175075\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175075\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Grab bars and seats are not required to be installed where reinforcement for such grab bars and seats is installed and located to permit future installation of grab bars and seats complying with Section 1107.2.2.8.2.1 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2725-html-1",
+      "kind" : "html",
+      "plainText" : "Grab bars and seats for showers shall comply with Sections 609 and 610 of ICC A117.1 and shall be provided in accordance with Sections 608.2.3.2 and 608.3 of ICC A117.1.\n\n Exception: Grab bars and seats are not required to be installed where reinforcement for such grab bars and seats is installed and located to permit future installation of grab bars and seats complying with Section 1107.2.2.8.2.1 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2725
+}

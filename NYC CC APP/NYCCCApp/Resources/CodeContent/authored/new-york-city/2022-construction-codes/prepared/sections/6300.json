@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186109\"><\/AnnotationDrawer><div>In areas where special danger to the public exists, including but not limited to vehicle entrances and exits, hoisting areas, points of storage of explosives or highly flammable material, blasting areas, or discharge ends of chutes, descriptive warning signs shall be provided in accordance with the requirements of the Department of Transportation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6300-html-1",
+      "kind" : "html",
+      "plainText" : "In areas where special danger to the public exists, including but not limited to vehicle entrances and exits, hoisting areas, points of storage of explosives or highly flammable material, blasting areas, or discharge ends of chutes, descriptive warning signs shall be provided in accordance with the requirements of the Department of Transportation."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6300
+}

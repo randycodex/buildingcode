@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167650\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167650\"><\/AnnotationDrawer><div>Level 2 and 3 aerosol products shall be stored and displayed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>. See the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and Section 311.2 of this code for occupancy group requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "593-html-1",
+      "kind" : "html",
+      "plainText" : "Level 2 and 3 aerosol products shall be stored and displayed in accordance with the New York City Fire Code . See the New York City Fire Code and Section 311.2 of this code for occupancy group requirements."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 593
+}

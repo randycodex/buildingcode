@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198204\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198204\"><\/AnnotationDrawer><div>Piping systems shall be provided with shutoff valves in accordance with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8257-html-1",
+      "kind" : "html",
+      "plainText" : "Piping systems shall be provided with shutoff valves in accordance with this section."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8257
+}

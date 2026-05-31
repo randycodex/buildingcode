@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181443\"><\/AnnotationDrawer><div>Where a response modification coefficient, R, in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177905', hash: '#JD_BCTable1613.5' }}\">Table 1613.5<\/Link>, is used for the design of cold-formed steel structures, the structures shall be designed and detailed in accordance with the requirements of AISI S100, ASCE 8, or, for cold-formed steel special-bolted moment frames, AISI S400.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181444\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181444\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181444\"><\/AnnotationDrawer><h6><a name=\"JD_BC2211\" id=\"JD_BC2211\" title=\"BC 2211\"><\/a>Section BC 2211: Cold-Formed Steel Light-Frame Construction<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4811-html-1",
+      "kind" : "html",
+      "plainText" : "Where a response modification coefficient, R, in accordance with Table 1613.5 , is used for the design of cold-formed steel structures, the structures shall be designed and detailed in accordance with the requirements of AISI S100, ASCE 8, or, for cold-formed steel special-bolted moment frames, AISI S400.\n\n Section BC 2211: Cold-Formed Steel Light-Frame Construction"
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4811
+}

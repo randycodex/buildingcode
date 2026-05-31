@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193792\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193792\"><\/AnnotationDrawer><div>Duct joints shall be butt joints, welded flange joints with a maximum flange depth of 1\/2 inch (12.7 mm) or overlapping duct joints of either the telescoping or bell type. Overlapping joints shall be installed to prevent ledges and obstructions from collecting grease or interfering with gravity drainage to the intended collection point. The difference between the inside cross-sectional dimensions of overlapping sections of duct shall not exceed 1\/4 inch (6.4 mm). The length of overlap for overlapping duct joints shall not exceed 2 inches (50.8 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23374-html-1",
+      "kind" : "html",
+      "plainText" : "Duct joints shall be butt joints, welded flange joints with a maximum flange depth of 1\/2 inch (12.7 mm) or overlapping duct joints of either the telescoping or bell type. Overlapping joints shall be installed to prevent ledges and obstructions from collecting grease or interfering with gravity drainage to the intended collection point. The difference between the inside cross-sectional dimensions of overlapping sections of duct shall not exceed 1\/4 inch (6.4 mm). The length of overlap for overlapping duct joints shall not exceed 2 inches (50.8 mm)."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23374
+}

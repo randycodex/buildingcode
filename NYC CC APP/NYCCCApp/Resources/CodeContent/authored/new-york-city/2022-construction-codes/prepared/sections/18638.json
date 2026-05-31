@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181441\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181441\"><\/AnnotationDrawer><div>Composite slabs of concrete and steel deck shall be permitted to be designed and constructed in accordance with SDI-C.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18638-html-1",
+      "kind" : "html",
+      "plainText" : "Composite slabs of concrete and steel deck shall be permitted to be designed and constructed in accordance with SDI-C."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18638
+}

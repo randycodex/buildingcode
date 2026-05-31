@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161555\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161555\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Slip joints shall be made with an approved elastomeric gasket and shall only be installed on the trap outlet, trap inlet and within the trap seal. Fixtures with concealed slip-joint connections shall be provided with an access panel or utility space not less than 12 inches (305 mm) in its smallest dimension or other approved arrangement so as to provide access to the slip joint connections for inspection and repair.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24705-html-1",
+      "kind" : "html",
+      "plainText" : "Slip joints shall be made with an approved elastomeric gasket and shall only be installed on the trap outlet, trap inlet and within the trap seal. Fixtures with concealed slip-joint connections shall be provided with an access panel or utility space not less than 12 inches (305 mm) in its smallest dimension or other approved arrangement so as to provide access to the slip joint connections for inspection and repair."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24705
+}

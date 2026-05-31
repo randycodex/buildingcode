@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163507\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163507\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Discharge piping shall meet the requirements of Section 1102.2, 1102.3 or 1102.4 and shall include a gate valve and a full flow check valve. Pipe and fittings shall be the same size as, or larger than, the pump discharge tapping.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163508\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163508\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;<\/span><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> In one- and two-family dwellings, only a check valve shall be required, located on the discharge piping from the pump or ejector.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163509\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163509\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163509\"><\/AnnotationDrawer><h6><a name=\"JD_PC1114\" id=\"JD_PC1114\" title=\"PC 1114\"><\/a>Section PC 1114: Private On-Site Stormwater Disposal Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12639-html-1",
+      "kind" : "html",
+      "plainText" : "Discharge piping shall meet the requirements of Section 1102.2, 1102.3 or 1102.4 and shall include a gate valve and a full flow check valve. Pipe and fittings shall be the same size as, or larger than, the pump discharge tapping. \n\n Exception: In one- and two-family dwellings, only a check valve shall be required, located on the discharge piping from the pump or ejector. \n\n Section PC 1114: Private On-Site Stormwater Disposal Systems"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 12639
+}

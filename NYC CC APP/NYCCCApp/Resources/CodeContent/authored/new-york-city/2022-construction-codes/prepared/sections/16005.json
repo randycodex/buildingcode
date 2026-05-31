@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173062\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173062\"><\/AnnotationDrawer><div>The numbers of exits or access to exits shall be provided in the uses described in Sections 1006.2.2.1 through 1006.2.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16005-html-1",
+      "kind" : "html",
+      "plainText" : "The numbers of exits or access to exits shall be provided in the uses described in Sections 1006.2.2.1 through 1006.2.2.5."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16005
+}

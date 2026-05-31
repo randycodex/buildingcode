@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195365\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195365\"><\/AnnotationDrawer><div>A unit heater shall not be attached to a warm-air duct system unless listed for such installation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195366\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195366\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195366\"><\/AnnotationDrawer><h6><a name=\"JD_MC921\" id=\"JD_MC921\" title=\"MC 921\"><\/a>Section MC 921: Vented Room Heaters<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11083-html-1",
+      "kind" : "html",
+      "plainText" : "A unit heater shall not be attached to a warm-air duct system unless listed for such installation.\n\n Section MC 921: Vented Room Heaters"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11083
+}

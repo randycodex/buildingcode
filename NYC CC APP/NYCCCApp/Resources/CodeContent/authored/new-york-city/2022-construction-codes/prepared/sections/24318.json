@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196404\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196404\"><\/AnnotationDrawer><div>Each storage tank shall be provided with a separate fill pipe, except that where a battery of tanks containing the same grade of oil is installed, a common fill and header pipe may be installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24318-html-1",
+      "kind" : "html",
+      "plainText" : "Each storage tank shall be provided with a separate fill pipe, except that where a battery of tanks containing the same grade of oil is installed, a common fill and header pipe may be installed."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24318
+}

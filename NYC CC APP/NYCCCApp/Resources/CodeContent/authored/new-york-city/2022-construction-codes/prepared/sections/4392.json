@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180314\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180314\"><\/AnnotationDrawer><div>Each time concrete is sampled for strength testing, the tests set forth in Items 1 through 5 shall be performed by the approved agency:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180315\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180315\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Temperature in accordance with ASTM C 1064.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180316\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180316\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Slump in accordance with ASTM C 143.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180317\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180317\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Unit weight in accordance with ASTM C 138.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180318\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180318\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Air content in accordance with ASTM C 173 or C 231. Testing in accordance with ASTM C 173 must be used for concretes made with lightweight aggregates, and other instances where ASTM C 231 is not applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180319\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180319\"><\/AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Water content per AASHTO T 318 when required by Section 1905.6.2.1 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4392-html-1",
+      "kind" : "html",
+      "plainText" : "Each time concrete is sampled for strength testing, the tests set forth in Items 1 through 5 shall be performed by the approved agency:\n\n 1. Temperature in accordance with ASTM C 1064.\n\n 2. Slump in accordance with ASTM C 143.\n\n 3. Unit weight in accordance with ASTM C 138.\n\n 4. Air content in accordance with ASTM C 173 or C 231. Testing in accordance with ASTM C 173 must be used for concretes made with lightweight aggregates, and other instances where ASTM C 231 is not applicable.\n\n 5. Water content per AASHTO T 318 when required by Section 1905.6.2.1 of this code."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4392
+}

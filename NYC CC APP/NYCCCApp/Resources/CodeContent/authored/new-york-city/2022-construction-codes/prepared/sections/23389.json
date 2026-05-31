@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193856\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193856\"><\/AnnotationDrawer><div>A suitable cleanout shall be provided for both the inlet side and outlet side of an in-line fan except where a duct does not connect to the fan. Such cleanouts shall be located within 3 feet (914.4 mm) of the fan duct connections to permit a thorough cleaning of the inlet and discharge ducts connected to the in-line fan as well as the interior of the fan itself.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193857\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193857\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where suitable cleanouts for in-line fans cannot be provided, the in-line fan shall be of \"clam shell\" construction which shall permit the fan to be opened and thoroughly cleaned while remaining in place.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23389-html-1",
+      "kind" : "html",
+      "plainText" : "A suitable cleanout shall be provided for both the inlet side and outlet side of an in-line fan except where a duct does not connect to the fan. Such cleanouts shall be located within 3 feet (914.4 mm) of the fan duct connections to permit a thorough cleaning of the inlet and discharge ducts connected to the in-line fan as well as the interior of the fan itself.\n\n Exception: Where suitable cleanouts for in-line fans cannot be provided, the in-line fan shall be of \"clam shell\" construction which shall permit the fan to be opened and thoroughly cleaned while remaining in place."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23389
+}

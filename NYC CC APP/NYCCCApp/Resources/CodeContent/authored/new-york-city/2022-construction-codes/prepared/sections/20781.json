@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197341\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197341\"><\/AnnotationDrawer><div>Appliances regulated by this code shall be listed and labeled.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20781-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances regulated by this code shall be listed and labeled."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20781
+}

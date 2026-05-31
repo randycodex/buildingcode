@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184440\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184440\"><\/AnnotationDrawer><div>All encroachments permitted beyond the street line by the provisions of this chapter shall be constructed so that they may be removed at any time without endangering the structural safety or fire safety of the building except that footings as permitted under Section 3202.1.1 of this code need not be removable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5716-html-1",
+      "kind" : "html",
+      "plainText" : "All encroachments permitted beyond the street line by the provisions of this chapter shall be constructed so that they may be removed at any time without endangering the structural safety or fire safety of the building except that footings as permitted under Section 3202.1.1 of this code need not be removable."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5716
+}

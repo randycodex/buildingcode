@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197489\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197489\"><\/AnnotationDrawer><div>The minimum required volume shall be 50 cubic feet per 1,000 Btu\/h (4.8 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/kW) of the appliance input rating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20845-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum required volume shall be 50 cubic feet per 1,000 Btu\/h (4.8 m\n 3 \n \/kW) of the appliance input rating."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20845
+}

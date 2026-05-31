@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188241\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188241\"><\/AnnotationDrawer><div>Signs that provide direction to, or information about, permanent interior spaces of the site and facilities shall contain visual characters complying with Section 703.2 (Visual Characters) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188242\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188242\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Building directories, personnel names, company or occupant names and logos, menus and temporary (seven days or less) signs are not required to comply with ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6918-html-1",
+      "kind" : "html",
+      "plainText" : "Signs that provide direction to, or information about, permanent interior spaces of the site and facilities shall contain visual characters complying with Section 703.2 (Visual Characters) of ICC A117.1.\n\n Exception: Building directories, personnel names, company or occupant names and logos, menus and temporary (seven days or less) signs are not required to comply with ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6918
+}

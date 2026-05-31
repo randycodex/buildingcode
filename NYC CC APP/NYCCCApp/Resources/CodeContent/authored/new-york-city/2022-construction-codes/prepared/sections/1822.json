@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171998\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171998\"><\/AnnotationDrawer><div>Where manual or automatic alarm initiation is required as part of a fire alarm system, the initiating devices shall be installed in accordance with Sections 907.4.1 through 907.4.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1822-html-1",
+      "kind" : "html",
+      "plainText" : "Where manual or automatic alarm initiation is required as part of a fire alarm system, the initiating devices shall be installed in accordance with Sections 907.4.1 through 907.4.4."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1822
+}

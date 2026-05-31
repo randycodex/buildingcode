@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161778\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161778\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Personal hygiene devices integral to water closets or water closet seats shall conform to the requirements of ASME A112.4.2.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161779\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161779\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161779\"><\/AnnotationDrawer><h6><a name=\"JD_PC425\" id=\"JD_PC425\" title=\"PC 425\"><\/a>Section PC 425: Flushing Devices for Water Closets and Urinals<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11979-html-1",
+      "kind" : "html",
+      "plainText" : "Personal hygiene devices integral to water closets or water closet seats shall conform to the requirements of ASME A112.4.2. \n\n Section PC 425: Flushing Devices for Water Closets and Urinals"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11979
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167944\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167944\"><\/AnnotationDrawer><div>Service corridors shall be mechanically ventilated as required by Section 415.11.1.6 or at not less than six air changes per hour.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "677-html-1",
+      "kind" : "html",
+      "plainText" : "Service corridors shall be mechanically ventilated as required by Section 415.11.1.6 or at not less than six air changes per hour."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 677
+}

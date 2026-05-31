@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176231\"><\/AnnotationDrawer><div>Adhered masonry veneer shall comply with the applicable requirements in this section and Sections 12.1 and 12.3 of TMS 402, as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180723', hash: '#JD_BCCh.21' }}\">Chapter 21<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16942-html-1",
+      "kind" : "html",
+      "plainText" : "Adhered masonry veneer shall comply with the applicable requirements in this section and Sections 12.1 and 12.3 of TMS 402, as modified by Chapter 21 of this code."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 16942
+}

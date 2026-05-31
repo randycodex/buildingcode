@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184141\"><\/AnnotationDrawer><div>The unobstructed width of pedestrian walkways shall be not less than 36 inches (914 mm). The total width shall be not greater than 30 feet (9144 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5602-html-1",
+      "kind" : "html",
+      "plainText" : "The unobstructed width of pedestrian walkways shall be not less than 36 inches (914 mm). The total width shall be not greater than 30 feet (9144 mm)."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5602
+}

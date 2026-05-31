@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198526\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198526\"><\/AnnotationDrawer><div>Ventilating hoods and exhaust systems shall be permitted to be used to vent appliances installed in commercial applications in accordance with Section 503.3.4 and to vent industrial appliances, such as where the process itself requires fume disposal.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21205-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilating hoods and exhaust systems shall be permitted to be used to vent appliances installed in commercial applications in accordance with Section 503.3.4 and to vent industrial appliances, such as where the process itself requires fume disposal."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21205
+}

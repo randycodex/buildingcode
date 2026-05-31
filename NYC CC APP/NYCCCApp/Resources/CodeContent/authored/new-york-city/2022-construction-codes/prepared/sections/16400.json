@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174578\"><\/AnnotationDrawer><div>Ramped aisles shall have edge protection in accordance with Section 1012.10 and 1012.10.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174579\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174579\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> In assembly spaces with fixed seating, edge protection is not required on the sides of ramped aisles where the ramped aisles provide access to the adjacent seating and aisle accessways.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16400-html-1",
+      "kind" : "html",
+      "plainText" : "Ramped aisles shall have edge protection in accordance with Section 1012.10 and 1012.10.1.\n\n Exception: In assembly spaces with fixed seating, edge protection is not required on the sides of ramped aisles where the ramped aisles provide access to the adjacent seating and aisle accessways."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16400
+}

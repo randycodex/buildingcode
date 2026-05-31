@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168682\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168682\"><\/AnnotationDrawer><div>No separation is required between accessory occupancies and the main occupancy.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168683\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168683\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168684\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168684\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Group H-2, H-3, H-4 and H-5 occupancies shall be separated from all other occupancies in accordance with Section 508.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168685\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168685\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Separated tenancies in accordance with the requirements of Section 510.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "917-html-1",
+      "kind" : "html",
+      "plainText" : "No separation is required between accessory occupancies and the main occupancy.\n\n Exceptions: \n\n 1. Group H-2, H-3, H-4 and H-5 occupancies shall be separated from all other occupancies in accordance with Section 508.4.\n\n 2. Separated tenancies in accordance with the requirements of Section 510.10."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 917
+}

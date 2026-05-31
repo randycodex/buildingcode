@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178677\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178677\"><\/AnnotationDrawer><div>Prior to the approval of construction documents, soil borings and testpits shall be performed in accordance with the provisions of Section 1114.2.1 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>. Soil borings and testpits shall be performed under the supervision of a special inspector. The results of the soil borings and testpits shall be filed on forms provided by the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3849-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the approval of construction documents, soil borings and testpits shall be performed in accordance with the provisions of Section 1114.2.1 of the New York City Plumbing Code . Soil borings and testpits shall be performed under the supervision of a special inspector. The results of the soil borings and testpits shall be filed on forms provided by the department."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3849
+}

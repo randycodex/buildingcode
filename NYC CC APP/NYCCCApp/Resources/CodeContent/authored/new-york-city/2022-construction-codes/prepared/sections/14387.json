@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167550\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167550\"><\/AnnotationDrawer><div>Where hangars have basements, floors over basements shall be of Type IA construction and shall be made tight against seepage of water, oil or vapors. There shall be no opening or communication between basements and the hangar. Access to basements shall be from outside only.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14387-html-1",
+      "kind" : "html",
+      "plainText" : "Where hangars have basements, floors over basements shall be of Type IA construction and shall be made tight against seepage of water, oil or vapors. There shall be no opening or communication between basements and the hangar. Access to basements shall be from outside only."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14387
+}

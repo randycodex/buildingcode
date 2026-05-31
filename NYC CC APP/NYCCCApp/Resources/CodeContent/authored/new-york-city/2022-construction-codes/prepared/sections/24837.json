@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161857\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161857\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Appliances shall be provided with access<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">for inspection, service, repair and replacement without disabling the function of a fire-resistance-rated assembly or removing permanent construction, other appliances or any other piping or ducts not connected to the appliance being inspected, serviced, repaired or replaced. A level working space not less than 30 inches in length and 30 inches in width (762 mm by 762 mm) shall be provided in front of the control side to service an appliance.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161858\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161858\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161858\"><\/AnnotationDrawer><h6><a name=\"JD_PC503\" id=\"JD_PC503\" title=\"PC 503\"><\/a>Section PC 503: Connections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24837-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances shall be provided with access for inspection, service, repair and replacement without disabling the function of a fire-resistance-rated assembly or removing permanent construction, other appliances or any other piping or ducts not connected to the appliance being inspected, serviced, repaired or replaced. A level working space not less than 30 inches in length and 30 inches in width (762 mm by 762 mm) shall be provided in front of the control side to service an appliance. \n\n Section PC 503: Connections"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 24837
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181368\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181368\"><\/AnnotationDrawer><div>The safe supporting capacity of concrete-filled steel columns shall be computed in accordance with AISC 360 or as determined by a test approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4776-html-1",
+      "kind" : "html",
+      "plainText" : "The safe supporting capacity of concrete-filled steel columns shall be computed in accordance with AISC 360 or as determined by a test approved by the commissioner."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4776
+}

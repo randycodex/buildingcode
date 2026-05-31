@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175990\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175990\"><\/AnnotationDrawer><div>Shower compartments and walls above bathtubs with installed shower heads shall be finished with a smooth, nonabsorbent surface to a height not less than 72 inches (1828.8 mm) above the drain inlet.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16864-html-1",
+      "kind" : "html",
+      "plainText" : "Shower compartments and walls above bathtubs with installed shower heads shall be finished with a smooth, nonabsorbent surface to a height not less than 72 inches (1828.8 mm) above the drain inlet."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16864
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197023\"><\/AnnotationDrawer><div>A person shall not make energy source connections to installations regulated by this code that have been disconnected or ordered to be disconnected by the commissioner, or the use of which has been ordered to be discontinued by the commissioner until the commissioner authorizes the reconnection and use of such installations. When an installation is maintained in violation of this code, and in violation of a notice issued pursuant to the provisions of this section, the commissioner shall institute appropriate action to prevent, restrain, correct or abate the violation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "20771-html-1",
+      "kind" : "html",
+      "plainText" : "A person shall not make energy source connections to installations regulated by this code that have been disconnected or ordered to be disconnected by the commissioner, or the use of which has been ordered to be discontinued by the commissioner until the commissioner authorizes the reconnection and use of such installations. When an installation is maintained in violation of this code, and in violation of a notice issued pursuant to the provisions of this section, the commissioner shall institute appropriate action to prevent, restrain, correct or abate the violation."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 20771
+}

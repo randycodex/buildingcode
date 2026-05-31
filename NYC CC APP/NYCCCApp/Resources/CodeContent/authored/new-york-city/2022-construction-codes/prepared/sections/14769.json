@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168778\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168778\"><\/AnnotationDrawer><div>Open parking garages constructed under Groups A, I, B, M and R shall not exceed the height and area limitations permitted under Section 406.5. The height and area of the portion of the building above the open parking garage shall not exceed the limitations in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168387', hash: '#JD_BC503' }}\">503<\/Link> for the upper occupancy. The height, in both feet and stories, of the portion of the building above the open parking garage shall be measured from grade plane and shall include both the open parking garage and the portion of the building above the parking garage. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168779\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168779\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224236\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224236\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14769-html-1",
+      "kind" : "html",
+      "plainText" : "Open parking garages constructed under Groups A, I, B, M and R shall not exceed the height and area limitations permitted under Section 406.5. The height and area of the portion of the building above the open parking garage shall not exceed the limitations in Section 503 for the upper occupancy. The height, in both feet and stories, of the portion of the building above the open parking garage shall be measured from grade plane and shall include both the open parking garage and the portion of the building above the parking garage. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14769
+}

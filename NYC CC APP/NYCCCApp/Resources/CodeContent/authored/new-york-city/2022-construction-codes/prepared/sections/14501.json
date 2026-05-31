@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167929\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167929\"><\/AnnotationDrawer><div>Workstations shall not be energized without adequate exhaust ventilation. See Section 415.11.1.6 for workstation exhaust ventilation requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14501-html-1",
+      "kind" : "html",
+      "plainText" : "Workstations shall not be energized without adequate exhaust ventilation. See Section 415.11.1.6 for workstation exhaust ventilation requirements."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14501
+}

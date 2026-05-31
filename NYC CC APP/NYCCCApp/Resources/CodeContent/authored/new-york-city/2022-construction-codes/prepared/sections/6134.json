@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185677\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185677\"><\/AnnotationDrawer><div>The unbraced length of shores shall not exceed the maximum length determined in accordance with the requirements of this code for the structural material used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6134-html-1",
+      "kind" : "html",
+      "plainText" : "The unbraced length of shores shall not exceed the maximum length determined in accordance with the requirements of this code for the structural material used."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6134
+}

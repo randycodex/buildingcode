@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193974\"><\/AnnotationDrawer><div>A Type I hood shall be installed with a clearance to combustibles of not less than 18 inches (457.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193975\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193975\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Clearance shall not be required from gypsum wallboard or 1\/2-inch (12.7 mm) or thicker cementitious wallboard attached to noncombustible structures provided that a smooth, cleanable, nonabsorbent and noncombustible material is installed between the hood and the gypsum or cementitious wallboard over an area extending not less than 18 inches (457.2 mm) in all directions from the hood.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10604-html-1",
+      "kind" : "html",
+      "plainText" : "A Type I hood shall be installed with a clearance to combustibles of not less than 18 inches (457.2 mm).\n\n Exception: Clearance shall not be required from gypsum wallboard or 1\/2-inch (12.7 mm) or thicker cementitious wallboard attached to noncombustible structures provided that a smooth, cleanable, nonabsorbent and noncombustible material is installed between the hood and the gypsum or cementitious wallboard over an area extending not less than 18 inches (457.2 mm) in all directions from the hood."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10604
+}

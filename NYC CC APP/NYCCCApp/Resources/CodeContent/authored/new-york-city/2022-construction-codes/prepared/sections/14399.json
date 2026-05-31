@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167594\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167594\"><\/AnnotationDrawer><div>Residential aircraft hangars shall be not greater than 2,000 square feet (186 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area and 20 feet (6096 mm) in building height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14399-html-1",
+      "kind" : "html",
+      "plainText" : "Residential aircraft hangars shall be not greater than 2,000 square feet (186 m\n\n 2 \n\n ) in area and 20 feet (6096 mm) in building height."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14399
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163059\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163059\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Individual, branch and circuit vents shall connect to a vent stack, stack vent, or extend to the open air above the roof.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25307-html-1",
+      "kind" : "html",
+      "plainText" : "Individual, branch and circuit vents shall connect to a vent stack, stack vent, or extend to the open air above the roof."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25307
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178002\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178002\"><\/AnnotationDrawer><div>Structural response of elements determined using a dynamic inelastic analysis shall not be less than 80 percent of the structural response determined using a static elastic analysis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3630-html-1",
+      "kind" : "html",
+      "plainText" : "Structural response of elements determined using a dynamic inelastic analysis shall not be less than 80 percent of the structural response determined using a static elastic analysis."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3630
+}

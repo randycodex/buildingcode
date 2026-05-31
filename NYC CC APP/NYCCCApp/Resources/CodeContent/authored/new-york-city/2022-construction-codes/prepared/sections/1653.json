@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171455\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171455\"><\/AnnotationDrawer><div>An approved audible device, located on the exterior of the building in an approved location, shall be connected to each automatic sprinkler system. Such sprinkler water-flow alarm devices shall be activated by water flow equivalent to the flow of a single sprinkler of the smallest orifice size installed in the system. Alarm devices shall be provided on the exterior of the building in an approved location or in a location approved by the Fire Department, except in buildings equipped with a fire alarm system. Where a fire alarm system is installed, actuation of the automatic sprinkler system shall actuate the building fire alarm system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1653-html-1",
+      "kind" : "html",
+      "plainText" : "An approved audible device, located on the exterior of the building in an approved location, shall be connected to each automatic sprinkler system. Such sprinkler water-flow alarm devices shall be activated by water flow equivalent to the flow of a single sprinkler of the smallest orifice size installed in the system. Alarm devices shall be provided on the exterior of the building in an approved location or in a location approved by the Fire Department, except in buildings equipped with a fire alarm system. Where a fire alarm system is installed, actuation of the automatic sprinkler system shall actuate the building fire alarm system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1653
+}

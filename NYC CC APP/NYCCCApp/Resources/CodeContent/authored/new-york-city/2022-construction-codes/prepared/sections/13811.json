@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230204\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230204\"><\/AnnotationDrawer><div>An exterior landing shall not be required where the landing or floor on the exterior side is no more than 7.75 inches (197 millimeters) below the top of threshold of the exit door, and the door does not swing over the landing or floor. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13811-html-1",
+      "kind" : "html",
+      "plainText" : "An exterior landing shall not be required where the landing or floor on the exterior side is no more than 7.75 inches (197 millimeters) below the top of threshold of the exit door, and the door does not swing over the landing or floor."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 13811
+}

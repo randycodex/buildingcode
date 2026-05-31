@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196705\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196705\"><\/AnnotationDrawer><div>A shutoff valve shall be installed at the supply connection to each appliance and a check valve installed at the return connection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11593-html-1",
+      "kind" : "html",
+      "plainText" : "A shutoff valve shall be installed at the supply connection to each appliance and a check valve installed at the return connection."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11593
+}

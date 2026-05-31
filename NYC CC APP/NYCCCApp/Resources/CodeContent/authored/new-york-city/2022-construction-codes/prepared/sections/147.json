@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166066\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166066\"><\/AnnotationDrawer><div>High-hazard Group H occupancy includes, among others, the use of a building or structure, or a portion thereof, that involves the manufacturing, processing, generation or storage of materials that constitute a physical or health hazard in quantities in excess of those allowed in control areas complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-167642', hash: '#JD_BC414' }}\">414<\/Link>, based on the maximum allowable quantity limits for control areas set forth in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166067', hash: '#JD_BCTable307.1(1)' }}\">Tables 307.1(1)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166067', hash: '#JD_BCTable307.1(2)' }}\">307.1(2)<\/Link>. Hazardous occupancies are classified in Groups H-1, H-2, H-3, H-4 and H-5 and shall be in accordance with this section, the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-167744', hash: '#JD_BC415' }}\">415<\/Link> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "147-html-1",
+      "kind" : "html",
+      "plainText" : "High-hazard Group H occupancy includes, among others, the use of a building or structure, or a portion thereof, that involves the manufacturing, processing, generation or storage of materials that constitute a physical or health hazard in quantities in excess of those allowed in control areas complying with Section 414 , based on the maximum allowable quantity limits for control areas set forth in Tables 307.1(1) and 307.1(2) . Hazardous occupancies are classified in Groups H-1, H-2, H-3, H-4 and H-5 and shall be in accordance with this section, the requirements of Section 415 and the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 147
+}

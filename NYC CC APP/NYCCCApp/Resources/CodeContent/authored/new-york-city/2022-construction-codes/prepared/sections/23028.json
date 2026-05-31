@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192463\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192463\"><\/AnnotationDrawer><div>Apparatus, material and labor required for testing a mechanical system or part thereof shall be furnished by the permit holder.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23028-html-1",
+      "kind" : "html",
+      "plainText" : "Apparatus, material and labor required for testing a mechanical system or part thereof shall be furnished by the permit holder."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 23028
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177485\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177485\"><\/AnnotationDrawer><div>The following simplification is permissible:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177486\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Live load placed on one-half of the span adjacent to one support.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177487\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177487\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Live load placed on the center one-fourth of the span.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177488\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177488\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Live load placed on 3\/8 of the span adjacent to each support. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17342-html-1",
+      "kind" : "html",
+      "plainText" : "The following simplification is permissible:\n\n 1. Live load placed on one-half of the span adjacent to one support.\n\n 2. Live load placed on the center one-fourth of the span.\n\n 3. Live load placed on 3\/8 of the span adjacent to each support."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17342
+}

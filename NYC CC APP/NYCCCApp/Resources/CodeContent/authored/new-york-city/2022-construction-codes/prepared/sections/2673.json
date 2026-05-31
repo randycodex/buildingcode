@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174921\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174921\"><\/AnnotationDrawer><div>Doors and doorways at entrance(s) to Accessible units and Type B+NYC units, including hardware, shall comply with Section 404 (Doors and doorways) of ICC A117.1. Doors and doorways, including hardware, at entrance(s) to Type B units shall comply with Section 1003.5 (Doors and doorways) of ICC A117.1. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174922\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174922\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174923\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;An accessible entrance is not required to dwelling units and sleeping units that are not required to be Accessible units, Type B+NYC units, or Type B units. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174924\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174924\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Entrances to multistory dwelling or sleeping units in Group R-2 occupancies as provided in Section 1107.2.5 that are not on the primary entry story to the unit and are not part of the accessible route required in Exception 1 of Section 1107.2.5 shall not be required to be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2673-html-1",
+      "kind" : "html",
+      "plainText" : "Doors and doorways at entrance(s) to Accessible units and Type B+NYC units, including hardware, shall comply with Section 404 (Doors and doorways) of ICC A117.1. Doors and doorways, including hardware, at entrance(s) to Type B units shall comply with Section 1003.5 (Doors and doorways) of ICC A117.1. \n\n Exceptions: \n\n 1. An accessible entrance is not required to dwelling units and sleeping units that are not required to be Accessible units, Type B+NYC units, or Type B units. \n\n 2. Entrances to multistory dwelling or sleeping units in Group R-2 occupancies as provided in Section 1107.2.5 that are not on the primary entry story to the unit and are not part of the accessible route required in Exception 1 of Section 1107.2.5 shall not be required to be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2673
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171862\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171862\"><\/AnnotationDrawer><div>Single- and multiple-station smoke alarms shall be installed in accordance with Section 907.2.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1780-html-1",
+      "kind" : "html",
+      "plainText" : "Single- and multiple-station smoke alarms shall be installed in accordance with Section 907.2.11."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1780
+}

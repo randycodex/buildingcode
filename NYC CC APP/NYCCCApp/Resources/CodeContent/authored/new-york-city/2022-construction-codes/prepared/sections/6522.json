@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186850\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186850\"><\/AnnotationDrawer><div>The provisions of ANSI A10.3, as modified in Section 3311.4, shall apply to explosive powered tools, including but not limited to powder-actuated tools. The storage, handling and use of explosives shall also comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and Section 3307.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6522-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of ANSI A10.3, as modified in Section 3311.4, shall apply to explosive powered tools, including but not limited to powder-actuated tools. The storage, handling and use of explosives shall also comply with the New York City Fire Code and Section 3307.4.2."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6522
+}

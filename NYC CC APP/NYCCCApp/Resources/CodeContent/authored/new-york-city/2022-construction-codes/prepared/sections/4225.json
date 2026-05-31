@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179813\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179813\"><\/AnnotationDrawer><div>When helical piles are embedded in soils of Classes 6 and 7, a buckling analysis shall be performed by a recognized method. The allowable axial compressive load shall be not more than two-thirds of the calculated load-causing buckling. The additional bending moments due to bracket assemblies, structural eccentric forces and coupling rigidity shall be appropriately included in the buckling analysis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4225-html-1",
+      "kind" : "html",
+      "plainText" : "When helical piles are embedded in soils of Classes 6 and 7, a buckling analysis shall be performed by a recognized method. The allowable axial compressive load shall be not more than two-thirds of the calculated load-causing buckling. The additional bending moments due to bracket assemblies, structural eccentric forces and coupling rigidity shall be appropriately included in the buckling analysis."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4225
+}

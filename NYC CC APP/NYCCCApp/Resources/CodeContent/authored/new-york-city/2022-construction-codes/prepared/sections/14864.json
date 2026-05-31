@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169199\"><\/AnnotationDrawer><div>The fire protection peer reviewer shall review the fire engineering analysis and construction documents relevant to the analysis for general compliance with the applicable provisions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14864-html-1",
+      "kind" : "html",
+      "plainText" : "The fire protection peer reviewer shall review the fire engineering analysis and construction documents relevant to the analysis for general compliance with the applicable provisions of this code."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14864
+}

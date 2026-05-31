@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199128\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199128\"><\/AnnotationDrawer><div>Decorative appliances for installation in approved solid fuel-burning fireplaces shall be tested in accordance with ANSI Z21.60\/CSA 2.26 and shall be installed in accordance with the manufacturer's instructions. Manually lighted natural gas decorative appliances shall be tested in accordance with ANSI Z21.84.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21395-html-1",
+      "kind" : "html",
+      "plainText" : "Decorative appliances for installation in approved solid fuel-burning fireplaces shall be tested in accordance with ANSI Z21.60\/CSA 2.26 and shall be installed in accordance with the manufacturer's instructions. Manually lighted natural gas decorative appliances shall be tested in accordance with ANSI Z21.84."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21395
+}

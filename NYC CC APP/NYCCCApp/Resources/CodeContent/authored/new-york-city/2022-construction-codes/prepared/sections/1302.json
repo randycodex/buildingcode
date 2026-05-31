@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169952\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169952\"><\/AnnotationDrawer><div>A listed smoke damper designed to resist the passage of smoke shall be provided at each point a duct or air transfer opening penetrates a fire barrier that serves as a horizontal exit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1302-html-1",
+      "kind" : "html",
+      "plainText" : "A listed smoke damper designed to resist the passage of smoke shall be provided at each point a duct or air transfer opening penetrates a fire barrier that serves as a horizontal exit."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1302
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184374\"><\/AnnotationDrawer><div>The following terms are defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184375\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184375\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;LARGE WIND TURBINE.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184376\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184376\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;LARGE WIND TURBINE TOWER.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5692-html-1",
+      "kind" : "html",
+      "plainText" : "The following terms are defined in Chapter 2 :\n\n LARGE WIND TURBINE. \n\n LARGE WIND TURBINE TOWER."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5692
+}

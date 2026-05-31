@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195208\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195208\"><\/AnnotationDrawer><div>Cooling towers, evaporative condensers and fluid coolers shall be provided with ready access.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23840-html-1",
+      "kind" : "html",
+      "plainText" : "Cooling towers, evaporative condensers and fluid coolers shall be provided with ready access."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23840
+}

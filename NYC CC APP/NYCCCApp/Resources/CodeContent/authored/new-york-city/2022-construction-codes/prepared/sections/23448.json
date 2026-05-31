@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194026\"><\/AnnotationDrawer><div>A performance test shall be conducted upon completion of and before final approval of the installation of a ventilation system serving commercial cooking appliances. The test shall verify the rate of exhaust airflow required by Section 507.5, makeup airflow required by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-203358', hash: '#JD_MC508' }}\">508<\/Link>, and proper operation as specified in this chapter. The permit holder shall furnish the necessary test equipment and devices required to perform the tests. The performance test shall be witnessed by a special inspector.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194027\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194027\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-203342', hash: '#JD_L.L.2013\/148' }}\">L.L. 2013\/148<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-203358\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-203358\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-203358\"><\/AnnotationDrawer><h6><a name=\"JD_MC508\" id=\"JD_MC508\" title=\"MC 508\"><\/a>Section MC 508: Commercial Kitchen Makeup Air<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23448-html-1",
+      "kind" : "html",
+      "plainText" : "A performance test shall be conducted upon completion of and before final approval of the installation of a ventilation system serving commercial cooking appliances. The test shall verify the rate of exhaust airflow required by Section 507.5, makeup airflow required by Section 508 , and proper operation as specified in this chapter. The permit holder shall furnish the necessary test equipment and devices required to perform the tests. The performance test shall be witnessed by a special inspector.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2013\/148 . \n\n Section MC 508: Commercial Kitchen Makeup Air"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23448
+}

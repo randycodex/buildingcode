@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180033\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180033\"><\/AnnotationDrawer><div>Where multi-tier pit-pier underpinning is utilized, the upper piers shall be braced prior to the excavation of the lower pier and the installation of upper and lower piers staggered, unless the design per Section 1817.5 and drawings include explicit methods that will ensure that the installation of lower tiers shall not displace the tiers above.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18122-html-1",
+      "kind" : "html",
+      "plainText" : "Where multi-tier pit-pier underpinning is utilized, the upper piers shall be braced prior to the excavation of the lower pier and the installation of upper and lower piers staggered, unless the design per Section 1817.5 and drawings include explicit methods that will ensure that the installation of lower tiers shall not displace the tiers above."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18122
+}

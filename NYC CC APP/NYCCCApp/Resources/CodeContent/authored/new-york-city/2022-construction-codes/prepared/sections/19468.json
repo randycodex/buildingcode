@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184241\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184241\"><\/AnnotationDrawer><div>Gates shall comply with Sections 3109.4.2.1 through 3109.4.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19468-html-1",
+      "kind" : "html",
+      "plainText" : "Gates shall comply with Sections 3109.4.2.1 through 3109.4.2.3."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19468
+}

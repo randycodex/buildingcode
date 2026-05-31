@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196312\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196312\"><\/AnnotationDrawer><div>Flexible fuel-oil piping systems with continuous vacuum leak detection consisting of a single wall or double wall metallic primary carrier encased with outer polymer jacket shall comply with the requirements of Sections 1302.9.1 through 1302.9.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11448-html-1",
+      "kind" : "html",
+      "plainText" : "Flexible fuel-oil piping systems with continuous vacuum leak detection consisting of a single wall or double wall metallic primary carrier encased with outer polymer jacket shall comply with the requirements of Sections 1302.9.1 through 1302.9.2."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11448
+}

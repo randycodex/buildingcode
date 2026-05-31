@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194748\"><\/AnnotationDrawer><div>Openings shall be provided, located and sized in accordance with Sections 702.3.1 and 702.3.2; additionally, there shall be one opening to the outdoors having a free area of at least 1 square inch per 5,000 Btu\/h (440 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/kW) of total input of all appliances in the space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-194749\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-194749\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-194749\"><\/AnnotationDrawer><h6><a name=\"JD_MC706\" id=\"JD_MC706\" title=\"MC 706\"><\/a>Section MC 706: Mechanical Combustion Air Supply<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23687-html-1",
+      "kind" : "html",
+      "plainText" : "Openings shall be provided, located and sized in accordance with Sections 702.3.1 and 702.3.2; additionally, there shall be one opening to the outdoors having a free area of at least 1 square inch per 5,000 Btu\/h (440 mm\n\n 2 \n\n \/kW) of total input of all appliances in the space.\n\n Section MC 706: Mechanical Combustion Air Supply"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 23687
+}

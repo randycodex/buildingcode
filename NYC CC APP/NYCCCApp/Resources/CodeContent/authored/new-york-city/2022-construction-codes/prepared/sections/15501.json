@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171512\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171512\"><\/AnnotationDrawer><div>Automatic equipment interlocks with fuel shutoffs, ventilation controls, door closers, window shutters, conveyor openings, smoke and heat vents and other features necessary for proper operation of the fire-extinguishing system shall be provided as required by the design and installation standard utilized for the hazard.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15501-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic equipment interlocks with fuel shutoffs, ventilation controls, door closers, window shutters, conveyor openings, smoke and heat vents and other features necessary for proper operation of the fire-extinguishing system shall be provided as required by the design and installation standard utilized for the hazard."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15501
+}

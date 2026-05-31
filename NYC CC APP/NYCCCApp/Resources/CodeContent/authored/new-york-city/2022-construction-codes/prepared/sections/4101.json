@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179468\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179468\"><\/AnnotationDrawer><div>The use of lagged or inverted timber piles is permitted. Double lagging shall be adequately connected to the basic timber pile material to transfer the full load from the basic timber pile material to the lagging without exceeding values of allowable stress as established in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-181504', hash: '#JD_BCCh.23' }}\">Chapter 23<\/Link>. The connection for single lagging shall be proportioned for half the timber pile load. The diameter of any inverted timber pile at any section shall be adequate to resist the applied load without exceeding the stresses specified in Section 1811.5.4, but in no case shall it be less than 8 inches (203.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4101-html-1",
+      "kind" : "html",
+      "plainText" : "The use of lagged or inverted timber piles is permitted. Double lagging shall be adequately connected to the basic timber pile material to transfer the full load from the basic timber pile material to the lagging without exceeding values of allowable stress as established in Chapter 23 . The connection for single lagging shall be proportioned for half the timber pile load. The diameter of any inverted timber pile at any section shall be adequate to resist the applied load without exceeding the stresses specified in Section 1811.5.4, but in no case shall it be less than 8 inches (203.2 mm)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4101
+}

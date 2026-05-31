@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163105\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163105\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The size of the relief vent shall be equal to the size of the vent stack to which it connects. The lower end of each relief vent shall connect to the soil or waste stack through a wye below the horizontal branch serving the floor, and the upper end shall connect to the vent stack through a tee or inverted wye not less than 3 feet (914 mm) above the floor.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163106\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163106\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163106\"><\/AnnotationDrawer><h6><a name=\"JD_PC909\" id=\"JD_PC909\" title=\"PC 909\"><\/a>Section PC 909: Fixture Vents<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25324-html-1",
+      "kind" : "html",
+      "plainText" : "The size of the relief vent shall be equal to the size of the vent stack to which it connects. The lower end of each relief vent shall connect to the soil or waste stack through a wye below the horizontal branch serving the floor, and the upper end shall connect to the vent stack through a tee or inverted wye not less than 3 feet (914 mm) above the floor. \n\n Section PC 909: Fixture Vents"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25324
+}

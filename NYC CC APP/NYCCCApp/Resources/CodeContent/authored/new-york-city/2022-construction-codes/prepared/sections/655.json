@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167875\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167875\"><\/AnnotationDrawer><div>The construction and installation of dry cleaning plants shall be in accordance with the requirements of this code, the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code,<\/span> the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span> and NFPA 32. Dry cleaning solvents and systems shall be classified in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "655-html-1",
+      "kind" : "html",
+      "plainText" : "The construction and installation of dry cleaning plants shall be in accordance with the requirements of this code, the New York City Mechanical Code, the New York City Plumbing Code and NFPA 32. Dry cleaning solvents and systems shall be classified in accordance with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 655
+}

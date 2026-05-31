@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183528\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183528\"><\/AnnotationDrawer><div>Standby power shall be provided for smoke control systems in accordance with Section 909.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5377-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power shall be provided for smoke control systems in accordance with Section 909.11."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5377
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162260\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162260\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Nonpotable distribution piping shall be purple in color and shall be embossed, or integrally stamped or marked, with the words: \"CAUTION: NONPOTABLE WATER &#8211; DO NOT DRINK\" or the piping shall be installed with a purple identification tape or wrap. Pipe identification shall include the contents of the piping system and an arrow indicating the direction of flow. Hazardous piping systems shall also contain information addressing the nature of the hazard. Pipe identification shall be repeated at intervals not exceeding 25 feet (7620 mm) and at each point where the piping passes through a wall, floor or roof. Lettering shall be readily observable within the room or space where the piping is located.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24991-html-1",
+      "kind" : "html",
+      "plainText" : "Nonpotable distribution piping shall be purple in color and shall be embossed, or integrally stamped or marked, with the words: \"CAUTION: NONPOTABLE WATER - DO NOT DRINK\" or the piping shall be installed with a purple identification tape or wrap. Pipe identification shall include the contents of the piping system and an arrow indicating the direction of flow. Hazardous piping systems shall also contain information addressing the nature of the hazard. Pipe identification shall be repeated at intervals not exceeding 25 feet (7620 mm) and at each point where the piping passes through a wall, floor or roof. Lettering shall be readily observable within the room or space where the piping is located."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24991
+}

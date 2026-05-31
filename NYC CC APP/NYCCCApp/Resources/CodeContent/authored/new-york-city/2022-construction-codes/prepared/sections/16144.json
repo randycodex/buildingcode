@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173644\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173644\"><\/AnnotationDrawer><div>Nosings shall have a curvature or bevel of not less than 1\/16 inch (1.6 mm) but not more than 9\/16 inch (14.3 mm) from the foremost projection of the tread. Risers shall be solid and vertical or sloped under the tread above from the underside of the nosing above at an angle not more than 30 degrees (0.52 rad) from the vertical.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16144-html-1",
+      "kind" : "html",
+      "plainText" : "Nosings shall have a curvature or bevel of not less than 1\/16 inch (1.6 mm) but not more than 9\/16 inch (14.3 mm) from the foremost projection of the tread. Risers shall be solid and vertical or sloped under the tread above from the underside of the nosing above at an angle not more than 30 degrees (0.52 rad) from the vertical."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16144
+}

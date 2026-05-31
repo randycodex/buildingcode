@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167177\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167177\"><\/AnnotationDrawer><div>Locking devices that restrict access to a care recipient's room from the corridor and that are operable only by staff from the corridor side shall not restrict the means of egress from the care recipient's room.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167178\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167178\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167179\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167179\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;This section shall not apply to rooms in psychiatric treatment and similar care areas.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167180\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167180\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Locking arrangements in accordance with Section 1010.1.9.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14258-html-1",
+      "kind" : "html",
+      "plainText" : "Locking devices that restrict access to a care recipient's room from the corridor and that are operable only by staff from the corridor side shall not restrict the means of egress from the care recipient's room.\n\n Exceptions: \n\n 1. This section shall not apply to rooms in psychiatric treatment and similar care areas.\n\n 2. Locking arrangements in accordance with Section 1010.1.9.6."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14258
+}

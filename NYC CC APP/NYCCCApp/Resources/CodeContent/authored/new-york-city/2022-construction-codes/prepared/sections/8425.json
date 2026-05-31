@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198656\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198656\"><\/AnnotationDrawer><div>Gas vents installed within masonry chimneys shall be installed in accordance with the terms of their listing and the manufacturer's instructions. Gas vents installed within masonry chimneys shall be identified with a permanent label installed at the point where the vent enters the chimney. The label shall contain the following language: \"This gas vent is for appliances that burn gas. Do not connect to solid or liquid fuel-burning appliances or incinerators.\"<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8425-html-1",
+      "kind" : "html",
+      "plainText" : "Gas vents installed within masonry chimneys shall be installed in accordance with the terms of their listing and the manufacturer's instructions. Gas vents installed within masonry chimneys shall be identified with a permanent label installed at the point where the vent enters the chimney. The label shall contain the following language: \"This gas vent is for appliances that burn gas. Do not connect to solid or liquid fuel-burning appliances or incinerators.\""
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8425
+}

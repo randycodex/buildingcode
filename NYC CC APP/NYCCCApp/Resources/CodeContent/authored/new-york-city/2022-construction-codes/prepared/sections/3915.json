@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178874\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178874\"><\/AnnotationDrawer><div>Geotechnical investigations shall be subject to special inspections in accordance with Sections 1705.6, 1705.7 and 1705.19 and be conducted in accordance with Sections 1803.2 through 1803.7. An engineer shall scope, supervise and approve the subsurface investigation and the classification of the soil and rock encountered.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3915-html-1",
+      "kind" : "html",
+      "plainText" : "Geotechnical investigations shall be subject to special inspections in accordance with Sections 1705.6, 1705.7 and 1705.19 and be conducted in accordance with Sections 1803.2 through 1803.7. An engineer shall scope, supervise and approve the subsurface investigation and the classification of the soil and rock encountered."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3915
+}

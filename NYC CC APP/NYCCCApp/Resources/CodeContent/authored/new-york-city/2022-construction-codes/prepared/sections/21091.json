@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198227\"><\/AnnotationDrawer><div>An approved shutoff valve shall be installed immediately ahead of each MP regulator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21091-html-1",
+      "kind" : "html",
+      "plainText" : "An approved shutoff valve shall be installed immediately ahead of each MP regulator."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21091
+}

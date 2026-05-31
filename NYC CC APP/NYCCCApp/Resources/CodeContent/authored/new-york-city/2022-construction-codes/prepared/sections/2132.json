@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172923\"><\/AnnotationDrawer><div>Protruding objects shall not reduce the minimum clear width of accessible routes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2132-html-1",
+      "kind" : "html",
+      "plainText" : "Protruding objects shall not reduce the minimum clear width of accessible routes."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2132
+}

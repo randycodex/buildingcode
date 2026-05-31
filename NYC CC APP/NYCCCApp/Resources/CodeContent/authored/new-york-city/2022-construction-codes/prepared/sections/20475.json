@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187248\"><\/AnnotationDrawer><div>Suspended scaffolds shall meet the requirements of Sections 3314.10.1 through 3314.10.14.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20475-html-1",
+      "kind" : "html",
+      "plainText" : "Suspended scaffolds shall meet the requirements of Sections 3314.10.1 through 3314.10.14."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20475
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176678\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176678\"><\/AnnotationDrawer><div>Concrete and clay tile shall be installed only over solid sheathing or spaced structural sheathing boards.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3273-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete and clay tile shall be installed only over solid sheathing or spaced structural sheathing boards."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3273
+}

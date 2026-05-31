@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173258\"><\/AnnotationDrawer><div>Where an elevator lobby serves as an area of rescue assistance, the shaft and lobby shall comply with Section 713.14 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183610', hash: '#JD_BCCh.30' }}\">Chapter 30<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2229-html-1",
+      "kind" : "html",
+      "plainText" : "Where an elevator lobby serves as an area of rescue assistance, the shaft and lobby shall comply with Section 713.14 and Chapter 30 ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2229
+}

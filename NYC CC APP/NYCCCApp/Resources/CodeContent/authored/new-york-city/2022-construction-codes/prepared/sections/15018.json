@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169619\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169619\"><\/AnnotationDrawer><div>Elevator, dumbwaiter and other hoistway enclosures shall be constructed in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183610', hash: '#JD_BCCh.30' }}\">Chapter 30<\/Link> and this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-169620\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-169620\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-169620\"><\/AnnotationDrawer><h6><a name=\"JD_BC714\" id=\"JD_BC714\" title=\"BC 714\"><\/a>Section BC 714: Penetrations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15018-html-1",
+      "kind" : "html",
+      "plainText" : "Elevator, dumbwaiter and other hoistway enclosures shall be constructed in accordance with Chapter 30 and this section.\n\n Section BC 714: Penetrations"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15018
+}

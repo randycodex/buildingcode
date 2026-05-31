@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179289\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179289\"><\/AnnotationDrawer><div>Where load bearing capacities of the installed deep foundations are in doubt, are considered non-conforming by the engineer, or where required by the commissioner, additional deep foundation elements shall be load tested to establish the allowable capacity. For friction-based deep foundations where the actual production deep foundation lengths vary more than 25 percent from that of the deep foundations initially installed and load tested, the engineer shall determine if additional load tests are required to establish the allowable capacity of the deep foundation. The number of additional load tests shall be determined by the engineer or commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17869-html-1",
+      "kind" : "html",
+      "plainText" : "Where load bearing capacities of the installed deep foundations are in doubt, are considered non-conforming by the engineer, or where required by the commissioner, additional deep foundation elements shall be load tested to establish the allowable capacity. For friction-based deep foundations where the actual production deep foundation lengths vary more than 25 percent from that of the deep foundations initially installed and load tested, the engineer shall determine if additional load tests are required to establish the allowable capacity of the deep foundation. The number of additional load tests shall be determined by the engineer or commissioner."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17869
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181953\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181953\"><\/AnnotationDrawer><div>Wood used in contact with exposed earth shall be naturally durable for both decay and termite resistance or preservative treated in accordance with AWPA U1 for soil or fresh water use.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181954\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181954\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Untreated wood is permitted where such wood is continuously and entirely below the ground-water level or submerged in fresh water.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4969-html-1",
+      "kind" : "html",
+      "plainText" : "Wood used in contact with exposed earth shall be naturally durable for both decay and termite resistance or preservative treated in accordance with AWPA U1 for soil or fresh water use.\n\n Exception: Untreated wood is permitted where such wood is continuously and entirely below the ground-water level or submerged in fresh water."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4969
+}

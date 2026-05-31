@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184564\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184564\"><\/AnnotationDrawer><div>When the occupancy or use of a building with a marquee is changed to an occupancy or use for which a projecting marquee is not permitted, the marquee shall be removed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184565\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184565\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> For buildings subject to the jurisdiction of the Landmarks Preservation Commission, Section 3202.2.1.4.6 shall not apply when the Landmarks Preservation Commission makes a determination that the removal of the marquee would be inappropriate to the architectural character of the building or historic district.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19613-html-1",
+      "kind" : "html",
+      "plainText" : "When the occupancy or use of a building with a marquee is changed to an occupancy or use for which a projecting marquee is not permitted, the marquee shall be removed.\n\n Exception: For buildings subject to the jurisdiction of the Landmarks Preservation Commission, Section 3202.2.1.4.6 shall not apply when the Landmarks Preservation Commission makes a determination that the removal of the marquee would be inappropriate to the architectural character of the building or historic district."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19613
+}

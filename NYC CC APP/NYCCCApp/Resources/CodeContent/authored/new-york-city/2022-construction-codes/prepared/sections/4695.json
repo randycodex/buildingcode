@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181139\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181139\"><\/AnnotationDrawer><div>In structures assigned to Seismic Design Category A or B, or those exempt from seismic analysis, seismic reinforcement is not required. In structures assigned to Seismic Design Category C or D, masonry chimneys shall be analyzed and designed for seismic loading in accordance with TMS 402, and at a minimum shall be reinforced and anchored in accordance with Sections 2113.3.1, 2113.3.2, and 2113.4, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180981', hash: '#JD_BCTable2111.1' }}\">Table 2111.1<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180981', hash: '#JD_BCFigure2111.1' }}\">Figure 2111.1<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4695-html-1",
+      "kind" : "html",
+      "plainText" : "In structures assigned to Seismic Design Category A or B, or those exempt from seismic analysis, seismic reinforcement is not required. In structures assigned to Seismic Design Category C or D, masonry chimneys shall be analyzed and designed for seismic loading in accordance with TMS 402, and at a minimum shall be reinforced and anchored in accordance with Sections 2113.3.1, 2113.3.2, and 2113.4, Table 2111.1 and Figure 2111.1 ."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4695
+}

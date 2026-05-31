@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185800\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185800\"><\/AnnotationDrawer><div>Cutting, notching, and splicing of cold-formed steel structural members shall be performed only in accordance with specifications as indicated on drawings, including but not limited to erection drawings, approved by a registered design professional.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6191-html-1",
+      "kind" : "html",
+      "plainText" : "Cutting, notching, and splicing of cold-formed steel structural members shall be performed only in accordance with specifications as indicated on drawings, including but not limited to erection drawings, approved by a registered design professional."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6191
+}

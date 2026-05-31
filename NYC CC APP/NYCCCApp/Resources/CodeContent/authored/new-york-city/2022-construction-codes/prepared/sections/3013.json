@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175917\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175917\"><\/AnnotationDrawer><div>This section shall apply to common interior walls, partitions and floor\/ceiling assemblies between adjacent dwelling units, between dwelling units and adjacent mechanical equipment spaces, or between dwelling units and adjacent occupancies, and public areas such as halls, corridors, stairs or service areas.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3013-html-1",
+      "kind" : "html",
+      "plainText" : "This section shall apply to common interior walls, partitions and floor\/ceiling assemblies between adjacent dwelling units, between dwelling units and adjacent mechanical equipment spaces, or between dwelling units and adjacent occupancies, and public areas such as halls, corridors, stairs or service areas."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 3013
+}

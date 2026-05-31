@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173677\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173677\"><\/AnnotationDrawer><div>A flight of stairs shall not have a vertical rise greater than 12 feet (3657.6 mm) between floor levels or landings.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173678\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173678\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173679\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173679\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Aisle stairs complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174405', hash: '#JD_BC1029' }}\">1029<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173680\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173680\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Alternating tread devices complying with Section 1011.14.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173681\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;Spiral stairways used as a means of egress from technical production areas.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2326-html-1",
+      "kind" : "html",
+      "plainText" : "A flight of stairs shall not have a vertical rise greater than 12 feet (3657.6 mm) between floor levels or landings.\n\n Exceptions: \n\n 1. Aisle stairs complying with Section 1029 .\n\n 2. Alternating tread devices complying with Section 1011.14.\n\n 3. Spiral stairways used as a means of egress from technical production areas."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2326
+}

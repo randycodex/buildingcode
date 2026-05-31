@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179157\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179157\"><\/AnnotationDrawer><div>The thickness of plain concrete footings supporting walls of other than light-frame construction shall not be less than 8 inches (203.2 mm) where placed on soil.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179158\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179158\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> For plain concrete footings supporting Group R-3 occupancies, the thickness is permitted to be 6 inches (152.4 mm), provided that the footing does not extend beyond a distance greater than the thickness of the footing on either side of the supported wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17822-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of plain concrete footings supporting walls of other than light-frame construction shall not be less than 8 inches (203.2 mm) where placed on soil.\n\n Exception: For plain concrete footings supporting Group R-3 occupancies, the thickness is permitted to be 6 inches (152.4 mm), provided that the footing does not extend beyond a distance greater than the thickness of the footing on either side of the supported wall."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17822
+}

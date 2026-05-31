@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196373\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196373\"><\/AnnotationDrawer><div>The fuel-oil system shall be sized for the maximum capacity of fuel oil required. The minimum size of a supply line shall be 3\/8-inch (9.5 mm) inside diameter nominal pipe or 3\/8-inch (9.5 mm) OD tubing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24304-html-1",
+      "kind" : "html",
+      "plainText" : "The fuel-oil system shall be sized for the maximum capacity of fuel oil required. The minimum size of a supply line shall be 3\/8-inch (9.5 mm) inside diameter nominal pipe or 3\/8-inch (9.5 mm) OD tubing."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24304
+}

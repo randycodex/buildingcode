@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178671\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178671\"><\/AnnotationDrawer><div>A written record of the special inspections performed for the tenant protection plan shall be maintained in a log prepared by the special inspector. The log shall include an entry for each inspection and shall indicate that the alteration or construction operation is being performed in accordance with the tenant protection plan. Copies of the special inspection log book shall be maintained at the job site, and at the office of the special inspector, and shall be available for use and review at all reasonable times, until the work subject to special inspection is complete.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3846-html-1",
+      "kind" : "html",
+      "plainText" : "A written record of the special inspections performed for the tenant protection plan shall be maintained in a log prepared by the special inspector. The log shall include an entry for each inspection and shall indicate that the alteration or construction operation is being performed in accordance with the tenant protection plan. Copies of the special inspection log book shall be maintained at the job site, and at the office of the special inspector, and shall be available for use and review at all reasonable times, until the work subject to special inspection is complete."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3846
+}

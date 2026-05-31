@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174773\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174773\"><\/AnnotationDrawer><div>Identifying accessibility signage shall be provided in accordance with item 5 of Section 1111.1 at accessible building entrances where not all entrances are accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16459-html-1",
+      "kind" : "html",
+      "plainText" : "Identifying accessibility signage shall be provided in accordance with item 5 of Section 1111.1 at accessible building entrances where not all entrances are accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16459
+}

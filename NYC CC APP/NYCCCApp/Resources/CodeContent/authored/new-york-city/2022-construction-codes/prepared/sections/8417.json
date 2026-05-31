@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198639\"><\/AnnotationDrawer><div>A combination gas- and solid fuel-burning appliance shall be permitted to be connected to a single chimney flue where equipped with a manual reset device to shut off gas to the main burner in the event of sustained back draft or flue gas spillage. The chimney flue shall be sized to properly vent the appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8417-html-1",
+      "kind" : "html",
+      "plainText" : "A combination gas- and solid fuel-burning appliance shall be permitted to be connected to a single chimney flue where equipped with a manual reset device to shut off gas to the main burner in the event of sustained back draft or flue gas spillage. The chimney flue shall be sized to properly vent the appliance."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8417
+}

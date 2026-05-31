@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182766\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182766\"><\/AnnotationDrawer><div>The locations specified in Sections 2406.4.1 through 2406.4.7 shall be considered to be specific hazardous locations requiring safety glazing materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18958-html-1",
+      "kind" : "html",
+      "plainText" : "The locations specified in Sections 2406.4.1 through 2406.4.7 shall be considered to be specific hazardous locations requiring safety glazing materials."
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 18958
+}

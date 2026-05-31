@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198075\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198075\"><\/AnnotationDrawer><div>Expansion joints shall be provided with temporary restraints, if required, for the additional thrust load under test.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8211-html-1",
+      "kind" : "html",
+      "plainText" : "Expansion joints shall be provided with temporary restraints, if required, for the additional thrust load under test."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8211
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163428\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163428\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The sanitary and storm drainage systems of a structure shall be entirely separate except for minor modifications to existing buildings having combined systems. Where a combined building drain is utilized, the building storm drain shall be connected in the same horizontal plane through a single-wye fitting to the building drain at least 10 feet (3048 mm) downstream from any soil stack. If a separate city storm sewer is not available, building sanitary drains shall be separate and shall only be permitted to connect to a common building combined drain downstream of building (house) trap.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12612-html-1",
+      "kind" : "html",
+      "plainText" : "The sanitary and storm drainage systems of a structure shall be entirely separate except for minor modifications to existing buildings having combined systems. Where a combined building drain is utilized, the building storm drain shall be connected in the same horizontal plane through a single-wye fitting to the building drain at least 10 feet (3048 mm) downstream from any soil stack. If a separate city storm sewer is not available, building sanitary drains shall be separate and shall only be permitted to connect to a common building combined drain downstream of building (house) trap."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 12612
+}

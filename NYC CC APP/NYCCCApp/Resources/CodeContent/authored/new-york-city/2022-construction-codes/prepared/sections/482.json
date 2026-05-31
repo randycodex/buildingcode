@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167335\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167335\"><\/AnnotationDrawer><div>Doors in openings in partitions required to be smoke tight by Section 408.8 shall be substantial doors, of construction that will resist the passage of smoke. Latches and door closures are not required on cell doors.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "482-html-1",
+      "kind" : "html",
+      "plainText" : "Doors in openings in partitions required to be smoke tight by Section 408.8 shall be substantial doors, of construction that will resist the passage of smoke. Latches and door closures are not required on cell doors."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 482
+}

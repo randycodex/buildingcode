@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194334\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194334\"><\/AnnotationDrawer><div>Ducts shall be approved for underground installation. Metallic ducts not having an approved protective coating shall be completely encased in not less than 2 inches (50.8 mm) of concrete.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23549-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts shall be approved for underground installation. Metallic ducts not having an approved protective coating shall be completely encased in not less than 2 inches (50.8 mm) of concrete."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23549
+}

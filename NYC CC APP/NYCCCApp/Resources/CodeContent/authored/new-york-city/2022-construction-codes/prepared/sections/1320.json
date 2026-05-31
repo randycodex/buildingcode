@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170030\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170030\"><\/AnnotationDrawer><div>Fireblocking and draftstopping shall be installed in combustible and noncombustible concealed locations in accordance with this section. Fireblocking shall comply with Section 718.2. Draftstopping in floor\/ceiling spaces and attic spaces shall comply with Sections 718.3 and 718.4, respectively. The permitted use of combustible materials in concealed spaces of buildings of Type I or II construction shall be limited to the applications indicated in Section 718.5. Installations of fireblocking and draftstopping shall comply with the special inspection requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170031\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170031\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Concealed spaces that are sprinklered in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-171003', hash: '#JD_BCCh.9' }}\">Chapter 9<\/Link> or are constructed as a shaft.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1320-html-1",
+      "kind" : "html",
+      "plainText" : "Fireblocking and draftstopping shall be installed in combustible and noncombustible concealed locations in accordance with this section. Fireblocking shall comply with Section 718.2. Draftstopping in floor\/ceiling spaces and attic spaces shall comply with Sections 718.3 and 718.4, respectively. The permitted use of combustible materials in concealed spaces of buildings of Type I or II construction shall be limited to the applications indicated in Section 718.5. Installations of fireblocking and draftstopping shall comply with the special inspection requirements of Chapter 17 .\n\n Exception: Concealed spaces that are sprinklered in accordance with Chapter 9 or are constructed as a shaft."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1320
+}

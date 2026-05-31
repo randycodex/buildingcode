@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167742\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167742\"><\/AnnotationDrawer><div>The overhead structure shall be of approved noncombustible construction with a maximum area of 1,500 square feet (140 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167743\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167743\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The maximum area is permitted to be increased as provided by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168483', hash: '#JD_BC506' }}\">506<\/Link>. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-167744\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-167744\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-167744\"><\/AnnotationDrawer><h6><a name=\"JD_BC415\" id=\"JD_BC415\" title=\"BC 415\"><\/a>Section BC 415: Groups H-1, H-2, H-3, H-4 and H-5<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "615-html-1",
+      "kind" : "html",
+      "plainText" : "The overhead structure shall be of approved noncombustible construction with a maximum area of 1,500 square feet (140 m\n\n 2 \n\n ).\n\n Exception: The maximum area is permitted to be increased as provided by Section 506 . \n\n Section BC 415: Groups H-1, H-2, H-3, H-4 and H-5"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 615
+}

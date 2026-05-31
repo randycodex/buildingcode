@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174098\"><\/AnnotationDrawer><div>Exterior exit doors shall lead directly to the exit discharge or the public way.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-174099\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-174099\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-174099\"><\/AnnotationDrawer><h6><a name=\"JD_BC1023\" id=\"JD_BC1023\" title=\"BC 1023\"><\/a>Section BC 1023: Interior Exit Stairways and Ramps<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2431-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior exit doors shall lead directly to the exit discharge or the public way.\n\n Section BC 1023: Interior Exit Stairways and Ramps"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2431
+}

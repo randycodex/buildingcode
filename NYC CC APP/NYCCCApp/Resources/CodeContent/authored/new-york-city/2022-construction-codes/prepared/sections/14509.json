@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167952\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167952\"><\/AnnotationDrawer><div>An emergency alarm system shall be provided in service corridors, with no fewer than one alarm device in each service corridor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14509-html-1",
+      "kind" : "html",
+      "plainText" : "An emergency alarm system shall be provided in service corridors, with no fewer than one alarm device in each service corridor."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14509
+}

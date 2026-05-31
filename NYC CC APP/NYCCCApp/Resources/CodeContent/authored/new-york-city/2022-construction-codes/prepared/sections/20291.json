@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186618\"><\/AnnotationDrawer><div>Whenever subsurface operations, other than excavation or fill, are conducted that may impose loads or movements on adjoining property, including but not limited to the driving of piles, compaction of soils, or soil solidification, the effects of such operations on adjoining property and structures shall be monitored in accordance with Section 3309.16.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186619\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186619\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Monitoring during underpinning or alternate methods of support of buildings and adjacent property shall be in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179904', hash: '#JD_BC1817' }}\">1817<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20291-html-1",
+      "kind" : "html",
+      "plainText" : "Whenever subsurface operations, other than excavation or fill, are conducted that may impose loads or movements on adjoining property, including but not limited to the driving of piles, compaction of soils, or soil solidification, the effects of such operations on adjoining property and structures shall be monitored in accordance with Section 3309.16.\n\n Exception: Monitoring during underpinning or alternate methods of support of buildings and adjacent property shall be in accordance with Section 1817 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20291
+}

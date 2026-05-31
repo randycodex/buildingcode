@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162368\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162368\"><\/AnnotationDrawer><div>Well sites shall be positively drained and shall be at higher elevations than potential sources of contamination.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25035-html-1",
+      "kind" : "html",
+      "plainText" : "Well sites shall be positively drained and shall be at higher elevations than potential sources of contamination."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25035
+}

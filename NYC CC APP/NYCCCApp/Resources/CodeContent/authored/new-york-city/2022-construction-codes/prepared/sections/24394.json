@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196640\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196640\"><\/AnnotationDrawer><div>All structural members shall be designed in accordance with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24394-html-1",
+      "kind" : "html",
+      "plainText" : "All structural members shall be designed in accordance with the requirements of the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24394
+}

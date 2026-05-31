@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184119\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184119\"><\/AnnotationDrawer><div>Openings in exterior walls required to be fire-resistance-rated in accordance with Section 3104.5.1.1 shall be equipped with opening protectives providing a not less than 3\/4-hour fire protection rating in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169727', hash: '#JD_BC716' }}\">716<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19422-html-1",
+      "kind" : "html",
+      "plainText" : "Openings in exterior walls required to be fire-resistance-rated in accordance with Section 3104.5.1.1 shall be equipped with opening protectives providing a not less than 3\/4-hour fire protection rating in accordance with Section 716 ."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19422
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176978\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176978\"><\/AnnotationDrawer><div>Unenclosed roof tanks shall have covers sloping toward the perimeter of the tanks.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17214-html-1",
+      "kind" : "html",
+      "plainText" : "Unenclosed roof tanks shall have covers sloping toward the perimeter of the tanks."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17214
+}

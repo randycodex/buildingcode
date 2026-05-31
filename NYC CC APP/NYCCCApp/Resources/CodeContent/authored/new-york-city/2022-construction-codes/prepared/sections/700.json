@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167998\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167998\"><\/AnnotationDrawer><div>Where HPM gases or liquids are carried in pressurized piping above 15 pounds per square inch gauge (psig) (103.4 kPa), excess flow control shall be provided. Where the piping originates from within a liquid storage room, HPM room or gas room, the excess flow control shall be located within the liquid storage room, HPM room or gas room. Where the piping originates from a bulk source, the excess flow control shall be located as close to the bulk source as practical.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "700-html-1",
+      "kind" : "html",
+      "plainText" : "Where HPM gases or liquids are carried in pressurized piping above 15 pounds per square inch gauge (psig) (103.4 kPa), excess flow control shall be provided. Where the piping originates from within a liquid storage room, HPM room or gas room, the excess flow control shall be located within the liquid storage room, HPM room or gas room. Where the piping originates from a bulk source, the excess flow control shall be located as close to the bulk source as practical."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 700
+}

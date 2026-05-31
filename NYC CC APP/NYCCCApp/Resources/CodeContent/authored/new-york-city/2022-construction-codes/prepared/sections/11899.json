@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161599\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161599\"><\/AnnotationDrawer><div>Waste connections shall not be required for emergency showers and eyewash stations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161600\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161600\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161600\"><\/AnnotationDrawer><h6><a name=\"JD_PC412\" id=\"JD_PC412\" title=\"PC 412\"><\/a>Section PC 412: Floor and Trench Drains<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11899-html-1",
+      "kind" : "html",
+      "plainText" : "Waste connections shall not be required for emergency showers and eyewash stations.\n\n Section PC 412: Floor and Trench Drains"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11899
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174860\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174860\"><\/AnnotationDrawer><div>At least one accessible route shall connect accessible buildings, accessible facilities, accessible elements and accessible spaces that are on the same site and shall comply with Section 1104.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174861\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174861\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174862\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174862\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;An accessible route is not required between accessible buildings, accessible facilities, accessible elements and accessible spaces that have, as the only means of access between them, a vehicular way not providing for pedestrian access.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174863\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174863\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;An accessible route to recreational facilities shall only be required to the extent specified in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175537', hash: '#JD_BC1110' }}\">1110<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2654-html-1",
+      "kind" : "html",
+      "plainText" : "At least one accessible route shall connect accessible buildings, accessible facilities, accessible elements and accessible spaces that are on the same site and shall comply with Section 1104.5.\n\n Exceptions: \n\n 1. An accessible route is not required between accessible buildings, accessible facilities, accessible elements and accessible spaces that have, as the only means of access between them, a vehicular way not providing for pedestrian access.\n\n 2. An accessible route to recreational facilities shall only be required to the extent specified in Section 1110 ."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2654
+}

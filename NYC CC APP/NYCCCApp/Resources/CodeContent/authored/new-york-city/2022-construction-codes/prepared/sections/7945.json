@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197021\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197021\"><\/AnnotationDrawer><div>The commissioner shall have the authority to require disconnection of utility service to the building, structure or system regulated by the technical codes in case of emergency where necessary to eliminate an immediate hazard to life or property. The commissioner shall notify the serving utility, and wherever possible, the owner and occupant of the building, structure or service system of the decision to disconnect prior to taking such action. If not notified prior to disconnection, the owner or occupant of the building, structure or service system shall be notified in writing, as soon as practicable thereafter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7945-html-1",
+      "kind" : "html",
+      "plainText" : "The commissioner shall have the authority to require disconnection of utility service to the building, structure or system regulated by the technical codes in case of emergency where necessary to eliminate an immediate hazard to life or property. The commissioner shall notify the serving utility, and wherever possible, the owner and occupant of the building, structure or service system of the decision to disconnect prior to taking such action. If not notified prior to disconnection, the owner or occupant of the building, structure or service system shall be notified in writing, as soon as practicable thereafter."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 7945
+}

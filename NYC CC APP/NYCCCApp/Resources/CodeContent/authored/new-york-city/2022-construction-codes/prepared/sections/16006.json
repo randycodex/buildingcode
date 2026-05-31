@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173064\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173064\"><\/AnnotationDrawer><div>Two exit access doorways are required in boiler, incinerator and furnace rooms where the area is over 500 square feet (46.5 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) and any fuel-fired equipment exceeds 400,000 British thermal units (Btu) (422 000 KJ) input capacity. Where two exit access doorways are required, one such doorway is permitted to be served by a fixed ladder or an alternating tread device. Exit access doorways shall be separated by a horizontal distance equal to one-half the length of the maximum overall diagonal dimension of the room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16006-html-1",
+      "kind" : "html",
+      "plainText" : "Two exit access doorways are required in boiler, incinerator and furnace rooms where the area is over 500 square feet (46.5 m\n\n 2 \n\n ) and any fuel-fired equipment exceeds 400,000 British thermal units (Btu) (422 000 KJ) input capacity. Where two exit access doorways are required, one such doorway is permitted to be served by a fixed ladder or an alternating tread device. Exit access doorways shall be separated by a horizontal distance equal to one-half the length of the maximum overall diagonal dimension of the room."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16006
+}

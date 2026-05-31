@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169659\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169659\"><\/AnnotationDrawer><div>Noncombustible penetrating items shall not connect to combustible items beyond the point of fire stopping unless it can be demonstrated to the commissioner that the fire-resistance integrity of the wall is maintained.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1206-html-1",
+      "kind" : "html",
+      "plainText" : "Noncombustible penetrating items shall not connect to combustible items beyond the point of fire stopping unless it can be demonstrated to the commissioner that the fire-resistance integrity of the wall is maintained."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1206
+}

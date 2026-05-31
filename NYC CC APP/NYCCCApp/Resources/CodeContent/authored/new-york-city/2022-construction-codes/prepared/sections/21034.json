@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198070\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198070\"><\/AnnotationDrawer><div>The test medium shall be air, nitrogen, carbon dioxide or an inert gas. Oxygen shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21034-html-1",
+      "kind" : "html",
+      "plainText" : "The test medium shall be air, nitrogen, carbon dioxide or an inert gas. Oxygen shall not be used."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21034
+}

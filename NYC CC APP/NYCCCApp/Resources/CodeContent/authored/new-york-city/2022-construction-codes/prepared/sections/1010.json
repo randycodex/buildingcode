@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169093\"><\/AnnotationDrawer><div>Exterior walls shall extend to the height required by Section 705.11. Interior structural elements that brace the exterior wall but that are not located within the plane of the exterior wall shall have the minimum fire-resistance rating required in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable601' }}\">Table 601<\/Link> for that structural element. Structural elements that brace the exterior wall but are located outside of the exterior wall or wholly or partly within the plane of the exterior wall shall have the minimum fire-resistance rating required in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable601' }}\">Tables 601<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168793', hash: '#JD_BCTable602' }}\">602<\/Link> for the exterior wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1010-html-1",
+      "kind" : "html",
+      "plainText" : "Exterior walls shall extend to the height required by Section 705.11. Interior structural elements that brace the exterior wall but that are not located within the plane of the exterior wall shall have the minimum fire-resistance rating required in Table 601 for that structural element. Structural elements that brace the exterior wall but are located outside of the exterior wall or wholly or partly within the plane of the exterior wall shall have the minimum fire-resistance rating required in Tables 601 and 602 for the exterior wall."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1010
+}

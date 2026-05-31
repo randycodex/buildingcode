@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185728\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185728\"><\/AnnotationDrawer><div>No construction loads exceeding the combination of superimposed dead load plus specified live load shall be supported on any unshored portion of the structure under construction, unless analysis indicates adequate strength to support such additional loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19983-html-1",
+      "kind" : "html",
+      "plainText" : "No construction loads exceeding the combination of superimposed dead load plus specified live load shall be supported on any unshored portion of the structure under construction, unless analysis indicates adequate strength to support such additional loads."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19983
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181799\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181799\"><\/AnnotationDrawer><div>The decking shall extend across a minimum of three spans. Pieces in each starter course and every third course shall be simple span pattern. Pieces in other courses shall be cantilevered over the supports with end joints at alternating quarter or third points of the spans. Each piece shall bear on at least one support.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4912-html-1",
+      "kind" : "html",
+      "plainText" : "The decking shall extend across a minimum of three spans. Pieces in each starter course and every third course shall be simple span pattern. Pieces in other courses shall be cantilevered over the supports with end joints at alternating quarter or third points of the spans. Each piece shall bear on at least one support."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4912
+}

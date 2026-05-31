@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183963\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183963\"><\/AnnotationDrawer><div>No building areas shall contain hazardous materials exceeding the maximum allowable quantities per control area as addressed in Section 414.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183964\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183964\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183964\"><\/AnnotationDrawer><h6><a name=\"JD_BC3009\" id=\"JD_BC3009\" title=\"BC 3009\"><\/a>Section BC 3009: Service Equipment Certificates<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19364-html-1",
+      "kind" : "html",
+      "plainText" : "No building areas shall contain hazardous materials exceeding the maximum allowable quantities per control area as addressed in Section 414.2.\n\n Section BC 3009: Service Equipment Certificates"
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 19364
+}

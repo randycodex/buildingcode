@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163939\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The provisions of <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163936', hash: '#JD_PCCh.14' }}\">Chapter 14<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> shall govern the materials, design, construction and installation of subsurface landscape irrigation systems connected to nonpotable water from on-site water reuse systems.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12798-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of Chapter 14 shall govern the materials, design, construction and installation of subsurface landscape irrigation systems connected to nonpotable water from on-site water reuse systems."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 12798
+}

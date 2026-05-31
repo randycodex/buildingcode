@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186504\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186504\"><\/AnnotationDrawer><div>Guardrail systems shall include a toprail, midrail, toeboard, and posts.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20260-html-1",
+      "kind" : "html",
+      "plainText" : "Guardrail systems shall include a toprail, midrail, toeboard, and posts."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20260
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164379\"><\/AnnotationDrawer><div>Where trusses are employed, a diagram or table shall indicate the loads or moments in the various members under the design loading conditions. The requirement for a diagram or table may be waived when the trusses consist of elements selected from load tables or similar data, subject to the requirements for verification described in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13882-html-1",
+      "kind" : "html",
+      "plainText" : "Where trusses are employed, a diagram or table shall indicate the loads or moments in the various members under the design loading conditions. The requirement for a diagram or table may be waived when the trusses consist of elements selected from load tables or similar data, subject to the requirements for verification described in this code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13882
+}

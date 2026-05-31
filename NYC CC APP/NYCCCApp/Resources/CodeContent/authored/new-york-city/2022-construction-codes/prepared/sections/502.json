@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167388\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167388\"><\/AnnotationDrawer><div>Beams designed only for the attachment of portable or fixed theater equipment, gridirons, galleries and catwalks shall be constructed of noncombustible materials. Floors of fly galleries and catwalks shall be constructed of noncombustible material. These areas shall not be considered to be floors, stories, mezzanines or levels in applying this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "502-html-1",
+      "kind" : "html",
+      "plainText" : "Beams designed only for the attachment of portable or fixed theater equipment, gridirons, galleries and catwalks shall be constructed of noncombustible materials. Floors of fly galleries and catwalks shall be constructed of noncombustible material. These areas shall not be considered to be floors, stories, mezzanines or levels in applying this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 502
+}

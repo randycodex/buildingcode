@@ -1,0 +1,1785 @@
+{
+  "chapterID": 86,
+  "chapterNumber": "5",
+  "groups": [
+    {
+      "headerLine": "SECTION MC 501",
+      "headingLine": "General",
+      "id": "SECTION MC 501",
+      "sections": [
+        {
+          "id": 10452,
+          "kind": "title",
+          "sectionNumber": "501.1",
+          "title": "501.1 Scope."
+        },
+        {
+          "id": 10453,
+          "kind": "title",
+          "sectionNumber": "501.2",
+          "title": "501.2 Independent system required."
+        },
+        {
+          "id": 10454,
+          "kind": "title",
+          "sectionNumber": "501.3",
+          "title": "501.3 Exhaust discharge."
+        },
+        {
+          "id": 10455,
+          "kind": "title",
+          "sectionNumber": "501.3.1",
+          "title": "501.3.1 Location of exhaust outlets."
+        },
+        {
+          "id": 10456,
+          "kind": "title",
+          "sectionNumber": "5.1.",
+          "title": "5.1. Clothes dryer exhaust, Section 504.4."
+        },
+        {
+          "id": 10457,
+          "kind": "title",
+          "sectionNumber": "5.2.",
+          "title": "5.2. Kitchen hoods and other kitchen exhaust equipment, Sections 506.3.13, 506.4 and 506.5."
+        },
+        {
+          "id": 10458,
+          "kind": "title",
+          "sectionNumber": "5.3.",
+          "title": "5.3. Dust stock and refuse conveying systems, Section 511."
+        },
+        {
+          "id": 10459,
+          "kind": "title",
+          "sectionNumber": "5.4.",
+          "title": "5.4. Subslab soil exhaust systems, Section 512.4."
+        },
+        {
+          "id": 10460,
+          "kind": "title",
+          "sectionNumber": "5.5.",
+          "title": "5.5. Smoke control systems, Section 909.10.3 of the New York City Building Code."
+        },
+        {
+          "id": 10461,
+          "kind": "title",
+          "sectionNumber": "5.6.",
+          "title": "5.6. Refrigerant discharge, Section 1105.7."
+        },
+        {
+          "id": 10462,
+          "kind": "title",
+          "sectionNumber": "5.7.",
+          "title": "5.7. Machinery room discharge, Section 1105.6.1."
+        },
+        {
+          "id": 10463,
+          "kind": "title",
+          "sectionNumber": "6.1.",
+          "title": "6.1. The exhaust system for the kitchen and the toilet/baths may be combined to the inlet of a single fan, provided such exhaust system serves only one dwelling unit."
+        },
+        {
+          "id": 10464,
+          "kind": "title",
+          "sectionNumber": "6.2.",
+          "title": "6.2. The dedicated exhaust from each dwelling unit shall be directed away from any window serving the same dwelling unit from which the exhaust is taken, and in addition, such exhaust opening shall terminate at least:"
+        },
+        {
+          "id": 10465,
+          "kind": "title",
+          "sectionNumber": "6.2.1.",
+          "title": "6.2.1. Two feet (609.6 mm) from any operational window or door serving the same dwelling unit."
+        },
+        {
+          "id": 10466,
+          "kind": "title",
+          "sectionNumber": "6.2.2.",
+          "title": "6.2.2. Three feet (914.4 mm) from any operational window or door serving an adjoining dwelling unit."
+        },
+        {
+          "id": 10467,
+          "kind": "title",
+          "sectionNumber": "6.2.3.",
+          "title": "6.2.3. Three feet (914.4 mm) from any operational window or door serving another occupancy group in the same building."
+        },
+        {
+          "id": 10468,
+          "kind": "title",
+          "sectionNumber": "6.2.4.",
+          "title": "6.2.4. Ten feet (3048 mm) from any outdoor air intake opening other than intakes serving the same dwelling unit."
+        },
+        {
+          "id": 10469,
+          "kind": "title",
+          "sectionNumber": "6.2.5.",
+          "title": "6.2.5. Ten feet (3048 mm) above the public sidewalk adjoining the same building."
+        },
+        {
+          "id": 10470,
+          "kind": "title",
+          "sectionNumber": "6.2.6",
+          "title": "6.2.6 All other minimum distances prescribed in items 1 through 5 of Section 501.3.1 shall be satisfied"
+        },
+        {
+          "id": 10471,
+          "kind": "title",
+          "sectionNumber": "501.3.1.1",
+          "title": "501.3.1.1 Exhaust discharge."
+        },
+        {
+          "id": 10472,
+          "kind": "title",
+          "sectionNumber": "501.3.2",
+          "title": "501.3.2 Exhaust opening protection."
+        },
+        {
+          "id": 10473,
+          "kind": "title",
+          "sectionNumber": "501.3.2.1",
+          "title": "501.3.2.1 Wind-driven rain."
+        },
+        {
+          "id": 10474,
+          "kind": "title",
+          "sectionNumber": "501.4",
+          "title": "501.4 Pressure equalization."
+        },
+        {
+          "id": 10475,
+          "kind": "title",
+          "sectionNumber": "501.5",
+          "title": "501.5 Ducts."
+        },
+        {
+          "id": 10476,
+          "kind": "title",
+          "sectionNumber": "501.6",
+          "title": "501.6 Independent system required."
+        },
+        {
+          "id": 10477,
+          "kind": "title",
+          "sectionNumber": "502.1",
+          "title": "502.1 General."
+        },
+        {
+          "id": 10478,
+          "kind": "title",
+          "sectionNumber": "502.1.1",
+          "title": "502.1.1 Exhaust location."
+        },
+        {
+          "id": 10479,
+          "kind": "title",
+          "sectionNumber": "502.1.2",
+          "title": "502.1.2 Fuel-dispensing areas."
+        },
+        {
+          "id": 10480,
+          "kind": "title",
+          "sectionNumber": "502.1.3",
+          "title": "502.1.3 Equipment, appliance and service rooms."
+        },
+        {
+          "id": 10481,
+          "kind": "title",
+          "sectionNumber": "502.1.4",
+          "title": "502.1.4 Hazardous exhaust."
+        },
+        {
+          "id": 10482,
+          "kind": "title",
+          "sectionNumber": "502.2",
+          "title": "502.2 Aircraft fueling and defueling."
+        },
+        {
+          "id": 10483,
+          "kind": "title",
+          "sectionNumber": "502.3",
+          "title": "502.3 Battery-charging areas for powered vehicles and equipment."
+        },
+        {
+          "id": 10484,
+          "kind": "title",
+          "sectionNumber": "502.4",
+          "title": "502.4 Stationary storage battery systems."
+        },
+        {
+          "id": 10485,
+          "kind": "title",
+          "sectionNumber": "502.4.1",
+          "title": "502.4.1 Hydrogen limit in rooms."
+        },
+        {
+          "id": 10486,
+          "kind": "title",
+          "sectionNumber": "502.4.2",
+          "title": "502.4.2 Ventilation rate in rooms."
+        },
+        {
+          "id": 10487,
+          "kind": "title",
+          "sectionNumber": "502.4.3",
+          "title": "502.4.3 Supervision."
+        },
+        {
+          "id": 10488,
+          "kind": "title",
+          "sectionNumber": "502.5",
+          "title": "502.5 Valve-regulated lead-acid batteries in cabinets."
+        },
+        {
+          "id": 10489,
+          "kind": "title",
+          "sectionNumber": "502.5.1",
+          "title": "502.5.1 Hydrogen limit in cabinets."
+        },
+        {
+          "id": 10490,
+          "kind": "title",
+          "sectionNumber": "502.5.2",
+          "title": "502.5.2 Ventilation rate in cabinets."
+        },
+        {
+          "id": 10491,
+          "kind": "title",
+          "sectionNumber": "502.5.3",
+          "title": "502.5.3 Supervision."
+        },
+        {
+          "id": 10492,
+          "kind": "title",
+          "sectionNumber": "502.6",
+          "title": "502.6 Dry cleaning plants."
+        },
+        {
+          "id": 10493,
+          "kind": "title",
+          "sectionNumber": "502.6.1",
+          "title": "502.6.1 Type II and III systems."
+        },
+        {
+          "id": 10494,
+          "kind": "title",
+          "sectionNumber": "502.6.2",
+          "title": "502.6.2 Type IV and V systems."
+        },
+        {
+          "id": 10495,
+          "kind": "title",
+          "sectionNumber": "502.6.3",
+          "title": "502.6.3 Spotting and pretreating."
+        },
+        {
+          "id": 10496,
+          "kind": "title",
+          "sectionNumber": "502.7",
+          "title": "502.7 Application of flammable finishes."
+        },
+        {
+          "id": 10497,
+          "kind": "title",
+          "sectionNumber": "502.7.1",
+          "title": "502.7.1 During construction."
+        },
+        {
+          "id": 10498,
+          "kind": "title",
+          "sectionNumber": "502.7.2",
+          "title": "502.7.2 Limited spraying spaces."
+        },
+        {
+          "id": 10499,
+          "kind": "title",
+          "sectionNumber": "502.7.3",
+          "title": "502.7.3 Flammable vapor areas."
+        },
+        {
+          "id": 10500,
+          "kind": "title",
+          "sectionNumber": "502.7.3.1",
+          "title": "502.7.3.1 Operation."
+        },
+        {
+          "id": 10501,
+          "kind": "title",
+          "sectionNumber": "502.7.3.2",
+          "title": "502.7.3.2 Recirculation."
+        },
+        {
+          "id": 10502,
+          "kind": "title",
+          "sectionNumber": "1.1.",
+          "title": "1.1. The solid particulate has been removed."
+        },
+        {
+          "id": 10503,
+          "kind": "title",
+          "sectionNumber": "1.2.",
+          "title": "1.2. The vapor concentration is less than 25 percent of the lower flammable limit (LFL)."
+        },
+        {
+          "id": 10504,
+          "kind": "title",
+          "sectionNumber": "1.3.",
+          "title": "1.3. Approved equipment is used to monitor the vapor concentration."
+        },
+        {
+          "id": 10505,
+          "kind": "title",
+          "sectionNumber": "1.5.",
+          "title": "1.5. In the event of shutdown of the vapor concentration monitor, 100 percent of the air volume specified in Section 510 is automatically exhausted."
+        },
+        {
+          "id": 10506,
+          "kind": "title",
+          "sectionNumber": "502.7.3.3",
+          "title": "502.7.3.3 Air velocity."
+        },
+        {
+          "id": 10507,
+          "kind": "title",
+          "sectionNumber": "502.7.3.3.1",
+          "title": "502.7.3.3.1 Open face or open front spray booth."
+        },
+        {
+          "id": 10508,
+          "kind": "title",
+          "sectionNumber": "502.7.3.3.2",
+          "title": "502.7.3.3.2 Enclosed spray booth or spray room with openings for product conveyance."
+        },
+        {
+          "id": 10509,
+          "kind": "title",
+          "sectionNumber": "502.7.3.4",
+          "title": "502.7.3.4 Ventilation obstruction."
+        },
+        {
+          "id": 10510,
+          "kind": "title",
+          "sectionNumber": "502.7.3.5",
+          "title": "502.7.3.5 Independent ducts."
+        },
+        {
+          "id": 10511,
+          "kind": "title",
+          "sectionNumber": "2.1.",
+          "title": "2.1. The sprayed materials used are compatible and will not react or cause ignition of the residue in the ducts."
+        },
+        {
+          "id": 10512,
+          "kind": "title",
+          "sectionNumber": "2.2.",
+          "title": "2.2. Nitrocellulose-based finishing material shall not be used."
+        },
+        {
+          "id": 10513,
+          "kind": "title",
+          "sectionNumber": "2.3.",
+          "title": "2.3. A filtering system shall be provided to reduce the amount of overspray carried into the duct manifold."
+        },
+        {
+          "id": 10514,
+          "kind": "title",
+          "sectionNumber": "2.4.",
+          "title": "2.4. Automatic sprinkler protection shall be provided at the junction of each booth exhaust with the manifold, in addition to the protection required by this chapter."
+        },
+        {
+          "id": 10515,
+          "kind": "title",
+          "sectionNumber": "502.7.3.6",
+          "title": "502.7.3.6 Fan motors and belts."
+        },
+        {
+          "id": 10516,
+          "kind": "title",
+          "sectionNumber": "502.7.4",
+          "title": "502.7.4 Dipping operations."
+        },
+        {
+          "id": 10517,
+          "kind": "title",
+          "sectionNumber": "502.7.5",
+          "title": "502.7.5 Electrostatic apparatus."
+        },
+        {
+          "id": 10518,
+          "kind": "title",
+          "sectionNumber": "502.7.6",
+          "title": "502.7.6 Powder coating."
+        },
+        {
+          "id": 10519,
+          "kind": "title",
+          "sectionNumber": "502.7.7",
+          "title": "502.7.7 Floor resurfacing operations."
+        },
+        {
+          "id": 10520,
+          "kind": "title",
+          "sectionNumber": "502.7.8",
+          "title": "502.7.8 Resin application areas."
+        },
+        {
+          "id": 10521,
+          "kind": "title",
+          "sectionNumber": "502.8",
+          "title": "502.8 Hazardous materials – general requirements."
+        },
+        {
+          "id": 10522,
+          "kind": "title",
+          "sectionNumber": "502.8.1",
+          "title": "502.8.1 Storage in excess of the maximum allowable quantities."
+        },
+        {
+          "id": 10523,
+          "kind": "title",
+          "sectionNumber": "502.8.1.1",
+          "title": "502.8.1.1 System requirements."
+        },
+        {
+          "id": 10524,
+          "kind": "title",
+          "sectionNumber": "502.8.2",
+          "title": "502.8.2 Gas rooms, exhausted enclosures and gas cabinets."
+        },
+        {
+          "id": 10525,
+          "kind": "title",
+          "sectionNumber": "502.8.3",
+          "title": "502.8.3 Indoor dispensing and use."
+        },
+        {
+          "id": 10526,
+          "kind": "title",
+          "sectionNumber": "502.8.4",
+          "title": "502.8.4 Indoor dispensing and use – point sources."
+        },
+        {
+          "id": 10527,
+          "kind": "title",
+          "sectionNumber": "502.8.5",
+          "title": "502.8.5 Closed systems."
+        },
+        {
+          "id": 10528,
+          "kind": "title",
+          "sectionNumber": "502.9",
+          "title": "502.9 Hazardous materials – requirements for specific materials."
+        },
+        {
+          "id": 10529,
+          "kind": "title",
+          "sectionNumber": "502.9.1",
+          "title": "502.9.1 Compressed gases – medical gas systems."
+        },
+        {
+          "id": 10530,
+          "kind": "title",
+          "sectionNumber": "502.9.2",
+          "title": "502.9.2 Corrosives."
+        },
+        {
+          "id": 10531,
+          "kind": "title",
+          "sectionNumber": "502.9.3",
+          "title": "502.9.3 Cryogenics."
+        },
+        {
+          "id": 10532,
+          "kind": "title",
+          "sectionNumber": "502.9.4",
+          "title": "502.9.4 Explosives."
+        },
+        {
+          "id": 10533,
+          "kind": "title",
+          "sectionNumber": "502.9.5",
+          "title": "502.9.5 Flammable and combustible liquids."
+        },
+        {
+          "id": 10534,
+          "kind": "title",
+          "sectionNumber": "502.9.5.1",
+          "title": "502.9.5.1 Vaults."
+        },
+        {
+          "id": 10535,
+          "kind": "title",
+          "sectionNumber": "502.9.5.2",
+          "title": "502.9.5.2 Storage rooms and warehouses."
+        },
+        {
+          "id": 10536,
+          "kind": "title",
+          "sectionNumber": "502.9.5.3",
+          "title": "502.9.5.3 Cleaning machines."
+        },
+        {
+          "id": 10537,
+          "kind": "title",
+          "sectionNumber": "502.9.5.4",
+          "title": "502.9.5.4 Use, dispensing and mixing."
+        },
+        {
+          "id": 10538,
+          "kind": "title",
+          "sectionNumber": "502.9.5.5",
+          "title": "502.9.5.5 Bulk plants or terminals."
+        },
+        {
+          "id": 10539,
+          "kind": "title",
+          "sectionNumber": "502.9.5.5.1",
+          "title": "502.9.5.5.1 General."
+        },
+        {
+          "id": 10540,
+          "kind": "title",
+          "sectionNumber": "502.9.5.5.2",
+          "title": "502.9.5.5.2 Basements and pits."
+        },
+        {
+          "id": 10541,
+          "kind": "title",
+          "sectionNumber": "502.9.5.5.3",
+          "title": "502.9.5.5.3 Dispensing of Class I liquids."
+        },
+        {
+          "id": 10542,
+          "kind": "title",
+          "sectionNumber": "502.9.6",
+          "title": "502.9.6 Highly toxic and toxic liquids."
+        },
+        {
+          "id": 10543,
+          "kind": "title",
+          "sectionNumber": "502.9.6.1",
+          "title": "502.9.6.1 Treatment system."
+        },
+        {
+          "id": 10544,
+          "kind": "title",
+          "sectionNumber": "502.9.6.2",
+          "title": "502.9.6.2 Open and closed systems."
+        },
+        {
+          "id": 10545,
+          "kind": "title",
+          "sectionNumber": "502.9.7",
+          "title": "502.9.7 Highly toxic and toxic compressed gases – any quantity."
+        },
+        {
+          "id": 10546,
+          "kind": "title",
+          "sectionNumber": "502.9.7.1",
+          "title": "502.9.7.1 Gas cabinets."
+        },
+        {
+          "id": 10547,
+          "kind": "title",
+          "sectionNumber": "502.9.7.2",
+          "title": "502.9.7.2 Exhausted enclosures."
+        },
+        {
+          "id": 10548,
+          "kind": "title",
+          "sectionNumber": "502.9.8",
+          "title": "502.9.8 Highly toxic and toxic compressed gases – quantities exceeding the maximum allowable quantity per control area."
+        },
+        {
+          "id": 10549,
+          "kind": "title",
+          "sectionNumber": "502.9.8.1",
+          "title": "502.9.8.1 Ventilated areas."
+        },
+        {
+          "id": 10550,
+          "kind": "title",
+          "sectionNumber": "502.9.8.2",
+          "title": "502.9.8.2 Local exhaust for portable tanks."
+        },
+        {
+          "id": 10551,
+          "kind": "title",
+          "sectionNumber": "502.9.8.3",
+          "title": "502.9.8.3 Piping and controls – stationary tanks."
+        },
+        {
+          "id": 10552,
+          "kind": "title",
+          "sectionNumber": "502.9.8.4",
+          "title": "502.9.8.4 Gas rooms."
+        },
+        {
+          "id": 10553,
+          "kind": "title",
+          "sectionNumber": "502.9.8.5",
+          "title": "502.9.8.5 Treatment system."
+        },
+        {
+          "id": 10554,
+          "kind": "title",
+          "sectionNumber": "502.9.8.6",
+          "title": "502.9.8.6 Process equipment."
+        },
+        {
+          "id": 10555,
+          "kind": "title",
+          "sectionNumber": "502.9.9",
+          "title": "502.9.9 Ozone gas generators."
+        },
+        {
+          "id": 10556,
+          "kind": "title",
+          "sectionNumber": "502.9.10",
+          "title": "502.9.10 LP-gas distribution facilities."
+        },
+        {
+          "id": 10557,
+          "kind": "title",
+          "sectionNumber": "502.9.11",
+          "title": "502.9.11 Silane gas."
+        },
+        {
+          "id": 10558,
+          "kind": "title",
+          "sectionNumber": "502.10",
+          "title": "502.10 Hazardous production materials (HPM)."
+        },
+        {
+          "id": 10559,
+          "kind": "title",
+          "sectionNumber": "502.10.1",
+          "title": "502.10.1 Where required."
+        },
+        {
+          "id": 10560,
+          "kind": "title",
+          "sectionNumber": "502.10.2",
+          "title": "502.10.2 Penetrations."
+        },
+        {
+          "id": 10561,
+          "kind": "title",
+          "sectionNumber": "502.10.3",
+          "title": "502.10.3 Treatment systems."
+        },
+        {
+          "id": 10562,
+          "kind": "title",
+          "sectionNumber": "502.11",
+          "title": "502.11 Motion picture projectors."
+        },
+        {
+          "id": 10563,
+          "kind": "title",
+          "sectionNumber": "502.11.1",
+          "title": "502.11.1 Projectors with an exhaust discharge."
+        },
+        {
+          "id": 10564,
+          "kind": "title",
+          "sectionNumber": "502.11.2",
+          "title": "502.11.2 Projectors without exhaust connection."
+        },
+        {
+          "id": 10565,
+          "kind": "title",
+          "sectionNumber": "502.12",
+          "title": "502.12 Organic coating processes."
+        },
+        {
+          "id": 10566,
+          "kind": "title",
+          "sectionNumber": "502.13",
+          "title": "502.13 Public garages."
+        },
+        {
+          "id": 10567,
+          "kind": "title",
+          "sectionNumber": "502.14",
+          "title": "502.14 Motor vehicle operation."
+        },
+        {
+          "id": 10568,
+          "kind": "title",
+          "sectionNumber": "502.15",
+          "title": "502.15 Repair garages."
+        },
+        {
+          "id": 10569,
+          "kind": "title",
+          "sectionNumber": "502.16",
+          "title": "502.16 Repair garages for natural gas- and hydrogen-fueled vehicles."
+        },
+        {
+          "id": 10570,
+          "kind": "title",
+          "sectionNumber": "502.16.1",
+          "title": "502.16.1 Design."
+        },
+        {
+          "id": 10571,
+          "kind": "title",
+          "sectionNumber": "502.16.2",
+          "title": "502.16.2 Operation."
+        },
+        {
+          "id": 10572,
+          "kind": "title",
+          "sectionNumber": "502.17",
+          "title": "502.17 Tire rebuilding or recapping."
+        },
+        {
+          "id": 10573,
+          "kind": "title",
+          "sectionNumber": "502.17.1",
+          "title": "502.17.1 Buffing machines."
+        },
+        {
+          "id": 10574,
+          "kind": "title",
+          "sectionNumber": "502.18",
+          "title": "502.18 Specific rooms."
+        },
+        {
+          "id": 10575,
+          "kind": "title",
+          "sectionNumber": "502.19",
+          "title": "502.19 Indoor firing ranges."
+        },
+        {
+          "id": 10576,
+          "kind": "title",
+          "sectionNumber": "502.20",
+          "title": "502.20 Manicure and pedicure stations."
+        },
+        {
+          "id": 10577,
+          "kind": "title",
+          "sectionNumber": "502.21",
+          "title": "502.21 Domestic kitchen exhaust systems."
+        },
+        {
+          "id": 10578,
+          "kind": "title",
+          "sectionNumber": "502.22",
+          "title": "502.22 Nonproduction chemical laboratories."
+        },
+        {
+          "id": 10579,
+          "kind": "title",
+          "sectionNumber": "503.1",
+          "title": "503.1 General."
+        },
+        {
+          "id": 10580,
+          "kind": "title",
+          "sectionNumber": "503.2",
+          "title": "503.2 Fans."
+        },
+        {
+          "id": 10581,
+          "kind": "title",
+          "sectionNumber": "503.3",
+          "title": "503.3 Equipment and appliance identification plate."
+        },
+        {
+          "id": 10582,
+          "kind": "title",
+          "sectionNumber": "503.4",
+          "title": "503.4 Corrosion-resistant fans."
+        },
+        {
+          "id": 10583,
+          "kind": "title",
+          "sectionNumber": "503.5",
+          "title": "503.5 Fan location."
+        },
+        {
+          "id": 10584,
+          "kind": "title",
+          "sectionNumber": "504.1",
+          "title": "504.1 Installation."
+        },
+        {
+          "id": 10585,
+          "kind": "title",
+          "sectionNumber": "504.2",
+          "title": "504.2 Exhaust duct penetrations."
+        },
+        {
+          "id": 10586,
+          "kind": "title",
+          "sectionNumber": "504.3",
+          "title": "504.3 Cleanout."
+        },
+        {
+          "id": 10587,
+          "kind": "title",
+          "sectionNumber": "504.4",
+          "title": "504.4 Exhaust installation."
+        },
+        {
+          "id": 10588,
+          "kind": "title",
+          "sectionNumber": "504.5",
+          "title": "504.5 Dryer exhaust duct power ventilators."
+        },
+        {
+          "id": 10589,
+          "kind": "title",
+          "sectionNumber": "504.6",
+          "title": "504.6 Makeup air."
+        },
+        {
+          "id": 10590,
+          "kind": "title",
+          "sectionNumber": "504.7",
+          "title": "504.7 Protection required."
+        },
+        {
+          "id": 10591,
+          "kind": "title",
+          "sectionNumber": "504.8",
+          "title": "504.8 Domestic clothes dryer ducts."
+        },
+        {
+          "id": 10592,
+          "kind": "title",
+          "sectionNumber": "504.8.1",
+          "title": "504.8.1 Material and size."
+        },
+        {
+          "id": 10593,
+          "kind": "title",
+          "sectionNumber": "504.8.2",
+          "title": "504.8.2 Duct installation."
+        },
+        {
+          "id": 10594,
+          "kind": "title",
+          "sectionNumber": "504.8.3",
+          "title": "504.8.3 Transition ducts."
+        },
+        {
+          "id": 10595,
+          "kind": "title",
+          "sectionNumber": "504.8.4",
+          "title": "504.8.4 Duct length."
+        },
+        {
+          "id": 10596,
+          "kind": "title",
+          "sectionNumber": "504.8.4.1",
+          "title": "504.8.4.1 Specified length."
+        },
+        {
+          "id": 10597,
+          "kind": "title",
+          "sectionNumber": "504.8.4.2",
+          "title": "504.8.4.2 Manufacturer's instructions."
+        },
+        {
+          "id": 10598,
+          "kind": "title",
+          "sectionNumber": "504.8.4.3",
+          "title": "504.8.4.3 Dryer exhaust duct power ventilator length."
+        },
+        {
+          "id": 10599,
+          "kind": "title",
+          "sectionNumber": "504.8.5",
+          "title": "504.8.5 Length identification."
+        },
+        {
+          "id": 10600,
+          "kind": "title",
+          "sectionNumber": "504.8.6",
+          "title": "504.8.6 Exhaust duct required."
+        },
+        {
+          "id": 10601,
+          "kind": "title",
+          "sectionNumber": "504.9",
+          "title": "504.9 Commercial clothes dryers."
+        },
+        {
+          "id": 10602,
+          "kind": "title",
+          "sectionNumber": "504.10",
+          "title": "504.10 Common multistory exhaust systems for clothes dryers."
+        },
+        {
+          "id": 10603,
+          "kind": "title",
+          "sectionNumber": "505.1",
+          "title": "505.1 Domestic systems."
+        },
+        {
+          "id": 10604,
+          "kind": "title",
+          "sectionNumber": "2.5.",
+          "title": "2.5. The PVC ducts shall be solvent cemented."
+        },
+        {
+          "id": 10605,
+          "kind": "title",
+          "sectionNumber": "505.2",
+          "title": "505.2 Makeup air required."
+        },
+        {
+          "id": 10606,
+          "kind": "title",
+          "sectionNumber": "505.3",
+          "title": "505.3 Reserved."
+        },
+        {
+          "id": 10607,
+          "kind": "title",
+          "sectionNumber": "505.4",
+          "title": "505.4 Other than Group R."
+        },
+        {
+          "id": 10608,
+          "kind": "title",
+          "sectionNumber": "506.1",
+          "title": "506.1 General."
+        },
+        {
+          "id": 10609,
+          "kind": "title",
+          "sectionNumber": "506.2",
+          "title": "506.2 Corrosion protection."
+        },
+        {
+          "id": 10610,
+          "kind": "title",
+          "sectionNumber": "506.3",
+          "title": "506.3 Ducts serving Type I hoods."
+        },
+        {
+          "id": 10611,
+          "kind": "title",
+          "sectionNumber": "506.3.1",
+          "title": "506.3.1 Duct materials."
+        },
+        {
+          "id": 10612,
+          "kind": "title",
+          "sectionNumber": "506.3.1.1",
+          "title": "506.3.1.1 Grease duct materials."
+        },
+        {
+          "id": 10613,
+          "kind": "title",
+          "sectionNumber": "506.3.1.2",
+          "title": "506.3.1.2 Makeup air ducts."
+        },
+        {
+          "id": 10614,
+          "kind": "title",
+          "sectionNumber": "506.3.2",
+          "title": "506.3.2 Joints, seams and penetrations of grease ducts."
+        },
+        {
+          "id": 10615,
+          "kind": "title",
+          "sectionNumber": "506.3.2.1",
+          "title": "506.3.2.1 Duct joint types."
+        },
+        {
+          "id": 10616,
+          "kind": "title",
+          "sectionNumber": "506.3.2.2",
+          "title": "506.3.2.2 Duct-to-hood joints."
+        },
+        {
+          "id": 10617,
+          "kind": "title",
+          "sectionNumber": "1.4.",
+          "title": "1.4. The duct-to-hood joint shall be secured by stud bolts not less than 1/4 inch (6.4 mm) in diameter welded to the hood with a spacing not greater than 4 inches (101.6 mm) on center for the full perimeter of the opening. The bolts and nuts shall be secured with lockwashers."
+        },
+        {
+          "id": 10618,
+          "kind": "title",
+          "sectionNumber": "506.3.2.3",
+          "title": "506.3.2.3 Duct-to-exhaust fan connections."
+        },
+        {
+          "id": 10619,
+          "kind": "title",
+          "sectionNumber": "506.3.2.4",
+          "title": "506.3.2.4 Vibration isolation."
+        },
+        {
+          "id": 10620,
+          "kind": "title",
+          "sectionNumber": "506.3.2.5",
+          "title": "506.3.2.5 Grease duct test."
+        },
+        {
+          "id": 10621,
+          "kind": "title",
+          "sectionNumber": "506.3.3",
+          "title": "506.3.3 Grease duct supports."
+        },
+        {
+          "id": 10622,
+          "kind": "title",
+          "sectionNumber": "506.3.4",
+          "title": "506.3.4 Air velocity."
+        },
+        {
+          "id": 10623,
+          "kind": "title",
+          "sectionNumber": "506.3.5",
+          "title": "506.3.5 Separation of grease duct system."
+        },
+        {
+          "id": 10624,
+          "kind": "title",
+          "sectionNumber": "2.6.",
+          "title": "2.6. Where branch ductwork is to be used to exhaust vapors from dishwashers, pot sinks, or other similar equipment of a commercial type from which moisture is emitted, copper or aluminum of the minimum gage and weights required in Chapter 6 shall be used. Such ductwork shall be installed so that condensate cannot leak from it."
+        },
+        {
+          "id": 10625,
+          "kind": "title",
+          "sectionNumber": "2.7",
+          "title": "2.7 Type I and Type II exhaust systems can be interconnected downstream of filters with a fire damper at the connection to the exhaust system."
+        },
+        {
+          "id": 10626,
+          "kind": "title",
+          "sectionNumber": "506.3.6",
+          "title": "506.3.6 Grease duct clearances."
+        },
+        {
+          "id": 10627,
+          "kind": "title",
+          "sectionNumber": "506.3.7",
+          "title": "506.3.7 Prevention of grease accumulation in grease ducts."
+        },
+        {
+          "id": 10628,
+          "kind": "title",
+          "sectionNumber": "506.3.7.1",
+          "title": "506.3.7.1 Grease duct reservoirs."
+        },
+        {
+          "id": 10629,
+          "kind": "title",
+          "sectionNumber": "506.3.8",
+          "title": "506.3.8 Grease duct cleanouts and other openings."
+        },
+        {
+          "id": 10630,
+          "kind": "title",
+          "sectionNumber": "506.3.8.1",
+          "title": "506.3.8.1 Personnel entry."
+        },
+        {
+          "id": 10631,
+          "kind": "title",
+          "sectionNumber": "506.3.8.2",
+          "title": "506.3.8.2 Cleanouts serving in-line fans."
+        },
+        {
+          "id": 10632,
+          "kind": "title",
+          "sectionNumber": "506.3.9",
+          "title": "506.3.9 Grease duct horizontal cleanouts."
+        },
+        {
+          "id": 10633,
+          "kind": "title",
+          "sectionNumber": "506.3.10",
+          "title": "506.3.10 Underground and raised floor cavity grease duct installation."
+        },
+        {
+          "id": 10634,
+          "kind": "title",
+          "sectionNumber": "506.3.11",
+          "title": "506.3.11 Grease duct enclosure."
+        },
+        {
+          "id": 10635,
+          "kind": "title",
+          "sectionNumber": "506.3.11.1",
+          "title": "506.3.11.1 Shaft enclosure."
+        },
+        {
+          "id": 10636,
+          "kind": "title",
+          "sectionNumber": "506.3.11.2",
+          "title": "506.3.11.2 Field-applied grease duct enclosure."
+        },
+        {
+          "id": 10637,
+          "kind": "title",
+          "sectionNumber": "506.3.11.3",
+          "title": "506.3.11.3 Factory-built grease duct enclosure assemblies."
+        },
+        {
+          "id": 10638,
+          "kind": "title",
+          "sectionNumber": "506.3.12",
+          "title": "506.3.12 Grease duct fire-resistive access opening."
+        },
+        {
+          "id": 10639,
+          "kind": "title",
+          "sectionNumber": "506.3.13",
+          "title": "506.3.13 Exhaust outlets serving Type I hoods."
+        },
+        {
+          "id": 10640,
+          "kind": "title",
+          "sectionNumber": "506.3.13.1",
+          "title": "506.3.13.1 Termination above the roof."
+        },
+        {
+          "id": 10641,
+          "kind": "title",
+          "sectionNumber": "506.3.13.2",
+          "title": "506.3.13.2 Termination through an exterior wall."
+        },
+        {
+          "id": 10642,
+          "kind": "title",
+          "sectionNumber": "506.3.13.3",
+          "title": "506.3.13.3 Termination location."
+        },
+        {
+          "id": 10643,
+          "kind": "title",
+          "sectionNumber": "506.4",
+          "title": "506.4 Ducts serving Type II hoods."
+        },
+        {
+          "id": 10644,
+          "kind": "title",
+          "sectionNumber": "506.4.1",
+          "title": "506.4.1 Ducts."
+        },
+        {
+          "id": 10645,
+          "kind": "title",
+          "sectionNumber": "506.4.2",
+          "title": "506.4.2 Type II terminations."
+        },
+        {
+          "id": 10646,
+          "kind": "title",
+          "sectionNumber": "506.4.2.1",
+          "title": "506.4.2.1 Cooking spaces."
+        },
+        {
+          "id": 10647,
+          "kind": "title",
+          "sectionNumber": "506.5",
+          "title": "506.5 Exhaust equipment."
+        },
+        {
+          "id": 10648,
+          "kind": "title",
+          "sectionNumber": "506.5.1",
+          "title": "506.5.1 Exhaust fans."
+        },
+        {
+          "id": 10649,
+          "kind": "title",
+          "sectionNumber": "506.5.1.1",
+          "title": "506.5.1.1 Fan motor."
+        },
+        {
+          "id": 10650,
+          "kind": "title",
+          "sectionNumber": "506.5.1.2",
+          "title": "506.5.1.2 In-line fan location."
+        },
+        {
+          "id": 10651,
+          "kind": "title",
+          "sectionNumber": "506.5.2",
+          "title": "506.5.2 Exhaust fan discharge."
+        },
+        {
+          "id": 10652,
+          "kind": "title",
+          "sectionNumber": "506.5.3",
+          "title": "506.5.3 Exhaust fan mounting."
+        },
+        {
+          "id": 10653,
+          "kind": "title",
+          "sectionNumber": "506.5.4",
+          "title": "506.5.4 Reserved."
+        },
+        {
+          "id": 10654,
+          "kind": "title",
+          "sectionNumber": "506.5.5",
+          "title": "506.5.5 Termination location."
+        },
+        {
+          "id": 10655,
+          "kind": "title",
+          "sectionNumber": "506.5.6",
+          "title": "506.5.6 Exhaust fan operation."
+        },
+        {
+          "id": 10656,
+          "kind": "title",
+          "sectionNumber": "506.6",
+          "title": "506.6 Exterior duct installations."
+        },
+        {
+          "id": 10657,
+          "kind": "title",
+          "sectionNumber": "506.7",
+          "title": "506.7 Identification of ducts."
+        },
+        {
+          "id": 10658,
+          "kind": "title",
+          "sectionNumber": "507.1",
+          "title": "507.1 General."
+        },
+        {
+          "id": 10659,
+          "kind": "title",
+          "sectionNumber": "507.1.1",
+          "title": "507.1.1 Operation."
+        },
+        {
+          "id": 10660,
+          "kind": "title",
+          "sectionNumber": "507.1.1.1",
+          "title": "507.1.1.1 Multiple hoods utilizing a single exhaust system."
+        },
+        {
+          "id": 10661,
+          "kind": "title",
+          "sectionNumber": "507.1.2",
+          "title": "507.1.2 Domestic cooking appliances used for commercial purposes."
+        },
+        {
+          "id": 10662,
+          "kind": "title",
+          "sectionNumber": "507.1.3",
+          "title": "507.1.3 Fuel-burning appliances."
+        },
+        {
+          "id": 10663,
+          "kind": "title",
+          "sectionNumber": "507.1.4",
+          "title": "507.1.4 Cleaning."
+        },
+        {
+          "id": 10664,
+          "kind": "title",
+          "sectionNumber": "507.1.5",
+          "title": "507.1.5 Exhaust outlets."
+        },
+        {
+          "id": 10665,
+          "kind": "title",
+          "sectionNumber": "507.2",
+          "title": "507.2 Type I hoods."
+        },
+        {
+          "id": 10666,
+          "kind": "title",
+          "sectionNumber": "507.2.1",
+          "title": "507.2.1 Type I exhaust flow rate label."
+        },
+        {
+          "id": 10667,
+          "kind": "title",
+          "sectionNumber": "507.2.2",
+          "title": "507.2.2 Type I extra-heavy-duty."
+        },
+        {
+          "id": 10668,
+          "kind": "title",
+          "sectionNumber": "507.2.3",
+          "title": "507.2.3 Type I materials."
+        },
+        {
+          "id": 10669,
+          "kind": "title",
+          "sectionNumber": "507.2.4",
+          "title": "507.2.4 Type I supports."
+        },
+        {
+          "id": 10670,
+          "kind": "title",
+          "sectionNumber": "507.2.5",
+          "title": "507.2.5 Type I hood joints, seams and penetrations."
+        },
+        {
+          "id": 10671,
+          "kind": "title",
+          "sectionNumber": "507.2.6",
+          "title": "507.2.6 Clearances for Type I hood."
+        },
+        {
+          "id": 10672,
+          "kind": "title",
+          "sectionNumber": "507.2.7",
+          "title": "507.2.7 Type I hoods penetrating a ceiling."
+        },
+        {
+          "id": 10673,
+          "kind": "title",
+          "sectionNumber": "507.2.8",
+          "title": "507.2.8 Type I grease filters."
+        },
+        {
+          "id": 10674,
+          "kind": "title",
+          "sectionNumber": "507.2.8.1",
+          "title": "507.2.8.1 Criteria."
+        },
+        {
+          "id": 10675,
+          "kind": "title",
+          "sectionNumber": "507.2.8.2",
+          "title": "507.2.8.2 Mounting position of grease filters."
+        },
+        {
+          "id": 10676,
+          "kind": "title",
+          "sectionNumber": "507.2.9",
+          "title": "507.2.9 Grease gutters for Type I hood."
+        },
+        {
+          "id": 10677,
+          "kind": "title",
+          "sectionNumber": "507.3",
+          "title": "507.3 Type II hoods."
+        },
+        {
+          "id": 10678,
+          "kind": "title",
+          "sectionNumber": "507.3.1",
+          "title": "507.3.1 Type II hood materials."
+        },
+        {
+          "id": 10679,
+          "kind": "title",
+          "sectionNumber": "507.3.2",
+          "title": "507.3.2 Type II supports."
+        },
+        {
+          "id": 10680,
+          "kind": "title",
+          "sectionNumber": "507.3.3",
+          "title": "507.3.3 Type II hood joints, seams and penetrations."
+        },
+        {
+          "id": 10681,
+          "kind": "title",
+          "sectionNumber": "507.4",
+          "title": "507.4 Hood size and location."
+        },
+        {
+          "id": 10682,
+          "kind": "title",
+          "sectionNumber": "507.4.1",
+          "title": "507.4.1 Canopy size and location."
+        },
+        {
+          "id": 10683,
+          "kind": "title",
+          "sectionNumber": "507.4.2",
+          "title": "507.4.2 Noncanopy size and location."
+        },
+        {
+          "id": 10684,
+          "kind": "title",
+          "sectionNumber": "507.5",
+          "title": "507.5 Capacity of hoods."
+        },
+        {
+          "id": 10685,
+          "kind": "title",
+          "sectionNumber": "507.5.1",
+          "title": "507.5.1 Extra-heavy-duty cooking appliances."
+        },
+        {
+          "id": 10686,
+          "kind": "title",
+          "sectionNumber": "507.5.2",
+          "title": "507.5.2 Heavy-duty cooking appliances."
+        },
+        {
+          "id": 10687,
+          "kind": "title",
+          "sectionNumber": "507.5.3",
+          "title": "507.5.3 Medium-duty cooking appliances."
+        },
+        {
+          "id": 10688,
+          "kind": "title",
+          "sectionNumber": "507.5.4",
+          "title": "507.5.4 Light-duty cooking appliances."
+        },
+        {
+          "id": 10689,
+          "kind": "title",
+          "sectionNumber": "507.5.5",
+          "title": "507.5.5 Dishwashing appliances."
+        },
+        {
+          "id": 10690,
+          "kind": "title",
+          "sectionNumber": "507.6",
+          "title": "507.6 Performance test."
+        },
+        {
+          "id": 10691,
+          "kind": "title",
+          "sectionNumber": "508.1",
+          "title": "508.1 Makeup air."
+        },
+        {
+          "id": 10692,
+          "kind": "title",
+          "sectionNumber": "508.1.1",
+          "title": "508.1.1 Makeup air temperature."
+        },
+        {
+          "id": 10693,
+          "kind": "title",
+          "sectionNumber": "508.1.2",
+          "title": "508.1.2 Air balance"
+        },
+        {
+          "id": 10694,
+          "kind": "title",
+          "sectionNumber": "508.2",
+          "title": "508.2 Compensating hoods."
+        },
+        {
+          "id": 10695,
+          "kind": "title",
+          "sectionNumber": "509.1",
+          "title": "509.1 Where required."
+        },
+        {
+          "id": 10696,
+          "kind": "title",
+          "sectionNumber": "510.1",
+          "title": "510.1 General."
+        },
+        {
+          "id": 10697,
+          "kind": "title",
+          "sectionNumber": "510.2",
+          "title": "510.2 Where required."
+        },
+        {
+          "id": 10698,
+          "kind": "title",
+          "sectionNumber": "510.2.1",
+          "title": "510.2.1 Lumber yards and woodworking facilities."
+        },
+        {
+          "id": 10699,
+          "kind": "title",
+          "sectionNumber": "510.2.2",
+          "title": "510.2.2 Combustible fibers."
+        },
+        {
+          "id": 10700,
+          "kind": "title",
+          "sectionNumber": "510.3",
+          "title": "510.3 Design and operation."
+        },
+        {
+          "id": 10701,
+          "kind": "title",
+          "sectionNumber": "510.4",
+          "title": "510.4 Independent system."
+        },
+        {
+          "id": 10702,
+          "kind": "title",
+          "sectionNumber": "510.5",
+          "title": "510.5 Incompatible materials and common shafts."
+        },
+        {
+          "id": 10703,
+          "kind": "title",
+          "sectionNumber": "8.1.",
+          "title": "8.1. The fans shall operate simultaneously in parallel and each fan shall be individually capable of providing the required exhaust rate."
+        },
+        {
+          "id": 10704,
+          "kind": "title",
+          "sectionNumber": "8.2.",
+          "title": "8.2. Each of the redundant fans is controlled so as to operate when the other fan has failed or is shut down for servicing."
+        },
+        {
+          "id": 10705,
+          "kind": "title",
+          "sectionNumber": "510.6",
+          "title": "510.6 Design."
+        },
+        {
+          "id": 10706,
+          "kind": "title",
+          "sectionNumber": "510.6.1",
+          "title": "510.6.1 Balancing."
+        },
+        {
+          "id": 10707,
+          "kind": "title",
+          "sectionNumber": "510.6.2",
+          "title": "510.6.2 Emission control."
+        },
+        {
+          "id": 10708,
+          "kind": "title",
+          "sectionNumber": "510.6.3",
+          "title": "510.6.3 Hoods required."
+        },
+        {
+          "id": 10709,
+          "kind": "title",
+          "sectionNumber": "510.6.4",
+          "title": "510.6.4 Contaminant capture and dilution."
+        },
+        {
+          "id": 10710,
+          "kind": "title",
+          "sectionNumber": "510.6.5",
+          "title": "510.6.5 Makeup air."
+        },
+        {
+          "id": 10711,
+          "kind": "title",
+          "sectionNumber": "510.6.6",
+          "title": "510.6.6 Clearances."
+        },
+        {
+          "id": 10712,
+          "kind": "title",
+          "sectionNumber": "510.6.7",
+          "title": "510.6.7 Ducts."
+        },
+        {
+          "id": 10713,
+          "kind": "title",
+          "sectionNumber": "510.7",
+          "title": "510.7 Penetrations."
+        },
+        {
+          "id": 10714,
+          "kind": "title",
+          "sectionNumber": "510.7.1",
+          "title": "510.7.1 Fire dampers and smoke dampers."
+        },
+        {
+          "id": 10715,
+          "kind": "title",
+          "sectionNumber": "510.7.1.1",
+          "title": "510.7.1.1 Shaft penetrations."
+        },
+        {
+          "id": 10716,
+          "kind": "title",
+          "sectionNumber": "510.7.2",
+          "title": "510.7.2 Floors."
+        },
+        {
+          "id": 10717,
+          "kind": "title",
+          "sectionNumber": "510.7.3",
+          "title": "510.7.3 Wall assemblies."
+        },
+        {
+          "id": 10718,
+          "kind": "title",
+          "sectionNumber": "510.7.4",
+          "title": "510.7.4 Fire walls."
+        },
+        {
+          "id": 10719,
+          "kind": "title",
+          "sectionNumber": "510.8",
+          "title": "510.8 Suppression required."
+        },
+        {
+          "id": 10720,
+          "kind": "title",
+          "sectionNumber": "510.9",
+          "title": "510.9 Duct construction."
+        },
+        {
+          "id": 10721,
+          "kind": "title",
+          "sectionNumber": "510.9.1",
+          "title": "510.9.1 Duct joints."
+        },
+        {
+          "id": 10722,
+          "kind": "title",
+          "sectionNumber": "510.9.2",
+          "title": "510.9.2 Clearance to combustibles."
+        },
+        {
+          "id": 10723,
+          "kind": "title",
+          "sectionNumber": "510.9.3",
+          "title": "510.9.3 Explosion relief."
+        },
+        {
+          "id": 10724,
+          "kind": "title",
+          "sectionNumber": "510.10",
+          "title": "510.10 Supports."
+        },
+        {
+          "id": 10725,
+          "kind": "title",
+          "sectionNumber": "511.1",
+          "title": "511.1 Dust, stock and refuse conveying systems."
+        },
+        {
+          "id": 10726,
+          "kind": "title",
+          "sectionNumber": "511.1.1",
+          "title": "511.1.1 Collectors and separators."
+        },
+        {
+          "id": 10727,
+          "kind": "title",
+          "sectionNumber": "511.1.2",
+          "title": "511.1.2 Discharge pipe."
+        },
+        {
+          "id": 10728,
+          "kind": "title",
+          "sectionNumber": "511.1.3",
+          "title": "511.1.3 Conveying systems exhaust discharge."
+        },
+        {
+          "id": 10729,
+          "kind": "title",
+          "sectionNumber": "511.1.4",
+          "title": "511.1.4 Spark protection."
+        },
+        {
+          "id": 10730,
+          "kind": "title",
+          "sectionNumber": "511.1.5",
+          "title": "511.1.5 Explosion relief vents."
+        },
+        {
+          "id": 10731,
+          "kind": "title",
+          "sectionNumber": "511.1.5.1",
+          "title": "511.1.5.1 Screens."
+        },
+        {
+          "id": 10732,
+          "kind": "title",
+          "sectionNumber": "511.1.5.2",
+          "title": "511.1.5.2 Hoods."
+        },
+        {
+          "id": 10733,
+          "kind": "title",
+          "sectionNumber": "511.2",
+          "title": "511.2 Exhaust outlets."
+        },
+        {
+          "id": 10734,
+          "kind": "title",
+          "sectionNumber": "512.1",
+          "title": "512.1 General."
+        },
+        {
+          "id": 10735,
+          "kind": "title",
+          "sectionNumber": "512.2",
+          "title": "512.2 Materials."
+        },
+        {
+          "id": 10736,
+          "kind": "title",
+          "sectionNumber": "512.3",
+          "title": "512.3 Grade."
+        },
+        {
+          "id": 10737,
+          "kind": "title",
+          "sectionNumber": "512.4",
+          "title": "512.4 Termination."
+        },
+        {
+          "id": 10738,
+          "kind": "title",
+          "sectionNumber": "512.5",
+          "title": "512.5 Identification."
+        },
+        {
+          "id": 10739,
+          "kind": "title",
+          "sectionNumber": "513.1",
+          "title": "513.1 Scope and purpose."
+        },
+        {
+          "id": 10740,
+          "kind": "title",
+          "sectionNumber": "513.2",
+          "title": "513.2 General design requirements."
+        },
+        {
+          "id": 10741,
+          "kind": "title",
+          "sectionNumber": "514.1",
+          "title": "514.1 General."
+        },
+        {
+          "id": 10742,
+          "kind": "title",
+          "sectionNumber": "514.2",
+          "title": "514.2 Prohibited applications."
+        },
+        {
+          "id": 10743,
+          "kind": "title",
+          "sectionNumber": "514.3",
+          "title": "514.3 Access."
+        },
+        {
+          "id": 10744,
+          "kind": "title",
+          "sectionNumber": "514.4",
+          "title": "514.4 Recirculated air."
+        },
+        {
+          "id": 10745,
+          "kind": "title",
+          "sectionNumber": "514.5",
+          "title": "514.5 Combined system allowed."
+        },
+        {
+          "id": 10746,
+          "kind": "title",
+          "sectionNumber": "515.1",
+          "title": "515.1 General."
+        }
+      ]
+    }
+  ],
+  "rawDraftText": "#- Chapter 5: Exhaust Systems\n\nSection MC 501: General\n\n#--- 501.1 Scope.\n\nThis chapter shall govern the design, construction and installation of mechanical exhaust systems, including exhaust systems serving clothes dryers and cooking appliances; hazardous exhaust systems; dust, stock and refuse conveyor systems; subslab soil exhaust systems; smoke control systems; energy recovery ventilation systems; and other systems specified in Section 502.\n\n#--- 501.2 Independent system required.\n\nSingle or combined mechanical exhaust systems for environmental air shall be independent of all other exhaust systems except as permitted in Section 514. Dryer exhaust shall be independent of all other systems. Type I exhaust systems shall be independent of all other exhaust systems except as provided in Section 506.3.5. Single or combined Type II exhaust systems for food-processing operations shall be independent of all other exhaust systems. Kitchen exhaust systems shall be constructed in accordance with Section 505 for domestic equipment and Sections 506 through 509 for commercial equipment.\n\n#--- 501.3 Exhaust discharge.\n\nThe air removed by every mechanical exhaust system shall be discharged outdoors at a point where it will not cause a nuisance and the air shaft will be located not less than the distances specified in Section 501.3.1. The air shall be discharged to a location from which it cannot again be readily drawn in by a ventilating system. Air shall not be exhausted into an attic or crawl space.\n\nExceptions:\n\n1. Whole-house ventilation-type attic fans shall be permitted to discharge into the attic space of dwelling units having private attics.\n\n2. Commercial cooking recirculating systems.\n\n3. Where installed in accordance with the manufacturer's instructions and where mechanical or natural ventilation is otherwise provided in accordance with Chapter 4, listed and labeled domestic ductless range hoods shall not be required to discharge to the outdoors.\n\n#---- 501.3.1 Location of exhaust outlets.\n\nThe termination point of exhaust outlets and ducts discharging to the outdoors shall be located with the minimum distances of separation specified in Items 1 through 6 of this section. Separation shall not be required between an air intake and the discharge air from non-evaporative heat rejection or heat absorption appliances such as air-cooled condensers, dry coolers, or heat pump evaporators; such air is not exhaust. The inlet and discharge of the appliance shall not reduce the effective separation of other exhausts from ventilation intakes to less than the required minimums.\n\n1. For ducts conveying noxious, toxic, explosive or flammable vapors, fumes or dusts (including but not limited to exhaust from dry cleaning establishments and spray booths): 30 feet (9144 mm) from property lines; 10 feet (3048 mm) from operable openings into buildings; 6 feet (1828.8 mm) from exterior walls and roofs; 30 feet (9144 mm) from combustible walls and operable openings into buildings which are in the direction of the exhaust discharge; 10 feet (3048 mm) above adjoining grade. Additional requirements may apply to Hazardous Exhaust Systems; see Section 510.\n\n2. For other product-conveying outlets: 10 feet (3048 mm) from the property lines; 3 feet (914.4 mm) from exterior walls and roofs; 10 feet (3048 mm) from operable openings into buildings; 10 feet (3048 mm) above adjoining grade; 10 feet from any exterior fire escape, stair, or balcony.\n\n3. For all environmental air exhaust outlets: 3 feet (914.4 mm) from property lines separating lots; 3 feet (914.4 mm) from operable openings into buildings for all occupancies other than Group U, and 10 feet (3048 mm) from mechanical air intakes. Such exhaust outlets shall not be considered hazardous or noxious.\n\nException: A 10 foot (3048 mm) separation is not required between a mechanical air intake and an exhaust outlet which serve either of the following:\n\n1. a single room, dwelling or sleeping unit with less than 750 cfm (354 L/s) Class 1 exhaust air; or\n\n2. a single dwelling or sleeping unit with less than 400 cfm (189 L/s) Class 2 exhaust air.\n\nFor this exception, the sum of any energy recovery device cross contamination and any re-entrainment of exhaust through the intake shall be less than 10% of the intake air flow as established by the manufacturer. The distance requirements from property lines and operable openings shall be maintained. Air Class shall be determined in accordance with ASHRAE Standard 62.1.\n\n4. Exhaust outlets and openings serving structures in flood hazard areas shall comply with the additional requirements of Appendix G of the New York City Building Code.\n\n5. For specific systems see the following sections:\n\n#--- 5.1. Clothes dryer exhaust, Section 504.4.\n\n#--- 5.2. Kitchen hoods and other kitchen exhaust equipment, Sections 506.3.13, 506.4 and 506.5.\n\n#--- 5.3. Dust stock and refuse conveying systems, Section 511.\n\n#--- 5.4. Subslab soil exhaust systems, Section 512.4.\n\n#--- 5.5. Smoke control systems, Section 909.10.3 of the New York City Building Code.\n\n#--- 5.6. Refrigerant discharge, Section 1105.7.\n\n#--- 5.7. Machinery room discharge, Section 1105.6.1.\n\n6. In Occupancy Groups R-2 and R-3 each dwelling unit may be individually exhausted directly to the outdoors with a dedicated exhaust fan and shall comply with the following:\n\n#--- 6.1. The exhaust system for the kitchen and the toilet/baths may be combined to the inlet of a single fan, provided such exhaust system serves only one dwelling unit.\n\n#--- 6.2. The dedicated exhaust from each dwelling unit shall be directed away from any window serving the same dwelling unit from which the exhaust is taken, and in addition, such exhaust opening shall terminate at least:\n\n#---- 6.2.1. Two feet (609.6 mm) from any operational window or door serving the same dwelling unit.\n\n#---- 6.2.2. Three feet (914.4 mm) from any operational window or door serving an adjoining dwelling unit.\n\n#---- 6.2.3. Three feet (914.4 mm) from any operational window or door serving another occupancy group in the same building.\n\n#---- 6.2.4. Ten feet (3048 mm) from any outdoor air intake opening other than intakes serving the same dwelling unit.\n\n#---- 6.2.5. Ten feet (3048 mm) above the public sidewalk adjoining the same building.\n\n#---- 6.2.6 All other minimum distances prescribed in items 1 through 5 of Section 501.3.1 shall be satisfied\n\n#----- 501.3.1.1 Exhaust discharge.\n\nExhaust air shall not be directed onto walkways.\n\n#---- 501.3.2 Exhaust opening protection.\n\nExhaust openings that terminate outdoors shall be protected with corrosion-resistant screens, louvers or grilles. Openings in screens, louvers and grilles shall be sized not less than 1/4 inch (6.4 mm) and not larger than 1/2 inch (12.7 mm). Openings shall be protected against local weather conditions. Louvers that protect exhaust openings shall comply with AMCA Standard 550. Outdoor openings located in exterior walls shall meet the provisions for exterior wall opening protective in accordance with the New York City Building Code.\n\n#----- 501.3.2.1 Wind-driven rain.\n\nAll exterior louvers for building exhaust systems shall conform to the requirements of Chapter 16 of the New York City Building Code, where applicable, and the following:\n\n1. Comply with the requirements of AMCA Standard 550. Louvers shall comply with the intrusion requirements of wind-driven rain without the use of a damper. Exhaust openings located in exterior walls shall meet the provisions for exterior wall opening protectives in accordance with Chapter 16 of the New York City Building Code; or\n\n2. Be installed on a plenum configured to intercept any wind-driven rain penetrating the louver and to prevent the rain from entering the building ductwork system. Such plenum shall be waterproofed and equipped with a drainage system to convey water penetrating the louver directly to the outdoors or in accordance with the New York City Plumbing Code.\n\n#--- 501.4 Pressure equalization.\n\nMechanical exhaust systems shall be sized to remove the quantity of air required by this chapter to be exhausted. The system shall operate when air is required to be exhausted. Where mechanical exhaust is required in a room or space in other than occupancies in R-3, such space shall be maintained with a neutral or negative pressure. If a greater quantity of air is supplied by a mechanical ventilating supply system than is removed by a mechanical exhaust for a room, adequate means shall be provided for the natural or mechanical exhaust of the excess air supplied. If only a mechanical exhaust system is installed for a room or if a greater quantity of air is removed by a mechanical exhaust system than is supplied by a mechanical ventilating supply system for a room, adequate makeup air consisting of supply air, transfer air or outdoor air shall be provided to satisfy the deficiency. The calculated building infiltration rate and openable area shall not be used to satisfy the requirements of this section.\n\n#--- 501.5 Ducts.\n\nWhere exhaust duct construction is not specified in this chapter, such construction shall comply with Chapter 6.\n\n#--- 501.6 Independent system required.\n\nThe following shall be independent of other exhaust systems:\n\n1. Single or combined mechanical exhaust systems from bath, toilet, urinal, locker, service sink closets and similar rooms shall be independent of all other exhaust systems, except as permitted in Section 501.3.1.\n\n2. A separate grease duct system shall be provided for each Type I hood except as provided in Section 506.3.5.\n\n3. Hazardous exhaust systems shall be independent of other types of exhaust systems as provided in Section 510.\n\nSection MC 502: Required Systems\n\n#--- 502.1 General.\n\nAn exhaust system shall be provided, maintained and operated as specifically required by this section and for all occupied areas where machines, vats, tanks, furnaces, forges, salamanders and other appliances, equipment and processes in such areas produce or throw off dust or particles sufficiently light to float in the air, or which emit heat, odors, fumes, spray, gas or smoke, in such quantities so as to be irritating or injurious to health or safety.\n\n#---- 502.1.1 Exhaust location.\n\nThe inlet to an exhaust system shall be located in the area of heaviest concentration of contaminants.\n\n#---- 502.1.2 Fuel-dispensing areas.\n\nThe bottom of an air inlet or exhaust opening in fuel-dispensing areas shall be located not more than 18 inches (457.2 mm) above the floor.\n\n#---- 502.1.3 Equipment, appliance and service rooms.\n\nEquipment, appliance and system service rooms that house sources of odors, fumes, noxious gases, smoke, steam, dust, spray or other contaminants shall be designed and constructed so as to prevent spreading of such contaminants to other occupied parts of the building.\n\n#---- 502.1.4 Hazardous exhaust.\n\nThe mechanical exhaust of high concentrations of dust or hazardous vapors shall conform to the requirements of Section 510.\n\n#--- 502.2 Aircraft fueling and defueling.\n\nCompartments housing piping, pumps, air eliminators, water separators, hose reels and similar equipment used in aircraft fueling and defueling operations shall be adequately ventilated at floor level or within the floor itself.\n\n#--- 502.3 Battery-charging areas for powered vehicles and equipment.\n\nVentilation shall be provided in an approved manner in battery-charging areas to prevent a dangerous accumulation of flammable gases.\n\nException: Lithium-ion batteries shall not require ventilation.\n\n#--- 502.4 Stationary storage battery systems.\n\nStationary storage battery systems, as regulated by Section 608 of the New York City Fire Code, shall be provided with ventilation in accordance with this chapter, Section 502.4.3 and either Section 502.4.1 or 502.4.2.\n\nException: Lithium-ion batteries shall not require ventilation.\n\n#---- 502.4.1 Hydrogen limit in rooms.\n\nFor flooded lead acid, flooded nickel cadmium and VRLA batteries, the ventilation system shall be designed to limit the maximum concentration of hydrogen to 1.0 percent of the total volume of the room.\n\n#---- 502.4.2 Ventilation rate in rooms.\n\nContinuous ventilation shall be provided at a rate of not less than 1 cubic foot per minute per square foot (cfm/ft 2 ) (0.00508 m 3 /(s • m 2 )) of floor area of the room.\n\n#---- 502.4.3 Supervision.\n\nMechanical ventilation systems required by Section 502.4 shall be supervised with proof of airflow by a central, proprietary system or remote station service or shall initiate an audible and visual signal at a constantly attended on-site location.\n\n#--- 502.5 Valve-regulated lead-acid batteries in cabinets.\n\nValve-regulated lead-acid (VRLA) batteries installed in cabinets, as regulated by Section 608.6.2 of the New York City Fire Code, shall be provided with ventilation in accordance with Section 502.5.3 and either Section 502.5.1 or 502.5.2.\n\n#---- 502.5.1 Hydrogen limit in cabinets.\n\nThe cabinet ventilation system shall be designed to limit the maximum concentration of hydrogen to 1.0 percent of the total volume of the cabinet during the worst-case event of simultaneous boost charging of all batteries in the cabinet.\n\n#---- 502.5.2 Ventilation rate in cabinets.\n\nContinuous cabinet ventilation shall be provided at a rate of not less than 1 cubic foot per minute per square foot (cfm/ft 2 ) (0.00508 m 3 /(s • m 2 )) of the floor area covered by the cabinet. The room in which the cabinet is installed shall be ventilated as required by Section 502.4.1 or 502.4.2.\n\n#---- 502.5.3 Supervision.\n\nMechanical ventilation systems required by Section 502.5 shall be supervised with proof of airflow by a central, proprietary system or remote station service or shall initiate an audible and visual signal at a constantly attended on-site location.\n\n#--- 502.6 Dry cleaning plants.\n\nMechanical ventilation in dry cleaning plants shall be provided and shall be adequate to protect employees and the public in accordance with this section and DOL 29 CFR Part 1910.1000, where applicable. Dry cleaning separations must comply with the requirements of Section 415.9.3 of the New York City Building Code and NFPA 32.\n\n#---- 502.6.1 Type II and III systems.\n\nType II and III dry cleaning systems shall be provided with a mechanical ventilation system that is designed to exhaust 1 cubic foot of air per minute for each square foot of floor area (1 cfm/ft 2 ) (0.00508 m 3 /(s • m 2 )) in dry cleaning rooms and in drying rooms. The ventilation system shall operate automatically when the dry cleaning equipment is in operation and shall have manual controls at an approved location.\n\n#---- 502.6.2 Type IV and V systems.\n\nType IV and V dry cleaning systems shall be provided with an automatically activated exhaust ventilation system to maintain an air velocity of not less than 100 feet per minute (0.51 m/s) through the loading door when the door is opened.\n\nException: Dry cleaning units are not required to be provided with exhaust ventilation where an exhaust hood is installed immediately outside of and above the loading door which operates at an airflow rate as follows:\n\nwhere:\n\n#---- 502.6.3 Spotting and pretreating.\n\nScrubbing tubs, scouring, brushing or spotting operations shall be located such that solvent vapors are captured and exhausted by the ventilating system.\n\n#--- 502.7 Application of flammable finishes.\n\nMechanical exhaust as required by this section shall be provided for operations involving the application of flammable finishes and shall comply with the New York City Fire Code.\n\n#---- 502.7.1 During construction.\n\nVentilation shall be provided for operations involving the application of materials containing flammable solvents in the course of construction, alteration or demolition of a structure.\n\n#---- 502.7.2 Limited spraying spaces.\n\nPositive mechanical ventilation that provides not less than six complete air changes per hour shall be installed in limited spraying spaces. Such system shall meet the requirements of the New York City Fire Code for handling flammable vapors. Explosion venting is not required.\n\n#---- 502.7.3 Flammable vapor areas.\n\nMechanical ventilation of flammable vapor areas shall be provided in accordance with the New York City Fire Code and Sections 502.7.3.1 through 502.7.3.6 of this code.\n\n#----- 502.7.3.1 Operation.\n\nMechanical ventilation shall be kept in operation at all times while spraying operations are being conducted and for a sufficient time thereafter to allow vapors from drying coated articles and finishing material residue to be exhausted. Spraying equipment shall be interlocked with the ventilation of the flammable vapor area such that spraying operations cannot be conducted unless the ventilation system is in operation.\n\n#----- 502.7.3.2 Recirculation.\n\nAir exhausted from spraying operations shall not be recirculated.\n\nExceptions:\n\n1. Air exhausted from spraying operations shall be permitted to be recirculated as makeup air for unmanned spray operations provided that:\n\n#--- 1.1. The solid particulate has been removed.\n\n#--- 1.2. The vapor concentration is less than 25 percent of the lower flammable limit (LFL).\n\n#--- 1.3. Approved equipment is used to monitor the vapor concentration.\n\n#--- 1.4. An alarm is sounded and spray operations are automatically shut down if the vapor concentration exceeds 25 percent of the LFL.\n\n#--- 1.5. In the event of shutdown of the vapor concentration monitor, 100 percent of the air volume specified in Section 510 is automatically exhausted.\n\n2. Air exhausted from spraying operations is allowed to be recirculated as makeup air to manned spraying operations where all of the conditions provided in Exception 1 are included in the installation and documents have been prepared to show that the installation does not pose a life safety hazard to personnel inside the spray booth, spraying space or spray room.\n\n#----- 502.7.3.3 Air velocity.\n\nThe ventilation system shall be designed, installed and maintained so that the flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust air flow below 25 percent of the contaminant's lower flammable limit (LFL). In addition, the spray booth shall be provided with mechanical ventilation so that the average air velocity through openings is in accordance with Sections 502.7.3.3.1 and 502.7.3.3.2.\n\n#------ 502.7.3.3.1 Open face or open front spray booth.\n\nFor spray application operations conducted in an open face or open front spray booth, the ventilation system shall be designed, installed and maintained so that the average air velocity into the spray booth through all openings is not less than 100 feet per minute (0.51 m/s).\n\nException: For fixed or automated electrostatic spray application equipment, the average air velocity into the spray booth through all openings shall be not less than 50 feet per minute (0.25 m/s).\n\n#------ 502.7.3.3.2 Enclosed spray booth or spray room with openings for product conveyance.\n\nFor spray application operations conducted in an enclosed spray booth or spray room with openings for product conveyance, the ventilation system shall be designed, installed and maintained so that the average air velocity into the spray booth through openings is not less than 100 feet per minute (0.51 m/s). For occupied spray booths and occupied spray rooms, the air velocity at the point of application shall not be less than 100 feet per minute (0.51 m/s).\n\nExceptions:\n\n1. For fixed or automated electrostatic spray application equipment, the average air velocity into the spray booth through all openings shall be not less than 50 feet per minute (0.25 m/s).\n\n2. Where methods are used to reduce cross drafts that can draw vapors and overspray through openings from the spray booth or spray room, the average air velocity into the spray booth or spray room shall be that necessary to capture and confine vapors and overspray to the spray booth or spray room.\n\n#----- 502.7.3.4 Ventilation obstruction.\n\nArticles being sprayed shall be positioned in a manner that does not obstruct collection of overspray.\n\n#----- 502.7.3.5 Independent ducts.\n\nEach spray booth and spray room shall have an independent exhaust duct system discharging to the outdoors.\n\nExceptions:\n\n1. Multiple spray booths having a combined frontal area of 18 square feet (1.67 m 2 ) or less are allowed to have a common exhaust where identical spray-finishing material is used in each booth. If more than one fan serves one booth, such fans shall be interconnected so that all fans operate simultaneously.\n\n2. Where treatment of exhaust is necessary for air pollution control or energy conservation, ducts shall be allowed to be manifolded if all of the following conditions are met:\n\n#--- 2.1. The sprayed materials used are compatible and will not react or cause ignition of the residue in the ducts.\n\n#--- 2.2. Nitrocellulose-based finishing material shall not be used.\n\n#--- 2.3. A filtering system shall be provided to reduce the amount of overspray carried into the duct manifold.\n\n#--- 2.4. Automatic sprinkler protection shall be provided at the junction of each booth exhaust with the manifold, in addition to the protection required by this chapter.\n\n#----- 502.7.3.6 Fan motors and belts.\n\nElectric motors driving exhaust fans shall not be placed inside booths or ducts. Fan rotating elements shall be nonferrous or nonsparking or the casing shall consist of, or be lined with, such material. Belts shall not enter the duct or booth unless the belt and pulley within the duct are tightly enclosed.\n\n#---- 502.7.4 Dipping operations.\n\nFlammable vapor areas of dip tank operations shall be provided with mechanical ventilation adequate to prevent the dangerous accumulation of vapors. Required ventilation systems shall be so arranged that the failure of any ventilating fan will automatically stop the dipping conveyor system.\n\n#---- 502.7.5 Electrostatic apparatus.\n\nThe flammable vapor area in spray-finishing operations involving electrostatic apparatus and devices shall be ventilated in accordance with Section 502.7.3.\n\n#---- 502.7.6 Powder coating.\n\nExhaust ventilation for powder-coating operations shall be sufficient to maintain the atmosphere below one-half of the minimum explosive concentration for the material being applied. Nondeposited, air-suspended powders shall be removed through exhaust ducts to the powder recovery system.\n\n#---- 502.7.7 Floor resurfacing operations.\n\nTo prevent the accumulation of flammable vapors during floor resurfacing operations, mechanical ventilation at a minimum rate of 1 cfm/ft 2 (0.00508 m 3 /(s • m 2 )) of area being finished shall be provided. Such exhaust shall be by approved temporary or portable means. Vapors shall be exhausted to the exterior of the building. Such exhaust equipment shall be kept in operation while the floor finishing operations are conducted and until any flammable vapors have been exhausted to the exterior of the building.\n\n#---- 502.7.8 Resin application areas.\n\nExhaust ventilation for resin application areas shall comply with Section 502.7.3.\n\nException: Mechanical ventilation is not required for buildings that are unenclosed for at least 75 percent of the perimeter.\n\n#--- 502.8 Hazardous materials – general requirements.\n\nExhaust ventilation systems for structures containing hazardous materials shall be provided as required in Sections 502.8.1 through 502.8.5 and shall comply with the New York City Fire Code.\n\n#---- 502.8.1 Storage in excess of the maximum allowable quantities.\n\nIndoor storage areas and storage buildings for hazardous materials in amounts exceeding the maximum allowable quantity per control area, as defined by the New York City Fire Code, shall be provided with mechanical exhaust ventilation or natural ventilation where natural ventilation can be shown to be acceptable for the materials as stored.\n\nExceptions:\n\n1. Storage areas for flammable solids complying with the New York City Fire Code.\n\n2. Storage areas and storage buildings for fireworks and explosives complying with the New York City Fire Code.\n\n#----- 502.8.1.1 System requirements.\n\nExhaust ventilation systems shall comply with all of the following:\n\n1. The installation shall be in accordance with this code.\n\n2. Mechanical ventilation shall be provided at a rate of not less than 1 cfm/ft 2 (0.00508 m 3 /(s • m 2 )) of floor area over the storage area.\n\n3. The systems shall operate continuously unless alternate designs are approved.\n\n4. A manual shutoff control shall be provided outside of the room in a position adjacent to the access door to the room or in another approved location. The switch shall be a break-glass or other approved type and shall be labeled: VENTILATION SYSTEM EMERGENCY SHUTOFF.\n\n5. The exhaust ventilation shall be designed to consider the density of the potential fumes or vapors released. For fumes or vapors that are heavier than air, exhaust shall be taken from a point within 12 inches (304.8 mm) of the floor. For fumes or vapors that are lighter than air, exhaust shall be taken from a point within 12 inches (304.8 mm) of the highest point of the room.\n\n6. The location of both the exhaust and inlet air openings shall be designed to provide air movement across all portions of the floor or room to prevent the accumulation of vapors.\n\n7. The exhaust air shall not be recirculated to occupied areas if the materials stored are capable of emitting hazardous vapors and contaminants have not been removed. Air contaminated with explosive or flammable vapors, fumes or dusts; flammable, highly toxic or toxic gases; or radioactive materials shall not be recirculated.\n\n#---- 502.8.2 Gas rooms, exhausted enclosures and gas cabinets.\n\nThe ventilation system for gas rooms, exhausted enclosures and gas cabinets for any quantity of hazardous material shall be designed to operate at a negative pressure in relation to the surrounding area. Highly toxic and toxic gases shall comply with Sections 502.9.7.1, 502.9.7.2 and 502.9.8.4.\n\n#---- 502.8.3 Indoor dispensing and use.\n\nIndoor dispensing and use areas for hazardous materials in amounts exceeding the maximum allowable quantity per control area shall be provided with exhaust ventilation in accordance with Section 502.8.1.\n\nException: Ventilation is not required for dispensing and use of flammable solids other than finely divided particles.\n\n#---- 502.8.4 Indoor dispensing and use – point sources.\n\nWhere gases, liquids or solids in amounts exceeding the maximum allowable quantity per control area and having a hazard ranking of 3 or 4 in accordance with NFPA 704 are dispensed or used, mechanical exhaust ventilation shall be provided to capture gases, fumes, mists or vapors at the point of generation.\n\nException: Where it can be demonstrated that the gases, liquids or solids do not create harmful gases, fumes, mists or vapors.\n\n#---- 502.8.5 Closed systems.\n\nWhere closed systems for the use of hazardous materials in amounts exceeding the maximum allowable quantity per control area are designed to be opened as part of normal operations, ventilation shall be provided in accordance with Section 502.8.4.\n\n#--- 502.9 Hazardous materials – requirements for specific materials.\n\nExhaust ventilation systems for specific hazardous materials shall be provided as required in Section 502.8 and Sections 502.9.1 through 502.9.11 and shall comply with the New York City Fire Code.\n\n#---- 502.9.1 Compressed gases – medical gas systems.\n\nRooms for the storage of compressed medical gases where the amounts being stored require a permit in accordance with the New York City Fire Code, and that do not have an exterior wall, shall be exhausted through a duct to the exterior of the building. Each space shall be separately exhausted, and each exhaust air stream shall be enclosed in a 1-hour-rated shaft enclosure from the room to the exterior. Approved mechanical ventilation shall be provided at a minimum rate of 1 cfm/ft 2 (0.00508 m 3 /(s • m 2 )) of the area of the room.\n\nGas cabinets for the storage of compressed medical gases where the amounts being stored require a permit in accordance with the New York City Fire Code shall be connected to an exhaust system. The average velocity of ventilation at the face of access ports or windows shall be not less than 200 feet per minute (1.02 m/s) with a minimum velocity of 150 feet per minute (0.76 m/s) at any point at the access port or window.\n\n#---- 502.9.2 Corrosives.\n\nWhere corrosive materials in amounts exceeding the maximum allowable quantity per control area are dispensed or used, mechanical exhaust ventilation in accordance with Section 502.8.4 shall be provided.\n\n#---- 502.9.3 Cryogenics.\n\nStorage areas for stationary or portable containers of cryogenic fluids in any quantity shall be ventilated in accordance with Section 502.8. Indoor areas where cryogenic fluids in any quantity are dispensed shall be ventilated in accordance with the requirements of Section 502.8.4 in a manner that captures any vapor at the point of generation.\n\nException: Ventilation for indoor dispensing areas is not required where it can be demonstrated that the cryogenic fluids do not create harmful vapors.\n\n#---- 502.9.4 Explosives.\n\nSquirrel cage blowers shall not be used for exhausting hazardous fumes, vapors or gases in operating buildings and rooms for the manufacture, assembly or testing of explosives. Only nonferrous fan blades shall be used for fans located within the ductwork and through which hazardous materials are exhausted. Motors shall be located outside the duct.\n\n#---- 502.9.5 Flammable and combustible liquids.\n\nExhaust ventilation systems shall be provided as required by Sections 502.9.5.1 through 502.9.5.5 for the storage, use, dispensing, mixing and handling of flammable and combustible liquids. Unless otherwise specified, this section shall apply to any quantity of flammable and combustible liquids.\n\nException: This section shall not apply to flammable and combustible liquids that are exempt from the New York City Fire Code.\n\n#----- 502.9.5.1 Vaults.\n\nVaults that contain tanks of Class I liquids shall be provided with continuous ventilation at a rate of not less than 1 cfm/ft 2 of floor area (0.00508 m 3 /(s • m 2 )), but not less than 150 cfm (4 m 3 /min). Failure of the exhaust airflow shall automatically shut down the dispensing system. The exhaust system shall be designed to provide air movement across all parts of the vault floor. Supply and exhaust ducts shall extend to a point not greater than 12 inches (304.8 mm) and not less than 3 inches (76.2 mm) above the floor. The exhaust system shall be installed in accordance with the provisions of NFPA 91. Means shall be provided to automatically detect any flammable vapors and to automatically shut down the dispensing system upon detection of such flammable vapors in the exhaust duct at a concentration of 25 percent of the LFL.\n\n#----- 502.9.5.2 Storage rooms and warehouses.\n\nLiquid storage rooms and liquid storage warehouses for quantities of liquids exceeding those specified in the New York City Fire Code shall be ventilated in accordance with Section 502.8.1.\n\n#----- 502.9.5.3 Cleaning machines.\n\nAreas containing machines used for parts cleaning in accordance with the New York City Fire Code shall be adequately ventilated to prevent accumulation of vapors.\n\n#----- 502.9.5.4 Use, dispensing and mixing.\n\nContinuous mechanical ventilation shall be provided for the use, dispensing and mixing of flammable and combustible liquids in open or closed systems in amounts exceeding the maximum allowable quantity per control area and for bulk transfer and process transfer operations. The ventilation rate shall be not less than 1 cfm/ft 2 (0.00508 m 3 /(s • m 2 )) of floor area over the design area. Provisions shall be made for the introduction of makeup air in a manner that will include all floor areas or pits where vapors can collect. Local or spot ventilation shall be provided where needed to prevent the accumulation of hazardous vapors.\n\n#----- 502.9.5.5 Bulk plants or terminals.\n\nVentilation shall be provided for portions of properties where flammable and combustible liquids are received by tank vessels, pipelines, tank cars or tank vehicles and which are stored or blended in bulk for the purpose of distributing such liquids by tank vessels, pipelines, tank cars, tank vehicles or containers as required by Sections 502.9.5.5.1 through 502.9.5.5.3.\n\n#------ 502.9.5.5.1 General.\n\nVentilation shall be provided for rooms, buildings and enclosures in which Class I liquids are pumped, used or transferred. Design of ventilation systems shall consider the relatively high specific gravity of the vapors. Where natural ventilation is used, adequate openings in outside walls at floor level, unobstructed except by louvers or coarse screens, shall be provided. Where natural ventilation is inadequate, mechanical ventilation shall be provided. The natural ventilation design shall be approved for each specific application by the commissioner prior to installation and/or use.\n\n#------ 502.9.5.5.2 Basements and pits.\n\nClass I liquids shall not be stored or used within a building having a basement or pit into which flammable vapors can travel, unless such area is provided with ventilation designed to prevent the accumulation of flammable vapors therein.\n\n#------ 502.9.5.5.3 Dispensing of Class I liquids.\n\nContainers of Class I liquids shall not be drawn from or filled within buildings unless a provision is made to prevent the accumulation of flammable vapors in hazardous concentrations. Where mechanical ventilation is required, it shall be kept in operation while flammable vapors could be present.\n\n#---- 502.9.6 Highly toxic and toxic liquids.\n\nVentilation exhaust shall be provided for highly toxic and toxic liquids as required by Sections 502.9.6.1 and 502.9.6.2.\n\n#----- 502.9.6.1 Treatment system.\n\nThis provision shall apply to indoor and outdoor storage and use of highly toxic and toxic liquids in amounts exceeding the maximum allowable quantities per control area. Exhaust scrubbers or other systems for processing vapors of highly toxic liquids shall be provided where a spill or accidental release of such liquids can be expected to release highly toxic vapors at normal temperature and pressure.\n\n#----- 502.9.6.2 Open and closed systems.\n\nMechanical exhaust ventilation shall be provided for highly toxic and toxic liquids used in open systems in accordance with Section 502.8.4. Mechanical exhaust ventilation shall be provided for highly toxic and toxic liquids used in closed systems in accordance with Section 502.8.5.\n\nException: Liquids or solids that do not generate highly toxic or toxic fumes, mists or vapors.\n\n#---- 502.9.7 Highly toxic and toxic compressed gases – any quantity.\n\nVentilation exhaust shall be provided for highly toxic and toxic compressed gases in any quantity as required by Sections 502.9.7.1 and 502.9.7.2.\n\n#----- 502.9.7.1 Gas cabinets.\n\nGas cabinets containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.8.2 and the following requirements:\n\n1. The average ventilation velocity at the face of gas cabinet access ports or windows shall be not less than 200 feet per minute (1.02 m/s) with a minimum velocity of 150 feet per minute (0.76 m/s) at any point at the access port or window.\n\n2. Gas cabinets shall be connected to an exhaust system.\n\n3. Gas cabinets shall not be used as the sole means of exhaust for any room or area.\n\n#----- 502.9.7.2 Exhausted enclosures.\n\nExhausted enclosures containing highly toxic or toxic compressed gases in any quantity shall comply with Section 502.8.2 and the following requirements:\n\n1. The average ventilation velocity at the face of the enclosure shall be not less than 200 feet per minute (1.02 m/s) with a minimum velocity of 150 feet per minute (0.76 m/s).\n\n2. Exhausted enclosures shall be connected to an exhaust system.\n\n3. Exhausted enclosures shall not be used as the sole means of exhaust for any room or area.\n\n#---- 502.9.8 Highly toxic and toxic compressed gases – quantities exceeding the maximum allowable quantity per control area.\n\nVentilation exhaust shall be provided for highly toxic and toxic compressed gases in amounts exceeding the maximum allowable quantities per control area as required by Sections 502.9.8.1 through 502.9.8.6.\n\n#----- 502.9.8.1 Ventilated areas.\n\nThe room or area in which indoor gas cabinets or exhausted enclosures are located shall be provided with exhaust ventilation. Gas cabinets or exhausted enclosures shall not be used as the sole means of exhaust for any room or area.\n\n#----- 502.9.8.2 Local exhaust for portable tanks.\n\nA means of local exhaust shall be provided to capture leakage from indoor and outdoor portable tanks. The local exhaust shall consist of portable ducts or collection systems designed to be applied to the site of a leak in a valve or fitting on the tank. The local exhaust system shall be located in a gas room. Exhaust shall be directed to a treatment system where required by the New York City Fire Code.\n\n#----- 502.9.8.3 Piping and controls – stationary tanks.\n\nFilling or dispensing connections on indoor stationary tanks shall be provided with a means of local exhaust. Such exhaust shall be designed to capture fumes and vapors. The exhaust shall be directed to a treatment system where required by the New York City Fire Code.\n\n#----- 502.9.8.4 Gas rooms.\n\nThe ventilation system for gas rooms shall be designed to operate at a negative pressure in relation to the surrounding area. The exhaust ventilation from gas rooms shall be directed to an exhaust system.\n\n#----- 502.9.8.5 Treatment system.\n\nThe exhaust ventilation from gas cabinets, exhausted enclosures and gas rooms, and local exhaust systems required in Sections 502.9.8.2 and 502.9.8.3 shall be directed to a treatment system where required by the New York City Fire Code.\n\n#----- 502.9.8.6 Process equipment.\n\nEffluent from indoor and outdoor process equipment containing highly toxic or toxic compressed gases which could be discharged to the atmosphere shall be processed through an exhaust scrubber or other processing system. Such systems shall be in accordance with the New York City Fire Code.\n\n#---- 502.9.9 Ozone gas generators.\n\nOzone cabinets and ozone gas-generator rooms for systems having a maximum ozone-generating capacity of one-half pound (0.23 kg) or more over a 24-hour period shall be mechanically ventilated at a rate of not less than six air changes per hour. For cabinets, the average velocity of ventilation at makeup air openings with cabinet doors closed shall be not less than 200 feet per minute (1.02 m/s).\n\n#---- 502.9.10 LP-gas distribution facilities.\n\nLP-gas distribution facilities shall conform to the requirements of the New York City Fire Code.\n\n#---- 502.9.11 Silane gas.\n\nExhausted enclosures and gas cabinets for the indoor storage of silane gas in amounts exceeding the maximum allowable quantities per control area shall comply with this section.\n\n1. Exhausted enclosures and gas cabinets shall be in accordance with Section 502.8.2.\n\n2. The velocity of ventilation across unwelded fittings and connections on the piping system shall not be less than 200 feet per minute (1.02 m/s).\n\n3. The average velocity at the face of the access ports or windows in the gas cabinet shall not be less than 200 feet per minute (1.02 m/s) with a minimum velocity of 150 feet per minute (0.76 m/s) at any point at the access port or window.\n\n#--- 502.10 Hazardous production materials (HPM).\n\nExhaust ventilation systems and materials for ducts utilized for the exhaust of HPM shall comply with this section, other applicable provisions of this code, the New York City Building Code and the New York City Fire Code.\n\n#---- 502.10.1 Where required.\n\nExhaust ventilation systems shall be provided in the following locations in accordance with the requirements of this section and the New York City Building Code:\n\n1. Fabrication areas: Exhaust ventilation for fabrication areas shall comply with the New York City Building Code. Additional manual control switches shall be provided where required by the commissioner.\n\n2. Workstations: A ventilation system shall be provided to capture and exhaust gases, fumes and vapors at workstations.\n\n3. Liquid storage rooms: Exhaust ventilation for liquid storage rooms shall comply with Section 502.8.1.1 and the New York City Building Code.\n\n4. HPM rooms: Exhaust ventilation for HPM rooms shall comply with Section 502.8.1.1 and the New York City Building Code.\n\n5. Gas cabinets: Exhaust ventilation for gas cabinets shall comply with Section 502.8.2. The gas cabinet ventilation system is allowed to connect to a workstation ventilation system. Exhaust ventilation for gas cabinets containing highly toxic or toxic gases shall also comply with Sections 502.9.7 and 502.9.8.\n\n6. Exhausted enclosures: Exhaust ventilation for exhausted enclosures shall comply with Section 502.8.2. Exhaust ventilation for exhausted enclosures containing highly toxic or toxic gases shall also comply with Sections 502.9.7 and 502.9.8.\n\n7. Gas rooms: Exhaust ventilation for gas rooms shall comply with Section 502.8.2. Exhaust ventilation for gas cabinets containing highly toxic or toxic gases shall also comply with Sections 502.9.7 and 502.9.8.\n\n#---- 502.10.2 Penetrations.\n\nExhaust ducts penetrating fire barrier assemblies constructed in accordance with Section 707 of the New York City Building Code or horizontal assemblies constructed in accordance with Section 711 of the New York City Building Code shall be contained in a shaft of equivalent fire-resistance-rated construction. Exhaust ducts shall not penetrate fire walls. Fire dampers shall not be installed in exhaust ducts.\n\n#---- 502.10.3 Treatment systems.\n\nTreatment systems for highly toxic and toxic gases shall comply with the New York City Fire Code.\n\n#--- 502.11 Motion picture projectors.\n\nMotion picture projectors shall be exhausted in accordance with Section 502.11.1 or 502.11.2.\n\n#---- 502.11.1 Projectors with an exhaust discharge.\n\nProjectors equipped with an exhaust discharge shall be directly connected to a mechanical exhaust system. The exhaust system shall operate at an exhaust rate as indicated by the manufacturer's instructions.\n\n#---- 502.11.2 Projectors without exhaust connection.\n\nProjectors without an exhaust connection shall have contaminants exhausted through a mechanical exhaust system. The exhaust rate for electric arc projectors shall be not less than 200 cubic feet per minute (cfm) (0.09 m 3 /s) per lamp. The exhaust rate for xenon projectors shall be not less than 300 cfm (0.14 m 3 /s) per lamp. Xenon projector exhaust shall be at a rate such that the exterior temperature of the lamp housing does not exceed 130°F (54.4°C). The lamp and projection room exhaust systems, whether combined or independent, shall not be interconnected with any other exhaust or return system within the building.\n\n#--- 502.12 Organic coating processes.\n\nEnclosed structures involving organic coating processes in which Class I liquids are processed or handled shall be ventilated at a rate of not less than 1 cfm/ft 2 (0.00508 m 3 /(s • m 2 )) of solid floor area. Ventilation shall be accomplished by exhaust fans that intake at floor levels and discharge to a safe location outside the structure. Noncontaminated intake air shall be introduced in such a manner that all portions of solid floor areas are provided with continuous uniformly distributed air movement.\n\n#--- 502.13 Public garages.\n\nMechanical exhaust systems for public garages, as required in Chapter 4, shall operate continuously or in accordance with Section 404.\n\n#--- 502.14 Motor vehicle operation.\n\nIn areas where motor vehicles operate, mechanical ventilation shall be provided in accordance with Section 403. Additionally, areas in which stationary motor vehicles are operated shall be provided with a source capture system that connects directly to the motor vehicle exhaust systems. Such system shall be engineered by a registered design professional or shall be factory-built equipment designed and sized for the purpose.\n\nExceptions:\n\n1. This section shall not apply where the motor vehicles being operated or repaired are electrically powered.\n\n2. This section shall not apply to one- and two-family dwellings.\n\n3. This section shall not apply to motor vehicle service areas where engines are operated inside the building only for the duration necessary to move the motor vehicles in and out of the building.\n\n#--- 502.15 Repair garages.\n\nWhere Class I liquids or LP-gas are stored or used within a building having a basement or pit wherein flammable vapors could accumulate, the basement or pit shall be provided with ventilation at a minimum rate of 1.5 cubic feet per minute per square foot (cfm/ft2) (0.008 m 3 /(s • m 2 )) designed to prevent the accumulation of flammable vapors therein.\n\n#--- 502.16 Repair garages for natural gas- and hydrogen-fueled vehicles.\n\nRepair garages used for the repair of natural gas- or hydrogen-fueled vehicles shall be provided with an approved mechanical ventilation system. The mechanical ventilation system shall be in accordance with Sections 502.16.1 and 502.16.2.\n\nException: Where approved by the commissioner, natural ventilation shall be permitted in lieu of mechanical ventilation.\n\n#---- 502.16.1 Design.\n\nIndoor locations shall be ventilated utilizing air supply inlets and exhaust outlets arranged to provide uniform air movement to the extent practical. Inlets shall be uniformly arranged on exterior walls near floor level. Outlets shall be located at the high point of the room in exterior walls or the roof.\n\n1. Ventilation shall be by a continuous mechanical ventilation system or by a mechanical ventilation system activated by a continuously monitoring natural gas detection system, or for hydrogen, a continuously monitoring flammable gas detection system, each activating at a gas concentration of 25 percent of the lower flammable limit (LFL). In all cases, the system shall shut down the fueling system in the event of failure of the ventilation system.\n\n2. The ventilation rate shall be not less than 1 cubic foot per minute per 12 cubic feet (0.00138 m 3 /(s • m 3 )) of room volume.\n\n#---- 502.16.2 Operation.\n\nThe mechanical ventilation system shall operate continuously.\n\nExceptions:\n\n1. Mechanical ventilation systems that are interlocked with a gas detection system designed in accordance with the New York City Building Code.\n\n2. Mechanical ventilation systems in garages that are used only for the repair of vehicles fueled by liquid fuels or odorized gases, such as CNG, where the ventilation system is electrically interlocked with the lighting circuit.\n\n#--- 502.17 Tire rebuilding or recapping.\n\nEach room where rubber cement is used or mixed, or where flammable or combustible solvents are applied, shall be ventilated in accordance with the applicable provisions of NFPA 91.\n\n#---- 502.17.1 Buffing machines.\n\nEach buffing machine shall be connected to a dust-collecting system that prevents the accumulation of the dust produced by the buffing process.\n\n#--- 502.18 Specific rooms.\n\nSpecific rooms, including bathrooms, locker rooms, smoking lounges and toilet rooms, shall be exhausted in accordance with the ventilation requirements of Chapter 4.\n\n#--- 502.19 Indoor firing ranges.\n\nVentilation shall be provided in an approved manner in areas utilized as indoor firing ranges. Firing ranges shall comply with all applicable laws and the requirements of the New York City Department of Health and Mental Hygiene.\n\n#--- 502.20 Manicure and pedicure stations.\n\nManicure and pedicure stations shall be provided with an exhaust system in accordance with Table 403.3.1.1, Note h. Manicure tables and pedicure stations not provided with factory-installed exhaust inlets shall be provided with exhaust inlets located not more than 12 inches (304.8 mm) horizontally and vertically from the point of chemical application.\n\n#--- 502.21 Domestic kitchen exhaust systems.\n\nIn all Group R occupancies, a minimum of No. 18 Gage galvanized sheet metal shall be used, except that ductwork that complies with Section 603.6.1.2 shall be permitted for independent apartment exhaust systems providing general exhaust ventilation of kitchen and toilet areas.\n\n#--- 502.22 Nonproduction chemical laboratories.\n\nNonproduction chemical laboratories shall comply with the New York City Building Code and NFPA 45.\n\nSection MC 503: Motors and Fans\n\n#--- 503.1 General.\n\nMotors and fans shall be sized to provide the required air movement. Motors in areas that contain flammable vapors or dusts shall be of a type approved for such environments. A manually operated remote control installed at an approved location shall be provided to shut off fans or blowers in flammable vapor or dust systems. Electrical equipment and appliances used in operations that generate explosive or flammable vapors, fumes or dusts shall be interlocked with the ventilation system so that the equipment and appliances cannot be operated unless the ventilation fans are in operation. Motors for fans used to convey flammable vapors or dusts shall be located outside the duct or shall be protected with approved shields and dustproofing. Motors and fans shall be provided with a means of access for servicing and maintenance.\n\n#--- 503.2 Fans.\n\nParts of fans in contact with explosive or flammable vapors, fumes or dusts shall be of nonferrous or nonsparking materials, or their casing shall be lined or constructed of such material. Where the size and hardness of materials passing through a fan are capable of producing a spark, both the fan and the casing shall be of nonsparking materials. Where fans are required to be spark resistant, their bearings shall not be within the airstream, and all parts of the fan shall be grounded. Fans in systems-handling materials that are capable of clogging the blades, and fans in buffing or woodworking exhaust systems, shall be of the radial-blade or tube-axial type.\n\n#--- 503.3 Equipment and appliance identification plate.\n\nEquipment and appliances used to exhaust explosive or flammable vapors, fumes or dusts shall bear an identification plate stating the ventilation rate for which the system was designed.\n\n#--- 503.4 Corrosion-resistant fans.\n\nFans located in systems conveying corrosives shall be of materials that are resistant to the corrosive or shall be coated with corrosion-resistant materials.\n\n#--- 503.5 Fan location.\n\nFans exhausting noxious, toxic, hot vapor or grease laden air shall be located as close to the terminus as practicable, at the roof or within a mechanical equipment room, immediately below the roof.\n\nSection MC 504: Clothes Dryer Exhaust\n\n#--- 504.1 Installation.\n\nClothes dryers shall be exhausted in accordance with the manufacturer's instructions. Dryer exhaust systems shall be independent of all other systems and shall convey the moisture and any products of combustion to the outside of the building. For the installation of gas dryers, refer to the New York City Fuel Gas Code.\n\nException: This section shall not apply to listed and labeled condensing (ductless) electric clothes dryers.\n\n#--- 504.2 Exhaust duct penetrations.\n\nWhere a clothes dryer exhaust duct penetrates a wall or ceiling membrane, the annular space shall be sealed with noncombustible material, approved fire caulking or a noncombustible dryer exhaust duct wall receptacle. Ducts that exhaust clothes dryers shall not penetrate or be located within any fireblocking, draftstopping or any wall, floor/ceiling or other assembly required by the New York City Building Code to be fire-resistance rated, unless such duct is constructed of galvanized steel or aluminum of the thickness specified in Section 603.4 and the fire-resistance rating is maintained in accordance with the New York City Building Code. Fire dampers, combination fire/smoke dampers and any similar devices that will obstruct the exhaust flow shall be prohibited in clothes dryer exhaust ducts.\n\n#--- 504.3 Cleanout.\n\nEach vertical riser shall be provided with a means for cleanout.\n\n#--- 504.4 Exhaust installation.\n\nDryer exhaust ducts for clothes dryers shall terminate on the outside of the building. Single dryer installations shall be equipped with a backdraft damper. Multiple dryer installations shall not have a backdraft damper. Screens shall not be installed at the duct termination. Ducts shall not be connected or installed with sheet metal screws or other fasteners that will obstruct the exhaust flow. Clothes dryer exhaust ducts shall not be connected to a vent connector, vent or chimney. Clothes dryer exhaust ducts shall not extend into or through ducts or plenums.\n\n#--- 504.5 Dryer exhaust duct power ventilators.\n\nDomestic dryer exhaust duct power ventilators shall be listed and labeled to UL 705 for use in dryer exhaust duct systems. The dryer exhaust duct power ventilator shall be installed in accordance with the manufacturer's instructions.\n\n#--- 504.6 Makeup air.\n\nInstallations exhausting more than 200 cfm (0.09 m 3 /s) shall be provided with makeup air. Where a closet is designed for the installation of a clothes dryer, an opening having an area of not less than 100 square inches (0.0645 m 2 ) shall be provided in the closet enclosure or makeup air shall be provided by other approved means.\n\n#--- 504.7 Protection required.\n\nProtective shield plates shall be placed where nails or screws from finish or other work are likely to penetrate the clothes dryer exhaust duct. Shield plates shall be placed on the finished face of all framing members where there is less than 1 1/4 inches (31.8 mm) between the duct and the finished face of the framing member. Protective shield plates shall be constructed of steel, have a thickness of 0.062 inch (1.6 mm) and extend not less than 2 inches (50.8 mm) above sole plates and below top plates.\n\n#--- 504.8 Domestic clothes dryer ducts.\n\nExhaust ducts for domestic clothes dryers shall conform to the requirements of Sections 504.8.1 through 504.8.6.\n\n#---- 504.8.1 Material and size.\n\nExhaust ducts shall have a smooth interior finish and shall be constructed of metal a minimum 0.016 inch (0.4 mm) thick. The exhaust duct size shall be 4 inches (101.6 mm) nominal in diameter, unless a larger duct size is specifically required by the dryer manufacturer. Exhaust ducts larger than 20 square inches (12 903.2 mm 2 ) shall be individually exhausted.\n\nException: Where the make and model of the clothes dryer to be installed is known and the manufacturer's instructions for such dryer are provided, the maximum length of the exhaust duct, including any transition duct, shall be permitted to be in accordance with the dryer manufacturer's instructions.\n\n#---- 504.8.2 Duct installation.\n\nExhaust ducts shall be supported at 4-foot (1219.2 mm) intervals and secured in place. The insert end of the duct shall extend into the adjoining duct or fitting in the direction of airflow. Ducts serving a single appliance shall not be joined with screws or similar fasteners that protrude more than 1/8 inch (3.2 mm) into the inside of the duct.\n\n#---- 504.8.3 Transition ducts.\n\nTransition ducts used to connect the dryer to the exhaust duct system shall be a single length that is listed and labeled in accordance with UL 2158A. Transition ducts shall be not greater than 8 feet (2438.4 mm) in length and shall not be concealed within construction.\n\n#---- 504.8.4 Duct length.\n\nThe maximum allowable exhaust duct length shall be determined by one of the methods specified in Sections 504.8.4.1 through 504.8.4.3.\n\n#----- 504.8.4.1 Specified length.\n\nThe maximum length of the exhaust duct shall be 35 feet (10 668 mm) from the connection to the transition duct from the dryer to the outlet terminal or to a common or central exhaust system. Where fittings are used, the maximum length of the exhaust duct shall be reduced in accordance with Table 504.8.4.1.\n\nTable 504.8.4.1 Dryer Exhaust Duct Fitting Equivalent Length a\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 degree = 0.0175 rad.\n\na. The equivalent length column of the table indicates how much length must be added to the exhaust duct total length for each fitting used.\n\n#----- 504.8.4.2 Manufacturer's instructions.\n\nThe maximum length of the exhaust duct shall be determined by the dryer manufacturer's instructions. The special inspector shall be provided with a copy of the instructions for the make and model of the dryer. Where the exhaust duct is to be concealed, the installation instructions shall be provided to the special inspector prior to the concealment inspection. In the absence of fitting equivalent length calculations from the clothes dryer manufacturer, Table 504.8.4.1 shall be used.\n\n#----- 504.8.4.3 Dryer exhaust duct power ventilator length.\n\nThe maximum length of the exhaust duct shall be determined by the dryer exhaust duct power ventilator manufacturer's instructions.\n\n#---- 504.8.5 Length identification.\n\nWhere the equivalent length of the exhaust duct exceeds 35 feet (10 668 mm) to the outlet terminal, common exhaust, or power ventilator, the equivalent length of the exhaust duct shall be identified on a permanent label or tag. The label or tag shall be located within 6 feet (1828.8 mm) of the exhaust duct connection.\n\n#---- 504.8.6 Exhaust duct required.\n\nWhere space for a clothes dryer is provided, an exhaust duct system shall be installed. Where the clothes dryer is not installed at the time of occupancy, the exhaust duct shall be capped at the location of the future dryer.\n\nException: Where a listed condensing clothes dryer is installed prior to occupancy of structure.\n\n#--- 504.9 Commercial clothes dryers.\n\nThe installation of dryer exhaust ducts serving commercial clothes dryers shall comply with the appliance manufacturer's instructions and NFPA 54. Exhaust fan motors installed in exhaust systems shall be located outside of the airstream. In multiple installations, the fan shall operate continuously or be interlocked to operate when any individual unit is operating. Ducts shall have a minimum clearance of 6 inches (152.4 mm) to combustible materials. Clothes dryer transition ducts used to connect the appliance to the exhaust duct system shall be limited to single lengths not to exceed 8 feet (2438.4 mm) in length and shall be listed and labeled for the application. Transition ducts shall not be concealed within construction.\n\n#--- 504.10 Common multistory exhaust systems for clothes dryers.\n\nWhere a common multistory duct system is designed and installed to convey exhaust from multiple clothes dryers, the construction of the system shall be in accordance with all of the following:\n\n1. The shaft in which the duct is installed shall be constructed and fire-resistance rated as required by the New York City Building Code.\n\n2. Dampers and subducts shall be prohibited in the exhaust duct.\n\n3. Rigid metal ductwork shall be installed within the shaft to convey the exhaust. The ductwork shall be constructed of sheet steel having a minimum thickness of 0.0187 inch (0.4712 mm) (No. 26 gage) and in accordance with SMACNA/ANSI Duct Construction Standards. The common ductwork ducts shall not be connected or installed with sheet metal screws or other fasteners that will obstruct the exhaust flow.\n\n4. Exhaust ducts 20 square inches (129 cm 2 ) or less connected into a common multistory exhaust system shall not require fire dampers when the exhaust fan runs continuously. Exhaust ducts greater than 20 square inches (129 cm 2 ) shall not be connected into a common multistory exhaust system.\n\n5. The exhaust fan motor design shall be in accordance with Section 503.2.\n\n6. The exhaust fan motor shall be located outside of the airstream.\n\n7. The exhaust fan shall run continuously, and shall be connected to a standby power source, where a building standby power source is required per the New York City Building Code.\n\n8. Exhaust fan operation shall be monitored in an approved location and shall initiate an audible or visual signal when the fan is not in operation.\n\n9. Makeup air shall be provided for the exhaust system.\n\n10. A cleanout opening shall be located at the base of the shaft, at all offsets and at all changes of direction to provide access to the duct to allow for cleaning and inspection. The finished opening shall be not less than 12 inches by 12 inches (304.8 mm by 304.8 mm).\n\n11. Screens shall not be installed at the termination.\n\n12. The common multistory duct system shall serve only clothes dryers and shall be independent of other exhaust systems.\n\n(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023)\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077.\n\nSection MC 505: Domestic Kitchen Exhaust Equipment\n\n#--- 505.1 Domestic systems.\n\nWhere domestic range hoods or domestic appliances equipped with downdraft exhaust are provided, such hoods and appliances shall discharge to the outdoors through ducts constructed of galvanized steel, stainless steel, aluminum or copper. Such ducts shall have smooth inner walls, shall be air tight, shall be equipped with a backdraft damper and shall be independent of all other exhaust systems. Such exhaust system shall be installed in strict compliance with the manufacturer's instructions as well as the requirements of the listing.\n\nExceptions:\n\n1. In other than Group I-1 and I-2, where installed in accordance with the manufacturer's instructions and where mechanical or natural ventilation is otherwise provided in accordance with Chapter 4, listed and labeled ductless range hoods shall not be required to discharge to the outdoors.\n\n2. Ducts for domestic kitchen cooking appliances equipped with downdraft exhaust systems shall be permitted to be constructed of Schedule 40 PVC pipe and fittings provided that the installation complies with all of the following:\n\n#--- 2.1. The duct shall be installed under a concrete slab poured on grade.\n\n#--- 2.2. The underfloor trench in which the duct is installed shall be completely backfilled with sand or gravel.\n\n#--- 2.3. The PVC duct shall extend not more than 1 inch (25.4 mm) above the indoor concrete floor surface.\n\n#--- 2.4. The PVC duct shall extend not more than 1 inch (25.4 mm) above grade outside of the building.\n\n#--- 2.5. The PVC ducts shall be solvent cemented.\n\n#--- 505.2 Makeup air required.\n\nExhaust hood systems where required by Chapter 4 shall be provided with makeup air at a rate in accordance with Table 403.3.1.1. Such makeup air systems shall be equipped with a means of closure and shall be automatically controlled to start and operate simultaneously with the exhaust system.\n\n#--- 505.3 Reserved.\n\n#--- 505.4 Other than Group R.\n\nAll domestic cooking appliances installed in cafeterias and in Group A-1, A-2, A-4, A-5, and M occupancies shall be provided with hoods and exhaust systems as required for the type of appliances and processes in accordance with Sections 506 and 507. In other than Group R occupancies, domestic appliances may be provided with domestic kitchen exhaust systems ducted to outdoors in accordance with this section provided that the installation complies with all of the following:\n\n1. No more than two domestic cooking appliances are installed in each fire separated room or tenancy in other than Group E occupancies;\n\n2. Each appliance shall have electric or gas connections and nameplate ratings not to exceed 10 kW for electric appliances or 75,000 Btu/h for gas appliances. Branch gas connections shall not be larger than 3/4 inch (19.1 mm) pipe;\n\n3. The appliances shall not include open top broilers or fryers; and\n\n4. The appliances are used for periodic, non-commercial, non-revenue generating purposes, except for in Group A-3 occupancies, where such appliances may be used a maximum of 8 hours per week to generate revenue.\n\nSection MC 506: Commercial Kitchen Hood Ventilation System Ducts and Exhaust Equipment\n\n#--- 506.1 General.\n\nCommercial kitchen hood ventilation ducts and exhaust equipment shall comply with the requirements of this section. Commercial kitchen grease ducts shall be designed for the type of cooking appliance and hood served. All ducts shall lead directly to the exterior of the building and terminate as required by Section 506.3.13 for Type 1 hoods and Section 506.4.2 for Type II hoods.\n\nException: Recirculating hoods that comply with Exception 2 of Section 507.1 do not require ducting in accordance with this section.\n\n#--- 506.2 Corrosion protection.\n\nDucts exposed to the outside atmosphere or subject to a corrosive environment shall be protected against corrosion.\n\n#--- 506.3 Ducts serving Type I hoods.\n\nType I exhaust ducts shall be independent of all other exhaust systems except as provided in Section 506.3.5. Commercial kitchen duct systems serving Type I hoods shall be designed, constructed and installed in accordance with Sections 506.3.1 through 506.3.13.3.\n\n#---- 506.3.1 Duct materials.\n\nDucts serving Type I hoods shall be constructed of materials in accordance with Sections 506.3.1.1 and 506.3.1.2.\n\n#----- 506.3.1.1 Grease duct materials.\n\nGrease ducts serving Type I hoods, and located within buildings, shall be constructed as follows:\n\n1. Ducts with a cross-sectional area up to and including 155 square inches (1.0 square meters) shall be constructed of 0.0598-inch (1.52 mm) No. 16 Gage steel;\n\n2. Ducts with a cross-sectional area over 155 square inches (100 000 mm 2 ), but not more than 200 square inches (0.129 m 2 ) shall be constructed of 0.074-inch (1.9 mm) No. 14 Gage steel; and\n\n3. Ducts with a cross-sectional area equal to or more than 200 square inches (0.129 m 2 ) shall be constructed of 0.1046-inch (2.66 mm) No. 12 Gage steel.\n\nIf stainless steel is used for ducts of any of the cross-sectional areas listed above, the Gage steel may be increased upwards (resulting in a smaller thickness) by 1 even Gage size.\n\nException: Listed and labeled factory-built commercial kitchen grease ducts shall be listed and labeled in accordance with UL 1978 and installed in accordance with Section 304.1 and as approved by the commissioner.\n\n#----- 506.3.1.2 Makeup air ducts.\n\nMakeup air ducts connecting to or within 18 inches (457.2 mm) of a Type I hood shall be constructed and installed in accordance with Sections 603.1, 603.3, 603.4, 603.9, 603.10, and 603.12. Duct insulation installed within 18 inches (457.2 mm) of a Type I hood shall be noncombustible or shall be listed for the application.\n\n#---- 506.3.2 Joints, seams and penetrations of grease ducts.\n\nJoints, seams and penetrations of grease ducts shall be made with a continuous liquid-tight weld or braze made on the external surface of the duct system.\n\nExceptions:\n\n1. Penetrations shall not be required to be welded or brazed where sealed by devices that are listed for the application.\n\n2. Internal welding or brazing shall not be prohibited provided that the joint is formed or ground smooth and is provided with ready access for inspection.\n\n3. Factory-built commercial kitchen grease ducts listed and labeled in accordance with UL 1978 and installed in accordance with Section 304.1 of this code.\n\n#----- 506.3.2.1 Duct joint types.\n\nDuct joints shall be butt joints, welded flange joints with a maximum flange depth of 1/2 inch (12.7 mm) or overlapping duct joints of either the telescoping or bell type. Overlapping joints shall be installed to prevent ledges and obstructions from collecting grease or interfering with gravity drainage to the intended collection point. The difference between the inside cross-sectional dimensions of overlapping sections of duct shall not exceed 1/4 inch (6.4 mm). The length of overlap for overlapping duct joints shall not exceed 2 inches (50.8 mm).\n\n#----- 506.3.2.2 Duct-to-hood joints.\n\nDuct-to-hood joints shall be made with continuous internal or external liquid-tight welded or brazed joints. Such joints shall be smooth, accessible for inspection, and without grease traps.\n\nExceptions: This section shall not apply to:\n\n1. A vertical duct-to-hood collar connection made in the top plane of the hood in accordance with all of the following:\n\n#--- 1.1. The hood duct opening shall have a 1-inch-deep (25.4 mm), full perimeter, welded flange turned down into the hood interior at an angle of 90 degrees (1.57 rad) from the plane of the opening.\n\n#--- 1.2. The duct shall have a 1-inch-deep (25.4 mm) flange made by a 1-inch by 1-inch (25.4 mm by 25.4 mm) angle iron welded to the full perimeter of the duct not less than 1 inch (25.4 mm) above the bottom end of the duct.\n\n#--- 1.3. A gasket rated for use at not less than 1,500°F (815.6°C) is installed between the duct flange and the top of the hood.\n\n#--- 1.4. The duct-to-hood joint shall be secured by stud bolts not less than 1/4 inch (6.4 mm) in diameter welded to the hood with a spacing not greater than 4 inches (101.6 mm) on center for the full perimeter of the opening. The bolts and nuts shall be secured with lockwashers.\n\n2. Listed and labeled duct-to-hood collar connections installed in accordance with Section 304.1.\n\n#----- 506.3.2.3 Duct-to-exhaust fan connections.\n\nDuct-to-exhaust fan connections shall be flanged and gasketed at the base of the fan for vertical discharge fans; shall be flanged, gasketed and bolted to the inlet of the fan for side-inlet utility fans; and shall be flanged, gasketed and bolted to the inlet and outlet of the fan for in-line fans. Approved flexible connectors may be provided. Gasket and sealing materials shall be rated for continuous duty at a temperature of not less than 1,500ºF (815.6ºC).\n\n#----- 506.3.2.4 Vibration isolation.\n\nA vibration isolation connector for connecting a duct to a fan shall consist of noncombustible packing in a metal sleeve joint of approved design or shall be a coated-fabric flexible duct connector listed and labeled for the application. Vibration isolation connectors shall be installed only at the connection of a duct to a fan inlet or outlet.\n\n#----- 506.3.2.5 Grease duct test.\n\nPrior to the use or concealment of any portion of a grease duct system, a leakage test shall be performed. Ducts shall be considered to be concealed where installed in shafts or covered by coatings or wraps that prevent the ductwork from being visually inspected on all sides. The duct installer shall be responsible for providing the necessary equipment and performing the grease duct leakage test. A duct leakage test, in accordance with this section, shall be performed for the entire duct system, including the hood-to-duct connection. The duct work shall be permitted to be tested in sections, provided that every joint is tested.\n\nTo determine the tightness of the grease duct construction, a smoke test shall be made in accordance with the following conditions and requirements:\n\n1. The test shall be performed in the presence of the special inspector.\n\n2. The grease duct shall be filled with a thick penetrating smoke produced by one or more smoke machines, or smoke bombs. A static pressure equal to or not less than 2\" wg shall be maintained throughout the test. The test shall be applied for a length of time sufficient to permit the inspection of the grease duct.\n\n3. If the test shows any evidence of leakage or other defects, such defects shall be corrected in accordance with the requirements of this chapter, and the test shall be repeated until there is no visible smoke observed.\n\n#---- 506.3.3 Grease duct supports.\n\nGrease duct bracing and supports shall be of noncombustible material securely attached to the structure and designed to carry gravity and seismic loads within the stress limitations of the New York City Building Code. Bolts, screws, rivets and other mechanical fasteners shall not penetrate duct walls.\n\n#---- 506.3.4 Air velocity.\n\nGrease duct systems serving a Type I hood shall be designed and installed to provide an air velocity within the duct system of not less than 500 feet per minute (2.5 m/s).\n\nException: The velocity limitations shall not apply within duct transitions utilized to connect ducts to differently sized or shaped openings in hoods and fans, provided that such transitions do not exceed 3 feet (914.4 mm) in length and are designed to prevent the trapping of grease.\n\n#---- 506.3.5 Separation of grease duct system.\n\nA separate grease duct system shall be provided for each Type I hood.\n\nExceptions:\n\n1. A separate grease duct system is not required where all of the following conditions are met:\n\n#--- 1.1. All interconnected hoods are located within the same story, provided that they are part of the same facility and under the control of one owner or tenant.\n\n#--- 1.2. All interconnected hoods are located within the same room or in adjoining rooms, provided that they are part of the same facility and under the control of one owner or tenant.\n\n#--- 1.3. Interconnecting ducts do not penetrate assemblies required to be fire-resistance rated.\n\n#--- 1.4. The grease duct system does not serve solid fuel-fired appliances.\n\n2. Branch ducts from other equipment in the same kitchen area, or from registers exhausting the kitchen space in general, may be connected to the main hood exhaust duct if the following requirements are complied with:\n\n#--- 2.1. A fusible link fire damper of the same gage as the hood exhaust duct shall be added at the point of connection of the branch duct to the exhaust duct.\n\n#--- 2.2. If the branch connection is made to the portion of the ductwork that will contain the fire-extinguishing medium, then the fire dampers required in Exception 2.1 shall be arranged to close automatically upon the operation of the fire-extinguishing system.\n\n#--- 2.3. The branch connection shall be made in either the top or sides of the main duct in a manner to prevent grease from flowing into the branch duct.\n\n#--- 2.4. The branch ducts shall be constructed of steel, aluminum, or copper of the gages and weights required in Chapter 6, and they shall be insulated with 2 inches (50.8 mm) of magnesia or other material having equivalent insulative and fire resistance qualities.\n\n#--- 2.5. All registers in these branches shall have fusible link actuated dampers.\n\n#--- 2.6. Where branch ductwork is to be used to exhaust vapors from dishwashers, pot sinks, or other similar equipment of a commercial type from which moisture is emitted, copper or aluminum of the minimum gage and weights required in Chapter 6 shall be used. Such ductwork shall be installed so that condensate cannot leak from it.\n\n#--- 2.7 Type I and Type II exhaust systems can be interconnected downstream of filters with a fire damper at the connection to the exhaust system.\n\n#---- 506.3.6 Grease duct clearances.\n\nWhere enclosures are not required, grease duct systems and exhaust equipment serving a Type I hood shall have a clearance to combustible construction of not less than 18 inches (457.2 mm), and shall have a clearance to noncombustible construction and gypsum wallboard attached to noncombustible structures of not less than 3 inches (76.2 mm).\n\nExceptions:\n\n1. For factory-built commercial kitchen grease ducts listed and labeled in accordance with UL 1978, the required clearance shall be in accordance with the listing of such material and as approved by the commissioner.\n\n2. Listed and labeled exhaust equipment installed in accordance with Section 304.1.\n\n3. Where commercial kitchen grease ducts are continuously covered on all sides with a listed and labeled field-applied grease duct enclosure material, system, product or method of construction specifically evaluated for such purpose in accordance with ASTM E 2336, the required clearance shall be in accordance with the listing of such material, system, product or method.\n\n4. Grease ducts protected with a minimum insulation covering of 2 inches (50.8 mm) of magnesium or calcium silicate block, with staggered joints, attached with galvanized steel wire or material assembly equivalent in insulating and fire-resistant qualities which cannot be penetrated by grease. Such protection shall be applied to all ducts inside of the building as approved by the commissioner.\n\n#---- 506.3.7 Prevention of grease accumulation in grease ducts.\n\nDuct systems serving a Type I hood shall be constructed and installed so that grease cannot collect in any portion thereof, and the system shall slope not less than one-fourth unit vertical in 12 units horizontal (2-percent slope) toward the hood or toward a grease reservoir designed and installed in accordance with Section 506.3.7.1. Where horizontal ducts exceed 75 feet (22 860 mm) in length, the slope shall be not less than one unit vertical in 12 units horizontal (8.3-percent slope). Dampers shall not be installed in the grease duct systems, except as required by Section 506.3.5, Exception 2.\n\n#----- 506.3.7.1 Grease duct reservoirs.\n\nGrease duct reservoirs shall:\n\n1. Be constructed as required for the grease duct they serve.\n\n2. Be located on the bottom of the horizontal duct or the bottommost section of the duct riser.\n\n3. Extend across the full width of the duct and have a length of not less than 12 inches (304.8 mm).\n\n4. Have a depth of not less than 1 inch (25.4 mm).\n\n5. Have a bottom that slopes to a capped drain connection.\n\n6. Be provided with a cleanout opening constructed in accordance with Section 506.3.8 and installed to provide direct access to the reservoir. The cleanout opening shall be located on a side or on top of the duct so as to permit cleaning of the reservoir.\n\n7. Be installed in accordance with the manufacturer's instructions where manufactured devices are utilized.\n\n#---- 506.3.8 Grease duct cleanouts and other openings.\n\nGrease duct systems shall not have openings therein other than those required for proper operation and maintenance of the system. Any portion of such system having sections not provided with access from the duct entry or discharge shall be provided with cleanout openings. Cleanout openings shall be provided at every change indirection, within 3 feet (914.4 mm) of the exhaust fan, and as required under Section 506.3.9. Cleanout openings shall be equipped with tight-fitting doors constructed of steel having a thickness not less than that required for the duct. Doors shall be equipped with a substantial method of latching, sufficient to hold the door tightly closed. Doors shall be designed so that they are operable without the use of a tool. Door assemblies shall have a gasket or sealant that is noncombustible and liquid tight, and shall not have fasteners that penetrate the duct. Listed and labeled access door assemblies shall be installed in accordance with the terms of the listing. Signage shall be provided at all required access doors and openings in accordance with Section 506.3.12.\n\n#----- 506.3.8.1 Personnel entry.\n\nWhere ductwork is large enough to allow entry of personnel, not less than one approved or listed opening having dimensions not less than 22 inches by 20 inches (558.8 mm by 508 mm) shall be provided in the horizontal sections, and in the top of vertical risers. Where such entry is provided, the duct and its supports shall be capable of supporting the additional load and the cleanouts specified in Section 506.3.8 are not required. Where personnel entry is not possible for cleaning the interior of vertical ducts, suitable provisions shall be made to clean the vertical duct in its entirety as well as for cleaning the base of the vertical riser.\n\n#----- 506.3.8.2 Cleanouts serving in-line fans.\n\nA suitable cleanout shall be provided for both the inlet side and outlet side of an in-line fan except where a duct does not connect to the fan. Such cleanouts shall be located within 3 feet (914.4 mm) of the fan duct connections to permit a thorough cleaning of the inlet and discharge ducts connected to the in-line fan as well as the interior of the fan itself.\n\nException: Where suitable cleanouts for in-line fans cannot be provided, the in-line fan shall be of \"clam shell\" construction which shall permit the fan to be opened and thoroughly cleaned while remaining in place.\n\n#---- 506.3.9 Grease duct horizontal cleanouts.\n\nCleanouts located on horizontal sections of ducts shall be spaced not more than 20 feet (6096 mm) apart, unless the opening prescribed by Section 506.3.8.1 is not possible, in which case openings large enough to permit thorough cleaning shall be provided at 12-foot (3657.6 mm) intervals. The cleanouts shall be located on the side of the duct with the opening not less than 1.5 inches (38.1 mm) above the bottom of the duct, and not less than 1 inch (25.4 mm) below the top of the duct. The opening minimum dimensions shall be 12 inches (304.8 mm) on each side. Where the dimensions of the side of the duct prohibit the cleanout installation prescribed herein, the openings shall be on the top of the duct or the bottom of the duct. Where located on the top of the duct, the opening edges shall be a minimum of 1 inch (25.4 mm) from the edges of the duct. Where located in the bottom of the duct, cleanout openings shall be designed to provide internal damming around the opening, shall be provided with gasketing to preclude grease leakage, shall provide for drainage of grease down the duct around the dam and shall be approved for the application. Where the dimensions of the sides, top or bottom of the duct preclude the installation of the prescribed minimum-size cleanout opening, the cleanout shall be located on the duct face that affords the largest opening dimension and shall be installed with the opening edges at the prescribed distances from the duct edges as previously set forth in this section.\n\n#---- 506.3.10 Underground and raised floor cavity grease duct installation.\n\nGrease ducts shall not be installed underground or in raised floor cavities.\n\n#---- 506.3.11 Grease duct enclosure.\n\nA commercial kitchen grease duct serving a Type I hood that penetrates a ceiling, wall, floor or any concealed space shall be enclosed from the first point of penetration to the outlet terminal. In-line exhaust fans not located outdoors shall be enclosed as required for grease ducts. A duct shall penetrate exterior walls only at locations where unprotected openings are permitted by the New York City Building Code. The duct enclosure shall serve a single grease duct and shall not contain other ducts, piping or wiring systems. Duct enclosures shall be a shaft enclosure in accordance with Section 506.3.11.1, a field-applied enclosure assembly in accordance with Section 506.3.11.2 or a factory-built enclosure assembly in accordance with Section 506.3.11.3. Duct enclosures shall have a fire-resistance rating of not less than that of the fire-resistance-rated assembly penetrated and not less than 1 hour. Fire dampers and smoke dampers shall not be installed in grease ducts.\n\nException: A duct enclosure shall not be required for a grease duct that penetrates only a nonfire-resistance-rated roof/ceiling assembly.\n\n#----- 506.3.11.1 Shaft enclosure.\n\nGrease ducts constructed in accordance with Section 506.3.1 shall be permitted to be enclosed in accordance with the New York City Building Code requirements for shaft construction. Such grease duct systems and exhaust equipment shall have a clearance to combustible construction of not less than 18 inches (457.2 mm), and shall have a clearance to noncombustible construction and gypsum wallboard attached to noncombustible structures of not less than 6 inches (152.4 mm). Duct enclosures shall be sealed around the duct at the point of penetration and vented to the outside of the building through the use of weather-protected openings.\n\nExceptions:\n\n1. The shaft enclosure provisions of this section shall not be required where a duct penetration is protected with a through-penetration firestop system classified in accordance with ASTM E 814 and having an \"F\" and \"T\" rating equal to the fire-resistance rating of the assembly being penetrated and where the surface of the duct is continuously covered on all sides from the point at which the duct penetrates a ceiling, wall or floor to the outlet terminal with a classified and labeled material, system, method of construction or product specifically evaluated for such purpose, which material, system, method of construction or product is approved by the commissioner and installed according to the manufacturer's instructions. Exposed duct wrap systems shall be protected where subject to physical damage.\n\n2. As an alternative to Exception 1 of this section, a minimum insulation covering of 2 inches (50.8 mm) of magnesium or calcium silicate block, with staggered joints, attached with galvanized steel wire or material assembly equivalent in insulating and fire-resistant qualities which cannot be penetrated by grease, and as approved by the commissioner, shall be applied to all ducts inside of the building.\n\n3. A duct enclosure shall not be required for a grease duct that penetrates only a nonfire-resistance-rated roof/ceiling assembly.\n\n4. A listed and labeled factory-built commercial kitchen grease duct system, evaluated as an enclosure system for reduced clearances to combustibles, and approved by the commissioner and installed according to manufacturer's instructions.\n\n#----- 506.3.11.2 Field-applied grease duct enclosure.\n\nGrease ducts constructed in accordance with Section 506.3.1 shall be enclosed by a listed and labeled field-applied grease duct enclosure material, systems, product, or method of construction specifically evaluated for such purpose in accordance with ASTM E 2336. The surface of the duct shall be continuously covered on all sides from the point at which the duct originates to the outlet terminal. Duct penetrations shall be protected with a through-penetration firestop system tested and listed in accordance with ASTM E 814 or UL 1479 and having an \"F\" and \"T\" rating equal to the fire-resistance rating of the assembly being penetrated. The grease duct enclosure and firestop system shall be installed in accordance with the listing and the manufacturer's instructions. Exposed duct-wrap systems shall be protected where subject to physical damage.\n\n#----- 506.3.11.3 Factory-built grease duct enclosure assemblies.\n\nFactory-built grease ducts incorporating integral enclosure materials shall be listed and labeled for use as grease duct enclosure assemblies specifically evaluated for such purpose in accordance with UL 2221. Duct penetrations shall be protected with a through-penetration firestop system tested and listed in accordance with ASTM E 814 or UL 1479 and having an \"F\" and \"T\" rating equal to the fire-resistance rating of the assembly being penetrated. The grease duct enclosure assembly and firestop system shall be installed in accordance with the listing and the manufacturer's instructions.\n\n#---- 506.3.12 Grease duct fire-resistive access opening.\n\nWhere cleanout openings are located in ducts within a fire-resistance-rated enclosure, access openings shall be provided in the enclosure at each cleanout point. Access openings shall be equipped with tight-fitting sliding or hinged doors that are equal in fire-resistive protection to that of the shaft or enclosure. An approved sign shall be placed on access opening panels with wording as follows: \"ACCESS PANEL. DO NOT OBSTRUCT.\" Cleanout openings provided in ducts that are not located within a fire-resistance-rated enclosure shall be provided with signage at the required opening that contains the same wording.\n\n#---- 506.3.13 Exhaust outlets serving Type I hoods.\n\nExhaust outlets for grease ducts serving Type I hoods shall conform to the requirements of Sections 506.3.13.1 through 506.3.13.3.\n\n#----- 506.3.13.1 Termination above the roof.\n\nExhaust outlets that terminate above the roof shall have the discharge opening located not less than 40 inches (1016 mm) above the roof surface. The exhaust flow shall be directed away from the surface of the roof.\n\n#----- 506.3.13.2 Termination through an exterior wall.\n\nExhaust outlets shall be permitted to terminate through exterior walls where the smoke, grease, gases, vapors and odors in the discharge from such terminations do not create a public nuisance or a fire hazard. Such terminations shall not be located where protected openings are required by the New York City Building Code. Other exterior openings shall not be located within 3 feet (914.4 mm) of such terminations.\n\n#----- 506.3.13.3 Termination location.\n\nExhaust outlets shall be located not less than 10 feet (3048 mm) horizontally from parts of the same or contiguous buildings, adjacent buildings and adjacent property lines and shall be located not less than 10 feet (3048 mm) above the adjoining grade level. Exhaust outlets shall be located not less than 10 feet (3048 mm) horizontally from and not less than 3 feet (914.4 mm) above air intake openings into any building.\n\nException: Exhaust outlets shall terminate not less than 5 feet (1524 mm) horizontally from parts of the same or contiguous building, an adjacent building, adjacent property line and air intake openings into a building where air from the exhaust outlet discharges away from such locations.\n\n#--- 506.4 Ducts serving Type II hoods.\n\nCommercial kitchen exhaust systems serving Type II hoods shall comply with Sections 506.4.1 and 506.4.2.\n\n#---- 506.4.1 Ducts.\n\nDucts and plenums serving Type II hoods shall be constructed of rigid metallic materials. Duct construction, installation, bracing and supports shall comply with Chapter 6. Ducts subject to positive pressure and ducts conveying moisture-laden or waste-heat-laden air shall be constructed, joined and sealed in an approved manner.\n\n#---- 506.4.2 Type II terminations.\n\nExhaust outlets serving Type II hoods shall terminate in accordance with the hood manufacturer's instructions and shall comply with all of the following:\n\n1. Outlets shall terminate not less than 3 feet (914.4 mm) in any direction from openings into the building.\n\n2. Outlets shall terminate not less than 10 feet (3048 mm) from property lines or buildings on the same lot.\n\n3. Outlets shall terminate not less than 10 feet (3048 mm) above grade.\n\n4. Outlets that terminate above a roof shall terminate not less than 30 inches (762 mm) above the roof's surface.\n\n5. Outlets shall terminate not less than 30 inches (762 mm) from exterior vertical walls.\n\n6. Outlets shall be protected against local weather conditions.\n\n7. Outlets shall not be directed onto walkways.\n\n8. Outlets shall meet the provisions for exterior wall opening protectives in accordance with the New York City Building Code.\n\n#----- 506.4.2.1 Cooking spaces.\n\nFor all buildings other than those classified as residential occupancy, a minimum of No. 16 Gage for galvanized sheet duct shall be used for nongrease duct exhaust applications.\n\n#--- 506.5 Exhaust equipment.\n\nExhaust equipment, including fans and grease reservoirs, shall comply with Section 506.5.1through 506.5.5 and shall be of an approved design or shall be listed for the application.\n\n#---- 506.5.1 Exhaust fans.\n\nExhaust fan housings serving a Type I hood shall be constructed as required for grease ducts in accordance with Section 506.3.1.1.\n\nException: Fans listed and labeled in accordance with UL 762.\n\n#----- 506.5.1.1 Fan motor.\n\nExhaust fan motors shall be located outside of the exhaust airstream.\n\n#----- 506.5.1.2 In-line fan location.\n\nWhere enclosed duct systems are connected to in-line fans not located outdoors, the fan shall be located in a room or enclosure having the same fire-resistance rating as the duct enclosure. Access shall be provided for servicing and cleaning of fan components. Such rooms or enclosures shall be ventilated in accordance with the fan manufacturer's instructions.\n\n#---- 506.5.2 Exhaust fan discharge.\n\nExhaust fans shall be positioned so that the discharge will not impinge on the roof, other equipment or appliances or parts of the structure. A vertical discharge fan serving a Type 1 hood shall be manufactured with an approved drain outlet at the lowest point of the housing to permit drainage of grease to an approved grease reservoir.\n\n#---- 506.5.3 Exhaust fan mounting.\n\nUp-blast fans serving Type I hoods and installed in a vertical or horizontal position shall be hinged, supplied with a flexible weatherproof electrical cable to permit inspection and cleaning and shall be equipped with a means of restraint to limit the swing of the fan on its hinge. The ductwork shall extend not less than 18 inches (457.2 mm) above the roof surface.\n\n#---- 506.5.4 Reserved.\n\n#---- 506.5.5 Termination location.\n\nThe outlet of exhaust equipment serving Type I hoods, shall be in accordance with Section 506.3.13.\n\nException: The minimum horizontal distance between vertical discharge fans and parapet-type building structures shall be 2 feet (609.6 mm) provided that such structures are not higher than the top of the fan discharge opening.\n\n#---- 506.5.6 Exhaust fan operation.\n\nThe operation of the exhaust fan shall be in accordance with the following requirements:\n\n1. The hood exhaust fan(s) shall continue to operate after the extinguishing system has been activated unless fan shutdown is required by a listed component of the ventilation system or by the design of the extinguishing system.\n\n2. The hood exhaust fan shall not be required to start automatically upon activation of the extinguishing system if the exhaust fan and all cooking equipment served by the fan have previously been shut down.\n\n3. The cooking appliances shall be interlocked with the exhaust hood system to prevent appliance operation when the exhaust hood system is not operating.\n\n#--- 506.6 Exterior duct installations.\n\nThe installation of exterior ducts shall comply with the following requirements:\n\n1. The exterior portion of the ductwork shall be vertical wherever possible and shall be installed and supported on the exterior of a building.\n\n2. Bolts, screws, rivets, and other mechanical fasteners shall not penetrate duct walls.\n\n3. Clearance of any ducts shall comply with Section 506.3.6.\n\n4. All ducts shall be protected on the exterior by paint or other suitable weather-protective coating.\n\n5. Ducts constructed of stainless steel shall not be required to have additional paint or weather-protective coatings.\n\n6. Ductwork subject to corrosion shall have minimal contact with the building surface.\n\n7. No portion of an exterior metal duct shall be nearer than 24 inches (609.6 mm) to any door or window or to any exit, or located where it would be readily accessible to the public, unless it is insulated or shielded to avoid injury to any person coming in contact with the duct.\n\nException: Listed and labeled factory-built commercial kitchen grease ducts may be used when installed in accordance with Section 304.1.\n\n#--- 506.7 Identification of ducts.\n\nAll duct systems serving Type I and Type II exhaust equipment shall be permanently labeled: \"CAUTION: KITCHEN EXHAUST SYSTEM.\" At the base of each duct and at its termination point, a clearly identifiable permanent sign shall be installed identifying the facility from which the duct originates.\n\nSection MC 507: Commercial Kitchen Hoods\n\n#--- 507.1 General.\n\nCommercial kitchen exhaust hoods shall comply with the requirements of this section. Hoods shall be Type I or II and shall be designed to capture and confine cooking vapors and residues. A Type I or Type II hood shall be installed at or above all commercial cooking appliances in accordance with Section 507.2 and 507.3. Where any cooking appliance under a single hood requires a Type I hood, a Type I hood shall be installed. Where a Type II hood is required, a Type I or Type II hood shall be installed. Where a Type I hood is installed, the installation of the entire system, including the hood, ducts, exhaust equipment and makeup air system shall comply with the requirements of Sections 506, 507, 508 and 509. Where total kitchen hood exhaust airflow rate is greater than 5,000 cfm or as required by the New York City Energy Conservation Code, each hood shall be a factory-built commercial exhaust hood listed by a nationally recognized testing laboratory in compliance with UL 710.\n\nExceptions:\n\n1. Factory-built commercial exhaust hoods that are listed and labeled in accordance with UL 710, and installed in accordance with Section 304.1, shall not be required to comply with Sections 507.1.5, 507.2.3, 507.2.5, 507.2.8, 507.3.1, 507.3.3, 507.4 and 507.5.\n\n2. Hoods used with electric cooking equipment shall be in accordance with UL 710B and have a grease removal and fire suppression system.\n\n3. Where cooking appliances are equipped with integral down-draft exhaust systems and such appliances and exhaust systems are listed and labeled for the application in accordance with NFPA 96, a hood shall not be required at or above them.\n\n#---- 507.1.1 Operation.\n\nCommercial kitchen exhaust hood systems shall operate while cooking equipment is in operation. The hood exhaust rate shall comply with the listing of the hood or shall comply with Section 507.5. The exhaust fan serving a Type I hood shall have automatic controls that will activate the fan when any appliance that requires such Type I Hood is turned on, or a means of interlock shall be provided that will prevent operation of such appliances when the exhaust fan is not turned on. Where one or more temperature or radiant energy sensors are used to activate a Type I hood exhaust fan, the fan shall activate not more than 15 minutes after the first appliance served by that hood has been turned on. A method of interlock between an exhaust hood system and appliances equipped with standing pilot burners shall not cause the pilot burners to be extinguished. A method of interlock between an exhaust hood system and cooking appliances shall not involve or depend upon any component of a fire-extinguishing system.\n\nHood exhaust volumes may be reduced during part-load cooking conditions only for listed hoods that are provided with variable speed or multispeed controls from or as approved by the hood manufacturer. Such controls shall automatically operate the exhaust system to maintain capture and removal of cooking effluents as required by this section. Reduced volumes shall maintain capture and removal of effluents from the idle cooking appliances that are operating in a standby mode. Minimum duct velocities shall be maintained during part load operation. The replacement air system shall be operated in coordination with the variable flow operation of the exhausts.\n\n#----- 507.1.1.1 Multiple hoods utilizing a single exhaust system.\n\nWhere heat or radiant energy sensors are utilized in hood systems consisting of multiple hoods served by a single exhaust system, such sensors shall be provided in each hood. Sensors shall be capable of being accessed from the hood outlet or from a cleanout location.\n\n#---- 507.1.2 Domestic cooking appliances used for commercial purposes.\n\nDomestic cooking appliances utilized for commercial purposes and all domestic cooking appliances installed in cafeterias and Group A-1, A-2, A-4, A-5, and M occupancies shall be provided with Type I, Type II, or UL 710B hoods as required for the type of appliances and processes in accordance with Sections 507.2 and 507.3. Refer to Section 505.4 for qualifying non-commercial uses.\n\n#---- 507.1.3 Fuel-burning appliances.\n\nWhere vented fuel-burning appliances are located in the same room or space as the hood, provisions shall be made to prevent the hood system from interfering with normal operation of the appliance vents.\n\n#---- 507.1.4 Cleaning.\n\nA hood shall be designed to facilitate thorough cleaning of the entire hood.\n\n#---- 507.1.5 Exhaust outlets.\n\nExhaust outlets located within the hood shall be located to optimize the capture of particulate matter. Each outlet shall serve not more than a 12-foot (3657.6 mm) section of hood.\n\n#--- 507.2 Type I hoods.\n\nType I hoods shall be installed where cooking appliances produce grease or smoke as a result of the cooking process. Type I hoods shall be installed over medium-duty, heavy-duty and extra-heavy-duty cooking appliances.\n\nException: A Type I hood shall not be required for an electric cooking appliance where an approved testing agency provides documentation that the appliance effluent contains 5 mg/m 3 or less of grease when tested at an exhaust flow rate of 500 cfm (0.236 m 3 /s) in accordance with UL 710B.\n\n#---- 507.2.1 Type I exhaust flow rate label.\n\nType I hoods shall bear a label indicating the minimum exhaust flow rate in cfm per linear foot (L/s per linear meter) of hood that provides for capture and containment of the exhaust effluent for the cooking appliances served by the hood, based on the cooking appliance duty classifications defined in this code.\n\n#---- 507.2.2 Type I extra-heavy-duty.\n\nType I hoods for use over extra-heavy-duty cooking appliances shall not cover heavy-, medium- or light-duty appliances. Such hoods shall discharge to an exhaust system that is independent of other exhaust systems.\n\n#---- 507.2.3 Type I materials.\n\nType I hoods shall be constructed of steel having a minimum thickness of 0.0466 inch (1.181 mm) (No. 18 gage) or stainless steel not less than 0.0335 inch (0.8525 mm) (No. 20 MSG) in thickness.\n\n#---- 507.2.4 Type I supports.\n\nType I hoods shall be secured in place by noncombustible supports. Type I hood supports shall be adequate for the applied load of the hood, the unsupported ductwork, the effluent loading and the possible weight of personnel working in or on the hood.\n\n#---- 507.2.5 Type I hood joints, seams and penetrations.\n\nExternal hood joints, seams and penetrations for Type I hoods shall be made with a continuous external liquid-tight weld or braze to the lowest outermost perimeter of the hood. Internal hood joints, seams, penetrations, filter support frames and other appendages attached inside the hood shall not be required to be welded or brazed but shall be otherwise sealed to be grease tight.\n\nExceptions:\n\n1. Penetrations shall not be required to be welded or brazed where sealed by devices that are listed for the application.\n\n2. Internal welding or brazing of seams, joints and penetrations of the hood shall not be prohibited provided that the joint is formed smooth or ground so as to not trap grease, and is readily cleanable.\n\n#---- 507.2.6 Clearances for Type I hood.\n\nA Type I hood shall be installed with a clearance to combustibles of not less than 18 inches (457.2 mm).\n\nException: Clearance shall not be required from gypsum wallboard or 1/2-inch (12.7 mm) or thicker cementitious wallboard attached to noncombustible structures provided that a smooth, cleanable, nonabsorbent and noncombustible material is installed between the hood and the gypsum or cementitious wallboard over an area extending not less than 18 inches (457.2 mm) in all directions from the hood.\n\n#---- 507.2.7 Type I hoods penetrating a ceiling.\n\nType I hoods or portions thereof penetrating a ceiling, wall or furred space shall comply with Section 506.3.11. Field-applied grease duct enclosure systems, as addressed in Section 506.3.11.2, shall not be utilized to satisfy the requirements of this section.\n\n#---- 507.2.8 Type I grease filters.\n\nType I hoods shall be equipped with grease filters listed and labeled in accordance with UL 1046. Grease filters shall be provided with access for cleaning or replacement. The lowest edge of a grease filter located above the cooking surface shall be not less than the height specified in Table 507.2.8.\n\nTable 507.2.8 Minimum Distance Between the Lowest Edge of a Grease Filter and the Cooking Surface or the Heating Surface\n\nFor SI: 1 foot = 304.8 mm.\n\n#----- 507.2.8.1 Criteria.\n\nFilters shall be of such size, type and arrangement as will permit the required quantity of air to pass through such units at rates not exceeding those for which the filter or unit was designed or approved. Filter units shall be installed in frames or holders so as to be readily removable without the use of separate tools, unless designed and installed to be cleaned in place and the system is equipped for such cleaning in place. Where filters are designed and required to be cleaned, removable filter units shall be of a size that will allow them to be cleaned in a dishwashing machine or pot sink. Filter units shall be arranged in place or provided with drip-intercepting devices to prevent grease or other condensate from dripping into food or on food preparation surfaces.\n\n#----- 507.2.8.2 Mounting position of grease filters.\n\nFilters shall be installed at an angle of not less than 45 degrees (0.79 rad) from the horizontal and shall be equipped with a drip tray beneath the lower edge of the filters.\n\n#---- 507.2.9 Grease gutters for Type I hood.\n\nGrease gutters shall drain to an approved collection receptacle that is fabricated, designed and installed to allow access for cleaning.\n\n#--- 507.3 Type II hoods.\n\nType II hoods shall be installed above dishwashers and appliances that produce heat or moisture and do not produce grease or smoke as a result of the cooking process, except where the heat and moisture loads from such appliances are incorporated into the HVAC system design or into the design of a separate removal system. Type II hoods shall be installed above all appliances that produce products of combustion and do not produce grease or smoke as a result of the cooking process. Spaces containing cooking appliances that do not require Type II hoods shall be provided with exhaust at a rate of 0.70 cfm per square foot (0.00033 m 3 /s). For the purpose of determining the floor area required to be exhausted, each individual appliance that is not required to be installed under a Type II hood shall be considered as occupying not less than 100 square feet (9.3 m2). Such additional square footage shall be provided with exhaust at a rate of 0.70 cfm per square foot (0.00356 m 3 /(s • m 2 )).\n\n#---- 507.3.1 Type II hood materials.\n\nType II hoods shall be constructed of steel having a minimum thickness of 0.0296 inch (0.7534 mm) (No. 22 gage) or stainless steel not less than 0.0220 inch (0.5550 mm) (No. 24 gage) in thickness, copper sheets weighing not less than 24 ounces per square foot (7.3 kg/m 2 ) or of other approved material and gage.\n\n#---- 507.3.2 Type II supports.\n\nType II hood supports shall be adequate for the applied load of the hood, the unsupported ductwork, the effluent loading and the possible weight of personnel working in or on the hood.\n\n#---- 507.3.3 Type II hood joints, seams and penetrations.\n\nJoints, seams and penetrations for Type II hoods shall be constructed as set forth in Chapter 6, shall be sealed on the interior of the hood and shall provide a smooth surface that is readily cleanable and water tight.\n\n#--- 507.4 Hood size and location.\n\nHoods shall comply with the overhang, setback and height requirements in accordance with Sections 507.4.1 and 507.4.2, based on the type of hood.\n\n#---- 507.4.1 Canopy size and location.\n\nThe inside lower edge of canopy-type Type I and II commercial hoods shall overhang or extend a horizontal distance of not less than 6 inches (152.4 mm) beyond the edge of the top horizontal surface of the appliance on all open sides. The vertical distance between the front lower lip of the hood and such surface shall not exceed 4 feet (1219.2 mm).\n\nException: The hood shall be permitted to be flush with the outer edge of the cooking surface where the hood is closed to the appliance side by a noncombustible wall or panel.\n\n#---- 507.4.2 Noncanopy size and location.\n\nNoncanopy-type hoods shall be located not greater than 3 feet (914.4 mm) above the cooking surface. The edge of the hood shall be set back not greater than 1 foot (304.8 mm) from the edge of the cooking surface.\n\n#--- 507.5 Capacity of hoods.\n\nCommercial food service hoods shall exhaust a minimum net quantity of air determined in accordance with this section and Sections 507.5.1 through 507.5.5. The net quantity of exhaust air shall be calculated by subtracting any airflow supplied directly to a hood cavity from the total exhaust flow rate of a hood. Where any combination of heavy-duty, medium-duty and light-duty cooking appliances are utilized under a single hood, the exhaust rate required by this section for the heaviest duty appliance covered by the hood shall be used for the entire hood.\n\n#---- 507.5.1 Extra-heavy-duty cooking appliances.\n\nThe minimum net airflow for hoods, as determined by Section 507.1, used for extra-heavy-duty cooking appliances shall be determined as follows:\n\nFor SI: 1 cfm per linear foot = 1.55 L/s per linear meter.\n\n#---- 507.5.2 Heavy-duty cooking appliances.\n\nThe minimum net airflow for hoods, as determined by Section 507.1, used for heavy-duty cooking appliances shall be determined as follows:\n\nFor SI: 1 cfm per linear foot = 1.55 L/s per linear meter.\n\n#---- 507.5.3 Medium-duty cooking appliances.\n\nThe minimum net airflow for hoods, as determined by Section 507.1, used for medium-duty cooking appliances shall be determined as follows:\n\nFor SI: 1 cfm per linear foot = 1.55 L/s per linear meter.\n\n#---- 507.5.4 Light-duty cooking appliances.\n\nThe minimum net airflow for hoods, as determined by Section 507.1, used for light-duty cooking appliances and food service preparation shall be determined as follows:\n\nFor SI: 1 cfm per linear foot = 1.55 L/s per linear meter.\n\n#---- 507.5.5 Dishwashing appliances.\n\nThe minimum net airflow for Type II hoods used for dishwashing appliances shall be 100 cfm per linear foot (155 L/s per linear meter) of hood length.\n\nException: Dishwashing appliances and equipment installed in accordance with Section 507.3.\n\n#--- 507.6 Performance test.\n\nA performance test shall be conducted upon completion of and before final approval of the installation of a ventilation system serving commercial cooking appliances. The test shall verify the rate of exhaust airflow required by Section 507.5, makeup airflow required by Section 508, and proper operation as specified in this chapter. The permit holder shall furnish the necessary test equipment and devices required to perform the tests. The performance test shall be witnessed by a special inspector.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2013/148.\n\nSection MC 508: Commercial Kitchen Makeup Air\n\n#--- 508.1 Makeup air.\n\nMakeup air shall be supplied during the operation of commercial kitchen exhaust systems that are provided for commercial cooking appliances. The amount of makeup air supplied to the building from all sources shall be approximately equal to the amount of exhaust air for all exhaust systems for the building. The makeup air shall not reduce the effectiveness of the exhaust system. Makeup air shall be provided by gravity or mechanical means or both. Mechanical makeup air systems shall be automatically controlled to start and operate simultaneously with the exhaust system. Makeup air intake opening locations shall comply with Section 401.4. Makeup air shall be provided in accordance with the New York City Energy Conservation Code.\n\n#---- 508.1.1 Makeup air temperature.\n\nThe temperature differential between makeup air delivered to the space and the air in the conditioned space shall not exceed 10ºF (6ºC) except where the makeup air contributes to satisfying the heating or cooling loads of the space and such temperature differential does not exceed 25°F (-38.9°C). The makeup air delivered to a compensating hood with front facing or side facing discharges shall be considered as being delivered to the space for the purposes of this section.\n\n#---- 508.1.2 Air balance\n\nDesign plans for a commercial kitchen ventilation system shall include a schedule or diagram indicating the design air balance of the kitchen and all communicating spaces clearly indicating makeup, transfer, exhaust and infiltration air flow rates. Negative pressurization caused by the kitchen exhaust system shall not cause improper operation of systems in communicating spaces or cause door opening forces in the building to exceed the limits set forth in Chapter 10 of the New York City Building Code.\n\n#--- 508.2 Compensating hoods.\n\nManufacturers of compensating hoods shall provide a label indicating minimum exhaust flow and/or maximum makeup airflow that provides capture and containment of the exhaust effluent.\n\nException: Compensating hoods with makeup air supplied only from the front face discharge and side face discharge openings shall not be required to be labeled with the maximum makeup airflow.\n\nSection MC 509: Fire Suppression Systems\n\n#--- 509.1 Where required.\n\nCommercial cooking appliances required by Section 507.2 to have a Type I hood shall be provided with an approved automatic fire suppression system complying with the New York City Building Code and the New York City Fire Code.\n\nSection MC 510: Hazardous Exhaust Systems\n\n#--- 510.1 General.\n\nThis section shall govern the design and construction of duct systems for hazardous exhaust and shall determine where such systems are required. Hazardous exhaust systems are systems designed to capture and control hazardous emissions generated from product handling or processes, and convey those emissions to the outdoors. Hazardous emissions include flammable vapors, gases, fumes, mists or dusts, and volatile or airborne materials posing a health hazard, such as toxic or corrosive materials. For the purposes of this section, the health-hazard rating of materials shall be as specified in NFPA 704.\n\nFor the purposes of the provisions of Section 510, a laboratory shall be defined as a building or portion thereof wherein chemicals or gases are used or synthesized on a nonproduction basis for testing, research, experimental, instructional or educational purposes.\n\n#--- 510.2 Where required.\n\nA hazardous exhaust system shall be required wherever operations involving the handling or processing of hazardous materials, in the absence of such exhaust systems and under normal operating conditions, have the potential to create one of the following conditions:\n\n1. A flammable vapor, gas, fume, mist or dust is present in concentrations exceeding 25 percent of the lower flammability limit of the substance for the expected room temperature.\n\n2. A vapor, gas, fume, mist or dust with a health-hazard rating of 4 is present in any concentration.\n\n3. A vapor, gas, fume, mist or dust with a health-hazard rating of 1, 2 or 3 is present in concentrations exceeding 1 percent of the median lethal concentration of the substance for acute inhalation toxicity.\n\nException: Laboratories, as defined in Section 510.1, except where the concentrations listed in Item 1 are exceeded, or a vapor, gas, fume, mist or dust with a health-hazard rating of 1, 2, 3 or 4 is present in concentrations exceeding 1 percent of the median lethal concentration of the substance for acute inhalation toxicity.\n\n#---- 510.2.1 Lumber yards and woodworking facilities.\n\nEquipment or machinery located inside buildings at lumber yards and woodworking facilities that generates or emits combustible dust shall be provided with an approved dust-collection and exhaust system installed in conformance with this section and the New York City Fire Code. Equipment and systems that are used to collect, process or convey combustible dusts shall be provided with an approved explosion-control system.\n\n#---- 510.2.2 Combustible fibers.\n\nEquipment or machinery within a building that generates or emits combustible fibers shall be provided with an approved dust-collecting and exhaust system. Such systems shall comply with this code and the New York City Fire Code.\n\n#--- 510.3 Design and operation.\n\nThe design and operation of the exhaust system shall be such that flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust flow below 25 percent of the contaminant's lower flammability limit.\n\n#--- 510.4 Independent system.\n\nHazardous exhaust systems shall be independent of other types of exhaust systems.\n\n#--- 510.5 Incompatible materials and common shafts.\n\nIncompatible materials, as defined in the New York City Fire Code, shall not be exhausted through the same hazardous exhaust system. Hazardous exhaust systems shall not share common shafts with other duct systems, except where such systems are hazardous exhaust systems originating in the same fire area.\n\nException: The provision of this section shall not apply to laboratory exhaust systems where all of the following conditions apply:\n\n1. All of the hazardous exhaust ductwork and other laboratory exhaust within both the occupied space and the shafts are under negative pressure while in operation.\n\n2. The hazardous exhaust ductwork manifolded together within the occupied space must originate within the same fire area.\n\n3. Hazardous exhaust ductwork originating in different fire areas and manifolded together in a common shaft shall use steel sub-ducts in accordance with Chapter 6.\n\n4. Each control branch has a flow regulating device.\n\n5. Perchloric acid hoods and connected exhaust shall be prohibited from manifolding.\n\n6. Radioisotope hoods are equipped with filtration, carbon beds, or both where required by the registered design professional.\n\n7. Biological safety cabinets are filtered.\n\n8. Each hazardous exhaust duct system shall be served by redundant exhaust fans that comply with either of the following:\n\n#--- 8.1. The fans shall operate simultaneously in parallel and each fan shall be individually capable of providing the required exhaust rate.\n\n#--- 8.2. Each of the redundant fans is controlled so as to operate when the other fan has failed or is shut down for servicing.\n\n#--- 510.6 Design.\n\nSystems for removal of vapors, gases and smoke shall be designed by the constant velocity or equal friction methods. Systems conveying particulate matter shall be designed employing the constant velocity method.\n\n#---- 510.6.1 Balancing.\n\nSystems conveying explosive or radioactive materials shall be prebalanced by duct sizing. Other systems shall be balanced by duct sizing with balancing devices, such as dampers. Dampers provided to balance air flow shall be provided with securely fixed minimum-position blocking devices to prevent restricting flow below the required volume or velocity.\n\n#---- 510.6.2 Emission control.\n\nThe design of the system shall be such that the emissions are confined to the area in which they are generated by air currents, hoods or enclosures and shall be exhausted by a duct system to a safe location or treated by removing contaminants.\n\n#---- 510.6.3 Hoods required.\n\nHoods or enclosures shall be used where contaminants originate in a limited area of a space. The design of the hood or enclosure shall be such that air currents created by the exhaust systems will capture the contaminants and transport them directly to the exhaust duct.\n\n#---- 510.6.4 Contaminant capture and dilution.\n\nThe velocity and circulation of air in work areas shall be such that contaminants are captured by an airstream at the area where the emissions are generated and conveyed into a product-conveying duct system. Contaminated air from work areas where hazardous contaminants are generated shall be diluted below the thresholds specified in Section 510.2 with air that does not contain other hazardous contaminants.\n\n#---- 510.6.5 Makeup air.\n\nMakeup air shall be provided at a rate approximately equal to the rate that air is exhausted by the hazardous exhaust system. Makeup air intakes shall be located in accordance with Section 401.4.\n\n#---- 510.6.6 Clearances.\n\nThe minimum clearance between hoods and combustible construction shall be the clearance required by the duct system.\n\n#---- 510.6.7 Ducts.\n\nHazardous exhaust duct systems shall extend directly to the exterior of the building and shall not extend into or through ducts and plenums.\n\n#--- 510.7 Penetrations.\n\nPenetrations of structural elements by a hazardous exhaust system shall conform to Sections 510.7.1 through 510.7.4.\n\nException: Duct penetrations within Group H-5 occupancies as allowed by the New York City Building Code.\n\n#---- 510.7.1 Fire dampers and smoke dampers.\n\nFire dampers and smoke dampers are prohibited in hazardous exhaust ducts.\n\n#----- 510.7.1.1 Shaft penetrations.\n\nHazardous exhaust ducts that penetrate fire-resistance-rated shafts shall comply with Section 714.3.1 or 714.3.1.2 of the New York City Building Code.\n\n#---- 510.7.2 Floors.\n\nHazardous exhaust systems that penetrate a floor/ceiling assembly shall be enclosed in a fire-resistance-rated shaft constructed in accordance with the New York City Building Code.\n\n#---- 510.7.3 Wall assemblies.\n\nHazardous exhaust duct systems that penetrate fire-resistance-rated wall assemblies shall be enclosed in fire-resistance-rated construction from the point of penetration to the outlet terminal, except where the interior of the duct is equipped with an approved automatic fire suppression system. Ducts shall be enclosed in accordance with the New York City Building Code requirements for shaft construction and such enclosure shall have a minimum fire-resistance rating of not less than the highest fire-resistance-rated wall assembly penetrated.\n\n#---- 510.7.4 Fire walls.\n\nDucts shall not penetrate a fire wall.\n\n#--- 510.8 Suppression required.\n\nDucts shall be protected with an approved automatic fire suppression system installed in accordance with the New York City Building Code.\n\nExceptions:\n\n1. An approved automatic fire suppression system shall not be required in ducts conveying materials, fumes, mists and vapors that are nonflammable and noncombustible under all conditions and at any concentrations.\n\n2. Automatic fire suppression systems shall not be required in metallic and noncombustible, nonmetallic exhaust ducts in semiconductor fabrication facilities.\n\n3. An approved automatic fire suppression system shall not be required in ducts where the largest cross-sectional diameter of the duct is less than 10 inches (254 mm).\n\n4. For laboratories, as defined in Section 510.1, approved automatic fire suppression systems shall not be required in laboratory hoods or exhaust systems.\n\n#--- 510.9 Duct construction.\n\nDucts used to convey hazardous exhaust shall be constructed of materials approved for installation in such an exhaust system and shall comply with one of the following:\n\n1. Ducts shall be constructed of approved G90 galvanized sheet steel, with a minimum nominal thickness as specified in Table 510.9.\n\n2. Ducts used in systems exhausting nonflammable corrosive fumes or vapors shall be constructed of nonmetallic materials that exhibit a flame spread index of 25 or less and a smoke-developed index of 50 or less when tested in accordance with ASTM E 84 or UL 723 and that are listed and labeled the application.\n\nWhere the products being exhausted are detrimental to the duct material, the ducts shall be constructed of alternative materials that are compatible with the exhaust.\n\nTable 510.9 Minimum Duct Thickness\n\nFor SI: 1 inch = 25.4 mm.\n\n#---- 510.9.1 Duct joints.\n\nDucts shall be made tight with lap joints having a minimum lap of 1 inch (25.4 mm). Joints used in SMACNA/ANSI Round Industrial Duct Construction Standards and SMACNA/ANSI Rectangular Industrial Duct Construction Standards are also acceptable.\n\n#---- 510.9.2 Clearance to combustibles.\n\nDucts shall have a clearance to combustibles in accordance with Table 510.9.2. Exhaust gases having temperatures in excess of 600°F (316°C) shall be exhausted to a chimney in accordance with Section 511.2.\n\nTable 510.9.2 Clearance to Combustibles\n\nFor SI: 1 inch = 25.4 mm, °C = ((°F) - 32)/1.8.\n\n#---- 510.9.3 Explosion relief.\n\nSystems exhausting potentially explosive mixtures shall be protected with an approved explosion relief system or by an approved explosion prevention system designed and installed in accordance with NFPA 69. An explosion relief system shall be designed to minimize the structural and mechanical damage resulting from an explosion or deflagration within the exhaust system. An explosion prevention system shall be designed to prevent an explosion or deflagration from occurring.\n\n#--- 510.10 Supports.\n\nDucts shall be supported at intervals not exceeding 10 feet (3048 mm). Supports shall be constructed of noncombustible material.\n\nSection MC 511: Dust, Stock and Refuse Conveying Systems\n\n#--- 511.1 Dust, stock and refuse conveying systems.\n\nDust, stock and refuse conveying systems shall comply with the provisions of Section 510 and Sections 511.1.1 through 511.2.\n\n#---- 511.1.1 Collectors and separators.\n\nCollectors and separators involving such systems as centrifugal separators, bag filter systems and similar devices, and associated supports shall be constructed of noncombustible materials and shall be located on the exterior of the building or structure. A collector or separator shall not be located nearer than 10 feet (3048 mm) to combustible construction or to an unprotected wall or floor opening, unless the collector is provided with a metal vent pipe that extends above the highest part of any roof within a distance of 30 feet (9144 mm).\n\nExceptions:\n\n1. Where dust producing equipment requires an aggregate dust collection flowrate less than 1,500 ft 3 per min (708 liters per second), collectors such as \"Point of Use\" collectors, close extraction weld fume collectors, spray finishing booths, stationary grinding tables, sanding booths, and integrated or machine-mounted collectors shall be permitted to be installed indoors provided the installation is in accordance with the New York City Fire Code and the New York City Electrical Code.\n\n2. Collectors in independent exhaust systems handling combustible dusts shall be permitted to be installed indoors provided that such collectors are installed in compliance with the New York City Fire Code and the New York City Electrical Code.\n\n#---- 511.1.2 Discharge pipe.\n\nDischarge piping shall conform to the requirements for ducts, including clearances required for high-heat appliances, as contained in this code. A delivery pipe from a centrifugal separator collector shall not convey refuse directly into the firebox of a boiler, furnace, dutch oven, refuse burner, incinerator or other appliance.\n\n#---- 511.1.3 Conveying systems exhaust discharge.\n\nAn exhaust system shall discharge to the outside of the building either directly by flue or indirectly through the bin or vault into which the system discharges except where the contaminants have been removed. Exhaust system discharge shall be permitted to be recirculated provided that the solid particulate has been removed at a minimum efficiency of 99.9 percent at 10 microns (10.01 mm), vapor concentrations are less than 25 percent of the LFL, and approved equipment is used to monitor the vapor concentration.\n\n#---- 511.1.4 Spark protection.\n\nThe outlet of an open-air exhaust terminal shall be protected with an approved metal or other noncombustible screen to prevent the entry of sparks.\n\n#---- 511.1.5 Explosion relief vents.\n\nA safety or explosion relief vent shall be provided on all systems that convey combustible refuse or stock of an explosive nature, in accordance with the requirements of the New York City Building Code.\n\n#----- 511.1.5.1 Screens.\n\nWhere a screen is installed in a safety relief vent, the screen shall be attached so as to permit ready release under the explosion pressure.\n\n#----- 511.1.5.2 Hoods.\n\nThe relief vent shall be provided with an approved noncombustible cowl or hood, or with a counterbalanced relief valve or cover arranged to prevent the escape of hazardous materials, gases or liquids.\n\n#--- 511.2 Exhaust outlets.\n\nOutlets for exhaust that exceed 600°F (315°C) shall be designed as a chimney in accordance with Table 511.2.\n\nTable 511.2 Construction Clearance and Termination Requirements for Single-Wall Metal Dust, Stock and Refuse Conveying Systems\n\nFor SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, °C = ((°F) - 32)/1.8.\n\na. Lining shall extend from bottom to top of outlet.\n\nb. Lining shall extend from 24 inches below connector to 24 feet above.\n\nc. Clearance shall be as specified by the design engineer and shall have sufficient clearance from buildings and structures to avoid overheating combustible materials (maximum 160°F).\n\nSection MC 512: Subslab Soil Exhaust Systems\n\n#--- 512.1 General.\n\nWhere a subslab soil exhaust system is provided, the duct shall conform to the requirements of this section.\n\n#--- 512.2 Materials.\n\nSubslab soil exhaust system duct material shall be air duct material listed and labeled to the requirements of UL 181 for Class 0 air ducts, or any of the following piping materials that comply with the New York City Plumbing Code as building sanitary drainage and vent pipe: cast iron; galvanized steel; brass or copper pipe; copper tube of a weight not less than that of copper drainage tube, Type DWV; and plastic piping.\n\n#--- 512.3 Grade.\n\nExhaust system ducts shall not be trapped and shall have a minimum slope of one-eighth unit vertical in 12 units horizontal (1-percent slope).\n\n#--- 512.4 Termination.\n\nSubslab soil exhaust system ducts shall extend through the roof and terminate not less than 6 inches (152.4 mm) above the roof and not less than 10 feet (3048 mm) from any operable openings or air intake.\n\n#--- 512.5 Identification.\n\nSubslab soil exhaust ducts shall be permanently identified within each floor level by means of a tag, stencil or other approved marking.\n\nSection MC 513: Smoke Control Systems\n\n#--- 513.1 Scope and purpose.\n\nThis section applies to mechanical and passive smoke control systems that are required by the New York City Building Code. A smoke control system, where required, facilitates the evacuation of the occupants. Smoke control systems not required by the New York City Building Code shall not be installed unless approved by the Department. The purpose of this section is to establish minimum requirements for the design, installation and acceptance testing of smoke control systems that are intended to provide a tenable environment for the evacuation or relocation of occupants. These provisions are not intended for the preservation of contents, the timely restoration of operations, or for assistance in fire suppression or post-fire smoke purge. Smoke control systems regulated by this section serve a different purpose than the smoke and heat-venting provisions found in Section 910 of the New York City Building Code. Mechanical smoke control systems shall not be considered exhaust systems under Chapter 5.\n\n#--- 513.2 General design requirements.\n\nSmoke control systems shall be designed and installed in accordance with Section 909 of the New York City Building Code.\n\nSection MC 514: Energy Recovery Ventilation Systems\n\n#--- 514.1 General.\n\nEnergy recovery ventilation systems shall be installed in accordance with this section. Where required for purposes of energy conservation, energy recovery ventilation systems shall comply with the New York City Energy Conservation Code. Ducted heat recovery ventilators shall be listed and labeled in accordance with UL 1812. Nonducted heat recovery ventilators shall be listed and labeled in accordance with UL 1815.\n\nEditor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/085.\n\n#--- 514.2 Prohibited applications.\n\nUnless specifically designed or listed for the specific applications and as part of an engineered system, energy recovery ventilation systems shall not be used in the following systems:\n\n1. Hazardous exhaust systems covered in Section 510.\n\n2. Dust, stock and refuse systems that convey explosive or flammable vapors, fumes or dust.\n\n3. Smoke control systems covered in Section 513.\n\n4. Commercial kitchen exhaust systems serving Type I or Type II hoods.\n\n5. Clothes dryer exhaust systems covered in Section 504.\n\nException: The application of energy recovery ventilation equipment that recovers sensible heat only utilizing coil-type heat exchangers shall not be limited by this section.\n\n#--- 514.3 Access.\n\nA means of access shall be provided to the heat exchanger and other components of the system as required for service, maintenance, repair or replacement.\n\n#--- 514.4 Recirculated air.\n\nClass 1 or Class 2 air as described in ASHRAE 62.1 that is conveyed within energy recovery systems shall not be considered as recirculated air where the energy recovery ventilation system is constructed to limit cross-leakage between air streams to less than 10 percent of the total airflow design capacity.\n\n#--- 514.5 Combined system allowed.\n\nEnvironmental exhaust air and toilet exhaust may be combined in any occupancy downstream of all air inlets of the system provided that such exhaust cannot be recirculated. In Group R occupancies, exhaust from domestic kitchens and toilets/baths from one or more dwelling or sleeping units may be combined at a point downstream of all air inlets of the system.\n\nSection MC 515: Postfire Smoke Purge Systems\n\n#--- 515.1 General.\n\nPostfire smoke purge systems shall be provided as required by Chapter 9 of the New York City Building Code.",
+  "schemaVersion": 1
+}

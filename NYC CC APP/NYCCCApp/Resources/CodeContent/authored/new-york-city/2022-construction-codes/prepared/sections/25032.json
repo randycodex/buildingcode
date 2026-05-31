@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162359\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162359\"><\/AnnotationDrawer><div>The water supply connection to coffee machines and noncarbonated beverage dispensers shall be protected against backflow by a backflow preventer conforming to ASSE 1022 or by an air gap.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25032-html-1",
+      "kind" : "html",
+      "plainText" : "The water supply connection to coffee machines and noncarbonated beverage dispensers shall be protected against backflow by a backflow preventer conforming to ASSE 1022 or by an air gap."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25032
+}

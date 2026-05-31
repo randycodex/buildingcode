@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183013\"><\/AnnotationDrawer><div>Water-resistive barriers shall be installed as required in Section 1404.2 and, where applied over wood-based sheathing, shall include a water-resistive barrier with a performance at least equivalent to two layers of water-resistive barrier complying with ASTM E 2556, Type I. The individual layers shall be installed independently such that each layer provides a separate continuous plane and any flashing (installed in accordance with Section 1405.4), has a means for draining water that enters the assembly to the exterior.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183014\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183014\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where the water-resistive barrier that is applied over wood-based sheathing has a water resistance equal to or greater than that of a water-resistive barrier complying with ASTM E 2556, Type II and is separated from the stucco by an intervening, substantially nonwater-absorbing layer or drainage space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5202-html-1",
+      "kind" : "html",
+      "plainText" : "Water-resistive barriers shall be installed as required in Section 1404.2 and, where applied over wood-based sheathing, shall include a water-resistive barrier with a performance at least equivalent to two layers of water-resistive barrier complying with ASTM E 2556, Type I. The individual layers shall be installed independently such that each layer provides a separate continuous plane and any flashing (installed in accordance with Section 1405.4), has a means for draining water that enters the assembly to the exterior.\n\n Exception: Where the water-resistive barrier that is applied over wood-based sheathing has a water resistance equal to or greater than that of a water-resistive barrier complying with ASTM E 2556, Type II and is separated from the stucco by an intervening, substantially nonwater-absorbing layer or drainage space."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5202
+}

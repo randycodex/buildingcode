@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181181\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181181\"><\/AnnotationDrawer><div>Masonry chimney walls shall be constructed of concrete, solid masonry units or hollow masonry units grouted solid with not less than 4 inches (102 mm) nominal thickness, or 8 inches (203 mm) nominal thickness for chimney walls extending more than 3 feet (914 mm) above the highest lateral support point.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18536-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry chimney walls shall be constructed of concrete, solid masonry units or hollow masonry units grouted solid with not less than 4 inches (102 mm) nominal thickness, or 8 inches (203 mm) nominal thickness for chimney walls extending more than 3 feet (914 mm) above the highest lateral support point."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18536
+}

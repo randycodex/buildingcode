@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180099\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180099\"><\/AnnotationDrawer><div>When a dispute arises between the applicant of record and the peer reviewer regarding compliance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224397', hash: '#JD_BC1818' }}\">1818<\/Link> that cannot be resolved by these parties, such dispute shall be reported to the department in the form of a letter from the applicant of record. The department may make a final decision or may accept a change of the peer reviewer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4318-html-1",
+      "kind" : "html",
+      "plainText" : "When a dispute arises between the applicant of record and the peer reviewer regarding compliance with Section 1818 that cannot be resolved by these parties, such dispute shall be reported to the department in the form of a letter from the applicant of record. The department may make a final decision or may accept a change of the peer reviewer."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4318
+}

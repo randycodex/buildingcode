@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166672\"><\/AnnotationDrawer><div>For all high-rise buildings, exit enclosures for interior exit stairways and elevator hoistway enclosures shall comply with Sections 403.2.3.1 through 403.2.3.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166673\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166673\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where fire-resistance rating is not required by this code for the enclosure or portions thereof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14086-html-1",
+      "kind" : "html",
+      "plainText" : "For all high-rise buildings, exit enclosures for interior exit stairways and elevator hoistway enclosures shall comply with Sections 403.2.3.1 through 403.2.3.4.\n\n Exception: Where fire-resistance rating is not required by this code for the enclosure or portions thereof."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14086
+}

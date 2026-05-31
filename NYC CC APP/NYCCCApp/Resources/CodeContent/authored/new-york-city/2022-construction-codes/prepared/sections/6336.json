@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-231435\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-231435\"><\/AnnotationDrawer><div>The passageway under the shed shall have a minimum clear ceiling height of 12 feet (3658 mm). A lower height may be allowed if necessary to avoid interference with required light, air, or egress. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186225\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Lights that extend no more than 8 inches (203 mm) below the level of the deck shall be excluded from the clear ceiling height measurement.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186226\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186226\"><\/AnnotationDrawer><div>(Am. L.L. 2025\/047, 4\/17\/2025, eff. 8\/15\/2025) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-234149\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-234149\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-231299', hash: '#JD_L.L.2025\/047' }}\">L.L. 2025\/047<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6336-html-1",
+      "kind" : "html",
+      "plainText" : "The passageway under the shed shall have a minimum clear ceiling height of 12 feet (3658 mm). A lower height may be allowed if necessary to avoid interference with required light, air, or egress. \n\n Exception: Lights that extend no more than 8 inches (203 mm) below the level of the deck shall be excluded from the clear ceiling height measurement.\n\n (Am. L.L. 2025\/047, 4\/17\/2025, eff. 8\/15\/2025) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2025\/047 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6336
+}

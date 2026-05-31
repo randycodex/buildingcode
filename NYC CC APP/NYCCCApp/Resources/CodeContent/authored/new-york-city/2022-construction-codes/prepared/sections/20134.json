@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186127\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186127\"><\/AnnotationDrawer><div>Watchpersons shall be provided as required by Section 3303.3. Flagpersons shall be provided as required by Section 3307.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20134-html-1",
+      "kind" : "html",
+      "plainText" : "Watchpersons shall be provided as required by Section 3303.3. Flagpersons shall be provided as required by Section 3307.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20134
+}

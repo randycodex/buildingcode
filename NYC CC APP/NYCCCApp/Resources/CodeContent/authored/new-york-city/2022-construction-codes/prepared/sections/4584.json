@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180846\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180846\"><\/AnnotationDrawer><div>Grout shall comply with Article 2.2 of TMS 602.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4584-html-1",
+      "kind" : "html",
+      "plainText" : "Grout shall comply with Article 2.2 of TMS 602."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4584
+}

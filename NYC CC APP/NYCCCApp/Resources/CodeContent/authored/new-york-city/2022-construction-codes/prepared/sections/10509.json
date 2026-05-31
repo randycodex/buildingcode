@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193670\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193670\"><\/AnnotationDrawer><div>Ventilation shall be provided in an approved manner in areas utilized as indoor firing ranges. Firing ranges shall comply with all applicable laws and the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Department of Health and Mental Hygiene<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10509-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation shall be provided in an approved manner in areas utilized as indoor firing ranges. Firing ranges shall comply with all applicable laws and the requirements of the New York City Department of Health and Mental Hygiene ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10509
+}

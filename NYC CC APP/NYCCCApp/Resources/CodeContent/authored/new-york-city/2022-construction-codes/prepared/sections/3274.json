@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176680\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176680\"><\/AnnotationDrawer><div>Clay and concrete roof tile shall be installed on roof slopes of 2 1\/2 units vertical in 12 units horizontal (21-percent slope) or greater. For roof slopes from 2 1\/2 units vertical in 12 units horizontal (21-percent slope) to four units vertical in 12 units horizontal (33-percent slope), double underlayment application is required in accordance with Section 1507.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3274-html-1",
+      "kind" : "html",
+      "plainText" : "Clay and concrete roof tile shall be installed on roof slopes of 2 1\/2 units vertical in 12 units horizontal (21-percent slope) or greater. For roof slopes from 2 1\/2 units vertical in 12 units horizontal (21-percent slope) to four units vertical in 12 units horizontal (33-percent slope), double underlayment application is required in accordance with Section 1507.3.3."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3274
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177410\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177410\"><\/AnnotationDrawer><div>Intermediate rails (all those except the handrail), balusters and panel fillers shall be designed to resist a concentrated load of 50 pounds (0.22 kN) in accordance with Section 4.5.1.1 of ASCE 7, a vertically downward load of 50 pounds per foot (0.73 kN\/m), and a concentrated upward load of 50 pounds (0.22 kN) applied at the most critical location. Reactions due to this loading are not required to be applied simultaneously with one another, and are not required to be superimposed with those of Section 1607.8.1 or 1607.8.1.1. The railings, balusters and components shall be designed separately for the effect of wind when the total wind load on the panel or component exceeds 50 pounds (0.22 kN). The wind load need not be combined with any other live load.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3493-html-1",
+      "kind" : "html",
+      "plainText" : "Intermediate rails (all those except the handrail), balusters and panel fillers shall be designed to resist a concentrated load of 50 pounds (0.22 kN) in accordance with Section 4.5.1.1 of ASCE 7, a vertically downward load of 50 pounds per foot (0.73 kN\/m), and a concentrated upward load of 50 pounds (0.22 kN) applied at the most critical location. Reactions due to this loading are not required to be applied simultaneously with one another, and are not required to be superimposed with those of Section 1607.8.1 or 1607.8.1.1. The railings, balusters and components shall be designed separately for the effect of wind when the total wind load on the panel or component exceeds 50 pounds (0.22 kN). The wind load need not be combined with any other live load."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3493
+}

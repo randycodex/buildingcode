@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193714\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193714\"><\/AnnotationDrawer><div>The maximum allowable exhaust duct length shall be determined by one of the methods specified in Sections 504.8.4.1 through 504.8.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10529-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum allowable exhaust duct length shall be determined by one of the methods specified in Sections 504.8.4.1 through 504.8.4.3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10529
+}

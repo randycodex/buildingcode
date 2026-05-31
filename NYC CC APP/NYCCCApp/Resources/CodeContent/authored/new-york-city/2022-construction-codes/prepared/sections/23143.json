@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193138\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193138\"><\/AnnotationDrawer><div>The operation of such exterior mechanical equipment shall comply with any applicable requirements of Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-44210', hash: '#JD_24-218' }}\">24-218<\/Link>, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-209181', hash: '#JD_24-227' }}\">24-227<\/Link>, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-203317', hash: '#JD_24-228' }}\">24-228<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-135567', hash: '#JD_24-232' }}\">24-232<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Noise Control Code<\/span>, as enforced by the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23143-html-1",
+      "kind" : "html",
+      "plainText" : "The operation of such exterior mechanical equipment shall comply with any applicable requirements of Sections 24-218 , 24-227 , 24-228 and 24-232 of the New York City Noise Control Code , as enforced by the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23143
+}

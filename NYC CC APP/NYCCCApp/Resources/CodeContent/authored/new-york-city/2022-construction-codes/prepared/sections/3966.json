@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179053\"><\/AnnotationDrawer><div>The drainage course and foundation drain shall discharge by gravity or mechanical means into an approved drainage system that complies with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span> and any other laws or requirements of agencies having jurisdiction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3966-html-1",
+      "kind" : "html",
+      "plainText" : "The drainage course and foundation drain shall discharge by gravity or mechanical means into an approved drainage system that complies with the New York City Plumbing Code and any other laws or requirements of agencies having jurisdiction."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3966
+}

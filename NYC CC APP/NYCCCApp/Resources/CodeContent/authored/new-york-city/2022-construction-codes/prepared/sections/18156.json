@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180137\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180137\"><\/AnnotationDrawer><div>Materials used to produce concrete, concrete itself and testing thereof shall comply with the applicable standards listed in ACI 318 and this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18156-html-1",
+      "kind" : "html",
+      "plainText" : "Materials used to produce concrete, concrete itself and testing thereof shall comply with the applicable standards listed in ACI 318 and this section."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18156
+}

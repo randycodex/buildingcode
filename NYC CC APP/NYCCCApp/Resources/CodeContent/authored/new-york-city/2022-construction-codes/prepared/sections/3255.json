@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176634\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176634\"><\/AnnotationDrawer><div>Roof-covering materials shall conform to the applicable standards listed in this chapter. In the absence of applicable standards or where materials are of questionable suitability, testing by an approved agency shall be required by the commissioner to determine the character, quality and limitations of application of the materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3255-html-1",
+      "kind" : "html",
+      "plainText" : "Roof-covering materials shall conform to the applicable standards listed in this chapter. In the absence of applicable standards or where materials are of questionable suitability, testing by an approved agency shall be required by the commissioner to determine the character, quality and limitations of application of the materials."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3255
+}

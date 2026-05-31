@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196414\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196414\"><\/AnnotationDrawer><div>Normal vent piping shall comply with the requirements of Section 1305.7.1 through 1305.7.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11497-html-1",
+      "kind" : "html",
+      "plainText" : "Normal vent piping shall comply with the requirements of Section 1305.7.1 through 1305.7.9."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11497
+}

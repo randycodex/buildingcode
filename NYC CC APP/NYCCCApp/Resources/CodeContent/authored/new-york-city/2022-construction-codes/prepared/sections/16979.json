@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176305\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176305\"><\/AnnotationDrawer><div>Fiber-cement panels shall comply with the requirements of ASTM C 1186, Type A, minimum Grade II or ISO 8336, Category A, minimum Class 2. Panels shall be installed with the long dimension either parallel or perpendicular to framing. Vertical and horizontal joints shall occur over framing members and shall be protected with sealant, battens or flashing. Alternatively, vertical or horizontal joints shall be shiplap or otherwise designed to comply with Section 1403.2 of this code. Panel siding shall be installed with fasteners in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16979-html-1",
+      "kind" : "html",
+      "plainText" : "Fiber-cement panels shall comply with the requirements of ASTM C 1186, Type A, minimum Grade II or ISO 8336, Category A, minimum Class 2. Panels shall be installed with the long dimension either parallel or perpendicular to framing. Vertical and horizontal joints shall occur over framing members and shall be protected with sealant, battens or flashing. Alternatively, vertical or horizontal joints shall be shiplap or otherwise designed to comply with Section 1403.2 of this code. Panel siding shall be installed with fasteners in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 16979
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183333\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183333\"><\/AnnotationDrawer><div>Light-transmitting plastics shall be permitted in lieu of plain glass in greenhouses.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19134-html-1",
+      "kind" : "html",
+      "plainText" : "Light-transmitting plastics shall be permitted in lieu of plain glass in greenhouses."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19134
+}

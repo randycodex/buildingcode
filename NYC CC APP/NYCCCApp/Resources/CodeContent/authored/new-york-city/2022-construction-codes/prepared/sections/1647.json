@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171432\"><\/AnnotationDrawer><div>Only areas classified by NFPA 13 as Light Hazard or Ordinary Hazard Group 1 shall be permitted to be protected by limited area sprinkler systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1647-html-1",
+      "kind" : "html",
+      "plainText" : "Only areas classified by NFPA 13 as Light Hazard or Ordinary Hazard Group 1 shall be permitted to be protected by limited area sprinkler systems."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1647
+}

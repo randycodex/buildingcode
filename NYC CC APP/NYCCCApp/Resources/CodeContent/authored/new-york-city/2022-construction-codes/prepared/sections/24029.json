@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195754\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195754\"><\/AnnotationDrawer><div>Pressure relief valves for ammonia systems shall discharge in accordance with ASHRAE 15.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24029-html-1",
+      "kind" : "html",
+      "plainText" : "Pressure relief valves for ammonia systems shall discharge in accordance with ASHRAE 15."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24029
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176956\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176956\"><\/AnnotationDrawer><div>A radiant barrier installed above a deck shall comply with ASTM C 1313\/1313M.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-176957\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-176957\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-176957\"><\/AnnotationDrawer><h6><a name=\"JD_BC1510\" id=\"JD_BC1510\" title=\"BC 1510\"><\/a>Section BC 1510: Rooftop Structures<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17205-html-1",
+      "kind" : "html",
+      "plainText" : "A radiant barrier installed above a deck shall comply with ASTM C 1313\/1313M.\n\n Section BC 1510: Rooftop Structures"
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17205
+}

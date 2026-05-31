@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178422\"><\/AnnotationDrawer><div>Special inspections for seismic resistance shall be required as specified in Sections 1705.12.1 through 1705.12.5, unless exempted by the exceptions of Section 1704.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3753-html-1",
+      "kind" : "html",
+      "plainText" : "Special inspections for seismic resistance shall be required as specified in Sections 1705.12.1 through 1705.12.5, unless exempted by the exceptions of Section 1704.2."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3753
+}

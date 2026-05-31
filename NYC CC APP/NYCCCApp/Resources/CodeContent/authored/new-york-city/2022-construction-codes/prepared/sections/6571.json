@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186993\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186993\"><\/AnnotationDrawer><div>Scaffolds shall be used in accordance with the requirements of Sections 3314.4.2.1 through 3314.4.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6571-html-1",
+      "kind" : "html",
+      "plainText" : "Scaffolds shall be used in accordance with the requirements of Sections 3314.4.2.1 through 3314.4.2.5."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6571
+}

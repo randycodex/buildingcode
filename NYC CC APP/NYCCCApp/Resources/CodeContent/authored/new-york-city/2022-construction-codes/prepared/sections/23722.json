@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194859\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194859\"><\/AnnotationDrawer><div>Where an appliance equipped with a forced or induced draft system creates a positive pressure in the venting system, the venting system shall be designed and listed for positive pressure applications.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23722-html-1",
+      "kind" : "html",
+      "plainText" : "Where an appliance equipped with a forced or induced draft system creates a positive pressure in the venting system, the venting system shall be designed and listed for positive pressure applications."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23722
+}

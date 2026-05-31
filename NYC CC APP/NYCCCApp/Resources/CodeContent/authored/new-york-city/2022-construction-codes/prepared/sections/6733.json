@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187513\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187513\"><\/AnnotationDrawer><div>Hoisting equipment and material handling equipment, including supports and runback structures, shall be installed, operated, used, and maintained to eliminate hazard to the public or to property.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6733-html-1",
+      "kind" : "html",
+      "plainText" : "Hoisting equipment and material handling equipment, including supports and runback structures, shall be installed, operated, used, and maintained to eliminate hazard to the public or to property."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6733
+}

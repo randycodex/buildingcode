@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167315\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167315\"><\/AnnotationDrawer><div>The number of residents in any smoke compartment shall be not more than 200. The distance of travel to a door in a smoke barrier from any room door required as exit access shall be not greater than 150 feet (45 720 mm). The distance of travel to a door in a smoke barrier from any point in a room shall be not greater than 200 feet (60 960 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "474-html-1",
+      "kind" : "html",
+      "plainText" : "The number of residents in any smoke compartment shall be not more than 200. The distance of travel to a door in a smoke barrier from any room door required as exit access shall be not greater than 150 feet (45 720 mm). The distance of travel to a door in a smoke barrier from any point in a room shall be not greater than 200 feet (60 960 mm)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 474
+}

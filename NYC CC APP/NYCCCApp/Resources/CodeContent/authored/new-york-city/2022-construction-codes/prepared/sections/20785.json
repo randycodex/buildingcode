@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197349\"><\/AnnotationDrawer><div>Appliances shall be designed for use with the type of fuel gas that will be supplied to them.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20785-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances shall be designed for use with the type of fuel gas that will be supplied to them."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20785
+}

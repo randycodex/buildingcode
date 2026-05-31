@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161683\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161683\"><\/AnnotationDrawer><div>Moveable sink systems shall comply with ASME A112.19.12.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161684\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161684\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161684\"><\/AnnotationDrawer><h6><a name=\"JD_PC419\" id=\"JD_PC419\" title=\"PC 419\"><\/a>Section PC 419: Urinals<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24760-html-1",
+      "kind" : "html",
+      "plainText" : "Moveable sink systems shall comply with ASME A112.19.12.\n\n Section PC 419: Urinals"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24760
+}

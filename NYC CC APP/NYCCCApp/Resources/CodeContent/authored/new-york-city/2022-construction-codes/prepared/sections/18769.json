@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181887\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181887\"><\/AnnotationDrawer><div>Heavy timber structural members shall be detailed and constructed in accordance with Sections 2304.11.1 through 2304.11.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18769-html-1",
+      "kind" : "html",
+      "plainText" : "Heavy timber structural members shall be detailed and constructed in accordance with Sections 2304.11.1 through 2304.11.1.4."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18769
+}

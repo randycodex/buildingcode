@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198173\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198173\"><\/AnnotationDrawer><div>Combustible gas indicators shall be listed and shall be calibrated in accordance with the manufacturer's instructions. Combustible gas indicators shall numerically display a volume scale from zero percent to 100 percent in 1 percent or smaller increments.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8246-html-1",
+      "kind" : "html",
+      "plainText" : "Combustible gas indicators shall be listed and shall be calibrated in accordance with the manufacturer's instructions. Combustible gas indicators shall numerically display a volume scale from zero percent to 100 percent in 1 percent or smaller increments."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8246
+}

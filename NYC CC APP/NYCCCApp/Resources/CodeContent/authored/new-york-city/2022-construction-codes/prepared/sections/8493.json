@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198843\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198843\"><\/AnnotationDrawer><div>Vent connectors for medium-heat appliances shall not pass through walls or partitions constructed of combustible material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8493-html-1",
+      "kind" : "html",
+      "plainText" : "Vent connectors for medium-heat appliances shall not pass through walls or partitions constructed of combustible material."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8493
+}

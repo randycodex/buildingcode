@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179108\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179108\"><\/AnnotationDrawer><div>Retaining walls shall be designed to ensure stability against overturning, sliding, excessive foundation pressure and the effects of water pressure, including uplift. Where a keyway is extended below the wall base with the intent to engage passive pressure and enhance sliding stability, lateral soil pressures on both sides of the keyway shall be considered in the sliding analysis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3976-html-1",
+      "kind" : "html",
+      "plainText" : "Retaining walls shall be designed to ensure stability against overturning, sliding, excessive foundation pressure and the effects of water pressure, including uplift. Where a keyway is extended below the wall base with the intent to engage passive pressure and enhance sliding stability, lateral soil pressures on both sides of the keyway shall be considered in the sliding analysis."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3976
+}

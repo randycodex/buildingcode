@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173178\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173178\"><\/AnnotationDrawer><div>In the event of power supply failure in buildings that require two or more means of egress, an emergency electrical system shall automatically illuminate all of the following areas:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173179\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173179\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Interior exit access stairways and ramps.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173180\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173180\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Interior and exterior exit stairways and ramps.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173181\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173181\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Exit passageways.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173182\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Vestibules and areas on the level of discharge used for exit discharge in accordance with Section 1028.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173183\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173183\"><\/AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Exterior landings as required by Section 1010.1.6 for exit doorways that lead directly to the exit discharge.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16041-html-1",
+      "kind" : "html",
+      "plainText" : "In the event of power supply failure in buildings that require two or more means of egress, an emergency electrical system shall automatically illuminate all of the following areas:\n\n 1. Interior exit access stairways and ramps.\n\n 2. Interior and exterior exit stairways and ramps.\n\n 3. Exit passageways.\n\n 4. Vestibules and areas on the level of discharge used for exit discharge in accordance with Section 1028.1.\n\n 5. Exterior landings as required by Section 1010.1.6 for exit doorways that lead directly to the exit discharge."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16041
+}

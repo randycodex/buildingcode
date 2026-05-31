@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194135\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194135\"><\/AnnotationDrawer><div>Discharge piping shall conform to the requirements for ducts, including clearances required for high-heat appliances, as contained in this code. A delivery pipe from a centrifugal separator collector shall not convey refuse directly into the firebox of a boiler, furnace, dutch oven, refuse burner, incinerator or other appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10660-html-1",
+      "kind" : "html",
+      "plainText" : "Discharge piping shall conform to the requirements for ducts, including clearances required for high-heat appliances, as contained in this code. A delivery pipe from a centrifugal separator collector shall not convey refuse directly into the firebox of a boiler, furnace, dutch oven, refuse burner, incinerator or other appliance."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10660
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180615\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180615\"><\/AnnotationDrawer><div>The maximum size of reinforcement shall be No. 5 bars unless it is demonstrated by preconstruction tests that adequate encasement of larger bars will be achieved.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4521-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum size of reinforcement shall be No. 5 bars unless it is demonstrated by preconstruction tests that adequate encasement of larger bars will be achieved."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4521
+}

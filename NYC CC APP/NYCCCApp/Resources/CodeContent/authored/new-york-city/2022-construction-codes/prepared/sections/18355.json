@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180630\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180630\"><\/AnnotationDrawer><div>The licensed concrete testing laboratory that sampled the preconstruction test panels shall test the core specimens with no reinforcing in accordance with ASTM C 39.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18355-html-1",
+      "kind" : "html",
+      "plainText" : "The licensed concrete testing laboratory that sampled the preconstruction test panels shall test the core specimens with no reinforcing in accordance with ASTM C 39."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18355
+}

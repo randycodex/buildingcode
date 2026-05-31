@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194374\"><\/AnnotationDrawer><div>Diffusers, registers and grilles shall be prohibited in the floor or its upward extension within toilet and bathing rooms required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> to have smooth, hard, nonabsorbent surfaces.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194375\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194375\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> In R-3 occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10740-html-1",
+      "kind" : "html",
+      "plainText" : "Diffusers, registers and grilles shall be prohibited in the floor or its upward extension within toilet and bathing rooms required by the New York City Building Code to have smooth, hard, nonabsorbent surfaces.\n\n Exception: In R-3 occupancies."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10740
+}

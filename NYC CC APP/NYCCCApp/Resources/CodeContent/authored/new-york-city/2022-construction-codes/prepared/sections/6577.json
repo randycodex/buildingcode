@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187021\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187021\"><\/AnnotationDrawer><div>Scaffolds shall be inspected in accordance with the requirements of Sections 3314.4.3.1 through 3314.4.3.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6577-html-1",
+      "kind" : "html",
+      "plainText" : "Scaffolds shall be inspected in accordance with the requirements of Sections 3314.4.3.1 through 3314.4.3.6."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6577
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181303\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181303\"><\/AnnotationDrawer><div>Each column, pier and wall shall be vertically tied continuously from its lowest to highest level. The vertical reinforcement shall be terminated in a horizontal tie or foundation or their equivalent. Where openings in bearing walls greater than 24 inches (610 mm) in height occur, ties shall be provided at each side of the opening that extend and are anchored in the masonry above and below the opening. Vertical ties shall be placed on both sides of control joints in bearing walls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18578-html-1",
+      "kind" : "html",
+      "plainText" : "Each column, pier and wall shall be vertically tied continuously from its lowest to highest level. The vertical reinforcement shall be terminated in a horizontal tie or foundation or their equivalent. Where openings in bearing walls greater than 24 inches (610 mm) in height occur, ties shall be provided at each side of the opening that extend and are anchored in the masonry above and below the opening. Vertical ties shall be placed on both sides of control joints in bearing walls."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18578
+}

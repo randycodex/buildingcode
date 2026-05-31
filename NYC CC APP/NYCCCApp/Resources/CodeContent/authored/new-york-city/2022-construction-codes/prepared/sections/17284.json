@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177263\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177263\"><\/AnnotationDrawer><div>Walls not meeting the requirements of Section 1604.8.2 and partitions shall be laterally supported with sufficient mechanical anchorage to resist the loads imposed per this code, including but not limited to live loads, wind loads, and earthquake loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17284-html-1",
+      "kind" : "html",
+      "plainText" : "Walls not meeting the requirements of Section 1604.8.2 and partitions shall be laterally supported with sufficient mechanical anchorage to resist the loads imposed per this code, including but not limited to live loads, wind loads, and earthquake loads."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17284
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172000\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172000\"><\/AnnotationDrawer><div>In areas that are not continuously occupied, a single smoke detector shall be provided at the location of each fire alarm control unit, notification appliance circuit power extenders, and supervising station transmitting equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172001\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172002\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172002\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Where ambient conditions prohibit installation of a smoke detector, a heat detector shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172003\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172003\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;In prior code buildings, where a fire alarm control unit is installed in an interior exit stairway or ramp or exit passageway, a smoke detector is not required at the location of such fire alarm control unit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1823-html-1",
+      "kind" : "html",
+      "plainText" : "In areas that are not continuously occupied, a single smoke detector shall be provided at the location of each fire alarm control unit, notification appliance circuit power extenders, and supervising station transmitting equipment.\n\n Exceptions: \n\n 1. Where ambient conditions prohibit installation of a smoke detector, a heat detector shall be permitted.\n\n 2. In prior code buildings, where a fire alarm control unit is installed in an interior exit stairway or ramp or exit passageway, a smoke detector is not required at the location of such fire alarm control unit."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1823
+}

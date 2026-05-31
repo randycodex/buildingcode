@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167198\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167198\"><\/AnnotationDrawer><div>Movement from habitable rooms shall not require passage through more than three doors and 100 feet (30 480 mm) distance of travel within the suite.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167199\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The distance of travel shall be permitted to be increased to 125 feet (38 100 mm) where an automatic smoke detection system is provided throughout the care suite and installed in accordance with NFPA 72 as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-191144', hash: '#JD_BCAppQ' }}\">Appendix Q<\/Link> of this code. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167200\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167200\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224210\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224210\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14264-html-1",
+      "kind" : "html",
+      "plainText" : "Movement from habitable rooms shall not require passage through more than three doors and 100 feet (30 480 mm) distance of travel within the suite.\n\n Exception: The distance of travel shall be permitted to be increased to 125 feet (38 100 mm) where an automatic smoke detection system is provided throughout the care suite and installed in accordance with NFPA 72 as modified by Appendix Q of this code. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14264
+}

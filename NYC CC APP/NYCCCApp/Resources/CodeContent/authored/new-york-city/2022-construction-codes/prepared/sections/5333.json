@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183434\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183434\"><\/AnnotationDrawer><div>Packages and containers of plastic composites used in exterior applications shall bear a label showing the manufacturer's name, product identification and information sufficient to determine that the end use will comply with code requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5333-html-1",
+      "kind" : "html",
+      "plainText" : "Packages and containers of plastic composites used in exterior applications shall bear a label showing the manufacturer's name, product identification and information sufficient to determine that the end use will comply with code requirements."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5333
+}

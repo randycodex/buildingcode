@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195306\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195306\"><\/AnnotationDrawer><div>Panels, grilles and access doors that are required to be removed for normal servicing operations shall not be attached to the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23883-html-1",
+      "kind" : "html",
+      "plainText" : "Panels, grilles and access doors that are required to be removed for normal servicing operations shall not be attached to the building."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23883
+}

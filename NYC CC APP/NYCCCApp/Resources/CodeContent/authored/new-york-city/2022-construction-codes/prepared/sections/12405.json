@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162887\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162887\"><\/AnnotationDrawer><div>Backwater valves shall be so constructed as to provide a mechanical seal against backflow. The flap shall be so designed as to hang partially open when not subject to backwater pressure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12405-html-1",
+      "kind" : "html",
+      "plainText" : "Backwater valves shall be so constructed as to provide a mechanical seal against backflow. The flap shall be so designed as to hang partially open when not subject to backwater pressure."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12405
+}

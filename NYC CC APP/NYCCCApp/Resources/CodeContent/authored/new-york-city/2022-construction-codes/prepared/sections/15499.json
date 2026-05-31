@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171507\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171507\"><\/AnnotationDrawer><div>Electrical wiring shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15499-html-1",
+      "kind" : "html",
+      "plainText" : "Electrical wiring shall be in accordance with the New York City Electrical Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15499
+}

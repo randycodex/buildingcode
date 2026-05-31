@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172698\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172698\"><\/AnnotationDrawer><div>Carbon monoxide detection systems shall comply with NFPA 720. Carbon monoxide detectors shall be listed in accordance with UL 2075.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2080-html-1",
+      "kind" : "html",
+      "plainText" : "Carbon monoxide detection systems shall comply with NFPA 720. Carbon monoxide detectors shall be listed in accordance with UL 2075."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2080
+}

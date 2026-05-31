@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188628\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188628\"><\/AnnotationDrawer><div>For a structure that is located in more than one zone (for instance both an A-Zone and an X-Zone, or both an A-Zone and a V-Zone), the provisions associated with the most restrictive zone shall apply to the entire structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13003-html-1",
+      "kind" : "html",
+      "plainText" : "For a structure that is located in more than one zone (for instance both an A-Zone and an X-Zone, or both an A-Zone and a V-Zone), the provisions associated with the most restrictive zone shall apply to the entire structure."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13003
+}

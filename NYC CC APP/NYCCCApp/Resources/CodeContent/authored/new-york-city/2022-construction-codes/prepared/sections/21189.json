@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198489\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198489\"><\/AnnotationDrawer><div>Chimneys and vents shall have air-space clearance to combustibles in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and the chimney or vent manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198490\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198490\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Masonry chimneys without the required air-space clearances shall be permitted to be used if lined or relined with a chimney lining system listed for use in chimneys with reduced clearances in accordance with UL 1777 or ULc-S635. The chimney clearance shall be not less than permitted by the terms of the chimney liner listing and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21189-html-1",
+      "kind" : "html",
+      "plainText" : "Chimneys and vents shall have air-space clearance to combustibles in accordance with the New York City Building Code and the chimney or vent manufacturer's instructions.\n\n Exception: Masonry chimneys without the required air-space clearances shall be permitted to be used if lined or relined with a chimney lining system listed for use in chimneys with reduced clearances in accordance with UL 1777 or ULc-S635. The chimney clearance shall be not less than permitted by the terms of the chimney liner listing and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21189
+}

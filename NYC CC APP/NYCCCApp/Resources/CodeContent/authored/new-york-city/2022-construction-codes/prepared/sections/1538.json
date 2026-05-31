@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171010\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171010\"><\/AnnotationDrawer><div>Fire protection systems shall be installed, repaired, operated and maintained in accordance with this code and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span> Any fire protection system for which an exception or reduction to the provisions of this code has been granted shall be considered to be a required system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171011\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171011\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Any fire protection system or portion thereof not required by this code shall be permitted to be installed provided that such system meets the requirements of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1538-html-1",
+      "kind" : "html",
+      "plainText" : "Fire protection systems shall be installed, repaired, operated and maintained in accordance with this code and the New York City Fire Code. Any fire protection system for which an exception or reduction to the provisions of this code has been granted shall be considered to be a required system.\n\n Exception: Any fire protection system or portion thereof not required by this code shall be permitted to be installed provided that such system meets the requirements of this code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1538
+}

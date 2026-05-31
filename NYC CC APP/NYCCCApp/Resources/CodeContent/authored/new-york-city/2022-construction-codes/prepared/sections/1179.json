@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169591\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169591\"><\/AnnotationDrawer><div>The effective venting area shall be not less than 3 1\/2 percent of the maximum shaft area at any floor, but in no event less than 72 square inches (46 451.5 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1179-html-1",
+      "kind" : "html",
+      "plainText" : "The effective venting area shall be not less than 3 1\/2 percent of the maximum shaft area at any floor, but in no event less than 72 square inches (46 451.5 mm\n\n 2 \n\n )."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1179
+}

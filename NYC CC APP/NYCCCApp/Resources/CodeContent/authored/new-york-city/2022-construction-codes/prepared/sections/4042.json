@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179291\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179291\"><\/AnnotationDrawer><div>The apparatus and structure to be used in making the load test shall be designed by an engineer. Load tests shall be performed under the observation of the special inspector. A complete record of such tests shall be filed with the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4042-html-1",
+      "kind" : "html",
+      "plainText" : "The apparatus and structure to be used in making the load test shall be designed by an engineer. Load tests shall be performed under the observation of the special inspector. A complete record of such tests shall be filed with the commissioner."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4042
+}

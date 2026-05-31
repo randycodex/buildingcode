@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195235\"><\/AnnotationDrawer><div>Cooling towers and evaporative condensers shall be equipped with drift eliminators that have a maximum drift rate of 0.005 percent of the circulated water flow rate as established in the equipment's design specifications.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23854-html-1",
+      "kind" : "html",
+      "plainText" : "Cooling towers and evaporative condensers shall be equipped with drift eliminators that have a maximum drift rate of 0.005 percent of the circulated water flow rate as established in the equipment's design specifications."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23854
+}

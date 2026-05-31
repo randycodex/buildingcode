@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164375\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164375\"><\/AnnotationDrawer><div>Drawings shall show sizes, sections, and locations of members, and such other information as may be required to indicate clearly all structural elements and special structural engineering features.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13880-html-1",
+      "kind" : "html",
+      "plainText" : "Drawings shall show sizes, sections, and locations of members, and such other information as may be required to indicate clearly all structural elements and special structural engineering features."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13880
+}

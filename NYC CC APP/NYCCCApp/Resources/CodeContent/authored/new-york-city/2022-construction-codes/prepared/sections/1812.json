@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171960\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171960\"><\/AnnotationDrawer><div>An automatic smoke detection system that activates the occupant notification system in accordance with Section 907.5 shall be provided in airport control towers in accordance with Sections 907.2.22.1 and 907.2.22.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171961\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Audible appliances shall not be installed within the control tower cab.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1812-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic smoke detection system that activates the occupant notification system in accordance with Section 907.5 shall be provided in airport control towers in accordance with Sections 907.2.22.1 and 907.2.22.2.\n\n Exception: Audible appliances shall not be installed within the control tower cab."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1812
+}

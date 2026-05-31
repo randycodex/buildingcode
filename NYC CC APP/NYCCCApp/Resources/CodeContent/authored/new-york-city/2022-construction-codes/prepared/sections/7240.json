@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189169\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189169\"><\/AnnotationDrawer><div>Marquee signs shall be attached to approved marquees that are constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184164', hash: '#JD_BC3106' }}\">3106<\/Link> of this code and shall be anchored in conformance with the requirements for projecting signs under Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-189146', hash: '#JD_BCH112' }}\">H112<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7240-html-1",
+      "kind" : "html",
+      "plainText" : "Marquee signs shall be attached to approved marquees that are constructed in accordance with Section 3106 of this code and shall be anchored in conformance with the requirements for projecting signs under Section H112 ."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7240
+}

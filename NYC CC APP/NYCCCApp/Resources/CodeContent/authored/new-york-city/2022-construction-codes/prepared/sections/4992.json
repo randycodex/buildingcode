@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182133\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182133\"><\/AnnotationDrawer><div>Connectors and fasteners used in conventional light-frame construction shall comply with the requirements of Section 2304.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4992-html-1",
+      "kind" : "html",
+      "plainText" : "Connectors and fasteners used in conventional light-frame construction shall comply with the requirements of Section 2304.10."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4992
+}

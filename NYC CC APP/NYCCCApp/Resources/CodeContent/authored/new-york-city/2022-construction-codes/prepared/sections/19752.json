@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185123\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185123\"><\/AnnotationDrawer><div>Housekeeping at a site shall be in accordance with Sections 3303.4.1 through 3303.4.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19752-html-1",
+      "kind" : "html",
+      "plainText" : "Housekeeping at a site shall be in accordance with Sections 3303.4.1 through 3303.4.11."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19752
+}

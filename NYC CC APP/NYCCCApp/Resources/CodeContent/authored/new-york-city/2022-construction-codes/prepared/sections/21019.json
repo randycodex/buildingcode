@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198036\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198036\"><\/AnnotationDrawer><div>All gas distribution piping to customer appliances operating in excess of 1\/2 psig (3.5 kPa gauge) shall be welded.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21019-html-1",
+      "kind" : "html",
+      "plainText" : "All gas distribution piping to customer appliances operating in excess of 1\/2 psig (3.5 kPa gauge) shall be welded."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21019
+}

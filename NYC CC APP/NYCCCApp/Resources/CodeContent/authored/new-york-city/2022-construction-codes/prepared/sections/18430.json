@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180883\"><\/AnnotationDrawer><div>Isolated masonry piers shall be bonded as required for solid walls of the same thickness and shall be provided with adequate means for distributing the load at the top of the pier.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18430-html-1",
+      "kind" : "html",
+      "plainText" : "Isolated masonry piers shall be bonded as required for solid walls of the same thickness and shall be provided with adequate means for distributing the load at the top of the pier."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18430
+}

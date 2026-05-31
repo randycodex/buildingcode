@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161628\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161628\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Each compartment of a laundry tray shall be provided with a waste outlet not less than 1 1\/2 inches (38 mm) in diameter and a strainer or crossbar to restrict the clear opening of the waste outlet.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161629\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161629\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161629\"><\/AnnotationDrawer><h6><a name=\"JD_PC416\" id=\"JD_PC416\" title=\"PC 416\"><\/a>Section PC 416: Lavatories<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11911-html-1",
+      "kind" : "html",
+      "plainText" : "Each compartment of a laundry tray shall be provided with a waste outlet not less than 1 1\/2 inches (38 mm) in diameter and a strainer or crossbar to restrict the clear opening of the waste outlet. \n\n Section PC 416: Lavatories"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11911
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174985\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174985\"><\/AnnotationDrawer><div>Electric vehicle charging stations and electric vehicle charging station controls shall comply with Sections 309.2 and 309.3 of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-174986\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-174986\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-174986\"><\/AnnotationDrawer><h6><a name=\"JD_BC1107\" id=\"JD_BC1107\" title=\"BC 1107\"><\/a>Section BC 1107: Dwelling Units and Sleeping Units<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2696-html-1",
+      "kind" : "html",
+      "plainText" : "Electric vehicle charging stations and electric vehicle charging station controls shall comply with Sections 309.2 and 309.3 of ICC A117.1.\n\n Section BC 1107: Dwelling Units and Sleeping Units"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2696
+}

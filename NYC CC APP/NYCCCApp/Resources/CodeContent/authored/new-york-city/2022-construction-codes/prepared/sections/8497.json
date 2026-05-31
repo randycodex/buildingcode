@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198852\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198852\"><\/AnnotationDrawer><div>A draft hood supplied with or forming a part of a listed vented appliance shall be installed without alteration, exactly as furnished and specified by the appliance manufacturer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8497-html-1",
+      "kind" : "html",
+      "plainText" : "A draft hood supplied with or forming a part of a listed vented appliance shall be installed without alteration, exactly as furnished and specified by the appliance manufacturer."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8497
+}

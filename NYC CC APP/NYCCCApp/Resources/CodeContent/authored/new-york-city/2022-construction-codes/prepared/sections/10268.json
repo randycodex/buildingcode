@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192984\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192984\"><\/AnnotationDrawer><div>Heat-producing equipment and appliances shall be installed to maintain the required clearances to combustible construction as specified in the listing and manufacturer's instructions. Such clearances shall be reduced only in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193089', hash: '#JD_MC308' }}\">308<\/Link>. Clearances to combustibles shall include such considerations as door swing, drawer pull, overhead projections or shelving and window swing, shutters, coverings and drapes. Devices such as doorstops or limits, closers, drapery ties or guards shall not be used to provide the required clearances.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10268-html-1",
+      "kind" : "html",
+      "plainText" : "Heat-producing equipment and appliances shall be installed to maintain the required clearances to combustible construction as specified in the listing and manufacturer's instructions. Such clearances shall be reduced only in accordance with Section 308 . Clearances to combustibles shall include such considerations as door swing, drawer pull, overhead projections or shelving and window swing, shutters, coverings and drapes. Devices such as doorstops or limits, closers, drapery ties or guards shall not be used to provide the required clearances."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 10268
+}

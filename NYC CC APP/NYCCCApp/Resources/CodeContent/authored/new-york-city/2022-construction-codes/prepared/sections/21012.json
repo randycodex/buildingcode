@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198012\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198012\"><\/AnnotationDrawer><div>The unthreaded portion of piping outlets shall extend not less than l inch (25.4 mm) through finished ceilings and walls and where extending through floors or outdoor patios and slabs, shall be not less than 2 inches (50.8 mm) above them. The outlet fitting or piping shall be securely supported. Outlets shall not be placed behind doors. Outlets shall be located in the room or space where the appliance is installed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198013\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Listed and labeled flush-mounted-type quick-disconnect devices and listed and labeled gas convenience outlets shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21012-html-1",
+      "kind" : "html",
+      "plainText" : "The unthreaded portion of piping outlets shall extend not less than l inch (25.4 mm) through finished ceilings and walls and where extending through floors or outdoor patios and slabs, shall be not less than 2 inches (50.8 mm) above them. The outlet fitting or piping shall be securely supported. Outlets shall not be placed behind doors. Outlets shall be located in the room or space where the appliance is installed.\n\n Exception: Listed and labeled flush-mounted-type quick-disconnect devices and listed and labeled gas convenience outlets shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21012
+}

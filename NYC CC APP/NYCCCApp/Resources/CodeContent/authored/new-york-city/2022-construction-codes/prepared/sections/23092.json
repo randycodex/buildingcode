@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192982\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192982\"><\/AnnotationDrawer><div>Boiler rooms and furnace rooms shall be protected as required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23092-html-1",
+      "kind" : "html",
+      "plainText" : "Boiler rooms and furnace rooms shall be protected as required by the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23092
+}

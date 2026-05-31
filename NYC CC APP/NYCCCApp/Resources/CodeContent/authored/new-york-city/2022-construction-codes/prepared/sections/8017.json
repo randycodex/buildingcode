@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197482\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197482\"><\/AnnotationDrawer><div>Where ventilation air is brought in by mechanical means for heat generation mitigation, provisions must be made for proper air balance to prevent a negative or positive pressure in the boiler room and to discharge the ventilation directly to the outside.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197483\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197483\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224708\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224708\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8017-html-1",
+      "kind" : "html",
+      "plainText" : "Where ventilation air is brought in by mechanical means for heat generation mitigation, provisions must be made for proper air balance to prevent a negative or positive pressure in the boiler room and to discharge the ventilation directly to the outside.\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8017
+}

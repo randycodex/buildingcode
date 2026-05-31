@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196451\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196451\"><\/AnnotationDrawer><div>Fuel-oil piping systems utilizing pumps to transfer fuel-oil to equipment at levels above the lowest floor or storage tanks at levels above the lowest floor in buildings shall comply with the requirements of Section 1305.9.1 through 1305.9.12.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24337-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-oil piping systems utilizing pumps to transfer fuel-oil to equipment at levels above the lowest floor or storage tanks at levels above the lowest floor in buildings shall comply with the requirements of Section 1305.9.1 through 1305.9.12."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24337
+}

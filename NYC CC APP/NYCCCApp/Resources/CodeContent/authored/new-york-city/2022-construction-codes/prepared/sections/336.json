@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166881\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166881\"><\/AnnotationDrawer><div>The following loads are classified as standby power loads:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166882\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Smoke control system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166883\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Ventilation and automatic fire detection equipment for smokeproof enclosures.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166884\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166884\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Fire pumps.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166885\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Elevators, as required in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183720', hash: '#JD_BC3003' }}\">3003<\/Link>; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166886\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166886\"><\/AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Stair pressurization systems when provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "336-html-1",
+      "kind" : "html",
+      "plainText" : "The following loads are classified as standby power loads:\n\n 1. Smoke control system.\n\n 2. Ventilation and automatic fire detection equipment for smokeproof enclosures.\n\n 3. Fire pumps.\n\n 4. Elevators, as required in Section 3003 ; and\n\n 5. Stair pressurization systems when provided."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 336
+}

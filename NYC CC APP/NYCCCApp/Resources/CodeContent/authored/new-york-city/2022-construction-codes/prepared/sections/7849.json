@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230205\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230205\"><\/AnnotationDrawer><div>No certificate of occupancy or temporary certificate of occupancy may be issued for an ADU located in a basement or cellar unless a certification is submitted to the commissioner that the level of radon in such ADU is tested in accordance with, and meets the standards set forth in rules promulgated by the department of health and mental hygiene, in consultation with the department, the fire department, and the office of emergency management. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7849-html-1",
+      "kind" : "html",
+      "plainText" : "No certificate of occupancy or temporary certificate of occupancy may be issued for an ADU located in a basement or cellar unless a certification is submitted to the commissioner that the level of radon in such ADU is tested in accordance with, and meets the standards set forth in rules promulgated by the department of health and mental hygiene, in consultation with the department, the fire department, and the office of emergency management."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7849
+}

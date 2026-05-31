@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175994\"><\/AnnotationDrawer><div>Privacy at water closets and urinals shall be provided in accordance with Sections 1210.3.1 and 1210.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16866-html-1",
+      "kind" : "html",
+      "plainText" : "Privacy at water closets and urinals shall be provided in accordance with Sections 1210.3.1 and 1210.3.2."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16866
+}

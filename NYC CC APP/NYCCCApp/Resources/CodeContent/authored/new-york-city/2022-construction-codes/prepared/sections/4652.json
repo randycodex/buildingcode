@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181012\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181012\"><\/AnnotationDrawer><div>The firebox of a masonry fireplace shall have a minimum depth of 20 inches (508 mm). The throat shall be not less than 8 inches (203 mm) above the fireplace opening. The throat opening shall not be less than 4 inches (102 mm) in depth. The cross-sectional area of the passageway above the firebox, including the throat, damper and smoke chamber, shall be not less than the cross-sectional area of the flue.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181013\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Rumford fireplaces shall be permitted provided that the depth of the fireplace is not less than 12 inches (305 mm) and at least one-third of the width of the fireplace opening, and the throat is not less than 12 inches (305 mm) above the lintel, and at least 1\/20 the cross-sectional area of the fireplace opening.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4652-html-1",
+      "kind" : "html",
+      "plainText" : "The firebox of a masonry fireplace shall have a minimum depth of 20 inches (508 mm). The throat shall be not less than 8 inches (203 mm) above the fireplace opening. The throat opening shall not be less than 4 inches (102 mm) in depth. The cross-sectional area of the passageway above the firebox, including the throat, damper and smoke chamber, shall be not less than the cross-sectional area of the flue.\n\n Exception: Rumford fireplaces shall be permitted provided that the depth of the fireplace is not less than 12 inches (305 mm) and at least one-third of the width of the fireplace opening, and the throat is not less than 12 inches (305 mm) above the lintel, and at least 1\/20 the cross-sectional area of the fireplace opening."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4652
+}

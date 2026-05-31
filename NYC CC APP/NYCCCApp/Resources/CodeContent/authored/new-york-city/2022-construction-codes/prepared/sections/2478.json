@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174254\"><\/AnnotationDrawer><div>For the purposes of this section, solid and continuous means without gaps or interruption, except as required for the control of expansion and contraction. A series of dashes, chevrons, dots, or other similar patterns is not solid and continuous. Luminous materials shall be considered solid and continuous if they occasionally contain the following safety green (ANSI Z 535.1) symbols or text:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174255\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174255\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The word \"EXIT\";<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174256\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174256\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Egress symbol as per NFPA 170;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174257\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174257\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Direction arrows as per NFPA 170; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174258\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Other text or symbols as approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2478-html-1",
+      "kind" : "html",
+      "plainText" : "For the purposes of this section, solid and continuous means without gaps or interruption, except as required for the control of expansion and contraction. A series of dashes, chevrons, dots, or other similar patterns is not solid and continuous. Luminous materials shall be considered solid and continuous if they occasionally contain the following safety green (ANSI Z 535.1) symbols or text:\n\n 1. The word \"EXIT\";\n\n 2. Egress symbol as per NFPA 170;\n\n 3. Direction arrows as per NFPA 170; or\n\n 4. Other text or symbols as approved by the commissioner."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2478
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181600\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181600\"><\/AnnotationDrawer><div>Particleboard shall conform to ANSI A208.1. Particleboard shall be identified by the grade mark or certificate of inspection issued by an approved agency. Particleboard shall not be utilized for applications other than indicated in this section unless the particleboard complies with the provisions of Section 2306.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18674-html-1",
+      "kind" : "html",
+      "plainText" : "Particleboard shall conform to ANSI A208.1. Particleboard shall be identified by the grade mark or certificate of inspection issued by an approved agency. Particleboard shall not be utilized for applications other than indicated in this section unless the particleboard complies with the provisions of Section 2306.3."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18674
+}

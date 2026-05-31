@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180446\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180446\"><\/AnnotationDrawer><div>Except for prestressing reinforcement, steel reinforcement with rust, mill scale or a combination of both, shall be permitted, provided the minimum dimensions, including height of deformations and weight of a hand-wire-brushed test specimen, comply with applicable ASTM specifications specified in Section 1903.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4446-html-1",
+      "kind" : "html",
+      "plainText" : "Except for prestressing reinforcement, steel reinforcement with rust, mill scale or a combination of both, shall be permitted, provided the minimum dimensions, including height of deformations and weight of a hand-wire-brushed test specimen, comply with applicable ASTM specifications specified in Section 1903.6."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4446
+}

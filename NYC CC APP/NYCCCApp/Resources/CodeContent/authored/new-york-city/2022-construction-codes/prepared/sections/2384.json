@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173865\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173865\"><\/AnnotationDrawer><div>Guards shall comply with the provisions of Sections 1015.2 through 1015.7. Operable windows with sills located more than 72 inches (1828.8 mm) above finished grade or other surface below shall comply with Section 1015.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2384-html-1",
+      "kind" : "html",
+      "plainText" : "Guards shall comply with the provisions of Sections 1015.2 through 1015.7. Operable windows with sills located more than 72 inches (1828.8 mm) above finished grade or other surface below shall comply with Section 1015.8."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2384
+}

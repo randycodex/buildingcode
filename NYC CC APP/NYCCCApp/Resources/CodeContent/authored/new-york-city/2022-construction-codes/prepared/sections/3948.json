@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179000\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179000\"><\/AnnotationDrawer><div>No fill or other surcharge loads shall be placed adjacent to any building or structure unless such building or structure is capable of withstanding the additional loads caused by the fill or the surcharge.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179001\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Grading for landscaping purposes shall be permitted where done with walk-behind equipment where the grade is not increased more than one foot (304.8 mm) from original design grade, or where approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3948-html-1",
+      "kind" : "html",
+      "plainText" : "No fill or other surcharge loads shall be placed adjacent to any building or structure unless such building or structure is capable of withstanding the additional loads caused by the fill or the surcharge.\n\n Exception: Grading for landscaping purposes shall be permitted where done with walk-behind equipment where the grade is not increased more than one foot (304.8 mm) from original design grade, or where approved by the commissioner."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3948
+}

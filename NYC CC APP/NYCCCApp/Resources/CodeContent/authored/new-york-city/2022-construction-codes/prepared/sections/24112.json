@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195953\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195953\"><\/AnnotationDrawer><div>Joints between different piping materials shall be rated for the temperatures and pressures of the systems in which the devices are installed and shall be compatible with the fluid and all materials provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24112-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between different piping materials shall be rated for the temperatures and pressures of the systems in which the devices are installed and shall be compatible with the fluid and all materials provided."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24112
+}

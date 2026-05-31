@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180387\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180387\"><\/AnnotationDrawer><div>The conveying equipment shall be capable of providing a supply of concrete at the site of placement without separation of ingredients and without interruptions sufficient to permit the loss of plasticity between successive increments.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18247-html-1",
+      "kind" : "html",
+      "plainText" : "The conveying equipment shall be capable of providing a supply of concrete at the site of placement without separation of ingredients and without interruptions sufficient to permit the loss of plasticity between successive increments."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18247
+}

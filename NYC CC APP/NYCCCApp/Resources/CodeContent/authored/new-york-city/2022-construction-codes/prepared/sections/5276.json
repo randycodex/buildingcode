@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183232\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183232\"><\/AnnotationDrawer><div>Foam plastic insulation complying with ASTM C 578 and ASTM C 1289 and used as exterior wall sheathing on framed wall assemblies shall comply with ANSI\/FS 100 for wind pressure resistance and withstand the loads indicated in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5276-html-1",
+      "kind" : "html",
+      "plainText" : "Foam plastic insulation complying with ASTM C 578 and ASTM C 1289 and used as exterior wall sheathing on framed wall assemblies shall comply with ANSI\/FS 100 for wind pressure resistance and withstand the loads indicated in Chapter 16 of this code."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5276
+}

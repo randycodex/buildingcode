@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197961\"><\/AnnotationDrawer><div>Where the conduit originates and terminates within the same building, the conduit shall originate and terminate in an accessible portion of the building and shall not be sealed. The conduit shall extend not less than 2 inches (50.8 mm) beyond the point where the pipe emerges from the floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20994-html-1",
+      "kind" : "html",
+      "plainText" : "Where the conduit originates and terminates within the same building, the conduit shall originate and terminate in an accessible portion of the building and shall not be sealed. The conduit shall extend not less than 2 inches (50.8 mm) beyond the point where the pipe emerges from the floor."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20994
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185570\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185570\"><\/AnnotationDrawer><div>Where slurry is utilized to support an excavation, trench, or drilled or bored hole, slurry mix proportions and installation procedures shall be provided by a registered design professional on signed and sealed design and installation procedures. The installation procedures shall account for all imposed loads, including those from the earth, adjacent structures, and adjacent equipment. Where construction documents are required for the support of excavation by Section 3304.4.1, slurry mix proportions, slurry installation procedures, and slurry parameters necessary for stability, including but not limited to viscosity, unit weight, fluid loss, sand content, and pH, shall be indicated on such construction documents. The use of slurry to support excavations shall be subject to special inspection in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-185571\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-185571\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-185571\"><\/AnnotationDrawer><h6><a name=\"JD_BC3305\" id=\"JD_BC3305\" title=\"BC 3305\"><\/a>Section BC 3305: Material Placement and Installation<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6093-html-1",
+      "kind" : "html",
+      "plainText" : "Where slurry is utilized to support an excavation, trench, or drilled or bored hole, slurry mix proportions and installation procedures shall be provided by a registered design professional on signed and sealed design and installation procedures. The installation procedures shall account for all imposed loads, including those from the earth, adjacent structures, and adjacent equipment. Where construction documents are required for the support of excavation by Section 3304.4.1, slurry mix proportions, slurry installation procedures, and slurry parameters necessary for stability, including but not limited to viscosity, unit weight, fluid loss, sand content, and pH, shall be indicated on such construction documents. The use of slurry to support excavations shall be subject to special inspection in accordance with Chapter 17 .\n\n Section BC 3305: Material Placement and Installation"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6093
+}

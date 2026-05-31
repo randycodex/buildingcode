@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199361\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199361\"><\/AnnotationDrawer><div>Commercial cooking appliances, other than those exempted by Section 501.8, shall be vented by connecting the appliance to a vent or chimney in accordance with this code and the appliance manufacturer's instructions or the appliance shall be vented in accordance with Section 505.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21492-html-1",
+      "kind" : "html",
+      "plainText" : "Commercial cooking appliances, other than those exempted by Section 501.8, shall be vented by connecting the appliance to a vent or chimney in accordance with this code and the appliance manufacturer's instructions or the appliance shall be vented in accordance with Section 505.1.1."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21492
+}

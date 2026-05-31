@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196326\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196326\"><\/AnnotationDrawer><div>Horizontal offsets shall comply with Section 1305.9.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11455-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal offsets shall comply with Section 1305.9.3."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11455
+}

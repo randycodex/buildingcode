@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198828\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198828\"><\/AnnotationDrawer><div>A vent connector shall be installed without dips or sags and shall slope upward toward the vent or chimney not less than 1\/4 inch per foot (21 mm\/m).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198829\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198829\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Vent connectors attached to a mechanical draft system installed in accordance with the manufacturers' instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8486-html-1",
+      "kind" : "html",
+      "plainText" : "A vent connector shall be installed without dips or sags and shall slope upward toward the vent or chimney not less than 1\/4 inch per foot (21 mm\/m).\n\n Exception: Vent connectors attached to a mechanical draft system installed in accordance with the manufacturers' instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8486
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162372\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Each well shall be provided with a water-tight casing extending to 10 feet (3048 mm) below the ground surface. Casings shall extend not less than 6 inches (152 mm) above the well platform. Casings shall be large enough to permit installation of a separate drop pipe. Casings shall be sealed at the bottom in an impermeable stratum or extend several feet into the water-bearing stratum.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25037-html-1",
+      "kind" : "html",
+      "plainText" : "Each well shall be provided with a water-tight casing extending to 10 feet (3048 mm) below the ground surface. Casings shall extend not less than 6 inches (152 mm) above the well platform. Casings shall be large enough to permit installation of a separate drop pipe. Casings shall be sealed at the bottom in an impermeable stratum or extend several feet into the water-bearing stratum."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25037
+}

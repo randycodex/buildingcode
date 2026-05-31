@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169712\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169712\"><\/AnnotationDrawer><div>A fire-resistant joint system shall be securely installed in accordance with the listing criteria in or on the joint for its entire length so as not to dislodge, loosen or otherwise impair the joint system's ability to accommodate expected building movements and to resist the passage of fire and hot gases.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1218-html-1",
+      "kind" : "html",
+      "plainText" : "A fire-resistant joint system shall be securely installed in accordance with the listing criteria in or on the joint for its entire length so as not to dislodge, loosen or otherwise impair the joint system's ability to accommodate expected building movements and to resist the passage of fire and hot gases."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1218
+}

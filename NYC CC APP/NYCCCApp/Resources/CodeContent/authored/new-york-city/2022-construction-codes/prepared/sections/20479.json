@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187258\"><\/AnnotationDrawer><div>The inboard ends of the suspended scaffold outrigger beam shall be stabilized by bolts or other direct connections to the floor or roof deck, or they shall have their inboard ends stabilized by counterweights.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187259\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187259\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Multipoint adjustable suspended scaffolds shall not be stabilized by counterweights.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20479-html-1",
+      "kind" : "html",
+      "plainText" : "The inboard ends of the suspended scaffold outrigger beam shall be stabilized by bolts or other direct connections to the floor or roof deck, or they shall have their inboard ends stabilized by counterweights.\n\n Exception: Multipoint adjustable suspended scaffolds shall not be stabilized by counterweights."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20479
+}

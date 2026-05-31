@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181962\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181962\"><\/AnnotationDrawer><div>For attic ventilation, see Section 1203.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18801-html-1",
+      "kind" : "html",
+      "plainText" : "For attic ventilation, see Section 1203.2."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18801
+}

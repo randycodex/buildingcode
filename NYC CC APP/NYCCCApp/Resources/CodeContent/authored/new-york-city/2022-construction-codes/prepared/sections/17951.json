@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179551\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179551\"><\/AnnotationDrawer><div>Structural steel pipe piles to be fabricated or spliced by welding shall be subject to qualification requirements of AWS D1.1 for unlisted base metals. Structural steel pipe piles to be welded shall have a carbon equivalency (CE) not exceeding 0.45 as defined by AWS D1.1 and a sulfur content not exceeding 0.05%. Carbon equivalency and sulfur content shall be determined by mill certificates or by chemical analysis, for a minimum of two samples per 1,000 linear feet (304 800 mm) of pipe or part thereof, where mill certificates are unavailable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17951-html-1",
+      "kind" : "html",
+      "plainText" : "Structural steel pipe piles to be fabricated or spliced by welding shall be subject to qualification requirements of AWS D1.1 for unlisted base metals. Structural steel pipe piles to be welded shall have a carbon equivalency (CE) not exceeding 0.45 as defined by AWS D1.1 and a sulfur content not exceeding 0.05%. Carbon equivalency and sulfur content shall be determined by mill certificates or by chemical analysis, for a minimum of two samples per 1,000 linear feet (304 800 mm) of pipe or part thereof, where mill certificates are unavailable."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17951
+}

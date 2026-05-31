@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179203\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179203\"><\/AnnotationDrawer><div>Deep foundation elements, including but not limited to timber piles, precast concrete piles, structural steel piles, cast-in-place concrete piles, caisson piles, drilled displacement piles, composite piles, and helical piles, shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179201', hash: '#JD_BC1810' }}\">1810<\/Link>; driven piles shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179409', hash: '#JD_BC1811' }}\">1811<\/Link>; cast-in-place concrete piles shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179573', hash: '#JD_BC1812' }}\">1812<\/Link>; composite piles shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179757', hash: '#JD_BC1813' }}\">1813<\/Link>; and helical piles shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179768', hash: '#JD_BC1814' }}\">1814<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17841-html-1",
+      "kind" : "html",
+      "plainText" : "Deep foundation elements, including but not limited to timber piles, precast concrete piles, structural steel piles, cast-in-place concrete piles, caisson piles, drilled displacement piles, composite piles, and helical piles, shall comply with Section 1810 ; driven piles shall comply with Section 1811 ; cast-in-place concrete piles shall comply with Section 1812 ; composite piles shall comply with Section 1813 ; and helical piles shall comply with Section 1814 ."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17841
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184448\"><\/AnnotationDrawer><div>Drainage water collected from a roof, awning, canopy or marquee, other than canvas and flexible material, and condensate from mechanical equipment shall not flow over a public walking surface.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19548-html-1",
+      "kind" : "html",
+      "plainText" : "Drainage water collected from a roof, awning, canopy or marquee, other than canvas and flexible material, and condensate from mechanical equipment shall not flow over a public walking surface."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19548
+}

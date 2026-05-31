@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167581\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167581\"><\/AnnotationDrawer><div>Maximum single fire areas established in accordance with hangar classification and construction type in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-167561', hash: '#JD_BCTable412.4.6' }}\">Table 412.4.6<\/Link> shall be separated by 2-hour fire walls constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169208', hash: '#JD_BC706' }}\">706<\/Link>. In determining the maximum single fire area as set forth in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-167561', hash: '#JD_BCTable412.4.6' }}\">Table 412.4.6<\/Link>, ancillary uses that are separated from aircraft servicing areas by a fire barrier of not less than 1 hour, constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169272', hash: '#JD_BC707' }}\">707<\/Link>, shall not be included in the area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "565-html-1",
+      "kind" : "html",
+      "plainText" : "Maximum single fire areas established in accordance with hangar classification and construction type in Table 412.4.6 shall be separated by 2-hour fire walls constructed in accordance with Section 706 . In determining the maximum single fire area as set forth in Table 412.4.6 , ancillary uses that are separated from aircraft servicing areas by a fire barrier of not less than 1 hour, constructed in accordance with Section 707 , shall not be included in the area."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 565
+}

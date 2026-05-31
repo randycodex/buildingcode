@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180893\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180893\"><\/AnnotationDrawer><div>Mortar shall not be substituted for grout where grout is specified on the construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180894\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180894\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180894\"><\/AnnotationDrawer><h6><a name=\"JD_BC2105\" id=\"JD_BC2105\" title=\"BC 2105\"><\/a>Section BC 2105: Quality Assurance<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18435-html-1",
+      "kind" : "html",
+      "plainText" : "Mortar shall not be substituted for grout where grout is specified on the construction documents.\n\n Section BC 2105: Quality Assurance"
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18435
+}

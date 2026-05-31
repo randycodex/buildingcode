@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180413\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180413\"><\/AnnotationDrawer><div>Accelerated curing of concrete shall comply with ACI 318, Section 26.5.3.2(c), but concrete temperature shall not exceed 160&#176;F (71&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4432-html-1",
+      "kind" : "html",
+      "plainText" : "Accelerated curing of concrete shall comply with ACI 318, Section 26.5.3.2(c), but concrete temperature shall not exceed 160°F (71°C)."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4432
+}

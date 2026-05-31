@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179321\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179321\"><\/AnnotationDrawer><div>For deep foundations whose heads are to be designed to be free to rotate in the final structure, the maximum test load shall be at least twice the proposed design working load. In the absence of specific project requirements as determined by the engineer, the resulting allowable load shall not be more than one-half of that test load that produces a gross lateral movement of 1 inch (25.4 mm) of the deep foundation at the ground surface.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4051-html-1",
+      "kind" : "html",
+      "plainText" : "For deep foundations whose heads are to be designed to be free to rotate in the final structure, the maximum test load shall be at least twice the proposed design working load. In the absence of specific project requirements as determined by the engineer, the resulting allowable load shall not be more than one-half of that test load that produces a gross lateral movement of 1 inch (25.4 mm) of the deep foundation at the ground surface."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4051
+}

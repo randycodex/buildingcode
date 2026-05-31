@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192457\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192457\"><\/AnnotationDrawer><div>The work shall remain accessible and exposed for inspection purposes. Neither the commissioner nor the city shall be liable for expense entailed in the removal or replacement of any material required to allow inspection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10200-html-1",
+      "kind" : "html",
+      "plainText" : "The work shall remain accessible and exposed for inspection purposes. Neither the commissioner nor the city shall be liable for expense entailed in the removal or replacement of any material required to allow inspection."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 10200
+}

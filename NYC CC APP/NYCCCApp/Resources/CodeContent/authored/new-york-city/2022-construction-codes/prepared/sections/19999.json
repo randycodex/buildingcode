@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185760\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185760\"><\/AnnotationDrawer><div>Care shall be taken while stripping is underway to ensure that material does not fall off the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19999-html-1",
+      "kind" : "html",
+      "plainText" : "Care shall be taken while stripping is underway to ensure that material does not fall off the building."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19999
+}

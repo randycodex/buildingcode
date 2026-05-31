@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179759\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179759\"><\/AnnotationDrawer><div>Composite piles shall conform to the requirements of Sections 1813.2 through 1813.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4201-html-1",
+      "kind" : "html",
+      "plainText" : "Composite piles shall conform to the requirements of Sections 1813.2 through 1813.5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4201
+}

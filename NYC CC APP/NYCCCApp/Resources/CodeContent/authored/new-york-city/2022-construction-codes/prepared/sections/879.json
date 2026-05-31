@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168580\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168580\"><\/AnnotationDrawer><div>The public ways or yards of 60 feet (18 288 mm) in width required in Sections 507.3, 507.4, 507.5 and 507.6 shall be permitted to be reduced to not less than 40 feet (12 192 mm) in width provided all of the following requirements are met:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168581\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168581\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The reduced width shall not be allowed for more than 75 percent of the perimeter of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168582\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168582\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The exterior walls facing the reduced width shall have a fire-resistance rating of not less than 3 hours.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168583\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168583\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Openings in the exterior walls facing the reduced width shall have opening protectives with a fire protection rating of not less than 3 hours.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "879-html-1",
+      "kind" : "html",
+      "plainText" : "The public ways or yards of 60 feet (18 288 mm) in width required in Sections 507.3, 507.4, 507.5 and 507.6 shall be permitted to be reduced to not less than 40 feet (12 192 mm) in width provided all of the following requirements are met:\n\n 1. The reduced width shall not be allowed for more than 75 percent of the perimeter of the building.\n\n 2. The exterior walls facing the reduced width shall have a fire-resistance rating of not less than 3 hours.\n\n 3. Openings in the exterior walls facing the reduced width shall have opening protectives with a fire protection rating of not less than 3 hours."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 879
+}

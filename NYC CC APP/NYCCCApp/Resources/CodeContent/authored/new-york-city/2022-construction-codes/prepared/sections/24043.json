@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195786\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195786\"><\/AnnotationDrawer><div>Ventilation systems in ammonia machinery rooms shall be operated continuously at the ventilation rate specified in Section 1105.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195787\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195787\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195788\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195788\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Machinery rooms equipped with a vapor detector that will automatically start the ventilation system at the ventilation rate specified in Section 1105.6.3 and that will actuate an alarm at a detection level not to exceed 1,000 ppm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195789\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195789\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Machinery rooms conforming to the Class 1, Division 2, hazardous location classification requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24043-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation systems in ammonia machinery rooms shall be operated continuously at the ventilation rate specified in Section 1105.6.3.\n\n Exceptions: \n\n 1. Machinery rooms equipped with a vapor detector that will automatically start the ventilation system at the ventilation rate specified in Section 1105.6.3 and that will actuate an alarm at a detection level not to exceed 1,000 ppm.\n\n 2. Machinery rooms conforming to the Class 1, Division 2, hazardous location classification requirements of the New York City Electrical Code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24043
+}

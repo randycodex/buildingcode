@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178727\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178727\"><\/AnnotationDrawer><div>The special inspections for structural aluminum elements of buildings and structures shall be as required by Section 1705.33.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3866-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspections for structural aluminum elements of buildings and structures shall be as required by Section 1705.33.1."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3866
+}

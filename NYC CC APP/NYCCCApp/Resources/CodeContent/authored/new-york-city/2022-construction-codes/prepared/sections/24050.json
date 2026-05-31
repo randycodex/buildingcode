@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195804\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195804\"><\/AnnotationDrawer><div>All refrigerant piping and fittings installed at a height less than 7 feet 3 inches (2209.8 mm) above the floor shall be concealed or otherwise protected from mechanical damage except at the point of connection to terminal equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24050-html-1",
+      "kind" : "html",
+      "plainText" : "All refrigerant piping and fittings installed at a height less than 7 feet 3 inches (2209.8 mm) above the floor shall be concealed or otherwise protected from mechanical damage except at the point of connection to terminal equipment."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24050
+}

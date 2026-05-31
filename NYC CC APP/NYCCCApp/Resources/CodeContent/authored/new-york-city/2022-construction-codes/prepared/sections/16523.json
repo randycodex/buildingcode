@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174983\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174983\"><\/AnnotationDrawer><div>Electric vehicle charging stations shall be designed so accessible routes are not obstructed by cables or other elements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16523-html-1",
+      "kind" : "html",
+      "plainText" : "Electric vehicle charging stations shall be designed so accessible routes are not obstructed by cables or other elements."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16523
+}

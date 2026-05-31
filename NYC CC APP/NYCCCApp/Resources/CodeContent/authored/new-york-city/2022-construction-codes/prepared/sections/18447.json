@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180927\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180927\"><\/AnnotationDrawer><div>The design of masonry structures using strength design shall comply with Section 2106 and the requirements of Chapters 1 through 7 and Chapter 9 of TMS 402, except as modified by Sections 2108.2 through 2108.3 of this code.<br><\/br>Exception: AAC masonry shall comply with the requirements of Chapters 1 through 7 and Chapter 11 of TMS 402.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18447-html-1",
+      "kind" : "html",
+      "plainText" : "The design of masonry structures using strength design shall comply with Section 2106 and the requirements of Chapters 1 through 7 and Chapter 9 of TMS 402, except as modified by Sections 2108.2 through 2108.3 of this code.\n Exception: AAC masonry shall comply with the requirements of Chapters 1 through 7 and Chapter 11 of TMS 402."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18447
+}

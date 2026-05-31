@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195363\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195363\"><\/AnnotationDrawer><div>Suspended-type unit heaters shall be supported by elements that are designed and constructed to accommodate the weight and dynamic loads. Hangers and brackets shall be of noncombustible material. Suspended-type oil-fired unit heaters shall be installed in accordance with NFPA 31.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11082-html-1",
+      "kind" : "html",
+      "plainText" : "Suspended-type unit heaters shall be supported by elements that are designed and constructed to accommodate the weight and dynamic loads. Hangers and brackets shall be of noncombustible material. Suspended-type oil-fired unit heaters shall be installed in accordance with NFPA 31."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11082
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196282\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196282\"><\/AnnotationDrawer><div>The building owner shall maintain a sufficient quantity of absorbent materials near fuel-oil storage tanks, pumps, and related equipment to control leaks and slipping hazards.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24261-html-1",
+      "kind" : "html",
+      "plainText" : "The building owner shall maintain a sufficient quantity of absorbent materials near fuel-oil storage tanks, pumps, and related equipment to control leaks and slipping hazards."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24261
+}

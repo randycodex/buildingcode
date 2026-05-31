@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178256\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178256\"><\/AnnotationDrawer><div>The special inspector shall perform an inspection of the steel frame to verify compliance with the details shown on the approved construction documents, such as bracing, stiffening, member locations and proper application of joint details at each connection, including connections designed for seismic effects.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17534-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall perform an inspection of the steel frame to verify compliance with the details shown on the approved construction documents, such as bracing, stiffening, member locations and proper application of joint details at each connection, including connections designed for seismic effects."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17534
+}

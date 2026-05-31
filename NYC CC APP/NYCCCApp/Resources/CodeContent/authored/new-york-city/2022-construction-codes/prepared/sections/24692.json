@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161520\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161520\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A water closet, urinal, lavatory or bidet shall not be set closer than 15 inches (381 mm) from its center to any side wall, partition, vanity or other obstruction, or closer than 30 inches (762 mm) center to center between adjacent fixtures. There shall be not less than a 21-inch (533 mm) clearance in front of the water closet, urinal, lavatory or bidet to any wall, fixture or door. Water closet compartments shall be not less than 30 inches (762 mm) in width and not less than 60 inches (1524 mm) in depth for floor-mounted water closets and not less than 30 inches (762 mm) in width and 56 inches (1422 mm) in depth for wall-hung water closets.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24692-html-1",
+      "kind" : "html",
+      "plainText" : "A water closet, urinal, lavatory or bidet shall not be set closer than 15 inches (381 mm) from its center to any side wall, partition, vanity or other obstruction, or closer than 30 inches (762 mm) center to center between adjacent fixtures. There shall be not less than a 21-inch (533 mm) clearance in front of the water closet, urinal, lavatory or bidet to any wall, fixture or door. Water closet compartments shall be not less than 30 inches (762 mm) in width and not less than 60 inches (1524 mm) in depth for floor-mounted water closets and not less than 30 inches (762 mm) in width and 56 inches (1422 mm) in depth for wall-hung water closets."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24692
+}

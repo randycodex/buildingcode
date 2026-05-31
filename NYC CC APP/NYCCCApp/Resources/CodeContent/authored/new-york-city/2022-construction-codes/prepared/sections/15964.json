@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172936\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172936\"><\/AnnotationDrawer><div>Elevators, escalators and moving walks shall not be used as a component of a required means of egress from any other part of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172937\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172937\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172938\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172938\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Elevators used as a component of an accessible means of egress in accordance with Section 1009.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172939\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Elevators permitted to be used for occupant self-evacuation pursuant to Sections 403.5.2 and 403.6.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-172940\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-172940\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-172940\"><\/AnnotationDrawer><h6><a name=\"JD_BC1004\" id=\"JD_BC1004\" title=\"BC 1004\"><\/a>Section BC 1004: Occupant Load<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15964-html-1",
+      "kind" : "html",
+      "plainText" : "Elevators, escalators and moving walks shall not be used as a component of a required means of egress from any other part of the building.\n\n Exceptions: \n\n 1. Elevators used as a component of an accessible means of egress in accordance with Section 1009.4.\n\n 2. Elevators permitted to be used for occupant self-evacuation pursuant to Sections 403.5.2 and 403.6.2.\n\n Section BC 1004: Occupant Load"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 15964
+}

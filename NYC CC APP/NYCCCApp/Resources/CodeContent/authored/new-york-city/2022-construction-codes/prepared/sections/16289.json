@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174211\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174211\"><\/AnnotationDrawer><div>The leading edge of landings shall be marked with a stripe consistent with the dimensional requirements for steps. Stripes on landings shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192262', hash: '#JD_BCFigureS101.1(3)' }}\">Figure S101.1(3)<\/Link> in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192260', hash: '#JD_BCAppS' }}\">Appendix S<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16289-html-1",
+      "kind" : "html",
+      "plainText" : "The leading edge of landings shall be marked with a stripe consistent with the dimensional requirements for steps. Stripes on landings shall comply with Figure S101.1(3) in Appendix S ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16289
+}

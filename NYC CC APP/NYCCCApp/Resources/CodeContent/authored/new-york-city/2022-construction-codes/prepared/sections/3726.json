@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178327\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178327\"><\/AnnotationDrawer><div>The minimum special inspection program for structures classified as Risk Categories I, II, or III, in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177237', hash: '#JD_BCTable1604.5' }}\">Table 1604.5<\/Link>, which are three stories or less in height, shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178318', hash: '#JD_BCTable1705.4.1' }}\">Table 1705.4.1<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3726-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum special inspection program for structures classified as Risk Categories I, II, or III, in accordance with Table 1604.5 , which are three stories or less in height, shall comply with Table 1705.4.1 ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3726
+}

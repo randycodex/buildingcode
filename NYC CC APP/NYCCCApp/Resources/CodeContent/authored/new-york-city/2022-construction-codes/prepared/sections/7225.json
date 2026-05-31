@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189133\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189133\"><\/AnnotationDrawer><div>Roof signs shall be constructed so as to provide a clear space of at least 7 feet (2134 mm) between the roof and the lowest part of the sign, and at least 5 feet (1524 mm) between the vertical supports thereof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7225-html-1",
+      "kind" : "html",
+      "plainText" : "Roof signs shall be constructed so as to provide a clear space of at least 7 feet (2134 mm) between the roof and the lowest part of the sign, and at least 5 feet (1524 mm) between the vertical supports thereof."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7225
+}

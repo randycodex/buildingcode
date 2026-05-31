@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183904\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183904\"><\/AnnotationDrawer><div>Automatic sprinklers shall not be installed in elevator machine rooms, machinery spaces, control rooms, control spaces and elevator hoistways of occupant evacuation elevators.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19343-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic sprinklers shall not be installed in elevator machine rooms, machinery spaces, control rooms, control spaces and elevator hoistways of occupant evacuation elevators."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 19343
+}

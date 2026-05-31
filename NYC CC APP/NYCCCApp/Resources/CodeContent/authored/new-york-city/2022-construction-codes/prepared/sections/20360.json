@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186866\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186866\"><\/AnnotationDrawer><div>Add the following sentence at the beginning of Section 7.9:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186867\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186867\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">7.9 The operator shall always verify the thickness and type of material into which the stud, pin or fastener is to be driven. <\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20360-html-1",
+      "kind" : "html",
+      "plainText" : "Add the following sentence at the beginning of Section 7.9:\n\n 7.9 The operator shall always verify the thickness and type of material into which the stud, pin or fastener is to be driven."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20360
+}

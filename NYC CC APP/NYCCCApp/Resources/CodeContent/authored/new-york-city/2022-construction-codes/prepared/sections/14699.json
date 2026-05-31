@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168544\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168544\"><\/AnnotationDrawer><div>For a building containing Group H-2 or H-3 occupancies, the allowable area shall be determined in accordance with Section 508.4.2, with the sprinkler system increase applicable only to the portions of the building not classified as Group H-2 or H-3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14699-html-1",
+      "kind" : "html",
+      "plainText" : "For a building containing Group H-2 or H-3 occupancies, the allowable area shall be determined in accordance with Section 508.4.2, with the sprinkler system increase applicable only to the portions of the building not classified as Group H-2 or H-3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14699
+}

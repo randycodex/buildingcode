@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199153\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199153\"><\/AnnotationDrawer><div>Commercial-industrial-type incinerators and crematories shall be constructed and installed in accordance with NFPA 82.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21405-html-1",
+      "kind" : "html",
+      "plainText" : "Commercial-industrial-type incinerators and crematories shall be constructed and installed in accordance with NFPA 82."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21405
+}

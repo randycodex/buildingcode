@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194855\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194855\"><\/AnnotationDrawer><div>The cross-sectional area of a flue serving a solid fuel-burning appliance shall be not greater than three times the cross-sectional area of the appliance flue collar or flue outlet.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10895-html-1",
+      "kind" : "html",
+      "plainText" : "The cross-sectional area of a flue serving a solid fuel-burning appliance shall be not greater than three times the cross-sectional area of the appliance flue collar or flue outlet."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10895
+}

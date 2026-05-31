@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169193\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169193\"><\/AnnotationDrawer><div>The applicant shall submit to the department an approval from the Fire Department that the proposed cantilever complies with applicable provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> with respect to access to buildings and roofs.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1033-html-1",
+      "kind" : "html",
+      "plainText" : "The applicant shall submit to the department an approval from the Fire Department that the proposed cantilever complies with applicable provisions of the New York City Fire Code with respect to access to buildings and roofs."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1033
+}

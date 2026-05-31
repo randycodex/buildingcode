@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195883\"><\/AnnotationDrawer><div>Space volume calculations shall comply with EN378 Part 1, Section 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11263-html-1",
+      "kind" : "html",
+      "plainText" : "Space volume calculations shall comply with EN378 Part 1, Section 7."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11263
+}

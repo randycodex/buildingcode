@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169270\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169270\"><\/AnnotationDrawer><div>Ducts and air transfer openings shall not penetrate fire walls.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169271\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169271\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Penetrations by ducts and air transfer openings of fire walls that are not on a lot line shall be allowed provided the penetrations comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169875', hash: '#JD_BC717' }}\">717<\/Link>. The size and aggregate width of all openings shall not exceed the limitations of Section 706.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-169272\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-169272\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-169272\"><\/AnnotationDrawer><h6><a name=\"JD_BC707\" id=\"JD_BC707\" title=\"BC 707\"><\/a>Section BC 707: Fire Barriers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14887-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts and air transfer openings shall not penetrate fire walls.\n\n Exception: Penetrations by ducts and air transfer openings of fire walls that are not on a lot line shall be allowed provided the penetrations comply with Section 717 . The size and aggregate width of all openings shall not exceed the limitations of Section 706.8.\n\n Section BC 707: Fire Barriers"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14887
+}

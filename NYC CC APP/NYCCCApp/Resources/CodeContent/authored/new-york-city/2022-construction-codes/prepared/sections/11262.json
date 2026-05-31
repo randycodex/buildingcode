@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195881\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195881\"><\/AnnotationDrawer><div>Refrigerant piping systems in occupied spaces shall comply with the requirements of EN378 Part 1, Section C.3.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11262-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigerant piping systems in occupied spaces shall comply with the requirements of EN378 Part 1, Section C.3.2.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11262
+}

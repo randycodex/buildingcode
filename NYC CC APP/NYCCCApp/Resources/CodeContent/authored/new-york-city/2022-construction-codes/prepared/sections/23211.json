@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193369\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193369\"><\/AnnotationDrawer><div>Single or combined mechanical exhaust systems for environmental air shall be independent of all other exhaust systems except as permitted in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-194170', hash: '#JD_MC514' }}\">514<\/Link>. Dryer exhaust shall be independent of all other systems. Type I exhaust systems shall be independent of all other exhaust systems except as provided in Section 506.3.5. Single or combined Type II exhaust systems for food-processing operations shall be independent of all other exhaust systems. Kitchen exhaust systems shall be constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224642', hash: '#JD_MC505' }}\">505<\/Link> for domestic equipment and Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193766', hash: '#JD_MC506' }}\">506<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-194037', hash: '#JD_MC509' }}\">509<\/Link> for commercial equipment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23211-html-1",
+      "kind" : "html",
+      "plainText" : "Single or combined mechanical exhaust systems for environmental air shall be independent of all other exhaust systems except as permitted in Section 514 . Dryer exhaust shall be independent of all other systems. Type I exhaust systems shall be independent of all other exhaust systems except as provided in Section 506.3.5. Single or combined Type II exhaust systems for food-processing operations shall be independent of all other exhaust systems. Kitchen exhaust systems shall be constructed in accordance with Section 505 for domestic equipment and Sections 506 through 509 for commercial equipment."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23211
+}

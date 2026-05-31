@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192999\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192999\"><\/AnnotationDrawer><div>Hangers and anchors shall be attached to the building structure. Post-installed anchors shall be subject to special inspection in accordance with Section 1705.37 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23100-html-1",
+      "kind" : "html",
+      "plainText" : "Hangers and anchors shall be attached to the building structure. Post-installed anchors shall be subject to special inspection in accordance with Section 1705.37 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23100
+}

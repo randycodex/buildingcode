@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175406\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175406\"><\/AnnotationDrawer><div>Audio output shall include all the information necessary to successfully call and locate the responding elevator without the use of a visual display including, but not limited to operating instructions, floor selection options, confirmation of floor selection, responding elevator car designation, directions to the responding elevator car and error messages.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16670-html-1",
+      "kind" : "html",
+      "plainText" : "Audio output shall include all the information necessary to successfully call and locate the responding elevator without the use of a visual display including, but not limited to operating instructions, floor selection options, confirmation of floor selection, responding elevator car designation, directions to the responding elevator car and error messages."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16670
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187012\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187012\"><\/AnnotationDrawer><div>The use of a supported scaffold shall be supervised by a competent person designated by the scaffold controlling entity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20401-html-1",
+      "kind" : "html",
+      "plainText" : "The use of a supported scaffold shall be supervised by a competent person designated by the scaffold controlling entity."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20401
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169913\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169913\"><\/AnnotationDrawer><div>Damper actuation shall be in accordance with Sections 717.3.3.1 through 717.3.3.4 as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1292-html-1",
+      "kind" : "html",
+      "plainText" : "Damper actuation shall be in accordance with Sections 717.3.3.1 through 717.3.3.4 as applicable."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1292
+}

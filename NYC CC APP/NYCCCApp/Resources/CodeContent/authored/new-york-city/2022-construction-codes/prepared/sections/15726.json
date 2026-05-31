@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172228\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172228\"><\/AnnotationDrawer><div>Compliance with the maximum allowable leakage area shall be determined by achieving the minimum air pressure difference across the barrier with the system in the smoke control mode for mechanical smoke control systems utilizing the pressurization method. Compliance with the maximum allowable leakage area of passive smoke control systems shall be verified through methods such as door fan testing or other methods, as approved by the commissioner and the Fire Commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15726-html-1",
+      "kind" : "html",
+      "plainText" : "Compliance with the maximum allowable leakage area shall be determined by achieving the minimum air pressure difference across the barrier with the system in the smoke control mode for mechanical smoke control systems utilizing the pressurization method. Compliance with the maximum allowable leakage area of passive smoke control systems shall be verified through methods such as door fan testing or other methods, as approved by the commissioner and the Fire Commissioner."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15726
+}

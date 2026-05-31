@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187902\"><\/AnnotationDrawer><div>Power buggies shall meet the requirements of Sections 3320.7.1 and 3320.7.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20664-html-1",
+      "kind" : "html",
+      "plainText" : "Power buggies shall meet the requirements of Sections 3320.7.1 and 3320.7.2."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20664
+}

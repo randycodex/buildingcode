@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168398\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168398\"><\/AnnotationDrawer><div>The height, in feet, and the number of stories of a building shall be determined based on the type of construction, occupancy classification and whether there is an automatic sprinkler system installed throughout the building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168399\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168399\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The building height of one-story aircraft hangars, aircraft paint hangars and buildings used for the manufacturing of aircraft shall not be limited where the building is provided with an automatic sprinkler system or automatic fire-extinguishing system in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-171003', hash: '#JD_BCCh.9' }}\">Chapter 9<\/Link> and is entirely surrounded by public ways or yards not less in width than one and one-half times the building height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "842-html-1",
+      "kind" : "html",
+      "plainText" : "The height, in feet, and the number of stories of a building shall be determined based on the type of construction, occupancy classification and whether there is an automatic sprinkler system installed throughout the building.\n\n Exception: The building height of one-story aircraft hangars, aircraft paint hangars and buildings used for the manufacturing of aircraft shall not be limited where the building is provided with an automatic sprinkler system or automatic fire-extinguishing system in accordance with Chapter 9 and is entirely surrounded by public ways or yards not less in width than one and one-half times the building height."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 842
+}

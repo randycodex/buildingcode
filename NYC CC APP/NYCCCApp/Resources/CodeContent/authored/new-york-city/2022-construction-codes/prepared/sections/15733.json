@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172258\"><\/AnnotationDrawer><div><div style=\"\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tWhere stairways or elevator hoistways are pressurized, such pressurization systems shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-234097', hash: '#JD_BC909' }}\">909<\/Link> of this code as smoke control systems, in addition to the requirements of Sections 909.20 and 909.21 of this code and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>. <\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15733-html-1",
+      "kind" : "html",
+      "plainText" : "Where stairways or elevator hoistways are pressurized, such pressurization systems shall comply with Section 909 of this code as smoke control systems, in addition to the requirements of Sections 909.20 and 909.21 of this code and the New York City Fire Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15733
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163126\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163126\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where the fixture drains being common vented connect at the same level, the vent connection shall be at the interconnection of the fixture drains.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163127\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163127\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Where wet vents are permitted by this code, the wet vent connection may be located downstream of the interconnection.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12506-html-1",
+      "kind" : "html",
+      "plainText" : "Where the fixture drains being common vented connect at the same level, the vent connection shall be at the interconnection of the fixture drains. \n\n Exception: Where wet vents are permitted by this code, the wet vent connection may be located downstream of the interconnection."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12506
+}

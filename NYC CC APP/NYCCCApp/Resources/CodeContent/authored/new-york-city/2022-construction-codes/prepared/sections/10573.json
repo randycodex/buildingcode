@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193881\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193881\"><\/AnnotationDrawer><div>Exhaust outlets that terminate above the roof shall have the discharge opening located not less than 40 inches (1016 mm) above the roof surface. The exhaust flow shall be directed away from the surface of the roof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10573-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust outlets that terminate above the roof shall have the discharge opening located not less than 40 inches (1016 mm) above the roof surface. The exhaust flow shall be directed away from the surface of the roof."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10573
+}

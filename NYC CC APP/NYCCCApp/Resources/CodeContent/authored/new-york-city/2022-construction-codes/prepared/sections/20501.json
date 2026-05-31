@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187313\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187313\"><\/AnnotationDrawer><div>If the scaffold grounding lead is disconnected at any time, the welding machine shall be shut off or the welding lead shall be removed from the scaffold.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20501-html-1",
+      "kind" : "html",
+      "plainText" : "If the scaffold grounding lead is disconnected at any time, the welding machine shall be shut off or the welding lead shall be removed from the scaffold."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20501
+}

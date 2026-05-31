@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183410\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183410\"><\/AnnotationDrawer><div>The aggregate area of skylights shall not exceed 33 1\/3 percent of the floor area of the room or space sheltered by the roof in which such skylights are installed where Class CC1 materials are utilized, and 25 percent where Class CC2 materials are utilized.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183411\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183411\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The aggregate area limitations of light-transmitting plastic skylights shall be increased 100 percent beyond the limitations set forth in this section where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 or the building is equipped with smoke and heat vents in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172492', hash: '#JD_BC910' }}\">910<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19152-html-1",
+      "kind" : "html",
+      "plainText" : "The aggregate area of skylights shall not exceed 33 1\/3 percent of the floor area of the room or space sheltered by the roof in which such skylights are installed where Class CC1 materials are utilized, and 25 percent where Class CC2 materials are utilized.\n\n Exception: The aggregate area limitations of light-transmitting plastic skylights shall be increased 100 percent beyond the limitations set forth in this section where the building is equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1 or the building is equipped with smoke and heat vents in accordance with Section 910 ."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19152
+}

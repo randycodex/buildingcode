@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167344\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167344\"><\/AnnotationDrawer><div>The provisions of Sections 409.1 through 409.5 of this code shall apply to rooms in which ribbon-type cellulose acetate or other safety film is utilized in conjunction with electric arc, xenon or other light-source projection equipment that develops hazardous gases, dust or radiation. The projection, use or storage of film having a nitrocellulose base (commonly known as nitrate film) shall not be permitted except under conditions specified in special permits when issued by the Fire Department. Safety film meeting the specification and test standards of NFPA 40 may be projected, used or stored.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "486-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of Sections 409.1 through 409.5 of this code shall apply to rooms in which ribbon-type cellulose acetate or other safety film is utilized in conjunction with electric arc, xenon or other light-source projection equipment that develops hazardous gases, dust or radiation. The projection, use or storage of film having a nitrocellulose base (commonly known as nitrate film) shall not be permitted except under conditions specified in special permits when issued by the Fire Department. Safety film meeting the specification and test standards of NFPA 40 may be projected, used or stored."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 486
+}

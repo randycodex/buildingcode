@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176410\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176410\"><\/AnnotationDrawer><div>MCM installations shall be fireblocked in accordance with Section 718.2.6.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-224321\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-224321\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-224321\"><\/AnnotationDrawer><h6><a name=\"JD_BC1408\" id=\"JD_BC1408\" title=\"BC 1408\"><\/a>Section BC 1408: Exterior Insulation and Finish Systems (EIFS)<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17014-html-1",
+      "kind" : "html",
+      "plainText" : "MCM installations shall be fireblocked in accordance with Section 718.2.6.1.\n\n Section BC 1408: Exterior Insulation and Finish Systems (EIFS)"
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 17014
+}

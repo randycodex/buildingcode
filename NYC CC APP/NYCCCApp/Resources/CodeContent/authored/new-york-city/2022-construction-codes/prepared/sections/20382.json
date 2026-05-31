@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186924\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186924\"><\/AnnotationDrawer><div>Scaffolds shall be designed in accordance with Sections 3314.3.1 through 3314.3.4. The design requirements of this section are independent of the permit requirements of Section 3314.2. Sections 3314.3.1 through 3314.3.4 may require a scaffold to be designed even if Section 3314.2 does not require a permit for such scaffold.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20382-html-1",
+      "kind" : "html",
+      "plainText" : "Scaffolds shall be designed in accordance with Sections 3314.3.1 through 3314.3.4. The design requirements of this section are independent of the permit requirements of Section 3314.2. Sections 3314.3.1 through 3314.3.4 may require a scaffold to be designed even if Section 3314.2 does not require a permit for such scaffold."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20382
+}

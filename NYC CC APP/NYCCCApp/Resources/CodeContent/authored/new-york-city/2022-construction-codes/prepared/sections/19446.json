@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184187\"><\/AnnotationDrawer><div>Towers shall be located and equipped with step bolts and ladders so as to provide ready access for inspection purposes. Guy wires or other accessories shall not cross or encroach upon any street or other public space, or over above-ground electric utility lines, or encroach upon any privately owned property without written consent of the owner of the encroached-upon property, space or above-ground electric utility lines. Towers shall be equipped with climbing and working facilities in compliance with TIA-222. See applicable OSHA, FCC and EPA regulations relating to limitations on access to tower sites.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19446-html-1",
+      "kind" : "html",
+      "plainText" : "Towers shall be located and equipped with step bolts and ladders so as to provide ready access for inspection purposes. Guy wires or other accessories shall not cross or encroach upon any street or other public space, or over above-ground electric utility lines, or encroach upon any privately owned property without written consent of the owner of the encroached-upon property, space or above-ground electric utility lines. Towers shall be equipped with climbing and working facilities in compliance with TIA-222. See applicable OSHA, FCC and EPA regulations relating to limitations on access to tower sites."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19446
+}

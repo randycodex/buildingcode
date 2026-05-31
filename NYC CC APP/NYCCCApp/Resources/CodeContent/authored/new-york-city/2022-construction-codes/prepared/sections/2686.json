@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174963\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174963\"><\/AnnotationDrawer><div>In a facility utilizing valet parking services in which vehicles are parked and later returned to their drivers by a valet employed by the facility, the number of accessible parking spaces shall be provided in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174958', hash: '#JD_BCTable1106.7.3' }}\">Table 1106.7.3<\/Link> of this code. A passenger loading zone complying with Section 1106.7 of this code shall be provided at valet parking services where the valet shall take control of the vehicles. Passenger loading zones shall comply with Section 503 (Passenger Loading Zones) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2686-html-1",
+      "kind" : "html",
+      "plainText" : "In a facility utilizing valet parking services in which vehicles are parked and later returned to their drivers by a valet employed by the facility, the number of accessible parking spaces shall be provided in accordance with Table 1106.7.3 of this code. A passenger loading zone complying with Section 1106.7 of this code shall be provided at valet parking services where the valet shall take control of the vehicles. Passenger loading zones shall comply with Section 503 (Passenger Loading Zones) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2686
+}

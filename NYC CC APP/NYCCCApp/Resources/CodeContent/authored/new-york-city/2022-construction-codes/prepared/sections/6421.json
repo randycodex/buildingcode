@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186476\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186476\"><\/AnnotationDrawer><div>The phrase \"when arresting a fall,\" shall be deleted from Section 6.4 of ANSI\/ASSP A10.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6421-html-1",
+      "kind" : "html",
+      "plainText" : "The phrase \"when arresting a fall,\" shall be deleted from Section 6.4 of ANSI\/ASSP A10.11."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6421
+}

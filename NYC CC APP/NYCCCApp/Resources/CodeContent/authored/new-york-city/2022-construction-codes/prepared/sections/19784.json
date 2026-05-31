@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185196\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185196\"><\/AnnotationDrawer><div>Chute enclosures shall comply with the following requirements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185197\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185197\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Material chutes that are at an angle of more than 45 degrees (0.79 rad) with the horizontal shall be entirely enclosed on all sides, except for openings at the floor levels for the receiving of materials. Such openings shall not exceed 48 inches (1219 mm) in height, measured along the wall of the chute, and all openings, except the top opening, shall be closed and secured when not in use.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185198\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185198\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Chutes at an angle of less than 45 degrees (0.79 rad) with the horizontal may be open on the upper side. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19784-html-1",
+      "kind" : "html",
+      "plainText" : "Chute enclosures shall comply with the following requirements:\n\n 1. Material chutes that are at an angle of more than 45 degrees (0.79 rad) with the horizontal shall be entirely enclosed on all sides, except for openings at the floor levels for the receiving of materials. Such openings shall not exceed 48 inches (1219 mm) in height, measured along the wall of the chute, and all openings, except the top opening, shall be closed and secured when not in use.\n\n 2. Chutes at an angle of less than 45 degrees (0.79 rad) with the horizontal may be open on the upper side."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19784
+}

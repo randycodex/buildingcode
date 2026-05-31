@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197702\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197702\"><\/AnnotationDrawer><div>Clearance requirements for indoor air-conditioning equipment shall comply with Sections 308.3.1 through 308.3.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8078-html-1",
+      "kind" : "html",
+      "plainText" : "Clearance requirements for indoor air-conditioning equipment shall comply with Sections 308.3.1 through 308.3.4."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8078
+}

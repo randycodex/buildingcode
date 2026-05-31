@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166706\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166706\"><\/AnnotationDrawer><div>Smoke detection shall be provided in accordance with Section 907.2.13.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14099-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke detection shall be provided in accordance with Section 907.2.13.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14099
+}

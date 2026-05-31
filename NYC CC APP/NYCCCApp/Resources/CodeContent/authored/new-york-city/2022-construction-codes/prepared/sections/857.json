@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168476\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168476\"><\/AnnotationDrawer><div>Equipment platforms in buildings shall not be considered as a portion of the floor below. Such equipment platforms shall not contribute to either the building area or the number of stories as regulated by Section 503.1. The area of the equipment platform shall not be included in determining the fire area in accordance with Section 903. Equipment platforms shall not be a part of any mezzanine and such platforms and the walkways, stairways, alternating tread devices and ladders providing access to an equipment platform shall not serve as a part of the means of egress from the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "857-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment platforms in buildings shall not be considered as a portion of the floor below. Such equipment platforms shall not contribute to either the building area or the number of stories as regulated by Section 503.1. The area of the equipment platform shall not be included in determining the fire area in accordance with Section 903. Equipment platforms shall not be a part of any mezzanine and such platforms and the walkways, stairways, alternating tread devices and ladders providing access to an equipment platform shall not serve as a part of the means of egress from the building."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 857
+}

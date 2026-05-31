@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195349\"><\/AnnotationDrawer><div>Volume dampers shall not be placed in the air inlet to a furnace in a manner that will reduce the required air to the furnace.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23901-html-1",
+      "kind" : "html",
+      "plainText" : "Volume dampers shall not be placed in the air inlet to a furnace in a manner that will reduce the required air to the furnace."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23901
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162041\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162041\"><\/AnnotationDrawer><div>Mechanically formed tee fittings shall be brazed in accordance with Section 605.14.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24901-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanically formed tee fittings shall be brazed in accordance with Section 605.14.1."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24901
+}

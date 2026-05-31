@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186400\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186400\"><\/AnnotationDrawer><div>The tensile strength for the structural net utilized in connection with a horizontal safety netting system shall be noted on the drawings by the registered design professional responsible for the design of the safety netting systems in accordance with Section 3308.3.1, or shall be recorded by such registered design professional in the form of a signed, sealed, and dated letter from such registered design professional, with such letter kept with the drawings. Where required by Section 3308.6.3, the strength shall be confirmed by testing; the results of the test shall be documented in the form of a signed, sealed, and dated letter from the registered design professional responsible for the design of the safety netting systems in accordance with Section 3308.3.1. Such letter shall be kept with the drawings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6394-html-1",
+      "kind" : "html",
+      "plainText" : "The tensile strength for the structural net utilized in connection with a horizontal safety netting system shall be noted on the drawings by the registered design professional responsible for the design of the safety netting systems in accordance with Section 3308.3.1, or shall be recorded by such registered design professional in the form of a signed, sealed, and dated letter from such registered design professional, with such letter kept with the drawings. Where required by Section 3308.6.3, the strength shall be confirmed by testing; the results of the test shall be documented in the form of a signed, sealed, and dated letter from the registered design professional responsible for the design of the safety netting systems in accordance with Section 3308.3.1. Such letter shall be kept with the drawings."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6394
+}

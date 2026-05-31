@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185615\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185615\"><\/AnnotationDrawer><div>Structural frames shall be properly braced with shores, guyed cables, turnbuckles, or other devices, as necessary, for the safety of the structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6113-html-1",
+      "kind" : "html",
+      "plainText" : "Structural frames shall be properly braced with shores, guyed cables, turnbuckles, or other devices, as necessary, for the safety of the structure."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6113
+}

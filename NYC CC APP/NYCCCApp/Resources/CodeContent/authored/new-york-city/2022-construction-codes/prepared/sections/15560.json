@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171676\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171676\"><\/AnnotationDrawer><div>Cabinets shall be identified in an approved manner by a permanently attached sign with white letters not less than 2 inches (50.8 mm) high and a red background color, indicating the equipment contained therein.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171677\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171677\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171678\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171678\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Doors not large enough to accommodate a written sign with 2-inch lettering shall be marked with a permanently attached pictogram indicating the equipment contained therein, in addition to corresponding smaller white lettering on a red background adjacent to such pictogram.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171679\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171679\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Doors that have either an approved visual identification clear glass panel or a complete glass door panel are not required to be marked.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15560-html-1",
+      "kind" : "html",
+      "plainText" : "Cabinets shall be identified in an approved manner by a permanently attached sign with white letters not less than 2 inches (50.8 mm) high and a red background color, indicating the equipment contained therein.\n\n Exceptions: \n\n 1. Doors not large enough to accommodate a written sign with 2-inch lettering shall be marked with a permanently attached pictogram indicating the equipment contained therein, in addition to corresponding smaller white lettering on a red background adjacent to such pictogram.\n\n 2. Doors that have either an approved visual identification clear glass panel or a complete glass door panel are not required to be marked."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15560
+}

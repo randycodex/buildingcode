@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163341\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163341\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Extensions of public storm or combined sewers shall be made in accordance with the rules of the Department of Environmental Protection.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25407-html-1",
+      "kind" : "html",
+      "plainText" : "Extensions of public storm or combined sewers shall be made in accordance with the rules of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25407
+}

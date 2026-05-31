@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188261\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188261\"><\/AnnotationDrawer><div>Stations covered by this section shall have identification signs containing visual characters complying with Section 703.2 (Visual Characters) of ICC A117.1. Signs shall be clearly visible and within the sightlines of a standing or sitting passenger from within the train on both sides when not obstructed by another train.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6925-html-1",
+      "kind" : "html",
+      "plainText" : "Stations covered by this section shall have identification signs containing visual characters complying with Section 703.2 (Visual Characters) of ICC A117.1. Signs shall be clearly visible and within the sightlines of a standing or sitting passenger from within the train on both sides when not obstructed by another train."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6925
+}

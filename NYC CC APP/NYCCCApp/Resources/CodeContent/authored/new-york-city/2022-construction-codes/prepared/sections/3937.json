@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178950\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178950\"><\/AnnotationDrawer><div>The geotechnical investigation shall determine the existing groundwater table.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3937-html-1",
+      "kind" : "html",
+      "plainText" : "The geotechnical investigation shall determine the existing groundwater table."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3937
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161862\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161862\"><\/AnnotationDrawer><div>The method of connecting a circulating water heater to the tank shall provide proper circulation of water through the water heater. The pipe or tubes required for the installation of appliances that will draw from the water heater or storage tank shall comply with the provisions of this code for material and installation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161863\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161863\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161863\"><\/AnnotationDrawer><h6><a name=\"JD_PC504\" id=\"JD_PC504\" title=\"PC 504\"><\/a>Section PC 504: Safety Devices<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24839-html-1",
+      "kind" : "html",
+      "plainText" : "The method of connecting a circulating water heater to the tank shall provide proper circulation of water through the water heater. The pipe or tubes required for the installation of appliances that will draw from the water heater or storage tank shall comply with the provisions of this code for material and installation.\n\n Section PC 504: Safety Devices"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 24839
+}

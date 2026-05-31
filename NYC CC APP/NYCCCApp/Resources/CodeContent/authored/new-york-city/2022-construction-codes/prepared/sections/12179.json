@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162289\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162289\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Pressure vacuum breaker assemblies shall conform to ASSE 1020 or CSA B64.1.2. Spill-resistant vacuum breaker assemblies shall comply with ASSE 1056. These assemblies are designed for installation under continuous pressure conditions where the critical level is installed at the required height. Pressure vacuum breaker assemblies shall not be installed in locations where spillage could cause damage to the structure.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12179-html-1",
+      "kind" : "html",
+      "plainText" : "Pressure vacuum breaker assemblies shall conform to ASSE 1020 or CSA B64.1.2. Spill-resistant vacuum breaker assemblies shall comply with ASSE 1056. These assemblies are designed for installation under continuous pressure conditions where the critical level is installed at the required height. Pressure vacuum breaker assemblies shall not be installed in locations where spillage could cause damage to the structure."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12179
+}

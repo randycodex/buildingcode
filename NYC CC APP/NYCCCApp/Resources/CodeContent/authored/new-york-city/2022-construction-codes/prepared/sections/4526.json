@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180626\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180626\"><\/AnnotationDrawer><div>Six core samples shall be obtained from each preconstruction test panel:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180627\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180627\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Three specimens with no reinforcing shall be sampled and prepared in accordance with ASTM C 42; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180628\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180628\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Three specimens with reinforcing steel. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4526-html-1",
+      "kind" : "html",
+      "plainText" : "Six core samples shall be obtained from each preconstruction test panel:\n\n 1. Three specimens with no reinforcing shall be sampled and prepared in accordance with ASTM C 42; and\n\n 2. Three specimens with reinforcing steel."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4526
+}

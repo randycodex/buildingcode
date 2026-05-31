@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164348\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164348\"><\/AnnotationDrawer><div>The lot diagram shall show compliance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Zoning Resolution,<\/span> indicating the size, height, and location of the proposed construction including parking and curb cuts; all existing structures on the zoning lot and their distances from lot and street lines; the established grade and existing curb elevations; and the proposed final grade elevations of the site shown by contours or spot grades at reasonable intervals. The lot diagram shall be drawn in accordance with an accurate boundary survey to the city datum, made by a land surveyor, which shall be attached to and form part of the application. A complete zoning analysis shall accompany the lot diagram with citation to the relevant sections of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Zoning Resolution.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13873-html-1",
+      "kind" : "html",
+      "plainText" : "The lot diagram shall show compliance with the New York City Zoning Resolution, indicating the size, height, and location of the proposed construction including parking and curb cuts; all existing structures on the zoning lot and their distances from lot and street lines; the established grade and existing curb elevations; and the proposed final grade elevations of the site shown by contours or spot grades at reasonable intervals. The lot diagram shall be drawn in accordance with an accurate boundary survey to the city datum, made by a land surveyor, which shall be attached to and form part of the application. A complete zoning analysis shall accompany the lot diagram with citation to the relevant sections of the New York City Zoning Resolution."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13873
+}

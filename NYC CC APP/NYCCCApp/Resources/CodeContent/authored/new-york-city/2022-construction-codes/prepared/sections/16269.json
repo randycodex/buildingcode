@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174137\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174137\"><\/AnnotationDrawer><div>Signs identifying stairways shall comply with Section 1023.9.1. Signs identifying floor levels shall comply with Sections 1023.9.2 through 1023.9.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16269-html-1",
+      "kind" : "html",
+      "plainText" : "Signs identifying stairways shall comply with Section 1023.9.1. Signs identifying floor levels shall comply with Sections 1023.9.2 through 1023.9.5."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16269
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183807\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183807\"><\/AnnotationDrawer><div>Elevator hoistways shall be pressurized to maintain a minimum positive pressure of 0.10 inches of water (25 Pa) and a maximum positive pressure of 0.25 inches of water (67 Pa) with respect to adjacent occupied space on all floors. This pressure shall be measured at the midpoint of each hoistway door, with all elevator cars at the floor of recall and all hoistway doors on the floor of recall open and all other hoistway doors closed. The opening and closing of hoistway doors at each level must be demonstrated during this test. The supply air intake shall be from an outside, uncontaminated source located a minimum distance of 20 feet (6096 mm) from any air exhaust system or outlet.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5475-html-1",
+      "kind" : "html",
+      "plainText" : "Elevator hoistways shall be pressurized to maintain a minimum positive pressure of 0.10 inches of water (25 Pa) and a maximum positive pressure of 0.25 inches of water (67 Pa) with respect to adjacent occupied space on all floors. This pressure shall be measured at the midpoint of each hoistway door, with all elevator cars at the floor of recall and all hoistway doors on the floor of recall open and all other hoistway doors closed. The opening and closing of hoistway doors at each level must be demonstrated during this test. The supply air intake shall be from an outside, uncontaminated source located a minimum distance of 20 feet (6096 mm) from any air exhaust system or outlet."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5475
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183699\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183699\"><\/AnnotationDrawer><div>Elevators provided in individual dwelling units in buildings in Occupancy Groups R-2 and R-3 shall comply with Section 3002.4.3.1 through 3002.4.3.3, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19261-html-1",
+      "kind" : "html",
+      "plainText" : "Elevators provided in individual dwelling units in buildings in Occupancy Groups R-2 and R-3 shall comply with Section 3002.4.3.1 through 3002.4.3.3, as applicable."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 19261
+}

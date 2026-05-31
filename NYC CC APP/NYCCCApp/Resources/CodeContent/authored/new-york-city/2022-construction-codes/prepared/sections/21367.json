@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199052\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199052\"><\/AnnotationDrawer><div>For multiple units of appliances all located on one floor, available total height (H) shall be measured from the highest draft hood outlet or flue collar up to the level of the outlet of the common vent.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21367-html-1",
+      "kind" : "html",
+      "plainText" : "For multiple units of appliances all located on one floor, available total height (H) shall be measured from the highest draft hood outlet or flue collar up to the level of the outlet of the common vent."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21367
+}

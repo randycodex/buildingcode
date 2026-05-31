@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162801\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162801\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The effluent level control shall be adjusted and maintained to at all times prevent the effluent from rising to within 2 inches (51 mm) of the invert of the gravity drain inlet into the sump.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12372-html-1",
+      "kind" : "html",
+      "plainText" : "The effluent level control shall be adjusted and maintained to at all times prevent the effluent from rising to within 2 inches (51 mm) of the invert of the gravity drain inlet into the sump."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12372
+}

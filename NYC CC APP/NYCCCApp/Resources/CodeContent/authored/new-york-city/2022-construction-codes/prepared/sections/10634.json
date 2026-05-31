@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194057\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194057\"><\/AnnotationDrawer><div>Hazardous exhaust systems shall be independent of other types of exhaust systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10634-html-1",
+      "kind" : "html",
+      "plainText" : "Hazardous exhaust systems shall be independent of other types of exhaust systems."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10634
+}

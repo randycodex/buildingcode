@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163116\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163116\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A vent shall not be installed within two pipe diameters of the trap weir<\/span><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163117\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163117\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163117\"><\/AnnotationDrawer><h6><a name=\"JD_PC910\" id=\"JD_PC910\" title=\"PC 910\"><\/a>Section PC 910: Individual Vent<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25327-html-1",
+      "kind" : "html",
+      "plainText" : "A vent shall not be installed within two pipe diameters of the trap weir . \n\n Section PC 910: Individual Vent"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25327
+}

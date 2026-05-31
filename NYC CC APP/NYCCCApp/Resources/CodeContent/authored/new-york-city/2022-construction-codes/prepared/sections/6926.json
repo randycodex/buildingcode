@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188263\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188263\"><\/AnnotationDrawer><div>Lists of stations, routes and destinations served by the station that are located on boarding areas, platforms or mezzanines shall provide visual characters complying with Section 703.2 (Visual Characters) of ICC A117.1. Signs covered by this provision shall, to the maximum extent practicable, be placed in uniform locations within the transit system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6926-html-1",
+      "kind" : "html",
+      "plainText" : "Lists of stations, routes and destinations served by the station that are located on boarding areas, platforms or mezzanines shall provide visual characters complying with Section 703.2 (Visual Characters) of ICC A117.1. Signs covered by this provision shall, to the maximum extent practicable, be placed in uniform locations within the transit system."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6926
+}

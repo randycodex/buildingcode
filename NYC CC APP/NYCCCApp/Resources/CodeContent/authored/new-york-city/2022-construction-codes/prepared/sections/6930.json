@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188272\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188272\"><\/AnnotationDrawer><div>Where a circulation path serving boarding platforms crosses tracks, an accessible route complying with ICC A117.1, including Section 402 (Accessible Routes) shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188273\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188273\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Openings for wheel flanges shall be permitted to be 2 1\/2 inches (64 mm) maximum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6930-html-1",
+      "kind" : "html",
+      "plainText" : "Where a circulation path serving boarding platforms crosses tracks, an accessible route complying with ICC A117.1, including Section 402 (Accessible Routes) shall be provided.\n\n Exception: Openings for wheel flanges shall be permitted to be 2 1\/2 inches (64 mm) maximum."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6930
+}

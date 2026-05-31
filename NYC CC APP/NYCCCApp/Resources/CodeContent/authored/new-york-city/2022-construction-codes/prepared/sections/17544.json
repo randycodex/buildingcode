@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178280\"><\/AnnotationDrawer><div>Nondestructive testing of structural steel elements in the seismic force-resisting systems of buildings and structures assigned to Seismic Design Category B, C or D other than those covered in Section 1705.2.5.1, including struts, collectors, chords and foundation elements, shall be performed in accordance with the quality assurance requirements of AISC 341.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178281\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178281\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Nondestructive testing of structural steel elements is not required in the seismic force-resisting systems of buildings and structures assigned to Seismic Design Category B or C with a response modification coefficient, R, of 3 or less.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17544-html-1",
+      "kind" : "html",
+      "plainText" : "Nondestructive testing of structural steel elements in the seismic force-resisting systems of buildings and structures assigned to Seismic Design Category B, C or D other than those covered in Section 1705.2.5.1, including struts, collectors, chords and foundation elements, shall be performed in accordance with the quality assurance requirements of AISC 341.\n\n Exception: Nondestructive testing of structural steel elements is not required in the seismic force-resisting systems of buildings and structures assigned to Seismic Design Category B or C with a response modification coefficient, R, of 3 or less."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17544
+}

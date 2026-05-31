@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196039\"><\/AnnotationDrawer><div>Pipe insulation installed in buildings shall conform to the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code,<\/span> shall be tested in accordance with ASTM E 84 or UL 723, using the specimen preparation and mounting procedures of ASTM E 2231; and shall have a maximum flame spread index of 25 and a smoke-developed index not exceeding 450. Insulation installed in an air plenum shall comply with Section 602.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196040\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196040\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205686', hash: '#JD_L.L.2009\/085' }}\">L.L. 2009\/085<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24153-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe insulation installed in buildings shall conform to the requirements of the New York City Energy Conservation Code, shall be tested in accordance with ASTM E 84 or UL 723, using the specimen preparation and mounting procedures of ASTM E 2231; and shall have a maximum flame spread index of 25 and a smoke-developed index not exceeding 450. Insulation installed in an air plenum shall comply with Section 602.2.1.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085 ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24153
+}

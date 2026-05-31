@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199457\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199457\"><\/AnnotationDrawer><div>Permanently fixed-in-place outdoor decorative appliances shall be tested in accordance with ANSI Z21.97\/CSA 2.41 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "21526-html-1",
+      "kind" : "html",
+      "plainText" : "Permanently fixed-in-place outdoor decorative appliances shall be tested in accordance with ANSI Z21.97\/CSA 2.41 and shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21526
+}

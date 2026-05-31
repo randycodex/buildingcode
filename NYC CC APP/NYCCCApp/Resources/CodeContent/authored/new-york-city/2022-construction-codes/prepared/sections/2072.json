@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172680\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172680\"><\/AnnotationDrawer><div>Activation of a carbon monoxide detector located at the source of carbon monoxide-producing equipment shall shut down that source.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172681\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> This provision does not apply where the source is a generator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2072-html-1",
+      "kind" : "html",
+      "plainText" : "Activation of a carbon monoxide detector located at the source of carbon monoxide-producing equipment shall shut down that source.\n\n Exception: This provision does not apply where the source is a generator."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2072
+}

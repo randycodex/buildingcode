@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175452\"><\/AnnotationDrawer><div>In prior code buildings, platform (wheelchair) lifts installed in accordance with Section 410 (Platform Lifts) of ICC A117.1, ASME A18.1, and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183610', hash: '#JD_BCCh.30' }}\">Chapter 30<\/Link> of this code, shall be permitted to be a part of the required accessible route. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16687-html-1",
+      "kind" : "html",
+      "plainText" : "In prior code buildings, platform (wheelchair) lifts installed in accordance with Section 410 (Platform Lifts) of ICC A117.1, ASME A18.1, and Chapter 30 of this code, shall be permitted to be a part of the required accessible route."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16687
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169205\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169205\"><\/AnnotationDrawer><div>The architect or engineer submitting the fire engineering analysis shall retain responsibility for the fire engineering analysis. The activities and reports of the fire protection peer reviewer shall not relieve the applicant of record of this responsibility.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14867-html-1",
+      "kind" : "html",
+      "plainText" : "The architect or engineer submitting the fire engineering analysis shall retain responsibility for the fire engineering analysis. The activities and reports of the fire protection peer reviewer shall not relieve the applicant of record of this responsibility."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14867
+}

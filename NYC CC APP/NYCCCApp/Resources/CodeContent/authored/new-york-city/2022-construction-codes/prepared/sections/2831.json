@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175377\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175377\"><\/AnnotationDrawer><div>LULA elevators shall comply with Section 408 (Limited-Use\/Limited-Application Elevators) of ICC A117.1 and with Part 5.2 of ASME A17.1 as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-189236', hash: '#JD_BCAppK' }}\">Appendix K<\/Link> of this code, and shall be limited to a maximum rise of not more than 25 feet (7620 mm). In new construction, such LULA elevators shall be permitted:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175378\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;To be a part of the required accessible route where either a wheelchair lift complying with Section 1109.7 is permitted or a private residence elevator complying with Section 409 (Private Residence Elevators) of ICC A117.1 is permitted;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175379\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;To be a part of the required accessible route in places of religious services; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175380\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175380\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;In multilevel buildings and facilities not required to have an accessible route pursuant to the exceptions in Section 1104.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2831-html-1",
+      "kind" : "html",
+      "plainText" : "LULA elevators shall comply with Section 408 (Limited-Use\/Limited-Application Elevators) of ICC A117.1 and with Part 5.2 of ASME A17.1 as modified by Appendix K of this code, and shall be limited to a maximum rise of not more than 25 feet (7620 mm). In new construction, such LULA elevators shall be permitted:\n\n 1. To be a part of the required accessible route where either a wheelchair lift complying with Section 1109.7 is permitted or a private residence elevator complying with Section 409 (Private Residence Elevators) of ICC A117.1 is permitted;\n\n 2. To be a part of the required accessible route in places of religious services; or\n\n 3. In multilevel buildings and facilities not required to have an accessible route pursuant to the exceptions in Section 1104.4."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2831
+}

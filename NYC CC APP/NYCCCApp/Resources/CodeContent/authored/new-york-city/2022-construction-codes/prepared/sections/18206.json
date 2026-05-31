@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180284\"><\/AnnotationDrawer><div>The frequency of conducting strength tests of concrete shall be as specified in Sections 1905.6.2.1 through 1905.6.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18206-html-1",
+      "kind" : "html",
+      "plainText" : "The frequency of conducting strength tests of concrete shall be as specified in Sections 1905.6.2.1 through 1905.6.2.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18206
+}

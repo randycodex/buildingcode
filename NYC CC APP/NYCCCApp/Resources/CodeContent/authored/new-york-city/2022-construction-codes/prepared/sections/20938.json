@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197830\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197830\"><\/AnnotationDrawer><div>Materials used for piping systems shall be new and comply with the requirements of this chapter or shall be approved.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20938-html-1",
+      "kind" : "html",
+      "plainText" : "Materials used for piping systems shall be new and comply with the requirements of this chapter or shall be approved."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20938
+}

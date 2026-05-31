@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170151\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170151\"><\/AnnotationDrawer><div>In reinforced concrete construction, gypsum plaster or portland cement plaster is permitted to be substituted for 1\/2 inch (12.7 mm) of the required poured concrete protection, except that a minimum thickness of 3\/8 inch (9.5 mm) of poured concrete shall be provided in reinforced concrete floors and 1 inch (25.4 mm) in reinforced concrete columns in addition to the plaster finish. The concrete base shall be prepared in accordance with Section 2510.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-170152\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-170152\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-170152\"><\/AnnotationDrawer><h6><a name=\"JD_BC720\" id=\"JD_BC720\" title=\"BC 720\"><\/a>Section BC 720: Thermal- and Sound-Insulating Materials<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1352-html-1",
+      "kind" : "html",
+      "plainText" : "In reinforced concrete construction, gypsum plaster or portland cement plaster is permitted to be substituted for 1\/2 inch (12.7 mm) of the required poured concrete protection, except that a minimum thickness of 3\/8 inch (9.5 mm) of poured concrete shall be provided in reinforced concrete floors and 1 inch (25.4 mm) in reinforced concrete columns in addition to the plaster finish. The concrete base shall be prepared in accordance with Section 2510.7.\n\n Section BC 720: Thermal- and Sound-Insulating Materials"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1352
+}

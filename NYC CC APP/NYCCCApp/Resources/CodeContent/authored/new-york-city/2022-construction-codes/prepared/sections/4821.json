@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181469\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181469\"><\/AnnotationDrawer><div>For cold-formed steel light-frame construction, the design and installation of non-structural members and connections shall be in accordance with AISI S220.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181470\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181470\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181470\"><\/AnnotationDrawer><h6><a name=\"JD_BC2212\" id=\"JD_BC2212\" title=\"BC 2212\"><\/a>Section BC 2212: Minimum Thickness of Metal<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4821-html-1",
+      "kind" : "html",
+      "plainText" : "For cold-formed steel light-frame construction, the design and installation of non-structural members and connections shall be in accordance with AISI S220.\n\n Section BC 2212: Minimum Thickness of Metal"
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4821
+}

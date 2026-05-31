@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199229\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199229\"><\/AnnotationDrawer><div>Direct-fired industrial air heaters shall be permitted to be installed in accordance with their listing and the manufacturer's instructions. Direct-fired industrial air heaters shall be installed only in industrial or commercial occupancies. Direct-fired industrial air heaters shall be permitted to provide fresh air ventilation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21439-html-1",
+      "kind" : "html",
+      "plainText" : "Direct-fired industrial air heaters shall be permitted to be installed in accordance with their listing and the manufacturer's instructions. Direct-fired industrial air heaters shall be installed only in industrial or commercial occupancies. Direct-fired industrial air heaters shall be permitted to provide fresh air ventilation."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21439
+}

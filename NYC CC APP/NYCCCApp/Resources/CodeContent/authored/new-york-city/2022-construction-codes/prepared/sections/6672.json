@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187311\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187311\"><\/AnnotationDrawer><div>In addition to a work lead attachment required by the welding process, a grounding conductor shall be connected from the scaffold to the structure. The size of the connector shall be at least the size of the welding process work lead, and this conductor shall not be in series with the welding process or the work piece.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6672-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to a work lead attachment required by the welding process, a grounding conductor shall be connected from the scaffold to the structure. The size of the connector shall be at least the size of the welding process work lead, and this conductor shall not be in series with the welding process or the work piece."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6672
+}

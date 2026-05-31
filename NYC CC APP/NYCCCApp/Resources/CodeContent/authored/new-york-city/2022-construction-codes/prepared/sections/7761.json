@@ -1,0 +1,49 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192195\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192195\"><\/AnnotationDrawer><div>Delete Figure 1 and replace as follows: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192196\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192196\"><\/AnnotationDrawer><div>",
+      "id" : "7761-html-1",
+      "kind" : "html",
+      "plainText" : "Delete Figure 1 and replace as follows:"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-1a-indirect-hung-suspension-system.jpg\" width=\"514\" height=\"231\"><\/img><\/span>",
+      "id" : "7761-image-2",
+      "imageID" : "building-code-figure-1a-indirect-hung-suspension-system.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192197\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192197\"><\/AnnotationDrawer><div><a name=\"JD_BCR102Figure1A\" id=\"JD_BCR102Figure1A\" title=\"BC R102 Figure 1A\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1A<br><\/br>Indirect Hung Suspension System<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192198\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192198\"><\/AnnotationDrawer><div>",
+      "id" : "7761-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 1A\n Indirect Hung Suspension System"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-1b-indirect-hung-suspension-system.jpg\" width=\"521.4\" height=\"203.133333333333\"><\/img><\/span>",
+      "id" : "7761-image-4",
+      "imageID" : "building-code-figure-1b-indirect-hung-suspension-system.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192199\"><\/AnnotationDrawer><div><a name=\"JD_BCR102Figure1B\" id=\"JD_BCR102Figure1B\" title=\"BC R102 Figure 1B\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1B<br><\/br>Indirect Hung Suspension System<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192200\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192200\"><\/AnnotationDrawer><div>",
+      "id" : "7761-html-5",
+      "kind" : "html",
+      "plainText" : "Figure 1B\n Indirect Hung Suspension System"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-1c-furring-bar-suspension-system.jpg\" width=\"520.4\" height=\"210.2\"><\/img><\/span>",
+      "id" : "7761-image-6",
+      "imageID" : "building-code-figure-1c-furring-bar-suspension-system.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192201\"><\/AnnotationDrawer><div><a name=\"JD_BCR102Figure1C\" id=\"JD_BCR102Figure1C\" title=\"BC R102 Figure 1C\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1C<br><\/br>Furring Bar Suspension System<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7761-html-7",
+      "kind" : "html",
+      "plainText" : "Figure 1C\n Furring Bar Suspension System"
+    }
+  ],
+  "chapterNumber" : "R",
+  "schemaVersion" : 1,
+  "sectionID" : 7761
+}

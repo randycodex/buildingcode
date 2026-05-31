@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167604\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167604\"><\/AnnotationDrawer><div>Storage of flammable liquids shall be in a liquid storage room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14404-html-1",
+      "kind" : "html",
+      "plainText" : "Storage of flammable liquids shall be in a liquid storage room."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14404
+}

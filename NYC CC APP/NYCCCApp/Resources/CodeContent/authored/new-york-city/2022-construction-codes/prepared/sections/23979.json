@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195576\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195576\"><\/AnnotationDrawer><div>Listed and labeled self-contained, factory-built equipment and appliances shall be tested in accordance with UL 207, 412, 471 or 1995. Such equipment and appliances are deemed to meet the design, manufacture and factory test requirements of this code if installed in accordance with their listing and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23979-html-1",
+      "kind" : "html",
+      "plainText" : "Listed and labeled self-contained, factory-built equipment and appliances shall be tested in accordance with UL 207, 412, 471 or 1995. Such equipment and appliances are deemed to meet the design, manufacture and factory test requirements of this code if installed in accordance with their listing and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 23979
+}

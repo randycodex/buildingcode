@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181090\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181090\"><\/AnnotationDrawer><div>Existing chimneys and vents shall comply with the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156201', hash: '#JD_28-104.13' }}\">28-104.13<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> and Sections 107.18 and 2113.1.5.1 through 2113.1.5.8 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4681-html-1",
+      "kind" : "html",
+      "plainText" : "Existing chimneys and vents shall comply with the requirements of Section 28-104.13 of the Administrative Code and Sections 107.18 and 2113.1.5.1 through 2113.1.5.8 of this code."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4681
+}

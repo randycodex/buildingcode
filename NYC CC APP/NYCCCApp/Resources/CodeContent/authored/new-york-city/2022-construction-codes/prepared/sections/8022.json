@@ -1,0 +1,25 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197502\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197502\"><\/AnnotationDrawer><div>Openings used to connect indoor spaces shall be sized and located in accordance with Sections 304.5.3.1 and 304.5.3.2 (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-197501', hash: '#JD_FGCFigure304.5.3' }}\">Figure 304.5.3<\/Link>).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197503\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197503\"><\/AnnotationDrawer><div>",
+      "id" : "8022-html-1",
+      "kind" : "html",
+      "plainText" : "Openings used to connect indoor spaces shall be sized and located in accordance with Sections 304.5.3.1 and 304.5.3.2 (see Figure 304.5.3 )."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/9468c77100d62ccfc5ef1c660a6d94db4e5e3213.png\" width=\"480\" height=\"507.333333333333\"><\/img><\/span>",
+      "id" : "8022-image-2",
+      "imageID" : "9468c77100d62ccfc5ef1c660a6d94db4e5e3213.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197504\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197504\"><\/AnnotationDrawer><div><a name=\"JD_FGCFigure304.5.3\" id=\"JD_FGCFigure304.5.3\" title=\"FGC Figure 304.5.3\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 304.5.3<br><\/br>All Air From Inside the Building<br><\/br>(see Section 304.5.3)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8022-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 304.5.3\n All Air From Inside the Building\n (see Section 304.5.3)"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8022
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195374\"><\/AnnotationDrawer><div>Kilns shall be listed and labeled unless otherwise approved in accordance with Section 105.1 Electric kilns shall comply with UL 499. The approval of unlisted appliances in accordance with Section 105.1 shall be based on approved engineering evaluation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11086-html-1",
+      "kind" : "html",
+      "plainText" : "Kilns shall be listed and labeled unless otherwise approved in accordance with Section 105.1 Electric kilns shall comply with UL 499. The approval of unlisted appliances in accordance with Section 105.1 shall be based on approved engineering evaluation."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11086
+}

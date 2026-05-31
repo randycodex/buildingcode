@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188904\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188904\"><\/AnnotationDrawer><div>Buildings whose main use or dominant occupancy is Group I-2 hospital and that are located in a flood hazard area shall be provided with connections for temporary external boilers and chillers in accordance with Section G304.5.2 by January 1, 2033, and a report detailing compliance with such requirements shall be filed with the department in accordance with Section G312.3.2 by such date.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13119-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings whose main use or dominant occupancy is Group I-2 hospital and that are located in a flood hazard area shall be provided with connections for temporary external boilers and chillers in accordance with Section G304.5.2 by January 1, 2033, and a report detailing compliance with such requirements shall be filed with the department in accordance with Section G312.3.2 by such date."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13119
+}

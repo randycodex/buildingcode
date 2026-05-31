@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162275\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162275\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The interior surface of a potable water tank shall not be lined, painted or repaired with any material that changes the taste, odor, color or potability of the water supply when the tank is placed in, or returned to, service. Linings, paints, and repairs must be in accordance with the requirements of the Department of Health and Mental Hygiene.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12172-html-1",
+      "kind" : "html",
+      "plainText" : "The interior surface of a potable water tank shall not be lined, painted or repaired with any material that changes the taste, odor, color or potability of the water supply when the tank is placed in, or returned to, service. Linings, paints, and repairs must be in accordance with the requirements of the Department of Health and Mental Hygiene."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12172
+}

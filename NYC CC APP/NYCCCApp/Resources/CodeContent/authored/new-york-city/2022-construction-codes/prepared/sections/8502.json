@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198862\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198862\"><\/AnnotationDrawer><div>Draft hoods and barometric draft regulators shall be installed in the same room or enclosure as the appliance in such a manner as to prevent any difference in pressure between the hood or regulator and the combustion air supply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8502-html-1",
+      "kind" : "html",
+      "plainText" : "Draft hoods and barometric draft regulators shall be installed in the same room or enclosure as the appliance in such a manner as to prevent any difference in pressure between the hood or regulator and the combustion air supply."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8502
+}

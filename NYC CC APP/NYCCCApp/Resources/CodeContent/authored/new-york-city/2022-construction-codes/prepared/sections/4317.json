@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180097\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180097\"><\/AnnotationDrawer><div>The engineer of record for the foundation design shall identify that a new review is required based upon changes to the design documents relevant to the scope of the peer review. The geotechnical peer reviewer shall review the items that have been affected and shall revise the geotechnical peer review report.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4317-html-1",
+      "kind" : "html",
+      "plainText" : "The engineer of record for the foundation design shall identify that a new review is required based upon changes to the design documents relevant to the scope of the peer review. The geotechnical peer reviewer shall review the items that have been affected and shall revise the geotechnical peer review report."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4317
+}

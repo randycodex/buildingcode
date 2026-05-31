@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188645\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188645\"><\/AnnotationDrawer><div>Development or land-disturbing activity shall not be authorized in the floodway unless it has been demonstrated through hydrologic and hydraulic analyses performed in accordance with standard engineering practice, and prepared by a registered design professional, that the proposed encroachment will not result in any increase in the base flood level, in accordance with Section G103.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13007-html-1",
+      "kind" : "html",
+      "plainText" : "Development or land-disturbing activity shall not be authorized in the floodway unless it has been demonstrated through hydrologic and hydraulic analyses performed in accordance with standard engineering practice, and prepared by a registered design professional, that the proposed encroachment will not result in any increase in the base flood level, in accordance with Section G103.5."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13007
+}

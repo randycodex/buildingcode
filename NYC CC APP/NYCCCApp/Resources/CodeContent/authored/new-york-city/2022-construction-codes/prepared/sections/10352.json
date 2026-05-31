@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193235\"><\/AnnotationDrawer><div>Buildings that are not more than three stories in height above grade plane, and that (i) are within Occupancy Group R-2 or Occupancy Group R-3, (ii) are adult homes or enriched living housing as described in Section 308.3.1 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>, within Occupancy Group I-1 and have 16 occupants or fewer, or (iii) are community residences or intermediate-care facilities as described in Section 308.3.2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>, shall be provided with outdoor air and local exhaust in accordance with Section 403.3.1.1.2. All other buildings intended to be occupied shall be provided with outdoor air and local exhaust in accordance with Sections 403.3.1.1 through 403.3.1.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10352-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings that are not more than three stories in height above grade plane, and that (i) are within Occupancy Group R-2 or Occupancy Group R-3, (ii) are adult homes or enriched living housing as described in Section 308.3.1 of the New York City Building Code , within Occupancy Group I-1 and have 16 occupants or fewer, or (iii) are community residences or intermediate-care facilities as described in Section 308.3.2 of the New York City Building Code , shall be provided with outdoor air and local exhaust in accordance with Section 403.3.1.1.2. All other buildings intended to be occupied shall be provided with outdoor air and local exhaust in accordance with Sections 403.3.1.1 through 403.3.1.6."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 10352
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180294\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180294\"><\/AnnotationDrawer><div>Standard-cured specimens shall comply with the provisions of Sections 1905.6.3.1 through 1905.6.3.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18211-html-1",
+      "kind" : "html",
+      "plainText" : "Standard-cured specimens shall comply with the provisions of Sections 1905.6.3.1 through 1905.6.3.9."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18211
+}

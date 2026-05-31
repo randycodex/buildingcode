@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168145\"><\/AnnotationDrawer><div>Hydrogen fuel gas rooms shall not be used for storage of gaseous hydrogen in quantities exceeding the maximum allowable quantity per control area set forth in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166067', hash: '#JD_BCTable307.1(1)' }}\">Table 307.1(1)<\/Link>. Where approved by the Fire Department, such hydrogen fuel gas rooms permitted to store greater quantities shall be classified as Occupancy Group H.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14580-html-1",
+      "kind" : "html",
+      "plainText" : "Hydrogen fuel gas rooms shall not be used for storage of gaseous hydrogen in quantities exceeding the maximum allowable quantity per control area set forth in Table 307.1(1) . Where approved by the Fire Department, such hydrogen fuel gas rooms permitted to store greater quantities shall be classified as Occupancy Group H."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14580
+}

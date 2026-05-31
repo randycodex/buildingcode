@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181287\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181287\"><\/AnnotationDrawer><div>Load-bearing masonry structures shall be reinforced to meet all of the requirements of this section. However, reinforcement provided for gravity, seismic or wind forces or for other purposes may be regarded as satisfying part of, or the whole of, these requirements. Reinforcement provided for one requirement may be counted towards the other requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18572-html-1",
+      "kind" : "html",
+      "plainText" : "Load-bearing masonry structures shall be reinforced to meet all of the requirements of this section. However, reinforcement provided for gravity, seismic or wind forces or for other purposes may be regarded as satisfying part of, or the whole of, these requirements. Reinforcement provided for one requirement may be counted towards the other requirements."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18572
+}

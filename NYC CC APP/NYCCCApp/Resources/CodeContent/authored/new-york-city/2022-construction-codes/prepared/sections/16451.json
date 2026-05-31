@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174751\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174751\"><\/AnnotationDrawer><div>The provisions of this chapter and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188136', hash: '#JD_BCAppE' }}\">Appendices E<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224612', hash: '#JD_BCAppN' }}\">N<\/Link> shall control the design and construction of facilities for accessibility for individuals with disabilities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16451-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this chapter and Appendices E and N shall control the design and construction of facilities for accessibility for individuals with disabilities."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16451
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184231\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184231\"><\/AnnotationDrawer><div>No overhead electrical conductors shall be installed within 15 feet (4572 mm) of any swimming pool. All metal fences, enclosures, or railings that might become electrically charged as a result of contact with broken overhead conductors or from any other cause near, or adjacent to, a swimming pool shall be grounded in accordance with the provisions of lightning protection in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5636-html-1",
+      "kind" : "html",
+      "plainText" : "No overhead electrical conductors shall be installed within 15 feet (4572 mm) of any swimming pool. All metal fences, enclosures, or railings that might become electrically charged as a result of contact with broken overhead conductors or from any other cause near, or adjacent to, a swimming pool shall be grounded in accordance with the provisions of lightning protection in the New York City Electrical Code."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5636
+}

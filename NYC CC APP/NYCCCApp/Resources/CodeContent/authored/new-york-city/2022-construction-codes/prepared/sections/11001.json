@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195175\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195175\"><\/AnnotationDrawer><div>A gasketed fireplace door shall not be installed on a factory-built fireplace except where the fireplace system has been specifically tested, listed and labeled for such use in accordance with UL 127.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11001-html-1",
+      "kind" : "html",
+      "plainText" : "A gasketed fireplace door shall not be installed on a factory-built fireplace except where the fireplace system has been specifically tested, listed and labeled for such use in accordance with UL 127."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11001
+}

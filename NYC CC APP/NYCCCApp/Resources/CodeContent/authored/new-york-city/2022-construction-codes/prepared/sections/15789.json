@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172405\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172405\"><\/AnnotationDrawer><div>Access to the interior exit stairway or ramp shall be by way of a vestibule or an open exterior balcony, unless such stairway is pressurized in accordance with Section 909.20.5. The minimum dimension of the vestibule or open exterior balcony shall not be less than the required width of the corridor leading to the vestibule or open exterior balcony but shall not have a width of less than 44 inches (1117.6 mm) and shall not have a length of less than 72 inches (1828.8 mm) in the direction of egress travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15789-html-1",
+      "kind" : "html",
+      "plainText" : "Access to the interior exit stairway or ramp shall be by way of a vestibule or an open exterior balcony, unless such stairway is pressurized in accordance with Section 909.20.5. The minimum dimension of the vestibule or open exterior balcony shall not be less than the required width of the corridor leading to the vestibule or open exterior balcony but shall not have a width of less than 44 inches (1117.6 mm) and shall not have a length of less than 72 inches (1828.8 mm) in the direction of egress travel."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15789
+}

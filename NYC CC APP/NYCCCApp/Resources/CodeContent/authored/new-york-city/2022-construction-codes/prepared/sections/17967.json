@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179605\"><\/AnnotationDrawer><div>Where subject to uplift, or where the required moment strength determined using the load combinations of Section 1605.2 exceeds the design cracking moment determined in accordance with Section 1812.1.2.1, cast-in-place concrete piles not enclosed by a structural steel pipe or tube shall be reinforced.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17967-html-1",
+      "kind" : "html",
+      "plainText" : "Where subject to uplift, or where the required moment strength determined using the load combinations of Section 1605.2 exceeds the design cracking moment determined in accordance with Section 1812.1.2.1, cast-in-place concrete piles not enclosed by a structural steel pipe or tube shall be reinforced."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17967
+}

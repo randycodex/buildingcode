@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167025\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167025\"><\/AnnotationDrawer><div>Repair garages shall be constructed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and Sections 406.8.1 through 406.8.6 of this code. This occupancy shall not include motor fuel-dispensing facilities, as regulated in Section 406.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "385-html-1",
+      "kind" : "html",
+      "plainText" : "Repair garages shall be constructed in accordance with the New York City Fire Code and Sections 406.8.1 through 406.8.6 of this code. This occupancy shall not include motor fuel-dispensing facilities, as regulated in Section 406.7."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 385
+}

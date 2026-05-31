@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181602\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181602\"><\/AnnotationDrawer><div>Particleboard floor underlayment shall conform to Type PBU of ANSI A208.1. Type PBU underlayment shall not be less than 1\/4-inch (6.4 mm) thick and shall be installed in accordance with the instructions of the Composite Panel Association.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4847-html-1",
+      "kind" : "html",
+      "plainText" : "Particleboard floor underlayment shall conform to Type PBU of ANSI A208.1. Type PBU underlayment shall not be less than 1\/4-inch (6.4 mm) thick and shall be installed in accordance with the instructions of the Composite Panel Association."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4847
+}

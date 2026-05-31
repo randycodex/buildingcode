@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192895\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192895\"><\/AnnotationDrawer><div>For buildings in coastal high-hazard areas and coastal A-zones as established in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188339', hash: '#JD_BCG102' }}\">G102<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>, mechanical systems and equipment shall not be mounted on or penetrate through breakaway walls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23055-html-1",
+      "kind" : "html",
+      "plainText" : "For buildings in coastal high-hazard areas and coastal A-zones as established in Section G102 of the New York City Building Code , mechanical systems and equipment shall not be mounted on or penetrate through breakaway walls."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23055
+}

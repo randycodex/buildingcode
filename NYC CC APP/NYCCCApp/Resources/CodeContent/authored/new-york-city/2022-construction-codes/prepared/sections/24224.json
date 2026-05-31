@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196195\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196195\"><\/AnnotationDrawer><div>A ground-source heat pump ground-loop piping system shall not be in direct contact with building materials that cause the piping or fitting material to degrade or corrode, or that interfere with the operation of the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24224-html-1",
+      "kind" : "html",
+      "plainText" : "A ground-source heat pump ground-loop piping system shall not be in direct contact with building materials that cause the piping or fitting material to degrade or corrode, or that interfere with the operation of the system."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24224
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192942\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192942\"><\/AnnotationDrawer><div>Appliances shall not be located in a hazardous location unless listed and approved for the specific installation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23077-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances shall not be located in a hazardous location unless listed and approved for the specific installation."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23077
+}

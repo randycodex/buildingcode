@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197970\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197970\"><\/AnnotationDrawer><div>Ferrous metal exposed in exterior locations shall be protected from corrosion by one of the following methods:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197971\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197971\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Zinc coatings (galvanizing).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197972\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Bonded coatings in accordance with Section 404.11.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197973\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197973\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Protective coatings in accordance with Section 404.11.5.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197974\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197974\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Protective wrappings in accordance with Section 404.11.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20999-html-1",
+      "kind" : "html",
+      "plainText" : "Ferrous metal exposed in exterior locations shall be protected from corrosion by one of the following methods:\n\n 1. Zinc coatings (galvanizing).\n\n 2. Bonded coatings in accordance with Section 404.11.4.\n\n 3. Protective coatings in accordance with Section 404.11.5.\n\n 4. Protective wrappings in accordance with Section 404.11.6."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20999
+}

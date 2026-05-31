@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182882\"><\/AnnotationDrawer><div>Lathing, plastering, gypsum board and gypsum panel product construction shall be done in the manner and with the materials specified in this chapter and the referenced standards listed in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182877', hash: '#JD_BCCh.25' }}\">Chapter 35<\/Link>. When fire protection is required, such construction shall also comply with the provisions of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168909', hash: '#JD_BCCh.7' }}\">Chapter 7<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182883\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224452\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18991-html-1",
+      "kind" : "html",
+      "plainText" : "Lathing, plastering, gypsum board and gypsum panel product construction shall be done in the manner and with the materials specified in this chapter and the referenced standards listed in Chapter 35 . When fire protection is required, such construction shall also comply with the provisions of Chapter 7 . \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 18991
+}

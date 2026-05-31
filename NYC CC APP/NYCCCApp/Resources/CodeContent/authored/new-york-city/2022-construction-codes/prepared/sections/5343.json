@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183454\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183454\"><\/AnnotationDrawer><div>Packages and containers of fiber-reinforced polymer and their components delivered to the job site shall bear the label of an approved agency showing the manufacturer's name, product listing, product identification and information sufficient to determine that the end use will comply with the code requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5343-html-1",
+      "kind" : "html",
+      "plainText" : "Packages and containers of fiber-reinforced polymer and their components delivered to the job site shall bear the label of an approved agency showing the manufacturer's name, product listing, product identification and information sufficient to determine that the end use will comply with the code requirements."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5343
+}

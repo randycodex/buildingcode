@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182384\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182384\"><\/AnnotationDrawer><div>Where all-wood foundations are used, the force transfer from the braced wall lines shall be determined based on calculation and shall have a capacity that is not less than the connections required by Section 2308.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18881-html-1",
+      "kind" : "html",
+      "plainText" : "Where all-wood foundations are used, the force transfer from the braced wall lines shall be determined based on calculation and shall have a capacity that is not less than the connections required by Section 2308.3."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18881
+}

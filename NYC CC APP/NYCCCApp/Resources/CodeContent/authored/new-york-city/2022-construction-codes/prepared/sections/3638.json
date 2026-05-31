@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178027\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178027\"><\/AnnotationDrawer><div>The structural peer review shall comply with Sections 1618.6.1 and 1618.6.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3638-html-1",
+      "kind" : "html",
+      "plainText" : "The structural peer review shall comply with Sections 1618.6.1 and 1618.6.2."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3638
+}

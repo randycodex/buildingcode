@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175120\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175120\"><\/AnnotationDrawer><div>Except as otherwise provided by rules of the department for the purposes of complying with rules and regulations established by the United States Postal Service and\/or the United States Department of Housing and Urban Development, where mailboxes are provided for each dwelling unit or sleeping unit in an interior location, 100% of such mailboxes shall comply with ICC A117.1, and the operable parts of such mailboxes shall be no higher than 48 inches (1220 mm) above the finished floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16567-html-1",
+      "kind" : "html",
+      "plainText" : "Except as otherwise provided by rules of the department for the purposes of complying with rules and regulations established by the United States Postal Service and\/or the United States Department of Housing and Urban Development, where mailboxes are provided for each dwelling unit or sleeping unit in an interior location, 100% of such mailboxes shall comply with ICC A117.1, and the operable parts of such mailboxes shall be no higher than 48 inches (1220 mm) above the finished floor."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16567
+}

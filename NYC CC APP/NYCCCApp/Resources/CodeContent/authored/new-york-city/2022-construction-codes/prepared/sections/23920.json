@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195401\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195401\"><\/AnnotationDrawer><div>Finish materials installed over radiant heating panels and systems shall be installed in accordance with the manufacturer's instructions. Surfaces shall be secured so that fasteners do not pierce the radiant heating elements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195402\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195402\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195402\"><\/AnnotationDrawer><h6><a name=\"JD_MC928\" id=\"JD_MC928\" title=\"MC 928\"><\/a>Section MC 928: Evaporative Coolers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23920-html-1",
+      "kind" : "html",
+      "plainText" : "Finish materials installed over radiant heating panels and systems shall be installed in accordance with the manufacturer's instructions. Surfaces shall be secured so that fasteners do not pierce the radiant heating elements.\n\n Section MC 928: Evaporative Coolers"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23920
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196077\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196077\"><\/AnnotationDrawer><div>Steam piping shall be installed to drain to the boiler or the steam trap. Steam systems shall not have drip pockets that reduce the capacity of the steam piping.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24170-html-1",
+      "kind" : "html",
+      "plainText" : "Steam piping shall be installed to drain to the boiler or the steam trap. Steam systems shall not have drip pockets that reduce the capacity of the steam piping."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24170
+}

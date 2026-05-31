@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168283\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168283\"><\/AnnotationDrawer><div>The total quantity of flammable solids allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 10 pounds (4.5 kg).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168284\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The total quantity of flammable solids allowed within a laboratory unit that is provided with walls, floors and ceilings that separate the laboratory unit from all adjoining areas by 2-hour fire-rated construction shall not exceed 15 pounds (6.8 kg).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14629-html-1",
+      "kind" : "html",
+      "plainText" : "The total quantity of flammable solids allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 10 pounds (4.5 kg).\n\n Exception: The total quantity of flammable solids allowed within a laboratory unit that is provided with walls, floors and ceilings that separate the laboratory unit from all adjoining areas by 2-hour fire-rated construction shall not exceed 15 pounds (6.8 kg)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14629
+}

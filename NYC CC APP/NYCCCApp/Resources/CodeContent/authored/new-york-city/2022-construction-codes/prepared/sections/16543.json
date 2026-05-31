@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175039\"><\/AnnotationDrawer><div>Grab bars for water closets shall comply with Section 609 of ICC A117.1 and shall be provided in accordance with Sections 1107.2.2.7.3.1 through 1107.2.2.7.3.2 of this code. Mounting heights of grab bars shall comply with Section 609.4 of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175040\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175040\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Grab bars are not required to be installed where reinforcement for such grab bars is installed and located to permit future installation of grab bars complying with Section 1107.2.2.7.3 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16543-html-1",
+      "kind" : "html",
+      "plainText" : "Grab bars for water closets shall comply with Section 609 of ICC A117.1 and shall be provided in accordance with Sections 1107.2.2.7.3.1 through 1107.2.2.7.3.2 of this code. Mounting heights of grab bars shall comply with Section 609.4 of ICC A117.1.\n\n Exception: Grab bars are not required to be installed where reinforcement for such grab bars is installed and located to permit future installation of grab bars complying with Section 1107.2.2.7.3 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16543
+}

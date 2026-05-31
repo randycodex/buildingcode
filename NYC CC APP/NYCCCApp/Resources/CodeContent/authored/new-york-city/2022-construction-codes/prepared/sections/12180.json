@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162291\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162291\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Pipe applied atmospheric-type vacuum breakers shall conform to ASSE 1001 or CSA B64.1.1. Hose-connection vacuum breakers shall conform to ASME A112.21.3, ASSE 1011, ASSE 1019, ASSE 1035, ASSE 1052, CSA B64.2, CSA B64.2.1, CSA B64.2.1.1, CSA B64.2.2 or CSA B64.7. These devices shall operate under normal atmospheric pressure when the critical level is installed at the required height.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12180-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe applied atmospheric-type vacuum breakers shall conform to ASSE 1001 or CSA B64.1.1. Hose-connection vacuum breakers shall conform to ASME A112.21.3, ASSE 1011, ASSE 1019, ASSE 1035, ASSE 1052, CSA B64.2, CSA B64.2.1, CSA B64.2.1.1, CSA B64.2.2 or CSA B64.7. These devices shall operate under normal atmospheric pressure when the critical level is installed at the required height."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12180
+}

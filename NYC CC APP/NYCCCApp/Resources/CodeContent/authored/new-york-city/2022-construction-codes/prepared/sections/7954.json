@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197337\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197337\"><\/AnnotationDrawer><div>The requirements for combustion and dilution air for gas-fired appliances shall be governed by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-197463', hash: '#JD_FGC304' }}\">304<\/Link>. The requirements for combustion and dilution air for appliances operating with fuels other than fuel gas shall be regulated by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7954-html-1",
+      "kind" : "html",
+      "plainText" : "The requirements for combustion and dilution air for gas-fired appliances shall be governed by Section 304 . The requirements for combustion and dilution air for appliances operating with fuels other than fuel gas shall be regulated by the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 7954
+}

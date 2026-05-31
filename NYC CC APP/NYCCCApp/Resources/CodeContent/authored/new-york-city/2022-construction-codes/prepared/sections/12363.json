@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162782\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162782\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where a vertical offset occurs in a soil or waste stack below the lowest horizontal branch, a change in diameter of the stack because of the offset shall not be required. If a horizontal offset occurs in a soil or waste stack below the lowest horizontal branch, the required diameter of the offset and the stack below it shall be determined as for a building drain in accordance with <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162751', hash: '#JD_PCTable710.1(1)' }}\">Table 710.1(1)<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162783\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162783\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162783\"><\/AnnotationDrawer><h6><a name=\"JD_PC712\" id=\"JD_PC712\" title=\"PC 712\"><\/a>Section PC 712: Ejectors<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12363-html-1",
+      "kind" : "html",
+      "plainText" : "Where a vertical offset occurs in a soil or waste stack below the lowest horizontal branch, a change in diameter of the stack because of the offset shall not be required. If a horizontal offset occurs in a soil or waste stack below the lowest horizontal branch, the required diameter of the offset and the stack below it shall be determined as for a building drain in accordance with Table 710.1(1) . \n\n Section PC 712: Ejectors"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12363
+}

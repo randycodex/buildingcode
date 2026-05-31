@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169427\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169427\"><\/AnnotationDrawer><div>Horizontal assemblies shall comply with Section 711.2. Nonfire-resistance-rated floor and roof assemblies shall comply with Section 711.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14946-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal assemblies shall comply with Section 711.2. Nonfire-resistance-rated floor and roof assemblies shall comply with Section 711.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14946
+}

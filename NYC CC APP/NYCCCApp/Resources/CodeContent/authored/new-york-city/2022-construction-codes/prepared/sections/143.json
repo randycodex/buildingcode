@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165984\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165984\"><\/AnnotationDrawer><div>Factory Industrial Group F occupancy includes, among others, the use of a building or structure, or a portion thereof, for assembling, disassembling, fabricating, finishing, manufacturing, packaging, repair, cleaning, laundering or processing operations that are not classified as a Group H hazardous occupancy. Factory Industrial Group F occupancy also includes certain mechanical and\/or electrical equipment rooms in accordance with Section 306.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "143-html-1",
+      "kind" : "html",
+      "plainText" : "Factory Industrial Group F occupancy includes, among others, the use of a building or structure, or a portion thereof, for assembling, disassembling, fabricating, finishing, manufacturing, packaging, repair, cleaning, laundering or processing operations that are not classified as a Group H hazardous occupancy. Factory Industrial Group F occupancy also includes certain mechanical and\/or electrical equipment rooms in accordance with Section 306.3."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 143
+}

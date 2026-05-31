@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164279\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164279\"><\/annotationdrawer><div>The legal occupancy of any structure lawfully in existence at the time of the adoption or a subsequent amendment of this code shall be permitted to continue without change, except as is otherwise specifically provided in this code or as is deemed necessary by the commissioner for the general safety and welfare of the occupants and the public. Refer to <link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-237170', hash: '#JD_T28C001' }}\">Chapter 1 of Title 28 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> for additional provisions relating to existing structures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><codeoptions destid=\"rid-0-0-0-164280\" class=\"Section\"><\/codeoptions><div id=\"rid-0-0-0-164280\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><annotationdrawer recordid=\"0-0-0-164280\"><\/annotationdrawer><h6><a name=\"JD_BC103\" id=\"JD_BC103\" title=\"BC 103\"><\/a>Section BC 103: Department of Buildings<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17-html-1",
+      "kind" : "html",
+      "plainText" : "The legal occupancy of any structure lawfully in existence at the time of the adoption or a subsequent amendment of this code shall be permitted to continue without change, except as is otherwise specifically provided in this code or as is deemed necessary by the commissioner for the general safety and welfare of the occupants and the public. Refer to Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to existing structures.\n\n Section BC 103: Department of Buildings"
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 17
+}

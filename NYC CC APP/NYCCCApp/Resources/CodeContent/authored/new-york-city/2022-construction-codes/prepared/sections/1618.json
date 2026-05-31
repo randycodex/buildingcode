@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171352\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171352\"><\/AnnotationDrawer><div>An automatic sprinkler system shall be installed at the top of rubbish and linen chutes, in chute access rooms, and in their terminal rooms. Chutes shall have additional sprinkler heads installed at alternate floors and at the lowest intake. Where a rubbish chute extends through a building more than one floor below the lowest intake, or through areas with no openings, such an extension shall have sprinklers installed that are recessed from the drop area of the chute and protected from freezing in accordance with Section 903.3.1.1. Such sprinklers shall be installed at alternate floors, beginning with the second level below the last intake and ending with the floor above the discharge. All chute sprinklers shall be accessible for servicing and shall not obstruct the vertical path for rubbish or linens.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1618-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system shall be installed at the top of rubbish and linen chutes, in chute access rooms, and in their terminal rooms. Chutes shall have additional sprinkler heads installed at alternate floors and at the lowest intake. Where a rubbish chute extends through a building more than one floor below the lowest intake, or through areas with no openings, such an extension shall have sprinklers installed that are recessed from the drop area of the chute and protected from freezing in accordance with Section 903.3.1.1. Such sprinklers shall be installed at alternate floors, beginning with the second level below the last intake and ending with the floor above the discharge. All chute sprinklers shall be accessible for servicing and shall not obstruct the vertical path for rubbish or linens."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1618
+}

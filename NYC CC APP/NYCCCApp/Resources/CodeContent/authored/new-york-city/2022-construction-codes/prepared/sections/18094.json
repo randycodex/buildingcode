@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179957\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179957\"><\/AnnotationDrawer><div>If the foundation loads are to be transferred to a lower bearing level, underpinning consisting of concrete piers, drilled piles, jacked piles, bracket piles, or similar engineered systems to transfer the existing building loads below the bottom of the proposed excavation shall be installed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179958\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179958\"><\/AnnotationDrawer><div>The bearing pressure at the base of the underpinning shall be computed accounting for all vertical loads and any overturning moments present due to lateral earth and water pressures, and shall be less than or equal to the allowable bearing pressure of the bearing stratum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18094-html-1",
+      "kind" : "html",
+      "plainText" : "If the foundation loads are to be transferred to a lower bearing level, underpinning consisting of concrete piers, drilled piles, jacked piles, bracket piles, or similar engineered systems to transfer the existing building loads below the bottom of the proposed excavation shall be installed.\n\n The bearing pressure at the base of the underpinning shall be computed accounting for all vertical loads and any overturning moments present due to lateral earth and water pressures, and shall be less than or equal to the allowable bearing pressure of the bearing stratum."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18094
+}

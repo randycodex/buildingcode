@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185899\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185899\"><\/AnnotationDrawer><div>The permit holder shall notify the department and adjoining property owners prior to the commencement of full and partial demolition operations in accordance with Sections 3306.3.1 and 3306.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185900\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185900\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185901\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185901\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Notification to the department or adjoining property owners is not required for partial demolition operations limited to the interior components of a building provided no mechanical demolition equipment, other than handheld devices, are used.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185902\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Notification to the department or adjoining property owners is not required for partial demolition that occurs on the exterior of a building, provided such work is a minor alteration or ordinary repair, and is accomplished without any mechanical demolition equipment, other than handheld devices.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20054-html-1",
+      "kind" : "html",
+      "plainText" : "The permit holder shall notify the department and adjoining property owners prior to the commencement of full and partial demolition operations in accordance with Sections 3306.3.1 and 3306.3.2.\n\n Exceptions: \n\n 1. Notification to the department or adjoining property owners is not required for partial demolition operations limited to the interior components of a building provided no mechanical demolition equipment, other than handheld devices, are used.\n\n 2. Notification to the department or adjoining property owners is not required for partial demolition that occurs on the exterior of a building, provided such work is a minor alteration or ordinary repair, and is accomplished without any mechanical demolition equipment, other than handheld devices."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20054
+}

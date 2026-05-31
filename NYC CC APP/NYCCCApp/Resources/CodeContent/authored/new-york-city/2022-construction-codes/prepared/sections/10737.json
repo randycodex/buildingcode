@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194364\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194364\"><\/AnnotationDrawer><div>Air dispersion systems shall:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194365\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194365\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Be installed entirely in exposed locations or in underfloor air supply plenums.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194366\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194366\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Be utilized in systems under positive pressure.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194367\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194367\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Not pass through or penetrate fire-resistant-rated construction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194368\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194368\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Be listed and labeled in compliance with UL 2518.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10737-html-1",
+      "kind" : "html",
+      "plainText" : "Air dispersion systems shall:\n\n 1. Be installed entirely in exposed locations or in underfloor air supply plenums.\n\n 2. Be utilized in systems under positive pressure.\n\n 3. Not pass through or penetrate fire-resistant-rated construction.\n\n 4. Be listed and labeled in compliance with UL 2518."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10737
+}

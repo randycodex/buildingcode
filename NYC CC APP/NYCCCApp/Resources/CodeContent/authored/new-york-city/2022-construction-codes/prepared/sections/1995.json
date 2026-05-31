@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172483\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172483\"><\/AnnotationDrawer><div>Special inspections for performance shall be required in accordance with Section 909.18.8. System acceptance testing shall be in accordance with Section 909.19.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1995-html-1",
+      "kind" : "html",
+      "plainText" : "Special inspections for performance shall be required in accordance with Section 909.18.8. System acceptance testing shall be in accordance with Section 909.19."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1995
+}

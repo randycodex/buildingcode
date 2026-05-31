@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181358\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181358\"><\/AnnotationDrawer><div>Systems of structural steel elements acting compositely with reinforced concrete shall be designed in accordance with AISC 360 and ACI 318, excluding ACI 318 Chapter 14.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18599-html-1",
+      "kind" : "html",
+      "plainText" : "Systems of structural steel elements acting compositely with reinforced concrete shall be designed in accordance with AISC 360 and ACI 318, excluding ACI 318 Chapter 14."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18599
+}

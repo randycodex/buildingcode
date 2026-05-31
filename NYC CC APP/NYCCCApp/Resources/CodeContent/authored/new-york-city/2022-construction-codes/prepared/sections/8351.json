@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198447\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198447\"><\/AnnotationDrawer><div>An appliance shall not be connected to a flue serving a factory-built fireplace unless the appliance is specifically listed for such installation. The connection shall be made in accordance with the appliance manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8351-html-1",
+      "kind" : "html",
+      "plainText" : "An appliance shall not be connected to a flue serving a factory-built fireplace unless the appliance is specifically listed for such installation. The connection shall be made in accordance with the appliance manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8351
+}

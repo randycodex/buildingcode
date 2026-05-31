@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168103\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168103\"><\/AnnotationDrawer><div>An automatic sprinkler system or fire-extinguishing system shall be provided in all spray, dip and immersing spaces and storage rooms and shall be installed in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-171003', hash: '#JD_BCCh.9' }}\">Chapter 9<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168104\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168104\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168104\"><\/AnnotationDrawer><h6><a name=\"JD_BC417\" id=\"JD_BC417\" title=\"BC 417\"><\/a>Section BC 417: Drying Rooms<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "733-html-1",
+      "kind" : "html",
+      "plainText" : "An automatic sprinkler system or fire-extinguishing system shall be provided in all spray, dip and immersing spaces and storage rooms and shall be installed in accordance with Chapter 9 .\n\n Section BC 417: Drying Rooms"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 733
+}

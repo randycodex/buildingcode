@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195586\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195586\"><\/AnnotationDrawer><div>Mechanical refrigeration systems shall be maintained in proper operating condition, free from accumulations of oil, dirt, waste, excessive corrosion, other debris and leaks.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11159-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical refrigeration systems shall be maintained in proper operating condition, free from accumulations of oil, dirt, waste, excessive corrosion, other debris and leaks."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11159
+}

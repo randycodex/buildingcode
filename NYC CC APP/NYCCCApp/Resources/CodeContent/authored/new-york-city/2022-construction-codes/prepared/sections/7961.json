@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197351\"><\/AnnotationDrawer><div>Appliances shall not be converted to utilize a different fuel gas except where complete instructions for such conversion are provided by the serving gas supplier, the appliance manufacturer, the burner manufacturer or the boiler manufacturer. If a specific listing and labeling is available for the burner and boiler combination it shall be submitted to the department. If a specific listing for the combination is not available the listing for the burner and a letter confirming compatibility shall be submitted by the burner manufacturer. The completed installation shall be inspected and tested in the field by a representative of the appliance manufacturer, the burner manufacturer or the boiler manufacturer, and certified by a registered design professional. A certification of compliance by a registered design professional developed in accordance with the requirements of the New York City Department of Environmental Protection may be used to satisfy this certification requirement. The registered design professional need not be the engineer of record for the design.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7961-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances shall not be converted to utilize a different fuel gas except where complete instructions for such conversion are provided by the serving gas supplier, the appliance manufacturer, the burner manufacturer or the boiler manufacturer. If a specific listing and labeling is available for the burner and boiler combination it shall be submitted to the department. If a specific listing for the combination is not available the listing for the burner and a letter confirming compatibility shall be submitted by the burner manufacturer. The completed installation shall be inspected and tested in the field by a representative of the appliance manufacturer, the burner manufacturer or the boiler manufacturer, and certified by a registered design professional. A certification of compliance by a registered design professional developed in accordance with the requirements of the New York City Department of Environmental Protection may be used to satisfy this certification requirement. The registered design professional need not be the engineer of record for the design."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 7961
+}

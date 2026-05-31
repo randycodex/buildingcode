@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170285\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170285\"><\/AnnotationDrawer><div>For hollow-core precast concrete wall panels in which the cores are of constant cross section throughout the length, calculation of the equivalent thickness by dividing the net cross-sectional area (the gross cross section minus the area of the cores) of the panel by its width shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1375-html-1",
+      "kind" : "html",
+      "plainText" : "For hollow-core precast concrete wall panels in which the cores are of constant cross section throughout the length, calculation of the equivalent thickness by dividing the net cross-sectional area (the gross cross section minus the area of the cores) of the panel by its width shall be permitted."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1375
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172096\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172096\"><\/AnnotationDrawer><div>Access shall be provided to each fire alarm device and notification appliance for periodic inspection, maintenance and testing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15684-html-1",
+      "kind" : "html",
+      "plainText" : "Access shall be provided to each fire alarm device and notification appliance for periodic inspection, maintenance and testing."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15684
+}

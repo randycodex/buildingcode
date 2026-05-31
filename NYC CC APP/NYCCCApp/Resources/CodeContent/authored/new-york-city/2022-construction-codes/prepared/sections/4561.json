@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180716\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180716\"><\/AnnotationDrawer><div>In addition to the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180709', hash: '#JD_BC2002' }}\">2002<\/Link>, the quality control of aluminum used for structural purposes shall comply with Sections 2003.2.1 and 2003.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4561-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of Section 2002 , the quality control of aluminum used for structural purposes shall comply with Sections 2003.2.1 and 2003.2.2."
+    }
+  ],
+  "chapterNumber" : "20",
+  "schemaVersion" : 1,
+  "sectionID" : 4561
+}

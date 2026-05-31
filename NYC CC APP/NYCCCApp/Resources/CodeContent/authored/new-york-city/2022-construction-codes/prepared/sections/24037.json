@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195770\"><\/AnnotationDrawer><div>The lowest pressure zone in a refrigerating system shall be provided with a dedicated means of determining a rise in system pressure to within 15 psi (103.4 kPa) of the zone pressure relief device setpoint. Activation of such overpressure sensing device shall cause all compressors on the effected system to immediately cease operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24037-html-1",
+      "kind" : "html",
+      "plainText" : "The lowest pressure zone in a refrigerating system shall be provided with a dedicated means of determining a rise in system pressure to within 15 psi (103.4 kPa) of the zone pressure relief device setpoint. Activation of such overpressure sensing device shall cause all compressors on the effected system to immediately cease operation."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24037
+}

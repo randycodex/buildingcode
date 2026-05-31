@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175387\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175387\"><\/AnnotationDrawer><div>Where destination-oriented elevators are provided, hall call consoles shall comply with Sections 1109.7.2.1 through 1109.7.2.3. Responding elevator cars shall comply with Section 1109.7.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2833-html-1",
+      "kind" : "html",
+      "plainText" : "Where destination-oriented elevators are provided, hall call consoles shall comply with Sections 1109.7.2.1 through 1109.7.2.3. Responding elevator cars shall comply with Section 1109.7.2.5."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2833
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177615\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177615\"><\/AnnotationDrawer><div>Base overturning moments determined from wind tunnel testing shall be limited to not less than 80 percent of the design base overturning moments determined in accordance with Section 27.2 of ASCE 7 unless the wind tunnel results and testing procedure are peer reviewed by an independent wind tunnel laboratory. In no case shall the limiting value be less than 70 percent of the design base overturning moments determined in accordance with Section 27.2 of ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17382-html-1",
+      "kind" : "html",
+      "plainText" : "Base overturning moments determined from wind tunnel testing shall be limited to not less than 80 percent of the design base overturning moments determined in accordance with Section 27.2 of ASCE 7 unless the wind tunnel results and testing procedure are peer reviewed by an independent wind tunnel laboratory. In no case shall the limiting value be less than 70 percent of the design base overturning moments determined in accordance with Section 27.2 of ASCE 7."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17382
+}

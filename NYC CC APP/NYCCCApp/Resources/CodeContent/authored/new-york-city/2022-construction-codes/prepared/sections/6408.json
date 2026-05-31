@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186443\"><\/AnnotationDrawer><div>When, during the course of new building construction, or during the vertical or horizontal enlargement of an existing building, the topmost walkable floor reaches a height of six stories or 75 feet (22 860 mm), whichever is less, above the level of the ground or an adjoining roof, horizontal safety netting shall be provided at a level not more than two stories or 30 feet (9144 mm), whichever is less, below:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186444\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186444\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;In concrete structures: the stripping floor; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186445\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186445\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;In steel structures: at the topmost story where the concrete floor slab has been placed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186446\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186446\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> When tarpaulins encase one or more floors immediately below the finished concrete floor in order to maintain temporary heat, the horizontal netting may be located no more than three floors below the finished concrete floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6408-html-1",
+      "kind" : "html",
+      "plainText" : "When, during the course of new building construction, or during the vertical or horizontal enlargement of an existing building, the topmost walkable floor reaches a height of six stories or 75 feet (22 860 mm), whichever is less, above the level of the ground or an adjoining roof, horizontal safety netting shall be provided at a level not more than two stories or 30 feet (9144 mm), whichever is less, below:\n\n 1. In concrete structures: the stripping floor; or\n\n 2. In steel structures: at the topmost story where the concrete floor slab has been placed.\n\n Exception: When tarpaulins encase one or more floors immediately below the finished concrete floor in order to maintain temporary heat, the horizontal netting may be located no more than three floors below the finished concrete floor."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6408
+}

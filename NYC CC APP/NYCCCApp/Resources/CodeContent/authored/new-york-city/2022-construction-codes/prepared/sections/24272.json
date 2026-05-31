@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196310\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196310\"><\/AnnotationDrawer><div>Flexible metal connectors and hoses used where rigid connections are impractical or to reduce the effect of jarring and vibration shall be listed and labeled in accordance with UL 2039 and shall be installed in compliance with its label and the manufacturer's installation instructions and shall not exceed 18 inches (457.2 mm). Connectors made from combustible materials shall not be used inside buildings or above ground outside of buildings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24272-html-1",
+      "kind" : "html",
+      "plainText" : "Flexible metal connectors and hoses used where rigid connections are impractical or to reduce the effect of jarring and vibration shall be listed and labeled in accordance with UL 2039 and shall be installed in compliance with its label and the manufacturer's installation instructions and shall not exceed 18 inches (457.2 mm). Connectors made from combustible materials shall not be used inside buildings or above ground outside of buildings."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24272
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198731\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198731\"><\/AnnotationDrawer><div>A venting system constructed of single-wall metal pipe shall be sized in accordance with one of the following methods and the appliance manufacturer's instructions:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198732\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198732\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;For a draft-hood-equipped appliance, in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198882', hash: '#JD_FGC504' }}\">504<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198733\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198733\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;For a venting system for a single appliance with a draft hood, the areas of the connector and the pipe each shall be not less than the area of the appliance flue collar or draft hood outlet, whichever is smaller. The vent area shall be not greater than seven times the draft hood outlet area.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198734\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198734\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Other approved engineering methods.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21276-html-1",
+      "kind" : "html",
+      "plainText" : "A venting system constructed of single-wall metal pipe shall be sized in accordance with one of the following methods and the appliance manufacturer's instructions:\n\n 1. For a draft-hood-equipped appliance, in accordance with Section 504 .\n\n 2. For a venting system for a single appliance with a draft hood, the areas of the connector and the pipe each shall be not less than the area of the appliance flue collar or draft hood outlet, whichever is smaller. The vent area shall be not greater than seven times the draft hood outlet area.\n\n 3. Other approved engineering methods."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21276
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177401\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177401\"><\/AnnotationDrawer><div>Handrails and guards shall be designed and constructed for the structural loading conditions set forth in Section 1607.8.1. Grab bars, shower seats and accessible benches shall be designed and constructed for the structural loading conditions set forth in Section 1607.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17318-html-1",
+      "kind" : "html",
+      "plainText" : "Handrails and guards shall be designed and constructed for the structural loading conditions set forth in Section 1607.8.1. Grab bars, shower seats and accessible benches shall be designed and constructed for the structural loading conditions set forth in Section 1607.8.2."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17318
+}

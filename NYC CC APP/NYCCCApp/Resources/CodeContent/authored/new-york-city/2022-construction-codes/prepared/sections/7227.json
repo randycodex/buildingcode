@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189137\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189137\"><\/AnnotationDrawer><div>The bearing plates of roof signs shall distribute the load directly to or upon masonry walls, steel roof girders, columns or beams. The building shall be designed to avoid overstress of these members.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7227-html-1",
+      "kind" : "html",
+      "plainText" : "The bearing plates of roof signs shall distribute the load directly to or upon masonry walls, steel roof girders, columns or beams. The building shall be designed to avoid overstress of these members."
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7227
+}

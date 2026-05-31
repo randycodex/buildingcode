@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161930\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161930\"><\/AnnotationDrawer><div>Only potable water shall be supplied to plumbing fixtures that provide water for drinking, bathing or culinary purposes, or for the processing of food, medical or pharmaceutical products. Unless otherwise provided in this code, potable water shall be supplied to all plumbing fixtures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24863-html-1",
+      "kind" : "html",
+      "plainText" : "Only potable water shall be supplied to plumbing fixtures that provide water for drinking, bathing or culinary purposes, or for the processing of food, medical or pharmaceutical products. Unless otherwise provided in this code, potable water shall be supplied to all plumbing fixtures."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24863
+}

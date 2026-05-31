@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198839\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198839\"><\/AnnotationDrawer><div>A vent connector shall not be connected to a chimney flue serving a fireplace.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8491-html-1",
+      "kind" : "html",
+      "plainText" : "A vent connector shall not be connected to a chimney flue serving a fireplace."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8491
+}

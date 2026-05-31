@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167606\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167606\"><\/AnnotationDrawer><div>Aircraft paint hangars shall be provided with fire suppression as required by NFPA 409.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14405-html-1",
+      "kind" : "html",
+      "plainText" : "Aircraft paint hangars shall be provided with fire suppression as required by NFPA 409."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14405
+}

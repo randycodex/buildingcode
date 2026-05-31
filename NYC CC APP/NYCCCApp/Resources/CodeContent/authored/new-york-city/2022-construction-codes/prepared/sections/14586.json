@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168158\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168158\"><\/AnnotationDrawer><div>Hydrogen fuel gas rooms shall be separately ventilated and provided with mechanical exhaust ventilation in accordance with the applicable provisions of NFPA 2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14586-html-1",
+      "kind" : "html",
+      "plainText" : "Hydrogen fuel gas rooms shall be separately ventilated and provided with mechanical exhaust ventilation in accordance with the applicable provisions of NFPA 2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14586
+}

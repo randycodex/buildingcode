@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194930\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194930\"><\/AnnotationDrawer><div>Barometric draft regulators shall be installed in the same room or enclosure as the appliance in such a manner as to prevent any difference in pressure between the regulator and the combustion air supply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23749-html-1",
+      "kind" : "html",
+      "plainText" : "Barometric draft regulators shall be installed in the same room or enclosure as the appliance in such a manner as to prevent any difference in pressure between the regulator and the combustion air supply."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23749
+}

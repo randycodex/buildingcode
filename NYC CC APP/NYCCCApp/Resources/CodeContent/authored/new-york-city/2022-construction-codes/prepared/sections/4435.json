@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180423\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180423\"><\/AnnotationDrawer><div>The design, fabrication and erection of forms shall comply with the requirements of ACI 318, Section 26.11 and Section 3305.3 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4435-html-1",
+      "kind" : "html",
+      "plainText" : "The design, fabrication and erection of forms shall comply with the requirements of ACI 318, Section 26.11 and Section 3305.3 of this code."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4435
+}

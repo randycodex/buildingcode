@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167027\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167027\"><\/AnnotationDrawer><div>Mixed uses shall be allowed in the same building as a repair garage subject to the provisions of Section 508.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "386-html-1",
+      "kind" : "html",
+      "plainText" : "Mixed uses shall be allowed in the same building as a repair garage subject to the provisions of Section 508.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 386
+}

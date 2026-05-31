@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162874\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162874\"><\/AnnotationDrawer><div>The discharge profiles for flow rates versus time from fixtures and appliances shall be in accordance with the manufacturer's specifications.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12399-html-1",
+      "kind" : "html",
+      "plainText" : "The discharge profiles for flow rates versus time from fixtures and appliances shall be in accordance with the manufacturer's specifications."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12399
+}

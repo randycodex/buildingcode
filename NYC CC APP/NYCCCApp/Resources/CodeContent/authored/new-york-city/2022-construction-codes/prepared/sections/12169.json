@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162269\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162269\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where used, identification tape shall be at least 3 inches (76 mm) wide and have white or black lettering on a purple field stating \"CAUTION: NONPOTABLE WATER &#8211; DO NOT DRINK.\" Identification tape shall be installed on top of nonpotable water distribution pipes, fastened at least every 10 feet (3048 mm) to each pipe length and run continuously the entire length of the pipe.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12169-html-1",
+      "kind" : "html",
+      "plainText" : "Where used, identification tape shall be at least 3 inches (76 mm) wide and have white or black lettering on a purple field stating \"CAUTION: NONPOTABLE WATER - DO NOT DRINK.\" Identification tape shall be installed on top of nonpotable water distribution pipes, fastened at least every 10 feet (3048 mm) to each pipe length and run continuously the entire length of the pipe."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12169
+}

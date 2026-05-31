@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161739\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161739\"><\/AnnotationDrawer><div>Steam supplies to sterilizers, including those connected by pipes from overhead mains or branches, shall be drained to prevent any moisture from reaching the sterilizer. The condensate drainage from the steam supply shall be discharged by gravity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24786-html-1",
+      "kind" : "html",
+      "plainText" : "Steam supplies to sterilizers, including those connected by pipes from overhead mains or branches, shall be drained to prevent any moisture from reaching the sterilizer. The condensate drainage from the steam supply shall be discharged by gravity."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24786
+}

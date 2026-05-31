@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193598\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193598\"><\/AnnotationDrawer><div>The room or area in which indoor gas cabinets or exhausted enclosures are located shall be provided with exhaust ventilation. Gas cabinets or exhausted enclosures shall not be used as the sole means of exhaust for any room or area.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10483-html-1",
+      "kind" : "html",
+      "plainText" : "The room or area in which indoor gas cabinets or exhausted enclosures are located shall be provided with exhaust ventilation. Gas cabinets or exhausted enclosures shall not be used as the sole means of exhaust for any room or area."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10483
+}

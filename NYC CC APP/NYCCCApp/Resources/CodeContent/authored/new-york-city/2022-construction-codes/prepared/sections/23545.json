@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194321\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194321\"><\/AnnotationDrawer><div>The materials, thickness, construction, and installation of ducts shall provide structural strength and durability in conformance with recognized good practice. Air ducts shall be considered to be in compliance with this requirement where constructed and installed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>. Where no standard exists for the construction of air ducts, they shall be constructed to withstand both the positive and negative pressures of the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23545-html-1",
+      "kind" : "html",
+      "plainText" : "The materials, thickness, construction, and installation of ducts shall provide structural strength and durability in conformance with recognized good practice. Air ducts shall be considered to be in compliance with this requirement where constructed and installed in accordance with the New York City Building Code . Where no standard exists for the construction of air ducts, they shall be constructed to withstand both the positive and negative pressures of the system."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23545
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184110\"><\/AnnotationDrawer><div>Only materials approved by the department shall be located in the pedestrian walkway. Decorations may be permitted in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19418-html-1",
+      "kind" : "html",
+      "plainText" : "Only materials approved by the department shall be located in the pedestrian walkway. Decorations may be permitted in accordance with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19418
+}

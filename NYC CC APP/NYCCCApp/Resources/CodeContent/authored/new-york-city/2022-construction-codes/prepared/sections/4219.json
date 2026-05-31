@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179801\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179801\"><\/AnnotationDrawer><div>The allowable lateral load of a helical pile shall be verified with load testing in accordance with Section 1810.4. Following the lateral load test, the helical pile shall be removed by unscrewing and inspected for any deformations to the helices to verify the structural integrity of the shaft and connections.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4219-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable lateral load of a helical pile shall be verified with load testing in accordance with Section 1810.4. Following the lateral load test, the helical pile shall be removed by unscrewing and inspected for any deformations to the helices to verify the structural integrity of the shaft and connections."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4219
+}

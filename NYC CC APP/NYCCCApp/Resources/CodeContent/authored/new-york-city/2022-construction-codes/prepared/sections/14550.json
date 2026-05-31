@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168074\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168074\"><\/AnnotationDrawer><div>An approved automatic fire sprinkler system shall be provided in exhaust ducts conveying vapors, fumes, mists or dusts generated from HPM in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> and Sections 415.11.11.1 through 415.11.11.3 of this code. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14550-html-1",
+      "kind" : "html",
+      "plainText" : "An approved automatic fire sprinkler system shall be provided in exhaust ducts conveying vapors, fumes, mists or dusts generated from HPM in accordance with the New York City Mechanical Code and Sections 415.11.11.1 through 415.11.11.3 of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14550
+}

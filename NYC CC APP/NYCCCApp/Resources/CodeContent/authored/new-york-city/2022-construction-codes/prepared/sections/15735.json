@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172262\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172262\"><\/AnnotationDrawer><div>This method shall not be employed where either the quantity of air or the velocity of the airflow will adversely affect other portions of the smoke control system, unduly intensify the fire, disrupt plume dynamics or interfere with exiting. In no case shall airflow toward the fire exceed 200 feet per minute (1.02 m\/s). Where the calculated airflow exceeds this limit, the airflow method shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15735-html-1",
+      "kind" : "html",
+      "plainText" : "This method shall not be employed where either the quantity of air or the velocity of the airflow will adversely affect other portions of the smoke control system, unduly intensify the fire, disrupt plume dynamics or interfere with exiting. In no case shall airflow toward the fire exceed 200 feet per minute (1.02 m\/s). Where the calculated airflow exceeds this limit, the airflow method shall not be used."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15735
+}

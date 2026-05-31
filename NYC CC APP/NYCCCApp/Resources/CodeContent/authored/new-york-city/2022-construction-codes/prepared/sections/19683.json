@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184717\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184717\"><\/AnnotationDrawer><div>A project information panel shall be posted on the fence on each perimeter fronting a public thoroughfare. Where such perimeter is more than 150 feet (45 720 mm) in length, a project information panel shall be posted at each corner. Such panels shall be posted on the fence at a height of 4 feet (1219 mm) above the ground, with such distance measured from the ground to the bottom edge of the panel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19683-html-1",
+      "kind" : "html",
+      "plainText" : "A project information panel shall be posted on the fence on each perimeter fronting a public thoroughfare. Where such perimeter is more than 150 feet (45 720 mm) in length, a project information panel shall be posted at each corner. Such panels shall be posted on the fence at a height of 4 feet (1219 mm) above the ground, with such distance measured from the ground to the bottom edge of the panel."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19683
+}

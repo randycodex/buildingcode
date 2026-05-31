@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184567\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184567\"><\/AnnotationDrawer><div>An applicant wishing to erect a marquee shall provide proof that the Commissioners of the Departments of Transportation, Consumer and Worker Protection, and Environmental Protection have not permitted the use of a space or structure on or under the sidewalk beneath the proposed marquee in such a manner that the construction of the proposed marquee shall interfere with the removal or repair of any such permitted use or structure. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184568\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184568\"><\/AnnotationDrawer><div>(Am. L.L. 2020\/080, 8\/28\/2020, eff. 8\/28\/2020) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184569\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184569\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-131874', hash: '#JD_L.L.2020\/080' }}\">L.L. 2020\/080<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19614-html-1",
+      "kind" : "html",
+      "plainText" : "An applicant wishing to erect a marquee shall provide proof that the Commissioners of the Departments of Transportation, Consumer and Worker Protection, and Environmental Protection have not permitted the use of a space or structure on or under the sidewalk beneath the proposed marquee in such a manner that the construction of the proposed marquee shall interfere with the removal or repair of any such permitted use or structure. \n\n (Am. L.L. 2020\/080, 8\/28\/2020, eff. 8\/28\/2020) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/080 ."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19614
+}

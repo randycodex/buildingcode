@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179172\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179172\"><\/AnnotationDrawer><div>The design, materials, and construction of pier foundations shall conform to the requirements of Sections 1809.5.2, 1809.5.3, and 1809.5.7.1 through 1809.5.7.6.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179173\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179173\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Piers shall be load tested as a deep foundation in accordance with the applicable portions of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179201', hash: '#JD_BC1810' }}\">1810<\/Link> when the bearing stratum is not physically available for inspection during construction as required by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4001-html-1",
+      "kind" : "html",
+      "plainText" : "The design, materials, and construction of pier foundations shall conform to the requirements of Sections 1809.5.2, 1809.5.3, and 1809.5.7.1 through 1809.5.7.6.\n\n Exception: Piers shall be load tested as a deep foundation in accordance with the applicable portions of Section 1810 when the bearing stratum is not physically available for inspection during construction as required by Chapter 17 ."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4001
+}

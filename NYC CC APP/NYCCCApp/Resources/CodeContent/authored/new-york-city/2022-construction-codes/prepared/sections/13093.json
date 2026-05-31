@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188841\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188841\"><\/AnnotationDrawer><div>Oil derricks located in special flood hazard areas shall be designed in conformance with ASCE 24.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13093-html-1",
+      "kind" : "html",
+      "plainText" : "Oil derricks located in special flood hazard areas shall be designed in conformance with ASCE 24."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13093
+}

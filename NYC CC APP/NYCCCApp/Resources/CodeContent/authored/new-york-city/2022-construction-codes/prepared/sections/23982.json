@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195582\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195582\"><\/AnnotationDrawer><div>Refrigeration system devices, equipment and appliances utilizing fuel oil or fuel gas for combustion shall be installed in accordance with the applicable provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code<\/span> and this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23982-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigeration system devices, equipment and appliances utilizing fuel oil or fuel gas for combustion shall be installed in accordance with the applicable provisions of the New York City Fuel Gas Code and this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 23982
+}

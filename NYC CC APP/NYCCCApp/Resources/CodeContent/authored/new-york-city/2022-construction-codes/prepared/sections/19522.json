@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184380\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184380\"><\/AnnotationDrawer><div>A large wind turbine shall be designed to withstand winds of up to and including 130 mph (58.1 m\/s) or such higher wind load as may be specified in this code or the design standard for such turbine pursuant to Section 3114.3. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19522-html-1",
+      "kind" : "html",
+      "plainText" : "A large wind turbine shall be designed to withstand winds of up to and including 130 mph (58.1 m\/s) or such higher wind load as may be specified in this code or the design standard for such turbine pursuant to Section 3114.3."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19522
+}

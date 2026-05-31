@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169470\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169470\"><\/AnnotationDrawer><div>Each vertical opening shall comply in accordance with one of the protection methods in Sections 712.1.1 through 712.1.16.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1137-html-1",
+      "kind" : "html",
+      "plainText" : "Each vertical opening shall comply in accordance with one of the protection methods in Sections 712.1.1 through 712.1.16."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1137
+}

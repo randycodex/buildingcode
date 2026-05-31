@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166871\"><\/AnnotationDrawer><div>A fire alarm system shall be provided where required by Sections 907.2.18 and 907.2.19.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "331-html-1",
+      "kind" : "html",
+      "plainText" : "A fire alarm system shall be provided where required by Sections 907.2.18 and 907.2.19."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 331
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168150\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168150\"><\/AnnotationDrawer><div>Hydrogen fuel gas rooms shall not be located below grade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14582-html-1",
+      "kind" : "html",
+      "plainText" : "Hydrogen fuel gas rooms shall not be located below grade."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14582
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178835\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178835\"><\/AnnotationDrawer><div>Concrete and clay roof tiles shall be tested to determine their resistance to overturning due to wind in accordance with ICC SBCCI SSTD 11 and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176478', hash: '#JD_BCCh.15' }}\">Chapter 15<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17737-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete and clay roof tiles shall be tested to determine their resistance to overturning due to wind in accordance with ICC SBCCI SSTD 11 and Chapter 15 ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17737
+}

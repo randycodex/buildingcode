@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163025\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163025\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Open vent pipes that extend through a roof shall be terminated not less than 24 inches (610 mm) above the roof. Where a roof is to be used for assembly or as a promenade, observation deck, sun bathing deck or similar purposes, open vent pipes shall terminate not less than 7 feet (2134 mm) above the roof. Approved vandal-resistant vent caps may be used.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12465-html-1",
+      "kind" : "html",
+      "plainText" : "Open vent pipes that extend through a roof shall be terminated not less than 24 inches (610 mm) above the roof. Where a roof is to be used for assembly or as a promenade, observation deck, sun bathing deck or similar purposes, open vent pipes shall terminate not less than 7 feet (2134 mm) above the roof. Approved vandal-resistant vent caps may be used."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12465
+}

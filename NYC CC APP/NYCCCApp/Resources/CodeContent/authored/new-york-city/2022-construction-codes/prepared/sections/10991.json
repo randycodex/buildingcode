@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195146\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195146\"><\/AnnotationDrawer><div>The requirements of this chapter shall apply to the mechanical equipment and appliances regulated by this chapter, in addition to the other requirements of this code, and installed in accordance with the requirements of NFPA 31, NFPA 54 and NFPA 211.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10991-html-1",
+      "kind" : "html",
+      "plainText" : "The requirements of this chapter shall apply to the mechanical equipment and appliances regulated by this chapter, in addition to the other requirements of this code, and installed in accordance with the requirements of NFPA 31, NFPA 54 and NFPA 211."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 10991
+}

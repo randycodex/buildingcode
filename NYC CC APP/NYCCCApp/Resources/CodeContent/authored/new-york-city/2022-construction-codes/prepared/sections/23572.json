@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194390\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194390\"><\/AnnotationDrawer><div>Duct coverings shall not penetrate a wall or floor required to have a fire-resistance rating or required to be fireblocked.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23572-html-1",
+      "kind" : "html",
+      "plainText" : "Duct coverings shall not penetrate a wall or floor required to have a fire-resistance rating or required to be fireblocked."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23572
+}

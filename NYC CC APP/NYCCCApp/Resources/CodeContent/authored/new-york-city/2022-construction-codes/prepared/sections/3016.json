@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175927\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175927\"><\/AnnotationDrawer><div>Elevator machine rooms and machinery spaces containing equipment totaling more than 75 rated h.p. shall not be located vertically or horizontally adjacent to dwelling units unless the total sound pressure level output of all the equipment in the machine room or space is certified not to exceed the maximum sound pressure levels of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175920', hash: '#JD_BCTable1207.2.1' }}\">Table 1207.2.1<\/Link> in any octave band.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3016-html-1",
+      "kind" : "html",
+      "plainText" : "Elevator machine rooms and machinery spaces containing equipment totaling more than 75 rated h.p. shall not be located vertically or horizontally adjacent to dwelling units unless the total sound pressure level output of all the equipment in the machine room or space is certified not to exceed the maximum sound pressure levels of Table 1207.2.1 in any octave band."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 3016
+}

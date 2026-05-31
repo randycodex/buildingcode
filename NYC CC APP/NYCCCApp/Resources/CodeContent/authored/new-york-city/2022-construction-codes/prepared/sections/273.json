@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166710\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166710\"><\/AnnotationDrawer><div>A high-rise building shall be equipped with a standpipe system as required by Section 905.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "273-html-1",
+      "kind" : "html",
+      "plainText" : "A high-rise building shall be equipped with a standpipe system as required by Section 905.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 273
+}

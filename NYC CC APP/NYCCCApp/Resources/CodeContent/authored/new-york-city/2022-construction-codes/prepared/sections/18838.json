@@ -1,0 +1,25 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182207\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182207\"><\/AnnotationDrawer><div>Notches on the ends of joists shall not exceed one-fourth the joist depth. Notches in the top or bottom of joists shall not exceed one-sixth the depth, shall not be longer than one-third the depth and shall not be located in the middle third of the span. Holes bored in joists shall not be within 2 inches (51 mm) of the top or bottom of the joist and the diameter of any such hole shall not exceed one-third the depth of the joist. Holes bored in the middle third of the span shall be located at the center of the joist depth. Clear distance between holes &amp; notches shall be a minimum of 2 inches (51 mm). See <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182206', hash: '#JD_BCFigure2308.4.2.4' }}\">Figure 2308.4.2.4<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182208\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182208\"><\/AnnotationDrawer><div>",
+      "id" : "18838-html-1",
+      "kind" : "html",
+      "plainText" : "Notches on the ends of joists shall not exceed one-fourth the joist depth. Notches in the top or bottom of joists shall not exceed one-sixth the depth, shall not be longer than one-third the depth and shall not be located in the middle third of the span. Holes bored in joists shall not be within 2 inches (51 mm) of the top or bottom of the joist and the diameter of any such hole shall not exceed one-third the depth of the joist. Holes bored in the middle third of the span shall be located at the center of the joist depth. Clear distance between holes & notches shall be a minimum of 2 inches (51 mm). See Figure 2308.4.2.4 ."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/fc35bdee64250552b0a7f67d98c5f79b75a5f92c.png\" width=\"672\" height=\"369.666666666667\"><\/img><\/span>",
+      "id" : "18838-image-2",
+      "imageID" : "fc35bdee64250552b0a7f67d98c5f79b75a5f92c.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182209\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure2308.4.2.4\" id=\"JD_BCFigure2308.4.2.4\" title=\"BC Figure 2308.4.2.4\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 2308.4.2.4<br><\/br>Joist Boring and Notching Limits<br><\/br>Not to Scale<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18838-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 2308.4.2.4\n Joist Boring and Notching Limits\n Not to Scale"
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18838
+}

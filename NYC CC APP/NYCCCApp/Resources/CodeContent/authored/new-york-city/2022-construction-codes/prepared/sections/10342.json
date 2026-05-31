@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193209\"><\/AnnotationDrawer><div>Stationary local sources producing air-borne particulates, heat, odors, fumes, spray, vapors, smoke or gases in such quantities as to be irritating or injurious to health shall be provided with an exhaust system in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-193364', hash: '#JD_MCCh.5' }}\">Chapter 5<\/Link> or a means of collection and removal of the contaminants. Such exhaust shall discharge directly to an approved location at the exterior of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10342-html-1",
+      "kind" : "html",
+      "plainText" : "Stationary local sources producing air-borne particulates, heat, odors, fumes, spray, vapors, smoke or gases in such quantities as to be irritating or injurious to health shall be provided with an exhaust system in accordance with Chapter 5 or a means of collection and removal of the contaminants. Such exhaust shall discharge directly to an approved location at the exterior of the building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 10342
+}

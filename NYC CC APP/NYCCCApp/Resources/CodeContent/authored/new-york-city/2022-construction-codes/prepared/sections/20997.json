@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197966\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197966\"><\/AnnotationDrawer><div>Metallic pipe, fittings, and joints susceptible to corrosive action, such as soil condition or moisture, shall be protected in an approved manner as set forth in Sections 404.11.1 through 404.11.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20997-html-1",
+      "kind" : "html",
+      "plainText" : "Metallic pipe, fittings, and joints susceptible to corrosive action, such as soil condition or moisture, shall be protected in an approved manner as set forth in Sections 404.11.1 through 404.11.6."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20997
+}

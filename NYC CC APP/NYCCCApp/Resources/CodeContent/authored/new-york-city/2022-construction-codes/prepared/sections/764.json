@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168173\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168173\"><\/AnnotationDrawer><div>Ambulatory care facilities shall comply with the provisions of Sections 422.1 through 422.5 and other applicable provisions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "764-html-1",
+      "kind" : "html",
+      "plainText" : "Ambulatory care facilities shall comply with the provisions of Sections 422.1 through 422.5 and other applicable provisions of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 764
+}

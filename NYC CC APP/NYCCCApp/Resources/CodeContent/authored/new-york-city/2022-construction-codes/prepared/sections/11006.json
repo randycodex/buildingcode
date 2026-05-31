@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195187\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195187\"><\/AnnotationDrawer><div>The connection of solid fuel appliances to chimney flues serving fireplaces shall comply with Sections 801.7 and 801.10.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11006-html-1",
+      "kind" : "html",
+      "plainText" : "The connection of solid fuel appliances to chimney flues serving fireplaces shall comply with Sections 801.7 and 801.10."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11006
+}

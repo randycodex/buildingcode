@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182131\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182131\"><\/AnnotationDrawer><div>When portions of a building of otherwise conventional light-frame construction exceed the limits of Section 2308.2, those portions and the supporting load path shall be designed in accordance with accepted engineering practice and the provisions of this code. For the purposes of this section, the term \"portions\" shall mean parts of buildings containing volume and area such as a room or a series of rooms. The extent of such design need only demonstrate compliance of the nonconventional light-framed elements with other applicable provisions of this code and shall be compatible with the performance of the conventional light-framed system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18819-html-1",
+      "kind" : "html",
+      "plainText" : "When portions of a building of otherwise conventional light-frame construction exceed the limits of Section 2308.2, those portions and the supporting load path shall be designed in accordance with accepted engineering practice and the provisions of this code. For the purposes of this section, the term \"portions\" shall mean parts of buildings containing volume and area such as a room or a series of rooms. The extent of such design need only demonstrate compliance of the nonconventional light-framed elements with other applicable provisions of this code and shall be compatible with the performance of the conventional light-framed system."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18819
+}

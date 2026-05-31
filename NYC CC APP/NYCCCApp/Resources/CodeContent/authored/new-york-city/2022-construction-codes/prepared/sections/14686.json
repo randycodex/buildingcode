@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168478\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168478\"><\/AnnotationDrawer><div>The aggregate area of all industrial equipment platforms within a room shall be not greater than two-thirds of the area of the room in which they occur. Where an equipment platform is located in the same room as a mezzanine, the area of the mezzanine shall be determined by Section 505.2.1 and the combined aggregate area of the equipment platforms and mezzanines shall be not greater than two-thirds of the room in which they are located.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14686-html-1",
+      "kind" : "html",
+      "plainText" : "The aggregate area of all industrial equipment platforms within a room shall be not greater than two-thirds of the area of the room in which they occur. Where an equipment platform is located in the same room as a mezzanine, the area of the mezzanine shall be determined by Section 505.2.1 and the combined aggregate area of the equipment platforms and mezzanines shall be not greater than two-thirds of the room in which they are located."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14686
+}

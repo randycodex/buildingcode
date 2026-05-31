@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195076\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195076\"><\/AnnotationDrawer><div>Factory-built chimneys shall be listed and labeled and shall be installed and terminated in accordance with this code and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10967-html-1",
+      "kind" : "html",
+      "plainText" : "Factory-built chimneys shall be listed and labeled and shall be installed and terminated in accordance with this code and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10967
+}

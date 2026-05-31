@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180896\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180896\"><\/AnnotationDrawer><div>A quality assurance program shall be used to ensure that the constructed masonry is in compliance with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180897\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180897\"><\/AnnotationDrawer><div>The quality assurance program shall comply with the inspection and testing requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link> and TMS 602.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4608-html-1",
+      "kind" : "html",
+      "plainText" : "A quality assurance program shall be used to ensure that the constructed masonry is in compliance with the approved construction documents.\n\n The quality assurance program shall comply with the inspection and testing requirements of Chapter 17 and TMS 602."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4608
+}

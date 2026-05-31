@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176122\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176122\"><\/AnnotationDrawer><div>Bird hazard installations shall be constructed of bird friendly materials regardless of their height above grade. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176123\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176123\"><\/AnnotationDrawer><div>(L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176124\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176124\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-130053', hash: '#JD_L.L.2020\/015' }}\">L.L. 2020\/015<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3073-html-1",
+      "kind" : "html",
+      "plainText" : "Bird hazard installations shall be constructed of bird friendly materials regardless of their height above grade. \n\n (L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3073
+}

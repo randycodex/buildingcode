@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196767\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196767\"><\/AnnotationDrawer><div>Factory-built collectors shall be listed and labeled, and bear a label showing the manufacturer's name and address, model number, collector dry weight, collector maximum allowable operating and nonoperating temperatures and pressures, minimum allowable temperatures and the types of heat transfer fluids that are compatible with the collector. The label shall clarify that these specifications apply only to the collector.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24444-html-1",
+      "kind" : "html",
+      "plainText" : "Factory-built collectors shall be listed and labeled, and bear a label showing the manufacturer's name and address, model number, collector dry weight, collector maximum allowable operating and nonoperating temperatures and pressures, minimum allowable temperatures and the types of heat transfer fluids that are compatible with the collector. The label shall clarify that these specifications apply only to the collector."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 24444
+}

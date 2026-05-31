@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174714\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174714\"><\/AnnotationDrawer><div>For the following buildings, signs shall be posted and maintained on exit stair doors in accordance with this section:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174715\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174715\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Buildings or portions thereof occupied by Group B or arranged to be occupied by more than 100 persons above or below the street level or more than 500 persons in the entire building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174716\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174716\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;High-rise buildings subject to Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166650', hash: '#JD_BC403' }}\">403<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174717\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174717\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Buildings where any stair side door is locked pursuant to Section 1010.1.9.11.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174718\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Signs shall not be required on exit stair doors opening directly to dwelling or sleeping units in occupancy Group R where permitted by Section 1016.3. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2612-html-1",
+      "kind" : "html",
+      "plainText" : "For the following buildings, signs shall be posted and maintained on exit stair doors in accordance with this section:\n\n 1. Buildings or portions thereof occupied by Group B or arranged to be occupied by more than 100 persons above or below the street level or more than 500 persons in the entire building.\n\n 2. High-rise buildings subject to Section 403 .\n\n 3. Buildings where any stair side door is locked pursuant to Section 1010.1.9.11.\n\n Exception: Signs shall not be required on exit stair doors opening directly to dwelling or sleeping units in occupancy Group R where permitted by Section 1016.3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2612
+}

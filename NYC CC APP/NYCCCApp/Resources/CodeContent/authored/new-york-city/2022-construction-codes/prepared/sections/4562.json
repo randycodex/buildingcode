@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180718\"><\/AnnotationDrawer><div>Welding operations shall be subjected to the special inspections as required by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178144', hash: '#JD_BCCh.17' }}\">Chapter 17<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4562-html-1",
+      "kind" : "html",
+      "plainText" : "Welding operations shall be subjected to the special inspections as required by Chapter 17 of this code."
+    }
+  ],
+  "chapterNumber" : "20",
+  "schemaVersion" : 1,
+  "sectionID" : 4562
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185770\"><\/AnnotationDrawer><div>Debris generated as a result of stripping operations shall be immediately contained and removed at reasonable intervals. Stripping operations on concrete structures shall not be performed more than three stories below the story being formed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20004-html-1",
+      "kind" : "html",
+      "plainText" : "Debris generated as a result of stripping operations shall be immediately contained and removed at reasonable intervals. Stripping operations on concrete structures shall not be performed more than three stories below the story being formed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20004
+}

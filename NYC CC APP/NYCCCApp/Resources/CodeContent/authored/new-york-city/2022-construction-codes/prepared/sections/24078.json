@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195857\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195857\"><\/AnnotationDrawer><div>Pipe and other refrigerant-containing components' insulation shall meet the requirements of Section 1204.1 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24078-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe and other refrigerant-containing components' insulation shall meet the requirements of Section 1204.1 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24078
+}

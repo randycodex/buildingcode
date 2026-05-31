@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173834\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173834\"><\/AnnotationDrawer><div>Handrails with a circular cross section shall have an outside diameter of not less than 1 1\/4 inches (31.75 mm) and not greater than 2 inches (50.8 mm). Where the handrail is not circular, it shall have a perimeter dimension of not less than 4 inches (101.6 mm) and not greater than 6 1\/4 inches (158.75 mm) with a maximum cross-sectional dimension of 2 1\/4 inches (57.15 mm) and minimum cross-sectional dimension of 1 inch (25.4 mm). Edges shall have a minimum radius of 0.01 inch (0.25 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2376-html-1",
+      "kind" : "html",
+      "plainText" : "Handrails with a circular cross section shall have an outside diameter of not less than 1 1\/4 inches (31.75 mm) and not greater than 2 inches (50.8 mm). Where the handrail is not circular, it shall have a perimeter dimension of not less than 4 inches (101.6 mm) and not greater than 6 1\/4 inches (158.75 mm) with a maximum cross-sectional dimension of 2 1\/4 inches (57.15 mm) and minimum cross-sectional dimension of 1 inch (25.4 mm). Edges shall have a minimum radius of 0.01 inch (0.25 mm)."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2376
+}

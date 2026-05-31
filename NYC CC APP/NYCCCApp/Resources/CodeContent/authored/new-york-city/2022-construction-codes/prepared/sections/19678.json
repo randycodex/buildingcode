@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184694\"><\/AnnotationDrawer><div>Nothing in this section shall diminish or relieve other notification requirements imposed by this chapter, including but not limited to, notifications by the site safety manager, site safety coordinator, concrete safety manager, or hoisting machine operator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19678-html-1",
+      "kind" : "html",
+      "plainText" : "Nothing in this section shall diminish or relieve other notification requirements imposed by this chapter, including but not limited to, notifications by the site safety manager, site safety coordinator, concrete safety manager, or hoisting machine operator."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19678
+}

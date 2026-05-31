@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180420\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180420\"><\/AnnotationDrawer><div>During hot weather, proper attention shall be given to ingredients, production methods, handling, placing, protection and curing to prevent excessive concrete temperatures or water evaporation that could impair the required strength or serviceability of the member or structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180421\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180421\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180421\"><\/AnnotationDrawer><h6><a name=\"JD_BC1906\" id=\"JD_BC1906\" title=\"BC 1906\"><\/a>Section BC 1906: Formwork, Embedded Pipes and Construction Joints<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4434-html-1",
+      "kind" : "html",
+      "plainText" : "During hot weather, proper attention shall be given to ingredients, production methods, handling, placing, protection and curing to prevent excessive concrete temperatures or water evaporation that could impair the required strength or serviceability of the member or structure.\n\n Section BC 1906: Formwork, Embedded Pipes and Construction Joints"
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4434
+}

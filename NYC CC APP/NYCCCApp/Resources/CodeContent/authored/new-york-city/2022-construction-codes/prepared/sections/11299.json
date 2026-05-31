@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195981\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195981\"><\/AnnotationDrawer><div>Branch tubes shall not restrict the flow in the run tube. A dimple\/depth stop shall be formed in the branch tube to ensure that penetration into the outlet is of the correct depth. For inspection purposes, a second dimple shall be placed 1\/4 inch (6.4 mm) above the first dimple. Dimples shall be aligned with the tube run.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11299-html-1",
+      "kind" : "html",
+      "plainText" : "Branch tubes shall not restrict the flow in the run tube. A dimple\/depth stop shall be formed in the branch tube to ensure that penetration into the outlet is of the correct depth. For inspection purposes, a second dimple shall be placed 1\/4 inch (6.4 mm) above the first dimple. Dimples shall be aligned with the tube run."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11299
+}

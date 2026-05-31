@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186493\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186493\"><\/AnnotationDrawer><div>The tensile strength of netting mesh and\/or twine of a structural net utilized in conjunction with a horizontal safety netting system shall be confirmed by testing in accordance with ASTM D 5034 or ASTM D 5035. The testing criteria shall be developed by the registered design professional who designed the safety netting system in accordance with Section 3308.3. Such testing shall occur prior to the installation of the net at the site for any net that has previously been used, and for any net that has been installed at the site for two years and every two years thereafter. Nets that do not meet the specified tensile strength as required by Section 3308.3.5 shall not be utilized or shall be replaced.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6429-html-1",
+      "kind" : "html",
+      "plainText" : "The tensile strength of netting mesh and\/or twine of a structural net utilized in conjunction with a horizontal safety netting system shall be confirmed by testing in accordance with ASTM D 5034 or ASTM D 5035. The testing criteria shall be developed by the registered design professional who designed the safety netting system in accordance with Section 3308.3. Such testing shall occur prior to the installation of the net at the site for any net that has previously been used, and for any net that has been installed at the site for two years and every two years thereafter. Nets that do not meet the specified tensile strength as required by Section 3308.3.5 shall not be utilized or shall be replaced."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6429
+}

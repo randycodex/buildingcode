@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180337\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180337\"><\/AnnotationDrawer><div>The investigation of low-strength test results shall be in accordance with the provisions of Sections 1905.6.5.1 through 1905.6.5.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18229-html-1",
+      "kind" : "html",
+      "plainText" : "The investigation of low-strength test results shall be in accordance with the provisions of Sections 1905.6.5.1 through 1905.6.5.5."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18229
+}

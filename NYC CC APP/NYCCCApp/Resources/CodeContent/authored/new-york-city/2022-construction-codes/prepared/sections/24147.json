@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196026\"><\/AnnotationDrawer><div>Joints between polyethylene\/aluminum\/polyethylene pressure pipe and fittings shall conform to Sections 1203.17.1 and 1203.17.2. Mechanical joints shall comply with Section 1203.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24147-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between polyethylene\/aluminum\/polyethylene pressure pipe and fittings shall conform to Sections 1203.17.1 and 1203.17.2. Mechanical joints shall comply with Section 1203.3."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24147
+}

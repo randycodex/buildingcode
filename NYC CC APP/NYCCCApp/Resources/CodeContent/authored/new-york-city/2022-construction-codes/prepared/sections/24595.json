@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161243\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161243\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">In concealed locations where piping, other than cast-iron or galvanized steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38 mm) from the nearest edge of the member, the pipe shall be protected by steel shield plates. Such shield plates shall have a thickness of not less than 0.0575 inch (1.463 mm) (No. 16 gage). Such plates shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (51 mm) above sole plates and below top plates.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24595-html-1",
+      "kind" : "html",
+      "plainText" : "In concealed locations where piping, other than cast-iron or galvanized steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38 mm) from the nearest edge of the member, the pipe shall be protected by steel shield plates. Such shield plates shall have a thickness of not less than 0.0575 inch (1.463 mm) (No. 16 gage). Such plates shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (51 mm) above sole plates and below top plates."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 24595
+}

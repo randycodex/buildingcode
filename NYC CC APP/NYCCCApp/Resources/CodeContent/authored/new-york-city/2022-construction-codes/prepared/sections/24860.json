@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161922\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161922\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A public water main shall be deemed available to a one- and two-family dwelling if a property line of such dwelling is within 100 feet (30 480 mm), measured along a street, alley, or right-of-way, of the public water supply system. The extension and connection shall be made in accordance with the applicable standards of the Department of Environmental Protection.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161923\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception: <\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where two or more one- or two-family dwellings are to be constructed on a tract of land, the public water supply system may be declared available thereto by the agencies having jurisdiction thereon even though the specified distance is exceeded.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24860-html-1",
+      "kind" : "html",
+      "plainText" : "A public water main shall be deemed available to a one- and two-family dwelling if a property line of such dwelling is within 100 feet (30 480 mm), measured along a street, alley, or right-of-way, of the public water supply system. The extension and connection shall be made in accordance with the applicable standards of the Department of Environmental Protection. \n\n Exception: Where two or more one- or two-family dwellings are to be constructed on a tract of land, the public water supply system may be declared available thereto by the agencies having jurisdiction thereon even though the specified distance is exceeded."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24860
+}

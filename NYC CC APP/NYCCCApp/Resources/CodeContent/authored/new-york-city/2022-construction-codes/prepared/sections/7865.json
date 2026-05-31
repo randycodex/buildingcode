@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230006\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230006\"><\/AnnotationDrawer><div>Where a manufactured home is permitted by this code, the manufactured home may be used as an ADU in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-230212', hash: '#JD_BCU103' }}\">U103<\/Link>, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-230209', hash: '#JD_BCU203' }}\">U203<\/Link>, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-230208', hash: '#JD_BCU204' }}\">U204<\/Link>, and rules of the department. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230003\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230003\"><\/AnnotationDrawer><div>(L.L. 2024\/127, 12\/18\/2024, eff. 6\/16\/2025) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "7865-html-1",
+      "kind" : "html",
+      "plainText" : "Where a manufactured home is permitted by this code, the manufactured home may be used as an ADU in accordance with Section U103 , U203 , U204 , and rules of the department. \n\n (L.L. 2024\/127, 12\/18\/2024, eff. 6\/16\/2025)"
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7865
+}

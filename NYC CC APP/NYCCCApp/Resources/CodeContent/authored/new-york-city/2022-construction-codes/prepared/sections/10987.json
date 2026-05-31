@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195136\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195136\"><\/AnnotationDrawer><div>The exhaust pipe may be connected to a chimney used for other equipment, provided that the operation of the engine does not adversely affect the operation of the other equipment so that it is in violation of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Air Pollution Control Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10987-html-1",
+      "kind" : "html",
+      "plainText" : "The exhaust pipe may be connected to a chimney used for other equipment, provided that the operation of the engine does not adversely affect the operation of the other equipment so that it is in violation of the New York City Air Pollution Control Code."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10987
+}

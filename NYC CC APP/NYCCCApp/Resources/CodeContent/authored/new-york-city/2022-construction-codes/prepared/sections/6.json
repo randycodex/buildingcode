@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164252\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164252\"><\/annotationdrawer><div>The provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code<\/span> shall apply to the installation of gas piping, gas appliances and related accessories as covered in this code. These requirements apply to gas piping systems extending to the inlet connections of appliances and the installation and operation of residential and commercial gas appliances and related accessories.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of the New York City Fuel Gas Code shall apply to the installation of gas piping, gas appliances and related accessories as covered in this code. These requirements apply to gas piping systems extending to the inlet connections of appliances and the installation and operation of residential and commercial gas appliances and related accessories."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 6
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178516\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178516\"><\/AnnotationDrawer><div>Inspection of fire-resistant joint systems that are tested and listed in accordance with Sections 715.3 and 715.4 of this code shall be conducted by an approved special inspection agency in accordance with ASTM E 2393.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17619-html-1",
+      "kind" : "html",
+      "plainText" : "Inspection of fire-resistant joint systems that are tested and listed in accordance with Sections 715.3 and 715.4 of this code shall be conducted by an approved special inspection agency in accordance with ASTM E 2393."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17619
+}

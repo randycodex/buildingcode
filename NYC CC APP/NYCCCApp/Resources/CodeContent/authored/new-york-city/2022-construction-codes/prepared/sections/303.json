@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166792\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166792\"><\/AnnotationDrawer><div>Where installed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183891', hash: '#JD_BC3008' }}\">3008<\/Link>, passenger elevators for general public use shall be permitted to be used for occupant self-evacuation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "303-html-1",
+      "kind" : "html",
+      "plainText" : "Where installed in accordance with Section 3008 , passenger elevators for general public use shall be permitted to be used for occupant self-evacuation."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 303
+}

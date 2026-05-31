@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230139\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230139\"><\/AnnotationDrawer><div>Where the ADU is permitted to be classified as an R-3 occupancy by this code, the exception in Section 903.2.8 shall not apply to such ADU and such ADU shall be provided with an automatic sprinkler system throughout the ADU in accordance with NFPA 13D as modified by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-191144', hash: '#JD_BCAppQ' }}\">Appendix Q<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13778-html-1",
+      "kind" : "html",
+      "plainText" : "Where the ADU is permitted to be classified as an R-3 occupancy by this code, the exception in Section 903.2.8 shall not apply to such ADU and such ADU shall be provided with an automatic sprinkler system throughout the ADU in accordance with NFPA 13D as modified by Appendix Q ."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 13778
+}

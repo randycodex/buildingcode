@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186551\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186551\"><\/AnnotationDrawer><div>Unenclosed perimeter protection shall be maintained in a safe condition and used in a manner that eliminates hazards to the public and property. Any hazardous conditions or defects discovered with such shall immediately be brought to the attention of the responsible permit holder under Section 3308.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20270-html-1",
+      "kind" : "html",
+      "plainText" : "Unenclosed perimeter protection shall be maintained in a safe condition and used in a manner that eliminates hazards to the public and property. Any hazardous conditions or defects discovered with such shall immediately be brought to the attention of the responsible permit holder under Section 3308.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20270
+}

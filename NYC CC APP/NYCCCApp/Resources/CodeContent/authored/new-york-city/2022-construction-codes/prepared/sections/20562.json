@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187515\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187515\"><\/AnnotationDrawer><div>The requirements of Section 3301.8 shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20562-html-1",
+      "kind" : "html",
+      "plainText" : "The requirements of Section 3301.8 shall apply."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20562
+}

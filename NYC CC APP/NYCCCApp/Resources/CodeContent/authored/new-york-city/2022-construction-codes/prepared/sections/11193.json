@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195713\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195713\"><\/AnnotationDrawer><div>Periodic tests of the mechanical ventilating system shall be performed in accordance with manufacturer's specifications and as required by the Commissioner of the Fire Department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11193-html-1",
+      "kind" : "html",
+      "plainText" : "Periodic tests of the mechanical ventilating system shall be performed in accordance with manufacturer's specifications and as required by the Commissioner of the Fire Department."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11193
+}

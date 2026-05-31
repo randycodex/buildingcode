@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176970\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176970\"><\/AnnotationDrawer><div>An enclosed rooftop structure not intended for human occupancy shall not be used for purposes other than shelter of mechanical equipment or shelter of vertical shaft openings in the roof. Provisions, such as louvers, louver blades or flashing, shall be made to protect the mechanical equipment and the building interior from the elements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17210-html-1",
+      "kind" : "html",
+      "plainText" : "An enclosed rooftop structure not intended for human occupancy shall not be used for purposes other than shelter of mechanical equipment or shelter of vertical shaft openings in the roof. Provisions, such as louvers, louver blades or flashing, shall be made to protect the mechanical equipment and the building interior from the elements."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17210
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177387\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177387\"><\/AnnotationDrawer><div>Where any structure does not restrict access for vehicles that exceed a 10,000 pound (4535.9 kg) gross vehicle weight rating, those portions of the structure subject to such loads shall be designed using the vehicular live loads, including consideration of impact and fatigue, in accordance with the NYSDOT Bridge Manual and the NYSDOT LRFD Bridge Design Specifications.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177388\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177388\"><\/AnnotationDrawer><div>Alternatively, it shall be acceptable to utilize the design live loads for sidewalks as shown in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177332', hash: '#JD_BCTable1607.1' }}\">Table 1607.1<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3484-html-1",
+      "kind" : "html",
+      "plainText" : "Where any structure does not restrict access for vehicles that exceed a 10,000 pound (4535.9 kg) gross vehicle weight rating, those portions of the structure subject to such loads shall be designed using the vehicular live loads, including consideration of impact and fatigue, in accordance with the NYSDOT Bridge Manual and the NYSDOT LRFD Bridge Design Specifications.\n\n Alternatively, it shall be acceptable to utilize the design live loads for sidewalks as shown in Table 1607.1 ."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3484
+}

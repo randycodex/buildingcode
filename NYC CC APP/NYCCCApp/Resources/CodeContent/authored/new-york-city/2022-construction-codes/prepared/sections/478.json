@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167327\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167327\"><\/AnnotationDrawer><div>Sleeping areas and any contiguous day room, group activity space or other common spaces where residents are housed shall be separated from other spaces in accordance with Sections 408.8.1 through 408.8.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "478-html-1",
+      "kind" : "html",
+      "plainText" : "Sleeping areas and any contiguous day room, group activity space or other common spaces where residents are housed shall be separated from other spaces in accordance with Sections 408.8.1 through 408.8.4."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 478
+}

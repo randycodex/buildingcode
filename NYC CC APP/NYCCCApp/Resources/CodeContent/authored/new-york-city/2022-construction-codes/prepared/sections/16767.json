@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175701\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175701\"><\/AnnotationDrawer><div>The space between the bottom of the floor joists and the surface under any building except spaces occupied by basements or cellars shall be provided with ventilation openings through foundation walls or exterior walls. Such openings shall be placed so as to provide cross ventilation of the under-floor space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16767-html-1",
+      "kind" : "html",
+      "plainText" : "The space between the bottom of the floor joists and the surface under any building except spaces occupied by basements or cellars shall be provided with ventilation openings through foundation walls or exterior walls. Such openings shall be placed so as to provide cross ventilation of the under-floor space."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16767
+}

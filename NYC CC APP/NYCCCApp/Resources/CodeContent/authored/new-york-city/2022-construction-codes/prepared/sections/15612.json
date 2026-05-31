@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171872\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171872\"><\/AnnotationDrawer><div>Single- or multiple-station smoke alarms shall be installed and maintained in Groups R-2 and R-3, regardless of occupant load at all of the following locations within all dwelling units:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171873\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171873\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;On the ceiling or wall outside of each room used for sleeping purposes within 15 feet (4572 mm) from the door to such room.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171874\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171874\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;In each room used for sleeping purposes.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171875\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171875\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;In each story within a dwelling unit, including below-grade stories and penthouses of any area, but not including crawl spaces and uninhabitable attics. In dwellings or dwelling units with split levels and without an intervening door between the adjacent levels, a smoke alarm installed on the upper level shall suffice for the adjacent lower level provided that the lower level is less than one full story below the upper level.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15612-html-1",
+      "kind" : "html",
+      "plainText" : "Single- or multiple-station smoke alarms shall be installed and maintained in Groups R-2 and R-3, regardless of occupant load at all of the following locations within all dwelling units:\n\n 1. On the ceiling or wall outside of each room used for sleeping purposes within 15 feet (4572 mm) from the door to such room.\n\n 2. In each room used for sleeping purposes.\n\n 3. In each story within a dwelling unit, including below-grade stories and penthouses of any area, but not including crawl spaces and uninhabitable attics. In dwellings or dwelling units with split levels and without an intervening door between the adjacent levels, a smoke alarm installed on the upper level shall suffice for the adjacent lower level provided that the lower level is less than one full story below the upper level."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15612
+}

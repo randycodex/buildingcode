@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175595\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175595\"><\/AnnotationDrawer><div>At least one of each type of exercise machine and equipment shall be on an accessible route and shall be in compliance with Section 1104 (Exercise Machines and Equipment) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16742-html-1",
+      "kind" : "html",
+      "plainText" : "At least one of each type of exercise machine and equipment shall be on an accessible route and shall be in compliance with Section 1104 (Exercise Machines and Equipment) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16742
+}

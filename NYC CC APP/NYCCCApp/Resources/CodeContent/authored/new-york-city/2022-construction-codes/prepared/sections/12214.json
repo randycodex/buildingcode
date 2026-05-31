@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162376\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162376\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Dug or bored well casings shall be of water-tight concrete, tile or galvanized or corrugated metal pipe extending to not less than 10 feet (3048 mm) below the ground surface. Where the water table is more than 10 feet (3048 mm) below the ground surface, the water-tight casing shall extend below the table surface. Well casings for dug wells or bored wells constructed with sections of concrete, tile or galvanized or corrugated metal pipe shall be surrounded by 6 inches (152 mm) of grout poured into the hole between the outside of the casing and the ground and extending not less than 10 feet (3048 mm) below the ground surface.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12214-html-1",
+      "kind" : "html",
+      "plainText" : "Dug or bored well casings shall be of water-tight concrete, tile or galvanized or corrugated metal pipe extending to not less than 10 feet (3048 mm) below the ground surface. Where the water table is more than 10 feet (3048 mm) below the ground surface, the water-tight casing shall extend below the table surface. Well casings for dug wells or bored wells constructed with sections of concrete, tile or galvanized or corrugated metal pipe shall be surrounded by 6 inches (152 mm) of grout poured into the hole between the outside of the casing and the ground and extending not less than 10 feet (3048 mm) below the ground surface."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12214
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197738\"><\/AnnotationDrawer><div>Approved gas meters shall be permitted to be installed for gas consumption monitoring, energy measurement, verification and analysis. Gas meters shall be listed in accordance with ANSI B109.1, ANSI B109.2, or ANSI B109.3 and installed in accordance with the manufacturer's instructions. A full size valve bypass shall be provided around gas meters for maintenance and repair.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8094-html-1",
+      "kind" : "html",
+      "plainText" : "Approved gas meters shall be permitted to be installed for gas consumption monitoring, energy measurement, verification and analysis. Gas meters shall be listed in accordance with ANSI B109.1, ANSI B109.2, or ANSI B109.3 and installed in accordance with the manufacturer's instructions. A full size valve bypass shall be provided around gas meters for maintenance and repair."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8094
+}

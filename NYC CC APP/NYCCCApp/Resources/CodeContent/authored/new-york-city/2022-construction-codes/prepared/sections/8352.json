@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198449\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198449\"><\/AnnotationDrawer><div>A connector shall extend from the appliance to the flue serving a masonry fireplace such that the flue gases are exhausted directly into the flue. The connector shall be accessible or removable for inspection and cleaning of both the connector and the flue. Listed direct connection devices shall be installed in accordance with their listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8352-html-1",
+      "kind" : "html",
+      "plainText" : "A connector shall extend from the appliance to the flue serving a masonry fireplace such that the flue gases are exhausted directly into the flue. The connector shall be accessible or removable for inspection and cleaning of both the connector and the flue. Listed direct connection devices shall be installed in accordance with their listing."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8352
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192461\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192461\"><\/AnnotationDrawer><div>New mechanical systems and parts of existing systems, that have been altered, extended, renovated or repaired, shall be tested as prescribed herein to disclose leaks and defects.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10202-html-1",
+      "kind" : "html",
+      "plainText" : "New mechanical systems and parts of existing systems, that have been altered, extended, renovated or repaired, shall be tested as prescribed herein to disclose leaks and defects."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 10202
+}

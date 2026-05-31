@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181067\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181067\"><\/AnnotationDrawer><div>The firebox floor of a masonry heater shall be a minimum thickness of 4 inches (102 mm) of noncombustible material and be supported on a noncombustible footing and foundation in accordance with Section 2113.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18501-html-1",
+      "kind" : "html",
+      "plainText" : "The firebox floor of a masonry heater shall be a minimum thickness of 4 inches (102 mm) of noncombustible material and be supported on a noncombustible footing and foundation in accordance with Section 2113.2."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18501
+}

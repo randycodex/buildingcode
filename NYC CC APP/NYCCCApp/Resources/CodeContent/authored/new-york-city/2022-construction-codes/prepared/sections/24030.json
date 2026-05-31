@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195756\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195756\"><\/AnnotationDrawer><div>Permanently installed refrigeration systems containing more than 6.6 pounds (3 kg) of a refrigerant other than a Group A1 refrigerant shall be provided with an emergency pressure control system in accordance with Sections 1105.9.1 and 1105.9.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24030-html-1",
+      "kind" : "html",
+      "plainText" : "Permanently installed refrigeration systems containing more than 6.6 pounds (3 kg) of a refrigerant other than a Group A1 refrigerant shall be provided with an emergency pressure control system in accordance with Sections 1105.9.1 and 1105.9.2."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24030
+}

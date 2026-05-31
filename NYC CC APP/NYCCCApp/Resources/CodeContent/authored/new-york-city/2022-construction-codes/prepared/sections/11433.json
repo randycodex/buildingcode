@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196276\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196276\"><\/AnnotationDrawer><div>Fuel-oil storage systems that are temporarily or permanently taken out of service shall comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York State Department of Environmental Conservation's Petroleum Bulk Storage Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11433-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-oil storage systems that are temporarily or permanently taken out of service shall comply with the requirements of the New York City Fire Code and of the New York State Department of Environmental Conservation's Petroleum Bulk Storage Code."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11433
+}

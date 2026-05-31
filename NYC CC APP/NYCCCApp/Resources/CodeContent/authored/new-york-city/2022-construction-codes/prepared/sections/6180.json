@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185779\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185779\"><\/AnnotationDrawer><div>Precast concrete members shall be adequately braced and supported during erection to ensure proper alignment and structural integrity until permanent connections are completed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6180-html-1",
+      "kind" : "html",
+      "plainText" : "Precast concrete members shall be adequately braced and supported during erection to ensure proper alignment and structural integrity until permanent connections are completed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6180
+}

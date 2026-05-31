@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178798\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178798\"><\/AnnotationDrawer><div>The deflection of structural members under the design load shall not exceed the limitations in Section 1604.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17723-html-1",
+      "kind" : "html",
+      "plainText" : "The deflection of structural members under the design load shall not exceed the limitations in Section 1604.3."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17723
+}

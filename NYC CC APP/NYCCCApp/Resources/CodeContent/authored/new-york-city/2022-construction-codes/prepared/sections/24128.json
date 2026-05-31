@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195989\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195989\"><\/AnnotationDrawer><div>Joints between brass tubing or fittings shall be brazed, mechanical or soldered joints conforming to Section 1203.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24128-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between brass tubing or fittings shall be brazed, mechanical or soldered joints conforming to Section 1203.3."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24128
+}

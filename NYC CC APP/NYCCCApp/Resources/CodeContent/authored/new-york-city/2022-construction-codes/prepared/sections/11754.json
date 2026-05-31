@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161209\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Ashes, cinders or rags; flammable, poisonous or explosive liquids or gases; oil, grease or any other insoluble material capable of obstructing, damaging or overloading the building drainage or sewer<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">system, or capable of interfering with the normal operation of the sewage treatment processes; or any other substance or material prohibited from being discharged into the public sewers in accordance with the rules of the Department of Environmental Protection, shall not be deposited, by any means, into such systems.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11754-html-1",
+      "kind" : "html",
+      "plainText" : "Ashes, cinders or rags; flammable, poisonous or explosive liquids or gases; oil, grease or any other insoluble material capable of obstructing, damaging or overloading the building drainage or sewer system, or capable of interfering with the normal operation of the sewage treatment processes; or any other substance or material prohibited from being discharged into the public sewers in accordance with the rules of the Department of Environmental Protection, shall not be deposited, by any means, into such systems."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11754
+}

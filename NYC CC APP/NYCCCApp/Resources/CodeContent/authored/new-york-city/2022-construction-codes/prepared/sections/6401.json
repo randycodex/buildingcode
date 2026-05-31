@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186429\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186429\"><\/AnnotationDrawer><div>Where the vertical safety netting relies upon a taut system, the net and cables shall be maintained taut. A positive tensioning system such as a turnbuckle shall be provided to keep the cable taut.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6401-html-1",
+      "kind" : "html",
+      "plainText" : "Where the vertical safety netting relies upon a taut system, the net and cables shall be maintained taut. A positive tensioning system such as a turnbuckle shall be provided to keep the cable taut."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6401
+}

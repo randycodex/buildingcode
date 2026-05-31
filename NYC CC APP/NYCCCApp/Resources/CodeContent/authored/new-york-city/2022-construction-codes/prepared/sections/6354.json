@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186280\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186280\"><\/AnnotationDrawer><div>Defects discovered during the course of performing an inspection required by Sections 3307.6.5.7 through 3307.6.5.10 shall immediately be brought to the attention of the permit holder for the shed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6354-html-1",
+      "kind" : "html",
+      "plainText" : "Defects discovered during the course of performing an inspection required by Sections 3307.6.5.7 through 3307.6.5.10 shall immediately be brought to the attention of the permit holder for the shed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6354
+}

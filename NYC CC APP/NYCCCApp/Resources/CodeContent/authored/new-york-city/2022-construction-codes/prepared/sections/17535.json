@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178258\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178258\"><\/AnnotationDrawer><div>Installation of high-strength bolts shall be inspected in accordance with this section and AISC 360.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178259\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178259\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Installation of high strength bolts in bearing type connections where the calculated connection strength is at least twice the required strength of the connection. Inspection of such connections shall be made under Section 1705.2.2. Such connections shall be clearly indicated on the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17535-html-1",
+      "kind" : "html",
+      "plainText" : "Installation of high-strength bolts shall be inspected in accordance with this section and AISC 360.\n\n Exception: Installation of high strength bolts in bearing type connections where the calculated connection strength is at least twice the required strength of the connection. Inspection of such connections shall be made under Section 1705.2.2. Such connections shall be clearly indicated on the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17535
+}

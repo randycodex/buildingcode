@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174908\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174908\"><\/AnnotationDrawer><div>Where provided, direct access for pedestrians from parking structures to buildings or facility entrances shall be accessible.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16495-html-1",
+      "kind" : "html",
+      "plainText" : "Where provided, direct access for pedestrians from parking structures to buildings or facility entrances shall be accessible."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16495
+}

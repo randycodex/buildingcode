@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195794\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195794\"><\/AnnotationDrawer><div>Remote control of the mechanical equipment and appliances located in the machinery room shall be provided at an accessible location immediately outside the machinery room and adjacent to its principal entrance and shall comply with Sections 1106.5.1 and 1106.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24045-html-1",
+      "kind" : "html",
+      "plainText" : "Remote control of the mechanical equipment and appliances located in the machinery room shall be provided at an accessible location immediately outside the machinery room and adjacent to its principal entrance and shall comply with Sections 1106.5.1 and 1106.5.2."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24045
+}

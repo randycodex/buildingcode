@@ -1,0 +1,37 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163602\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163602\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">On-site stormwater disposal systems shall be designed to provide adequate storage, support the use at the surface, and allow for operation and required maintenance. Systems shall be constructed with all necessary components and materials required by the manufacturers specifications. Drywell design shall incorporate a grit chamber, and where required, a sand column constructed in accordance with <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163601', hash: '#JD_PCFigure1114.4(1)' }}\">Figures 1114.4(1)<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> and <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163601', hash: '#JD_PCFigure1114.4(2)' }}\">1114.4(2)<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">, respectively.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163603\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163603\"><\/AnnotationDrawer><div><div style=\"text-align:center;\">",
+      "id" : "25486-html-1",
+      "kind" : "html",
+      "plainText" : "On-site stormwater disposal systems shall be designed to provide adequate storage, support the use at the surface, and allow for operation and required maintenance. Systems shall be constructed with all necessary components and materials required by the manufacturers specifications. Drywell design shall incorporate a grit chamber, and where required, a sand column constructed in accordance with Figures 1114.4(1) and 1114.4(2) , respectively."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/e3fb73d2bcbc83e7ddcc07332fe648b616bc64fd.png\" width=\"432\" height=\"513.666666666667\"><\/img><\/span>",
+      "id" : "25486-image-2",
+      "imageID" : "e3fb73d2bcbc83e7ddcc07332fe648b616bc64fd.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163604\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163604\"><\/AnnotationDrawer><div><div style=\"text-align:center;\"><a name=\"JD_PCFigure1114.4(1)\" id=\"JD_PCFigure1114.4(1)\" title=\"PC Figure 1114.4(1)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1114.4(1)<br><\/br>Grit Chamber<\/span><\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163605\"><\/AnnotationDrawer><div><div style=\"text-align:center;\">",
+      "id" : "25486-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 1114.4(1)\n Grit Chamber"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/6f18736591872bff5ba53637b51032d6a0228891.png\" width=\"816\" height=\"539.066666666667\"><\/img><\/span>",
+      "id" : "25486-image-4",
+      "imageID" : "6f18736591872bff5ba53637b51032d6a0228891.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163606\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163606\"><\/AnnotationDrawer><div><div style=\"text-align:center;\"><a name=\"JD_PCFigure1114.4(2)\" id=\"JD_PCFigure1114.4(2)\" title=\"PC Figure 1114.4(2)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1114.4(2)<br><\/br>Detail of Drywell with Sand Column<\/span><\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25486-html-5",
+      "kind" : "html",
+      "plainText" : "Figure 1114.4(2)\n Detail of Drywell with Sand Column"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25486
+}

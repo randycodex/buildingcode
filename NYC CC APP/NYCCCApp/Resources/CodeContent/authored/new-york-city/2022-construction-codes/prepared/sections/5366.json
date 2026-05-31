@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183506\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183506\"><\/AnnotationDrawer><div>The emergency and standby power systems shall have capacity and ratings that supply all equipment required to be operational at the same time.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5366-html-1",
+      "kind" : "html",
+      "plainText" : "The emergency and standby power systems shall have capacity and ratings that supply all equipment required to be operational at the same time."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5366
+}

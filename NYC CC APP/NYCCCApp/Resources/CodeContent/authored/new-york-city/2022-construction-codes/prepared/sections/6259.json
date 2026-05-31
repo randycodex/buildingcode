@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186001\"><\/AnnotationDrawer><div>Prior to the commencement of demolition operations, hazards shall be removed in accordance with Sections 3306.9.8.1 through 3306.9.8.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6259-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the commencement of demolition operations, hazards shall be removed in accordance with Sections 3306.9.8.1 through 3306.9.8.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6259
+}

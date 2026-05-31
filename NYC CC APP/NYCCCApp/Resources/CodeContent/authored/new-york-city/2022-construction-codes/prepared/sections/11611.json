@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196749\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196749\"><\/AnnotationDrawer><div>Solar energy system components containing pressurized fluids shall be protected against pressures and temperatures exceeding design limitations with a pressure and temperature relief valve. Each section of the system in which excessive pressures are capable of developing shall have a relief device located so that a section cannot be valved off or otherwise isolated from a relief device. Relief valves shall comply with the requirements of Section 1006.4 and discharge in accordance with Section 1006.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11611-html-1",
+      "kind" : "html",
+      "plainText" : "Solar energy system components containing pressurized fluids shall be protected against pressures and temperatures exceeding design limitations with a pressure and temperature relief valve. Each section of the system in which excessive pressures are capable of developing shall have a relief device located so that a section cannot be valved off or otherwise isolated from a relief device. Relief valves shall comply with the requirements of Section 1006.4 and discharge in accordance with Section 1006.6."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 11611
+}

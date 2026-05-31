@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193921\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193921\"><\/AnnotationDrawer><div>The operation of the exhaust fan shall be in accordance with the following requirements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193922\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193922\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The hood exhaust fan(s) shall continue to operate after the extinguishing system has been activated unless fan shutdown is required by a listed component of the ventilation system or by the design of the extinguishing system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193923\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The hood exhaust fan shall not be required to start automatically upon activation of the extinguishing system if the exhaust fan and all cooking equipment served by the fan have previously been shut down.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193924\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193924\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The cooking appliances shall be interlocked with the exhaust hood system to prevent appliance operation when the exhaust hood system is not operating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23413-html-1",
+      "kind" : "html",
+      "plainText" : "The operation of the exhaust fan shall be in accordance with the following requirements:\n\n 1. The hood exhaust fan(s) shall continue to operate after the extinguishing system has been activated unless fan shutdown is required by a listed component of the ventilation system or by the design of the extinguishing system.\n\n 2. The hood exhaust fan shall not be required to start automatically upon activation of the extinguishing system if the exhaust fan and all cooking equipment served by the fan have previously been shut down.\n\n 3. The cooking appliances shall be interlocked with the exhaust hood system to prevent appliance operation when the exhaust hood system is not operating."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23413
+}

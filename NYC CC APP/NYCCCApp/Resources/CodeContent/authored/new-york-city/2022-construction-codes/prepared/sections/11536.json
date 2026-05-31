@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196539\"><\/AnnotationDrawer><div>Oil-storage outside of buildings shall comply with applicable requirements of Sections 1305.11.2.1 and 1305.11.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11536-html-1",
+      "kind" : "html",
+      "plainText" : "Oil-storage outside of buildings shall comply with applicable requirements of Sections 1305.11.2.1 and 1305.11.2.2."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11536
+}

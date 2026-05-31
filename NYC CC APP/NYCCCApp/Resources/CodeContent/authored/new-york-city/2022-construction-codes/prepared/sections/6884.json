@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188150\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188150\"><\/AnnotationDrawer><div>In banquet rooms or spaces where a head table or speaker's lectern is located on a raised platform, an accessible route shall be provided to the platform.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188151\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188151\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188151\"><\/AnnotationDrawer><h6><a name=\"JD_BCE104\" id=\"JD_BCE104\" title=\"BC E104\"><\/a>Section BC E104: Special Occupancies<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6884-html-1",
+      "kind" : "html",
+      "plainText" : "In banquet rooms or spaces where a head table or speaker's lectern is located on a raised platform, an accessible route shall be provided to the platform.\n\n Section BC E104: Special Occupancies"
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6884
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187844\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187844\"><\/AnnotationDrawer><div>No certificate of operation for a crane shall be issued or renewed on or after January 1, 2019, unless the crane is equipped with an event recorder that is supplied by the crane manufacturer, or by a dealer, distributor, vendor, or third-party authorized crane manufacturer.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187845\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187845\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Cranes where the manufacturer certifies to the department that an event recorder cannot be installed on the crane due to a technological limitation.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187846\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187846\"><\/AnnotationDrawer><div>(L.L. 2017\/079, 5\/10\/2017, eff. 1\/1\/2019; Am. L.L. 2018\/013, 12\/31\/2017, eff. 4\/30\/2018) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20645-html-1",
+      "kind" : "html",
+      "plainText" : "No certificate of operation for a crane shall be issued or renewed on or after January 1, 2019, unless the crane is equipped with an event recorder that is supplied by the crane manufacturer, or by a dealer, distributor, vendor, or third-party authorized crane manufacturer.\n\n Exception: Cranes where the manufacturer certifies to the department that an event recorder cannot be installed on the crane due to a technological limitation.\n\n (L.L. 2017\/079, 5\/10\/2017, eff. 1\/1\/2019; Am. L.L. 2018\/013, 12\/31\/2017, eff. 4\/30\/2018)"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20645
+}

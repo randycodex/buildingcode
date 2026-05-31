@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180450\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180450\"><\/AnnotationDrawer><div>The placement of concrete reinforcement shall comply with the provisions of Sections 1907.5.1 through 1907.5.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18276-html-1",
+      "kind" : "html",
+      "plainText" : "The placement of concrete reinforcement shall comply with the provisions of Sections 1907.5.1 through 1907.5.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18276
+}

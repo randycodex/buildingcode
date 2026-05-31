@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172629\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172629\"><\/AnnotationDrawer><div>Suitable means shall be provided for maintaining the temperature of a pump room or pump house, where required, above 40&#176;F (4.4&#176;C).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15882-html-1",
+      "kind" : "html",
+      "plainText" : "Suitable means shall be provided for maintaining the temperature of a pump room or pump house, where required, above 40°F (4.4°C)."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15882
+}

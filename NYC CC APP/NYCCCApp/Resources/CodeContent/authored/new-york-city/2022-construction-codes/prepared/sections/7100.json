@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188748\"><\/AnnotationDrawer><div>Where an existing emergency vehicle garage or fire, rescue, ambulance, or police station building is undergoing substantial improvement or an increase in the degree of noncompliance, such existing emergency vehicle storage area shall be permitted to be located below the design flood elevation, provided such space is wet floodproofed in accordance with ASCE 24 and an emergency action plan is filed with the department in accordance with ASCE 24, Section 6.2.3. Such emergency action plan shall include actionable directives for the relocation of such emergency vehicles in advance of a flood event.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7100-html-1",
+      "kind" : "html",
+      "plainText" : "Where an existing emergency vehicle garage or fire, rescue, ambulance, or police station building is undergoing substantial improvement or an increase in the degree of noncompliance, such existing emergency vehicle storage area shall be permitted to be located below the design flood elevation, provided such space is wet floodproofed in accordance with ASCE 24 and an emergency action plan is filed with the department in accordance with ASCE 24, Section 6.2.3. Such emergency action plan shall include actionable directives for the relocation of such emergency vehicles in advance of a flood event."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7100
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198719\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198719\"><\/AnnotationDrawer><div>A pipe passing through a roof shall extend without interruption through the roof flashing, roof jack, or roof thimble. Where a single-wall metal pipe passes through a roof constructed of combustible material, a noncombustible, non-ventilating thimble shall be used at the point of passage. The thimble shall extend not less than 18 inches (457.2 mm) above and 6 inches (152.4 mm) below the roof with the annular space open at the bottom and closed only at the top. The thimble shall be sized in accordance with Section 503.7.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8447-html-1",
+      "kind" : "html",
+      "plainText" : "A pipe passing through a roof shall extend without interruption through the roof flashing, roof jack, or roof thimble. Where a single-wall metal pipe passes through a roof constructed of combustible material, a noncombustible, non-ventilating thimble shall be used at the point of passage. The thimble shall extend not less than 18 inches (457.2 mm) above and 6 inches (152.4 mm) below the roof with the annular space open at the bottom and closed only at the top. The thimble shall be sized in accordance with Section 503.7.7."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8447
+}

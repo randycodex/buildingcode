@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181789\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181789\"><\/AnnotationDrawer><div>Each piece of lumber decking shall be square-end trimmed. When random lengths are furnished, each piece shall be square-end trimmed across the face so that at least 90 percent of the pieces are within 0.5 degrees (0.00873 rad) of square. The ends of the pieces shall be permitted to be beveled up to 2 degrees (0.0349 rad) from the vertical with the exposed face of the piece slightly longer than the opposite face of the piece. Tongue-and-groove decking shall be installed with the tongues up on sloped or pitched roofs with pattern faces down.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18735-html-1",
+      "kind" : "html",
+      "plainText" : "Each piece of lumber decking shall be square-end trimmed. When random lengths are furnished, each piece shall be square-end trimmed across the face so that at least 90 percent of the pieces are within 0.5 degrees (0.00873 rad) of square. The ends of the pieces shall be permitted to be beveled up to 2 degrees (0.0349 rad) from the vertical with the exposed face of the piece slightly longer than the opposite face of the piece. Tongue-and-groove decking shall be installed with the tongues up on sloped or pitched roofs with pattern faces down."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18735
+}

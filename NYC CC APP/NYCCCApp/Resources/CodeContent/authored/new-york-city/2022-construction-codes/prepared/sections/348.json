@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166926\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166926\"><\/AnnotationDrawer><div>Parking garages, other than private parking garages, shall be classified as public parking garages and shall comply with the provisions of Sections 406.4.2 through 406.4.10 and shall be classified as either an open parking garage or an enclosed parking garage. Open parking garages shall also comply with Section 406.5. Enclosed parking garages shall also comply with Section 406.6. See Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168746', hash: '#JD_BC510' }}\">510<\/Link> for special provisions for parking garages.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "348-html-1",
+      "kind" : "html",
+      "plainText" : "Parking garages, other than private parking garages, shall be classified as public parking garages and shall comply with the provisions of Sections 406.4.2 through 406.4.10 and shall be classified as either an open parking garage or an enclosed parking garage. Open parking garages shall also comply with Section 406.5. Enclosed parking garages shall also comply with Section 406.6. See Section 510 for special provisions for parking garages."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 348
+}

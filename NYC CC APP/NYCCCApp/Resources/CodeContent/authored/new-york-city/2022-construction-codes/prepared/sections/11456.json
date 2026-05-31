@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196328\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196328\"><\/AnnotationDrawer><div>Flexible fuel-oil piping systems shall be installed with continuous vacuum leak detection and alarm. The alarm shall sound and the transfer pump shall stop when a leak is detected. The alarm shall be connected to a local audible alarm and to a remote alarm located at a supervising station. The wiring shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196329\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196329\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196329\"><\/AnnotationDrawer><h6><a name=\"JD_MC1303\" id=\"JD_MC1303\" title=\"MC 1303\"><\/a>Section MC 1303: Joints and Connections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11456-html-1",
+      "kind" : "html",
+      "plainText" : "Flexible fuel-oil piping systems shall be installed with continuous vacuum leak detection and alarm. The alarm shall sound and the transfer pump shall stop when a leak is detected. The alarm shall be connected to a local audible alarm and to a remote alarm located at a supervising station. The wiring shall comply with the New York City Electrical Code .\n\n Section MC 1303: Joints and Connections"
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11456
+}

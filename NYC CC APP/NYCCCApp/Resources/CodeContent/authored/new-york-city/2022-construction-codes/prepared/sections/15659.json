@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172020\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172020\"><\/AnnotationDrawer><div>Where an automatic smoke detection system is required it shall utilize smoke detectors unless ambient conditions prohibit such an installation. In spaces where smoke detectors cannot be utilized due to ambient conditions, approved automatic heat detectors shall be permitted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15659-html-1",
+      "kind" : "html",
+      "plainText" : "Where an automatic smoke detection system is required it shall utilize smoke detectors unless ambient conditions prohibit such an installation. In spaces where smoke detectors cannot be utilized due to ambient conditions, approved automatic heat detectors shall be permitted."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15659
+}

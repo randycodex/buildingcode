@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162221\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162221\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Fixture fittings, faucets and diverters shall be installed and adjusted so that the flow of hot water from the fittings corresponds to the left-hand side of the fixture fitting.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162222\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162222\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception: <\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Shower and tub\/shower mixing valves conforming to ASSE 1016\/ASME A112.1016\/CSA B125.16 or ASME A112.18.1\/CSA B125.1, where the flow of hot water corresponds to the markings on the device.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24978-html-1",
+      "kind" : "html",
+      "plainText" : "Fixture fittings, faucets and diverters shall be installed and adjusted so that the flow of hot water from the fittings corresponds to the left-hand side of the fixture fitting. \n\n Exception: Shower and tub\/shower mixing valves conforming to ASSE 1016\/ASME A112.1016\/CSA B125.16 or ASME A112.18.1\/CSA B125.1, where the flow of hot water corresponds to the markings on the device."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24978
+}

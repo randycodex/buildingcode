@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177544\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177544\"><\/AnnotationDrawer><div>The lateral force on crane runway beams with electrically powered trolleys shall be calculated as 20 percent of the sum of the rated capacity of the crane and the weight of the hoist and trolley. The lateral force shall be assumed to act horizontally at the traction surface of a runway beam, in either direction perpendicular to the beam, and shall be distributed according to the lateral stiffness of the runway beam and supporting structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17358-html-1",
+      "kind" : "html",
+      "plainText" : "The lateral force on crane runway beams with electrically powered trolleys shall be calculated as 20 percent of the sum of the rated capacity of the crane and the weight of the hoist and trolley. The lateral force shall be assumed to act horizontally at the traction surface of a runway beam, in either direction perpendicular to the beam, and shall be distributed according to the lateral stiffness of the runway beam and supporting structure."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17358
+}

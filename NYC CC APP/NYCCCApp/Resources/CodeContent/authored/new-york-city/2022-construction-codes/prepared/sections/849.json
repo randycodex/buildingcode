@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168452\"><\/AnnotationDrawer><div>A mezzanine or mezzanines in compliance with Section 505.2 shall be considered a portion of the story below. Such mezzanines shall not contribute to either the building area or number of stories as regulated by Section 503.1. The area of the mezzanine shall be included in determining the fire area. The clear height above and below the mezzanine floor construction shall be not less than 7 feet (2134 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168453\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168453\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The clear height of habitable spaces above or below mezzanines within dwelling units shall be not less than 8 feet (2438 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "849-html-1",
+      "kind" : "html",
+      "plainText" : "A mezzanine or mezzanines in compliance with Section 505.2 shall be considered a portion of the story below. Such mezzanines shall not contribute to either the building area or number of stories as regulated by Section 503.1. The area of the mezzanine shall be included in determining the fire area. The clear height above and below the mezzanine floor construction shall be not less than 7 feet (2134 mm).\n\n Exception: The clear height of habitable spaces above or below mezzanines within dwelling units shall be not less than 8 feet (2438 mm)."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 849
+}

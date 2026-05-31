@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195083\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195083\"><\/AnnotationDrawer><div>Where a factory-built chimney serving a solid fuel-burning appliance or fireplace incorporates offsets, no part of the chimney shall be at an angle of more than 30 degrees (0.52 rad) from vertical at any point in the assembly and the chimney assembly shall not include more than four elbows.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195084\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Factory-built chimneys listed to UL 103 Type HT serving a solid fuel-burning appliance or fireplace may offset at angles greater than 30 degrees from vertical if listed for such angles and installed in accordance with manufacturer's instructions. Cleanouts shall be installed in accordance with Section 801.13.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23794-html-1",
+      "kind" : "html",
+      "plainText" : "Where a factory-built chimney serving a solid fuel-burning appliance or fireplace incorporates offsets, no part of the chimney shall be at an angle of more than 30 degrees (0.52 rad) from vertical at any point in the assembly and the chimney assembly shall not include more than four elbows.\n\n Exception: Factory-built chimneys listed to UL 103 Type HT serving a solid fuel-burning appliance or fireplace may offset at angles greater than 30 degrees from vertical if listed for such angles and installed in accordance with manufacturer's instructions. Cleanouts shall be installed in accordance with Section 801.13."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23794
+}

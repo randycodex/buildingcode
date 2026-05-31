@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187331\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187331\"><\/AnnotationDrawer><div>Wood pole scaffolds shall meet the requirements of Sections 3314.12.1 through 3314.12.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6681-html-1",
+      "kind" : "html",
+      "plainText" : "Wood pole scaffolds shall meet the requirements of Sections 3314.12.1 through 3314.12.9."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6681
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180432\"><\/AnnotationDrawer><div>Standard hooks on reinforcing bars used in concrete construction shall comply with ACI 318, Section 25.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18267-html-1",
+      "kind" : "html",
+      "plainText" : "Standard hooks on reinforcing bars used in concrete construction shall comply with ACI 318, Section 25.3."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18267
+}

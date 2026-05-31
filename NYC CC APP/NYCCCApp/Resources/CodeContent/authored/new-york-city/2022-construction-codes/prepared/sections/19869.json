@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185409\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185409\"><\/AnnotationDrawer><div>Concrete washout water shall not be allowed to enter any sewer, catch basin, drain, or body of water or to leach into the ground.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19869-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete washout water shall not be allowed to enter any sewer, catch basin, drain, or body of water or to leach into the ground."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19869
+}

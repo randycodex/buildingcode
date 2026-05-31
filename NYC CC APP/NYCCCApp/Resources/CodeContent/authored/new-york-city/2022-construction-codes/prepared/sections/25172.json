@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162720\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162720\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where it is necessary to protect a cleanout plug from the loads of vehicular traffic, cleanout assemblies in accordance with ASME A112.36.2M shall be installed.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162721\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162721\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224181\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224181\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25172-html-1",
+      "kind" : "html",
+      "plainText" : "Where it is necessary to protect a cleanout plug from the loads of vehicular traffic, cleanout assemblies in accordance with ASME A112.36.2M shall be installed. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25172
+}

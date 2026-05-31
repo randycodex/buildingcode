@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187053\"><\/AnnotationDrawer><div>Suspended scaffolds shall be inspected prior to each shift, and after any occurrence which could affect a scaffold's structural integrity, in accordance with a pre-shift inspection checklist that meets the requirements of Section 3314.4.3.4.2. The scaffold shall not be used until it has passed such inspection and the results have been documented on the checklist. The checklist shall be kept at the site by the scaffold controlling entity.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187054\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187054\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> A pre-shift inspection is not required for a non-adjustable suspended scaffold that, pursuant to Section 3314.3.2, is not required to be designed. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6584-html-1",
+      "kind" : "html",
+      "plainText" : "Suspended scaffolds shall be inspected prior to each shift, and after any occurrence which could affect a scaffold's structural integrity, in accordance with a pre-shift inspection checklist that meets the requirements of Section 3314.4.3.4.2. The scaffold shall not be used until it has passed such inspection and the results have been documented on the checklist. The checklist shall be kept at the site by the scaffold controlling entity.\n\n Exception: A pre-shift inspection is not required for a non-adjustable suspended scaffold that, pursuant to Section 3314.3.2, is not required to be designed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6584
+}

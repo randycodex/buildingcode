@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192404\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192404\"><\/AnnotationDrawer><div>Construction documents for heating systems shall include the temperature to be maintained in every room and the output capacity in BTU per hour of the central heating source.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10181-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents for heating systems shall include the temperature to be maintained in every room and the output capacity in BTU per hour of the central heating source."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 10181
+}

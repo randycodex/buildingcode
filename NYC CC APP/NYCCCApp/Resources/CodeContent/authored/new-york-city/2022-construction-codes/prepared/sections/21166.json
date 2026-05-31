@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198427\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198427\"><\/AnnotationDrawer><div>The outlet shall be arranged so that the flue gases are not directed so that they jeopardize people, overheat combustible structures, or enter building openings in the vicinity of the outlet. Gas-fired appliances shall be vented in accordance with this code and NFPA 54.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21166-html-1",
+      "kind" : "html",
+      "plainText" : "The outlet shall be arranged so that the flue gases are not directed so that they jeopardize people, overheat combustible structures, or enter building openings in the vicinity of the outlet. Gas-fired appliances shall be vented in accordance with this code and NFPA 54."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21166
+}

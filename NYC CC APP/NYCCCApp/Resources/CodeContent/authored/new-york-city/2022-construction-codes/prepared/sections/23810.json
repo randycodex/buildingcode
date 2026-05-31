@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195132\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195132\"><\/AnnotationDrawer><div>The location of discharge outlets for emergency and standby generators shall comply with the requirements of NFPA 37 so that the flue gases are not directed to jeopardize the health or safety of people, overheat combustible structures, nor enter building openings in the vicinity of the outlet, nor shall the location of such openings cause the condensate leaving the outlet to come into contact with people.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23810-html-1",
+      "kind" : "html",
+      "plainText" : "The location of discharge outlets for emergency and standby generators shall comply with the requirements of NFPA 37 so that the flue gases are not directed to jeopardize the health or safety of people, overheat combustible structures, nor enter building openings in the vicinity of the outlet, nor shall the location of such openings cause the condensate leaving the outlet to come into contact with people."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23810
+}

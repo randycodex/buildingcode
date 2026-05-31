@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198341\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198341\"><\/AnnotationDrawer><div>Each overpressure protection device installed to meet the requirements of this section shall be capable of limiting the pressure to its connected appliance(s) as required by Section 416.2.1, independently of any other pressure control equipment in the piping system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8314-html-1",
+      "kind" : "html",
+      "plainText" : "Each overpressure protection device installed to meet the requirements of this section shall be capable of limiting the pressure to its connected appliance(s) as required by Section 416.2.1, independently of any other pressure control equipment in the piping system."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8314
+}

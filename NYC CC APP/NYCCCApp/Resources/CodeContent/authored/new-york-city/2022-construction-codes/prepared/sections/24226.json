@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196199\"><\/AnnotationDrawer><div>Piping located in a flood hazard area shall be capable of resisting hydrostatic and hydrodynamic loads and stresses, including the effects of buoyancy, during the occurrence of flooding to the design flood elevation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24226-html-1",
+      "kind" : "html",
+      "plainText" : "Piping located in a flood hazard area shall be capable of resisting hydrostatic and hydrodynamic loads and stresses, including the effects of buoyancy, during the occurrence of flooding to the design flood elevation."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24226
+}

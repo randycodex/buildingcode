@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185208\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185208\"><\/AnnotationDrawer><div>Chutes that exceed 75 feet (22 860 mm) in height, or that are used in an occupied building where the main use or dominant occupancy is in Group I, shall either:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185209\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Be constructed of noncombustible material; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185210\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185210\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Where constructed of combustible material, the combustible material of the chute shall be covered on the exterior of the chute with corrugated steel sheeting having a minimum thickness of 24 gauge through the entire height of the chute.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5958-html-1",
+      "kind" : "html",
+      "plainText" : "Chutes that exceed 75 feet (22 860 mm) in height, or that are used in an occupied building where the main use or dominant occupancy is in Group I, shall either:\n\n 1. Be constructed of noncombustible material; or\n\n 2. Where constructed of combustible material, the combustible material of the chute shall be covered on the exterior of the chute with corrugated steel sheeting having a minimum thickness of 24 gauge through the entire height of the chute."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5958
+}

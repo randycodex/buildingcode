@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179323\"><\/AnnotationDrawer><div>For deep foundations whose heads are designed to be fixed in the final structure, the results of the load test shall be used to verify the input parameters used in the lateral load analysis. In the absence of specific project requirements as determined by the engineer, the allowable load shall be the load that produces a gross lateral movement of 3\/8 inch (9.5 mm) of the deep foundation at the ground surface in the lateral load analysis.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4052-html-1",
+      "kind" : "html",
+      "plainText" : "For deep foundations whose heads are designed to be fixed in the final structure, the results of the load test shall be used to verify the input parameters used in the lateral load analysis. In the absence of specific project requirements as determined by the engineer, the allowable load shall be the load that produces a gross lateral movement of 3\/8 inch (9.5 mm) of the deep foundation at the ground surface in the lateral load analysis."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4052
+}

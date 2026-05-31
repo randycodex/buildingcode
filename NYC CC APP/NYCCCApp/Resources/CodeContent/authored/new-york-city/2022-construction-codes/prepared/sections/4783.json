@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181383\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181383\"><\/AnnotationDrawer><div>Where required, the seismic design of buildings shall be in accordance with the additional provisions of Section 2205.2 or 2211.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4783-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, the seismic design of buildings shall be in accordance with the additional provisions of Section 2205.2 or 2211.1.1."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4783
+}

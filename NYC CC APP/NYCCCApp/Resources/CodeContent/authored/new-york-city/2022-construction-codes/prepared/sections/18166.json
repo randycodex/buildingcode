@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180157\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180157\"><\/AnnotationDrawer><div>Cementitious materials and aggregates shall be stored in such a manner as to prevent deterioration or intrusion of foreign matter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18166-html-1",
+      "kind" : "html",
+      "plainText" : "Cementitious materials and aggregates shall be stored in such a manner as to prevent deterioration or intrusion of foreign matter."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18166
+}

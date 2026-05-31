@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167297\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167297\"><\/AnnotationDrawer><div>Doors remotely unlocked under emergency conditions shall not automatically relock when closed unless specific action is taken at the remote location to enable doors to relock.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "469-html-1",
+      "kind" : "html",
+      "plainText" : "Doors remotely unlocked under emergency conditions shall not automatically relock when closed unless specific action is taken at the remote location to enable doors to relock."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 469
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167223\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167223\"><\/AnnotationDrawer><div>Smoke barriers shall be provided to subdivide every story used by persons receiving care, treatment or sleeping and to divide other stories with an occupant load of 50 or more persons, into no fewer than two smoke compartments. Such stories shall be divided into smoke compartments with an area of not more than 22,500 square feet (2090 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in nursing homes in Group I-2, and not more than 40,000 square feet (3716 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in detoxification facilities, hospitals and psychiatric centers in Group I-2, and the distance of travel from any point in a smoke compartment to a smoke barrier door shall be not greater than 200 feet (60 960 mm). The smoke barrier shall be in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169367', hash: '#JD_BC709' }}\">709<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "444-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke barriers shall be provided to subdivide every story used by persons receiving care, treatment or sleeping and to divide other stories with an occupant load of 50 or more persons, into no fewer than two smoke compartments. Such stories shall be divided into smoke compartments with an area of not more than 22,500 square feet (2090 m\n\n 2 \n\n ) in nursing homes in Group I-2, and not more than 40,000 square feet (3716 m\n\n 2 \n\n ) in detoxification facilities, hospitals and psychiatric centers in Group I-2, and the distance of travel from any point in a smoke compartment to a smoke barrier door shall be not greater than 200 feet (60 960 mm). The smoke barrier shall be in accordance with Section 709 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 444
+}

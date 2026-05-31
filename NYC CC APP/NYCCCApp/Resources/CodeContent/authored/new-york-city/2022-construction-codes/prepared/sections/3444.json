@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177226\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177226\"><\/AnnotationDrawer><div>The deflection limits of Section 1604.3.1 shall be used unless more restrictive deflection limits are required by a referenced standard for the element or finish material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3444-html-1",
+      "kind" : "html",
+      "plainText" : "The deflection limits of Section 1604.3.1 shall be used unless more restrictive deflection limits are required by a referenced standard for the element or finish material."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3444
+}

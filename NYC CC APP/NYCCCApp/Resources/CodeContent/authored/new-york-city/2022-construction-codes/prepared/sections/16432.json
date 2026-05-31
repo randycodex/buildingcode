@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174697\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174697\"><\/AnnotationDrawer><div>Emergency escape and rescue openings shall have the bottom of the clear opening not greater than 36 inches (914.4 mm) measured from the floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16432-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency escape and rescue openings shall have the bottom of the clear opening not greater than 36 inches (914.4 mm) measured from the floor."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16432
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184426\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184426\"><\/AnnotationDrawer><div>A small wind turbine shall be designed in accordance with applicable sections of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Noise Control Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5711-html-1",
+      "kind" : "html",
+      "plainText" : "A small wind turbine shall be designed in accordance with applicable sections of the New York City Noise Control Code ."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5711
+}

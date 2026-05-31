@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196973\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196973\"><\/AnnotationDrawer><div>Except as otherwise specified in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156908', hash: '#JD_28-116.2.4.3' }}\">28-116.2.4.3<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>, inspections required by this code or by the department during the progress of work may be performed on behalf of the owner by approved agencies or, if applicable, by special inspectors. However, in the interest of public safety, the commissioner may direct that any of such inspections be performed by the department. All inspections shall be performed at the sole cost and expense of the owner. Refer to <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156867', hash: '#JD_28-116' }}\">Article 116 of Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span> for additional provisions relating to inspections. In addition to any inspections otherwise required by this code or applicable rules, the following inspections shall be required:<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7924-html-1",
+      "kind" : "html",
+      "plainText" : "Except as otherwise specified in Section 28-116.2.4.3 of the Administrative Code , inspections required by this code or by the department during the progress of work may be performed on behalf of the owner by approved agencies or, if applicable, by special inspectors. However, in the interest of public safety, the commissioner may direct that any of such inspections be performed by the department. All inspections shall be performed at the sole cost and expense of the owner. Refer to Article 116 of Chapter 1 of Title 28 of the Administrative Code for additional provisions relating to inspections. In addition to any inspections otherwise required by this code or applicable rules, the following inspections shall be required:"
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 7924
+}

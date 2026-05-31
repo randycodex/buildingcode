@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161898\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161898\"><\/AnnotationDrawer><div>On copper fin tube, gas fired domestic hot water heaters, a flow switch shall be provided to interrupt the gas supply to the heater in the event water flow through the coil is interrupted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161899\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161899\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161899\"><\/AnnotationDrawer><h6><a name=\"JD_PC505\" id=\"JD_PC505\" title=\"PC 505\"><\/a>Section PC 505: Insulation<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24850-html-1",
+      "kind" : "html",
+      "plainText" : "On copper fin tube, gas fired domestic hot water heaters, a flow switch shall be provided to interrupt the gas supply to the heater in the event water flow through the coil is interrupted.\n\n Section PC 505: Insulation"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 24850
+}

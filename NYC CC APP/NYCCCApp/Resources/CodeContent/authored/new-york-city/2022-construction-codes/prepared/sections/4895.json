@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181728\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181728\"><\/AnnotationDrawer><div>Headers, double joists, trusses or other approved assemblies that are of adequate size to transfer loads to the vertical members shall be provided over window and door openings in load-bearing walls and partitions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4895-html-1",
+      "kind" : "html",
+      "plainText" : "Headers, double joists, trusses or other approved assemblies that are of adequate size to transfer loads to the vertical members shall be provided over window and door openings in load-bearing walls and partitions."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4895
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198445\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198445\"><\/AnnotationDrawer><div>A noncombustible seal shall be provided below the point of connection to prevent entry of room air into the flue. Means shall be provided for access to the flue for inspection and cleaning.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21175-html-1",
+      "kind" : "html",
+      "plainText" : "A noncombustible seal shall be provided below the point of connection to prevent entry of room air into the flue. Means shall be provided for access to the flue for inspection and cleaning."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21175
+}

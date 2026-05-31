@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192889\"><\/AnnotationDrawer><div>Defective material or parts shall be replaced or repaired in such a manner so as to preserve the original approval or listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23052-html-1",
+      "kind" : "html",
+      "plainText" : "Defective material or parts shall be replaced or repaired in such a manner so as to preserve the original approval or listing."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23052
+}

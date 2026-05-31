@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184235\"><\/AnnotationDrawer><div>Public swimming pools shall comply with the requirements for safety and accessibility as provided in Sections 3109.3 and 3109.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184236\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184236\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> A swimming pool with a power safety cover or a spa with a safety cover complying with ASTM F 1346.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5638-html-1",
+      "kind" : "html",
+      "plainText" : "Public swimming pools shall comply with the requirements for safety and accessibility as provided in Sections 3109.3 and 3109.4.\n\n Exception: A swimming pool with a power safety cover or a spa with a safety cover complying with ASTM F 1346."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5638
+}

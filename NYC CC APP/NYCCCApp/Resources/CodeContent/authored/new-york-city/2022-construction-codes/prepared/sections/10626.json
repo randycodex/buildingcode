@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194033\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194033\"><\/AnnotationDrawer><div>Design plans for a commercial kitchen ventilation system shall include a schedule or diagram indicating the design air balance of the kitchen and all communicating spaces clearly indicating makeup, transfer, exhaust and infiltration air flow rates. Negative pressurization caused by the kitchen exhaust system shall not cause improper operation of systems in communicating spaces or cause door opening forces in the building to exceed the limits set forth in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10626-html-1",
+      "kind" : "html",
+      "plainText" : "Design plans for a commercial kitchen ventilation system shall include a schedule or diagram indicating the design air balance of the kitchen and all communicating spaces clearly indicating makeup, transfer, exhaust and infiltration air flow rates. Negative pressurization caused by the kitchen exhaust system shall not cause improper operation of systems in communicating spaces or cause door opening forces in the building to exceed the limits set forth in Chapter 10 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10626
+}

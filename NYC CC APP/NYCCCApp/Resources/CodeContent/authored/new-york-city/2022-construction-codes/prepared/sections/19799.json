@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185246\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185246\"><\/AnnotationDrawer><div>When existing sprinkler systems with fire department hose connections are present in buildings undergoing full or partial demolition, such systems shall be maintained as a nonautomatic sprinkler system, except as provided in Section 3303.7.4.3. When demolition starts, the sprinkler risers shall be capped immediately below the floor being demolished so as to maintain the sprinkler system on all lower floors for Fire Department use. Cutting and capping of sprinklers during demolition work shall be performed only by a licensed master plumber or licensed master fire suppression piping contractor who has obtained a permit for such work. Fire department hose connections shall be kept free from obstruction and shall be marked by a metal sign reading \"Sprinkler Connection\" and by a red light at night. The red paint required pursuant to Section 903.6 shall be maintained during any demolition operations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19799-html-1",
+      "kind" : "html",
+      "plainText" : "When existing sprinkler systems with fire department hose connections are present in buildings undergoing full or partial demolition, such systems shall be maintained as a nonautomatic sprinkler system, except as provided in Section 3303.7.4.3. When demolition starts, the sprinkler risers shall be capped immediately below the floor being demolished so as to maintain the sprinkler system on all lower floors for Fire Department use. Cutting and capping of sprinklers during demolition work shall be performed only by a licensed master plumber or licensed master fire suppression piping contractor who has obtained a permit for such work. Fire department hose connections shall be kept free from obstruction and shall be marked by a metal sign reading \"Sprinkler Connection\" and by a red light at night. The red paint required pursuant to Section 903.6 shall be maintained during any demolition operations."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19799
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169409\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169409\"><\/AnnotationDrawer><div>Doors in smoke partitions shall comply with Sections 710.5.2.1 through 710.5.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1110-html-1",
+      "kind" : "html",
+      "plainText" : "Doors in smoke partitions shall comply with Sections 710.5.2.1 through 710.5.2.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1110
+}

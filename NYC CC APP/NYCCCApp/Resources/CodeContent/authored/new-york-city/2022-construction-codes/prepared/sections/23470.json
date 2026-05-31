@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194086\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194086\"><\/AnnotationDrawer><div>Hazardous exhaust duct systems shall extend directly to the exterior of the building and shall not extend into or through ducts and plenums.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23470-html-1",
+      "kind" : "html",
+      "plainText" : "Hazardous exhaust duct systems shall extend directly to the exterior of the building and shall not extend into or through ducts and plenums."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23470
+}

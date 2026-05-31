@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195516\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195516\"><\/AnnotationDrawer><div>Low-water cut outs shall be maintained in accordance with ASME CSD-1 and the manufacturer's specifications. An operator shall test low-water cut outs as follows: (1) high pressure steam boilers every shift, (2) low pressure steam boilers daily and (3) hot water boilers monthly. Slow drain tests shall be conducted for steam boilers every six months. Every year, low-water cut outs and associated piping for steam boilers shall be opened, cleaned and inspected. Records of all testing, cleaning, and inspection required by this section shall be maintained, and made available to the department upon request. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195517\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195517\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195517\"><\/AnnotationDrawer><h6><a name=\"JD_MC1008\" id=\"JD_MC1008\" title=\"MC 1008\"><\/a>Section MC 1008: Boiler Blowoff \/ Blowdown Valves<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11136-html-1",
+      "kind" : "html",
+      "plainText" : "Low-water cut outs shall be maintained in accordance with ASME CSD-1 and the manufacturer's specifications. An operator shall test low-water cut outs as follows: (1) high pressure steam boilers every shift, (2) low pressure steam boilers daily and (3) hot water boilers monthly. Slow drain tests shall be conducted for steam boilers every six months. Every year, low-water cut outs and associated piping for steam boilers shall be opened, cleaned and inspected. Records of all testing, cleaning, and inspection required by this section shall be maintained, and made available to the department upon request. \n\n Section MC 1008: Boiler Blowoff \/ Blowdown Valves"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11136
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160718\"><\/AnnotationDrawer><div>Permits shall comply with this section, with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156205', hash: '#JD_28-105' }}\">Article 105 of Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code,<\/span> and with requirements found elsewhere in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24515-html-1",
+      "kind" : "html",
+      "plainText" : "Permits shall comply with this section, with Article 105 of Chapter 1 of Title 28 of the Administrative Code, and with requirements found elsewhere in this code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 24515
+}

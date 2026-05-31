@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198217\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198217\"><\/AnnotationDrawer><div>Every meter shall be equipped with a shutoff valve located on the supply side of the meter. Meter valves shall be of a type approved by the utility company.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8261-html-1",
+      "kind" : "html",
+      "plainText" : "Every meter shall be equipped with a shutoff valve located on the supply side of the meter. Meter valves shall be of a type approved by the utility company."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8261
+}

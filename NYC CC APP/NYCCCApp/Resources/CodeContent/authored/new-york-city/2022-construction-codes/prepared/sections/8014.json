@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197476\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197476\"><\/AnnotationDrawer><div>Where used, a draft hood or a barometric draft regulator shall be installed in the same room or enclosure as the equipment served to prevent any difference in pressure between the hood or regulator and the combustion air supply. A barometric damper may be installed in an adjacent room provided that a louver is installed in the adjacent room to the outside air. The net free area of the louver shall be equal to or greater than the area of the barometric damper.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8014-html-1",
+      "kind" : "html",
+      "plainText" : "Where used, a draft hood or a barometric draft regulator shall be installed in the same room or enclosure as the equipment served to prevent any difference in pressure between the hood or regulator and the combustion air supply. A barometric damper may be installed in an adjacent room provided that a louver is installed in the adjacent room to the outside air. The net free area of the louver shall be equal to or greater than the area of the barometric damper."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8014
+}

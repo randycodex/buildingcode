@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176399\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176399\"><\/AnnotationDrawer><div>MCM shall be separated from the interior of a building by an approved thermal barrier consisting of 5\/8-inch (15.9 mm) Type X gypsum wallboard or equivalent thermal barrier material that will limit the average temperature rise of the unexposed surface to not more than 250&#176;F (12 1&#176;C) after 20 minutes of fire exposure in accordance with the standard time-temperature curve of ASTM E 119 or UL 263. The thermal barrier shall be installed in accordance with criteria established by testing in accordance with UL 1715, where the thermal barrier shall remain in place for 20 minutes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17008-html-1",
+      "kind" : "html",
+      "plainText" : "MCM shall be separated from the interior of a building by an approved thermal barrier consisting of 5\/8-inch (15.9 mm) Type X gypsum wallboard or equivalent thermal barrier material that will limit the average temperature rise of the unexposed surface to not more than 250°F (12 1°C) after 20 minutes of fire exposure in accordance with the standard time-temperature curve of ASTM E 119 or UL 263. The thermal barrier shall be installed in accordance with criteria established by testing in accordance with UL 1715, where the thermal barrier shall remain in place for 20 minutes."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 17008
+}

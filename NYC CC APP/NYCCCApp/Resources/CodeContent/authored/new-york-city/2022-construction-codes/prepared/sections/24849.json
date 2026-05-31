@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161896\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161896\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The pan drain shall extend full size and terminate over a suitably located indirect waste receptor or floor drain or extend to the exterior of the building and terminate not less than 6 inches (152 mm) and not more than 24 inches (610 mm) above the adjacent ground surface at a point that is readily observable by the building occupants.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24849-html-1",
+      "kind" : "html",
+      "plainText" : "The pan drain shall extend full size and terminate over a suitably located indirect waste receptor or floor drain or extend to the exterior of the building and terminate not less than 6 inches (152 mm) and not more than 24 inches (610 mm) above the adjacent ground surface at a point that is readily observable by the building occupants."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 24849
+}

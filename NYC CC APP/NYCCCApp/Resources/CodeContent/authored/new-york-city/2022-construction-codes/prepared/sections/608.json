@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167727\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167727\"><\/AnnotationDrawer><div>Standby power for mechanical ventilation, treatment systems and temperature control systems shall not be required where an approved fail-safe engineered system is installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "608-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power for mechanical ventilation, treatment systems and temperature control systems shall not be required where an approved fail-safe engineered system is installed."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 608
+}

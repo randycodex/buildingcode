@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172332\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172332\"><\/AnnotationDrawer><div>Control tubing serving other than smoke control functions shall be isolated by automatic isolation valves or shall be an independent system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15763-html-1",
+      "kind" : "html",
+      "plainText" : "Control tubing serving other than smoke control functions shall be isolated by automatic isolation valves or shall be an independent system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15763
+}

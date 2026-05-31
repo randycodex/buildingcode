@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187303\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187303\"><\/AnnotationDrawer><div>Precautions shall be taken to prevent the possibility of arcing through the suspension wire rope during welding operations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6668-html-1",
+      "kind" : "html",
+      "plainText" : "Precautions shall be taken to prevent the possibility of arcing through the suspension wire rope during welding operations."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6668
+}

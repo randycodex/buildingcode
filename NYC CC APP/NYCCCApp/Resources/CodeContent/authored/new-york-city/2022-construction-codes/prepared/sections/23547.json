@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194330\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194330\"><\/AnnotationDrawer><div>Flexible air ducts and air connectors shall be installed with a minimum clearance to an appliance as specified in the appliance manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23547-html-1",
+      "kind" : "html",
+      "plainText" : "Flexible air ducts and air connectors shall be installed with a minimum clearance to an appliance as specified in the appliance manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23547
+}

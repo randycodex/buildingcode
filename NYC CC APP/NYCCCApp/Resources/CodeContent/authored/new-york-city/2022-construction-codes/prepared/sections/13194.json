@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189145\"><\/AnnotationDrawer><div>Wall signs shall not extend above the top of the wall, nor beyond the ends of the wall to which the signs are attached unless such signs conform to the requirements for roof signs, projecting signs or ground signs.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-189146\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-189146\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-189146\"><\/AnnotationDrawer><h6><a name=\"JD_BCH112\" id=\"JD_BCH112\" title=\"BC H112\"><\/a>Section BC H112: Projecting Signs<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13194-html-1",
+      "kind" : "html",
+      "plainText" : "Wall signs shall not extend above the top of the wall, nor beyond the ends of the wall to which the signs are attached unless such signs conform to the requirements for roof signs, projecting signs or ground signs.\n\n Section BC H112: Projecting Signs"
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 13194
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173912\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173912\"><\/AnnotationDrawer><div>Guards shall be provided where the roof hatch opening is located within 10 feet (3048 mm) of a roof edge or open side of a walking surface and such edge or open side is located more than 30 inches (762 mm) above the floor, roof or grade below. The guard shall be constructed so as to prevent the passage of a sphere 21 inches (533.4 mm) in diameter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16219-html-1",
+      "kind" : "html",
+      "plainText" : "Guards shall be provided where the roof hatch opening is located within 10 feet (3048 mm) of a roof edge or open side of a walking surface and such edge or open side is located more than 30 inches (762 mm) above the floor, roof or grade below. The guard shall be constructed so as to prevent the passage of a sphere 21 inches (533.4 mm) in diameter."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16219
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195764\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195764\"><\/AnnotationDrawer><div>Refrigerating system zones that are connected to a higher pressure zone by an automatic crossover valve shall be designed to safely contain the maximum pressure that can be achieved by interconnection of the two zones.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11209-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigerating system zones that are connected to a higher pressure zone by an automatic crossover valve shall be designed to safely contain the maximum pressure that can be achieved by interconnection of the two zones."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11209
+}

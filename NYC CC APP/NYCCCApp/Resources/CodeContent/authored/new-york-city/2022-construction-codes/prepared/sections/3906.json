@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178829\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178829\"><\/AnnotationDrawer><div>The torsional moment capacity for the joist hanger shall be determined by testing at least three joist hanger assemblies as specified in ASTM D 1761. The allowable torsional moment of the joist hanger shall be the average torsional moment at which the lateral movement of the top or bottom of the joist with respect to the original position of the joist is 0.125 inch (3.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3906-html-1",
+      "kind" : "html",
+      "plainText" : "The torsional moment capacity for the joist hanger shall be determined by testing at least three joist hanger assemblies as specified in ASTM D 1761. The allowable torsional moment of the joist hanger shall be the average torsional moment at which the lateral movement of the top or bottom of the joist with respect to the original position of the joist is 0.125 inch (3.2 mm)."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3906
+}

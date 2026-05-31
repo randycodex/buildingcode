@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179193\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179193\"><\/AnnotationDrawer><div>The thickness of foundation walls shall not be less than the thickness of the wall supported, except that foundation walls of at least 8 inch (203.2 mm) nominal width are permitted to support brick-veneered frame walls and 10 inch wide (254 mm) cavity walls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17838-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of foundation walls shall not be less than the thickness of the wall supported, except that foundation walls of at least 8 inch (203.2 mm) nominal width are permitted to support brick-veneered frame walls and 10 inch wide (254 mm) cavity walls."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17838
+}

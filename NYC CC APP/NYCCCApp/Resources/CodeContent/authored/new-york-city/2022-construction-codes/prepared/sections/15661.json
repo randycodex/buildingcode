@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172024\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172024\"><\/AnnotationDrawer><div>Where a fire alarm system is required by another section of this code or is otherwise installed, automatic fire-extinguishing systems installed in accordance with Section 904 shall be monitored by the fire alarm system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15661-html-1",
+      "kind" : "html",
+      "plainText" : "Where a fire alarm system is required by another section of this code or is otherwise installed, automatic fire-extinguishing systems installed in accordance with Section 904 shall be monitored by the fire alarm system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15661
+}

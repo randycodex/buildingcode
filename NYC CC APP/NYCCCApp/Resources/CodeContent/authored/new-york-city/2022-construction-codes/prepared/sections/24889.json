@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162011\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162011\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water pressure-reducing valves, regulators and strainers shall be so constructed and installed as to permit repair or removal of parts without breaking a pipeline or removing the valve and strainer from the pipeline.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24889-html-1",
+      "kind" : "html",
+      "plainText" : "Water pressure-reducing valves, regulators and strainers shall be so constructed and installed as to permit repair or removal of parts without breaking a pipeline or removing the valve and strainer from the pipeline."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24889
+}

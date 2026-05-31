@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195824\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195824\"><\/AnnotationDrawer><div>Refrigerant piping installed in concrete floors shall be encased in pipe ducts. The piping shall be isolated and supported to prevent damaging vibration, stress and corrosion.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24064-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigerant piping installed in concrete floors shall be encased in pipe ducts. The piping shall be isolated and supported to prevent damaging vibration, stress and corrosion."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24064
+}

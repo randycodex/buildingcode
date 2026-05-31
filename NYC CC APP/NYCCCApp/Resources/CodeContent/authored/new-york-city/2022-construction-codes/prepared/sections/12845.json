@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188141\"><\/AnnotationDrawer><div>Technical requirements for items herein shall comply with this code and ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-188142\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-188142\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-188142\"><\/AnnotationDrawer><h6><a name=\"JD_BCE102\" id=\"JD_BCE102\" title=\"BC E102\"><\/a>Section BC E102: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12845-html-1",
+      "kind" : "html",
+      "plainText" : "Technical requirements for items herein shall comply with this code and ICC A117.1.\n\n Section BC E102: Definitions"
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12845
+}

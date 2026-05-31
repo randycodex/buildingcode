@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180296\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180296\"><\/AnnotationDrawer><div>The special inspector shall verify that the proportions indicated on the batch ticket for the concrete delivered to the construction site are as per the approved concrete mix design prior to concrete placement (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-178293', hash: '#JD_BCTable1705.3' }}\">Table 1705.3<\/Link> of this code). Concrete that does not meet the requirements of the approved concrete mix design shall be rejected.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180297\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180297\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224406\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224406\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4384-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall verify that the proportions indicated on the batch ticket for the concrete delivered to the construction site are as per the approved concrete mix design prior to concrete placement (see Table 1705.3 of this code). Concrete that does not meet the requirements of the approved concrete mix design shall be rejected.\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4384
+}

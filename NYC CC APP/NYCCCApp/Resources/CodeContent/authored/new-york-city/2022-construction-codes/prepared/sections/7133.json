@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188847\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188847\"><\/AnnotationDrawer><div>Decks, porches and patios shall be designed and constructed in accordance with ASCE 24.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7133-html-1",
+      "kind" : "html",
+      "plainText" : "Decks, porches and patios shall be designed and constructed in accordance with ASCE 24."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7133
+}

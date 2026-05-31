@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168156\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168156\"><\/AnnotationDrawer><div>Operable windows in interior walls shall not be permitted. Fixed windows shall be permitted where in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169727', hash: '#JD_BC716' }}\">716<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "757-html-1",
+      "kind" : "html",
+      "plainText" : "Operable windows in interior walls shall not be permitted. Fixed windows shall be permitted where in accordance with Section 716 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 757
+}

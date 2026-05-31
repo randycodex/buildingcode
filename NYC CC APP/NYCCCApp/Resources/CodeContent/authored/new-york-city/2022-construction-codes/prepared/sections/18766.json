@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181874\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181874\"><\/AnnotationDrawer><div>Wood columns and posts shall be framed to provide full end bearing. Alternatively, column-and-post end connections shall be designed to resist the full compressive loads, neglecting end-bearing capacity. Column-and-post end connections shall be fastened to resist lateral and net induced uplift forces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18766-html-1",
+      "kind" : "html",
+      "plainText" : "Wood columns and posts shall be framed to provide full end bearing. Alternatively, column-and-post end connections shall be designed to resist the full compressive loads, neglecting end-bearing capacity. Column-and-post end connections shall be fastened to resist lateral and net induced uplift forces."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18766
+}

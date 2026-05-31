@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175155\"><\/AnnotationDrawer><div>Accessible units, Type B+NYC units and Type B units shall be provided in Group R occupancies in accordance with Sections 1107.6.1 through 1107.6.3. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2752-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible units, Type B+NYC units and Type B units shall be provided in Group R occupancies in accordance with Sections 1107.6.1 through 1107.6.3."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2752
+}

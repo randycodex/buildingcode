@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182768\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182768\"><\/AnnotationDrawer><div>Glazing in all fixed and operable panels of swinging, sliding and bifold doors shall be considered a hazardous location.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182769\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182769\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182770\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Glazed openings of a size through which a 3-inch diameter (76 mm) sphere is unable to pass.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182771\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182771\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Decorative glazing.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182772\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182772\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;Glazing materials used as curved glazed panels in revolving doors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182773\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182773\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;4.&#160;&#160;&#160;Commercial refrigerated cabinet glazed doors.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5131-html-1",
+      "kind" : "html",
+      "plainText" : "Glazing in all fixed and operable panels of swinging, sliding and bifold doors shall be considered a hazardous location.\n\n Exceptions: \n\n 1. Glazed openings of a size through which a 3-inch diameter (76 mm) sphere is unable to pass.\n\n 2. Decorative glazing.\n\n 3. Glazing materials used as curved glazed panels in revolving doors.\n\n 4. Commercial refrigerated cabinet glazed doors."
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 5131
+}

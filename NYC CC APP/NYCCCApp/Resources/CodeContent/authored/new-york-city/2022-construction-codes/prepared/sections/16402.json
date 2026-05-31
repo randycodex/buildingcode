@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174583\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174583\"><\/AnnotationDrawer><div>Tread depths shall be not less than 11 inches (279.4 mm) and shall have dimensional uniformity.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174584\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174584\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The tolerance between adjacent treads shall not exceed 3\/16 inch (4.8 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16402-html-1",
+      "kind" : "html",
+      "plainText" : "Tread depths shall be not less than 11 inches (279.4 mm) and shall have dimensional uniformity.\n\n Exception: The tolerance between adjacent treads shall not exceed 3\/16 inch (4.8 mm)."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16402
+}

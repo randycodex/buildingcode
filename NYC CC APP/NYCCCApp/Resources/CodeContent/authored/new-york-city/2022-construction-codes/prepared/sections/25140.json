@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162630\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162630\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Mechanical joints in drainage piping shall be made with an elastomeric seal conforming to ASTM C 1173, ASTM D 3212 or CSA B602. Mechanical joints shall be installed in accordance with the manufacturer's instructions.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25140-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical joints in drainage piping shall be made with an elastomeric seal conforming to ASTM C 1173, ASTM D 3212 or CSA B602. Mechanical joints shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25140
+}

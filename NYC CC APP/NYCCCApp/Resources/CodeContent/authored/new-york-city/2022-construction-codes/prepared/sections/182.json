@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166405\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166405\"><\/AnnotationDrawer><div>A room or space used for storage purposes that is less than 100 square feet (9.3 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area and accessory to another occupancy shall be classified as part of that occupancy. The aggregate area of such rooms or spaces shall not exceed the allowable area limits of Section 508.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "182-html-1",
+      "kind" : "html",
+      "plainText" : "A room or space used for storage purposes that is less than 100 square feet (9.3 m\n\n 2 \n\n ) in area and accessory to another occupancy shall be classified as part of that occupancy. The aggregate area of such rooms or spaces shall not exceed the allowable area limits of Section 508.2.3."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 182
+}

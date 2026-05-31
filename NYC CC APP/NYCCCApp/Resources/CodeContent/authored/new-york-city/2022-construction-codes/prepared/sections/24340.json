@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196461\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196461\"><\/AnnotationDrawer><div>Where it is necessary to make horizontal offsets in the fuel-oil piping and pipe shafts, including the lowest level, such piping shall be enclosed in a fully welded outer containment of at least No. 10 standard Gage steel.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196462\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196462\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196463\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196463\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The containment enclosure may be omitted on horizontal piping along the roof for a maximum length of 72 inches (1828.8 mm) from the enclosure, tank or the equipment served for hard piped connections and valves as required.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196464\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196464\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;The containment enclosure may be omitted where a double metallic wall flexible fuel-oil piping system is installed as a horizontal offset, such pipe system does not need to be enclosed in an additional containment enclosure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24340-html-1",
+      "kind" : "html",
+      "plainText" : "Where it is necessary to make horizontal offsets in the fuel-oil piping and pipe shafts, including the lowest level, such piping shall be enclosed in a fully welded outer containment of at least No. 10 standard Gage steel.\n\n Exceptions: \n\n 1. The containment enclosure may be omitted on horizontal piping along the roof for a maximum length of 72 inches (1828.8 mm) from the enclosure, tank or the equipment served for hard piped connections and valves as required.\n\n 2. The containment enclosure may be omitted where a double metallic wall flexible fuel-oil piping system is installed as a horizontal offset, such pipe system does not need to be enclosed in an additional containment enclosure."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24340
+}

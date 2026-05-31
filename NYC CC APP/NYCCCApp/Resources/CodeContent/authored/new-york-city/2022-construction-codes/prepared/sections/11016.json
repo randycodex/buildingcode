@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195210\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195210\"><\/AnnotationDrawer><div>Cooling towers, evaporative condensers and fluid coolers shall be located to prevent the discharge vapor plumes from entering occupied spaces. Plume discharges shall be not less than 5 feet (1524 mm) above or 20 feet (6096 mm) away from any ventilation inlet to a building. Location on the property shall be as required for buildings in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11016-html-1",
+      "kind" : "html",
+      "plainText" : "Cooling towers, evaporative condensers and fluid coolers shall be located to prevent the discharge vapor plumes from entering occupied spaces. Plume discharges shall be not less than 5 feet (1524 mm) above or 20 feet (6096 mm) away from any ventilation inlet to a building. Location on the property shall be as required for buildings in accordance with the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11016
+}

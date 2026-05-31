@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162209\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">For residential occupancies, the installation of heated water circulation and temperature maintenance systems shall be in accordance with the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Energy Conservation Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">. For commercial occupancies that are three stories or less in height above grade plane, the installation of heated water circulation and heat trace systems shall be in accordance with the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Energy Conservation Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162210\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162210\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205686', hash: '#JD_L.L.2009\/085' }}\">L.L. 2009\/085<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12148-html-1",
+      "kind" : "html",
+      "plainText" : "For residential occupancies, the installation of heated water circulation and temperature maintenance systems shall be in accordance with the New York City Energy Conservation Code . For commercial occupancies that are three stories or less in height above grade plane, the installation of heated water circulation and heat trace systems shall be in accordance with the New York City Energy Conservation Code . \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009\/085 ."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12148
+}

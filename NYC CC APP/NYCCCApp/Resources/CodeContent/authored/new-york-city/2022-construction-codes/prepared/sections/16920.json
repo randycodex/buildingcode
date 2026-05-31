@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176167\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176167\"><\/AnnotationDrawer><div>EIFS shall be designed and constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224321', hash: '#JD_BC1408' }}\">1408<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16920-html-1",
+      "kind" : "html",
+      "plainText" : "EIFS shall be designed and constructed in accordance with Section 1408 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 16920
+}

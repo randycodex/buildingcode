@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193902\"><\/AnnotationDrawer><div>For all buildings other than those classified as residential occupancy, a minimum of No. 16 Gage for galvanized sheet duct shall be used for nongrease duct exhaust applications.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10579-html-1",
+      "kind" : "html",
+      "plainText" : "For all buildings other than those classified as residential occupancy, a minimum of No. 16 Gage for galvanized sheet duct shall be used for nongrease duct exhaust applications."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10579
+}

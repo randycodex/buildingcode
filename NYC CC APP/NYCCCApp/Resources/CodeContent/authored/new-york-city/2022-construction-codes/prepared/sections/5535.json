@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183961\"><\/AnnotationDrawer><div>Not fewer than one audible and one visible notification appliance shall be installed within each occupant evacuation elevator lobby.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5535-html-1",
+      "kind" : "html",
+      "plainText" : "Not fewer than one audible and one visible notification appliance shall be installed within each occupant evacuation elevator lobby."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 5535
+}

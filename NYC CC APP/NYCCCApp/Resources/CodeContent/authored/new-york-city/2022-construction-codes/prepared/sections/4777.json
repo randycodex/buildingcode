@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181370\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181370\"><\/AnnotationDrawer><div>Caps, base plates and connections shall be in accordance with AISC 360 and shall be positively attached to the shell and anchored to the concrete core. Welding of brackets without mechanical anchorage is prohibited. Where the pipe is slotted to accommodate webs of brackets or other connections, the integrity of the shell shall be restored by welding to ensure hooping action of the composite section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4777-html-1",
+      "kind" : "html",
+      "plainText" : "Caps, base plates and connections shall be in accordance with AISC 360 and shall be positively attached to the shell and anchored to the concrete core. Welding of brackets without mechanical anchorage is prohibited. Where the pipe is slotted to accommodate webs of brackets or other connections, the integrity of the shell shall be restored by welding to ensure hooping action of the composite section."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4777
+}

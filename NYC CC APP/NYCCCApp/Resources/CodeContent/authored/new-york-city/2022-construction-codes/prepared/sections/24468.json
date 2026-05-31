@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164081\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164081\"><\/AnnotationDrawer><div>Obtain the necessary information regarding the minimum daily static service pressure in the area where the building is to be located. If the building supply is to be metered, obtain information regarding friction loss relative to the rate of flow for meters in the range of sizes likely to be used. Friction loss data can be obtained from most manufacturers of water meters.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24468-html-1",
+      "kind" : "html",
+      "plainText" : "Obtain the necessary information regarding the minimum daily static service pressure in the area where the building is to be located. If the building supply is to be metered, obtain information regarding friction loss relative to the rate of flow for meters in the range of sizes likely to be used. Friction loss data can be obtained from most manufacturers of water meters."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 24468
+}

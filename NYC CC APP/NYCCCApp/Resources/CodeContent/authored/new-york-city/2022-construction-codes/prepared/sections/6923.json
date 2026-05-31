@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188254\"><\/AnnotationDrawer><div>Signage in fixed transportation facilities and stations shall comply with Sections E109.2.2.1 through E109.2.2.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6923-html-1",
+      "kind" : "html",
+      "plainText" : "Signage in fixed transportation facilities and stations shall comply with Sections E109.2.2.1 through E109.2.2.3."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6923
+}

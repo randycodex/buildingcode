@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166585\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166585\"><\/AnnotationDrawer><div>Covered and open mall buildings, anchor buildings and associated parking garages shall be provided with emergency systems complying with Sections 402.7.1 through 402.7.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "223-html-1",
+      "kind" : "html",
+      "plainText" : "Covered and open mall buildings, anchor buildings and associated parking garages shall be provided with emergency systems complying with Sections 402.7.1 through 402.7.5."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 223
+}

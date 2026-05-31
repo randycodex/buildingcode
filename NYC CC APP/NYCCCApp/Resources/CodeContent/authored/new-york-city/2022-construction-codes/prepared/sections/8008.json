@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197462\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197462\"><\/AnnotationDrawer><div>Appliances installed in pits or excavations shall not come in direct contact with the surrounding soil. The sides of the pit or excavation shall be held back a minimum of 12 inches (304.8 mm) from the appliance. Where the depth exceeds 12 inches (304.8 mm) below adjoining grade, the walls of the pit or excavation shall be lined with concrete or masonry, such concrete or masonry shall extend a minimum of 4 inches (101.6 mm) above adjoining grade and shall have sufficient lateral load-bearing capacity to resist collapse. The appliance shall be protected from flooding in a manner approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-197463\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-197463\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-197463\"><\/AnnotationDrawer><h6><a name=\"JD_FGC304\" id=\"JD_FGC304\" title=\"FGC 304\"><\/a>Section FGC 304: Combustion, Ventilation and Dilution Air<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8008-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances installed in pits or excavations shall not come in direct contact with the surrounding soil. The sides of the pit or excavation shall be held back a minimum of 12 inches (304.8 mm) from the appliance. Where the depth exceeds 12 inches (304.8 mm) below adjoining grade, the walls of the pit or excavation shall be lined with concrete or masonry, such concrete or masonry shall extend a minimum of 4 inches (101.6 mm) above adjoining grade and shall have sufficient lateral load-bearing capacity to resist collapse. The appliance shall be protected from flooding in a manner approved by the commissioner.\n\n Section FGC 304: Combustion, Ventilation and Dilution Air"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8008
+}

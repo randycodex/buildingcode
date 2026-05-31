@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176762\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176762\"><\/AnnotationDrawer><div>Underlayment shall comply with ASTM D 226, Type I or ASTM D 4869.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3300-html-1",
+      "kind" : "html",
+      "plainText" : "Underlayment shall comply with ASTM D 226, Type I or ASTM D 4869."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3300
+}

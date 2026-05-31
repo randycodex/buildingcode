@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168351\"><\/AnnotationDrawer><div>Radiation machines or particle accelerators, linear accelerators, cyclotrons, synchrotons, betatrons, or bevatrons shall be located only in buildings of Type I or II construction; however, this requirement shall not apply to conventional medical, dental, research, or industrial x-ray machines of less than one million-volt capacity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14655-html-1",
+      "kind" : "html",
+      "plainText" : "Radiation machines or particle accelerators, linear accelerators, cyclotrons, synchrotons, betatrons, or bevatrons shall be located only in buildings of Type I or II construction; however, this requirement shall not apply to conventional medical, dental, research, or industrial x-ray machines of less than one million-volt capacity."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14655
+}

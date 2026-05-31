@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168162\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168162\"><\/AnnotationDrawer><div>Activation of a gas detection alarm shall initiate the following notification and action:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168163\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168163\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Initiation of distinct audible and visible alarm signals both inside and outside of the hydrogen fuel gas room.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168164\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168164\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Automatic activation of the mechanical exhaust ventilation system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14588-html-1",
+      "kind" : "html",
+      "plainText" : "Activation of a gas detection alarm shall initiate the following notification and action:\n\n 1. Initiation of distinct audible and visible alarm signals both inside and outside of the hydrogen fuel gas room.\n\n 2. Automatic activation of the mechanical exhaust ventilation system."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14588
+}

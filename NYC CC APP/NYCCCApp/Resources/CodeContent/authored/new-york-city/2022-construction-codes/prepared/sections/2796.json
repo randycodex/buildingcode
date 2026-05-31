@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175285\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175285\"><\/AnnotationDrawer><div>Judicial facilities shall comply with Sections 1108.4.1 and 1108.4.2 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2796-html-1",
+      "kind" : "html",
+      "plainText" : "Judicial facilities shall comply with Sections 1108.4.1 and 1108.4.2 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2796
+}

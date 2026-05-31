@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172950\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172950\"><\/AnnotationDrawer><div>That portion of the occupant load of a mezzanine with required egress through a room, area or space on an adjacent level shall be added to the occupant load of that room, area or space.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15969-html-1",
+      "kind" : "html",
+      "plainText" : "That portion of the occupant load of a mezzanine with required egress through a room, area or space on an adjacent level shall be added to the occupant load of that room, area or space."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 15969
+}

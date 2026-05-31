@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161965\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161965\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Corporation stops, wet connections, or other connections to a street main shall be made only by employees of the Department of Environmental Protection. The cost of the installation shall be borne by the owner of the property for which the connection is made.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161966\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161966\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161966\"><\/AnnotationDrawer><h6><a name=\"JD_PC604\" id=\"JD_PC604\" title=\"PC 604\"><\/a>Section PC 604: Design of Building Water Distribution System<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12053-html-1",
+      "kind" : "html",
+      "plainText" : "Corporation stops, wet connections, or other connections to a street main shall be made only by employees of the Department of Environmental Protection. The cost of the installation shall be borne by the owner of the property for which the connection is made. \n\n Section PC 604: Design of Building Water Distribution System"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12053
+}

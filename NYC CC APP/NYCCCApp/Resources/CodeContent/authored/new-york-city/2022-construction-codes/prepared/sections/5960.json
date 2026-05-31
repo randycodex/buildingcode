@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185214\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185214\"><\/AnnotationDrawer><div>No chute shall be installed until a permit has been issued by the commissioner on the basis of drawings prepared by a registered design professional.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185215\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185215\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Design and permit is not required for a chute that meets all of the following criteria:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185216\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The chute is installed on the exterior of a building or structure at a height of 40 feet (12 192 mm) or less above the level of the adjoining ground;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185217\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185217\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;The chute is a manufactured product and is installed in accordance with the manufacturer's specifications; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185218\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185218\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;The chute does not attach to or impart a load on a scaffold.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5960-html-1",
+      "kind" : "html",
+      "plainText" : "No chute shall be installed until a permit has been issued by the commissioner on the basis of drawings prepared by a registered design professional.\n\n Exception: Design and permit is not required for a chute that meets all of the following criteria:\n\n 1. The chute is installed on the exterior of a building or structure at a height of 40 feet (12 192 mm) or less above the level of the adjoining ground;\n\n 2. The chute is a manufactured product and is installed in accordance with the manufacturer's specifications; and\n\n 3. The chute does not attach to or impart a load on a scaffold."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5960
+}

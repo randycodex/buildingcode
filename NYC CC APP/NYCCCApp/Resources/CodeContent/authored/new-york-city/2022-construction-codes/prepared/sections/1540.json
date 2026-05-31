@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171016\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171016\"><\/AnnotationDrawer><div>No person shall remove or modify any fire protection system installed or maintained under the provisions of this code or the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> without approval by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1540-html-1",
+      "kind" : "html",
+      "plainText" : "No person shall remove or modify any fire protection system installed or maintained under the provisions of this code or the New York City Fire Code without approval by the commissioner."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1540
+}

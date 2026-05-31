@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161653\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161653\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The shower compartment access and egress opening shall have a clear and unobstructed finished width of not less than 22 inches (559 mm). Shower compartments required to be designed in conformance to accessibility provisions shall comply with Section 404.1.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11922-html-1",
+      "kind" : "html",
+      "plainText" : "The shower compartment access and egress opening shall have a clear and unobstructed finished width of not less than 22 inches (559 mm). Shower compartments required to be designed in conformance to accessibility provisions shall comply with Section 404.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11922
+}

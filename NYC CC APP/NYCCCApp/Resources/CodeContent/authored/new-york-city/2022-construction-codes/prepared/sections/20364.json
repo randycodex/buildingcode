@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186872\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186872\"><\/AnnotationDrawer><div>Add a new Section 10.3.1 to read as follows: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186873\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186873\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">10.3.1 The authorized instructors' card shall list the specific models of powder actuated tools for which training may be given.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20364-html-1",
+      "kind" : "html",
+      "plainText" : "Add a new Section 10.3.1 to read as follows: \n\n 10.3.1 The authorized instructors' card shall list the specific models of powder actuated tools for which training may be given."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20364
+}

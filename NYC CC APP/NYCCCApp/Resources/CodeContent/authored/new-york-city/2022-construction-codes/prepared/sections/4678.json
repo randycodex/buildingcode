@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181084\"><\/AnnotationDrawer><div>The lining in chimneys shall not be considered as taking either compression or tension stresses.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4678-html-1",
+      "kind" : "html",
+      "plainText" : "The lining in chimneys shall not be considered as taking either compression or tension stresses."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4678
+}

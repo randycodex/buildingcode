@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183631\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183631\"><\/AnnotationDrawer><div>A mirror shall be installed in each self-service passenger elevator in multiple dwellings. Such mirror shall be affixed and maintained in a manner sufficient to enable persons entering such elevator to view the inside thereof prior to entry to determine whether any person is in the elevator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19242-html-1",
+      "kind" : "html",
+      "plainText" : "A mirror shall be installed in each self-service passenger elevator in multiple dwellings. Such mirror shall be affixed and maintained in a manner sufficient to enable persons entering such elevator to view the inside thereof prior to entry to determine whether any person is in the elevator."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 19242
+}

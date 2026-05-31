@@ -1,0 +1,49 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197512\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197512\"><\/AnnotationDrawer><div>Two permanent openings, one commencing within 12 inches (304.8 mm) of the top and one commencing within 12 inches (304.8 mm) of the bottom of the enclosure, shall be provided. The openings shall communicate directly or by ducts with the outdoors or spaces that freely communicate with the outdoors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197513\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197513\"><\/AnnotationDrawer><div>Where directly communicating with the outdoors, or where communicating with the outdoors through vertical ducts, each opening shall have a minimum free area of 1 square inch per 4,000 Btu\/h (550 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/kW) of total input rating of all appliances in the enclosure (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-197511', hash: '#JD_FGCFigure304.6.1(1)' }}\">Figures 304.6.1(1)<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-197511', hash: '#JD_FGCFigure304.6.1(2)' }}\">304.6.1(2)<\/Link>).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197514\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197514\"><\/AnnotationDrawer><div>Where communicating with the outdoors through horizontal ducts, each opening shall have a minimum free area of not less than 1 square inch per 2,000 Btu\/h (1100 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/kW) of total input rating of all appliances in the enclosure (see <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-197511', hash: '#JD_FGCFigure304.6.1(3)' }}\">Figure 304.6.1(3)<\/Link>).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197515\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197515\"><\/AnnotationDrawer><div>",
+      "id" : "8026-html-1",
+      "kind" : "html",
+      "plainText" : "Two permanent openings, one commencing within 12 inches (304.8 mm) of the top and one commencing within 12 inches (304.8 mm) of the bottom of the enclosure, shall be provided. The openings shall communicate directly or by ducts with the outdoors or spaces that freely communicate with the outdoors.\n\n Where directly communicating with the outdoors, or where communicating with the outdoors through vertical ducts, each opening shall have a minimum free area of 1 square inch per 4,000 Btu\/h (550 mm\n\n 2 \n\n \/kW) of total input rating of all appliances in the enclosure (see Figures 304.6.1(1) and 304.6.1(2) ).\n\n Where communicating with the outdoors through horizontal ducts, each opening shall have a minimum free area of not less than 1 square inch per 2,000 Btu\/h (1100 mm\n\n 2 \n\n \/kW) of total input rating of all appliances in the enclosure (see Figure 304.6.1(3) )."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/d3dfd5f9b1d0779c37077cb03a5d475c18d66be6.png\" width=\"480\" height=\"437.733333333333\"><\/img><\/span>",
+      "id" : "8026-image-2",
+      "imageID" : "d3dfd5f9b1d0779c37077cb03a5d475c18d66be6.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197516\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197516\"><\/AnnotationDrawer><div><a name=\"JD_FGCFigure304.6.1(1)\" id=\"JD_FGCFigure304.6.1(1)\" title=\"FGC Figure 304.6.1(1)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 304.6.1(1)<br><\/br>All Air from Outdoors &#8211; Inlet Air from Ventilated Crawl Space and Outlet Air to Ventilated Attic<br><\/br>(see Section 304.6.1)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197517\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197517\"><\/AnnotationDrawer><div>",
+      "id" : "8026-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 304.6.1(1)\n All Air from Outdoors - Inlet Air from Ventilated Crawl Space and Outlet Air to Ventilated Attic\n (see Section 304.6.1)"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/578819866584a13742d386db13aafb8a279b04ee.png\" width=\"480\" height=\"509.933333333333\"><\/img><\/span>",
+      "id" : "8026-image-4",
+      "imageID" : "578819866584a13742d386db13aafb8a279b04ee.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197518\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197518\"><\/AnnotationDrawer><div><a name=\"JD_FGCFigure304.6.1(2)\" id=\"JD_FGCFigure304.6.1(2)\" title=\"FGC Figure 304.6.1(2)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 304.6.1(2)<br><\/br>All Air from Outdoors Through Ventilated Attic<br><\/br>(see Section 304.6.1)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197519\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197519\"><\/AnnotationDrawer><div>",
+      "id" : "8026-html-5",
+      "kind" : "html",
+      "plainText" : "Figure 304.6.1(2)\n All Air from Outdoors Through Ventilated Attic\n (see Section 304.6.1)"
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/2537b0c208ca8605adfb08c4beb22e857a414621.png\" width=\"480\" height=\"372.666666666667\"><\/img><\/span>",
+      "id" : "8026-image-6",
+      "imageID" : "2537b0c208ca8605adfb08c4beb22e857a414621.png",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197520\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197520\"><\/AnnotationDrawer><div><a name=\"JD_FGCFigure304.6.1(3)\" id=\"JD_FGCFigure304.6.1(3)\" title=\"FGC Figure 304.6.1(3)\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 304.6.1(3)<br><\/br>All Air from Outdoors<br><\/br>(see Section 304.6.1)<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8026-html-7",
+      "kind" : "html",
+      "plainText" : "Figure 304.6.1(3)\n All Air from Outdoors\n (see Section 304.6.1)"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8026
+}

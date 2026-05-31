@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172145\"><\/AnnotationDrawer><div>Machinery rooms shall contain refrigerant detectors with audible and visual alarms. The detectors, or sampling tubes that draw air to each detector, shall be located in all areas where refrigerant from a leak will concentrate. The alarm shall be actuated at a value not greater than the corresponding TLV-TWA values for the refrigerant classification indicated in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span> Detectors and alarms shall be placed in approved locations. Refrigerant detectors shall initiate all functions as required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span> and <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1873-html-1",
+      "kind" : "html",
+      "plainText" : "Machinery rooms shall contain refrigerant detectors with audible and visual alarms. The detectors, or sampling tubes that draw air to each detector, shall be located in all areas where refrigerant from a leak will concentrate. The alarm shall be actuated at a value not greater than the corresponding TLV-TWA values for the refrigerant classification indicated in the New York City Mechanical Code. Detectors and alarms shall be placed in approved locations. Refrigerant detectors shall initiate all functions as required by the New York City Mechanical Code and New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1873
+}

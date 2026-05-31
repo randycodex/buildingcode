@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169602\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169602\"><\/AnnotationDrawer><div>Waste and linen chutes, and discharge rooms for such chutes, shall comply with the provisions of NFPA 82, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168791', hash: '#JD_BCCh.6' }}\">Chapter 6<\/Link> of this code and shall meet the requirements of Sections 713.13.1 through 713.13.6 of this code. Incinerator rooms shall meet the provisions of Sections 713.13.4 through 713.13.5 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169603\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169603\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Chutes serving and contained within a single dwelling unit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15011-html-1",
+      "kind" : "html",
+      "plainText" : "Waste and linen chutes, and discharge rooms for such chutes, shall comply with the provisions of NFPA 82, Chapter 6 of this code and shall meet the requirements of Sections 713.13.1 through 713.13.6 of this code. Incinerator rooms shall meet the provisions of Sections 713.13.4 through 713.13.5 of this code.\n\n Exception: Chutes serving and contained within a single dwelling unit."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15011
+}

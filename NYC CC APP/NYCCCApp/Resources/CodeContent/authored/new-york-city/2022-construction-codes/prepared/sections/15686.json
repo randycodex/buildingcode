@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172104\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172104\"><\/AnnotationDrawer><div>Automatic telephone-dialing devices used to transmit an emergency alarm shall not be connected to any Fire Department telephone number unless approved by the Fire Commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15686-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic telephone-dialing devices used to transmit an emergency alarm shall not be connected to any Fire Department telephone number unless approved by the Fire Commissioner."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15686
+}

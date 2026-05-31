@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197001\"><\/AnnotationDrawer><div>Installations shall be tested as required in this code and in accordance with Sections 108.3.1 through 108.3.3. Tests shall be made by the permit holder and witnessed by the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20762-html-1",
+      "kind" : "html",
+      "plainText" : "Installations shall be tested as required in this code and in accordance with Sections 108.3.1 through 108.3.3. Tests shall be made by the permit holder and witnessed by the department."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 20762
+}

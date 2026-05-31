@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193728\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193728\"><\/AnnotationDrawer><div>Where space for a clothes dryer is provided, an exhaust duct system shall be installed. Where the clothes dryer is not installed at the time of occupancy, the exhaust duct shall be capped at the location of the future dryer.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193729\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193729\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where a listed condensing clothes dryer is installed prior to occupancy of structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10534-html-1",
+      "kind" : "html",
+      "plainText" : "Where space for a clothes dryer is provided, an exhaust duct system shall be installed. Where the clothes dryer is not installed at the time of occupancy, the exhaust duct shall be capped at the location of the future dryer.\n\n Exception: Where a listed condensing clothes dryer is installed prior to occupancy of structure."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10534
+}

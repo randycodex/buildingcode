@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171076\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171076\"><\/AnnotationDrawer><div>Where the alteration involves the addition of stories to a building with no existing standpipe system, standpipes shall be provided to all stair shafts in accordance with this chapter. <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171077\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171077\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception.<\/span> Standpipes are not required where:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171078\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171078\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;the alteration involves the addition of only one story;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171079\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171079\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;the completed building does not exceed 7 stories; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171080\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171080\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;the completed building does not exceed 85 feet (25.9 m) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1562-html-1",
+      "kind" : "html",
+      "plainText" : "Where the alteration involves the addition of stories to a building with no existing standpipe system, standpipes shall be provided to all stair shafts in accordance with this chapter. \n\n Exception. Standpipes are not required where:\n\n 1. the alteration involves the addition of only one story;\n\n 2. the completed building does not exceed 7 stories; and\n\n 3. the completed building does not exceed 85 feet (25.9 m) in height."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1562
+}

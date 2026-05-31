@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198509\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198509\"><\/AnnotationDrawer><div>The application of vents shall be in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198557', hash: '#JD_FGCTable503.4' }}\">Table 503.4<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21197-html-1",
+      "kind" : "html",
+      "plainText" : "The application of vents shall be in accordance with Table 503.4 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21197
+}

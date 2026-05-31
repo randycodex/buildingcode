@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179110\"><\/AnnotationDrawer><div>Retaining walls shall be designed for the lateral soil loads set forth in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177268', hash: '#JD_BC1605' }}\">1605<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179111\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179111\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where the structural design of a retaining wall is based on load factor design, the load factors in Section 1605.2 may be modified as follows: where water can freely flow over the top of the wall, the wall may be designed for a water pressure equal to that caused by a groundwater table elevation at the top of the wall. For this condition, the load factor for the groundwater pressure may be reduced to 1.2. The load factor for the lateral earth pressure shall remain at 1.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17805-html-1",
+      "kind" : "html",
+      "plainText" : "Retaining walls shall be designed for the lateral soil loads set forth in Section 1605 .\n\n Exception: Where the structural design of a retaining wall is based on load factor design, the load factors in Section 1605.2 may be modified as follows: where water can freely flow over the top of the wall, the wall may be designed for a water pressure equal to that caused by a groundwater table elevation at the top of the wall. For this condition, the load factor for the groundwater pressure may be reduced to 1.2. The load factor for the lateral earth pressure shall remain at 1.6."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17805
+}

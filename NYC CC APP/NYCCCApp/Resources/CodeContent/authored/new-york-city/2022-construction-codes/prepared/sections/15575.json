@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171739\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171739\"><\/AnnotationDrawer><div>Amendments to approved construction documents shall be submitted and approved by the Fire Department before the final inspection of the work or equipment is completed, and such amendments when approved shall be deemed part of the original construction documents. The Fire Department may allow minor revisions of construction documents to be made and submitted to the Fire Department after the completion of work but prior to sign-off of the work in accordance with rules promulgated by the Fire Department regarding such amendments. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171740\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171740\"><\/AnnotationDrawer><div>(Am. L.L. 2018\/195, 12\/1\/2018, eff. 5\/30\/2019) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171741\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171741\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-129017', hash: '#JD_L.L.2018\/195' }}\">L.L. 2018\/195<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15575-html-1",
+      "kind" : "html",
+      "plainText" : "Amendments to approved construction documents shall be submitted and approved by the Fire Department before the final inspection of the work or equipment is completed, and such amendments when approved shall be deemed part of the original construction documents. The Fire Department may allow minor revisions of construction documents to be made and submitted to the Fire Department after the completion of work but prior to sign-off of the work in accordance with rules promulgated by the Fire Department regarding such amendments. \n\n (Am. L.L. 2018\/195, 12\/1\/2018, eff. 5\/30\/2019) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018\/195 ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15575
+}

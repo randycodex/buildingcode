@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184638\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184638\"><\/AnnotationDrawer><div>Enclosures for sidewalk cafes, where permitted by the Commissioner of the Department of Consumer Affairs pursuant to applicable law and constructed in compliance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184327', hash: '#JD_BC3111' }}\">3111<\/Link>, may be constructed beyond the street line.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5825-html-1",
+      "kind" : "html",
+      "plainText" : "Enclosures for sidewalk cafes, where permitted by the Commissioner of the Department of Consumer Affairs pursuant to applicable law and constructed in compliance with Section 3111 , may be constructed beyond the street line."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5825
+}

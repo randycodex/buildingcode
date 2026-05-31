@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176707\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176707\"><\/AnnotationDrawer><div>Tile shall be applied according to the manufacturer's instructions, based on the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176708\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176708\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Climatic conditions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176709\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176709\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Roof slope.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176710\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176710\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Underlayment system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176711\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176711\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Type of tile being installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3282-html-1",
+      "kind" : "html",
+      "plainText" : "Tile shall be applied according to the manufacturer's instructions, based on the following:\n\n 1. Climatic conditions.\n\n 2. Roof slope.\n\n 3. Underlayment system.\n\n 4. Type of tile being installed."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3282
+}

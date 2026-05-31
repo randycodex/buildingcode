@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193952\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193952\"><\/AnnotationDrawer><div>Where vented fuel-burning appliances are located in the same room or space as the hood, provisions shall be made to prevent the hood system from interfering with normal operation of the appliance vents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10595-html-1",
+      "kind" : "html",
+      "plainText" : "Where vented fuel-burning appliances are located in the same room or space as the hood, provisions shall be made to prevent the hood system from interfering with normal operation of the appliance vents."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10595
+}

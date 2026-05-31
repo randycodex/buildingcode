@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181199\"><\/AnnotationDrawer><div>When a flue is relined with a material not complying with Section 2113.11.1, the chimney shall be plainly and permanently identified by a label attached to a wall, ceiling or other conspicuous location adjacent to where the connector enters the chimney. The label shall include the following message or equivalent language: \"This chimney is for use only with (type or category of appliance) that burns (type of fuel). Do not connect other types of appliances.\"<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4715-html-1",
+      "kind" : "html",
+      "plainText" : "When a flue is relined with a material not complying with Section 2113.11.1, the chimney shall be plainly and permanently identified by a label attached to a wall, ceiling or other conspicuous location adjacent to where the connector enters the chimney. The label shall include the following message or equivalent language: \"This chimney is for use only with (type or category of appliance) that burns (type of fuel). Do not connect other types of appliances.\""
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4715
+}

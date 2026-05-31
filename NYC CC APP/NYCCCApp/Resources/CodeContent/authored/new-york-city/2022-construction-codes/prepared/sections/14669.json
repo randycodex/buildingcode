@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168395\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168395\"><\/AnnotationDrawer><div>Buildings of Type I construction permitted to be of unlimited tabular building heights and areas are not subject to the special requirements that allow unlimited area buildings in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168570', hash: '#JD_BC507' }}\">507<\/Link> or unlimited building height in Sections 503.1.1 and 504.3 or increased building heights and areas for other types of construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168396\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168396\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168396\"><\/AnnotationDrawer><h6><a name=\"JD_BC504\" id=\"JD_BC504\" title=\"BC 504\"><\/a>Section BC 504: Building Height and Number of Stories<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14669-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings of Type I construction permitted to be of unlimited tabular building heights and areas are not subject to the special requirements that allow unlimited area buildings in Section 507 or unlimited building height in Sections 503.1.1 and 504.3 or increased building heights and areas for other types of construction.\n\n Section BC 504: Building Height and Number of Stories"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14669
+}

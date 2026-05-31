@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161549\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161549\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where any fixture is provided with an overflow, the waste shall be designed and installed so that standing water in the fixture will not rise in the overflow when the stopper is closed, and no water will remain in the overflow when the fixture is empty.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161550\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161550\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Existing overflows for bath tubs utilizing standing wastes.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24703-html-1",
+      "kind" : "html",
+      "plainText" : "Where any fixture is provided with an overflow, the waste shall be designed and installed so that standing water in the fixture will not rise in the overflow when the stopper is closed, and no water will remain in the overflow when the fixture is empty. \n\n Exception: Existing overflows for bath tubs utilizing standing wastes."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24703
+}

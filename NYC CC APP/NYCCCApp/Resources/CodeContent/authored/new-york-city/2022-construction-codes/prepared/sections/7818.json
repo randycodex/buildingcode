@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230133\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230133\"><\/AnnotationDrawer><div>All ADUs shall be provided with carbon monoxide alarms in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172648', hash: '#JD_BC915' }}\">915<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7818-html-1",
+      "kind" : "html",
+      "plainText" : "All ADUs shall be provided with carbon monoxide alarms in accordance with Section 915 ."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7818
+}

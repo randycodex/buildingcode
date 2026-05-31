@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162004\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162004\"><\/AnnotationDrawer><div>Wherever water pressure from the street main or other source of supply is insufficient to provide flow pressures at fixture outlets as required under <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-161971', hash: '#JD_PCTable604.3' }}\">Table 604.3<\/Link>, a water pressure booster system conforming to Section 606.5 shall be installed on the building water supply system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24886-html-1",
+      "kind" : "html",
+      "plainText" : "Wherever water pressure from the street main or other source of supply is insufficient to provide flow pressures at fixture outlets as required under Table 604.3 , a water pressure booster system conforming to Section 606.5 shall be installed on the building water supply system."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24886
+}

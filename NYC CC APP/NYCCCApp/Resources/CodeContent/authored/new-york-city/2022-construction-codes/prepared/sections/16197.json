@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173813\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173813\"><\/AnnotationDrawer><div>Externally illuminated exit signs shall comply with Sections 1013.6.1 through 1013.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16197-html-1",
+      "kind" : "html",
+      "plainText" : "Externally illuminated exit signs shall comply with Sections 1013.6.1 through 1013.6.3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16197
+}

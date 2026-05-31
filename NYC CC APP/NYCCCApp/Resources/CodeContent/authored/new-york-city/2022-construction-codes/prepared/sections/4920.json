@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181828\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181828\"><\/AnnotationDrawer><div>Two-inch (51 mm) sawn tongue-and-groove decking shall comply with Sections 2304.9.4.1 through 2304.9.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4920-html-1",
+      "kind" : "html",
+      "plainText" : "Two-inch (51 mm) sawn tongue-and-groove decking shall comply with Sections 2304.9.4.1 through 2304.9.4.3."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4920
+}

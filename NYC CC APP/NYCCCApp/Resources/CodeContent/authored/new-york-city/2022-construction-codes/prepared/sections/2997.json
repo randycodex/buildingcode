@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175876\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175876\"><\/AnnotationDrawer><div>Artificial light shall meet the minimum illumination standards set forth in Section 1205.3. Artificial light shall not exceed maximum energy consumption requirements, if applicable, as required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Energy Conservation Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2997-html-1",
+      "kind" : "html",
+      "plainText" : "Artificial light shall meet the minimum illumination standards set forth in Section 1205.3. Artificial light shall not exceed maximum energy consumption requirements, if applicable, as required by the New York City Energy Conservation Code ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 2997
+}

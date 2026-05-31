@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187141\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187141\"><\/AnnotationDrawer><div>For individuals who fail to complete the required refresher program or course within any 4 year period, a refresher program or course shall be considered timely if completed within 1 year after the expiration date of the last previously completed initial or refresher program or course. During such period, such individual shall not perform or supervise any activity for which the lapsed training is required to perform or supervise such activity until such individual has successfully completed such refresher program or course. Where more than 1 year has lapsed, such individual shall be required to successfully recomplete the initial training program or course.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6615-html-1",
+      "kind" : "html",
+      "plainText" : "For individuals who fail to complete the required refresher program or course within any 4 year period, a refresher program or course shall be considered timely if completed within 1 year after the expiration date of the last previously completed initial or refresher program or course. During such period, such individual shall not perform or supervise any activity for which the lapsed training is required to perform or supervise such activity until such individual has successfully completed such refresher program or course. Where more than 1 year has lapsed, such individual shall be required to successfully recomplete the initial training program or course."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6615
+}

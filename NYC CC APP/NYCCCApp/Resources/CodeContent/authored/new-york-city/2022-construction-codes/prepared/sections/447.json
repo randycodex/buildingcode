@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167232\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167232\"><\/AnnotationDrawer><div>Horizontal assemblies supporting smoke barriers required by this section shall be designed to resist the movement of smoke. Elevator lobbies shall be in accordance with Section 3006.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "447-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal assemblies supporting smoke barriers required by this section shall be designed to resist the movement of smoke. Elevator lobbies shall be in accordance with Section 3006.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 447
+}

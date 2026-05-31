@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197430\"><\/AnnotationDrawer><div>The carbon monoxide detector shall be listed and labeled in accordance with UL 2034 and UL 2075 and installed in accordance with the carbon monoxide detector manufacturer's instructions. The carbon monoxide detector may be installed integral to the appliance, on the surface of the appliance or remotely, but hard-wired, no more than 5 feet (1.5 m) from the appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20822-html-1",
+      "kind" : "html",
+      "plainText" : "The carbon monoxide detector shall be listed and labeled in accordance with UL 2034 and UL 2075 and installed in accordance with the carbon monoxide detector manufacturer's instructions. The carbon monoxide detector may be installed integral to the appliance, on the surface of the appliance or remotely, but hard-wired, no more than 5 feet (1.5 m) from the appliance."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20822
+}

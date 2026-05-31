@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177761\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177761\"><\/AnnotationDrawer><div>Design wind speed during construction for a construction period of less than 5 years may be reduced as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177762\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177762\"><\/AnnotationDrawer><div>Unless otherwise directed by the commissioner, the basic design wind speed may be reduced to 110 mph for all risk categories, corresponding to 1.7 percent probability of exceedance in 5 years. The basic design wind speed refers to the ultimate design 3-second gust wind speed at 33 feet (10 058.4 mm) above ground for Exposure Category C, as defined in Section 1609.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3579-html-1",
+      "kind" : "html",
+      "plainText" : "Design wind speed during construction for a construction period of less than 5 years may be reduced as follows:\n\n Unless otherwise directed by the commissioner, the basic design wind speed may be reduced to 110 mph for all risk categories, corresponding to 1.7 percent probability of exceedance in 5 years. The basic design wind speed refers to the ultimate design 3-second gust wind speed at 33 feet (10 058.4 mm) above ground for Exposure Category C, as defined in Section 1609.3."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3579
+}

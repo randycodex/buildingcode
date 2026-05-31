@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172934\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172934\"><\/AnnotationDrawer><div>The path of egress travel along a means of egress shall not be interrupted by a building element other than a means of egress component as specified in this chapter. Obstructions shall not be placed in the minimum width or required capacity of a means of egress component except projections permitted by this chapter. The minimum width or required capacity of a means of egress system shall not be diminished along the path of egress travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2135-html-1",
+      "kind" : "html",
+      "plainText" : "The path of egress travel along a means of egress shall not be interrupted by a building element other than a means of egress component as specified in this chapter. Obstructions shall not be placed in the minimum width or required capacity of a means of egress component except projections permitted by this chapter. The minimum width or required capacity of a means of egress system shall not be diminished along the path of egress travel."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2135
+}

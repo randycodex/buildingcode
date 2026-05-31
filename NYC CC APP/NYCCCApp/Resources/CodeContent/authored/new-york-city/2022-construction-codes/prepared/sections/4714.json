@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181197\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181197\"><\/AnnotationDrawer><div>Flue lining and vent systems for use in masonry chimneys with oil-fired appliances approved for use with Type L vent shall be limited to flue lining systems complying with Section 2113.11.1 and listed chimney liners complying with UL 641. See Section 2113.11.1.5 for marking.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4714-html-1",
+      "kind" : "html",
+      "plainText" : "Flue lining and vent systems for use in masonry chimneys with oil-fired appliances approved for use with Type L vent shall be limited to flue lining systems complying with Section 2113.11.1 and listed chimney liners complying with UL 641. See Section 2113.11.1.5 for marking."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4714
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180891\"><\/AnnotationDrawer><div>All non-participating masonry walls and veneers shall be constructed with adequate depth and width of isolation joints to prevent masonry distress induced by deflections, drifts, shortening, expansion, or other similar movements in the plane of the wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18434-html-1",
+      "kind" : "html",
+      "plainText" : "All non-participating masonry walls and veneers shall be constructed with adequate depth and width of isolation joints to prevent masonry distress induced by deflections, drifts, shortening, expansion, or other similar movements in the plane of the wall."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18434
+}

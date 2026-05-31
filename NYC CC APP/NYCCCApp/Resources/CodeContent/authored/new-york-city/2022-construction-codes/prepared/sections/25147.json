@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162642\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162642\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints between different types of plastic pipe or between plastic pipe and other piping material shall be made with an approved adapter fitting. Joints between plastic pipe and cast-iron hub pipe shall be made by a caulked joint or a mechanical compression joint.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25147-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between different types of plastic pipe or between plastic pipe and other piping material shall be made with an approved adapter fitting. Joints between plastic pipe and cast-iron hub pipe shall be made by a caulked joint or a mechanical compression joint."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25147
+}

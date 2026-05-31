@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179480\"><\/AnnotationDrawer><div>Precast concrete piles shall be handled and driven so as not to cause injury or overstressing in a manner that affects durability or strength. A precast concrete pile shall not be driven before the concrete has attained a compressive strength of at least 75 percent of the 28-day specified compressive strength (<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t), and not less than the strength sufficient to withstand handling and driving forces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17934-html-1",
+      "kind" : "html",
+      "plainText" : "Precast concrete piles shall be handled and driven so as not to cause injury or overstressing in a manner that affects durability or strength. A precast concrete pile shall not be driven before the concrete has attained a compressive strength of at least 75 percent of the 28-day specified compressive strength ( f ' c \n\n ), and not less than the strength sufficient to withstand handling and driving forces."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17934
+}

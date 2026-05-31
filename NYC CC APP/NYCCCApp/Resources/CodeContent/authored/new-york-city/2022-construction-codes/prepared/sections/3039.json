@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175996\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175996\"><\/AnnotationDrawer><div>Each water closet utilized by the public or employees shall occupy a separate compartment with walls or partitions and a door enclosing the fixtures for privacy.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175997\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175997\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175998\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175998\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Water closet compartments shall not be required in a single-occupant toilet room with a lockable door.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175999\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175999\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Toilet rooms located in child day care facilities and containing two or more water closets shall be permitted to have one water closet without an enclosing compartment.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176000\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176000\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;This provision is not applicable to toilet areas located within Group I-3 occupancy housing areas.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3039-html-1",
+      "kind" : "html",
+      "plainText" : "Each water closet utilized by the public or employees shall occupy a separate compartment with walls or partitions and a door enclosing the fixtures for privacy.\n\n Exceptions: \n\n 1. Water closet compartments shall not be required in a single-occupant toilet room with a lockable door.\n\n 2. Toilet rooms located in child day care facilities and containing two or more water closets shall be permitted to have one water closet without an enclosing compartment.\n\n 3. This provision is not applicable to toilet areas located within Group I-3 occupancy housing areas."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 3039
+}

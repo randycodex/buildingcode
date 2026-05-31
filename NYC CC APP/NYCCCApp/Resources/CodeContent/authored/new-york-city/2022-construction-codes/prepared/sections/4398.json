@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180331\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180331\"><\/AnnotationDrawer><div>Field-cured cylinders shall be cured under field conditions in accordance with ASTM C 31.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4398-html-1",
+      "kind" : "html",
+      "plainText" : "Field-cured cylinders shall be cured under field conditions in accordance with ASTM C 31."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4398
+}

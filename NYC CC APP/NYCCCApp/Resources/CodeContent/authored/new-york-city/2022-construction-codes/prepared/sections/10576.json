@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193888\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193888\"><\/AnnotationDrawer><div>Commercial kitchen exhaust systems serving Type II hoods shall comply with Sections 506.4.1 and 506.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10576-html-1",
+      "kind" : "html",
+      "plainText" : "Commercial kitchen exhaust systems serving Type II hoods shall comply with Sections 506.4.1 and 506.4.2."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10576
+}

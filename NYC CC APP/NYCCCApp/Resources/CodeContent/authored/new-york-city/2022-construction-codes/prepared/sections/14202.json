@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166992\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166992\"><\/AnnotationDrawer><div>The following uses and alterations are not permitted: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166993\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166993\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Vehicle repair work. <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166994\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Parking of commercial vehicles, buses, trucks and similar vehicles.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166995\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166995\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Partial or complete closing of required openings in exterior walls by tarpaulins or any other means.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166996\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166996\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Dispensing of fuel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14202-html-1",
+      "kind" : "html",
+      "plainText" : "The following uses and alterations are not permitted: \n\n 1. Vehicle repair work. \n\n 2. Parking of commercial vehicles, buses, trucks and similar vehicles.\n\n 3. Partial or complete closing of required openings in exterior walls by tarpaulins or any other means.\n\n 4. Dispensing of fuel."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14202
+}

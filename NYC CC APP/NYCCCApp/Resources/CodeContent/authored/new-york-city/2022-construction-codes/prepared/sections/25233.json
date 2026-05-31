@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162897\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162897\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">This chapter shall govern matters concerning indirect waste piping and special wastes. This chapter shall further control matters concerning food-handling establishments, sterilizers, clear-water waste, swimming pools, methods of providing air breaks or air gaps, and neutralizing devices for corrosive wastes.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25233-html-1",
+      "kind" : "html",
+      "plainText" : "This chapter shall govern matters concerning indirect waste piping and special wastes. This chapter shall further control matters concerning food-handling establishments, sterilizers, clear-water waste, swimming pools, methods of providing air breaks or air gaps, and neutralizing devices for corrosive wastes."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 25233
+}

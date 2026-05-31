@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162428\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162428\"><\/AnnotationDrawer><div>One such fixture shall be provided for each 100 occupants as determined by the occupant load of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25058-html-1",
+      "kind" : "html",
+      "plainText" : "One such fixture shall be provided for each 100 occupants as determined by the occupant load of the building."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25058
+}

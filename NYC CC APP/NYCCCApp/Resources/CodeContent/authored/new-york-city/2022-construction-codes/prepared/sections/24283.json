@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196333\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196333\"><\/AnnotationDrawer><div>Joints between different piping materials shall be made with adapter fittings. Joints between different metallic piping materials shall be made with dielectric fittings. All such fittings shall conform with the requirements of Section 1203. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24283-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between different piping materials shall be made with adapter fittings. Joints between different metallic piping materials shall be made with dielectric fittings. All such fittings shall conform with the requirements of Section 1203."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24283
+}

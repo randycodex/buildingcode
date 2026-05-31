@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169866\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169866\"><\/AnnotationDrawer><div>Metal mullions that exceed a nominal height of 12 feet (3658 mm) shall be protected with materials to afford the same fire-resistance rating as required for the wall construction in which the protective is located.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15100-html-1",
+      "kind" : "html",
+      "plainText" : "Metal mullions that exceed a nominal height of 12 feet (3658 mm) shall be protected with materials to afford the same fire-resistance rating as required for the wall construction in which the protective is located."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15100
+}

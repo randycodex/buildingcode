@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161478\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161478\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">All single-occupant toilet rooms shall be made available for use by persons of any sex. Existing toilet rooms shall comply with this section. Nothing in this section shall be construed to affect or alter the number of toilet rooms in a building otherwise required pursuant to this code or where applicable the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">1968 Building Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161479\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161479\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where egress from a single-occupant toilet room is through a room permissibly restricted by sex. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161480\"><\/AnnotationDrawer><div>(L.L. 2016\/079, 6\/28\/2016, eff. 10\/26\/2016) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24675-html-1",
+      "kind" : "html",
+      "plainText" : "All single-occupant toilet rooms shall be made available for use by persons of any sex. Existing toilet rooms shall comply with this section. Nothing in this section shall be construed to affect or alter the number of toilet rooms in a building otherwise required pursuant to this code or where applicable the 1968 Building Code . \n\n Exception: Where egress from a single-occupant toilet room is through a room permissibly restricted by sex. \n\n (L.L. 2016\/079, 6\/28\/2016, eff. 10\/26\/2016)"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24675
+}

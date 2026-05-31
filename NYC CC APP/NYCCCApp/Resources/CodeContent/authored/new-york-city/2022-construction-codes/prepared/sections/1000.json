@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169058\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169058\"><\/AnnotationDrawer><div>The finished condition of SFRM applied to structural members or assemblies shall not, upon complete drying or curing, exhibit cracks, voids, spalls, delamination or any exposure of the substrate. Surface irregularities of SFRM shall be deemed acceptable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1000-html-1",
+      "kind" : "html",
+      "plainText" : "The finished condition of SFRM applied to structural members or assemblies shall not, upon complete drying or curing, exhibit cracks, voids, spalls, delamination or any exposure of the substrate. Surface irregularities of SFRM shall be deemed acceptable."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1000
+}

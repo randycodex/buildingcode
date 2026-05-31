@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183489\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183489\"><\/AnnotationDrawer><div>Emergency power systems and standby power systems shall be installed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code,<\/span> NFPA 110 and NFPA 111.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5359-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency power systems and standby power systems shall be installed in accordance with the New York City Electrical Code, NFPA 110 and NFPA 111."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5359
+}

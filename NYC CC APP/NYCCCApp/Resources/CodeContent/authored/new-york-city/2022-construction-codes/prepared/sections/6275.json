@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186038\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186038\"><\/AnnotationDrawer><div>Debris, bricks, and similar material shall be removed through openings in the floors of the structure, or by means of chutes, buckets, or hoists that comply with the provisions of this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6275-html-1",
+      "kind" : "html",
+      "plainText" : "Debris, bricks, and similar material shall be removed through openings in the floors of the structure, or by means of chutes, buckets, or hoists that comply with the provisions of this chapter."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6275
+}

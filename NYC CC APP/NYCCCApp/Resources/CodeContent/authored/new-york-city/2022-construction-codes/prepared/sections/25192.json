@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162791\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162791\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The ejector pump capacity and head shall be appropriate to anticipated use requirements.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25192-html-1",
+      "kind" : "html",
+      "plainText" : "The ejector pump capacity and head shall be appropriate to anticipated use requirements."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25192
+}

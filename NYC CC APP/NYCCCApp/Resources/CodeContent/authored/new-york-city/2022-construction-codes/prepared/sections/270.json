@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166704\"><\/AnnotationDrawer><div>The detection, alarm and emergency systems of high-rise buildings shall comply with Sections 403.4.1 through 403.4.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "270-html-1",
+      "kind" : "html",
+      "plainText" : "The detection, alarm and emergency systems of high-rise buildings shall comply with Sections 403.4.1 through 403.4.8."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 270
+}

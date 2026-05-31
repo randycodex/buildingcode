@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178583\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178583\"><\/AnnotationDrawer><div>The special inspector shall verify the qualifications of the welder and the quality of the welding materials and equipment prior to welding operations. The special inspector shall review the proposed welding procedures for compliance with applicable standards listed in Section 1211.2.2 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17638-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall verify the qualifications of the welder and the quality of the welding materials and equipment prior to welding operations. The special inspector shall review the proposed welding procedures for compliance with applicable standards listed in Section 1211.2.2 of the New York City Mechanical Code ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17638
+}

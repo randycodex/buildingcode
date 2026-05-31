@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179738\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179738\"><\/AnnotationDrawer><div>Micropiles shall have an outside diameter of between 5 and 14 inches (127 and 355.6 mm). The steel pipe shall have a minimum wall thickness of 3\/16 inch (4.8 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4193-html-1",
+      "kind" : "html",
+      "plainText" : "Micropiles shall have an outside diameter of between 5 and 14 inches (127 and 355.6 mm). The steel pipe shall have a minimum wall thickness of 3\/16 inch (4.8 mm)."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4193
+}

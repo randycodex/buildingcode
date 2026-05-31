@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183145\"><\/AnnotationDrawer><div>In nonsprinklered buildings, foam plastic having a thickness that does not exceed 4 inches (102 mm) and a maximum flame spread index of 75 is permitted without thermal barrier in walk-in coolers or freezer units where the aggregate floor area does not exceed 400 square feet (37 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) and the foam plastic is covered by a metal facing not less than 0.032-inch-thick (0.81 mm) aluminum or corrosion-resistant steel having a minimum base metal thickness of 0.016 inch (0.41 mm). A thickness of up to 10 inches (254 mm) is permitted where protected by a thermal barrier.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19072-html-1",
+      "kind" : "html",
+      "plainText" : "In nonsprinklered buildings, foam plastic having a thickness that does not exceed 4 inches (102 mm) and a maximum flame spread index of 75 is permitted without thermal barrier in walk-in coolers or freezer units where the aggregate floor area does not exceed 400 square feet (37 m\n\n 2 \n\n ) and the foam plastic is covered by a metal facing not less than 0.032-inch-thick (0.81 mm) aluminum or corrosion-resistant steel having a minimum base metal thickness of 0.016 inch (0.41 mm). A thickness of up to 10 inches (254 mm) is permitted where protected by a thermal barrier."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19072
+}

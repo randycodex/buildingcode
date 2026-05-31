@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184072\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184072\"><\/AnnotationDrawer><div>No air-inflated structure, air-supported structure, or tent shall be erected closer than 20 feet (6096 mm) to any interior lot line nor closer than 30 feet (9144 mm) in any direction to an unprotected opening, required exterior stairway or corridor, or required exit door, on the same level or above the level of such structure. Such structure may abut another building on the same tax lot if the following conditions exist:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184073\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184073\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;No unprotected openings or exits are located above or within 30 feet (9144 mm) of such structure.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184074\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184074\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;No doors serving as a required exit are located between such structure and the abutted building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184075\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184075\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The exterior wall of the abutted building meets the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169061', hash: '#JD_BC705' }}\">705<\/Link> for fire walls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19405-html-1",
+      "kind" : "html",
+      "plainText" : "No air-inflated structure, air-supported structure, or tent shall be erected closer than 20 feet (6096 mm) to any interior lot line nor closer than 30 feet (9144 mm) in any direction to an unprotected opening, required exterior stairway or corridor, or required exit door, on the same level or above the level of such structure. Such structure may abut another building on the same tax lot if the following conditions exist:\n\n 1. No unprotected openings or exits are located above or within 30 feet (9144 mm) of such structure.\n\n 2. No doors serving as a required exit are located between such structure and the abutted building.\n\n 3. The exterior wall of the abutted building meets the requirements of Section 705 for fire walls."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19405
+}

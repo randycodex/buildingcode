@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197926\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197926\"><\/AnnotationDrawer><div>Gas piping shall be designed and installed to withstand seismic forces in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177795', hash: '#JD_BC1613' }}\">1613<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20979-html-1",
+      "kind" : "html",
+      "plainText" : "Gas piping shall be designed and installed to withstand seismic forces in accordance with Section 1613 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20979
+}

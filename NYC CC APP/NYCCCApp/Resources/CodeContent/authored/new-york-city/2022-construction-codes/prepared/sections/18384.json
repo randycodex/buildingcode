@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180694\"><\/AnnotationDrawer><div>The following terms are defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180695\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180695\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;ASPHALT.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180696\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180696\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;ASPHALTIC CONCRETE or ASPHALT PAVING.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180697\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180697\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;I-4 MIX.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180698\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180698\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;RECLAIMED ASPHALT PAVEMENT.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18384-html-1",
+      "kind" : "html",
+      "plainText" : "The following terms are defined in Chapter 2 .\n\n ASPHALT. \n\n ASPHALTIC CONCRETE or ASPHALT PAVING. \n\n I-4 MIX. \n\n RECLAIMED ASPHALT PAVEMENT."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18384
+}

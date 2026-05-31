@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194847\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194847\"><\/AnnotationDrawer><div>Masonry chimneys shall be constructed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23716-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry chimneys shall be constructed in accordance with the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23716
+}

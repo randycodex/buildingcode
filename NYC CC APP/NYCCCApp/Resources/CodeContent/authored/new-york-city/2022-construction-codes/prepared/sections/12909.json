@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188306\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188306\"><\/AnnotationDrawer><div>Windows and other openings shall comply with Sections F102.4.1 and F102.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12909-html-1",
+      "kind" : "html",
+      "plainText" : "Windows and other openings shall comply with Sections F102.4.1 and F102.4.2."
+    }
+  ],
+  "chapterNumber" : "F",
+  "schemaVersion" : 1,
+  "sectionID" : 12909
+}

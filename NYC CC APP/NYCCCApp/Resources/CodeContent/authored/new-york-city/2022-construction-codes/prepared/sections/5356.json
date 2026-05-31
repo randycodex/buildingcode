@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183480\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183480\"><\/AnnotationDrawer><div>Reflective plastic core insulation shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in accordance with ASTM E 84 or UL 723. The reflective plastic core insulation shall be tested at the maximum thickness intended for use. Test specimen preparation and mounting shall be in accordance with ASTM E 2599.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5356-html-1",
+      "kind" : "html",
+      "plainText" : "Reflective plastic core insulation shall have a flame spread index of not more than 25 and a smoke-developed index of not more than 450 when tested in accordance with ASTM E 84 or UL 723. The reflective plastic core insulation shall be tested at the maximum thickness intended for use. Test specimen preparation and mounting shall be in accordance with ASTM E 2599."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5356
+}

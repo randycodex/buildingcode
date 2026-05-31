@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194182\"><\/AnnotationDrawer><div>A means of access shall be provided to the heat exchanger and other components of the system as required for service, maintenance, repair or replacement.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10676-html-1",
+      "kind" : "html",
+      "plainText" : "A means of access shall be provided to the heat exchanger and other components of the system as required for service, maintenance, repair or replacement."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10676
+}

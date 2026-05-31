@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176950\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176950\"><\/AnnotationDrawer><div>A radiant barrier installed above a deck shall comply with Sections 1509.2 through 1509.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17202-html-1",
+      "kind" : "html",
+      "plainText" : "A radiant barrier installed above a deck shall comply with Sections 1509.2 through 1509.4."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17202
+}

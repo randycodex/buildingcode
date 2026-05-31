@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196345\"><\/AnnotationDrawer><div>Joints between brass pipe or fittings shall be brazed, threaded or welded joints complying with Section 1303.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24290-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between brass pipe or fittings shall be brazed, threaded or welded joints complying with Section 1303.3."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24290
+}

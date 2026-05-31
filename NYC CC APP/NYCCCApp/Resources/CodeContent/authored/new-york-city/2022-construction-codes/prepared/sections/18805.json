@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181972\"><\/AnnotationDrawer><div>Structures using wood-frame shear walls or wood-frame diaphragms to resist wind, seismic or other lateral loads shall be designed and constructed in accordance with AWC SDPWS and the applicable provisions of Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-181970', hash: '#JD_BC2305' }}\">2305<\/Link>, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182015', hash: '#JD_BC2306' }}\">2306<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182124', hash: '#JD_BC2307' }}\">2307<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18805-html-1",
+      "kind" : "html",
+      "plainText" : "Structures using wood-frame shear walls or wood-frame diaphragms to resist wind, seismic or other lateral loads shall be designed and constructed in accordance with AWC SDPWS and the applicable provisions of Sections 2305 , 2306 and 2307 ."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18805
+}

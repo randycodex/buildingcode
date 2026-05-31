@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176733\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176733\"><\/AnnotationDrawer><div>Metal roof panels shall be secured to the supports in accordance with the approved manufacturers' fasteners. In the absence of manufacturer recommendations, the following fasteners shall be used:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176734\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176734\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Galvanized fasteners shall be used for steel roofs.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176735\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176735\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Copper, brass, bronze, copper alloy or 300 series stainless-steel fasteners shall be used for copper roofs.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176736\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176736\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Stainless-steel fasteners are acceptable for all types of metal roofs.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176737\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176737\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Aluminum fasteners are acceptable for aluminum roofs attached to aluminum supports.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3288-html-1",
+      "kind" : "html",
+      "plainText" : "Metal roof panels shall be secured to the supports in accordance with the approved manufacturers' fasteners. In the absence of manufacturer recommendations, the following fasteners shall be used:\n\n 1. Galvanized fasteners shall be used for steel roofs.\n\n 2. Copper, brass, bronze, copper alloy or 300 series stainless-steel fasteners shall be used for copper roofs.\n\n 3. Stainless-steel fasteners are acceptable for all types of metal roofs.\n\n 4. Aluminum fasteners are acceptable for aluminum roofs attached to aluminum supports."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3288
+}

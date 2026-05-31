@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169415\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169415\"><\/AnnotationDrawer><div>Smoke and draft control doors complying only with UL 1784 shall be permitted to show the letter \"S\" on the manufacturer's labeling.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14941-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke and draft control doors complying only with UL 1784 shall be permitted to show the letter \"S\" on the manufacturer's labeling."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14941
+}

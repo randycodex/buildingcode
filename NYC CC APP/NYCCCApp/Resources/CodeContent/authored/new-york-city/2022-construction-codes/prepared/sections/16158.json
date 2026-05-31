@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173698\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173698\"><\/AnnotationDrawer><div>In buildings four or more stories or more than 40 feet (12 192 mm) in height above grade, one stairway shall extend to the roof surface through a stairway bulkhead complying with Section 1510.2, unless the roof has a slope steeper than 20 degrees (0.35 rad). Access to setback roof areas may be through a door or window opening to the roof. Stairways terminating at the level of a setback shall provide access to the setback roof areas, except where the setback is less than 4 feet (1220 mm) in width and 10 feet (3048 mm) in length, measured from the inside of the parapet wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16158-html-1",
+      "kind" : "html",
+      "plainText" : "In buildings four or more stories or more than 40 feet (12 192 mm) in height above grade, one stairway shall extend to the roof surface through a stairway bulkhead complying with Section 1510.2, unless the roof has a slope steeper than 20 degrees (0.35 rad). Access to setback roof areas may be through a door or window opening to the roof. Stairways terminating at the level of a setback shall provide access to the setback roof areas, except where the setback is less than 4 feet (1220 mm) in width and 10 feet (3048 mm) in length, measured from the inside of the parapet wall."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16158
+}

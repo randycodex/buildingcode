@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167994\"><\/AnnotationDrawer><div>Systems supplying HPM liquids or gases having a health-hazard ranking of 3 or 4 shall be welded throughout, except for connections, to the systems that are within a ventilated enclosure if the material is a gas, or an approved method of drainage or containment is provided for the connections if the material is a liquid.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "698-html-1",
+      "kind" : "html",
+      "plainText" : "Systems supplying HPM liquids or gases having a health-hazard ranking of 3 or 4 shall be welded throughout, except for connections, to the systems that are within a ventilated enclosure if the material is a gas, or an approved method of drainage or containment is provided for the connections if the material is a liquid."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 698
+}

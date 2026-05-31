@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186034\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186034\"><\/AnnotationDrawer><div>Debris stored in the cellar or basement shall not be piled above the level of the adjacent exterior grade unless the demolition contractor provides sheet-piling, shoring, bracing, or such other means necessary to insure the stability of the walls and to prevent any wall from collapsing due to horizontal loading created by the debris as determined by a registered design professional. Where debris is stored against a party wall, the requirements of Section 3306.9.11.5 shall also apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20101-html-1",
+      "kind" : "html",
+      "plainText" : "Debris stored in the cellar or basement shall not be piled above the level of the adjacent exterior grade unless the demolition contractor provides sheet-piling, shoring, bracing, or such other means necessary to insure the stability of the walls and to prevent any wall from collapsing due to horizontal loading created by the debris as determined by a registered design professional. Where debris is stored against a party wall, the requirements of Section 3306.9.11.5 shall also apply."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20101
+}

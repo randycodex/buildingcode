@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178458\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178458\"><\/AnnotationDrawer><div>The substrate shall have a minimum ambient temperature before and after application as specified in the ' written instructions of approved manufacturers. The area for application shall be ventilated during and after application as required by the written instructions of approved manufacturers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17594-html-1",
+      "kind" : "html",
+      "plainText" : "The substrate shall have a minimum ambient temperature before and after application as specified in the ' written instructions of approved manufacturers. The area for application shall be ventilated during and after application as required by the written instructions of approved manufacturers."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17594
+}

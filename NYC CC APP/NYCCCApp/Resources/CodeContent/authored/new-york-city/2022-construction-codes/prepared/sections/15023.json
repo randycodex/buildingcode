@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169630\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169630\"><\/AnnotationDrawer><div>Penetrations into or through fire walls, fire barriers, smoke barrier walls and fire partitions shall comply with Sections 714.3.1 through 714.3.3. Penetrations in smoke barrier walls shall also comply with Section 714.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15023-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations into or through fire walls, fire barriers, smoke barrier walls and fire partitions shall comply with Sections 714.3.1 through 714.3.3. Penetrations in smoke barrier walls shall also comply with Section 714.4.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15023
+}

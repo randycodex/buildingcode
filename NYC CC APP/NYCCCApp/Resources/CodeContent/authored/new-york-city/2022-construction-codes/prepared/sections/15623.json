@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171909\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171909\"><\/AnnotationDrawer><div>An emergency voice\/alarm communication system, which is also allowed to serve as a public address system, shall be installed in accordance with Section 907.5.2.2 and be audible throughout the entire special amusement building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15623-html-1",
+      "kind" : "html",
+      "plainText" : "An emergency voice\/alarm communication system, which is also allowed to serve as a public address system, shall be installed in accordance with Section 907.5.2.2 and be audible throughout the entire special amusement building."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15623
+}

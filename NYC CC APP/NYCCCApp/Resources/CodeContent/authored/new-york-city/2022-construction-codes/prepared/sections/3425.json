@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177151\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177151\"><\/AnnotationDrawer><div>The uniformly distributed, concentrated and impact floor live load used in the design shall be indicated for floor areas. Use of live load reduction in accordance with Section 1607.11 shall be indicated for each type of live load used in the design.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3425-html-1",
+      "kind" : "html",
+      "plainText" : "The uniformly distributed, concentrated and impact floor live load used in the design shall be indicated for floor areas. Use of live load reduction in accordance with Section 1607.11 shall be indicated for each type of live load used in the design."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3425
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184674\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184674\"><\/AnnotationDrawer><div>During construction or demolition operations, structures, building systems or components, temporary construction installations, materials, and equipment shall be installed, removed, and utilized in accordance with the specifications of their manufacturer, where such specifications exist.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5841-html-1",
+      "kind" : "html",
+      "plainText" : "During construction or demolition operations, structures, building systems or components, temporary construction installations, materials, and equipment shall be installed, removed, and utilized in accordance with the specifications of their manufacturer, where such specifications exist."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5841
+}

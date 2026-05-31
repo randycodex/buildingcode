@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179355\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179355\"><\/AnnotationDrawer><div>The maximum compressive load on any deep foundation due to mislocation shall not exceed 110 percent of the allowable design load. If the total load on any deep foundation, so determined, is in excess of 110 percent of the allowable load-bearing capacity, correction shall be made by installing additional deep foundations or by other methods of load distribution as required to reduce the maximum load to 110 percent of the allowable deep foundation capacity.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17896-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum compressive load on any deep foundation due to mislocation shall not exceed 110 percent of the allowable design load. If the total load on any deep foundation, so determined, is in excess of 110 percent of the allowable load-bearing capacity, correction shall be made by installing additional deep foundations or by other methods of load distribution as required to reduce the maximum load to 110 percent of the allowable deep foundation capacity."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17896
+}

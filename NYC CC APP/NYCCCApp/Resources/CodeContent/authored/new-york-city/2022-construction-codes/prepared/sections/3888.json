@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178777\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178777\"><\/AnnotationDrawer><div>In-situ load tests shall be conducted in accordance with Section 1708.3.1 or Section 1708.3.2 and shall be supervised by a registered design professional. The test shall simulate the applicable loading conditions specified in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177069', hash: '#JD_BCCh.16' }}\">Chapter 16<\/Link> as necessary to address the concerns regarding structural stability of the building, structure or portion thereof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3888-html-1",
+      "kind" : "html",
+      "plainText" : "In-situ load tests shall be conducted in accordance with Section 1708.3.1 or Section 1708.3.2 and shall be supervised by a registered design professional. The test shall simulate the applicable loading conditions specified in Chapter 16 as necessary to address the concerns regarding structural stability of the building, structure or portion thereof."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3888
+}

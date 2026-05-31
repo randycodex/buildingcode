@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183032\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183032\"><\/AnnotationDrawer><div>Showers and public toilet walls shall conform to Sections 1210.2 and 1210.3. When wood frame walls and partitions are covered on the interior with cement plaster or tile of similar material and are subject to water splash, the framing shall be protected with an approved moisture barrier.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183033\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183033\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183033\"><\/AnnotationDrawer><h6><a name=\"JD_BC2512\" id=\"JD_BC2512\" title=\"BC 2512\"><\/a>Section BC 2512: Exterior Plaster<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19037-html-1",
+      "kind" : "html",
+      "plainText" : "Showers and public toilet walls shall conform to Sections 1210.2 and 1210.3. When wood frame walls and partitions are covered on the interior with cement plaster or tile of similar material and are subject to water splash, the framing shall be protected with an approved moisture barrier.\n\n Section BC 2512: Exterior Plaster"
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 19037
+}

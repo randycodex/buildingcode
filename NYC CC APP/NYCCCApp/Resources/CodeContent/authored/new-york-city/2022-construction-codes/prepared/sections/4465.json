@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180486\"><\/AnnotationDrawer><div>Offset bent longitudinal bars in columns and load transfer in structural steel cores of composite compression members shall comply with the provisions of ACI 318, Section 10.7.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4465-html-1",
+      "kind" : "html",
+      "plainText" : "Offset bent longitudinal bars in columns and load transfer in structural steel cores of composite compression members shall comply with the provisions of ACI 318, Section 10.7.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4465
+}

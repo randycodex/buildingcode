@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161790\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161790\"><\/AnnotationDrawer><div>Flush tanks equipped for manual flushing shall be controlled by a device designed to refill the tank after each discharge and to shut off completely the water flow to the tank when the tank is filled to operational capacity. The trap seal to the fixture shall be automatically refilled after each flushing. The water supply to flush tanks equipped for automatic flushing shall be controlled with a timing device or sensor control devices.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11984-html-1",
+      "kind" : "html",
+      "plainText" : "Flush tanks equipped for manual flushing shall be controlled by a device designed to refill the tank after each discharge and to shut off completely the water flow to the tank when the tank is filled to operational capacity. The trap seal to the fixture shall be automatically refilled after each flushing. The water supply to flush tanks equipped for automatic flushing shall be controlled with a timing device or sensor control devices."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11984
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196652\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196652\"><\/AnnotationDrawer><div>Such tanks shall be built of steel plates of the quality required for cylindrical tanks in accordance with Section 1305.14.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11573-html-1",
+      "kind" : "html",
+      "plainText" : "Such tanks shall be built of steel plates of the quality required for cylindrical tanks in accordance with Section 1305.14.2."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11573
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161909\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161909\"><\/AnnotationDrawer><div>Existing metallic water service piping used for electrical grounding shall not be replaced with nonmetallic pipe or tubing until other approved means of grounding is provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24854-html-1",
+      "kind" : "html",
+      "plainText" : "Existing metallic water service piping used for electrical grounding shall not be replaced with nonmetallic pipe or tubing until other approved means of grounding is provided."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24854
+}

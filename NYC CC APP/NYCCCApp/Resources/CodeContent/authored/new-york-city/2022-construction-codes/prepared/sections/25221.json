@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162867\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162867\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The diameter of a sterilizer vent stack serving an instrument washer sterilizer shall be not less than 2 inches (51 mm). Not more than two sterilizers shall be installed on a 2-inch (51 mm) stack, and not more than four sterilizers shall be installed on a 3-inch (76 mm) stack.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162868\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162868\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162868\"><\/AnnotationDrawer><h6><a name=\"JD_PC714\" id=\"JD_PC714\" title=\"PC 714\"><\/a>Section PC 714: Computerized Drainage Design<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25221-html-1",
+      "kind" : "html",
+      "plainText" : "The diameter of a sterilizer vent stack serving an instrument washer sterilizer shall be not less than 2 inches (51 mm). Not more than two sterilizers shall be installed on a 2-inch (51 mm) stack, and not more than four sterilizers shall be installed on a 3-inch (76 mm) stack. \n\n Section PC 714: Computerized Drainage Design"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25221
+}

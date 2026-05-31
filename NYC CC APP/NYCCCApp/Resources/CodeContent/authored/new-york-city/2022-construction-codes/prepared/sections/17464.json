@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178023\"><\/AnnotationDrawer><div>The structural peer review shall be performed by a qualified independent structural engineer who has been retained by or on behalf of the owner. A structural peer reviewer shall meet the requirements of the rules of the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17464-html-1",
+      "kind" : "html",
+      "plainText" : "The structural peer review shall be performed by a qualified independent structural engineer who has been retained by or on behalf of the owner. A structural peer reviewer shall meet the requirements of the rules of the department."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17464
+}

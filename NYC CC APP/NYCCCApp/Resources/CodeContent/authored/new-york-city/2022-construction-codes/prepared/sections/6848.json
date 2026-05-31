@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187929\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187929\"><\/AnnotationDrawer><div>Hand propelled vehicles shall be constructed and braked to withstand the loads to be carried and shall be maintained in repair. Vehicles with loose parts shall not be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6848-html-1",
+      "kind" : "html",
+      "plainText" : "Hand propelled vehicles shall be constructed and braked to withstand the loads to be carried and shall be maintained in repair. Vehicles with loose parts shall not be used."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6848
+}

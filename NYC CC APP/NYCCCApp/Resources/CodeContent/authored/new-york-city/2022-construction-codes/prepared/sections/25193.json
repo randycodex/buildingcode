@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162793\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162793\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The ejector pit shall be not less than 18 inches (457 mm) in diameter and 24 inches (610 mm) in depth, unless otherwise approved. The pit shall be accessible and located such that all drainage flows into the pit by gravity. The ejector pit shall be constructed of tile, concrete, steel, plastic or other approved materials. The pit bottom shall be solid and provide permanent support for the pump. The ejector pit shall be fitted with a gas-tight removable cover that is installed flush with grade or floor level, or above grade or floor level. The cover shall be adequate to support anticipated loads in the area of use. The ejector pit shall be vented in accordance with <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162998', hash: '#JD_PCCh.9' }}\">Chapter 9<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25193-html-1",
+      "kind" : "html",
+      "plainText" : "The ejector pit shall be not less than 18 inches (457 mm) in diameter and 24 inches (610 mm) in depth, unless otherwise approved. The pit shall be accessible and located such that all drainage flows into the pit by gravity. The ejector pit shall be constructed of tile, concrete, steel, plastic or other approved materials. The pit bottom shall be solid and provide permanent support for the pump. The ejector pit shall be fitted with a gas-tight removable cover that is installed flush with grade or floor level, or above grade or floor level. The cover shall be adequate to support anticipated loads in the area of use. The ejector pit shall be vented in accordance with Chapter 9 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25193
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197736\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197736\"><\/AnnotationDrawer><div>Service piping includes the fuel-gas piping up to the point of delivery. Meters and service piping shall comply with the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-199501', hash: '#JD_FGC_AppE' }}\">Appendix E<\/Link>. In addition, service piping located within buildings shall be designed and installed in accordance with the structural integrity, firestopping, and fire protection provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20918-html-1",
+      "kind" : "html",
+      "plainText" : "Service piping includes the fuel-gas piping up to the point of delivery. Meters and service piping shall comply with the requirements of Appendix E . In addition, service piping located within buildings shall be designed and installed in accordance with the structural integrity, firestopping, and fire protection provisions of the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20918
+}

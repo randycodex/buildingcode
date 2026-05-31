@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196350\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196350\"><\/AnnotationDrawer><div>Joints between copper or copper-alloy tubing or fittings shall be brazed joints complying with Section 1303.3 or flared joints. Flared joints shall be made by a tool designed for that operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11468-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between copper or copper-alloy tubing or fittings shall be brazed joints complying with Section 1303.3 or flared joints. Flared joints shall be made by a tool designed for that operation."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11468
+}

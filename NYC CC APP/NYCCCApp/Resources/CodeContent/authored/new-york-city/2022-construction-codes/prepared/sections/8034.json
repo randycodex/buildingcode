@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197540\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197540\"><\/AnnotationDrawer><div>Where exhaust fans are installed, makeup air shall be provided to replace the exhausted air.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8034-html-1",
+      "kind" : "html",
+      "plainText" : "Where exhaust fans are installed, makeup air shall be provided to replace the exhausted air."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8034
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197764\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197764\"><\/AnnotationDrawer><div>Gas piping shall be sized in accordance with one of the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197765\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197765\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Pipe sizing tables or sizing equations in accordance with Section 402.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197766\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197766\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The sizing tables included in a listed piping system's manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197767\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197767\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Other approved engineering methods.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197768\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197768\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Individual outlets to gas ranges shall not be less than 3\/4 inches (19.1 mm) NPS.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20931-html-1",
+      "kind" : "html",
+      "plainText" : "Gas piping shall be sized in accordance with one of the following:\n\n 1. Pipe sizing tables or sizing equations in accordance with Section 402.4.\n\n 2. The sizing tables included in a listed piping system's manufacturer's instructions.\n\n 3. Other approved engineering methods.\n\n 4. Individual outlets to gas ranges shall not be less than 3\/4 inches (19.1 mm) NPS."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20931
+}

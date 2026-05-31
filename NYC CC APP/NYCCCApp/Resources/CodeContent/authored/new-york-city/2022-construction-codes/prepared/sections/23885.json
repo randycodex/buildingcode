@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195310\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195310\"><\/AnnotationDrawer><div>A timer, if provided to control main burner operation, shall have a maximum operating time of 1 hour. The control for the timer shall be located outside the sauna room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23885-html-1",
+      "kind" : "html",
+      "plainText" : "A timer, if provided to control main burner operation, shall have a maximum operating time of 1 hour. The control for the timer shall be located outside the sauna room."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23885
+}

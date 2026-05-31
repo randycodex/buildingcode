@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181705\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181705\"><\/AnnotationDrawer><div>Truss members and components shall not be cut, notched, drilled, spliced or otherwise altered in any way without written concurrence and approval of a registered design professional. Alterations resulting in the addition of loads to any member (e.g., HVAC equipment, piping, additional roofing or insulation, etc.) shall not be permitted without verification that the truss is capable of supporting such additional loading.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4884-html-1",
+      "kind" : "html",
+      "plainText" : "Truss members and components shall not be cut, notched, drilled, spliced or otherwise altered in any way without written concurrence and approval of a registered design professional. Alterations resulting in the addition of loads to any member (e.g., HVAC equipment, piping, additional roofing or insulation, etc.) shall not be permitted without verification that the truss is capable of supporting such additional loading."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4884
+}

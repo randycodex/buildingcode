@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172696\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172696\"><\/AnnotationDrawer><div>Carbon monoxide detection systems shall be an acceptable alternative to carbon monoxide alarms and shall comply with Sections 915.6.1 through 915.6.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15907-html-1",
+      "kind" : "html",
+      "plainText" : "Carbon monoxide detection systems shall be an acceptable alternative to carbon monoxide alarms and shall comply with Sections 915.6.1 through 915.6.4."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15907
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172789\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172789\"><\/AnnotationDrawer><div>A gas detection system alarm shall be initiated when a sensor detects a concentration of gas exceeding the following thresholds unless otherwise specified in this code or the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172790\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172790\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;For flammable gases, a gas concentration exceeding 25 percent of the lower flammability limit (LFL).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172791\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172791\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;For nonflammable gases, a gas concentration exceeding one-half of the immediately dangerous to life and health (IDLH) concentration.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2111-html-1",
+      "kind" : "html",
+      "plainText" : "A gas detection system alarm shall be initiated when a sensor detects a concentration of gas exceeding the following thresholds unless otherwise specified in this code or the New York City Fire Code :\n\n 1. For flammable gases, a gas concentration exceeding 25 percent of the lower flammability limit (LFL).\n\n 2. For nonflammable gases, a gas concentration exceeding one-half of the immediately dangerous to life and health (IDLH) concentration."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2111
+}

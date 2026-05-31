@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195503\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195503\"><\/AnnotationDrawer><div>The power supply to the electrical control system shall be from a two-wire branch circuit that has a grounded conductor, or from an isolation transformer with a two-wire secondary. Where an isolation transformer is provided, one conductor of the secondary winding shall be grounded. Control voltage shall not exceed 150 volts nominal, line to line. Control and limit devices shall interrupt the ungrounded side of the circuit. A means of manually disconnecting the control circuit shall be provided and controls shall be arranged so that when deenergized, the burner shall be inoperative. Such disconnecting means shall be capable of being locked in the off position and shall be provided with ready access.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23956-html-1",
+      "kind" : "html",
+      "plainText" : "The power supply to the electrical control system shall be from a two-wire branch circuit that has a grounded conductor, or from an isolation transformer with a two-wire secondary. Where an isolation transformer is provided, one conductor of the secondary winding shall be grounded. Control voltage shall not exceed 150 volts nominal, line to line. Control and limit devices shall interrupt the ungrounded side of the circuit. A means of manually disconnecting the control circuit shall be provided and controls shall be arranged so that when deenergized, the burner shall be inoperative. Such disconnecting means shall be capable of being locked in the off position and shall be provided with ready access."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 23956
+}

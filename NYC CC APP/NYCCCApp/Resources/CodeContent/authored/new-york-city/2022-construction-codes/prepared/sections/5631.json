@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184218\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184218\"><\/AnnotationDrawer><div>All swimming pools and spas shall be equipped with an approved pool alarm. Pool alarms shall comply with ASTM F 2208 and shall be installed, used and maintained in accordance with the manufacturer's instructions and this section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184219\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184219\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184220\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;A hot tub or spa equipped with a safety cover that complies with ASTM F 1346.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184221\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184221\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;A swimming pool (other than a hot tub or spa) equipped with an automatic power safety cover that complies with ASTM F 1346.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5631-html-1",
+      "kind" : "html",
+      "plainText" : "All swimming pools and spas shall be equipped with an approved pool alarm. Pool alarms shall comply with ASTM F 2208 and shall be installed, used and maintained in accordance with the manufacturer's instructions and this section.\n\n Exceptions: \n\n 1. A hot tub or spa equipped with a safety cover that complies with ASTM F 1346.\n\n 2. A swimming pool (other than a hot tub or spa) equipped with an automatic power safety cover that complies with ASTM F 1346."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5631
+}

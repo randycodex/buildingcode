@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175460\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175460\"><\/AnnotationDrawer><div>Cycle storage shall comply with Section 905 (Storage Facilities) of ICC A117.1 and Sections 1109.9.3.1 through 1109.9.3.4 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2863-html-1",
+      "kind" : "html",
+      "plainText" : "Cycle storage shall comply with Section 905 (Storage Facilities) of ICC A117.1 and Sections 1109.9.3.1 through 1109.9.3.4 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2863
+}

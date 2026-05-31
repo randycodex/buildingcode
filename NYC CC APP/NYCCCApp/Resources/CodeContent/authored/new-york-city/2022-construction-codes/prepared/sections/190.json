@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166500\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166500\"><\/AnnotationDrawer><div>For the purpose of this code, a perimeter line shall be established. The perimeter line shall encircle all buildings and structures that comprise the open mall building and shall encompass any open-air interior walkways, open-air courtyards or similar open-air spaces. The perimeter line shall define the extent of the open mall building. Anchor buildings and parking structures shall be outside of the perimeter line and are not considered as part of the open mall building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "190-html-1",
+      "kind" : "html",
+      "plainText" : "For the purpose of this code, a perimeter line shall be established. The perimeter line shall encircle all buildings and structures that comprise the open mall building and shall encompass any open-air interior walkways, open-air courtyards or similar open-air spaces. The perimeter line shall define the extent of the open mall building. Anchor buildings and parking structures shall be outside of the perimeter line and are not considered as part of the open mall building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 190
+}

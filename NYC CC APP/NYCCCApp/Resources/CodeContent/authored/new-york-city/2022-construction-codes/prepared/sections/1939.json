@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172340\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172340\"><\/AnnotationDrawer><div>A firefighter's smoke control panel for Fire Department emergency response purposes only shall be provided and shall include manual control or override of automatic control for mechanical smoke control systems. The panel shall be located in a fire command center complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172545', hash: '#JD_BC911' }}\">911<\/Link> in high-rise buildings or buildings with smoke-protected assembly seating. In all other buildings, the firefighter's smoke control panel shall be installed in the ground floor lobby of the building, adjacent to the fire alarm control panel or remote annunciator, or in another approved location. The firefighter's smoke control panel shall either be a separate panel or can be integrated with a UUKL listed fire alarm control panel. The firefighter's smoke control panel shall comply with Sections 909.16.1 through 909.16.3. Where required in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172732', hash: '#JD_BC917' }}\">917<\/Link>, the post-fire smoke purge system shall be manually activated from the firefighter's control panel or an adjacent panel. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1939-html-1",
+      "kind" : "html",
+      "plainText" : "A firefighter's smoke control panel for Fire Department emergency response purposes only shall be provided and shall include manual control or override of automatic control for mechanical smoke control systems. The panel shall be located in a fire command center complying with Section 911 in high-rise buildings or buildings with smoke-protected assembly seating. In all other buildings, the firefighter's smoke control panel shall be installed in the ground floor lobby of the building, adjacent to the fire alarm control panel or remote annunciator, or in another approved location. The firefighter's smoke control panel shall either be a separate panel or can be integrated with a UUKL listed fire alarm control panel. The firefighter's smoke control panel shall comply with Sections 909.16.1 through 909.16.3. Where required in Section 917 , the post-fire smoke purge system shall be manually activated from the firefighter's control panel or an adjacent panel."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1939
+}

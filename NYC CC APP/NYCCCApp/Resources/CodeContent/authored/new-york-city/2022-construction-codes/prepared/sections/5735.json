@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184492\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184492\"><\/AnnotationDrawer><div>Encroachments into the public right-of-way above grade shall be prohibited except as provided for in Sections 3202.2.1 through 3202.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5735-html-1",
+      "kind" : "html",
+      "plainText" : "Encroachments into the public right-of-way above grade shall be prohibited except as provided for in Sections 3202.2.1 through 3202.2.5."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5735
+}

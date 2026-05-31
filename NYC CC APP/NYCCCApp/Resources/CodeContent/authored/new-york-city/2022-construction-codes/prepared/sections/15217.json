@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170349\"><\/AnnotationDrawer><div>Finishes on concrete walls that are assumed to contribute to the total fire-resistance rating of the wall shall comply with the installation requirements of Section 722.3.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15217-html-1",
+      "kind" : "html",
+      "plainText" : "Finishes on concrete walls that are assumed to contribute to the total fire-resistance rating of the wall shall comply with the installation requirements of Section 722.3.2.5."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15217
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181711\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181711\"><\/AnnotationDrawer><div>Trusses not part of a manufacturing process in accordance with either Section 2303.4.6 or a referenced standard, which provides requirements for quality control done under the supervision of a third-party quality control agency, shall be manufactured in compliance with Sections 1704.2 and 1705.5, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18715-html-1",
+      "kind" : "html",
+      "plainText" : "Trusses not part of a manufacturing process in accordance with either Section 2303.4.6 or a referenced standard, which provides requirements for quality control done under the supervision of a third-party quality control agency, shall be manufactured in compliance with Sections 1704.2 and 1705.5, as applicable."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18715
+}

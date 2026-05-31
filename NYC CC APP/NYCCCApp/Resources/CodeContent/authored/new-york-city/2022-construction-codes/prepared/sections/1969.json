@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172421\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172421\"><\/AnnotationDrawer><div>The door assembly from the building into the vestibule shall be a fire door assembly complying with Section 716.5.3. The door assembly from the vestibule to the stairway or ramp shall not have less than a 90-minute fire protection rating and shall meet the requirements for a smoke door assembly in accordance with Section 716.5.3. The door shall be installed in accordance with NFPA 105.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1969-html-1",
+      "kind" : "html",
+      "plainText" : "The door assembly from the building into the vestibule shall be a fire door assembly complying with Section 716.5.3. The door assembly from the vestibule to the stairway or ramp shall not have less than a 90-minute fire protection rating and shall meet the requirements for a smoke door assembly in accordance with Section 716.5.3. The door shall be installed in accordance with NFPA 105."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1969
+}

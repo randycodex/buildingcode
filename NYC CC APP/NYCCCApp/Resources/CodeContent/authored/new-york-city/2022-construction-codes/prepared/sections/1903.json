@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172245\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172245\"><\/AnnotationDrawer><div>The minimum pressure difference across a smoke barrier shall be 0.05-inch water gauge (0.0 124 kPa) in fully sprinklered buildings. In buildings permitted to be other than fully sprinklered, the smoke control system shall be designed to achieve pressure differences not less than two times the maximum calculated pressure difference produced by the design fire.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1903-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum pressure difference across a smoke barrier shall be 0.05-inch water gauge (0.0 124 kPa) in fully sprinklered buildings. In buildings permitted to be other than fully sprinklered, the smoke control system shall be designed to achieve pressure differences not less than two times the maximum calculated pressure difference produced by the design fire."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1903
+}

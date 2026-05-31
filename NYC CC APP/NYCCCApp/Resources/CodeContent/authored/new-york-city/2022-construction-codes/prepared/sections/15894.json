@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172662\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172662\"><\/AnnotationDrawer><div>Carbon monoxide alarms or detectors shall be located within dwelling units as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172663\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172663\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Outside of any room used for sleeping purposes, within 15 feet (4572 mm) of the entrance to such room.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172664\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172664\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;In any room used for sleeping purposes.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172665\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172665\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;On any story within a dwelling unit, including below-grade stories and penthouses of any area, but not including crawl spaces and uninhabitable attics.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15894-html-1",
+      "kind" : "html",
+      "plainText" : "Carbon monoxide alarms or detectors shall be located within dwelling units as follows:\n\n 1. Outside of any room used for sleeping purposes, within 15 feet (4572 mm) of the entrance to such room.\n\n 2. In any room used for sleeping purposes.\n\n 3. On any story within a dwelling unit, including below-grade stories and penthouses of any area, but not including crawl spaces and uninhabitable attics."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15894
+}

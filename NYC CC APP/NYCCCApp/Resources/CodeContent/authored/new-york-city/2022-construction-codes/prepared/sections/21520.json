@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199436\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199436\"><\/AnnotationDrawer><div>In addition to the requirements of this code, the installation of boilers shall be in accordance with the manufacturer's instructions and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span> Operating instructions of a permanent type shall be attached to the boiler. Spill switches must be installed on all flue gas draft openings and interlocked with all vented appliances. Boilers shall have all controls set, adjusted and tested by the installer. A complete control diagram together with complete boiler operating instructions shall be furnished by the installer. The manufacturer's rating data and the nameplate shall be attached to the boiler.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21520-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of this code, the installation of boilers shall be in accordance with the manufacturer's instructions and the New York City Mechanical Code. Operating instructions of a permanent type shall be attached to the boiler. Spill switches must be installed on all flue gas draft openings and interlocked with all vented appliances. Boilers shall have all controls set, adjusted and tested by the installer. A complete control diagram together with complete boiler operating instructions shall be furnished by the installer. The manufacturer's rating data and the nameplate shall be attached to the boiler."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21520
+}

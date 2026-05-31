@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172378\"><\/AnnotationDrawer><div>Each smoke zone equipped with an automatic-initiation device shall be put into operation by the actuation of one such device. Each additional device within the zone shall be verified to cause the same sequence without requiring the operation of fan motors in order to prevent damage. Control sequences shall be verified throughout the system, including verification of override from the firefighter's control panel and simulation of standby power conditions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1951-html-1",
+      "kind" : "html",
+      "plainText" : "Each smoke zone equipped with an automatic-initiation device shall be put into operation by the actuation of one such device. Each additional device within the zone shall be verified to cause the same sequence without requiring the operation of fan motors in order to prevent damage. Control sequences shall be verified throughout the system, including verification of override from the firefighter's control panel and simulation of standby power conditions."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1951
+}

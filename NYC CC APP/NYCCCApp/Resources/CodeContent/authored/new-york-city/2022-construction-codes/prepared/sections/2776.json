@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175220\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175220\"><\/AnnotationDrawer><div>In theaters, bleachers, grandstands, stadiums, arenas and other assembly areas, accessible wheelchair spaces, companion seats, and designated aisle seats complying with ICC A117.1, including Section 802 (Assembly Areas) shall be provided in accordance with Sections 1108.2.2.1 through 1108.2.2.4 of this code. Required accessible wheelchair spaces and their companion seats as required in Section 1108.2.5 shall be delineated on the approved seating plans. Such spaces and seats which are unsold 1 day (24 hours) before the event shall be permitted to be released for sale to the public, including individuals without disabilities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2776-html-1",
+      "kind" : "html",
+      "plainText" : "In theaters, bleachers, grandstands, stadiums, arenas and other assembly areas, accessible wheelchair spaces, companion seats, and designated aisle seats complying with ICC A117.1, including Section 802 (Assembly Areas) shall be provided in accordance with Sections 1108.2.2.1 through 1108.2.2.4 of this code. Required accessible wheelchair spaces and their companion seats as required in Section 1108.2.5 shall be delineated on the approved seating plans. Such spaces and seats which are unsold 1 day (24 hours) before the event shall be permitted to be released for sale to the public, including individuals without disabilities."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2776
+}

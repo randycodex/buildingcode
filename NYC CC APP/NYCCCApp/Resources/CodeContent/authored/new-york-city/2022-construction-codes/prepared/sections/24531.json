@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160769\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160769\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Applications for construction document approval shall comply with Sections 107.6.1, 107.6.2 and 107.6.3.<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t&#160;\n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160770\"><\/AnnotationDrawer><div>(Am. L.L. 2017\/097, 5\/30\/2017, eff. 6\/1\/2019) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24531-html-1",
+      "kind" : "html",
+      "plainText" : "Applications for construction document approval shall comply with Sections 107.6.1, 107.6.2 and 107.6.3. \n\n (Am. L.L. 2017\/097, 5\/30\/2017, eff. 6\/1\/2019)"
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 24531
+}

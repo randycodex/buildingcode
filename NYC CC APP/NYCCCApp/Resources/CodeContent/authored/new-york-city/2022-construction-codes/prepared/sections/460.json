@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167269\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167269\"><\/AnnotationDrawer><div>Spiral stairways that conform to the requirements of Section 1011.10 are permitted for access to and between staff locations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "460-html-1",
+      "kind" : "html",
+      "plainText" : "Spiral stairways that conform to the requirements of Section 1011.10 are permitted for access to and between staff locations."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 460
+}

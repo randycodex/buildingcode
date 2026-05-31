@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163501\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163501\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The sump pump shall be of a capacity and head appropriate to anticipated use requirements.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25461-html-1",
+      "kind" : "html",
+      "plainText" : "The sump pump shall be of a capacity and head appropriate to anticipated use requirements."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25461
+}

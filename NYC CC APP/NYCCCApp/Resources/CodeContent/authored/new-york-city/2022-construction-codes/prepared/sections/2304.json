@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173592\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173592\"><\/AnnotationDrawer><div>Buildings containing eight or more dwelling units shall be provided with an intercommunication system located at the door giving access to the main entrance lobby, consisting of a device or devices for voice communication between the occupant of each dwelling unit and a person outside the door to the main entrance lobby, and permitting such dwelling unit occupant to release the locking mechanism of said door from the dwelling unit. In buildings provided with a full-time lobby attendant, the intercommunication system may be between each dwelling unit and the attendant's station.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-173593\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-173593\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-173593\"><\/AnnotationDrawer><h6><a name=\"JD_BC1011\" id=\"JD_BC1011\" title=\"BC 1011\"><\/a>Section BC 1011: Stairways<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2304-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings containing eight or more dwelling units shall be provided with an intercommunication system located at the door giving access to the main entrance lobby, consisting of a device or devices for voice communication between the occupant of each dwelling unit and a person outside the door to the main entrance lobby, and permitting such dwelling unit occupant to release the locking mechanism of said door from the dwelling unit. In buildings provided with a full-time lobby attendant, the intercommunication system may be between each dwelling unit and the attendant's station.\n\n Section BC 1011: Stairways"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2304
+}

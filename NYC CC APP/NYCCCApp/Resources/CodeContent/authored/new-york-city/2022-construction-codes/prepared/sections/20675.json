@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187927\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187927\"><\/AnnotationDrawer><div>No lift or fork truck shall be in motion when the loaded forks are elevated higher than necessary to clear obstructions, except as may be required for positioning, picking up, or depositing the load.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20675-html-1",
+      "kind" : "html",
+      "plainText" : "No lift or fork truck shall be in motion when the loaded forks are elevated higher than necessary to clear obstructions, except as may be required for positioning, picking up, or depositing the load."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20675
+}

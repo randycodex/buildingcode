@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199077\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199077\"><\/AnnotationDrawer><div>All combinations of pipe sizes, single-wall and double-wall metal pipe shall be allowed within any connector run(s) or within the common vent, provided that all of the appropriate tables permit all of the desired sizes and types of pipe, as if they were used for the entire length of the subject connector or vent. Where single-wall and Type B double-wall metal pipes are used for vent connectors within the same venting system, the common vent must be sized using <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198971', hash: '#JD_FGCTable504.3(2)' }}\">Table 504.3(2)<\/Link> or<Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198971', hash: '#JD_FGCTable504.3(4)' }}\"> 504.3(4)<\/Link>, as appropriate.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8552-html-1",
+      "kind" : "html",
+      "plainText" : "All combinations of pipe sizes, single-wall and double-wall metal pipe shall be allowed within any connector run(s) or within the common vent, provided that all of the appropriate tables permit all of the desired sizes and types of pipe, as if they were used for the entire length of the subject connector or vent. Where single-wall and Type B double-wall metal pipes are used for vent connectors within the same venting system, the common vent must be sized using Table 504.3(2) or 504.3(4) , as appropriate."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8552
+}

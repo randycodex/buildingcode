@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170262\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170262\"><\/AnnotationDrawer><div>The provisions of this section contain procedures by which the fire resistance of specific materials or combinations of materials is established by calculations. These procedures apply only to the information contained in this section and shall not be otherwise used. The calculated fire resistance of concrete, concrete masonry and clay masonry assemblies shall be permitted in accordance with ACI 216.1\/TMS 216. The calculated fire resistance of steel assemblies shall be permitted in accordance with Chapter 5 of ASCE 29. The calculated fire resistance of exposed wood members and wood decking shall be permitted in accordance with Chapter 16 of ANSI\/AWC National Design Specification for Wood Construction (NDS).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15198-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this section contain procedures by which the fire resistance of specific materials or combinations of materials is established by calculations. These procedures apply only to the information contained in this section and shall not be otherwise used. The calculated fire resistance of concrete, concrete masonry and clay masonry assemblies shall be permitted in accordance with ACI 216.1\/TMS 216. The calculated fire resistance of steel assemblies shall be permitted in accordance with Chapter 5 of ASCE 29. The calculated fire resistance of exposed wood members and wood decking shall be permitted in accordance with Chapter 16 of ANSI\/AWC National Design Specification for Wood Construction (NDS)."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15198
+}

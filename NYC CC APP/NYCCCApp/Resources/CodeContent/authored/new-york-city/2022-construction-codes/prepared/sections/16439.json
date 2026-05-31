@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174712\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174712\"><\/AnnotationDrawer><div>Stairway floor number and stairway identification signs shall be provided in accordance with Section 1023.9. Elevator identification and emergency signs shall be provided in accordance with Section 3002.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16439-html-1",
+      "kind" : "html",
+      "plainText" : "Stairway floor number and stairway identification signs shall be provided in accordance with Section 1023.9. Elevator identification and emergency signs shall be provided in accordance with Section 3002.3."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16439
+}

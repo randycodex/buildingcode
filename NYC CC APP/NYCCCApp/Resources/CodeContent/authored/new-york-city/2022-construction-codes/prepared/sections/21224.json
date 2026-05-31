@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198574\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198574\"><\/AnnotationDrawer><div>A smoke test shall be conducted in accordance with Section 503.4.2.5. Any faults or leaks found shall be corrected. Such smoke test shall be witnessed by a representative of the commissioner. In the alternative, the commissioner may accept a test report instead of requiring that it be witnessed by a representative of the commissioner. Such test report of the registered design professional or special inspector responsible for the test which shall be submitted in writing to the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21224-html-1",
+      "kind" : "html",
+      "plainText" : "A smoke test shall be conducted in accordance with Section 503.4.2.5. Any faults or leaks found shall be corrected. Such smoke test shall be witnessed by a representative of the commissioner. In the alternative, the commissioner may accept a test report instead of requiring that it be witnessed by a representative of the commissioner. Such test report of the registered design professional or special inspector responsible for the test which shall be submitted in writing to the department."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21224
+}

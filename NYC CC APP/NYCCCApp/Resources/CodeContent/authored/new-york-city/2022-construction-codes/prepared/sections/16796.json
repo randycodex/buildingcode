@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175776\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175776\"><\/AnnotationDrawer><div>Where openings provide natural ventilation to bathrooms or toilet rooms located in basements or cellars, such opening shall also comply with the applicable provisions of Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-60903', hash: '#JD_27-2081' }}\">27-2081<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-60969', hash: '#JD_27-2087' }}\">27-2087<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Housing Maintenance Code<\/span> and Sections 26(8) and 34 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York State Multiple Dwelling Law<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16796-html-1",
+      "kind" : "html",
+      "plainText" : "Where openings provide natural ventilation to bathrooms or toilet rooms located in basements or cellars, such opening shall also comply with the applicable provisions of Sections 27-2081 through 27-2087 of the New York City Housing Maintenance Code and Sections 26(8) and 34 of the New York State Multiple Dwelling Law ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16796
+}

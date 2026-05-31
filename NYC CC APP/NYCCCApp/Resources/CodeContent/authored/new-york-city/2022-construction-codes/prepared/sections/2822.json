@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175349\"><\/AnnotationDrawer><div>In assembly and mercantile occupancies on each floor level containing a public toilet room, both male and female occupants shall have access to at least one safe, sanitary and convenient diaper changing station, deck, table or similar amenity, which shall comply with Section 603.5 (Diaper Changing Tables) of ICC A117.1<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175350\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175350\"><\/AnnotationDrawer><div>(L.L. 2018\/034, 1\/9\/2018, eff. 7\/8\/2018)<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2822-html-1",
+      "kind" : "html",
+      "plainText" : "In assembly and mercantile occupancies on each floor level containing a public toilet room, both male and female occupants shall have access to at least one safe, sanitary and convenient diaper changing station, deck, table or similar amenity, which shall comply with Section 603.5 (Diaper Changing Tables) of ICC A117.1\n\n (L.L. 2018\/034, 1\/9\/2018, eff. 7\/8\/2018)"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2822
+}

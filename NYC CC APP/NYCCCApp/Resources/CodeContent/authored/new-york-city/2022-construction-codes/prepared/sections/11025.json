@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195227\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195227\"><\/AnnotationDrawer><div>Drains, overflows and blowdown provisions shall be indirectly connected to an approved disposal location. Discharge of chemical waste shall be approved by the appropriate regulatory authority.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11025-html-1",
+      "kind" : "html",
+      "plainText" : "Drains, overflows and blowdown provisions shall be indirectly connected to an approved disposal location. Discharge of chemical waste shall be approved by the appropriate regulatory authority."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11025
+}

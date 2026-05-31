@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163135\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163135\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Any combination of fixtures within one bathroom group located in the same room is permitted to be vented by a horizontal wet vent. The wet vent shall be considered the vent for the fixtures and shall extend from the connection of the dry vent along the direction of the flow in the drain pipe to the most downstream fixture drain connection to the horizontal branch drain. Each wet-vented fixture drain shall connect independently to the horizontal wet vent. Only the fixtures within the bathroom groups shall connect to the wet-vented horizontal branch drain. Any additional fixtures shall discharge downstream of the horizontal wet vent.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25333-html-1",
+      "kind" : "html",
+      "plainText" : "Any combination of fixtures within one bathroom group located in the same room is permitted to be vented by a horizontal wet vent. The wet vent shall be considered the vent for the fixtures and shall extend from the connection of the dry vent along the direction of the flow in the drain pipe to the most downstream fixture drain connection to the horizontal branch drain. Each wet-vented fixture drain shall connect independently to the horizontal wet vent. Only the fixtures within the bathroom groups shall connect to the wet-vented horizontal branch drain. Any additional fixtures shall discharge downstream of the horizontal wet vent."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25333
+}

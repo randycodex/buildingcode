@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173758\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173758\"><\/AnnotationDrawer><div>The landing width shall be not less than the width of the widest ramp run adjoining the landing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16179-html-1",
+      "kind" : "html",
+      "plainText" : "The landing width shall be not less than the width of the widest ramp run adjoining the landing."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16179
+}

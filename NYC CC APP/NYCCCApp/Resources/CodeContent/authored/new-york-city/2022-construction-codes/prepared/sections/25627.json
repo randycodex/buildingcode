@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163947\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163947\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Disinfection shall not be required for on-site nonpotable water reuse for subsurface landscape irrigation systems.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25627-html-1",
+      "kind" : "html",
+      "plainText" : "Disinfection shall not be required for on-site nonpotable water reuse for subsurface landscape irrigation systems."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 25627
+}

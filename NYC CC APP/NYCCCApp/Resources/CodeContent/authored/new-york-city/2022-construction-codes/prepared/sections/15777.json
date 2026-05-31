@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172374\"><\/AnnotationDrawer><div>Fans shall be examined for correct rotation. Measurements of voltage, amperage, revolutions per minute (rpm) and belt tension shall be made.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15777-html-1",
+      "kind" : "html",
+      "plainText" : "Fans shall be examined for correct rotation. Measurements of voltage, amperage, revolutions per minute (rpm) and belt tension shall be made."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15777
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180041\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180041\"><\/AnnotationDrawer><div>Piles used for underpinning are subject to the load testing criteria of Section 1810.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18126-html-1",
+      "kind" : "html",
+      "plainText" : "Piles used for underpinning are subject to the load testing criteria of Section 1810.4."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18126
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185359\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185359\"><\/AnnotationDrawer><div>During the construction or enlargement of a building, once the topmost working deck exceeds 75 feet (22 860 mm) in height above the lowest level of the ground, all floors that are closed to the public and within 40 feet (12 192 mm) above the lowest level of the ground shall be served by an elevator or hoist meeting the requirements of this section. Where this measurement lands between floors, the measurement shall be rounded such that the elevator or hoist is brought up to serve the higher floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6022-html-1",
+      "kind" : "html",
+      "plainText" : "During the construction or enlargement of a building, once the topmost working deck exceeds 75 feet (22 860 mm) in height above the lowest level of the ground, all floors that are closed to the public and within 40 feet (12 192 mm) above the lowest level of the ground shall be served by an elevator or hoist meeting the requirements of this section. Where this measurement lands between floors, the measurement shall be rounded such that the elevator or hoist is brought up to serve the higher floor."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6022
+}

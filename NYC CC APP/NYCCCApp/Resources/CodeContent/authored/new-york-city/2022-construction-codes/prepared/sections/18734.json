@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181787\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181787\"><\/AnnotationDrawer><div>Lumber decking shall be designed and installed in accordance with the general provisions of this code and Sections 2304.9.1 through 2304.9.5.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18734-html-1",
+      "kind" : "html",
+      "plainText" : "Lumber decking shall be designed and installed in accordance with the general provisions of this code and Sections 2304.9.1 through 2304.9.5.3."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18734
+}

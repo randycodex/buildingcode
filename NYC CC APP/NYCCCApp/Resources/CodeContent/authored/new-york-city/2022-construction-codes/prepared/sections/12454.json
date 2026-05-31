@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163001\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The provisions of this chapter shall govern the materials, design, construction and installation of vent systems except for vent systems for methane and radon which shall be governed by this section.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12454-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of this chapter shall govern the materials, design, construction and installation of vent systems except for vent systems for methane and radon which shall be governed by this section."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12454
+}

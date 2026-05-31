@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175735\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175735\"><\/AnnotationDrawer><div>Where an interior balcony or mezzanine opens to form part of another room or space, its area shall be added to the area of the room or space in which it is located to compute the ventilation required for both spaces.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16776-html-1",
+      "kind" : "html",
+      "plainText" : "Where an interior balcony or mezzanine opens to form part of another room or space, its area shall be added to the area of the room or space in which it is located to compute the ventilation required for both spaces."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16776
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171424\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171424\"><\/AnnotationDrawer><div>Fire hose threads and fittings used in connection with automatic sprinkler systems shall be approved and compatible with Fire Department hose threads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1643-html-1",
+      "kind" : "html",
+      "plainText" : "Fire hose threads and fittings used in connection with automatic sprinkler systems shall be approved and compatible with Fire Department hose threads."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1643
+}

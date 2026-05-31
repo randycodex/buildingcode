@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182438\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182438\"><\/AnnotationDrawer><div>The framing details required in this section apply to roofs having a slope of not less than three units vertical in 12 units horizontal (25-percent slope). Where the roof slope is less than three units vertical in 12 units horizontal (25-percent slope), members supporting rafters and ceiling joists such as ridge board, hips and valleys shall be designed as beams.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5072-html-1",
+      "kind" : "html",
+      "plainText" : "The framing details required in this section apply to roofs having a slope of not less than three units vertical in 12 units horizontal (25-percent slope). Where the roof slope is less than three units vertical in 12 units horizontal (25-percent slope), members supporting rafters and ceiling joists such as ridge board, hips and valleys shall be designed as beams."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 5072
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178594\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178594\"><\/AnnotationDrawer><div>The special inspector shall perform periodic special inspection for the pipe joining and welding operations in accordance with the above. Radiographic testing shall be performed to the connections as indicated in Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198052', hash: '#JD_FGC406' }}\">406<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3815-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall perform periodic special inspection for the pipe joining and welding operations in accordance with the above. Radiographic testing shall be performed to the connections as indicated in Section 406 of the New York City Fuel Gas Code ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3815
+}

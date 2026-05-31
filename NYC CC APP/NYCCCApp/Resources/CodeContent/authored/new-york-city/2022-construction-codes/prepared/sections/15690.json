@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172112\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172112\"><\/AnnotationDrawer><div>A record of completion in accordance with NFPA 72 verifying that the system has been installed and tested in accordance with the approved construction documents and specifications shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15690-html-1",
+      "kind" : "html",
+      "plainText" : "A record of completion in accordance with NFPA 72 verifying that the system has been installed and tested in accordance with the approved construction documents and specifications shall be provided."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15690
+}

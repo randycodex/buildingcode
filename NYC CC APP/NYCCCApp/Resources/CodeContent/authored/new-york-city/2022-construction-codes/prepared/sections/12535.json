@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163221\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163221\"><\/AnnotationDrawer><div>An engineer shall also inspect and certify the system upon completion of the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163222\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163222\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163222\"><\/AnnotationDrawer><h6><a name=\"JD_PC920\" id=\"JD_PC920\" title=\"PC 920\"><\/a>Section PC 920: Computerized Vent Design<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12535-html-1",
+      "kind" : "html",
+      "plainText" : "An engineer shall also inspect and certify the system upon completion of the system.\n\n Section PC 920: Computerized Vent Design"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12535
+}

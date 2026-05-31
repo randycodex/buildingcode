@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196098\"><\/AnnotationDrawer><div>Piping to be embedded in concrete shall be pressure tested prior to pouring concrete. During pouring, the pipe shall be maintained at the proposed operating pressure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11354-html-1",
+      "kind" : "html",
+      "plainText" : "Piping to be embedded in concrete shall be pressure tested prior to pouring concrete. During pouring, the pipe shall be maintained at the proposed operating pressure."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11354
+}

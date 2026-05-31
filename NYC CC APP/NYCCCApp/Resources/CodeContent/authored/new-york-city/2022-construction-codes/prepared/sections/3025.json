@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175961\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175961\"><\/AnnotationDrawer><div>In a dwelling unit, at least one habitable room shall have not less than 150 square feet (13.9 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) of net floor area.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175962\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175962\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Group R-1 dwelling or sleeping units.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3025-html-1",
+      "kind" : "html",
+      "plainText" : "In a dwelling unit, at least one habitable room shall have not less than 150 square feet (13.9 m\n\n 2 \n\n ) of net floor area.\n\n Exception: Group R-1 dwelling or sleeping units."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 3025
+}

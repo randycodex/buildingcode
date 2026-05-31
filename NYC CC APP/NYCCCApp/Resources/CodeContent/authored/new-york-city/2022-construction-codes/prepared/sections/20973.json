@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197913\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197913\"><\/AnnotationDrawer><div>Material for gaskets shall be capable of withstanding the design temperature and pressure of the piping system, and the chemical constituents of the gas being conducted, without change to its chemical and physical properties. The effects of fire exposure to the joint shall be considered in choosing material. Acceptable materials include metal (plain or corrugated), non-asbestos fiber, and spiral wound metal gaskets. Where a flanged joint is opened, the gasket shall be replaced. Full-face flange gaskets shall be used with all non-steel flanges. Rubber-faced phenolic and elastomeric gaskets shall be prohibited.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20973-html-1",
+      "kind" : "html",
+      "plainText" : "Material for gaskets shall be capable of withstanding the design temperature and pressure of the piping system, and the chemical constituents of the gas being conducted, without change to its chemical and physical properties. The effects of fire exposure to the joint shall be considered in choosing material. Acceptable materials include metal (plain or corrugated), non-asbestos fiber, and spiral wound metal gaskets. Where a flanged joint is opened, the gasket shall be replaced. Full-face flange gaskets shall be used with all non-steel flanges. Rubber-faced phenolic and elastomeric gaskets shall be prohibited."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20973
+}

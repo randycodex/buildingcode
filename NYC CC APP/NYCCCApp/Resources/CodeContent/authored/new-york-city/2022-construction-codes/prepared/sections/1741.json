@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171708\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171708\"><\/AnnotationDrawer><div>Notwithstanding any other provision of law, where construction documents were approved and permits issued for the construction of a new building or alteration of an existing building prior to March 2, 2010, and the work is not signed off by the department prior to such date, all exposed portions of the standpipe system and handles of valves serving the standpipe system shall be painted red prior to the hydrostatic pressure test, including portions that will be enclosed at a later point in time.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171709\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171709\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Portions of the standpipe system enclosed prior to March 2, 2010, need not be painted.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1741-html-1",
+      "kind" : "html",
+      "plainText" : "Notwithstanding any other provision of law, where construction documents were approved and permits issued for the construction of a new building or alteration of an existing building prior to March 2, 2010, and the work is not signed off by the department prior to such date, all exposed portions of the standpipe system and handles of valves serving the standpipe system shall be painted red prior to the hydrostatic pressure test, including portions that will be enclosed at a later point in time.\n\n Exception: Portions of the standpipe system enclosed prior to March 2, 2010, need not be painted."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1741
+}

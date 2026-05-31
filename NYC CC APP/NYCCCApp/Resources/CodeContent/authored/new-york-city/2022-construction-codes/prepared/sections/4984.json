@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182052\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182052\"><\/AnnotationDrawer><div>The allowable unit stresses for preservative-treated wood shall be adjusted for treatment in accordance with the ANSI\/AWC NDS.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182053\"><\/AnnotationDrawer><div>The allowable unit stresses for fire-retardant-treated wood, including fastener values, shall be developed from an approved method of investigation that considers the effects of anticipated temperature and humidity to which the fire-retardant-treated wood will be subjected, the type of treatment and the redrying process. Other adjustments are applicable except that the impact load duration shall not apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4984-html-1",
+      "kind" : "html",
+      "plainText" : "The allowable unit stresses for preservative-treated wood shall be adjusted for treatment in accordance with the ANSI\/AWC NDS.\n\n The allowable unit stresses for fire-retardant-treated wood, including fastener values, shall be developed from an approved method of investigation that considers the effects of anticipated temperature and humidity to which the fire-retardant-treated wood will be subjected, the type of treatment and the redrying process. Other adjustments are applicable except that the impact load duration shall not apply."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4984
+}

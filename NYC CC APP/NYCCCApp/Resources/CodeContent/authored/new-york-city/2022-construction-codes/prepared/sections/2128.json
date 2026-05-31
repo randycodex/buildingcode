@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172911\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172911\"><\/AnnotationDrawer><div>Protruding objects on circulation paths shall comply with the requirements of Sections 1003.3.1 through 1003.3.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2128-html-1",
+      "kind" : "html",
+      "plainText" : "Protruding objects on circulation paths shall comply with the requirements of Sections 1003.3.1 through 1003.3.4."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2128
+}

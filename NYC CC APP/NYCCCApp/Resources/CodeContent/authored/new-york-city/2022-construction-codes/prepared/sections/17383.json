@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177617\"><\/AnnotationDrawer><div>The design pressures for components and cladding on walls or roofs shall be selected as the greater of: (i) the wind tunnel test results; or (ii) 80 percent of the pressure obtained for Zone 4 for walls and Zone 1 for roofs, as determined in Section 30.5 of ASCE 7, unless the wind tunnel results and testing procedure are peer reviewed by an independent wind tunnel laboratory. In no case shall the limiting value be less than 70 percent of the pressure obtained for Zone 4 for walls and Zone 1 for roofs, as determined in Section 30.5 of ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17383-html-1",
+      "kind" : "html",
+      "plainText" : "The design pressures for components and cladding on walls or roofs shall be selected as the greater of: (i) the wind tunnel test results; or (ii) 80 percent of the pressure obtained for Zone 4 for walls and Zone 1 for roofs, as determined in Section 30.5 of ASCE 7, unless the wind tunnel results and testing procedure are peer reviewed by an independent wind tunnel laboratory. In no case shall the limiting value be less than 70 percent of the pressure obtained for Zone 4 for walls and Zone 1 for roofs, as determined in Section 30.5 of ASCE 7."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17383
+}

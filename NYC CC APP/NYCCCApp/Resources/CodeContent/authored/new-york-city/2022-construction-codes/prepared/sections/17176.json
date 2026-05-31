@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176884\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176884\"><\/AnnotationDrawer><div>Spray-applied polyurethane foam insulation shall comply with Type III or IV as defined in ASTM C 1029.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17176-html-1",
+      "kind" : "html",
+      "plainText" : "Spray-applied polyurethane foam insulation shall comply with Type III or IV as defined in ASTM C 1029."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17176
+}

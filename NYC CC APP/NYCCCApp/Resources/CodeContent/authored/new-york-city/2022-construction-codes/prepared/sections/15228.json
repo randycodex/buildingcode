@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170422\"><\/AnnotationDrawer><div>The minimum thickness of concrete cover to the positive moment reinforcement shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170395', hash: '#JD_BCTable722.2.3(1)' }}\">Table 722.2.3(1)<\/Link> for reinforced concrete and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170395', hash: '#JD_BCTable722.2.3(2)' }}\">Table 722.2.3(2)<\/Link> for prestressed concrete. These tables are applicable for solid or hollow-core one-way or two-way slabs with flat undersurfaces. These tables are applicable to slabs that are either cast in place or precast. For precast prestressed concrete not covered elsewhere, the procedures contained in PCI MNL 124 shall be acceptable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15228-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum thickness of concrete cover to the positive moment reinforcement shall comply with Table 722.2.3(1) for reinforced concrete and Table 722.2.3(2) for prestressed concrete. These tables are applicable for solid or hollow-core one-way or two-way slabs with flat undersurfaces. These tables are applicable to slabs that are either cast in place or precast. For precast prestressed concrete not covered elsewhere, the procedures contained in PCI MNL 124 shall be acceptable."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15228
+}

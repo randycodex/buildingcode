@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162110\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Grooved and shouldered mechanical joints shall comply with ASTM F 1476, shall be made with an approved elastomeric seal and shall be installed in accordance with the manufacturer's instructions. Such joints shall be exposed or concealed.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24935-html-1",
+      "kind" : "html",
+      "plainText" : "Grooved and shouldered mechanical joints shall comply with ASTM F 1476, shall be made with an approved elastomeric seal and shall be installed in accordance with the manufacturer's instructions. Such joints shall be exposed or concealed."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24935
+}

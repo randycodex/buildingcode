@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199043\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199043\"><\/AnnotationDrawer><div>The cross-sectional area of the common vent shall be equal to or greater than the cross-sectional area of the largest connector.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21362-html-1",
+      "kind" : "html",
+      "plainText" : "The cross-sectional area of the common vent shall be equal to or greater than the cross-sectional area of the largest connector."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21362
+}

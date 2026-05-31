@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175438\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175438\"><\/AnnotationDrawer><div>When an elevator car responds to a call following activation of the accessibility function button, it shall provide audio output complying with Section 1109.7.2.2.2. In addition, during travel, the responding car shall provide an in-car announcement of all floors on which it stops.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16685-html-1",
+      "kind" : "html",
+      "plainText" : "When an elevator car responds to a call following activation of the accessibility function button, it shall provide audio output complying with Section 1109.7.2.2.2. In addition, during travel, the responding car shall provide an in-car announcement of all floors on which it stops."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16685
+}

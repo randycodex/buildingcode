@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160700\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160700\"><\/AnnotationDrawer><div>References to standards in this code shall be to the editions of those standards provided for in Chapter 15, or as otherwise provided by rule.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24508-html-1",
+      "kind" : "html",
+      "plainText" : "References to standards in this code shall be to the editions of those standards provided for in Chapter 15, or as otherwise provided by rule."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 24508
+}

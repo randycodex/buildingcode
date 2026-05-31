@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173355\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173355\"><\/AnnotationDrawer><div>Forces shall be applied to the latch side of the door.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16081-html-1",
+      "kind" : "html",
+      "plainText" : "Forces shall be applied to the latch side of the door."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16081
+}

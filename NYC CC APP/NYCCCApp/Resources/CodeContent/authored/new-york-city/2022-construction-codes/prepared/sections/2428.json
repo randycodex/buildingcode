@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174091\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174091\"><\/AnnotationDrawer><div>Exits shall comply with Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174089', hash: '#JD_BC1022' }}\">1022<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174317', hash: '#JD_BC1027' }}\">1027<\/Link> and the applicable requirements of Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172896', hash: '#JD_BC1003' }}\">1003<\/Link> through <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173863', hash: '#JD_BC1015' }}\">1015<\/Link>. An exit shall not be used for any purpose that interferes with its function as a means of egress. Once a given level of exit protection is achieved, such level of protection shall not be reduced until arrival at the exit discharge. Exits shall be continuous from the point of entry into the exit to the exit discharge.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174092\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174092\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Interior exit stairways with doors that are automatic-closing by smoke detection pursuant to the exception set forth in Section 713.7 may be used for travel between floors and this use shall not be deemed to interfere with function as a means of egress.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2428-html-1",
+      "kind" : "html",
+      "plainText" : "Exits shall comply with Sections 1022 through 1027 and the applicable requirements of Sections 1003 through 1015 . An exit shall not be used for any purpose that interferes with its function as a means of egress. Once a given level of exit protection is achieved, such level of protection shall not be reduced until arrival at the exit discharge. Exits shall be continuous from the point of entry into the exit to the exit discharge.\n\n Exception: Interior exit stairways with doors that are automatic-closing by smoke detection pursuant to the exception set forth in Section 713.7 may be used for travel between floors and this use shall not be deemed to interfere with function as a means of egress."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2428
+}

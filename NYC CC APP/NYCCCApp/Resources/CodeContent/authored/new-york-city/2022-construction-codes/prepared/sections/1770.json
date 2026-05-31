@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171818\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171818\"><\/AnnotationDrawer><div>Fire alarm systems shall be installed in Group R-1 occupancies as required in Sections 907.2.8.1 through 907.2.8.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1770-html-1",
+      "kind" : "html",
+      "plainText" : "Fire alarm systems shall be installed in Group R-1 occupancies as required in Sections 907.2.8.1 through 907.2.8.5."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1770
+}

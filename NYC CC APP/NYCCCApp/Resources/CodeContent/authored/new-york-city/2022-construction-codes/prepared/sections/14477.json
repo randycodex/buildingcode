@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167863\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167863\"><\/AnnotationDrawer><div>An approved automatic alarm shall be provided to indicate a leak in a storage tank and room. The alarm shall sound an audible signal, 15 dBa above the ambient sound level, at every point of entry into the room in which the leaking storage tank is located. An approved sign shall be posted on every entry door to the tank storage room indicating the potential hazard of the interior room environment, or the sign shall state: WARNING, WHEN ALARM SOUNDS, THE ENVIRONMENT WITHIN THE ROOM MAY BE HAZARDOUS. The leakage alarm shall also be supervised in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-171003', hash: '#JD_BCCh.9' }}\">Chapter 9<\/Link> to transmit a trouble signal.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14477-html-1",
+      "kind" : "html",
+      "plainText" : "An approved automatic alarm shall be provided to indicate a leak in a storage tank and room. The alarm shall sound an audible signal, 15 dBa above the ambient sound level, at every point of entry into the room in which the leaking storage tank is located. An approved sign shall be posted on every entry door to the tank storage room indicating the potential hazard of the interior room environment, or the sign shall state: WARNING, WHEN ALARM SOUNDS, THE ENVIRONMENT WITHIN THE ROOM MAY BE HAZARDOUS. The leakage alarm shall also be supervised in accordance with Chapter 9 to transmit a trouble signal."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14477
+}

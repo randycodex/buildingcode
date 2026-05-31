@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169541\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169541\"><\/AnnotationDrawer><div>Shaft enclosures shall have a fire-resistance rating of not less than 2 hours where penetrating three stories or more, and not less than 1 hour where penetrating fewer than three stories. The number of stories connected by the shaft enclosure shall include any basements or cellars, but not any mezzanines. Shaft enclosures shall have a fire-resistance rating not less than the floor assembly penetrated, but need not exceed 2 hours. Shaft enclosures shall meet the requirements of Section 703.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1166-html-1",
+      "kind" : "html",
+      "plainText" : "Shaft enclosures shall have a fire-resistance rating of not less than 2 hours where penetrating three stories or more, and not less than 1 hour where penetrating fewer than three stories. The number of stories connected by the shaft enclosure shall include any basements or cellars, but not any mezzanines. Shaft enclosures shall have a fire-resistance rating not less than the floor assembly penetrated, but need not exceed 2 hours. Shaft enclosures shall meet the requirements of Section 703.2.1."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1166
+}

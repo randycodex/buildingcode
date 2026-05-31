@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172274\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172274\"><\/AnnotationDrawer><div>The analysis shall make use of best available data from approved sources and shall not be based on excessively stringent limitations of combustible material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1913-html-1",
+      "kind" : "html",
+      "plainText" : "The analysis shall make use of best available data from approved sources and shall not be based on excessively stringent limitations of combustible material."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1913
+}

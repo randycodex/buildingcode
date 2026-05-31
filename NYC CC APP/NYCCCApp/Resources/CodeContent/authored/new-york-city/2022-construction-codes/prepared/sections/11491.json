@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196400\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196400\"><\/AnnotationDrawer><div>Fill piping shall be a minimum of 2 inches (50.8 mm) in diameter or 3 inches (76.2 mm) for No. 6 fuel oil.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11491-html-1",
+      "kind" : "html",
+      "plainText" : "Fill piping shall be a minimum of 2 inches (50.8 mm) in diameter or 3 inches (76.2 mm) for No. 6 fuel oil."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11491
+}

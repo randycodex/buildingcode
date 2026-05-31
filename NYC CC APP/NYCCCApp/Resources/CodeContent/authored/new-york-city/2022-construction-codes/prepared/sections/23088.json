@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192972\"><\/AnnotationDrawer><div>Equipment and appliances having an ignition source shall not be installed in Group H occupancies or control areas where open use, handling or dispensing of combustible, flammable or explosive materials occurs.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23088-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment and appliances having an ignition source shall not be installed in Group H occupancies or control areas where open use, handling or dispensing of combustible, flammable or explosive materials occurs."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23088
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173995\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173995\"><\/AnnotationDrawer><div>Aisles and aisle accessways serving as a portion of the exit access in the means of egress system shall comply with the requirements of this section. Aisles or aisle accessways shall be provided from all occupied portions of the exit access that contain seats, tables, furnishings, displays and similar fixtures or equipment. The minimum width or required capacity of aisles shall be unobstructed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173996\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173996\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Encroachments complying with Section 1005.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2406-html-1",
+      "kind" : "html",
+      "plainText" : "Aisles and aisle accessways serving as a portion of the exit access in the means of egress system shall comply with the requirements of this section. Aisles or aisle accessways shall be provided from all occupied portions of the exit access that contain seats, tables, furnishings, displays and similar fixtures or equipment. The minimum width or required capacity of aisles shall be unobstructed.\n\n Exception: Encroachments complying with Section 1005.7."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2406
+}

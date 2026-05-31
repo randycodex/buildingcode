@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192237\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192237\"><\/AnnotationDrawer><div>Delete Section 2.2.3 and replace as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192238\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192238\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">2.2.3<\/span> Local kinks or bends shall not be made in hangers as a means of leveling the carrying channels.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7782-html-1",
+      "kind" : "html",
+      "plainText" : "Delete Section 2.2.3 and replace as follows:\n\n 2.2.3 Local kinks or bends shall not be made in hangers as a means of leveling the carrying channels."
+    }
+  ],
+  "chapterNumber" : "R",
+  "schemaVersion" : 1,
+  "sectionID" : 7782
+}

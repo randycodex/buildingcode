@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167960\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167960\"><\/AnnotationDrawer><div>Activation of the emergency alarm system shall sound a local alarm and transmit a signal to the emergency control station.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14513-html-1",
+      "kind" : "html",
+      "plainText" : "Activation of the emergency alarm system shall sound a local alarm and transmit a signal to the emergency control station."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14513
+}

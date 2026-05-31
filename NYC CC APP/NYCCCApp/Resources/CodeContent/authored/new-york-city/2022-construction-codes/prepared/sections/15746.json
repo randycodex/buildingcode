@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172285\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172285\"><\/AnnotationDrawer><div>Equipment shall be located so as not to expose uninvolved portions of the building to an additional fire hazard. Outside air inlets shall be located so as to minimize the potential for introducing smoke or flame into the building. Exhaust outlets shall be located so as to minimize reintroduction of smoke into the building and to limit exposure of the building or adjacent buildings to an additional fire hazard.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15746-html-1",
+      "kind" : "html",
+      "plainText" : "Equipment shall be located so as not to expose uninvolved portions of the building to an additional fire hazard. Outside air inlets shall be located so as to minimize the potential for introducing smoke or flame into the building. Exhaust outlets shall be located so as to minimize reintroduction of smoke into the building and to limit exposure of the building or adjacent buildings to an additional fire hazard."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15746
+}

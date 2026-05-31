@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188791\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188791\"><\/AnnotationDrawer><div>Mechanical equipment and outside appliances shall be elevated to or above the design flood elevation.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188792\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188792\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where such equipment and appliances are designed and installed to prevent water from entering or accumulating within their components and the systems are constructed to resist hydrostatic and hydrodynamic loads and stresses, including the effects of buoyancy, during the occurrence of flooding up to the elevation required by ASCE 24, Table 2-1, the systems and equipment shall be permitted to be located below the elevation required by ASCE 24, Table 2-1. Electrical wiring systems shall be permitted below the design flood elevation provided they conform to the provisions of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7115-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical equipment and outside appliances shall be elevated to or above the design flood elevation.\n\n Exception: Where such equipment and appliances are designed and installed to prevent water from entering or accumulating within their components and the systems are constructed to resist hydrostatic and hydrodynamic loads and stresses, including the effects of buoyancy, during the occurrence of flooding up to the elevation required by ASCE 24, Table 2-1, the systems and equipment shall be permitted to be located below the elevation required by ASCE 24, Table 2-1. Electrical wiring systems shall be permitted below the design flood elevation provided they conform to the provisions of the New York City Electrical Code ."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7115
+}

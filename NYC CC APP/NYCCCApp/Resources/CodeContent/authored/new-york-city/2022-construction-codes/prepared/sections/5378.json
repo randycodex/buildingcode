@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183530\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183530\"><\/AnnotationDrawer><div>Emergency power shall be provided for exit signs in accordance with Section 1013.6.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5378-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency power shall be provided for exit signs in accordance with Section 1013.6.3."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5378
+}

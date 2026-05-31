@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230163\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230163\"><\/AnnotationDrawer><div>The creation of an ADU shall not diminish the light or ventilation of any habitable rooms of the primary dwelling in any way not in compliance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-175664', hash: '#JD_BCCh.12' }}\">Chapter 12<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13769-html-1",
+      "kind" : "html",
+      "plainText" : "The creation of an ADU shall not diminish the light or ventilation of any habitable rooms of the primary dwelling in any way not in compliance with Chapter 12 ."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 13769
+}

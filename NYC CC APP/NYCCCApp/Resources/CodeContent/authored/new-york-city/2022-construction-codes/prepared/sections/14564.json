@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168110\"><\/AnnotationDrawer><div>Where the operating temperature of the dryer is 175&#176;F (79&#176;C) or more, metal enclosures shall be insulated from adjacent combustible materials by not less than 12 inches (305 mm) of airspace, or the metal walls shall be lined with 1\/4-inch (6.4 mm) insulating mill board or other approved equivalent insulation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14564-html-1",
+      "kind" : "html",
+      "plainText" : "Where the operating temperature of the dryer is 175°F (79°C) or more, metal enclosures shall be insulated from adjacent combustible materials by not less than 12 inches (305 mm) of airspace, or the metal walls shall be lined with 1\/4-inch (6.4 mm) insulating mill board or other approved equivalent insulation."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14564
+}

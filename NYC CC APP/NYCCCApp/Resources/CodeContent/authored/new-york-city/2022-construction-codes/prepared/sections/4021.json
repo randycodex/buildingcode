@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179232\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179232\"><\/AnnotationDrawer><div>Deep foundations left in place where a structure has been demolished shall not be used for the support of new construction unless the existing deep foundations are load tested in accordance with Section 1810.4, original installation and testing records of the existing deep foundations are available, or the new loads are no more than half the calculated previous loads on the existing deep foundations. The engineer shall determine and certify that the existing deep foundations are sound and meet the requirements of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4021-html-1",
+      "kind" : "html",
+      "plainText" : "Deep foundations left in place where a structure has been demolished shall not be used for the support of new construction unless the existing deep foundations are load tested in accordance with Section 1810.4, original installation and testing records of the existing deep foundations are available, or the new loads are no more than half the calculated previous loads on the existing deep foundations. The engineer shall determine and certify that the existing deep foundations are sound and meet the requirements of this code."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4021
+}

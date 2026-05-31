@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175294\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175294\"><\/AnnotationDrawer><div>An assistive listening system must be provided. Receivers shall be provided for the assistive listening system in accordance with Section 1108.2.7.1 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16628-html-1",
+      "kind" : "html",
+      "plainText" : "An assistive listening system must be provided. Receivers shall be provided for the assistive listening system in accordance with Section 1108.2.7.1 of this code."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16628
+}

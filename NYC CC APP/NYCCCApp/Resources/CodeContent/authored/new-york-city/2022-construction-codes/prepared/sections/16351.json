@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174416\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174416\"><\/AnnotationDrawer><div>A Certificate of Operation shall be required for a place of assembly in accordance with Section 303.7. It shall be unlawful to occupy any building or space as a place of assembly unless and until a Certificate of Operation therefore has been issued by the department pursuant to the provisions of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-237170', hash: '#JD_T28C001' }}\">Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16351-html-1",
+      "kind" : "html",
+      "plainText" : "A Certificate of Operation shall be required for a place of assembly in accordance with Section 303.7. It shall be unlawful to occupy any building or space as a place of assembly unless and until a Certificate of Operation therefore has been issued by the department pursuant to the provisions of Chapter 1 of Title 28 of the Administrative Code ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16351
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184012\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184012\"><\/AnnotationDrawer><div>The duration of Certificates of Occupancy for air-inflated structures, air-supported structures, and tents shall be limited in accordance with the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-237170', hash: '#JD_T28C001' }}\">Chapter 1 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19383-html-1",
+      "kind" : "html",
+      "plainText" : "The duration of Certificates of Occupancy for air-inflated structures, air-supported structures, and tents shall be limited in accordance with the requirements of Chapter 1 of Title 28 of the Administrative Code ."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19383
+}

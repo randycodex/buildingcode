@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186439\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186439\"><\/AnnotationDrawer><div>Horizontal safety netting shall meet the requirements of Sections 3308.6.1 through 3308.6.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20234-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal safety netting shall meet the requirements of Sections 3308.6.1 through 3308.6.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20234
+}

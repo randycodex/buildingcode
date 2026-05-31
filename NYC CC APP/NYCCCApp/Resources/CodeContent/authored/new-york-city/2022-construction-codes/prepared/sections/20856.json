@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197532\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197532\"><\/AnnotationDrawer><div>The outdoor opening(s) size shall be calculated in accordance with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197533\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197533\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The ratio of interior spaces shall be the available volume of all communicating spaces divided by the required volume.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197534\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197534\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The outdoor size reduction factor shall be one minus the ratio of interior spaces.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197535\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197535\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The minimum size of outdoor opening(s) shall be the full size of outdoor opening(s) calculated in accordance with Section 304.6, multiplied by the reduction factor. The minimum dimension of air openings shall be not less than 3 inches (76.2 mm). <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20856-html-1",
+      "kind" : "html",
+      "plainText" : "The outdoor opening(s) size shall be calculated in accordance with the following:\n\n 1. The ratio of interior spaces shall be the available volume of all communicating spaces divided by the required volume.\n\n 2. The outdoor size reduction factor shall be one minus the ratio of interior spaces.\n\n 3. The minimum size of outdoor opening(s) shall be the full size of outdoor opening(s) calculated in accordance with Section 304.6, multiplied by the reduction factor. The minimum dimension of air openings shall be not less than 3 inches (76.2 mm)."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20856
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173120\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173120\"><\/AnnotationDrawer><div>Open or enclosed parking garages shall not have less than two exits from each parking tier. An unenclosed vehicle ramp constructed in accordance with Section 1012.1 may serve as one of the required exits when provided with pedestrian facilities along the ramp. Such ramps serving as part of a nonaccessible means of egress in open or enclosed parking garages three stories or less in height and serving not more than one level below grade is permitted to comply with Section 1012.2, Exception 2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173121\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173121\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> One exit shall be permitted in parking garages complying with Item 3 of Section 1006.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-173122\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-173122\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-173122\"><\/AnnotationDrawer><h6><a name=\"JD_BC1007\" id=\"JD_BC1007\" title=\"BC 1007\"><\/a>Section BC 1007: Exit and Exit Access Doorway Configuration<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2195-html-1",
+      "kind" : "html",
+      "plainText" : "Open or enclosed parking garages shall not have less than two exits from each parking tier. An unenclosed vehicle ramp constructed in accordance with Section 1012.1 may serve as one of the required exits when provided with pedestrian facilities along the ramp. Such ramps serving as part of a nonaccessible means of egress in open or enclosed parking garages three stories or less in height and serving not more than one level below grade is permitted to comply with Section 1012.2, Exception 2.\n\n Exception: One exit shall be permitted in parking garages complying with Item 3 of Section 1006.3.2.\n\n Section BC 1007: Exit and Exit Access Doorway Configuration"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2195
+}

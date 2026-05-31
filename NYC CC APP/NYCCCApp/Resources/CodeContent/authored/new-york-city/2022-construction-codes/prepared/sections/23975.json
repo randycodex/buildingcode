@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195565\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195565\"><\/AnnotationDrawer><div>Any pressurized system that contains hazardous materials or presents a physical hazard by release shall be pre-approved for installation, subject to testing, and subject to inspection by the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23975-html-1",
+      "kind" : "html",
+      "plainText" : "Any pressurized system that contains hazardous materials or presents a physical hazard by release shall be pre-approved for installation, subject to testing, and subject to inspection by the department."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 23975
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179162\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179162\"><\/AnnotationDrawer><div>No shallow foundation shall be placed on frozen soils unless the soils are maintained in frozen condition throughout the service life of the structure being supported. No foundation shall be placed in freezing weather unless provision is made to maintain the underlying soil free of frost. Concrete shallow foundations shall be protected from freezing during depositing and for a period of not less than five days thereafter. Water shall not be allowed to flow through the deposited concrete.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17824-html-1",
+      "kind" : "html",
+      "plainText" : "No shallow foundation shall be placed on frozen soils unless the soils are maintained in frozen condition throughout the service life of the structure being supported. No foundation shall be placed in freezing weather unless provision is made to maintain the underlying soil free of frost. Concrete shallow foundations shall be protected from freezing during depositing and for a period of not less than five days thereafter. Water shall not be allowed to flow through the deposited concrete."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17824
+}

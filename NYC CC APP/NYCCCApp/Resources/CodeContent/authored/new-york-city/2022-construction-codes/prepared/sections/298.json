@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166780\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166780\"><\/AnnotationDrawer><div>Every required interior exit stairway serving floors more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access shall comply with Sections 909.20 and 1023.11<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166781\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166781\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Smokeproof enclosures are not required in occupancy Group R-2 unless provided pursuant to Exception 2 of Section 917.1. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "298-html-1",
+      "kind" : "html",
+      "plainText" : "Every required interior exit stairway serving floors more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access shall comply with Sections 909.20 and 1023.11\n\n Exception: Smokeproof enclosures are not required in occupancy Group R-2 unless provided pursuant to Exception 2 of Section 917.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 298
+}

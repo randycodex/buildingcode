@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178487\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178487\"><\/AnnotationDrawer><div>The test samples for determining the cohesive\/adhesive bond strength of the sprayed fire-resistant materials shall be selected from each floor, roof and wall assembly at the rate of not less than one sample for every 2,500 square feet (232.3 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) or part thereof of the sprayed area in each story. Samples shall be obtained from locations no less than 50 LF (15 240 mm) apart or 10 LF (3048 mm) from any starting edge of an application of a specific type of material.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3779-html-1",
+      "kind" : "html",
+      "plainText" : "The test samples for determining the cohesive\/adhesive bond strength of the sprayed fire-resistant materials shall be selected from each floor, roof and wall assembly at the rate of not less than one sample for every 2,500 square feet (232.3 m\n\n 2 \n\n ) or part thereof of the sprayed area in each story. Samples shall be obtained from locations no less than 50 LF (15 240 mm) apart or 10 LF (3048 mm) from any starting edge of an application of a specific type of material."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3779
+}

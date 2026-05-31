@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197606\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197606\"><\/AnnotationDrawer><div>Appliances, control devices, heat exchangers and HVAC components shall be accessible for inspection, service, repair and replacement without disabling the function of a fire-resistance-rated assembly or removing permanent construction, other appliances, or any other piping or ducts not connected to the appliance being inspected, serviced, repaired or replaced. A level working space not less than 30 inches (762 mm) deep and 30 inches (762 mm) wide shall be provided in front of the control side to service an appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20882-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances, control devices, heat exchangers and HVAC components shall be accessible for inspection, service, repair and replacement without disabling the function of a fire-resistance-rated assembly or removing permanent construction, other appliances, or any other piping or ducts not connected to the appliance being inspected, serviced, repaired or replaced. A level working space not less than 30 inches (762 mm) deep and 30 inches (762 mm) wide shall be provided in front of the control side to service an appliance."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20882
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187475\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187475\"><\/AnnotationDrawer><div>At every access point to a runway or ramp, a sign shall be posted indicating whether the runway or ramp, or a portion thereof, is intended for use by motor vehicles or by persons.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20554-html-1",
+      "kind" : "html",
+      "plainText" : "At every access point to a runway or ramp, a sign shall be posted indicating whether the runway or ramp, or a portion thereof, is intended for use by motor vehicles or by persons."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20554
+}

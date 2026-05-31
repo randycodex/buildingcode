@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199425\"><\/AnnotationDrawer><div>Infrared radiant heaters shall be tested in accordance with ANSI Z83.19\/CSA 2.35 or ANSI Z83.20\/CSA 2.34 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8690-html-1",
+      "kind" : "html",
+      "plainText" : "Infrared radiant heaters shall be tested in accordance with ANSI Z83.19\/CSA 2.35 or ANSI Z83.20\/CSA 2.34 and shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8690
+}

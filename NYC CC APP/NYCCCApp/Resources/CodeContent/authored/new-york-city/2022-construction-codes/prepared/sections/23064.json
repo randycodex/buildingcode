@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192914\"><\/AnnotationDrawer><div>Bored holes not greater than 40 percent of the stud width are permitted to be bored in any wood stud. Bored holes not greater than 60 percent of the stud width are permitted in nonbearing partitions or in any wall where each bored stud is doubled, provided not more than two such successive doubled studs are so bored. In no case shall the edge of the bored hole be nearer than 5\/8 inch (15.9 mm) to the edge of the stud. Bored holes shall not be located at the same section of stud as a cut or notch. See <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182278', hash: '#JD_BCFIgure2308.5.8' }}\">Figure 2308.5.8<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23064-html-1",
+      "kind" : "html",
+      "plainText" : "Bored holes not greater than 40 percent of the stud width are permitted to be bored in any wood stud. Bored holes not greater than 60 percent of the stud width are permitted in nonbearing partitions or in any wall where each bored stud is doubled, provided not more than two such successive doubled studs are so bored. In no case shall the edge of the bored hole be nearer than 5\/8 inch (15.9 mm) to the edge of the stud. Bored holes shall not be located at the same section of stud as a cut or notch. See Figure 2308.5.8 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23064
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185114\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185114\"><\/AnnotationDrawer><div>Prior to the removal of any service, the utility connection shall be discontinued and capped, and certifications to that effect issued by the representative utility company shall be filed with the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19748-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the removal of any service, the utility connection shall be discontinued and capped, and certifications to that effect issued by the representative utility company shall be filed with the department."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19748
+}

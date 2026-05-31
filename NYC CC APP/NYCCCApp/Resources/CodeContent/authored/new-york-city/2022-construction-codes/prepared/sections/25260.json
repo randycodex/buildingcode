@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162960\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162960\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joint surfaces shall be clean and free from moisture. Joints shall be made in accordance with the pipe manufacturer's installation instructions. Where such instructions require that a primer be used, the primer shall be applied to the joint surfaces and a solvent cement orange in color and conforming to ASTM F 2618 shall be applied to the joint surfaces. Where such instructions allow for a one-step solvent cement, yellow in color and conforming to ASTM F 2618, to be used, the joint surfaces shall not require application of a primer before the solvent cement is applied. The joint shall be made while the cement is wet and in accordance with ASTM F 2618. Solvent cement joints shall be permitted above or below ground.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25260-html-1",
+      "kind" : "html",
+      "plainText" : "Joint surfaces shall be clean and free from moisture. Joints shall be made in accordance with the pipe manufacturer's installation instructions. Where such instructions require that a primer be used, the primer shall be applied to the joint surfaces and a solvent cement orange in color and conforming to ASTM F 2618 shall be applied to the joint surfaces. Where such instructions allow for a one-step solvent cement, yellow in color and conforming to ASTM F 2618, to be used, the joint surfaces shall not require application of a primer before the solvent cement is applied. The joint shall be made while the cement is wet and in accordance with ASTM F 2618. Solvent cement joints shall be permitted above or below ground."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 25260
+}

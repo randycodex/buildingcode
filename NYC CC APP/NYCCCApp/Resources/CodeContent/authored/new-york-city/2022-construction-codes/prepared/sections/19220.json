@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183558\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183558\"><\/AnnotationDrawer><div>Standby power for elevators, including elevators provided to accommodate ambulance stretchers pursuant to Section 3002.4, shall be provided as set forth in Section 3003.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19220-html-1",
+      "kind" : "html",
+      "plainText" : "Standby power for elevators, including elevators provided to accommodate ambulance stretchers pursuant to Section 3002.4, shall be provided as set forth in Section 3003.1."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 19220
+}

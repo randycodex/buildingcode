@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183641\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183641\"><\/AnnotationDrawer><div>All equipment listed in ASME A17.1\/CSA B44, Section 8.3 as modified by<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\"> New York City Building Code<\/span>, Appendix K, Chapter K1, shall be listed by an approved agency in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156797', hash: '#JD_28-113.2.3' }}\">28-113.2.3<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>, Section 8.3.1 of ASME A17.1\/CSA B44, and the rules of the department, and shall be approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19247-html-1",
+      "kind" : "html",
+      "plainText" : "All equipment listed in ASME A17.1\/CSA B44, Section 8.3 as modified by New York City Building Code , Appendix K, Chapter K1, shall be listed by an approved agency in accordance with Section 28-113.2.3 of the Administrative Code , Section 8.3.1 of ASME A17.1\/CSA B44, and the rules of the department, and shall be approved by the commissioner."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 19247
+}

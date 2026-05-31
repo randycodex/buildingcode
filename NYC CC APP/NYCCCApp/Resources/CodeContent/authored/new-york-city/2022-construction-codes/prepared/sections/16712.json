@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175518\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175518\"><\/AnnotationDrawer><div>Where operable windows are provided in rooms or spaces that are required to be accessible in accordance with Sections 1107.5.1, 1107.5.2, 1107.5.3, 1107.5.4, 1107.6.1.1, or 1107.6.1.4.1, at least one window in each room shall be accessible and each required operable window shall be accessible. Where operable windows are provided in Type B+NYC units in accordance with Section 1107.6.2, such windows shall comply with Section 1107.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175519\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175519\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Accessible windows are not required in bathrooms or kitchens unless otherwise required in Section 1107.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16712-html-1",
+      "kind" : "html",
+      "plainText" : "Where operable windows are provided in rooms or spaces that are required to be accessible in accordance with Sections 1107.5.1, 1107.5.2, 1107.5.3, 1107.5.4, 1107.6.1.1, or 1107.6.1.4.1, at least one window in each room shall be accessible and each required operable window shall be accessible. Where operable windows are provided in Type B+NYC units in accordance with Section 1107.6.2, such windows shall comply with Section 1107.2.4.\n\n Exception: Accessible windows are not required in bathrooms or kitchens unless otherwise required in Section 1107.2.4."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16712
+}

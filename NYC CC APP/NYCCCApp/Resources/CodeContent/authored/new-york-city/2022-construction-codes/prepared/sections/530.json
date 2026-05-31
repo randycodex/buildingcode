@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167466\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167466\"><\/AnnotationDrawer><div>Construction in seating areas shall be in accordance with Sections 410.10.1 and 410.10.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "530-html-1",
+      "kind" : "html",
+      "plainText" : "Construction in seating areas shall be in accordance with Sections 410.10.1 and 410.10.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 530
+}

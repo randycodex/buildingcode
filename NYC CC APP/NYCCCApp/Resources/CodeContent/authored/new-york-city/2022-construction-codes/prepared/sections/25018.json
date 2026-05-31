@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162321\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162321\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Openings and outlets shall be protected by atmospheric-type or pressure-type vacuum breakers. The critical level of the vacuum breaker shall be set not less than 6 inches (152 mm) above the flood level rim of the fixture or device. Fill valves shall be set in accordance with Section 425.3.1. Vacuum breakers shall not be installed under exhaust hoods or similar that will contain toxic fumes or vapors. Pipe-applied vacuum breakers shall be installed not less than 6 inches (152 mm) above the flood level rim of the fixture, receptor or device served.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25018-html-1",
+      "kind" : "html",
+      "plainText" : "Openings and outlets shall be protected by atmospheric-type or pressure-type vacuum breakers. The critical level of the vacuum breaker shall be set not less than 6 inches (152 mm) above the flood level rim of the fixture or device. Fill valves shall be set in accordance with Section 425.3.1. Vacuum breakers shall not be installed under exhaust hoods or similar that will contain toxic fumes or vapors. Pipe-applied vacuum breakers shall be installed not less than 6 inches (152 mm) above the flood level rim of the fixture, receptor or device served."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25018
+}

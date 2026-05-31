@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169056\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169056\"><\/AnnotationDrawer><div>A minimum ambient and substrate temperature of 40&#176; F (4.44&#176; C) shall be maintained during and for not fewer than 24 hours after the application of the SFRM, unless the manufacturer's instructions allow otherwise.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "999-html-1",
+      "kind" : "html",
+      "plainText" : "A minimum ambient and substrate temperature of 40° F (4.44° C) shall be maintained during and for not fewer than 24 hours after the application of the SFRM, unless the manufacturer's instructions allow otherwise."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 999
+}

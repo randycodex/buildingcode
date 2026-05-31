@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162412\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162412\"><\/AnnotationDrawer><div>The tubing to and from drinking water treatment units shall be of a size and material as recommended by the manufacturer. The tubing shall comply with NSF 14, NSF 42, NSF 44, NSF 53, NSF 58 or NSF 61.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162413\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162413\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162413\"><\/AnnotationDrawer><h6><a name=\"JD_PC612\" id=\"JD_PC612\" title=\"PC 612\"><\/a>Section PC 612: Solar Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25053-html-1",
+      "kind" : "html",
+      "plainText" : "The tubing to and from drinking water treatment units shall be of a size and material as recommended by the manufacturer. The tubing shall comply with NSF 14, NSF 42, NSF 44, NSF 53, NSF 58 or NSF 61.\n\n Section PC 612: Solar Systems"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25053
+}

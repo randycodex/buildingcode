@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161748\"><\/AnnotationDrawer><div>Baptisteries, ornamental and lily pools, aquariums, ornamental fountain basins, swimming pools, and similar constructions, where provided with water supplies, shall be protected against backflow in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162225', hash: '#JD_PC608' }}\">608<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11965-html-1",
+      "kind" : "html",
+      "plainText" : "Baptisteries, ornamental and lily pools, aquariums, ornamental fountain basins, swimming pools, and similar constructions, where provided with water supplies, shall be protected against backflow in accordance with Section 608 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11965
+}

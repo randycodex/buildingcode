@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185736\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185736\"><\/AnnotationDrawer><div>The results of control tests, including concrete cylinder specimens prepared in accordance with ASTM C 31, cast-in-place cores, or other device that will produce test specimens representative of the condition of the concrete in place, of suitable size and proportions, and approved by the registered design professional of record shall be evidence that the concrete has attained sufficient strength or the strength as may be specified on the drawings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19987-html-1",
+      "kind" : "html",
+      "plainText" : "The results of control tests, including concrete cylinder specimens prepared in accordance with ASTM C 31, cast-in-place cores, or other device that will produce test specimens representative of the condition of the concrete in place, of suitable size and proportions, and approved by the registered design professional of record shall be evidence that the concrete has attained sufficient strength or the strength as may be specified on the drawings."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19987
+}

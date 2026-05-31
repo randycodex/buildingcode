@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172409\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172409\"><\/AnnotationDrawer><div>Doors in a smoke proof enclosure shall be self- or automatic-closing by actuation of a smoke detector in accordance with Section 716.5.9.3 and shall be installed at the floor-side entrance to the smoke proof enclosure. The actuation of the smoke detector on any door shall activate the closing devices on all doors in the smoke proof enclosure at all levels. Smoke detectors shall be installed in accordance with Section 907.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1963-html-1",
+      "kind" : "html",
+      "plainText" : "Doors in a smoke proof enclosure shall be self- or automatic-closing by actuation of a smoke detector in accordance with Section 716.5.9.3 and shall be installed at the floor-side entrance to the smoke proof enclosure. The actuation of the smoke detector on any door shall activate the closing devices on all doors in the smoke proof enclosure at all levels. Smoke detectors shall be installed in accordance with Section 907.3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1963
+}

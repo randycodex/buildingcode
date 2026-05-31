@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162891\"><\/AnnotationDrawer><div>Backwater valves shall be installed so that access is provided to the working parts for service and repair. Masonry access manholes shall be provided when the centerline of any drain line is 18 inches (457 mm) or more below a slab on grade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162892\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162892\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162892\"><\/AnnotationDrawer><h6><a name=\"JD_PC716\" id=\"JD_PC716\" title=\"PC 716\"><\/a>Section PC 716: Reserved<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162893\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162893\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162893\"><\/AnnotationDrawer><h6><a name=\"JD_PC717\" id=\"JD_PC717\" title=\"PC 717\"><\/a>Section PC 717: Reserved<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "25232-html-1",
+      "kind" : "html",
+      "plainText" : "Backwater valves shall be installed so that access is provided to the working parts for service and repair. Masonry access manholes shall be provided when the centerline of any drain line is 18 inches (457 mm) or more below a slab on grade.\n\n Section PC 716: Reserved\n\n Section PC 717: Reserved"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25232
+}

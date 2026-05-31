@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162906\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162906\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Floor drains located within walk-in refrigerators or freezers in food service and food establishments shall be indirectly connected to the sanitary drainage system by means of an air gap. Where a floor drain is located within an area subject to freezing, the waste line serving the floor drain shall not be trapped and shall indirectly discharge into a waste receptor located outside of the area subject to freezing.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162907\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;<\/span><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Where protected against backflow by a backwater valve, such floor drains shall be indirectly connected to the sanitary drainage system by means of an air break or an air gap.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25237-html-1",
+      "kind" : "html",
+      "plainText" : "Floor drains located within walk-in refrigerators or freezers in food service and food establishments shall be indirectly connected to the sanitary drainage system by means of an air gap. Where a floor drain is located within an area subject to freezing, the waste line serving the floor drain shall not be trapped and shall indirectly discharge into a waste receptor located outside of the area subject to freezing. \n\n Exception: Where protected against backflow by a backwater valve, such floor drains shall be indirectly connected to the sanitary drainage system by means of an air break or an air gap."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 25237
+}

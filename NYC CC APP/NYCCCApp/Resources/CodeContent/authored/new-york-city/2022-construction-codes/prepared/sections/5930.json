@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185139\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185139\"><\/AnnotationDrawer><div>Control of debris during construction and demolition work shall include the measures specified in Sections 3303.4.4.1 through 3303.4.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5930-html-1",
+      "kind" : "html",
+      "plainText" : "Control of debris during construction and demolition work shall include the measures specified in Sections 3303.4.4.1 through 3303.4.4.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5930
+}

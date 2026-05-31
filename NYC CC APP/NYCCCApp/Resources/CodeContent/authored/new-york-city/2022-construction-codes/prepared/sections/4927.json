@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181842\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181842\"><\/AnnotationDrawer><div>There shall be a minimum distance of 48 inches (1219 mm) between end joints in adjacent courses. Pieces not bearing on a support are permitted to be located in interior bays provided the adjacent pieces in the same course continue over the support for at least 24 inches (610 mm). This condition shall not occur more than once in every six courses in each interior bay.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4927-html-1",
+      "kind" : "html",
+      "plainText" : "There shall be a minimum distance of 48 inches (1219 mm) between end joints in adjacent courses. Pieces not bearing on a support are permitted to be located in interior bays provided the adjacent pieces in the same course continue over the support for at least 24 inches (610 mm). This condition shall not occur more than once in every six courses in each interior bay."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4927
+}

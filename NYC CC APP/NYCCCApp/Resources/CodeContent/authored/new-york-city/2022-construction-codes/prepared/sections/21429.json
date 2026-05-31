@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199208\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199208\"><\/AnnotationDrawer><div>Nonrecirculating direct-fired industrial air heaters shall be installed with a clearance from combustible materials of not less than that shown on the rating plate and in the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21429-html-1",
+      "kind" : "html",
+      "plainText" : "Nonrecirculating direct-fired industrial air heaters shall be installed with a clearance from combustible materials of not less than that shown on the rating plate and in the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21429
+}

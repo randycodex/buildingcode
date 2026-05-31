@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198939\"><\/AnnotationDrawer><div>For appliances with more than one input rate, the minimum vent capacity (FAN Min) determined from the tables shall be less than the lowest appliance input rating, and the maximum vent capacity (FAN Max\/NAT Max) determined from the tables shall be greater than the highest appliance rating input.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21342-html-1",
+      "kind" : "html",
+      "plainText" : "For appliances with more than one input rate, the minimum vent capacity (FAN Min) determined from the tables shall be less than the lowest appliance input rating, and the maximum vent capacity (FAN Max\/NAT Max) determined from the tables shall be greater than the highest appliance rating input."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21342
+}

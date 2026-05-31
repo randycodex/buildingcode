@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172644\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172644\"><\/AnnotationDrawer><div>Door or window openings to a hoistway or shaftway from the interior of the building shall be plainly marked with the word \"SHAFTWAY\" in red letters not less than 6 inches (152.4 mm) high on a white background. Such warning signs shall be placed so as to be readily discernible.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172645\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172645\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Markings shall not be required on shaftway openings that are readily discernible as openings onto a shaftway by the construction or arrangement.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2061-html-1",
+      "kind" : "html",
+      "plainText" : "Door or window openings to a hoistway or shaftway from the interior of the building shall be plainly marked with the word \"SHAFTWAY\" in red letters not less than 6 inches (152.4 mm) high on a white background. Such warning signs shall be placed so as to be readily discernible.\n\n Exception: Markings shall not be required on shaftway openings that are readily discernible as openings onto a shaftway by the construction or arrangement."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2061
+}

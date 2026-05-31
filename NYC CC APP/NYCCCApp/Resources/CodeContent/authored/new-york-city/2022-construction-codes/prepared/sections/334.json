@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166877\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166877\"><\/AnnotationDrawer><div>Every required stairway serving floor levels more than 30 feet (9144 mm) below its level of exit discharge shall comply with the requirements for a smokeproof enclosure as provided in Section 1023.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "334-html-1",
+      "kind" : "html",
+      "plainText" : "Every required stairway serving floor levels more than 30 feet (9144 mm) below its level of exit discharge shall comply with the requirements for a smokeproof enclosure as provided in Section 1023.11."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 334
+}

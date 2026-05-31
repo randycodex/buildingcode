@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162970\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162970\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints in high silicon cast iron system shall be in accordance with Section 705.4.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25265-html-1",
+      "kind" : "html",
+      "plainText" : "Joints in high silicon cast iron system shall be in accordance with Section 705.4."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 25265
+}

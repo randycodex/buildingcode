@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162849\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162849\"><\/AnnotationDrawer><div>Sterilizer vent stack sizes shall comply with Sections 713.11.1 through 713.11.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25217-html-1",
+      "kind" : "html",
+      "plainText" : "Sterilizer vent stack sizes shall comply with Sections 713.11.1 through 713.11.4."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25217
+}

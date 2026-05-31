@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174581\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174581\"><\/AnnotationDrawer><div>Aisles with a slope exceeding one unit vertical in eight units horizontal (12.5-percent slope) shall consist of a series of risers and treads that extends across the full width of aisles and complies with Sections 1029.13.2.1 through 1029.13.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16401-html-1",
+      "kind" : "html",
+      "plainText" : "Aisles with a slope exceeding one unit vertical in eight units horizontal (12.5-percent slope) shall consist of a series of risers and treads that extends across the full width of aisles and complies with Sections 1029.13.2.1 through 1029.13.2.4."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16401
+}

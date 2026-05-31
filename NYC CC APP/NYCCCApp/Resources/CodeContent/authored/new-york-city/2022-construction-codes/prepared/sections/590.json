@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167644\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167644\"><\/AnnotationDrawer><div>The provisions of Sections 414.1 through 414.6 shall apply to buildings and structures occupied for the manufacturing, processing, dispensing, use or storage of hazardous materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "590-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of Sections 414.1 through 414.6 shall apply to buildings and structures occupied for the manufacturing, processing, dispensing, use or storage of hazardous materials."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 590
+}

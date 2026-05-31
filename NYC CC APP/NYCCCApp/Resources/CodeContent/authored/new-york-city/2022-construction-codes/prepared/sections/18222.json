@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180323\"><\/AnnotationDrawer><div>The approved agency shall immediately report the results of field tests performed to the contractor, and concrete truck driver, or other representative of the concrete producer. If at any time during the concrete operations, the concrete is not in conformance with ASTM C 94, this code, or is otherwise compromised, it shall be rejected. If it is placed, the location of the load shall be recorded and a pair of cylinders shall be molded from the load per ASTM C 31 and included in the average <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">f '<\/span><span style=\"font-weight: normal;font-style: italic;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">c<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t. The approved agency shall keep a written record of all field tests at the construction site and make the records available upon request. These results need not be used in calculating the arithmetic average of consecutive test results required by Section 1905.6.3.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18222-html-1",
+      "kind" : "html",
+      "plainText" : "The approved agency shall immediately report the results of field tests performed to the contractor, and concrete truck driver, or other representative of the concrete producer. If at any time during the concrete operations, the concrete is not in conformance with ASTM C 94, this code, or is otherwise compromised, it shall be rejected. If it is placed, the location of the load shall be recorded and a pair of cylinders shall be molded from the load per ASTM C 31 and included in the average f ' c \n\n . The approved agency shall keep a written record of all field tests at the construction site and make the records available upon request. These results need not be used in calculating the arithmetic average of consecutive test results required by Section 1905.6.3.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18222
+}

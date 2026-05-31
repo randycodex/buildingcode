@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198229\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198229\"><\/AnnotationDrawer><div>Each appliance shall be provided with a shutoff valve in accordance with Section 409.5.1 or 409.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21092-html-1",
+      "kind" : "html",
+      "plainText" : "Each appliance shall be provided with a shutoff valve in accordance with Section 409.5.1 or 409.5.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21092
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199419\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199419\"><\/AnnotationDrawer><div>Where an appliance pressure regulator is not supplied with an illuminating appliance and the service line is not equipped with a service pressure regulator, an appliance pressure regulator shall be installed in the line to the illuminating appliance. For multiple installations, one regulator of adequate capacity shall be permitted to serve more than one illuminating appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199420\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199420\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199420\"><\/AnnotationDrawer><h6><a name=\"JD_FGC629\" id=\"JD_FGC629\" title=\"FGC 629\"><\/a>Section FGC 629: Ceramic Kilns<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21513-html-1",
+      "kind" : "html",
+      "plainText" : "Where an appliance pressure regulator is not supplied with an illuminating appliance and the service line is not equipped with a service pressure regulator, an appliance pressure regulator shall be installed in the line to the illuminating appliance. For multiple installations, one regulator of adequate capacity shall be permitted to serve more than one illuminating appliance.\n\n Section FGC 629: Ceramic Kilns"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21513
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187317\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187317\"><\/AnnotationDrawer><div>Wire rope clips used on suspended scaffolds shall be in accordance with Sections 3114.11.7.1 through 3314.11.7.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20503-html-1",
+      "kind" : "html",
+      "plainText" : "Wire rope clips used on suspended scaffolds shall be in accordance with Sections 3114.11.7.1 through 3314.11.7.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20503
+}

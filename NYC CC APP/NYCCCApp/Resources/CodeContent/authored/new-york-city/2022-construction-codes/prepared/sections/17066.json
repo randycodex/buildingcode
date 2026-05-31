@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176572\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176572\"><\/AnnotationDrawer><div>Ballasted low-slope (roof slope &lt; 2:12) single-ply roof system coverings installed in accordance with Sections 1507.12 and 1507.13 shall be designed in accordance with ANSI\/SPRI RP-4 and Section 1504.8 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17066-html-1",
+      "kind" : "html",
+      "plainText" : "Ballasted low-slope (roof slope < 2:12) single-ply roof system coverings installed in accordance with Sections 1507.12 and 1507.13 shall be designed in accordance with ANSI\/SPRI RP-4 and Section 1504.8 of this code."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17066
+}

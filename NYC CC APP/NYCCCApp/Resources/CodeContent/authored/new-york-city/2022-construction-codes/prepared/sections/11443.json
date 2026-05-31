@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196300\"><\/AnnotationDrawer><div>Nonmetallic pipe shall be listed and labeled as being acceptable for the intended application for flammable and combustible liquids. Nonmetallic pipe shall be installed only outside, underground.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11443-html-1",
+      "kind" : "html",
+      "plainText" : "Nonmetallic pipe shall be listed and labeled as being acceptable for the intended application for flammable and combustible liquids. Nonmetallic pipe shall be installed only outside, underground."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11443
+}

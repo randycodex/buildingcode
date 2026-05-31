@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172528\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172528\"><\/AnnotationDrawer><div>The building shall be equipped throughout with an approved automatic sprinkler system in accordance with Section 903.3.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2009-html-1",
+      "kind" : "html",
+      "plainText" : "The building shall be equipped throughout with an approved automatic sprinkler system in accordance with Section 903.3.1.1."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2009
+}

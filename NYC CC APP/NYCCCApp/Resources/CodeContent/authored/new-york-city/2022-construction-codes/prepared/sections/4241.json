@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179854\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179854\"><\/AnnotationDrawer><div>Anchors shall be designed in accordance with Sections 1815.4.1 through 1815.4.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4241-html-1",
+      "kind" : "html",
+      "plainText" : "Anchors shall be designed in accordance with Sections 1815.4.1 through 1815.4.5."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4241
+}

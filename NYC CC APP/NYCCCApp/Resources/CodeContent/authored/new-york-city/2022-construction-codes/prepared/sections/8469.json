@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198765\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198765\"><\/AnnotationDrawer><div>Vent connectors shall be constructed in accordance with Sections 503.10.2.1 through 503.10.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8469-html-1",
+      "kind" : "html",
+      "plainText" : "Vent connectors shall be constructed in accordance with Sections 503.10.2.1 through 503.10.2.5."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8469
+}

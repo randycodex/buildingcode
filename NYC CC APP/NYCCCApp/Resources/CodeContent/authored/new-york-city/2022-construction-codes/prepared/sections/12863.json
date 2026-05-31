@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188189\"><\/AnnotationDrawer><div>Where automatic teller machines or self-service fare vending, collection or adjustment machines are provided, at least one machine of each type at each location where such machines are provided shall be accessible and comply with ICC A117.1, including Section 707 (ATMs and Fare Machines). Where bins are provided for envelopes, wastepaper or other purposes, at least one of each type shall be accessible and comply with ICC A117.1, including Section 905 (Storage Facilities).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12863-html-1",
+      "kind" : "html",
+      "plainText" : "Where automatic teller machines or self-service fare vending, collection or adjustment machines are provided, at least one machine of each type at each location where such machines are provided shall be accessible and comply with ICC A117.1, including Section 707 (ATMs and Fare Machines). Where bins are provided for envelopes, wastepaper or other purposes, at least one of each type shall be accessible and comply with ICC A117.1, including Section 905 (Storage Facilities)."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12863
+}

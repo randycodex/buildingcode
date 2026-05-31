@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174971\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174971\"><\/AnnotationDrawer><div>Mechanical access parking garages shall provide at least one passenger loading zone in compliance with Section 1106.7 at vehicle drop-off and vehicle pick-up areas.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16518-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical access parking garages shall provide at least one passenger loading zone in compliance with Section 1106.7 at vehicle drop-off and vehicle pick-up areas."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16518
+}

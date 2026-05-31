@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188203\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188203\"><\/AnnotationDrawer><div>TTYs complying with ICC A117.1, including Section 704.4 through 704.7, shall be provided in accordance with Sections E106.4.1 through E106.4.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6905-html-1",
+      "kind" : "html",
+      "plainText" : "TTYs complying with ICC A117.1, including Section 704.4 through 704.7, shall be provided in accordance with Sections E106.4.1 through E106.4.9."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6905
+}

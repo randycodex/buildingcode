@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197367\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197367\"><\/AnnotationDrawer><div>Buildings or structures and the walls enclosing habitable or occupiable rooms and spaces in which persons live, sleep or work, or in which feed, food or foodstuffs are stored, prepared, processed, served or sold, shall be constructed to protect against rodents in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7969-html-1",
+      "kind" : "html",
+      "plainText" : "Buildings or structures and the walls enclosing habitable or occupiable rooms and spaces in which persons live, sleep or work, or in which feed, food or foodstuffs are stored, prepared, processed, served or sold, shall be constructed to protect against rodents in accordance with the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 7969
+}

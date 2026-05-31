@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193918\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193918\"><\/AnnotationDrawer><div>The outlet of exhaust equipment serving Type I hoods, shall be in accordance with Section 506.3.13.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193919\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193919\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The minimum horizontal distance between vertical discharge fans and parapet-type building structures shall be 2 feet (609.6 mm) provided that such structures are not higher than the top of the fan discharge opening.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10587-html-1",
+      "kind" : "html",
+      "plainText" : "The outlet of exhaust equipment serving Type I hoods, shall be in accordance with Section 506.3.13.\n\n Exception: The minimum horizontal distance between vertical discharge fans and parapet-type building structures shall be 2 feet (609.6 mm) provided that such structures are not higher than the top of the fan discharge opening."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10587
+}

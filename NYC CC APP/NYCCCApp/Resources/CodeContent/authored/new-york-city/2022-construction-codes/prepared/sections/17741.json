@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178845\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178845\"><\/AnnotationDrawer><div>Where foundations are proportioned using the load combinations of Sections 1605.2 or 1605.3.1 and the computation of seismic overturning effects is by equivalent lateral force or modal analysis, the proportioning shall be in accordance with Section 12.13.4 of ASCE 7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-178846\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-178846\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-178846\"><\/AnnotationDrawer><h6><a name=\"JD_BC1802\" id=\"JD_BC1802\" title=\"BC 1802\"><\/a>Section BC 1802: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17741-html-1",
+      "kind" : "html",
+      "plainText" : "Where foundations are proportioned using the load combinations of Sections 1605.2 or 1605.3.1 and the computation of seismic overturning effects is by equivalent lateral force or modal analysis, the proportioning shall be in accordance with Section 12.13.4 of ASCE 7.\n\n Section BC 1802: Definitions"
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17741
+}

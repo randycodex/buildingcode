@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176542\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176542\"><\/AnnotationDrawer><div>Intake and exhaust vents shall be provided in accordance with Section 1203.2 and the vent product's manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3227-html-1",
+      "kind" : "html",
+      "plainText" : "Intake and exhaust vents shall be provided in accordance with Section 1203.2 and the vent product's manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3227
+}

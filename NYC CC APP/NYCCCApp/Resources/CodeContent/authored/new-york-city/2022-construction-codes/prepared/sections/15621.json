@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171902\"><\/AnnotationDrawer><div>Actuation of a single smoke detector, automatic sprinkler system or other automatic fire detection system shall initiate a pre-signal system in accordance with NFPA 72 at a constantly attended location from which the Fire Department shall be notified and live voice evacuation instructions shall be initiated using an emergency voice\/alarm communications system in accordance with Section 907.5.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15621-html-1",
+      "kind" : "html",
+      "plainText" : "Actuation of a single smoke detector, automatic sprinkler system or other automatic fire detection system shall initiate a pre-signal system in accordance with NFPA 72 at a constantly attended location from which the Fire Department shall be notified and live voice evacuation instructions shall be initiated using an emergency voice\/alarm communications system in accordance with Section 907.5.2.2."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15621
+}

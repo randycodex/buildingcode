@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193170\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193170\"><\/AnnotationDrawer><div>All moving parts of cooling towers located on a roof or floor other than a floor on grade shall be installed on vibration isolators providing a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum static deflection of 4 inches (101.6 mm). Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm). Vibration cutoff switches shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23155-html-1",
+      "kind" : "html",
+      "plainText" : "All moving parts of cooling towers located on a roof or floor other than a floor on grade shall be installed on vibration isolators providing a minimum isolation efficiency of 90 percent at fan rotor rpm with a maximum static deflection of 4 inches (101.6 mm). Each isolator shall incorporate a leveling device and a resilient pad having a minimum thickness of 1\/4 inch (6.4 mm). Vibration cutoff switches shall be provided."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23155
+}

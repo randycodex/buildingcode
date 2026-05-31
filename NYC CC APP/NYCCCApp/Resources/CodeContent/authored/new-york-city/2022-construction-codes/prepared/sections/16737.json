@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175578\"><\/AnnotationDrawer><div>Amusement rides shall provide at least one wheelchair space, amusement ride seat designed for transfer or a transfer device.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175579\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175579\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175580\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175580\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Amusement rides that are controlled or operated by the rider are not required to comply with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175581\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175581\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Amusement rides designed primarily for children, where children are assisted on and off the ride by an adult, are not required to comply with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175582\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175582\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;Amusement rides that do not provide seats that are built-in or mechanically fastened shall not be required to comply with this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16737-html-1",
+      "kind" : "html",
+      "plainText" : "Amusement rides shall provide at least one wheelchair space, amusement ride seat designed for transfer or a transfer device.\n\n Exceptions: \n\n 1. Amusement rides that are controlled or operated by the rider are not required to comply with this section.\n\n 2. Amusement rides designed primarily for children, where children are assisted on and off the ride by an adult, are not required to comply with this section.\n\n 3. Amusement rides that do not provide seats that are built-in or mechanically fastened shall not be required to comply with this section."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16737
+}

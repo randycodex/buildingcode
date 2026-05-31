@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172481\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172481\"><\/AnnotationDrawer><div>The elevator pressurization system shall be activated upon activation of either the building fire alarm system or the elevator landing smoke detectors. Where both a building fire alarm system and elevator landing smoke detectors are present, each shall be independently capable of activating the pressurization system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1994-html-1",
+      "kind" : "html",
+      "plainText" : "The elevator pressurization system shall be activated upon activation of either the building fire alarm system or the elevator landing smoke detectors. Where both a building fire alarm system and elevator landing smoke detectors are present, each shall be independently capable of activating the pressurization system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1994
+}

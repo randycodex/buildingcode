@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160844\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160844\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The special inspector shall submit a final report in writing to the commissioner upon completion of the installation, certifying that the alternative engineered design installation conforms to the approved construction documents.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11732-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall submit a final report in writing to the commissioner upon completion of the installation, certifying that the alternative engineered design installation conforms to the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 11732
+}

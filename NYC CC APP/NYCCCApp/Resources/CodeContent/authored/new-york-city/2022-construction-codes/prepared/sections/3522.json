@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177523\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177523\"><\/AnnotationDrawer><div>Roof structures that support photovoltaic panel systems shall be designed to resist each of the following conditions:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177524\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177524\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Applicable uniform and concentrated roof loads with the photovoltaic panel system dead loads.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177525\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177525\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Roof live loads need not be applied to the area covered by photovoltaic panels where the clear space between the panels and the roof surface is 24 inches (609.6 mm) or less.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177526\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177526\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Applicable uniform and concentrated roof loads without the photovoltaic panel system present.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3522-html-1",
+      "kind" : "html",
+      "plainText" : "Roof structures that support photovoltaic panel systems shall be designed to resist each of the following conditions:\n\n 1. Applicable uniform and concentrated roof loads with the photovoltaic panel system dead loads.\n\n Exception: Roof live loads need not be applied to the area covered by photovoltaic panels where the clear space between the panels and the roof surface is 24 inches (609.6 mm) or less.\n\n 2. Applicable uniform and concentrated roof loads without the photovoltaic panel system present."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3522
+}

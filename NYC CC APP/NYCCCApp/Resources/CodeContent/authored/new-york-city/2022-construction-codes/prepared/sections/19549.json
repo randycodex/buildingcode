@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184450\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184450\"><\/AnnotationDrawer><div>Any permission, expressed or implied, permitting the construction of encroachments within the area of the street under the provisions of this chapter shall be revocable, except footings as permitted under Section 3202.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19549-html-1",
+      "kind" : "html",
+      "plainText" : "Any permission, expressed or implied, permitting the construction of encroachments within the area of the street under the provisions of this chapter shall be revocable, except footings as permitted under Section 3202.1.1."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19549
+}

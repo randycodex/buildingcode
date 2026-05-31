@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168170\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168170\"><\/AnnotationDrawer><div>Mechanical exhaust ventilation and gas detection systems shall be provided with an emergency power system in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183487', hash: '#JD_BC2702' }}\">2702<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168171\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168171\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168171\"><\/AnnotationDrawer><h6><a name=\"JD_BC422\" id=\"JD_BC422\" title=\"BC 422\"><\/a>Section BC 422: Ambulatory Care Facilities<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14591-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical exhaust ventilation and gas detection systems shall be provided with an emergency power system in accordance with Section 2702 .\n\n Section BC 422: Ambulatory Care Facilities"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14591
+}

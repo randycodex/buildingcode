@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185103\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185103\"><\/AnnotationDrawer><div>All temporary electrical equipment and wiring shall meet the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code,<\/span> and shall be maintained in compliance with such requirements. Portions of permanent electrical installations may be used for temporary operations provided the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code <\/span>are met.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19744-html-1",
+      "kind" : "html",
+      "plainText" : "All temporary electrical equipment and wiring shall meet the requirements of the New York City Electrical Code, and shall be maintained in compliance with such requirements. Portions of permanent electrical installations may be used for temporary operations provided the requirements of the New York City Electrical Code are met."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19744
+}

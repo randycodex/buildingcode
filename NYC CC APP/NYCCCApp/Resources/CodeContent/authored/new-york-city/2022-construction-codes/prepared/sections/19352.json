@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183923\"><\/AnnotationDrawer><div>Other than doors to the hoistway, and elevator machine rooms, machinery spaces, control rooms, and control spaces within the lobby enclosure smoke barrier, each doorway to an occupant evacuation elevator lobby shall comply with the smoke and draft control assembly requirements of Section 716.5.3.1 with the UL 1784 test conducted without the artificial bottom seal. Such doorway shall not be required to have a fire-resistance rating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19352-html-1",
+      "kind" : "html",
+      "plainText" : "Other than doors to the hoistway, and elevator machine rooms, machinery spaces, control rooms, and control spaces within the lobby enclosure smoke barrier, each doorway to an occupant evacuation elevator lobby shall comply with the smoke and draft control assembly requirements of Section 716.5.3.1 with the UL 1784 test conducted without the artificial bottom seal. Such doorway shall not be required to have a fire-resistance rating."
+    }
+  ],
+  "chapterNumber" : "30",
+  "schemaVersion" : 1,
+  "sectionID" : 19352
+}

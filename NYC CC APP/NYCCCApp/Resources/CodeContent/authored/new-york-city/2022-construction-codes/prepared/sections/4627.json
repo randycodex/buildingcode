@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180944\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180944\"><\/AnnotationDrawer><div>Dry-stacked, surface-bonded concrete masonry walls shall comply with the requirements of Appendix A of TMS 402, except where otherwise noted in this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4627-html-1",
+      "kind" : "html",
+      "plainText" : "Dry-stacked, surface-bonded concrete masonry walls shall comply with the requirements of Appendix A of TMS 402, except where otherwise noted in this section."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4627
+}

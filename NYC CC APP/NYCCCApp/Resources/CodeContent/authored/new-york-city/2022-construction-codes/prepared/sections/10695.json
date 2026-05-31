@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194250\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194250\"><\/AnnotationDrawer><div>Plastic fire sprinkler piping exposed within a plenum shall be used only in wet pipe systems and shall have a peak optical density of 0.50 or less, an average optical density of 0.15 or less, and a flame spread of 5 feet (1524 mm) or less when tested in accordance with UL 1887. Piping shall be listed and labeled.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10695-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic fire sprinkler piping exposed within a plenum shall be used only in wet pipe systems and shall have a peak optical density of 0.50 or less, an average optical density of 0.15 or less, and a flame spread of 5 feet (1524 mm) or less when tested in accordance with UL 1887. Piping shall be listed and labeled."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10695
+}

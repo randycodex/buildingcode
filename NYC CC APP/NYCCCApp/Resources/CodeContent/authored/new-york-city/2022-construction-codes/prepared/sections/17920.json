@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179450\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179450\"><\/AnnotationDrawer><div>Driven deep foundations shall be installed in accordance with Section 1810.2 and Sections 1811.4.1 through 1811.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17920-html-1",
+      "kind" : "html",
+      "plainText" : "Driven deep foundations shall be installed in accordance with Section 1810.2 and Sections 1811.4.1 through 1811.4.3."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17920
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171418\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171418\"><\/AnnotationDrawer><div>Where the domestic service provides the water supply for the automatic sprinkler system, the supply shall be in accordance with NFPA 13, 13R and 13D.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15468-html-1",
+      "kind" : "html",
+      "plainText" : "Where the domestic service provides the water supply for the automatic sprinkler system, the supply shall be in accordance with NFPA 13, 13R and 13D."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15468
+}

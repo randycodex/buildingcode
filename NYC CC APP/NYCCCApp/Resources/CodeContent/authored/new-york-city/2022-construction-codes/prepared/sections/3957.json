@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179033\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179033\"><\/AnnotationDrawer><div>Dampproofing materials for floors shall be installed between: (i) the floor and (ii) the base course required by Section 1805.4.1 or the sub-floor. Subgrade for the dampproofing material shall be prepared in accordance with manufacturer's recommendations. Dampproofing material shall be installed in accordance with manufacturer's recommendations and protected after placement. Any damaged areas and punctures must be repaired prior to placement of slab. All penetrations shall be sealed as per manufacturer's recommendations. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3957-html-1",
+      "kind" : "html",
+      "plainText" : "Dampproofing materials for floors shall be installed between: (i) the floor and (ii) the base course required by Section 1805.4.1 or the sub-floor. Subgrade for the dampproofing material shall be prepared in accordance with manufacturer's recommendations. Dampproofing material shall be installed in accordance with manufacturer's recommendations and protected after placement. Any damaged areas and punctures must be repaired prior to placement of slab. All penetrations shall be sealed as per manufacturer's recommendations."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3957
+}

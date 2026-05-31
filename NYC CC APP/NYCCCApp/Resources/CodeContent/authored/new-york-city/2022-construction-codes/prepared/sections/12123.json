@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162143\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">All water supply tanks shall be equipped with a lockable cover to keep out unauthorized persons, dirt and vermin. Such cover shall be tamper-proof and equipped with a local alarm. The covers of gravity tanks shall be vented with a return bend vent pipe with an area not less than the area of the down-feed riser pipe, and the vent shall be screened with a corrosion-resistant screen of not less than 16 by 20 mesh per inch (630 by 787 mesh per m).<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12123-html-1",
+      "kind" : "html",
+      "plainText" : "All water supply tanks shall be equipped with a lockable cover to keep out unauthorized persons, dirt and vermin. Such cover shall be tamper-proof and equipped with a local alarm. The covers of gravity tanks shall be vented with a return bend vent pipe with an area not less than the area of the down-feed riser pipe, and the vent shall be screened with a corrosion-resistant screen of not less than 16 by 20 mesh per inch (630 by 787 mesh per m)."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12123
+}

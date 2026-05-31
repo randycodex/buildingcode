@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162803\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162803\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Pumps connected to the drainage system shall connect to a building drain, soil stack, waste stack or horizontal branch drain. Where the discharge line connects into horizontal drainage piping, the connection shall be made through a wye fitting into the top of the drainage piping and such wye fitting shall be located not less than 10 pipe diameters from the base of any soil stack, waste stack or fixture drain.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25198-html-1",
+      "kind" : "html",
+      "plainText" : "Pumps connected to the drainage system shall connect to a building drain, soil stack, waste stack or horizontal branch drain. Where the discharge line connects into horizontal drainage piping, the connection shall be made through a wye fitting into the top of the drainage piping and such wye fitting shall be located not less than 10 pipe diameters from the base of any soil stack, waste stack or fixture drain."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25198
+}

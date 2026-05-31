@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161571\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161571\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Doors in a bathtub enclosure shall conform to ASME A112.19.15.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161572\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161572\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161572\"><\/AnnotationDrawer><h6><a name=\"JD_PC408\" id=\"JD_PC408\" title=\"PC 408\"><\/a>Section PC 408: Bidets<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11887-html-1",
+      "kind" : "html",
+      "plainText" : "Doors in a bathtub enclosure shall conform to ASME A112.19.15. \n\n Section PC 408: Bidets"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11887
+}

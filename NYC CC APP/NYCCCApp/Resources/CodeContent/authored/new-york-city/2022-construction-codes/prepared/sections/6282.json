@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186058\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186058\"><\/AnnotationDrawer><div>Partitions required for the stability of the structure or required for egress, as identified in the submittal documents required by Section 3306.5, shall be clearly marked prior to the commencement of demolition operations. Such partitions shall not be removed until a competent person designated by the permit holder has determined the demolition sequence, as identified in the submittal documents, has reached the point the partitions can be safely removed, and authorizes their removal.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6282-html-1",
+      "kind" : "html",
+      "plainText" : "Partitions required for the stability of the structure or required for egress, as identified in the submittal documents required by Section 3306.5, shall be clearly marked prior to the commencement of demolition operations. Such partitions shall not be removed until a competent person designated by the permit holder has determined the demolition sequence, as identified in the submittal documents, has reached the point the partitions can be safely removed, and authorizes their removal."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6282
+}

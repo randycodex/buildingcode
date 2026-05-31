@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168776\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168776\"><\/AnnotationDrawer><div>The height limitation for buildings of Type IIA construction in Group R-2 shall be increased to nine stories and 100 feet (30 480 mm) where the building is separated by not less than 50 feet (15 240 mm) from any other building on the lot and from lot lines, the exits are segregated in an area enclosed by a 2-hour fire-resistance-rated fire wall and the first floor assembly has a fire-resistance rating of not less than 1 1\/2 hours. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168777\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168777\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224234\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224234\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14768-html-1",
+      "kind" : "html",
+      "plainText" : "The height limitation for buildings of Type IIA construction in Group R-2 shall be increased to nine stories and 100 feet (30 480 mm) where the building is separated by not less than 50 feet (15 240 mm) from any other building on the lot and from lot lines, the exits are segregated in an area enclosed by a 2-hour fire-resistance-rated fire wall and the first floor assembly has a fire-resistance rating of not less than 1 1\/2 hours. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14768
+}

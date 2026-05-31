@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181338\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181338\"><\/AnnotationDrawer><div>The design, detailing, fabrication and erection of structural steel seismic force-resisting systems, and the material used for such systems, shall be in accordance with the provisions of Section 2205.2.1.1 or 2205.2.1.2, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18591-html-1",
+      "kind" : "html",
+      "plainText" : "The design, detailing, fabrication and erection of structural steel seismic force-resisting systems, and the material used for such systems, shall be in accordance with the provisions of Section 2205.2.1.1 or 2205.2.1.2, as applicable."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18591
+}

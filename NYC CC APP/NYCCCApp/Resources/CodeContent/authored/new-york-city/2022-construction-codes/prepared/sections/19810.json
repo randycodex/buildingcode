@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185271\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185271\"><\/AnnotationDrawer><div>Where a structural connection between a girder and column is not provided with its permanent fire-rated enclosure or protection, it shall be protected by a temporary 1-hour rated enclosure or protection. Such temporary enclosure or protection shall be installed as soon as practical after the connection has been made, and no later than by the end of the shift.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19810-html-1",
+      "kind" : "html",
+      "plainText" : "Where a structural connection between a girder and column is not provided with its permanent fire-rated enclosure or protection, it shall be protected by a temporary 1-hour rated enclosure or protection. Such temporary enclosure or protection shall be installed as soon as practical after the connection has been made, and no later than by the end of the shift."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19810
+}

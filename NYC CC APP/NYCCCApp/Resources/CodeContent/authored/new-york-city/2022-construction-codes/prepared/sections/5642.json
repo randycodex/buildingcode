@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184245\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184245\"><\/AnnotationDrawer><div>All gates shall be self-latching, with the latch handle located within the enclosure (i.e., on the pool side of the enclosure) and not less than 40 inches (1016 mm) above grade. If the latch handle is located less than 54 inches (1372 mm) from the bottom of the gate, the latch handle shall be located not less than 3 inches (76 mm) below the top of the gate, and neither the gate nor barrier shall have any opening greater than 0.5 inch (12.7 mm) within 18 inches (457 mm) of the latch handle.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5642-html-1",
+      "kind" : "html",
+      "plainText" : "All gates shall be self-latching, with the latch handle located within the enclosure (i.e., on the pool side of the enclosure) and not less than 40 inches (1016 mm) above grade. If the latch handle is located less than 54 inches (1372 mm) from the bottom of the gate, the latch handle shall be located not less than 3 inches (76 mm) below the top of the gate, and neither the gate nor barrier shall have any opening greater than 0.5 inch (12.7 mm) within 18 inches (457 mm) of the latch handle."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5642
+}

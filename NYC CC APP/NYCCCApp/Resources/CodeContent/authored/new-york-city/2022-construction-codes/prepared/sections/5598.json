@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184130\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184130\"><\/AnnotationDrawer><div>The wall shall be constructed of a tempered, wired or laminated glass wall and doors or glass separating the interior of the building from the pedestrian walkway. The glass shall be protected by an automatic sprinkler system in accordance with Section 903.3.1.1 that, when actuated, shall completely wet the entire surface of interior sides of the wall or glass. Obstructions shall not be installed between the sprinkler heads and the wall or glass. The glass shall be in a gasketed frame and installed in such a manner that the framing system will deflect without breaking (loading) the glass before the sprinkler operates.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5598-html-1",
+      "kind" : "html",
+      "plainText" : "The wall shall be constructed of a tempered, wired or laminated glass wall and doors or glass separating the interior of the building from the pedestrian walkway. The glass shall be protected by an automatic sprinkler system in accordance with Section 903.3.1.1 that, when actuated, shall completely wet the entire surface of interior sides of the wall or glass. Obstructions shall not be installed between the sprinkler heads and the wall or glass. The glass shall be in a gasketed frame and installed in such a manner that the framing system will deflect without breaking (loading) the glass before the sprinkler operates."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5598
+}

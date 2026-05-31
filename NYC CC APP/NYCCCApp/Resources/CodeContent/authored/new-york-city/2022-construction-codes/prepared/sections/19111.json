@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183272\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183272\"><\/AnnotationDrawer><div>The minimum density of the interior trim shall be 20 pcf (320 kg\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19111-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum density of the interior trim shall be 20 pcf (320 kg\/m\n 3 \n )."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19111
+}

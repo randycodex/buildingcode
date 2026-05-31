@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174469\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174469\"><\/AnnotationDrawer><div>A smoke-protected assembly seating area with a roof shall have the lowest portion of the roof deck not less than 15 feet (4572 mm) above the highest aisle or aisle accessway.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174470\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174470\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> A roof canopy in an outdoor stadium shall be permitted to be less than 15 feet (4572 mm) above the highest aisle or aisle accessway provided that there are no objects less than 80 inches (2032 mm) above the highest aisle or aisle accessway.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16365-html-1",
+      "kind" : "html",
+      "plainText" : "A smoke-protected assembly seating area with a roof shall have the lowest portion of the roof deck not less than 15 feet (4572 mm) above the highest aisle or aisle accessway.\n\n Exception: A roof canopy in an outdoor stadium shall be permitted to be less than 15 feet (4572 mm) above the highest aisle or aisle accessway provided that there are no objects less than 80 inches (2032 mm) above the highest aisle or aisle accessway."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16365
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171882\"><\/AnnotationDrawer><div>Smoke alarms shall not be installed in the following locations unless this would prevent placement of a smoke alarm in a location required by Section 907.2.11.1:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171883\"><\/AnnotationDrawer><div>1.&#160;&#160;&#160;Ionization smoke alarms shall not be installed less than 20 feet (6096 mm) horizontally from a permanently installed cooking appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171884\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171884\"><\/AnnotationDrawer><div>2.&#160;&#160;&#160;Ionization smoke alarms with an alarm-silencing switch shall not be installed less than 10 feet (3048 mm) horizontally from a permanently installed cooking appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171885\"><\/AnnotationDrawer><div>3.&#160;&#160;&#160;Photoelectric smoke alarms shall not be installed less than 6 feet (1828.8 mm) horizontally from a permanently installed cooking appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15615-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke alarms shall not be installed in the following locations unless this would prevent placement of a smoke alarm in a location required by Section 907.2.11.1:\n\n 1. Ionization smoke alarms shall not be installed less than 20 feet (6096 mm) horizontally from a permanently installed cooking appliance.\n\n 2. Ionization smoke alarms with an alarm-silencing switch shall not be installed less than 10 feet (3048 mm) horizontally from a permanently installed cooking appliance.\n\n 3. Photoelectric smoke alarms shall not be installed less than 6 feet (1828.8 mm) horizontally from a permanently installed cooking appliance."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15615
+}

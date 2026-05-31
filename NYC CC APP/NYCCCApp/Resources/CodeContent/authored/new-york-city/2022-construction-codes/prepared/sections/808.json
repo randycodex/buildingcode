@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168302\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168302\"><\/AnnotationDrawer><div>The total quantity of solid or liquid corrosive material allowed within a laboratory unit, excluding any quantity in a storage room, shall not exceed 250 gallons (946 L).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "808-html-1",
+      "kind" : "html",
+      "plainText" : "The total quantity of solid or liquid corrosive material allowed within a laboratory unit, excluding any quantity in a storage room, shall not exceed 250 gallons (946 L)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 808
+}

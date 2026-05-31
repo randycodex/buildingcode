@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195926\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195926\"><\/AnnotationDrawer><div>Piping and piping system components for hydronic systems shall be sized for the design requirements of the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24102-html-1",
+      "kind" : "html",
+      "plainText" : "Piping and piping system components for hydronic systems shall be sized for the design requirements of the system."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24102
+}

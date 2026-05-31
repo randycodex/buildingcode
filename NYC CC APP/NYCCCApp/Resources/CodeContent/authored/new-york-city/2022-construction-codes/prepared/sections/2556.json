@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174538\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174538\"><\/AnnotationDrawer><div>Transitions where the stairway changes direction from the stepped aisle shall have a minimum depth of 11 inches (279.4 mm) or the stepped aisle tread depth, whichever is greater, between the stepped aisle and stairway.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2556-html-1",
+      "kind" : "html",
+      "plainText" : "Transitions where the stairway changes direction from the stepped aisle shall have a minimum depth of 11 inches (279.4 mm) or the stepped aisle tread depth, whichever is greater, between the stepped aisle and stairway."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2556
+}

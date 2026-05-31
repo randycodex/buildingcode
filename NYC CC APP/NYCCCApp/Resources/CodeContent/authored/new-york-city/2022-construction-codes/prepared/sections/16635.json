@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175309\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175309\"><\/AnnotationDrawer><div>Accessible building features and facilities shall be provided in accordance with Sections 1109.2 through 1109.15 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175310\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175310\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Type B+NYC and Type B units shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174986', hash: '#JD_BC1107' }}\">1107<\/Link> of this code and ICC A117.1. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16635-html-1",
+      "kind" : "html",
+      "plainText" : "Accessible building features and facilities shall be provided in accordance with Sections 1109.2 through 1109.15 of this code.\n\n Exception: Type B+NYC and Type B units shall comply with Section 1107 of this code and ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16635
+}

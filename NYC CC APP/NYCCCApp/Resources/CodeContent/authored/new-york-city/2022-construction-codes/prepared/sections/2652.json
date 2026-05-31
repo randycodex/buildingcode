@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174855\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174855\"><\/AnnotationDrawer><div>Walk-in coolers and freezers intended for employee use only are not required to comply with this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-174856\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-174856\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-174856\"><\/AnnotationDrawer><h6><a name=\"JD_BC1104\" id=\"JD_BC1104\" title=\"BC 1104\"><\/a>Section BC 1104: Accessible Route<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2652-html-1",
+      "kind" : "html",
+      "plainText" : "Walk-in coolers and freezers intended for employee use only are not required to comply with this chapter.\n\n Section BC 1104: Accessible Route"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2652
+}

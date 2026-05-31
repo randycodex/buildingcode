@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167093\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167093\"><\/AnnotationDrawer><div>Open parking lots shall provide a perimeter screen enclosure as per this section unless otherwise required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Zoning Resolution.<\/span> Such screen enclosure may be constructed as a masonry wall, woven wire fence, iron picket fence, or uniformly painted fence of fire-resistant material at least 4 feet (1219 mm) high, but not more than 8 feet (2438 mm) above finished grade, subject to the limitations of Section 3111. Such enclosures shall completely separate the lot from adjoining premises and public sidewalks. Openings shall be limited as provided for in Section 406.9.5.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167094\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167094\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Screening shall not be required for any portion of the lot adjacent to an existing wall located at the lot line.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "410-html-1",
+      "kind" : "html",
+      "plainText" : "Open parking lots shall provide a perimeter screen enclosure as per this section unless otherwise required by the New York City Zoning Resolution. Such screen enclosure may be constructed as a masonry wall, woven wire fence, iron picket fence, or uniformly painted fence of fire-resistant material at least 4 feet (1219 mm) high, but not more than 8 feet (2438 mm) above finished grade, subject to the limitations of Section 3111. Such enclosures shall completely separate the lot from adjoining premises and public sidewalks. Openings shall be limited as provided for in Section 406.9.5.1.\n\n Exception: Screening shall not be required for any portion of the lot adjacent to an existing wall located at the lot line."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 410
+}

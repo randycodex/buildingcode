@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169566\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169566\"><\/AnnotationDrawer><div>Penetrations other than those necessary for the purpose of the shaft shall not be permitted in shaft enclosures.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1172-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations other than those necessary for the purpose of the shaft shall not be permitted in shaft enclosures."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1172
+}

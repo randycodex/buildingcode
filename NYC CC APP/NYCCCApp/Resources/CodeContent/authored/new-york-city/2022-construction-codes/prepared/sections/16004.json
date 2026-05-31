@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173060\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173060\"><\/AnnotationDrawer><div>Three exits or exit access doorways shall be provided from any space with an occupant load of 501 to 1,000. Four exits or exit access doorways shall be provided from any space with an occupant load greater than 1,000.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16004-html-1",
+      "kind" : "html",
+      "plainText" : "Three exits or exit access doorways shall be provided from any space with an occupant load of 501 to 1,000. Four exits or exit access doorways shall be provided from any space with an occupant load greater than 1,000."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16004
+}

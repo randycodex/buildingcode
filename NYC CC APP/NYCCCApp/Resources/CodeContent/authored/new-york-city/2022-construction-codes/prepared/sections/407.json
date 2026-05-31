@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167086\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167086\"><\/AnnotationDrawer><div>Motor fuel-dispensing facilities, accessory to open parking lots, shall comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> and Section 406.8 of this code. Motor fuel pumps shall be located at least 30 feet (9144 mm) from any parking space or interior lot line.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "407-html-1",
+      "kind" : "html",
+      "plainText" : "Motor fuel-dispensing facilities, accessory to open parking lots, shall comply with the requirements of the New York City Fire Code and Section 406.8 of this code. Motor fuel pumps shall be located at least 30 feet (9144 mm) from any parking space or interior lot line."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 407
+}

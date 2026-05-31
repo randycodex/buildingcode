@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197382\"><\/AnnotationDrawer><div>Penetrations of floor\/ceiling assemblies and assemblies required to have a fire-resistance rating shall be protected in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20801-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations of floor\/ceiling assemblies and assemblies required to have a fire-resistance rating shall be protected in accordance with the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20801
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193879\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193879\"><\/AnnotationDrawer><div>Exhaust outlets for grease ducts serving Type I hoods shall conform to the requirements of Sections 506.3.13.1 through 506.3.13.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23397-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust outlets for grease ducts serving Type I hoods shall conform to the requirements of Sections 506.3.13.1 through 506.3.13.3."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23397
+}

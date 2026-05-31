@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196118\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196118\"><\/AnnotationDrawer><div>Reused pipe, fittings, valves, and other materials shall not be permitted in ground-source heat pump loop systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11363-html-1",
+      "kind" : "html",
+      "plainText" : "Reused pipe, fittings, valves, and other materials shall not be permitted in ground-source heat pump loop systems."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11363
+}

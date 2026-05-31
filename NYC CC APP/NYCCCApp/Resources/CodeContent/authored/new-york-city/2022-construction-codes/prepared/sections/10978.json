@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195109\"><\/AnnotationDrawer><div>Chimneys shall not be supported by the equipment they serve, unless such equipment has been specifically designed for such loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195110\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195110\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195110\"><\/AnnotationDrawer><h6><a name=\"JD_MC810\" id=\"JD_MC810\" title=\"MC 810\"><\/a>Section MC 810: Test Run and Smoke Test<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10978-html-1",
+      "kind" : "html",
+      "plainText" : "Chimneys shall not be supported by the equipment they serve, unless such equipment has been specifically designed for such loads.\n\n Section MC 810: Test Run and Smoke Test"
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10978
+}

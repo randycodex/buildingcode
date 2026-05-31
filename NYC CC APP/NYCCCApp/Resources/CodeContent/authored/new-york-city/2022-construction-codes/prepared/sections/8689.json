@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199422\"><\/AnnotationDrawer><div>Kilns shall be listed and labeled unless otherwise approved in accordance with Section 105.1. Electric kilns shall comply with UL 499. The approval of unlisted appliances in accordance with Section 105.1 shall be based on an approved engineering evaluation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199423\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199423\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199423\"><\/AnnotationDrawer><h6><a name=\"JD_FGC630\" id=\"JD_FGC630\" title=\"FGC 630\"><\/a>Section FGC 630: Infrared Radiant Heaters<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8689-html-1",
+      "kind" : "html",
+      "plainText" : "Kilns shall be listed and labeled unless otherwise approved in accordance with Section 105.1. Electric kilns shall comply with UL 499. The approval of unlisted appliances in accordance with Section 105.1 shall be based on an approved engineering evaluation.\n\n Section FGC 630: Infrared Radiant Heaters"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8689
+}

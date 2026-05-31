@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188657\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188657\"><\/AnnotationDrawer><div>Streets and sidewalks shall be designed to minimize potential for increasing or aggravating flood levels and shall meet the requirements of Section G303.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13012-html-1",
+      "kind" : "html",
+      "plainText" : "Streets and sidewalks shall be designed to minimize potential for increasing or aggravating flood levels and shall meet the requirements of Section G303.8."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13012
+}

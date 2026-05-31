@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168668\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168668\"><\/AnnotationDrawer><div>Accessory occupancies are those occupancies that are ancillary to the main occupancy of the building or portion thereof. Accessory occupancies shall comply with the provisions of Sections 508.2.1 through 508.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "910-html-1",
+      "kind" : "html",
+      "plainText" : "Accessory occupancies are those occupancies that are ancillary to the main occupancy of the building or portion thereof. Accessory occupancies shall comply with the provisions of Sections 508.2.1 through 508.2.4."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 910
+}

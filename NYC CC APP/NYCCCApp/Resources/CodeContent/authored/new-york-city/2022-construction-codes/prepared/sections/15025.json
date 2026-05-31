@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169637\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169637\"><\/AnnotationDrawer><div>Penetrations shall be installed as tested in an approved fire-resistance-rated assembly.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15025-html-1",
+      "kind" : "html",
+      "plainText" : "Penetrations shall be installed as tested in an approved fire-resistance-rated assembly."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15025
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180904\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180904\"><\/AnnotationDrawer><div>Masonry walls that are not part of the lateral force resisting system shall be isolated from the structure so that the vertical and lateral forces are not imparted to these elements. Isolation joints and connectors between these elements and the structure shall be designed to accommodate the design story drift.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180905\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180905\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180905\"><\/AnnotationDrawer><h6><a name=\"JD_BC2107\" id=\"JD_BC2107\" title=\"BC 2107\"><\/a>Section BC 2107: Allowable Stress Design<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4611-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry walls that are not part of the lateral force resisting system shall be isolated from the structure so that the vertical and lateral forces are not imparted to these elements. Isolation joints and connectors between these elements and the structure shall be designed to accommodate the design story drift.\n\n Section BC 2107: Allowable Stress Design"
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4611
+}

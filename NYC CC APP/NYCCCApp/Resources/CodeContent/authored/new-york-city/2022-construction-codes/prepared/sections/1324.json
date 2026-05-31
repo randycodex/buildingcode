@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170047\"><\/AnnotationDrawer><div>Unfaced fiberglass batt insulation used as fireblocking shall fill the entire cross section of the wall cavity to a minimum height of 16 inches (406.4 mm) measured vertically. Where piping, conduit or similar obstructions are encountered, the insulation shall be packed tightly around the obstruction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1324-html-1",
+      "kind" : "html",
+      "plainText" : "Unfaced fiberglass batt insulation used as fireblocking shall fill the entire cross section of the wall cavity to a minimum height of 16 inches (406.4 mm) measured vertically. Where piping, conduit or similar obstructions are encountered, the insulation shall be packed tightly around the obstruction."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1324
+}

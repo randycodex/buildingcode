@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162785\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162785\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Building subdrains that cannot be discharged to the sewer by gravity flow shall be discharged into a gas-tight covered and vented ejector pit\/basin from which the liquid shall be lifted and discharged into the building gravity drainage system by automatic pumping equipment or other approved method.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25189-html-1",
+      "kind" : "html",
+      "plainText" : "Building subdrains that cannot be discharged to the sewer by gravity flow shall be discharged into a gas-tight covered and vented ejector pit\/basin from which the liquid shall be lifted and discharged into the building gravity drainage system by automatic pumping equipment or other approved method."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25189
+}

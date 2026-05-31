@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192332\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192332\"><\/AnnotationDrawer><div>Where a replacement cooling tower is installed and physical limitations prohibit compliance with the vibration isolator requirements of Section 313.3.7, such isolators may be omitted provided the devices shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Noise Control Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10156-html-1",
+      "kind" : "html",
+      "plainText" : "Where a replacement cooling tower is installed and physical limitations prohibit compliance with the vibration isolator requirements of Section 313.3.7, such isolators may be omitted provided the devices shall comply with the New York City Noise Control Code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 10156
+}

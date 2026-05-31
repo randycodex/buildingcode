@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195212\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195212\"><\/AnnotationDrawer><div>Cooling towers, evaporative condensers and fluid coolers located inside of buildings shall be constructed of noncombustible materials including fill and drift eliminators.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11017-html-1",
+      "kind" : "html",
+      "plainText" : "Cooling towers, evaporative condensers and fluid coolers located inside of buildings shall be constructed of noncombustible materials including fill and drift eliminators."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11017
+}

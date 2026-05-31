@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198098\"><\/AnnotationDrawer><div>Test duration shall be not less than 1\/2 hour, unless a greater duration is required by Section 406.4.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8220-html-1",
+      "kind" : "html",
+      "plainText" : "Test duration shall be not less than 1\/2 hour, unless a greater duration is required by Section 406.4.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8220
+}

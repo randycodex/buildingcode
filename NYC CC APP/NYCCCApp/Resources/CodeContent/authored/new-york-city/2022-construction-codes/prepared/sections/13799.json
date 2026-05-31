@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230073\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230073\"><\/AnnotationDrawer><div>Notwithstanding Section 1208.2, all habitable rooms in basements shall have a minimum clear ceiling height of 7 feet (2.1 meters). The minimum clear ceiling height of all habitable rooms in a cellar shall be 7 feet (2.1 meters). \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13799-html-1",
+      "kind" : "html",
+      "plainText" : "Notwithstanding Section 1208.2, all habitable rooms in basements shall have a minimum clear ceiling height of 7 feet (2.1 meters). The minimum clear ceiling height of all habitable rooms in a cellar shall be 7 feet (2.1 meters)."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 13799
+}

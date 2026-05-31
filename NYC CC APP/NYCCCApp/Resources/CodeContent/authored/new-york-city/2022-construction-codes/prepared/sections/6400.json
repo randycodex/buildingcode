@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186427\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186427\"><\/AnnotationDrawer><div>Zero cables shall be secured to the deck and be maintained in contact with the deck such that debris cannot accumulate nor pass beneath the cable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6400-html-1",
+      "kind" : "html",
+      "plainText" : "Zero cables shall be secured to the deck and be maintained in contact with the deck such that debris cannot accumulate nor pass beneath the cable."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6400
+}

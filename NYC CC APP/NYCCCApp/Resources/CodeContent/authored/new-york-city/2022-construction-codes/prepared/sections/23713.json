@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194841\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194841\"><\/AnnotationDrawer><div>Chimneys and vents shall not be supported by the equipment they serve unless such equipment has been specifically designed for such loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23713-html-1",
+      "kind" : "html",
+      "plainText" : "Chimneys and vents shall not be supported by the equipment they serve unless such equipment has been specifically designed for such loads."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23713
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163430\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163430\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Drains carrying clear water, i.e., air-conditioning drips, pump drips, cooling water, etc., may discharge into the storm water drainage system through an indirect waste connection discharging into a trapped funnel or raised lip floor drain.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163431\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163431\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Cooling tower blow-down shall discharge into the sanitary drainage system.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25438-html-1",
+      "kind" : "html",
+      "plainText" : "Drains carrying clear water, i.e., air-conditioning drips, pump drips, cooling water, etc., may discharge into the storm water drainage system through an indirect waste connection discharging into a trapped funnel or raised lip floor drain. \n\n Exception: Cooling tower blow-down shall discharge into the sanitary drainage system."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25438
+}

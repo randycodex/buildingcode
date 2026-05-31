@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162922\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162922\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Indirect waste piping shall discharge through an air gap or air break into a waste receptor. Waste receptors shall be trapped and vented and shall connect to the building drainage system. Indirect waste piping that exceeds 30 inches (762 mm) in developed length measured horizontally, or 54 inches (1372 mm) in total developed length, shall be trapped.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162923\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Where a waste receptor receives only clear-water waste and does not directly connect to a sanitary drainage system, the receptor shall not require a trap.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12419-html-1",
+      "kind" : "html",
+      "plainText" : "Indirect waste piping shall discharge through an air gap or air break into a waste receptor. Waste receptors shall be trapped and vented and shall connect to the building drainage system. Indirect waste piping that exceeds 30 inches (762 mm) in developed length measured horizontally, or 54 inches (1372 mm) in total developed length, shall be trapped. \n\n Exception: Where a waste receptor receives only clear-water waste and does not directly connect to a sanitary drainage system, the receptor shall not require a trap."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 12419
+}

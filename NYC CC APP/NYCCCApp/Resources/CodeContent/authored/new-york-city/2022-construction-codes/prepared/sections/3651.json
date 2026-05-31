@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178074\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178074\"><\/AnnotationDrawer><div>Temporary construction installations that are required by this code to be designed by a registered design professional, and all temporary structures, shall comply with all the provisions of this code, except as described in Sections 1619.3 and 1619.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3651-html-1",
+      "kind" : "html",
+      "plainText" : "Temporary construction installations that are required by this code to be designed by a registered design professional, and all temporary structures, shall comply with all the provisions of this code, except as described in Sections 1619.3 and 1619.4."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3651
+}

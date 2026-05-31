@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169016\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169016\"><\/AnnotationDrawer><div>The edges of lugs, brackets, rivets and bolt heads attached to structural members shall be protected to the highest required fire-resistance rating of the members connected.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "986-html-1",
+      "kind" : "html",
+      "plainText" : "The edges of lugs, brackets, rivets and bolt heads attached to structural members shall be protected to the highest required fire-resistance rating of the members connected."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 986
+}

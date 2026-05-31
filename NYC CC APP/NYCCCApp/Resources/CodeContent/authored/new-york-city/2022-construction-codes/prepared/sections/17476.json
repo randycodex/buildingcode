@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178067\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178067\"><\/AnnotationDrawer><div>The structural engineer of record shall identify that a new review is required based upon changes to the design documents relevant to the scope of the peer review. The structural peer reviewer shall review the items that have been affected and shall revise the structural peer review report.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17476-html-1",
+      "kind" : "html",
+      "plainText" : "The structural engineer of record shall identify that a new review is required based upon changes to the design documents relevant to the scope of the peer review. The structural peer reviewer shall review the items that have been affected and shall revise the structural peer review report."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17476
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194000\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194000\"><\/AnnotationDrawer><div>The inside lower edge of canopy-type Type I and II commercial hoods shall overhang or extend a horizontal distance of not less than 6 inches (152.4 mm) beyond the edge of the top horizontal surface of the appliance on all open sides. The vertical distance between the front lower lip of the hood and such surface shall not exceed 4 feet (1219.2 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194001\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194001\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The hood shall be permitted to be flush with the outer edge of the cooking surface where the hood is closed to the appliance side by a noncombustible wall or panel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10615-html-1",
+      "kind" : "html",
+      "plainText" : "The inside lower edge of canopy-type Type I and II commercial hoods shall overhang or extend a horizontal distance of not less than 6 inches (152.4 mm) beyond the edge of the top horizontal surface of the appliance on all open sides. The vertical distance between the front lower lip of the hood and such surface shall not exceed 4 feet (1219.2 mm).\n\n Exception: The hood shall be permitted to be flush with the outer edge of the cooking surface where the hood is closed to the appliance side by a noncombustible wall or panel."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10615
+}

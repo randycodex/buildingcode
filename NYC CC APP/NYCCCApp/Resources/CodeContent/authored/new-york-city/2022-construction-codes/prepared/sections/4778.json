@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181372\"><\/AnnotationDrawer><div>Steel reinforcement shall be in the form of rods, structural shapes or pipe embedded in the concrete core in accordance with AISC 360 with sufficient clearance to ensure the composite action of the section, but not nearer than 1 inch (25 mm) to the exterior steel shell. Structural shapes used as reinforcement shall be milled to ensure bearing on cap and base plates.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4778-html-1",
+      "kind" : "html",
+      "plainText" : "Steel reinforcement shall be in the form of rods, structural shapes or pipe embedded in the concrete core in accordance with AISC 360 with sufficient clearance to ensure the composite action of the section, but not nearer than 1 inch (25 mm) to the exterior steel shell. Structural shapes used as reinforcement shall be milled to ensure bearing on cap and base plates."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4778
+}

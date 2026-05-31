@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172425\"><\/AnnotationDrawer><div>Where a specially engineered system is used, the system shall exhaust a quantity of air equal to not less than 90 air changes per hour from any vestibule in the emergency operation mode and shall be sized to handle three vestibules simultaneously. Smoke detectors shall be located at the floor-side entrance to each vestibule and shall activate the system for the affected vestibule. Smoke detectors shall be installed in accordance with Section 907.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1971-html-1",
+      "kind" : "html",
+      "plainText" : "Where a specially engineered system is used, the system shall exhaust a quantity of air equal to not less than 90 air changes per hour from any vestibule in the emergency operation mode and shall be sized to handle three vestibules simultaneously. Smoke detectors shall be located at the floor-side entrance to each vestibule and shall activate the system for the affected vestibule. Smoke detectors shall be installed in accordance with Section 907.3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1971
+}

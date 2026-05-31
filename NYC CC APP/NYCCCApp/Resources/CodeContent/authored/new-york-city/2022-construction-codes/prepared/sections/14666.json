@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168389\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168389\"><\/AnnotationDrawer><div>Unless otherwise specifically modified in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-166480', hash: '#JD_BCCh.4' }}\">Chapter 4<\/Link>, building height, number of stories and building area shall not exceed the limits specified in Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168396', hash: '#JD_BC504' }}\">504<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168483', hash: '#JD_BC506' }}\">506<\/Link>, based on the type of construction as determined by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-168832', hash: '#JD_BC602' }}\">602<\/Link>, and the occupancies as determined by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-165864', hash: '#JD_BC302' }}\">302<\/Link>, except as modified hereafter in this chapter. Building height, number of stories and building area provisions shall be applied independently. Each portion of a building separated by one or more fire walls complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169208', hash: '#JD_BC706' }}\">706<\/Link> shall be considered to be a separate building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14666-html-1",
+      "kind" : "html",
+      "plainText" : "Unless otherwise specifically modified in Chapter 4 , building height, number of stories and building area shall not exceed the limits specified in Sections 504 and 506 , based on the type of construction as determined by Section 602 , and the occupancies as determined by Section 302 , except as modified hereafter in this chapter. Building height, number of stories and building area provisions shall be applied independently. Each portion of a building separated by one or more fire walls complying with Section 706 shall be considered to be a separate building."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 14666
+}

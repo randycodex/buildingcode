@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179678\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179678\"><\/AnnotationDrawer><div>The shell shall be seamless or provided with seams of strength equal to the basic material and be of a configuration that will provide confinement to the cast-in-place concrete.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17991-html-1",
+      "kind" : "html",
+      "plainText" : "The shell shall be seamless or provided with seams of strength equal to the basic material and be of a configuration that will provide confinement to the cast-in-place concrete."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17991
+}

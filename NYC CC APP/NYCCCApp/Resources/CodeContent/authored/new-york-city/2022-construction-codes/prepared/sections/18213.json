@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180298\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180298\"><\/AnnotationDrawer><div>Samples for strength tests shall be taken in accordance with ASTM C 172.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18213-html-1",
+      "kind" : "html",
+      "plainText" : "Samples for strength tests shall be taken in accordance with ASTM C 172."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18213
+}

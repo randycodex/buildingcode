@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198707\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198707\"><\/AnnotationDrawer><div>Screws, rivets and other fasteners shall not penetrate the inner wall of double-wall gas vents, except at the transition from an appliance draft hood outlet, a flue collar or a single-wall metal connector to a double-wall vent.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21266-html-1",
+      "kind" : "html",
+      "plainText" : "Screws, rivets and other fasteners shall not penetrate the inner wall of double-wall gas vents, except at the transition from an appliance draft hood outlet, a flue collar or a single-wall metal connector to a double-wall vent."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21266
+}

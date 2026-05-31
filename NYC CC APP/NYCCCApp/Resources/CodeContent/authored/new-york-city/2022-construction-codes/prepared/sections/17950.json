@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179549\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179549\"><\/AnnotationDrawer><div>Structural steel H-piles and structural steel sheet piling shall conform to the material requirements in ASTM A 6. Steel pipe piles shall conform to the material requirements in ASTM A 252. Welded built-up steel piles shall be fabricated from plates that conform to the material requirements in ASTM A 36, ASTM A 283, ASTM A 572, ASTM A 588 or ASTM A 690.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17950-html-1",
+      "kind" : "html",
+      "plainText" : "Structural steel H-piles and structural steel sheet piling shall conform to the material requirements in ASTM A 6. Steel pipe piles shall conform to the material requirements in ASTM A 252. Welded built-up steel piles shall be fabricated from plates that conform to the material requirements in ASTM A 36, ASTM A 283, ASTM A 572, ASTM A 588 or ASTM A 690."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17950
+}

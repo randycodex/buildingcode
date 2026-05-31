@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198517\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198517\"><\/AnnotationDrawer><div>In concealed locations, where a vent is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38.1 mm) from the nearest edge of the member, the vent shall be protected by shield plates. Protective steel shield plates having a minimum thickness of 0.0575 inch (1.461 mm) (No. 16 gage) shall cover the area of the vent where the member is notched or bored and shall extend not less than 4 inches (101.6 mm) above sole plates, below top plates and to each side of a stud, joist or rafter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21201-html-1",
+      "kind" : "html",
+      "plainText" : "In concealed locations, where a vent is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38.1 mm) from the nearest edge of the member, the vent shall be protected by shield plates. Protective steel shield plates having a minimum thickness of 0.0575 inch (1.461 mm) (No. 16 gage) shall cover the area of the vent where the member is notched or bored and shall extend not less than 4 inches (101.6 mm) above sole plates, below top plates and to each side of a stud, joist or rafter."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21201
+}

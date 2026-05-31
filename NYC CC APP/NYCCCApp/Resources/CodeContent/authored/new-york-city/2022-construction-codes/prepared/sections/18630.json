@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181422\"><\/AnnotationDrawer><div>Open web steel joists shall be prohibited in high-rise buildings until the commissioner promulgates rules establishing minimum acceptable fireproofing methods.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181423\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181423\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181423\"><\/AnnotationDrawer><h6><a name=\"JD_BC2208\" id=\"JD_BC2208\" title=\"BC 2208\"><\/a>Section BC 2208: Steel Cable Structures<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18630-html-1",
+      "kind" : "html",
+      "plainText" : "Open web steel joists shall be prohibited in high-rise buildings until the commissioner promulgates rules establishing minimum acceptable fireproofing methods.\n\n Section BC 2208: Steel Cable Structures"
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18630
+}

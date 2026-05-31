@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168987\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168987\"><\/AnnotationDrawer><div>The tests indicated in Sections 703.5.1 and 703.5.2 shall serve as criteria for acceptance of building materials as set forth in Sections 602.2, 602.3 and 602.4 in Type I, II, III and IV construction. The term \"noncombustible\" does not apply to the flame spread characteristics of interior finish or trim materials. A material shall not be classified as a noncombustible building construction material if it is subject to an increase in combustibility or flame spread beyond the limitations herein established through the effects of age, fabrication or erection techniques, moisture or other atmospheric conditions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14802-html-1",
+      "kind" : "html",
+      "plainText" : "The tests indicated in Sections 703.5.1 and 703.5.2 shall serve as criteria for acceptance of building materials as set forth in Sections 602.2, 602.3 and 602.4 in Type I, II, III and IV construction. The term \"noncombustible\" does not apply to the flame spread characteristics of interior finish or trim materials. A material shall not be classified as a noncombustible building construction material if it is subject to an increase in combustibility or flame spread beyond the limitations herein established through the effects of age, fabrication or erection techniques, moisture or other atmospheric conditions."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14802
+}

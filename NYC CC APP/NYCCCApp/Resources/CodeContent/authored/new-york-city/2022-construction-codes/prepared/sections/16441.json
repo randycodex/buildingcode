@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174720\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174720\"><\/AnnotationDrawer><div>Where reentry is not provided from a stair to every floor, a sign that reads, \"NO REENTRY FROM THIS STAIR\" shall be posted on the occupied side of the stair door at every floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16441-html-1",
+      "kind" : "html",
+      "plainText" : "Where reentry is not provided from a stair to every floor, a sign that reads, \"NO REENTRY FROM THIS STAIR\" shall be posted on the occupied side of the stair door at every floor."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16441
+}

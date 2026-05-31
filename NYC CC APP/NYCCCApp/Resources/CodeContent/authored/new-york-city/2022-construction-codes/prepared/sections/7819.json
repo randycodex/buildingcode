@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230131\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230131\"><\/AnnotationDrawer><div>Where gas service is provided in an ADU, gas alarms shall be required in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172764', hash: '#JD_BC918' }}\">918<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7819-html-1",
+      "kind" : "html",
+      "plainText" : "Where gas service is provided in an ADU, gas alarms shall be required in accordance with Section 918 ."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7819
+}

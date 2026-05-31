@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171514\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171514\"><\/AnnotationDrawer><div>Where alarms are required to indicate the operation of automatic fire-extinguishing systems, distinctive audible and visible alarms and warning signs shall be provided to warn of pending agent discharge. Where exposure to automatic-extinguishing agents poses a hazard to persons and a delay is required to ensure the evacuation of occupants before agent discharge, a separate warning signal shall be provided to alert occupants once agent discharge has begun. Audible signals shall be in accordance with Section 907.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15502-html-1",
+      "kind" : "html",
+      "plainText" : "Where alarms are required to indicate the operation of automatic fire-extinguishing systems, distinctive audible and visible alarms and warning signs shall be provided to warn of pending agent discharge. Where exposure to automatic-extinguishing agents poses a hazard to persons and a delay is required to ensure the evacuation of occupants before agent discharge, a separate warning signal shall be provided to alert occupants once agent discharge has begun. Audible signals shall be in accordance with Section 907.5.2."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15502
+}

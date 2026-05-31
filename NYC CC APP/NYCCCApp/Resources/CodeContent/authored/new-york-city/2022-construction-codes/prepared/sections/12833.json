@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188049\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188049\"><\/AnnotationDrawer><div>Group H-1 occupancies shall be prohibited from location within the fire district.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12833-html-1",
+      "kind" : "html",
+      "plainText" : "Group H-1 occupancies shall be prohibited from location within the fire district."
+    }
+  ],
+  "chapterNumber" : "D",
+  "schemaVersion" : 1,
+  "sectionID" : 12833
+}

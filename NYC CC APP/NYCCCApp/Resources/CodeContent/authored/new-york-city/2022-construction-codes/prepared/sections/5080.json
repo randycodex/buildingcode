@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182549\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182549\"><\/AnnotationDrawer><div>In buildings classified as Seismic Design Category B, C or D, openings in horizontal diaphragms with a dimension that is greater than 4 feet (1219 mm) shall be constructed with metal ties and blocking in accordance with this section and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-182214', hash: '#JD_BCFigure2308.4.4.1(1)' }}\">Figure 2308.4.4.1(1)<\/Link>. Metal ties shall be not less than 0.058 inch (1.47 mm) (16 galvanized gage) in thickness by 1 1\/2 inches (38 mm) in width and shall have a yield stress not less than 33,000 psi (227 Mpa). Blocking shall extend not less than the dimension of the opening in the direction of the tie and blocking. Ties shall be attached to blocking in accordance with the manufacturer's instructions but with not less than eight 16d common nails on each side of the header-joist intersection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5080-html-1",
+      "kind" : "html",
+      "plainText" : "In buildings classified as Seismic Design Category B, C or D, openings in horizontal diaphragms with a dimension that is greater than 4 feet (1219 mm) shall be constructed with metal ties and blocking in accordance with this section and Figure 2308.4.4.1(1) . Metal ties shall be not less than 0.058 inch (1.47 mm) (16 galvanized gage) in thickness by 1 1\/2 inches (38 mm) in width and shall have a yield stress not less than 33,000 psi (227 Mpa). Blocking shall extend not less than the dimension of the opening in the direction of the tie and blocking. Ties shall be attached to blocking in accordance with the manufacturer's instructions but with not less than eight 16d common nails on each side of the header-joist intersection."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 5080
+}

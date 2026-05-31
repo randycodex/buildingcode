@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171516\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171516\"><\/AnnotationDrawer><div>Where a fire alarm system is installed, automatic fire-extinguishing systems shall be monitored by the fire alarm system in accordance with NFPA 72.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1675-html-1",
+      "kind" : "html",
+      "plainText" : "Where a fire alarm system is installed, automatic fire-extinguishing systems shall be monitored by the fire alarm system in accordance with NFPA 72."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1675
+}

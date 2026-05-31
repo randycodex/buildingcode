@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180403\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180403\"><\/AnnotationDrawer><div>When construction joints are required, they shall be made in accordance with Section 1906.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4427-html-1",
+      "kind" : "html",
+      "plainText" : "When construction joints are required, they shall be made in accordance with Section 1906.4."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4427
+}

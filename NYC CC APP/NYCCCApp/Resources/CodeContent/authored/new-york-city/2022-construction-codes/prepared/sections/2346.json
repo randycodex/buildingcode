@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173748\"><\/AnnotationDrawer><div>The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2346-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum width and required capacity of a means of egress ramp shall be not less than that required for corridors by Section 1020.2. The clear width of a ramp between handrails, if provided, or other permissible projections shall be 36 inches (914.4 mm) minimum."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2346
+}

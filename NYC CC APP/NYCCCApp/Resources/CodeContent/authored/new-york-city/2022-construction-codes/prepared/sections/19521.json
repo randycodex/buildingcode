@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184378\"><\/AnnotationDrawer><div>A large wind turbine shall be designed in accordance with standards adopted by rules of the commissioner. Such standards shall include but need not be limited to standards relating to the design of large wind turbines that are developed by the American Wind Energy Association, the New York State Energy Research and Development Authority, the California Energy Commission, the European Wind Turbine Certification, the British Wind Energy Association, the International Electrotechnical Commission, the National Renewable Energy Laboratory, or the Underwriters Laboratory. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19521-html-1",
+      "kind" : "html",
+      "plainText" : "A large wind turbine shall be designed in accordance with standards adopted by rules of the commissioner. Such standards shall include but need not be limited to standards relating to the design of large wind turbines that are developed by the American Wind Energy Association, the New York State Energy Research and Development Authority, the California Energy Commission, the European Wind Turbine Certification, the British Wind Energy Association, the International Electrotechnical Commission, the National Renewable Energy Laboratory, or the Underwriters Laboratory."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19521
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161309\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161309\"><\/AnnotationDrawer><div>Expansion joint fittings shall be used only where necessary to provide for expansion and contraction of the pipes. Expansion joint fittings shall be of the typical material suitable for use with the type of piping in which such fittings are installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161310\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161310\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161310\"><\/AnnotationDrawer><h6><a name=\"JD_PC309\" id=\"JD_PC309\" title=\"PC 309\"><\/a>Section PC 309: Flood Hazard Resistance<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24624-html-1",
+      "kind" : "html",
+      "plainText" : "Expansion joint fittings shall be used only where necessary to provide for expansion and contraction of the pipes. Expansion joint fittings shall be of the typical material suitable for use with the type of piping in which such fittings are installed.\n\n Section PC 309: Flood Hazard Resistance"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 24624
+}

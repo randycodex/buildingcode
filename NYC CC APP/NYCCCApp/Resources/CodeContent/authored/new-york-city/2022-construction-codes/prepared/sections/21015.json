@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198018\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198018\"><\/AnnotationDrawer><div>A device shall not be placed inside the piping or fittings that will reduce the cross-sectional area or otherwise obstruct the free flow of gas.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198019\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198019\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198020\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198020\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Approved gas filters.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198021\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198021\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;An approved fitting or device where the gas piping system has been sized to accommodate the pressure drop of the fitting or device.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198022\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198022\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;3.&#160;&#160;&#160;Approved gas meters for monitoring and analysis of gas usage.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21015-html-1",
+      "kind" : "html",
+      "plainText" : "A device shall not be placed inside the piping or fittings that will reduce the cross-sectional area or otherwise obstruct the free flow of gas.\n\n Exceptions: \n\n 1. Approved gas filters.\n\n 2. An approved fitting or device where the gas piping system has been sized to accommodate the pressure drop of the fitting or device.\n\n 3. Approved gas meters for monitoring and analysis of gas usage."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21015
+}

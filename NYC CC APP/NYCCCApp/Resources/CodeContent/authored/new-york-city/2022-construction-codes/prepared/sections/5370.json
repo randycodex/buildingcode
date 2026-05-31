@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183514\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183514\"><\/AnnotationDrawer><div>Automatic transfer devices, emergency generators and emergency or standby power system feeders shall comply with Sections 2702.1.7.1 through 2702.1.7.2.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5370-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic transfer devices, emergency generators and emergency or standby power system feeders shall comply with Sections 2702.1.7.1 through 2702.1.7.2.1."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 5370
+}

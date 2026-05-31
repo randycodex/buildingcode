@@ -1,0 +1,25 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170301\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170301\"><\/AnnotationDrawer><div>For walls that consist of two wythes of different types of concrete, the fire-resistance ratings shall be permitted to be determined from <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170300', hash: '#JD_BCFigure722.2.1.2' }}\">Figure 722.2.1.2<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170302\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170302\"><\/AnnotationDrawer><div>",
+      "id" : "1379-html-1",
+      "kind" : "html",
+      "plainText" : "For walls that consist of two wythes of different types of concrete, the fire-resistance ratings shall be permitted to be determined from Figure 722.2.1.2 ."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-722-2-1-2-fire-resistance-ratings-of-two-wythe-concrete-walls.jpg\" width=\"576\" height=\"519.533333333333\"><\/img><\/span>",
+      "id" : "1379-image-2",
+      "imageID" : "building-code-figure-722-2-1-2-fire-resistance-ratings-of-two-wythe-concrete-walls.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170303\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170303\"><\/AnnotationDrawer><div class=\"Small\"><br><\/br>For SI: 1 inch = 25.4 mm.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170304\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170304\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure722.2.1.2\" id=\"JD_BCFigure722.2.1.2\" title=\"BC Figure 722.2.1.2\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 722.2.1.2<br><\/br>Fire-resistance Ratings of Two-wythe Concrete Walls<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1379-html-3",
+      "kind" : "html",
+      "plainText" : "For SI: 1 inch = 25.4 mm.\n\n Figure 722.2.1.2\n Fire-resistance Ratings of Two-wythe Concrete Walls"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1379
+}

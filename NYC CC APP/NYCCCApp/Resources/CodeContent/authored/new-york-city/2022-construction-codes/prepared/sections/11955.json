@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161727\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161727\"><\/AnnotationDrawer><div>Access shall be provided to concealed piping in connection with special fixtures where such piping contains steam traps, valves, relief valves, check valves, vacuum breakers or other similar items that require periodic inspection, servicing, maintenance or repair. Access shall be provided to concealed piping that requires periodic inspection, maintenance or repair.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11955-html-1",
+      "kind" : "html",
+      "plainText" : "Access shall be provided to concealed piping in connection with special fixtures where such piping contains steam traps, valves, relief valves, check valves, vacuum breakers or other similar items that require periodic inspection, servicing, maintenance or repair. Access shall be provided to concealed piping that requires periodic inspection, maintenance or repair."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11955
+}

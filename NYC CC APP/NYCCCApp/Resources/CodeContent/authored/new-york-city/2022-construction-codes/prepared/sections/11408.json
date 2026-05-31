@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196213\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196213\"><\/AnnotationDrawer><div>Ground-source heat pump ground-loop piping to be embedded in concrete shall be pressure tested prior to pouring concrete. During pouring, the pipe shall be maintained at the proposed operating pressure. Embedded piping shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-196094', hash: '#JD_MC1209' }}\">1209<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-196214\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-196214\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-196214\"><\/AnnotationDrawer><h6><a name=\"JD_MC1211\" id=\"JD_MC1211\" title=\"MC 1211\"><\/a>Section MC 1211: High-Pressure Steam and High Temperature Hot Water Piping Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11408-html-1",
+      "kind" : "html",
+      "plainText" : "Ground-source heat pump ground-loop piping to be embedded in concrete shall be pressure tested prior to pouring concrete. During pouring, the pipe shall be maintained at the proposed operating pressure. Embedded piping shall comply with Section 1209 .\n\n Section MC 1211: High-Pressure Steam and High Temperature Hot Water Piping Systems"
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11408
+}

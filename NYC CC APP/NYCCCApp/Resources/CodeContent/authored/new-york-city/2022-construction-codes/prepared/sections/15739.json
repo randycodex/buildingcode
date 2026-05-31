@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172270\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172270\"><\/AnnotationDrawer><div>The engineering analysis shall include the characteristics of the fuel, fuel load, effects included by the fire and whether the fire is likely to be steady or unsteady.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15739-html-1",
+      "kind" : "html",
+      "plainText" : "The engineering analysis shall include the characteristics of the fuel, fuel load, effects included by the fire and whether the fire is likely to be steady or unsteady."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15739
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162295\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Spill-resistant pressure vacuum breaker assemblies shall conform to ASSE 1056 or CSA B64.1.3. These assemblies are designed for installation under continuous-pressure conditions where the critical level is installed at the required height.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12182-html-1",
+      "kind" : "html",
+      "plainText" : "Spill-resistant pressure vacuum breaker assemblies shall conform to ASSE 1056 or CSA B64.1.3. These assemblies are designed for installation under continuous-pressure conditions where the critical level is installed at the required height."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12182
+}

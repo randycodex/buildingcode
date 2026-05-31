@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181006\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181006\"><\/AnnotationDrawer><div>Masonry fireplaces shall have their chimneys anchored in accordance with Section 2113.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18477-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry fireplaces shall have their chimneys anchored in accordance with Section 2113.4."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18477
+}

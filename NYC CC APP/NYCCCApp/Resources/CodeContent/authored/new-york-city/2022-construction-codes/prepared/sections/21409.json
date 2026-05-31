@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199162\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199162\"><\/AnnotationDrawer><div>Vented wall furnaces shall be located so as not to cause a fire hazard to walls, floors, combustible furnishings or doors. Vented wall furnaces installed between bathrooms and adjoining rooms shall not circulate air from bathrooms to other parts of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21409-html-1",
+      "kind" : "html",
+      "plainText" : "Vented wall furnaces shall be located so as not to cause a fire hazard to walls, floors, combustible furnishings or doors. Vented wall furnaces installed between bathrooms and adjoining rooms shall not circulate air from bathrooms to other parts of the building."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21409
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163844\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163844\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A sufficient amount of rainwater shall be diverted at the beginning of each rain event, and not allowed to enter the storage tank, to wash accumulated debris from the collection surface. The amount of rainfall to be diverted shall be field adjustable as necessary to minimize storage tank water contamination. The roof washer shall not rely on manually operated valves or devices, and shall operate automatically. Diverted rainwater shall not be drained to the roof surface, and shall be discharged in a manner consistent with the storm water runoff requirements of the Department of Environmental Protection and this code. Roof washers shall be accessible for maintenance and service.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25579-html-1",
+      "kind" : "html",
+      "plainText" : "A sufficient amount of rainwater shall be diverted at the beginning of each rain event, and not allowed to enter the storage tank, to wash accumulated debris from the collection surface. The amount of rainfall to be diverted shall be field adjustable as necessary to minimize storage tank water contamination. The roof washer shall not rely on manually operated valves or devices, and shall operate automatically. Diverted rainwater shall not be drained to the roof surface, and shall be discharged in a manner consistent with the storm water runoff requirements of the Department of Environmental Protection and this code. Roof washers shall be accessible for maintenance and service."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 25579
+}

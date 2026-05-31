@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177926\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177926\"><\/AnnotationDrawer><div>Ballasted, roof-mounted photovoltaic panel systems need not be rigidly attached to the roof or supporting structure. Ballasted non-penetrating systems shall be designed and installed only on roofs with slopes not more than one unit vertical in 12 units horizontal. Ballasted nonpenetrating systems shall be designed to resist sliding and uplift resulting from lateral and vertical forces as required by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177268', hash: '#JD_BC1605' }}\">1605<\/Link> of this code, using a coefficient of friction determined by acceptable engineering principles. In structures assigned to Seismic Design Category C or D, ballasted nonpenetrating systems shall be designed to accommodate seismic displacement determined by nonlinear response-history analysis or shake-table testing, using input motions consistent with ASCE 7 lateral and vertical seismic forces for nonstructural components on roofs.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-177927\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-177927\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-177927\"><\/AnnotationDrawer><h6><a name=\"JD_BC1614\" id=\"JD_BC1614\" title=\"BC 1614\"><\/a>Section BC 1614: Atmospheric Ice Loads<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17438-html-1",
+      "kind" : "html",
+      "plainText" : "Ballasted, roof-mounted photovoltaic panel systems need not be rigidly attached to the roof or supporting structure. Ballasted non-penetrating systems shall be designed and installed only on roofs with slopes not more than one unit vertical in 12 units horizontal. Ballasted nonpenetrating systems shall be designed to resist sliding and uplift resulting from lateral and vertical forces as required by Section 1605 of this code, using a coefficient of friction determined by acceptable engineering principles. In structures assigned to Seismic Design Category C or D, ballasted nonpenetrating systems shall be designed to accommodate seismic displacement determined by nonlinear response-history analysis or shake-table testing, using input motions consistent with ASCE 7 lateral and vertical seismic forces for nonstructural components on roofs.\n\n Section BC 1614: Atmospheric Ice Loads"
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17438
+}

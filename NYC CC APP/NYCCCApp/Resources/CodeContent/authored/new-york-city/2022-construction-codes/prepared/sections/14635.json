@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168300\"><\/AnnotationDrawer><div>The total quantity of solid or liquid toxic material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 250 pounds (113.4 kg).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14635-html-1",
+      "kind" : "html",
+      "plainText" : "The total quantity of solid or liquid toxic material allowed within a laboratory unit, excluding any quantities in a storage room, shall not exceed 250 pounds (113.4 kg)."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14635
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195914\"><\/AnnotationDrawer><div>The following emergency devices and systems shall be periodically tested and the results logged in accordance with the manufacturer's instructions and as required by the Commissioner of the Fire Department:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195915\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195915\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Treatment and flaring systems.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195916\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195916\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Valves and appurtenances necessary to the operation of emergency refrigeration control boxes.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195917\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195917\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Fans and associated equipment intended to operate emergency purge ventilation systems.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195918\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195918\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Detection and alarm systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24099-html-1",
+      "kind" : "html",
+      "plainText" : "The following emergency devices and systems shall be periodically tested and the results logged in accordance with the manufacturer's instructions and as required by the Commissioner of the Fire Department:\n\n 1. Treatment and flaring systems.\n\n 2. Valves and appurtenances necessary to the operation of emergency refrigeration control boxes.\n\n 3. Fans and associated equipment intended to operate emergency purge ventilation systems.\n\n 4. Detection and alarm systems."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 24099
+}

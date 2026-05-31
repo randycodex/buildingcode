@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196727\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196727\"><\/AnnotationDrawer><div>Heat exchangers used in domestic water-heating systems shall be approved for the intended use. The system shall have adequate protection to ensure that the potability of the water supply and distribution system is properly safeguarded.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11602-html-1",
+      "kind" : "html",
+      "plainText" : "Heat exchangers used in domestic water-heating systems shall be approved for the intended use. The system shall have adequate protection to ensure that the potability of the water supply and distribution system is properly safeguarded."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 11602
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171775\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171775\"><\/AnnotationDrawer><div>A manual and automatic fire alarm system shall be installed in Group E occupancies. An emergency voice\/alarm communication system meeting the requirements of Section 907.5.2.2 and installed in accordance with Section 907.6 shall be installed in Group E occupancies. Automatic sprinkler systems, smoke detectors and\/or other initiating devices, shall be installed in accordance with other sections of this code. When such systems, initiating devices, and\/or detectors are installed, they shall be connected to the building fire alarm system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171776\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171776\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Emergency voice\/alarm communication systems meeting the requirements of Section 907.5.2.2 and installed in accordance with Section 907.6 shall not be required in Group E occupancies with occupant loads of 100 or less, provided that activation of the manual and automatic fire alarm system initiates an approved occupant notification signal in accordance with Section 907.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15584-html-1",
+      "kind" : "html",
+      "plainText" : "A manual and automatic fire alarm system shall be installed in Group E occupancies. An emergency voice\/alarm communication system meeting the requirements of Section 907.5.2.2 and installed in accordance with Section 907.6 shall be installed in Group E occupancies. Automatic sprinkler systems, smoke detectors and\/or other initiating devices, shall be installed in accordance with other sections of this code. When such systems, initiating devices, and\/or detectors are installed, they shall be connected to the building fire alarm system.\n\n Exception: Emergency voice\/alarm communication systems meeting the requirements of Section 907.5.2.2 and installed in accordance with Section 907.6 shall not be required in Group E occupancies with occupant loads of 100 or less, provided that activation of the manual and automatic fire alarm system initiates an approved occupant notification signal in accordance with Section 907.5."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15584
+}

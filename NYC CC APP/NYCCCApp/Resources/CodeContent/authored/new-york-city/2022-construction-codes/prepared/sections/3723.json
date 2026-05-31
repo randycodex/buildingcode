@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178312\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178312\"><\/AnnotationDrawer><div>When the specified compressive strength of concrete in a column is greater than 1.4 times that specified for a floor system, the special inspections for concrete construction shall also comply with the requirements of Section 1908.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3723-html-1",
+      "kind" : "html",
+      "plainText" : "When the specified compressive strength of concrete in a column is greater than 1.4 times that specified for a floor system, the special inspections for concrete construction shall also comply with the requirements of Section 1908.1.4."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3723
+}

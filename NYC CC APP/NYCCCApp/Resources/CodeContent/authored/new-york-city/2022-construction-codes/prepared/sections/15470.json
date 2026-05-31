@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171422\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171422\"><\/AnnotationDrawer><div>A secondary on-site water supply for high-rise buildings shall be provided in accordance with Section 403.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15470-html-1",
+      "kind" : "html",
+      "plainText" : "A secondary on-site water supply for high-rise buildings shall be provided in accordance with Section 403.3.3."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15470
+}

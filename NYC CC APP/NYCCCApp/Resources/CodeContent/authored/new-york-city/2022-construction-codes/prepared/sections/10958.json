@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195054\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195054\"><\/AnnotationDrawer><div>Mechanical draft systems of either forced or induced draft design shall be listed and labeled in accordance with UL 378 and shall comply with Sections 804.3.1 through 804.3.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10958-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical draft systems of either forced or induced draft design shall be listed and labeled in accordance with UL 378 and shall comply with Sections 804.3.1 through 804.3.8."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10958
+}

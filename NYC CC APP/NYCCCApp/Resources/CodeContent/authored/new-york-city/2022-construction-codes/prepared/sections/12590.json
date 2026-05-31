@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163366\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163366\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Roofs shall be designed for the maximum possible depth of water that will pond thereon as determined by the relative levels of roof deck and overflow weirs, scuppers, edges or serviceable drains in combination with the deflected structural elements. In determining the maximum possible depth of water, all primary roof drainage means shall be assumed to be blocked. The maximum possible depth of water on the roof shall include the height of the water required above the inlet of the secondary roof drainage means to achieve the required flow rate of the secondary drainage means to accommodate the design rainfall rate as required by Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-163440', hash: '#JD_PC1106' }}\">1106<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12590-html-1",
+      "kind" : "html",
+      "plainText" : "Roofs shall be designed for the maximum possible depth of water that will pond thereon as determined by the relative levels of roof deck and overflow weirs, scuppers, edges or serviceable drains in combination with the deflected structural elements. In determining the maximum possible depth of water, all primary roof drainage means shall be assumed to be blocked. The maximum possible depth of water on the roof shall include the height of the water required above the inlet of the secondary roof drainage means to achieve the required flow rate of the secondary drainage means to accommodate the design rainfall rate as required by Section 1106 ."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 12590
+}

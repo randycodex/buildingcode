@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162899\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162899\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Devices, appurtenances, appliances and apparatus intended to serve some special function, such as sterilization, distillation, processing, cooling, or storage of ice or foods, and that discharge to the drainage system, shall be provided with protection against backflow, flooding, fouling, contamination and stoppage of the drain.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-162900\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-162900\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-162900\"><\/AnnotationDrawer><h6><a name=\"JD_PC802\" id=\"JD_PC802\" title=\"PC 802\"><\/a>Section PC 802: Indirect Wastes<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25234-html-1",
+      "kind" : "html",
+      "plainText" : "Devices, appurtenances, appliances and apparatus intended to serve some special function, such as sterilization, distillation, processing, cooling, or storage of ice or foods, and that discharge to the drainage system, shall be provided with protection against backflow, flooding, fouling, contamination and stoppage of the drain. \n\n Section PC 802: Indirect Wastes"
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 25234
+}

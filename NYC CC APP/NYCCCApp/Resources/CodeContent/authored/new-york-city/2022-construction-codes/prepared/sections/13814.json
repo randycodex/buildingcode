@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230041\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230041\"><\/AnnotationDrawer><div>An ADU located in a basement or cellar shall comply with the following: \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230040\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230040\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Water sensor and alarm.<\/span> Every habitable room shall be provided with at least 1 water sensor with backup battery power to warn the occupants in the event of a flood. The department may promulgate rules to supplement the requirement of such water sensors and alarms. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230039\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230039\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Emergency preparedness information.<\/span> The owner shall post all required signage in a manner prescribed by the Housing Maintenance Code and the rules of the department of housing preservation and development and shall notify any tenants about enrollment in an emergency alert system operated by the office of emergency management. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13814-html-1",
+      "kind" : "html",
+      "plainText" : "An ADU located in a basement or cellar shall comply with the following: \n\n 1. Water sensor and alarm. Every habitable room shall be provided with at least 1 water sensor with backup battery power to warn the occupants in the event of a flood. The department may promulgate rules to supplement the requirement of such water sensors and alarms. \n\n 2. Emergency preparedness information. The owner shall post all required signage in a manner prescribed by the Housing Maintenance Code and the rules of the department of housing preservation and development and shall notify any tenants about enrollment in an emergency alert system operated by the office of emergency management."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 13814
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178819\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178819\"><\/AnnotationDrawer><div>The vertical load-bearing capacity, torsional moment capacity and deflection characteristics of joist hangers shall be determined in accordance with ASTM D 1761, using lumber having a specific gravity of 0.49 or greater, but not greater than 0.55, as determined in accordance with AFPA NDS for the joist and headers.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178820\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178820\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The joist length shall not be required to exceed 24 inches (609.6 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17732-html-1",
+      "kind" : "html",
+      "plainText" : "The vertical load-bearing capacity, torsional moment capacity and deflection characteristics of joist hangers shall be determined in accordance with ASTM D 1761, using lumber having a specific gravity of 0.49 or greater, but not greater than 0.55, as determined in accordance with AFPA NDS for the joist and headers.\n\n Exception: The joist length shall not be required to exceed 24 inches (609.6 mm)."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17732
+}

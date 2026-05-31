@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-191147\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-191147\"><\/AnnotationDrawer><div>This appendix provides the modifications to the nationally recognized standards NFPA 13, NFPA 13D, NFPA 13R, NFPA 14, NFPA 20, NFPA 72, and NFPA 92, governing the installation and maintenance requirements of automatic sprinkler systems, standpipe and hose systems, fire pumps, fire alarms, and smoke control systems. Where a referenced publication has been modified for the City of New York as by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span>, every reference to such publication shall be deemed to include all such modifications.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-191148\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-191148\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-191148\"><\/AnnotationDrawer><h6><a name=\"JD_BCQ102\" id=\"JD_BCQ102\" title=\"BC Q102\"><\/a>Section BC Q102: Installation of Sprinkler Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7752-html-1",
+      "kind" : "html",
+      "plainText" : "This appendix provides the modifications to the nationally recognized standards NFPA 13, NFPA 13D, NFPA 13R, NFPA 14, NFPA 20, NFPA 72, and NFPA 92, governing the installation and maintenance requirements of automatic sprinkler systems, standpipe and hose systems, fire pumps, fire alarms, and smoke control systems. Where a referenced publication has been modified for the City of New York as by the New York City Building Code and the New York City Fire Code , every reference to such publication shall be deemed to include all such modifications.\n\n Section BC Q102: Installation of Sprinkler Systems"
+    }
+  ],
+  "chapterNumber" : "Q",
+  "schemaVersion" : 1,
+  "sectionID" : 7752
+}

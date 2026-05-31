@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195286\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195286\"><\/AnnotationDrawer><div>Heaters shall be installed with clearances from combustible material in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195287\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195287\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195287\"><\/AnnotationDrawer><h6><a name=\"JD_MC913\" id=\"JD_MC913\" title=\"MC 913\"><\/a>Section MC 913: Clothes Dryers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23876-html-1",
+      "kind" : "html",
+      "plainText" : "Heaters shall be installed with clearances from combustible material in accordance with the manufacturer's instructions.\n\n Section MC 913: Clothes Dryers"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23876
+}

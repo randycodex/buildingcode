@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161418\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161418\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where multiple evaporators and or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161419\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161419\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161419\"><\/AnnotationDrawer><h6><a name=\"JD_PC315\" id=\"JD_PC315\" title=\"PC 315\"><\/a>Section PC 315: Penetrations<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11835-html-1",
+      "kind" : "html",
+      "plainText" : "Where multiple evaporators and or condensate pumps discharge into the same piping system, it shall be piped to prevent the discharge of condensate from one appliance to another. \n\n Section PC 315: Penetrations"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11835
+}

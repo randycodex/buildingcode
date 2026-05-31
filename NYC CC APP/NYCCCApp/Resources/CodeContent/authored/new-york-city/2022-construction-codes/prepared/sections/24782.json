@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161731\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161731\"><\/AnnotationDrawer><div>A clinical sink serving a soiled utility room shall not be considered as a substitute for, or be utilized as, a service sink. A service sink shall not be utilized for the disposal of urine, fecal matter or other human waste.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24782-html-1",
+      "kind" : "html",
+      "plainText" : "A clinical sink serving a soiled utility room shall not be considered as a substitute for, or be utilized as, a service sink. A service sink shall not be utilized for the disposal of urine, fecal matter or other human waste."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24782
+}

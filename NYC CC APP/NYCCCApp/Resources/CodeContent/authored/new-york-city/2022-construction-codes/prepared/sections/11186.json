@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195697\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195697\"><\/AnnotationDrawer><div>Volume calculations shall be in accordance with Sections 1104.4.1 through 1104.4.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11186-html-1",
+      "kind" : "html",
+      "plainText" : "Volume calculations shall be in accordance with Sections 1104.4.1 through 1104.4.3."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11186
+}

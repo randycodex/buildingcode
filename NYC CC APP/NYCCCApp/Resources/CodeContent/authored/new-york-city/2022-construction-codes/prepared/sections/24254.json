@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196265\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196265\"><\/AnnotationDrawer><div>Fuel-oil storage and piping systems shall comply with the requirements of this chapter, <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-196816', hash: '#JD_MCAppC' }}\">Appendix C<\/Link> and, to the extent not otherwise provided for in this code, shall comply with the requirements of NFPA 31. All above-ground and underground storage facilities shall also comply with the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York State Department of Environmental Conservation's Petroleum Bulk Storage Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24254-html-1",
+      "kind" : "html",
+      "plainText" : "Fuel-oil storage and piping systems shall comply with the requirements of this chapter, Appendix C and, to the extent not otherwise provided for in this code, shall comply with the requirements of NFPA 31. All above-ground and underground storage facilities shall also comply with the requirements of the New York State Department of Environmental Conservation's Petroleum Bulk Storage Code ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24254
+}

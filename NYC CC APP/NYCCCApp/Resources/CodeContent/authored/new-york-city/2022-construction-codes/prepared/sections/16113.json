@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173556\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173556\"><\/AnnotationDrawer><div>Gates serving the means of egress system shall comply with the requirements of this section. Gates used as a component in a means of egress shall conform to the applicable requirements for doors.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173557\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173557\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Horizontal sliding or swinging gates exceeding the 4-foot (1220 mm) maximum leaf width limitation are permitted in fences and walls surrounding a stadium.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16113-html-1",
+      "kind" : "html",
+      "plainText" : "Gates serving the means of egress system shall comply with the requirements of this section. Gates used as a component in a means of egress shall conform to the applicable requirements for doors.\n\n Exception: Horizontal sliding or swinging gates exceeding the 4-foot (1220 mm) maximum leaf width limitation are permitted in fences and walls surrounding a stadium."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16113
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187939\"><\/AnnotationDrawer><div>Lubrication and operation of jacks shall be in accordance with the recommendations of the manufacturer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20681-html-1",
+      "kind" : "html",
+      "plainText" : "Lubrication and operation of jacks shall be in accordance with the recommendations of the manufacturer."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20681
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181736\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181736\"><\/AnnotationDrawer><div>Combustible framing shall be a minimum of 2 inches (51 mm), but shall not be less than the distance specified in Sections <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224409', hash: '#JD_BC2111' }}\">2111<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224411', hash: '#JD_BC2113' }}\">2113<\/Link> and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code,<\/span> from flues, chimneys and fireplaces, and 6 inches (152 mm) away from flue openings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18727-html-1",
+      "kind" : "html",
+      "plainText" : "Combustible framing shall be a minimum of 2 inches (51 mm), but shall not be less than the distance specified in Sections 2111 and 2113 and the New York City Mechanical Code, from flues, chimneys and fireplaces, and 6 inches (152 mm) away from flue openings."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18727
+}

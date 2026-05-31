@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185975\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185975\"><\/AnnotationDrawer><div>Any structural member that is being dismembered shall not support any load other than its own weight. No wall, chimney, or other structural part shall be left in such condition that it may collapse or be toppled by wind, vibration or any other cause. The method of removal of any structural member shall not destabilize remaining members. All handling and movement of material or debris shall be controlled such that it will not develop unaccounted impact loads on the structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6248-html-1",
+      "kind" : "html",
+      "plainText" : "Any structural member that is being dismembered shall not support any load other than its own weight. No wall, chimney, or other structural part shall be left in such condition that it may collapse or be toppled by wind, vibration or any other cause. The method of removal of any structural member shall not destabilize remaining members. All handling and movement of material or debris shall be controlled such that it will not develop unaccounted impact loads on the structure."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6248
+}

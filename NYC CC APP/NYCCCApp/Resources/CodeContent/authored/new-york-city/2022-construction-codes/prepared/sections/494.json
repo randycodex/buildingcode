@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167361\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167361\"><\/AnnotationDrawer><div>Each projection room shall be provided with rewind and film storage facilities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-167362\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-167362\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-167362\"><\/AnnotationDrawer><h6><a name=\"JD_BC410\" id=\"JD_BC410\" title=\"BC 410\"><\/a>Section BC 410: Stages, Platforms and Technical Production Areas<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "494-html-1",
+      "kind" : "html",
+      "plainText" : "Each projection room shall be provided with rewind and film storage facilities.\n\n Section BC 410: Stages, Platforms and Technical Production Areas"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 494
+}

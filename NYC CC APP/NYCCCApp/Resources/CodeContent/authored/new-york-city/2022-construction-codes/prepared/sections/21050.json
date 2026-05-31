@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198115\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198115\"><\/AnnotationDrawer><div>The holder of the plumbing permit shall give at least 2 days prior notice to the commissioner that the plumbing work covered by the permit is ready for inspections and test.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21050-html-1",
+      "kind" : "html",
+      "plainText" : "The holder of the plumbing permit shall give at least 2 days prior notice to the commissioner that the plumbing work covered by the permit is ready for inspections and test."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 21050
+}

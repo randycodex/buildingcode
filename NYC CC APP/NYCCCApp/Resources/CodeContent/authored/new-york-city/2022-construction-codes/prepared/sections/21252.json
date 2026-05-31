@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198674\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198674\"><\/AnnotationDrawer><div>Decorative shrouds shall not be installed at the termination of gas vents except where such shrouds are listed for use with the specific gas venting system and are installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21252-html-1",
+      "kind" : "html",
+      "plainText" : "Decorative shrouds shall not be installed at the termination of gas vents except where such shrouds are listed for use with the specific gas venting system and are installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21252
+}

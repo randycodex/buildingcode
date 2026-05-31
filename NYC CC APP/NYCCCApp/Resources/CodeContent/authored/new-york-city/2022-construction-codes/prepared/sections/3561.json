@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177658\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177658\"><\/AnnotationDrawer><div>For each wind direction considered, an exposure category that adequately reflects the characteristics of ground surface irregularities shall be determined for the site at which the building or structure is to be constructed.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177659\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177659\"><\/AnnotationDrawer><div>Account shall be taken of variations in ground surface roughness that arise from natural topography and vegetation as well as from constructed features.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3561-html-1",
+      "kind" : "html",
+      "plainText" : "For each wind direction considered, an exposure category that adequately reflects the characteristics of ground surface irregularities shall be determined for the site at which the building or structure is to be constructed.\n\n Account shall be taken of variations in ground surface roughness that arise from natural topography and vegetation as well as from constructed features."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3561
+}

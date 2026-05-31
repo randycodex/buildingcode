@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180381\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180381\"><\/AnnotationDrawer><div>Job-mixed concrete shall comply with ACI 318, Section 26.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18244-html-1",
+      "kind" : "html",
+      "plainText" : "Job-mixed concrete shall comply with ACI 318, Section 26.5."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18244
+}

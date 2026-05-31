@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186010\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186010\"><\/AnnotationDrawer><div>Prior to the commencement of demolition operations, all pipes, tanks, boilers, or similar devices containing steam or fuel and located in the area authorized to be demolished by the work permit shall be purged of such steam or fuel.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186011\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186011\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Pipes, tanks, boilers, or similar devices containing steam or fuel located in the area authorized to be demolished by the work permit and which will not be disturbed during the course of the demolition operation may, in lieu of being purged, be safeguarded so as to prevent their being damaged during the course of demolition operations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20091-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the commencement of demolition operations, all pipes, tanks, boilers, or similar devices containing steam or fuel and located in the area authorized to be demolished by the work permit shall be purged of such steam or fuel.\n\n Exception: Pipes, tanks, boilers, or similar devices containing steam or fuel located in the area authorized to be demolished by the work permit and which will not be disturbed during the course of the demolition operation may, in lieu of being purged, be safeguarded so as to prevent their being damaged during the course of demolition operations."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20091
+}

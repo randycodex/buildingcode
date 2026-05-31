@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174554\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174554\"><\/AnnotationDrawer><div>Aisle accessways serving arrangements of seating at tables or counters shall comply with the capacity requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-173002', hash: '#JD_BC1005' }}\">1005<\/Link> but shall not have less than 12 inches (304.8 mm) of width plus 1\/2 inch (12.7 mm) of width for each additional 1 foot (304.8 mm), or fraction thereof, beyond 12 feet (3657.6 mm) of aisle accessway length measured from the center of the seat farthest from an aisle.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174555\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174555\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Portions of an aisle accessway having a length not exceeding 6 feet (1828.8 mm) and used by a total of not more than four persons.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16391-html-1",
+      "kind" : "html",
+      "plainText" : "Aisle accessways serving arrangements of seating at tables or counters shall comply with the capacity requirements of Section 1005 but shall not have less than 12 inches (304.8 mm) of width plus 1\/2 inch (12.7 mm) of width for each additional 1 foot (304.8 mm), or fraction thereof, beyond 12 feet (3657.6 mm) of aisle accessway length measured from the center of the seat farthest from an aisle.\n\n Exception: Portions of an aisle accessway having a length not exceeding 6 feet (1828.8 mm) and used by a total of not more than four persons."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16391
+}

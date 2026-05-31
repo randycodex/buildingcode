@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168914\"><\/AnnotationDrawer><div>Fire assemblies that serve multiple purposes in a building shall comply with all of the requirements that are applicable for each of the individual fire assemblies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168915\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168915\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168915\"><\/AnnotationDrawer><h6><a name=\"JD_BC702\" id=\"JD_BC702\" title=\"BC 702\"><\/a>Section BC 702: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14791-html-1",
+      "kind" : "html",
+      "plainText" : "Fire assemblies that serve multiple purposes in a building shall comply with all of the requirements that are applicable for each of the individual fire assemblies.\n\n Section BC 702: Definitions"
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14791
+}

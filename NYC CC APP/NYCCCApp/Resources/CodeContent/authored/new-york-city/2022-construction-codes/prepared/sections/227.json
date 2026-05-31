@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166593\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166593\"><\/AnnotationDrawer><div>Where the total floor area is greater than 50,000 square feet (4645 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t) within either a covered mall building or within the perimeter line of an open mall building, an emergency voice\/alarm communication system shall be provided. Emergency voice\/alarm communication systems serving a mall, required or otherwise, shall be accessible to the fire department. The systems shall be provided in accordance with Section 907.5.2.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "227-html-1",
+      "kind" : "html",
+      "plainText" : "Where the total floor area is greater than 50,000 square feet (4645 m\n 2 \n ) within either a covered mall building or within the perimeter line of an open mall building, an emergency voice\/alarm communication system shall be provided. Emergency voice\/alarm communication systems serving a mall, required or otherwise, shall be accessible to the fire department. The systems shall be provided in accordance with Section 907.5.2.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 227
+}

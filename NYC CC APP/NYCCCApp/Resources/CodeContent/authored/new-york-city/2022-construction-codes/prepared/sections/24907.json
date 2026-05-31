@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162063\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162063\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Joints between brass pipe and fittings shall comply with Sections 605.11.1 through 605.11.3.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24907-html-1",
+      "kind" : "html",
+      "plainText" : "Joints between brass pipe and fittings shall comply with Sections 605.11.1 through 605.11.3."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24907
+}

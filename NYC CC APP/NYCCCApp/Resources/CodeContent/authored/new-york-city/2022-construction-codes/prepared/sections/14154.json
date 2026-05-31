@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166861\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166861\"><\/AnnotationDrawer><div>The separation between the two compartments shall be of minimum 2-hour fire barrier wall construction that shall extend from floor slab to floor deck above. Penetrations between the two compartments shall be limited to plumbing and electrical piping and conduit that are firestopped in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169620', hash: '#JD_BC714' }}\">714<\/Link>. Doorways shall be protected by fire door assemblies that are automatic-closing by smoke detection in accordance with Section 716.5.9.3 and are installed in accordance with NFPA 105 and Section 716.5.3 of this code. Where provided, each compartment shall have an air supply and an exhaust system independent of the other compartments.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14154-html-1",
+      "kind" : "html",
+      "plainText" : "The separation between the two compartments shall be of minimum 2-hour fire barrier wall construction that shall extend from floor slab to floor deck above. Penetrations between the two compartments shall be limited to plumbing and electrical piping and conduit that are firestopped in accordance with Section 714 . Doorways shall be protected by fire door assemblies that are automatic-closing by smoke detection in accordance with Section 716.5.9.3 and are installed in accordance with NFPA 105 and Section 716.5.3 of this code. Where provided, each compartment shall have an air supply and an exhaust system independent of the other compartments."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14154
+}

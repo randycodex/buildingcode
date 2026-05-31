@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167441\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167441\"><\/AnnotationDrawer><div>The following exit access components are permitted where serving technical production areas:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167442\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167442\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Stairways.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167443\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167443\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Ramps.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167444\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167444\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Spiral stairways.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167445\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167445\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Catwalks.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167446\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167446\"><\/AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Alternating tread devices.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167447\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167447\"><\/AnnotationDrawer><div>&#160;&#160;&#160;6.&#160;&#160;&#160;Permanent ladders.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14353-html-1",
+      "kind" : "html",
+      "plainText" : "The following exit access components are permitted where serving technical production areas:\n\n 1. Stairways.\n\n 2. Ramps.\n\n 3. Spiral stairways.\n\n 4. Catwalks.\n\n 5. Alternating tread devices.\n\n 6. Permanent ladders."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14353
+}

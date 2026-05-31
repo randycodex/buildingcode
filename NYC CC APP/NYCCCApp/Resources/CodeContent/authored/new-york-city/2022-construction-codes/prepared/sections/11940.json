@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161695\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161695\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water closets shall conform to the water consumption requirements of Section 604.4 and shall conform to ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124. Water closets shall conform to the hydraulic performance requirements of ASME A112.19.2\/CSAB45.1. Water closet tanks shall conform to ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124. Electro-hydraulic water closets shall comply with ASME A112.19.2\/CSA B45.1. Water closets equipped with a dual flushing device shall comply with ASME A112.19.14.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11940-html-1",
+      "kind" : "html",
+      "plainText" : "Water closets shall conform to the water consumption requirements of Section 604.4 and shall conform to ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124. Water closets shall conform to the hydraulic performance requirements of ASME A112.19.2\/CSAB45.1. Water closet tanks shall conform to ASME A112.19.2\/CSA B45.1, ASME A112.19.3\/CSA B45.4 or CSA B45.5\/IAPMO Z124. Electro-hydraulic water closets shall comply with ASME A112.19.2\/CSA B45.1. Water closets equipped with a dual flushing device shall comply with ASME A112.19.14."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11940
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197907\"><\/AnnotationDrawer><div>Raised face flanges shall not be joined to flat faced cast-iron, ductile-iron or nonferrous material flanges.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20970-html-1",
+      "kind" : "html",
+      "plainText" : "Raised face flanges shall not be joined to flat faced cast-iron, ductile-iron or nonferrous material flanges."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20970
+}

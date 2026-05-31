@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187943\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187943\"><\/AnnotationDrawer><div>When the object has been lifted to the desired height, blocking or cribbing shall be immediately placed under it if the jack does not have built-in safety devices such as stop-rings, locknuts, or place-in cylinder sleeves.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-187944\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-187944\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-187944\"><\/AnnotationDrawer><h6><a name=\"JD_BC3321\" id=\"JD_BC3321\" title=\"BC 3321\"><\/a>Section BC 3321: Construction Site Safety Training<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20683-html-1",
+      "kind" : "html",
+      "plainText" : "When the object has been lifted to the desired height, blocking or cribbing shall be immediately placed under it if the jack does not have built-in safety devices such as stop-rings, locknuts, or place-in cylinder sleeves.\n\n Section BC 3321: Construction Site Safety Training"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20683
+}

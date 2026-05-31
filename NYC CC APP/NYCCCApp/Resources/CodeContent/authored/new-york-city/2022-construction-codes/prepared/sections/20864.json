@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197550\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197550\"><\/AnnotationDrawer><div>A sign stating, \"Louvers, dampers and\/or ventilation openings must not be blocked or disabled.\" shall be permanently affixed, in clear view, adjacent to the opening(s) within the room containing the equipment. The letters used on the sign shall be at least 1 inch (25.4 mm) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20864-html-1",
+      "kind" : "html",
+      "plainText" : "A sign stating, \"Louvers, dampers and\/or ventilation openings must not be blocked or disabled.\" shall be permanently affixed, in clear view, adjacent to the opening(s) within the room containing the equipment. The letters used on the sign shall be at least 1 inch (25.4 mm) in height."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20864
+}

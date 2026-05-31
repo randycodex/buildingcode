@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175047\"><\/AnnotationDrawer><div>The rear wall grab bar shall be 36 inches (914.4 mm) minimum in length, and extend from the centerline of the water closet 12 inches (304.8 mm) minimum on the side closet to the wall, and 24 inches (609.2 mm) minimum on the transfer side.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175048\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175048\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where wall space will not permit a grab bar 36 inches (914.4 mm) minimum in length, reinforcement for a rear wall grab bar 24 inches (609.2 mm) minimum in length centered on the water closet shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16545-html-1",
+      "kind" : "html",
+      "plainText" : "The rear wall grab bar shall be 36 inches (914.4 mm) minimum in length, and extend from the centerline of the water closet 12 inches (304.8 mm) minimum on the side closet to the wall, and 24 inches (609.2 mm) minimum on the transfer side.\n\n Exception: Where wall space will not permit a grab bar 36 inches (914.4 mm) minimum in length, reinforcement for a rear wall grab bar 24 inches (609.2 mm) minimum in length centered on the water closet shall be provided."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16545
+}

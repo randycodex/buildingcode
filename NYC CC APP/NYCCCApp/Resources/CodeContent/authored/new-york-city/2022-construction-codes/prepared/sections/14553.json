@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168086\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168086\"><\/AnnotationDrawer><div>Sprinkler systems shall be installed at 12-foot (3658 mm) intervals in horizontal ducts and at changes indirection. In vertical ducts, sprinklers shall be installed at the top and at alternate floor levels.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168087\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168087\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168087\"><\/AnnotationDrawer><h6><a name=\"JD_BC416\" id=\"JD_BC416\" title=\"BC 416\"><\/a>Section BC 416: Application of Flammable Finishes<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14553-html-1",
+      "kind" : "html",
+      "plainText" : "Sprinkler systems shall be installed at 12-foot (3658 mm) intervals in horizontal ducts and at changes indirection. In vertical ducts, sprinklers shall be installed at the top and at alternate floor levels.\n\n Section BC 416: Application of Flammable Finishes"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14553
+}

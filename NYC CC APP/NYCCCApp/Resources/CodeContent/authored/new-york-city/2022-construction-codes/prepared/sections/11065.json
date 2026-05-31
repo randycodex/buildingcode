@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195325\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195325\"><\/AnnotationDrawer><div>Pool and spa heaters shall be installed in accordance with the manufacturer's instructions. Oil-fired pool and spa heaters shall be tested in accordance with UL 726. Electric pool and spa heaters shall be tested in accordance with UL 1261.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195326\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195326\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195326\"><\/AnnotationDrawer><h6><a name=\"JD_MC917\" id=\"JD_MC917\" title=\"MC 917\"><\/a>Section MC 917: Cooking Appliances<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11065-html-1",
+      "kind" : "html",
+      "plainText" : "Pool and spa heaters shall be installed in accordance with the manufacturer's instructions. Oil-fired pool and spa heaters shall be tested in accordance with UL 726. Electric pool and spa heaters shall be tested in accordance with UL 1261.\n\n Section MC 917: Cooking Appliances"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11065
+}

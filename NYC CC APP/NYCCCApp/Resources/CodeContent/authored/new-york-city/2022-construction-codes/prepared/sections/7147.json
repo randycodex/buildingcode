@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188877\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188877\"><\/AnnotationDrawer><div>Fully enclosed areas below the design flood elevation shall be constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188665', hash: '#JD_BCG304' }}\">G304<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7147-html-1",
+      "kind" : "html",
+      "plainText" : "Fully enclosed areas below the design flood elevation shall be constructed in accordance with Section G304 ."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 7147
+}

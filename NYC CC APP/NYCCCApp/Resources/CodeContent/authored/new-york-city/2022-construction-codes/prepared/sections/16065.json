@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173278\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173278\"><\/AnnotationDrawer><div>Stairways that are part of the accessible means of egress for the exterior area for assisted rescue shall provide a clear width of 48 inches (1220 mm) between handrails.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173279\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173279\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The clear width of 48 inches (1220 mm) between handrails is not required at stairways serving buildings equipped throughout with an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16065-html-1",
+      "kind" : "html",
+      "plainText" : "Stairways that are part of the accessible means of egress for the exterior area for assisted rescue shall provide a clear width of 48 inches (1220 mm) between handrails.\n\n Exception: The clear width of 48 inches (1220 mm) between handrails is not required at stairways serving buildings equipped throughout with an automatic sprinkler system installed in accordance with Section 903.3.1.1 or 903.3.1.2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16065
+}

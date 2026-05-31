@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175718\"><\/AnnotationDrawer><div>Natural ventilation of occupiable and habitable space shall be through openings to the outdoors. The openings shall be of a type permitted under Sections 1203.5.1.1, 1203.5.1.2, 1203.5.1.3 and 1203.5.1.4. The operating mechanism for such openings shall be provided with ready access so that the openings are readily controllable by the building occupants.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175719\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175719\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> An opening providing the required dimensional operable area shall be permitted to be reduced by limiting devices in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Health Code<\/span>, provided that the owner shall remove such limiting devices where requested by the occupant. In such cases, where required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Health Code<\/span>, alternative means of compliance shall be provided in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Health Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2942-html-1",
+      "kind" : "html",
+      "plainText" : "Natural ventilation of occupiable and habitable space shall be through openings to the outdoors. The openings shall be of a type permitted under Sections 1203.5.1.1, 1203.5.1.2, 1203.5.1.3 and 1203.5.1.4. The operating mechanism for such openings shall be provided with ready access so that the openings are readily controllable by the building occupants.\n\n Exception: An opening providing the required dimensional operable area shall be permitted to be reduced by limiting devices in accordance with the New York City Health Code , provided that the owner shall remove such limiting devices where requested by the occupant. In such cases, where required by the New York City Health Code , alternative means of compliance shall be provided in accordance with the New York City Health Code ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 2942
+}

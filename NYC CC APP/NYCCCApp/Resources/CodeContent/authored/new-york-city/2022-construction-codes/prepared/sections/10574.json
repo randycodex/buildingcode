@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193883\"><\/AnnotationDrawer><div>Exhaust outlets shall be permitted to terminate through exterior walls where the smoke, grease, gases, vapors and odors in the discharge from such terminations do not create a public nuisance or a fire hazard. Such terminations shall not be located where protected openings are required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span> Other exterior openings shall not be located within 3 feet (914.4 mm) of such terminations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10574-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust outlets shall be permitted to terminate through exterior walls where the smoke, grease, gases, vapors and odors in the discharge from such terminations do not create a public nuisance or a fire hazard. Such terminations shall not be located where protected openings are required by the New York City Building Code. Other exterior openings shall not be located within 3 feet (914.4 mm) of such terminations."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10574
+}

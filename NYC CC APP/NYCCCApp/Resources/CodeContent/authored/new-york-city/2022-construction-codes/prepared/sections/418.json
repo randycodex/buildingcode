@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167122\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167122\"><\/AnnotationDrawer><div>Occupancies in Group I-2 shall comply with the provisions of Sections 407.1 through 407.10 and other applicable provisions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "418-html-1",
+      "kind" : "html",
+      "plainText" : "Occupancies in Group I-2 shall comply with the provisions of Sections 407.1 through 407.10 and other applicable provisions of this code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 418
+}

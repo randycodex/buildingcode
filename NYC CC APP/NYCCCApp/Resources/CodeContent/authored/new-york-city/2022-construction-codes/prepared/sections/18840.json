@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182213\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182213\"><\/AnnotationDrawer><div>Trimmer and header joists shall be doubled, or of lumber of equivalent cross section, where the span of the header exceeds 4 feet (1219 mm). The ends of header joists more than 6 feet (1829 mm) in length shall be supported by framing anchors or joist hangers unless bearing on a beam, partition or wall. Tail joists over 12 feet (3658 mm) in length shall be supported at the header by framing anchors or on ledger strips not less than 2 inches by 2 inches (51 mm by 51 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18840-html-1",
+      "kind" : "html",
+      "plainText" : "Trimmer and header joists shall be doubled, or of lumber of equivalent cross section, where the span of the header exceeds 4 feet (1219 mm). The ends of header joists more than 6 feet (1829 mm) in length shall be supported by framing anchors or joist hangers unless bearing on a beam, partition or wall. Tail joists over 12 feet (3658 mm) in length shall be supported at the header by framing anchors or on ledger strips not less than 2 inches by 2 inches (51 mm by 51 mm)."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18840
+}

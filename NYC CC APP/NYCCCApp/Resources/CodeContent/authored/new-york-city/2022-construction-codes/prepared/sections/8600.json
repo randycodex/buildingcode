@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199199\"><\/AnnotationDrawer><div>Where a duct furnace is installed so that supply ducts convey air to areas outside the space containing the furnace, the return air shall be conveyed by a duct(s) sealed to the furnace casing and terminating outside the space containing the furnace. The duct furnace shall be installed on the positive pressure side of the circulating air blower.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8600-html-1",
+      "kind" : "html",
+      "plainText" : "Where a duct furnace is installed so that supply ducts convey air to areas outside the space containing the furnace, the return air shall be conveyed by a duct(s) sealed to the furnace casing and terminating outside the space containing the furnace. The duct furnace shall be installed on the positive pressure side of the circulating air blower."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8600
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184310\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184310\"><\/AnnotationDrawer><div>A temporary barrier shall be replaced by a complying permanent barrier within either of the following periods:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184311\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184311\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;90 days of the date of issuance of the building permit for the installation or construction of the swimming pool; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184312\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184312\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;90 days of the date of commencement of the installation or construction of the swimming pool.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5671-html-1",
+      "kind" : "html",
+      "plainText" : "A temporary barrier shall be replaced by a complying permanent barrier within either of the following periods:\n\n 1. 90 days of the date of issuance of the building permit for the installation or construction of the swimming pool; or\n\n 2. 90 days of the date of commencement of the installation or construction of the swimming pool."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5671
+}

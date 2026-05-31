@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184034\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184034\"><\/AnnotationDrawer><div>Membrane structures shall not exceed one story nor shall such structures exceed the height limitations in feet specified in Section 504.3. Membrane structures may be erected above the roof of a building provided that such roof is of noncombustible construction required to have a fire-resistance rating.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184035\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184035\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Noncombustible membrane structures serving as roofs only. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19389-html-1",
+      "kind" : "html",
+      "plainText" : "Membrane structures shall not exceed one story nor shall such structures exceed the height limitations in feet specified in Section 504.3. Membrane structures may be erected above the roof of a building provided that such roof is of noncombustible construction required to have a fire-resistance rating.\n\n Exception: Noncombustible membrane structures serving as roofs only."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19389
+}

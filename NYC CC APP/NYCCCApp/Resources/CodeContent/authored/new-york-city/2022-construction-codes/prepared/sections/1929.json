@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172311\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172311\"><\/AnnotationDrawer><div>Mechanical smoke control systems using the pressurization, airflow or exhaust method shall have completely automatic control.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1929-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical smoke control systems using the pressurization, airflow or exhaust method shall have completely automatic control."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1929
+}

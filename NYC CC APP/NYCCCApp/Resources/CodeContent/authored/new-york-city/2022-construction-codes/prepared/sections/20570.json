@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187537\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187537\"><\/AnnotationDrawer><div>It shall be unlawful to operate any hoisting equipment or material handling equipment that is not provided with a positive means for preventing the unauthorized operation of such equipment. The means whereby the equipment may be made inoperative shall be acceptable to the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20570-html-1",
+      "kind" : "html",
+      "plainText" : "It shall be unlawful to operate any hoisting equipment or material handling equipment that is not provided with a positive means for preventing the unauthorized operation of such equipment. The means whereby the equipment may be made inoperative shall be acceptable to the department."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20570
+}

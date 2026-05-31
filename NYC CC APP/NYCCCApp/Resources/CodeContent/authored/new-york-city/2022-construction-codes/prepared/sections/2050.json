@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172617\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172617\"><\/AnnotationDrawer><div>Where provided or required, fire pumps shall be installed in accordance with this section, NFPA 20 and other applicable sections of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2050-html-1",
+      "kind" : "html",
+      "plainText" : "Where provided or required, fire pumps shall be installed in accordance with this section, NFPA 20 and other applicable sections of this code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2050
+}

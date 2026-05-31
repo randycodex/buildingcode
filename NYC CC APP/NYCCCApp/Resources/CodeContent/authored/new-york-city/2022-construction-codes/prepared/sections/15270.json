@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170666\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170666\"><\/AnnotationDrawer><div>These procedures establish a basis for determining the fire resistance of column assemblies as a function of the thickness of fire-resistant material and, the weight, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">W<\/span>, and heated perimeter, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">D<\/span>, of structural steel columns. As used in these sections, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">W<\/span> is the average weight of a structural steel column in pounds per linear foot. The heated perimeter, <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">D<\/span>, is the inside perimeter of the fire-resistant material in inches as illustrated in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-170586', hash: '#JD_BCFigure722.5.1(1)' }}\">Figure 722.5.1(1)<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15270-html-1",
+      "kind" : "html",
+      "plainText" : "These procedures establish a basis for determining the fire resistance of column assemblies as a function of the thickness of fire-resistant material and, the weight, W , and heated perimeter, D , of structural steel columns. As used in these sections, W is the average weight of a structural steel column in pounds per linear foot. The heated perimeter, D , is the inside perimeter of the fire-resistant material in inches as illustrated in Figure 722.5.1(1) ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15270
+}

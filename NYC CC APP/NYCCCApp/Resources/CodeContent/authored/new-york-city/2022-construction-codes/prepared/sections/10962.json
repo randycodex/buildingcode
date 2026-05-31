@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195062\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195062\"><\/AnnotationDrawer><div>Horizontal terminations and discharges, including any horizontal direct vent terminations subject to Section 804.1 and horizontal integral vent terminals subject to Section 804.2, shall not be permitted, unless otherwise authorized by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10962-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal terminations and discharges, including any horizontal direct vent terminations subject to Section 804.1 and horizontal integral vent terminals subject to Section 804.2, shall not be permitted, unless otherwise authorized by the commissioner."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10962
+}

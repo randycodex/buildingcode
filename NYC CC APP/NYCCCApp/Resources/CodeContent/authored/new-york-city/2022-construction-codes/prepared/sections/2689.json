@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174969\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174969\"><\/AnnotationDrawer><div>The attendant shall park and retrieve all vehicles not equipped with special controls entering the facility in which an individual with disabilities is either the driver or a passenger, provided accessible parking space is available.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2689-html-1",
+      "kind" : "html",
+      "plainText" : "The attendant shall park and retrieve all vehicles not equipped with special controls entering the facility in which an individual with disabilities is either the driver or a passenger, provided accessible parking space is available."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2689
+}

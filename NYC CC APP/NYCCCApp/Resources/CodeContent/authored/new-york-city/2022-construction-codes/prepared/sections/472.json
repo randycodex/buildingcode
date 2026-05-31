@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167307\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167307\"><\/AnnotationDrawer><div>Where a floor opening is permitted between communicating floor levels of a housing unit in accordance with Section 408.5.1, plumbing chases serving vertically stacked individual cells contained within the housing unit shall be permitted without a shaft enclosure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "472-html-1",
+      "kind" : "html",
+      "plainText" : "Where a floor opening is permitted between communicating floor levels of a housing unit in accordance with Section 408.5.1, plumbing chases serving vertically stacked individual cells contained within the housing unit shall be permitted without a shaft enclosure."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 472
+}

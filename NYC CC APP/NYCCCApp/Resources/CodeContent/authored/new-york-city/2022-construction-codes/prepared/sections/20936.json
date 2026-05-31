@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197821\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197821\"><\/AnnotationDrawer><div>The design pressure loss in any piping system under maximum probable flow conditions, from the point of delivery to the inlet connection of the appliance, shall be such that the supply pressure at the appliance is greater than or equal to the minimum pressure required by the appliance.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20936-html-1",
+      "kind" : "html",
+      "plainText" : "The design pressure loss in any piping system under maximum probable flow conditions, from the point of delivery to the inlet connection of the appliance, shall be such that the supply pressure at the appliance is greater than or equal to the minimum pressure required by the appliance."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20936
+}

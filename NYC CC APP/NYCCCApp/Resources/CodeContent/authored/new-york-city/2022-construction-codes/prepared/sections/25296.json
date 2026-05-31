@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163037\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163037\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">A door, operable window, or other air intake opening of the new or altered building shall not be located within 10 feet (3048 mm) horizontally from an open vent terminal from a drainage system of an existing adjacent building unless the existing terminal is at least 3 feet (914 mm) above such opening. Whenever necessary, the owner of the new building shall at his or her own expense, and with approval of the adjoining owner, offset the vent stack of the adjacent existing building to a distance of 10 feet (3048 mm) or more from such openings, or shall extend such vent stack to a height of at least 3 feet (924 mm) above the topmost opening.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25296-html-1",
+      "kind" : "html",
+      "plainText" : "A door, operable window, or other air intake opening of the new or altered building shall not be located within 10 feet (3048 mm) horizontally from an open vent terminal from a drainage system of an existing adjacent building unless the existing terminal is at least 3 feet (914 mm) above such opening. Whenever necessary, the owner of the new building shall at his or her own expense, and with approval of the adjoining owner, offset the vent stack of the adjacent existing building to a distance of 10 feet (3048 mm) or more from such openings, or shall extend such vent stack to a height of at least 3 feet (924 mm) above the topmost opening."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25296
+}

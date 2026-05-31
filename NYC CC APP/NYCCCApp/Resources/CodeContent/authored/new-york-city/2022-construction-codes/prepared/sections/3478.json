@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177373\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177373\"><\/AnnotationDrawer><div>Where actual partition weights are used, the uniform design live load may be omitted from the strip of floor area under each partition.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3478-html-1",
+      "kind" : "html",
+      "plainText" : "Where actual partition weights are used, the uniform design live load may be omitted from the strip of floor area under each partition."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3478
+}

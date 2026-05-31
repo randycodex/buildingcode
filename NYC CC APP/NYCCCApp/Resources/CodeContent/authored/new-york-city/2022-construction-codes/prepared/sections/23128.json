@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193097\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193097\"><\/AnnotationDrawer><div>The reduction of required clearances to combustible assemblies or combustible materials shall be based on the utilization of a reduced clearance protective assembly in accordance with Section 308.4.1 or 308.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23128-html-1",
+      "kind" : "html",
+      "plainText" : "The reduction of required clearances to combustible assemblies or combustible materials shall be based on the utilization of a reduced clearance protective assembly in accordance with Section 308.4.1 or 308.4.2."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23128
+}

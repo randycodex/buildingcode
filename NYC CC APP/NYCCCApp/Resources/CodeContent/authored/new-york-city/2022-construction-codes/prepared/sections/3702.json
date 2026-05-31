@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178248\"><\/AnnotationDrawer><div>Welding inspection and welding inspector qualification shall be in compliance with this section and the rules of the department.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3702-html-1",
+      "kind" : "html",
+      "plainText" : "Welding inspection and welding inspector qualification shall be in compliance with this section and the rules of the department."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3702
+}

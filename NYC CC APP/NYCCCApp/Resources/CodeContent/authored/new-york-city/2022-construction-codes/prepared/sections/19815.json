@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185281\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185281\"><\/AnnotationDrawer><div>Chutes shall comply with the requirements of Section 3303.5.5.3 even if the building does not otherwise meet the trigger thresholds of Section 3303.5.5.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19815-html-1",
+      "kind" : "html",
+      "plainText" : "Chutes shall comply with the requirements of Section 3303.5.5.3 even if the building does not otherwise meet the trigger thresholds of Section 3303.5.5.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19815
+}

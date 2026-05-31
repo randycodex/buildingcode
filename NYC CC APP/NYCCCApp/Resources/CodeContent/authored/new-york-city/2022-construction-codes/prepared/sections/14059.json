@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166601\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166601\"><\/AnnotationDrawer><div>The aggregate clear egress width of the mall in either a covered or open mall building shall be not less than 20 feet (6096 mm). The mall width shall be sufficient to accommodate the occupant load served. No portion of the minimum required aggregate egress width shall be less than 10 feet (3048 mm) measured to a height of 8 feet (2438 mm) between any projection of a tenant space bordering the mall and the nearest kiosk, vending machine, bench, display opening, food court or other obstruction to means of egress travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14059-html-1",
+      "kind" : "html",
+      "plainText" : "The aggregate clear egress width of the mall in either a covered or open mall building shall be not less than 20 feet (6096 mm). The mall width shall be sufficient to accommodate the occupant load served. No portion of the minimum required aggregate egress width shall be less than 10 feet (3048 mm) measured to a height of 8 feet (2438 mm) between any projection of a tenant space bordering the mall and the nearest kiosk, vending machine, bench, display opening, food court or other obstruction to means of egress travel."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14059
+}

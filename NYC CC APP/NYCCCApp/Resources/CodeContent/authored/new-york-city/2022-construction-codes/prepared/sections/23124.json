@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193088\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193088\"><\/AnnotationDrawer><div>This section applies to permanently installed equipment. Window units and through-the-wall air-conditioning units are exempt from the requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193089\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193089\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193089\"><\/AnnotationDrawer><h6><a name=\"JD_MC308\" id=\"JD_MC308\" title=\"MC 308\"><\/a>Section MC 308: Clearance Reduction<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23124-html-1",
+      "kind" : "html",
+      "plainText" : "This section applies to permanently installed equipment. Window units and through-the-wall air-conditioning units are exempt from the requirements of this section.\n\n Section MC 308: Clearance Reduction"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23124
+}

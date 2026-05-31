@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177576\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177576\"><\/AnnotationDrawer><div>The provisions of ICC 600 are applicable only to buildings located within Exposure B or C as defined in Section 1609.4. The provisions of ICC 600, AWC WFCM and AISI S230 shall not apply to buildings sited on the upper half of an isolated hill, ridge or escarpment meeting the following conditions:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177577\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177577\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The hill, ridge or escarpment is 60 feet (18 288 mm) or higher if located in Exposure B or 30 feet (9144 mm) or higher if located in Exposure C;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177578\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The maximum average slope of the hill exceeds 10 percent; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177579\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177579\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The hill, ridge or escarpment is unobstructed upwind by other such topographic features for a distance from the high point of 50 times the height of the hill or 2 miles (3.22 km), whichever is greater.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17368-html-1",
+      "kind" : "html",
+      "plainText" : "The provisions of ICC 600 are applicable only to buildings located within Exposure B or C as defined in Section 1609.4. The provisions of ICC 600, AWC WFCM and AISI S230 shall not apply to buildings sited on the upper half of an isolated hill, ridge or escarpment meeting the following conditions:\n\n 1. The hill, ridge or escarpment is 60 feet (18 288 mm) or higher if located in Exposure B or 30 feet (9144 mm) or higher if located in Exposure C;\n\n 2. The maximum average slope of the hill exceeds 10 percent; and\n\n 3. The hill, ridge or escarpment is unobstructed upwind by other such topographic features for a distance from the high point of 50 times the height of the hill or 2 miles (3.22 km), whichever is greater."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17368
+}

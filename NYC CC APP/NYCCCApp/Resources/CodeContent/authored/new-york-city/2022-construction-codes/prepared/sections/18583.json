@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181320\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181320\"><\/AnnotationDrawer><div>Identification of structural steel elements shall be in accordance with the requirements contained in AISC 303. Identification of cold-formed steel members shall be in accordance with the requirements contained in AISI S100. Identification of cold-formed steel light-frame construction shall also comply with the requirements contained in AISI S240 or AISI S220, as applicable. Other steel furnished for structural load-carrying purposes shall be properly identified for conformity to the ordered grade in accordance with the specified ASTM standard or other specification and the provisions of this chapter. Where the steel grade is not readily identifiable from marking and test records, the steel shall be tested to determine conformity to such standards.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18583-html-1",
+      "kind" : "html",
+      "plainText" : "Identification of structural steel elements shall be in accordance with the requirements contained in AISC 303. Identification of cold-formed steel members shall be in accordance with the requirements contained in AISI S100. Identification of cold-formed steel light-frame construction shall also comply with the requirements contained in AISI S240 or AISI S220, as applicable. Other steel furnished for structural load-carrying purposes shall be properly identified for conformity to the ordered grade in accordance with the specified ASTM standard or other specification and the provisions of this chapter. Where the steel grade is not readily identifiable from marking and test records, the steel shall be tested to determine conformity to such standards."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18583
+}

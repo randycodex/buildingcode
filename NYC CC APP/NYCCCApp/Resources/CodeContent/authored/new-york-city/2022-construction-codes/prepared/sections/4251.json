@@ -1,0 +1,25 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179882\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179882\"><\/AnnotationDrawer><div>An assessment of the liquefaction potential shall be determined for each building site except Structural Occupancy\/Risk Category I structures. The evaluation of liquefaction potential shall include the following considerations:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179883\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179883\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Noncohesive granular soils below groundwater table and less than 50 feet (15 240 mm) below the ground surface shall be considered to have potential for liquefaction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179884\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179884\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The potential for liquefaction on level ground shall be determined on the basis of the risk categories associated with the values of N\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: sub;display: inline;font-size:8pt;\">60<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t at the site, as defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179881', hash: '#JD_BCFigure1816.1' }}\">Figure 1816.1<\/Link>, or a site-specific analysis performed by a geotechnical engineer.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179885\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179885\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Clays, silts and clayey silts below the groundwater table and less than 50 feet (15 240 mm) below the ground surface with a plasticity index less than 20 shall be considered to have potential for liquefaction. The susceptibility of the fine grained soils shall be evaluated in accordance with generally accepted engineering practice or a site-specific analysis performed by a geotechnical engineer.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179886\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179886\"><\/AnnotationDrawer><div>",
+      "id" : "4251-html-1",
+      "kind" : "html",
+      "plainText" : "An assessment of the liquefaction potential shall be determined for each building site except Structural Occupancy\/Risk Category I structures. The evaluation of liquefaction potential shall include the following considerations:\n\n 1. Noncohesive granular soils below groundwater table and less than 50 feet (15 240 mm) below the ground surface shall be considered to have potential for liquefaction.\n\n 2. The potential for liquefaction on level ground shall be determined on the basis of the risk categories associated with the values of N\n\n 60 \n\n at the site, as defined in Figure 1816.1 , or a site-specific analysis performed by a geotechnical engineer.\n\n 3. Clays, silts and clayey silts below the groundwater table and less than 50 feet (15 240 mm) below the ground surface with a plasticity index less than 20 shall be considered to have potential for liquefaction. The susceptibility of the fine grained soils shall be evaluated in accordance with generally accepted engineering practice or a site-specific analysis performed by a geotechnical engineer."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-1816-1-liquefaction-assessment-diagram.jpg\" width=\"1032\" height=\"747.2\"><\/img><\/span>",
+      "id" : "4251-image-2",
+      "imageID" : "building-code-figure-1816-1-liquefaction-assessment-diagram.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179887\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179887\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure1816.1\" id=\"JD_BCFigure1816.1\" title=\"BC Figure 1816.1\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1816.1<br><\/br>Liquefaction Assessment Diagram<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4251-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 1816.1\n Liquefaction Assessment Diagram"
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4251
+}

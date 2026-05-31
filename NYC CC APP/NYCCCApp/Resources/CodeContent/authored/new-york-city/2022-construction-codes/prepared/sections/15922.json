@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172749\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172749\"><\/AnnotationDrawer><div>Post-fire smoke purge systems are permitted to use dedicated equipment, the normal building HVAC system or other openings and shall have the capability to exhaust smoke from occupied spaces. Smoke removal may be by either mechanical or natural ventilation, but shall be capable of removing cold smoke. Smoke removed from a space must be discharged to a safe location outside the building and shall not be recirculated into the building in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15922-html-1",
+      "kind" : "html",
+      "plainText" : "Post-fire smoke purge systems are permitted to use dedicated equipment, the normal building HVAC system or other openings and shall have the capability to exhaust smoke from occupied spaces. Smoke removal may be by either mechanical or natural ventilation, but shall be capable of removing cold smoke. Smoke removed from a space must be discharged to a safe location outside the building and shall not be recirculated into the building in accordance with the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15922
+}

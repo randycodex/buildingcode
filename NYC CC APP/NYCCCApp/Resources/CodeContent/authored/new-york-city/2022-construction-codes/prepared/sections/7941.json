@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197012\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197012\"><\/AnnotationDrawer><div>A gas test that is accepted by the department shall be valid for a period of one year from the date of the test.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7941-html-1",
+      "kind" : "html",
+      "plainText" : "A gas test that is accepted by the department shall be valid for a period of one year from the date of the test."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 7941
+}

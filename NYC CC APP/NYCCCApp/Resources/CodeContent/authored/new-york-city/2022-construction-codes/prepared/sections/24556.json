@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160842\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160842\"><\/AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The special inspector shall periodically inspect and observe the work being performed to determine that the installation is in accordance with the approved construction documents for the alternative engineered design. All discrepancies shall be brought to the immediate attention of the plumbing contractor for correction. Records shall be kept of all inspections.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24556-html-1",
+      "kind" : "html",
+      "plainText" : "The special inspector shall periodically inspect and observe the work being performed to determine that the installation is in accordance with the approved construction documents for the alternative engineered design. All discrepancies shall be brought to the immediate attention of the plumbing contractor for correction. Records shall be kept of all inspections."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 24556
+}

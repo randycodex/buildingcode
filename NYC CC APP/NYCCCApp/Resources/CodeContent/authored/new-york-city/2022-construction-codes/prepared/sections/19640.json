@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184609\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184609\"><\/AnnotationDrawer><div>Sun control devices constructed in accordance with Section 3105 and supported entirely from the building may project beyond the street line not more than 2 feet 6 inches (762 mm), provided that no part of the sun control device is less than 8 feet (2438 mm) above the ground or sidewalk level. Any portion of a sun control device that is located over a sidewalk vault and is more than 10 inches (254 mm) beyond the street line and less than 40 feet (12 192 mm) above the ground or sidewalk shall be removable or retractable to less than 10 inches (254 mm) beyond the street line. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-204413\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-204413\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224484\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224484\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-204394', hash: '#JD_L.L.2012\/028' }}\">L.L. 2012\/028<\/Link> and <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19640-html-1",
+      "kind" : "html",
+      "plainText" : "Sun control devices constructed in accordance with Section 3105 and supported entirely from the building may project beyond the street line not more than 2 feet 6 inches (762 mm), provided that no part of the sun control device is less than 8 feet (2438 mm) above the ground or sidewalk level. Any portion of a sun control device that is located over a sidewalk vault and is more than 10 inches (254 mm) beyond the street line and less than 40 feet (12 192 mm) above the ground or sidewalk shall be removable or retractable to less than 10 inches (254 mm) beyond the street line. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012\/028 and L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19640
+}

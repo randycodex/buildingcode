@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167295\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167295\"><\/AnnotationDrawer><div>Remote release, mechanically operated sliding doors or remote release, mechanically operated locks shall be provided with a mechanically operated release mechanism at each door, or shall be provided with a redundant remote release control.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "468-html-1",
+      "kind" : "html",
+      "plainText" : "Remote release, mechanically operated sliding doors or remote release, mechanically operated locks shall be provided with a mechanically operated release mechanism at each door, or shall be provided with a redundant remote release control."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 468
+}

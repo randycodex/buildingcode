@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161785\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161785\"><\/AnnotationDrawer><div>Where automatic flushing devices connected to an external supply of electrical power are provided for water closets in a bathroom or toilet room, the flushing device of at least one water closet in such bathroom or toilet room shall be capable of normal operation in the absence of an external supply of electrical power for a period of at least two weeks, either through manual operation or built-in battery back-up. Where such automatic flushing devices are located in a bathroom or toilet room with a required accessible water closet, such operational flushing device shall be at such required accessible water closet.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161786\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161786\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Section 425.1.2 shall not apply to more than one bathroom or toilet room in a dwelling unit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11982-html-1",
+      "kind" : "html",
+      "plainText" : "Where automatic flushing devices connected to an external supply of electrical power are provided for water closets in a bathroom or toilet room, the flushing device of at least one water closet in such bathroom or toilet room shall be capable of normal operation in the absence of an external supply of electrical power for a period of at least two weeks, either through manual operation or built-in battery back-up. Where such automatic flushing devices are located in a bathroom or toilet room with a required accessible water closet, such operational flushing device shall be at such required accessible water closet.\n\n Exception: Section 425.1.2 shall not apply to more than one bathroom or toilet room in a dwelling unit."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11982
+}

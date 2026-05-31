@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176559\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176559\"><\/AnnotationDrawer><div>Concrete and clay roof tiles shall be tested to determine their resistance to overturning due to wind in accordance with SBCCI SSTD 11 and this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17061-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete and clay roof tiles shall be tested to determine their resistance to overturning due to wind in accordance with SBCCI SSTD 11 and this chapter."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17061
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175539\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175539\"><\/AnnotationDrawer><div>Recreational facilities shall be provided with accessible features in accordance with Sections 1110.2 through 1110.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2892-html-1",
+      "kind" : "html",
+      "plainText" : "Recreational facilities shall be provided with accessible features in accordance with Sections 1110.2 through 1110.4."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2892
+}

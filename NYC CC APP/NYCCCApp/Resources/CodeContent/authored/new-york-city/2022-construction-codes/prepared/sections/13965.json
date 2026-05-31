@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165932\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165932\"><\/AnnotationDrawer><div>Group A-5 occupancy includes assembly uses intended for participation in or viewing outdoor activities including, but not limited to:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165933\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165933\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Amusement park structures <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165934\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165934\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Bleachers <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165935\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165935\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Grandstands <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165936\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165936\"><\/AnnotationDrawer><div>&#160;&#160;&#160;Stadiums <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13965-html-1",
+      "kind" : "html",
+      "plainText" : "Group A-5 occupancy includes assembly uses intended for participation in or viewing outdoor activities including, but not limited to:\n\n Amusement park structures \n\n Bleachers \n\n Grandstands \n\n Stadiums"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 13965
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175202\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175202\"><\/AnnotationDrawer><div>Where elevator service in the building provides an accessible route only to the lowest story containing dwelling units or sleeping units intended to be occupied as a residence, only the units on that story that are intended to be occupied as a residence on the lowest story served by the elevator are required to be Type B units.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16597-html-1",
+      "kind" : "html",
+      "plainText" : "Where elevator service in the building provides an accessible route only to the lowest story containing dwelling units or sleeping units intended to be occupied as a residence, only the units on that story that are intended to be occupied as a residence on the lowest story served by the elevator are required to be Type B units."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16597
+}

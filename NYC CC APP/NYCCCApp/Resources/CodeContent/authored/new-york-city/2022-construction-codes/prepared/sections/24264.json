@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196289\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196289\"><\/AnnotationDrawer><div>All materials shall be rated for the operating temperatures and pressures of the system, and shall be compatible with the type of liquid being handled by the system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24264-html-1",
+      "kind" : "html",
+      "plainText" : "All materials shall be rated for the operating temperatures and pressures of the system, and shall be compatible with the type of liquid being handled by the system."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24264
+}

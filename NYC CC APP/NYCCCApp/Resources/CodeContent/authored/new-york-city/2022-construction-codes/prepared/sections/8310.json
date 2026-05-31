@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198333\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198333\"><\/AnnotationDrawer><div>Where the serving gas supplier delivers gas at a pressure greater than 2 psi (13.79 kPa) for piping systems serving appliances designed to operate at a gas pressure of 14 inches w.c. (3.49 kPa) or less, overpressure protection devices shall be installed. Piping systems serving appliances designed to operate at inlet pressures greater than 14 inches w.c. (3.49 kPa) shall be equipped with overpressure protection devices as required by the appliance manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8310-html-1",
+      "kind" : "html",
+      "plainText" : "Where the serving gas supplier delivers gas at a pressure greater than 2 psi (13.79 kPa) for piping systems serving appliances designed to operate at a gas pressure of 14 inches w.c. (3.49 kPa) or less, overpressure protection devices shall be installed. Piping systems serving appliances designed to operate at inlet pressures greater than 14 inches w.c. (3.49 kPa) shall be equipped with overpressure protection devices as required by the appliance manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8310
+}

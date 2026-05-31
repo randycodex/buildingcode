@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172536\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172536\"><\/AnnotationDrawer><div>The mechanical smoke removal system shall be started by manual controls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15841-html-1",
+      "kind" : "html",
+      "plainText" : "The mechanical smoke removal system shall be started by manual controls."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15841
+}

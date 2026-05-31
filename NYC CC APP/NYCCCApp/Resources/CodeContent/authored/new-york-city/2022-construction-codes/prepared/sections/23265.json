@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193486\"><\/AnnotationDrawer><div>The ventilation system shall be designed, installed and maintained so that the flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust air flow below 25 percent of the contaminant's lower flammable limit (LFL). In addition, the spray booth shall be provided with mechanical ventilation so that the average air velocity through openings is in accordance with Sections 502.7.3.3.1 and 502.7.3.3.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23265-html-1",
+      "kind" : "html",
+      "plainText" : "The ventilation system shall be designed, installed and maintained so that the flammable contaminants are diluted in noncontaminated air to maintain concentrations in the exhaust air flow below 25 percent of the contaminant's lower flammable limit (LFL). In addition, the spray booth shall be provided with mechanical ventilation so that the average air velocity through openings is in accordance with Sections 502.7.3.3.1 and 502.7.3.3.2."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23265
+}

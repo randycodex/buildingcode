@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193224\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193224\"><\/AnnotationDrawer><div>The minimum outdoor airflow rate shall be determined in accordance with Section 403.3.1.1. <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193225\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The minimum required rate of outdoor air may be reduced where the registered design professional demonstrates that an engineered ventilation system is designed in accordance with ASHRAE 62.1 Indoor Air Quality Procedure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23174-html-1",
+      "kind" : "html",
+      "plainText" : "The minimum outdoor airflow rate shall be determined in accordance with Section 403.3.1.1. \n\n Exception: The minimum required rate of outdoor air may be reduced where the registered design professional demonstrates that an engineered ventilation system is designed in accordance with ASHRAE 62.1 Indoor Air Quality Procedure."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 23174
+}

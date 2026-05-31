@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178047\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178047\"><\/AnnotationDrawer><div>The reviewing engineer shall submit a report to the department stating whether or not the structural design shown on the plans and specifications generally conforms to the structural and foundation requirements of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3642-html-1",
+      "kind" : "html",
+      "plainText" : "The reviewing engineer shall submit a report to the department stating whether or not the structural design shown on the plans and specifications generally conforms to the structural and foundation requirements of this code."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3642
+}

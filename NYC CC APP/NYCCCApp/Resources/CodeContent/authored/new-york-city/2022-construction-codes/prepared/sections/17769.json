@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178958\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178958\"><\/AnnotationDrawer><div>The engineer responsible for the geotechnical investigation may engage specialized technicians to conduct alternative investigative methods such as cone penetrometer testing (CPT) performed in accordance with ASTM D 3441 or ASTM D 5778. Data from these investigations may be used to (i) supplement soil boring and rock coring information, provided there is a demonstrated correlation between the findings, and (ii) determine material properties for static and seismic or liquefaction analyses. CPTs may replace borings on a one to one basis, but in no case shall there be fewer than half the required standard borings as per Section 1803.4.1, and no less than two standard borings. The boring depth requirements of Section 1803.4.1 shall be accomplished with borings. The alternative investigative methods must be capable of extending to the depths of the required borings. Other in-situ testing methods, such as geophysical, vane shear, and pressure meter, may be used to determine engineering design parameters, but may not be used as a substitute for the required number of borings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17769-html-1",
+      "kind" : "html",
+      "plainText" : "The engineer responsible for the geotechnical investigation may engage specialized technicians to conduct alternative investigative methods such as cone penetrometer testing (CPT) performed in accordance with ASTM D 3441 or ASTM D 5778. Data from these investigations may be used to (i) supplement soil boring and rock coring information, provided there is a demonstrated correlation between the findings, and (ii) determine material properties for static and seismic or liquefaction analyses. CPTs may replace borings on a one to one basis, but in no case shall there be fewer than half the required standard borings as per Section 1803.4.1, and no less than two standard borings. The boring depth requirements of Section 1803.4.1 shall be accomplished with borings. The alternative investigative methods must be capable of extending to the depths of the required borings. Other in-situ testing methods, such as geophysical, vane shear, and pressure meter, may be used to determine engineering design parameters, but may not be used as a substitute for the required number of borings."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17769
+}

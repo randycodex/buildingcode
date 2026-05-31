@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179151\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179151\"><\/AnnotationDrawer><div>The design, materials and construction of concrete shallow foundations shall comply with Sections 1809.5.2.1 through 1809.5.2.5 and the provisions of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-180102', hash: '#JD_BCCh.19' }}\">Chapter 19<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3991-html-1",
+      "kind" : "html",
+      "plainText" : "The design, materials and construction of concrete shallow foundations shall comply with Sections 1809.5.2.1 through 1809.5.2.5 and the provisions of Chapter 19 ."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 3991
+}

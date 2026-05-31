@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199431\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199431\"><\/AnnotationDrawer><div>Overhead infrared heaters installed in garages for more than three motor vehicles or in aircraft hangars shall be installed in accordance with Sections 305.9, 305.10 and 305.11.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199432\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199432\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199432\"><\/AnnotationDrawer><h6><a name=\"JD_FGC631\" id=\"JD_FGC631\" title=\"FGC 631\"><\/a>Section FGC 631: Boilers<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8693-html-1",
+      "kind" : "html",
+      "plainText" : "Overhead infrared heaters installed in garages for more than three motor vehicles or in aircraft hangars shall be installed in accordance with Sections 305.9, 305.10 and 305.11.\n\n Section FGC 631: Boilers"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 8693
+}

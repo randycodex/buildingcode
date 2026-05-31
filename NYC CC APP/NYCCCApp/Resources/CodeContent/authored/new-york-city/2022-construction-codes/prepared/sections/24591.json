@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161235\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161235\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Any pipe that passes under a footing or through a foundation wall shall be provided with a relieving arch, or a pipe sleeve pipe shall be built into the foundation wall. The sleeve shall be two pipe sizes greater than the pipe passing through the wall.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24591-html-1",
+      "kind" : "html",
+      "plainText" : "Any pipe that passes under a footing or through a foundation wall shall be provided with a relieving arch, or a pipe sleeve pipe shall be built into the foundation wall. The sleeve shall be two pipe sizes greater than the pipe passing through the wall."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 24591
+}

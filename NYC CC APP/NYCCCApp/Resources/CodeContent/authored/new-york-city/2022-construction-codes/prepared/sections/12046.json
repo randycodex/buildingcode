@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161947\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161947\"><\/AnnotationDrawer><div>The water service pipe shall be sized to supply water to the structure in the quantities and at the pressures required in this code. The minimum diameter of water service pipe shall be 1 inch (25 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12046-html-1",
+      "kind" : "html",
+      "plainText" : "The water service pipe shall be sized to supply water to the structure in the quantities and at the pressures required in this code. The minimum diameter of water service pipe shall be 1 inch (25 mm)."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12046
+}

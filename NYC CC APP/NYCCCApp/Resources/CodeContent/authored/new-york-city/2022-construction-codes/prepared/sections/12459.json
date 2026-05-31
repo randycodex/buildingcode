@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163011\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163011\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The plumbing vent system shall not be utilized for purposes other than the venting of the plumbing system.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12459-html-1",
+      "kind" : "html",
+      "plainText" : "The plumbing vent system shall not be utilized for purposes other than the venting of the plumbing system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 12459
+}

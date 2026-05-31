@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184732\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184732\"><\/AnnotationDrawer><div>When content required by Section 3301.9.1.1 changes, the project information panel shall be updated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5858-html-1",
+      "kind" : "html",
+      "plainText" : "When content required by Section 3301.9.1.1 changes, the project information panel shall be updated."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5858
+}

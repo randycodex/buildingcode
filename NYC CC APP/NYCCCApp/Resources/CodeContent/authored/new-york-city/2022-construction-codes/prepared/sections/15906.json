@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172694\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172694\"><\/AnnotationDrawer><div>When two or more alarms are installed, they shall be interconnected in accordance with NFPA 720.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15906-html-1",
+      "kind" : "html",
+      "plainText" : "When two or more alarms are installed, they shall be interconnected in accordance with NFPA 720."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15906
+}

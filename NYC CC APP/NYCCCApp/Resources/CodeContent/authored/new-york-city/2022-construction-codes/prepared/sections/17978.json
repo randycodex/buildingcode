@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179647\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179647\"><\/AnnotationDrawer><div>The load-bearing capacity of enlarged base piles shall be verified by load tests in accordance with Section 1810.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17978-html-1",
+      "kind" : "html",
+      "plainText" : "The load-bearing capacity of enlarged base piles shall be verified by load tests in accordance with Section 1810.4."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17978
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178349\"><\/AnnotationDrawer><div>Where a truss clear span is 60 feet (18 288 mm) or greater, the special inspector shall verify that the temporary installation restraint\/bracing and the permanent individual truss member restraint\/bracing are installed in accordance with the approved truss submittal package.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17560-html-1",
+      "kind" : "html",
+      "plainText" : "Where a truss clear span is 60 feet (18 288 mm) or greater, the special inspector shall verify that the temporary installation restraint\/bracing and the permanent individual truss member restraint\/bracing are installed in accordance with the approved truss submittal package."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17560
+}

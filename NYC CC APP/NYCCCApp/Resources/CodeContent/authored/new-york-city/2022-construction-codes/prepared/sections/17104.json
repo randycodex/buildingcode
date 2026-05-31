@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176684\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176684\"><\/AnnotationDrawer><div>For roof slopes from 2 1\/2 units vertical in 12 units horizontal (21-percent slope), up to four units vertical in 12 units horizontal (33-percent slope), underlayment shall be a minimum of two layers applied as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176685\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176685\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Starting at the eave, a 19-inch (482.6 mm) strip of underlayment shall be applied parallel with the eave and fastened sufficiently in place.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176686\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176686\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Starting at the eave, 36-inch (914.4 mm) wide strips of underlayment felt shall be applied overlapping successive sheets 19 inches (482.6 mm) and fastened sufficiently in place.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17104-html-1",
+      "kind" : "html",
+      "plainText" : "For roof slopes from 2 1\/2 units vertical in 12 units horizontal (21-percent slope), up to four units vertical in 12 units horizontal (33-percent slope), underlayment shall be a minimum of two layers applied as follows:\n\n 1. Starting at the eave, a 19-inch (482.6 mm) strip of underlayment shall be applied parallel with the eave and fastened sufficiently in place.\n\n 2. Starting at the eave, 36-inch (914.4 mm) wide strips of underlayment felt shall be applied overlapping successive sheets 19 inches (482.6 mm) and fastened sufficiently in place."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 17104
+}

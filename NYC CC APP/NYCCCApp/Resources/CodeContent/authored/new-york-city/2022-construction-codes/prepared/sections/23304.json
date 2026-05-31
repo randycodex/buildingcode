@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193584\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193584\"><\/AnnotationDrawer><div>Ventilation exhaust shall be provided for highly toxic and toxic compressed gases in any quantity as required by Sections 502.9.7.1 and 502.9.7.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23304-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation exhaust shall be provided for highly toxic and toxic compressed gases in any quantity as required by Sections 502.9.7.1 and 502.9.7.2."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23304
+}

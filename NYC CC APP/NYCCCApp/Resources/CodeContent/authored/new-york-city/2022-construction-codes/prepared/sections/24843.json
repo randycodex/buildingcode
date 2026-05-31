@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161871\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161871\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Storage water heaters operating above atmospheric pressure shall be provided with an approved, self-closing (levered) pressure relief valve and temperature relief valve or combination thereof. The relief valve shall conform to ANSI Z21.22. The relief valve shall not be used as a means of controlling thermal expansion.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24843-html-1",
+      "kind" : "html",
+      "plainText" : "Storage water heaters operating above atmospheric pressure shall be provided with an approved, self-closing (levered) pressure relief valve and temperature relief valve or combination thereof. The relief valve shall conform to ANSI Z21.22. The relief valve shall not be used as a means of controlling thermal expansion."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 24843
+}

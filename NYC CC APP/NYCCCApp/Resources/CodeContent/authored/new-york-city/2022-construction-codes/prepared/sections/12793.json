@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163926\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163926\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Operation and maintenance manuals shall be supplied with rainwater collection and conveyance systems in accordance with Sections 1303.16.1 through 1303.16.4.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12793-html-1",
+      "kind" : "html",
+      "plainText" : "Operation and maintenance manuals shall be supplied with rainwater collection and conveyance systems in accordance with Sections 1303.16.1 through 1303.16.4."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12793
+}

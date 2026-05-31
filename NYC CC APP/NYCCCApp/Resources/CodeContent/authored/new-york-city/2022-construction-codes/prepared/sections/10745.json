@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194386\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194386\"><\/AnnotationDrawer><div>Foam plastic used as duct coverings and linings shall conform to the requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-194378', hash: '#JD_MC604' }}\">604<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10745-html-1",
+      "kind" : "html",
+      "plainText" : "Foam plastic used as duct coverings and linings shall conform to the requirements of Section 604 ."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 10745
+}

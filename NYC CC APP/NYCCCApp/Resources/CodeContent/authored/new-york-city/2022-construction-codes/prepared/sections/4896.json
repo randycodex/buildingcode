@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181730\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181730\"><\/AnnotationDrawer><div>Wood walls and bearing partitions shall not support more than two floors and a roof unless an analysis satisfactory to the commissioner shows that shrinkage of the wood framing will not have adverse effects on the structure or any plumbing, electrical or mechanical systems or other equipment installed therein due to excessive shrinkage or differential movements caused by shrinkage. The analysis shall also show that the roof drainage system and the foregoing systems or equipment will not be adversely affected or, as an alternate, such systems shall be designed to accommodate the differential shrinkage or movements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4896-html-1",
+      "kind" : "html",
+      "plainText" : "Wood walls and bearing partitions shall not support more than two floors and a roof unless an analysis satisfactory to the commissioner shows that shrinkage of the wood framing will not have adverse effects on the structure or any plumbing, electrical or mechanical systems or other equipment installed therein due to excessive shrinkage or differential movements caused by shrinkage. The analysis shall also show that the roof drainage system and the foregoing systems or equipment will not be adversely affected or, as an alternate, such systems shall be designed to accommodate the differential shrinkage or movements."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4896
+}

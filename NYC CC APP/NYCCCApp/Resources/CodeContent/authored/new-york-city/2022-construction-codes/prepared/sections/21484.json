@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199344\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199344\"><\/AnnotationDrawer><div>Cooking appliances that are designed for permanent installation, including ranges, ovens, stoves, broilers, grills, fryers, griddles, hot plates and barbecues, shall be tested in accordance with ANSI Z21.1\/CSA 6.5, ANSI Z21.58\/CSA 1.6 or ANSI Z83.11\/CSA 1.8 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21484-html-1",
+      "kind" : "html",
+      "plainText" : "Cooking appliances that are designed for permanent installation, including ranges, ovens, stoves, broilers, grills, fryers, griddles, hot plates and barbecues, shall be tested in accordance with ANSI Z21.1\/CSA 6.5, ANSI Z21.58\/CSA 1.6 or ANSI Z83.11\/CSA 1.8 and shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21484
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179712\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179712\"><\/AnnotationDrawer><div>For the purposes of Section 1812.7, threaded bars conforming to ASTM A 615 and ASTM A 722 shall be considered the same as deformed reinforcing bars.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18008-html-1",
+      "kind" : "html",
+      "plainText" : "For the purposes of Section 1812.7, threaded bars conforming to ASTM A 615 and ASTM A 722 shall be considered the same as deformed reinforcing bars."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18008
+}

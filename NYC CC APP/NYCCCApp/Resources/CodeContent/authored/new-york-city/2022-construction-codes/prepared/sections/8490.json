@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198837\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198837\"><\/AnnotationDrawer><div>The entire length of a vent connector shall be provided with ready access for inspection, cleaning and replacement.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8490-html-1",
+      "kind" : "html",
+      "plainText" : "The entire length of a vent connector shall be provided with ready access for inspection, cleaning and replacement."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8490
+}

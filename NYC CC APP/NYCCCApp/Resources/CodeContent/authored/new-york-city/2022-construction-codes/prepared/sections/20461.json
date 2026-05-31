@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187189\"><\/AnnotationDrawer><div>Loads from supported and suspended scaffolds imposed on an existing roof or floor or similar structure shall: <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187190\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187190\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Not be concentrated so as to cause stresses in excess of the allowable values designated for the applicable material described in this code; or <\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187191\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Be distributed with dunnage or shoring so as to prevent such load from exceeding the allowable values designated for the applicable material described in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20461-html-1",
+      "kind" : "html",
+      "plainText" : "Loads from supported and suspended scaffolds imposed on an existing roof or floor or similar structure shall: \n\n 1. Not be concentrated so as to cause stresses in excess of the allowable values designated for the applicable material described in this code; or \n\n 2. Be distributed with dunnage or shoring so as to prevent such load from exceeding the allowable values designated for the applicable material described in this code."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20461
+}

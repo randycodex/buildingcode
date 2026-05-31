@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196490\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196490\"><\/AnnotationDrawer><div>Vacuum breaking devices shall be designed for their required use. Vacuum breaking devices shall be hard-piped to a reservoir with a leak detection alarm, arranged so as to sound an alarm. The alarm shall be connected to a local audible alarm and to a remote alarm located at a supervising station. The wiring shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11525-html-1",
+      "kind" : "html",
+      "plainText" : "Vacuum breaking devices shall be designed for their required use. Vacuum breaking devices shall be hard-piped to a reservoir with a leak detection alarm, arranged so as to sound an alarm. The alarm shall be connected to a local audible alarm and to a remote alarm located at a supervising station. The wiring shall comply with the New York City Electrical Code ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11525
+}

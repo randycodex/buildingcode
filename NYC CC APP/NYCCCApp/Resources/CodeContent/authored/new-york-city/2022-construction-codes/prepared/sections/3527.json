@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177537\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177537\"><\/AnnotationDrawer><div>The crane live load shall be the rated capacity of the crane. Design loads for the runway beams, including connections and support brackets, of moving bridge cranes and monorail cranes shall include the maximum wheel loads of the crane and the vertical impact, lateral and longitudinal forces induced by the moving crane.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3527-html-1",
+      "kind" : "html",
+      "plainText" : "The crane live load shall be the rated capacity of the crane. Design loads for the runway beams, including connections and support brackets, of moving bridge cranes and monorail cranes shall include the maximum wheel loads of the crane and the vertical impact, lateral and longitudinal forces induced by the moving crane."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3527
+}

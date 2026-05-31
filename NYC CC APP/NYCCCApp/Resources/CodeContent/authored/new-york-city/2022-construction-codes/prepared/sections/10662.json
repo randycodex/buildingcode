@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194139\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194139\"><\/AnnotationDrawer><div>The outlet of an open-air exhaust terminal shall be protected with an approved metal or other noncombustible screen to prevent the entry of sparks.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10662-html-1",
+      "kind" : "html",
+      "plainText" : "The outlet of an open-air exhaust terminal shall be protected with an approved metal or other noncombustible screen to prevent the entry of sparks."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10662
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184216\"><\/AnnotationDrawer><div>Swimming pool and spa alarms shall comply with Sections 3109.3.2.1 through 3109.3.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5630-html-1",
+      "kind" : "html",
+      "plainText" : "Swimming pool and spa alarms shall comply with Sections 3109.3.2.1 through 3109.3.2.4."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 5630
+}

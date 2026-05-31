@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198467\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198467\"><\/AnnotationDrawer><div>Masonry chimneys utilized to vent appliances shall be located, constructed and sized as specified in the manufacturer's instructions for the appliances being vented and Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-198520', hash: '#JD_FGC503' }}\">503<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21181-html-1",
+      "kind" : "html",
+      "plainText" : "Masonry chimneys utilized to vent appliances shall be located, constructed and sized as specified in the manufacturer's instructions for the appliances being vented and Section 503 ."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21181
+}

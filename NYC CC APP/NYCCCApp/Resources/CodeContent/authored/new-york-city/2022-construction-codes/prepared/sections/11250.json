@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195851\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195851\"><\/AnnotationDrawer><div>Copper tubing joints used in refrigerating systems containing Group A2, A3, B1, B2 or B3 refrigerants shall be brazed. Soldered joints shall not be used in such refrigerating systems. Brazed joints shall be made in accordance with <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">ASME Boiler and Pressure Vessel Code,<\/span> Section IX Welding and Brazing Qualifications or in accordance with American Welding Society AWS B2.2 Standard for Brazing Procedure and Performance Qualification.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11250-html-1",
+      "kind" : "html",
+      "plainText" : "Copper tubing joints used in refrigerating systems containing Group A2, A3, B1, B2 or B3 refrigerants shall be brazed. Soldered joints shall not be used in such refrigerating systems. Brazed joints shall be made in accordance with ASME Boiler and Pressure Vessel Code, Section IX Welding and Brazing Qualifications or in accordance with American Welding Society AWS B2.2 Standard for Brazing Procedure and Performance Qualification."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11250
+}

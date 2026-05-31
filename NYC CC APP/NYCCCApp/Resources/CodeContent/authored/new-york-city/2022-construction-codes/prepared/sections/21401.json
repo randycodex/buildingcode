@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199142\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199142\"><\/AnnotationDrawer><div>Panels, grilles and access doors that are required to be removed for normal servicing operations shall not be attached to the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-199143\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-199143\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-199143\"><\/AnnotationDrawer><h6><a name=\"JD_FGC605\" id=\"JD_FGC605\" title=\"FGC 605\"><\/a>Section FGC 605: Vented Gas Fireplace Heaters<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21401-html-1",
+      "kind" : "html",
+      "plainText" : "Panels, grilles and access doors that are required to be removed for normal servicing operations shall not be attached to the building.\n\n Section FGC 605: Vented Gas Fireplace Heaters"
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 21401
+}

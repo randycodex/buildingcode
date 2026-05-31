@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183449\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183449\"><\/AnnotationDrawer><div>Plastic composite decking, handrails and guards shall be installed in accordance with this code and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183450\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183450\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183450\"><\/AnnotationDrawer><h6><a name=\"JD_BC2613\" id=\"JD_BC2613\" title=\"BC 2613\"><\/a>Section BC 2613: Fiber-Reinforced Polymer<\/h6><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183451\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183451\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224456\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224456\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5340-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic composite decking, handrails and guards shall be installed in accordance with this code and the manufacturer's instructions.\n\n Section BC 2613: Fiber-Reinforced Polymer\n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 5340
+}

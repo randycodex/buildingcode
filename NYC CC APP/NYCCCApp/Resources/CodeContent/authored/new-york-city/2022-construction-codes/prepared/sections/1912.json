@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172272\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172272\"><\/AnnotationDrawer><div>Determination of the design fire shall include consideration of the type of fuel, fuel spacing and configuration.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1912-html-1",
+      "kind" : "html",
+      "plainText" : "Determination of the design fire shall include consideration of the type of fuel, fuel spacing and configuration."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1912
+}

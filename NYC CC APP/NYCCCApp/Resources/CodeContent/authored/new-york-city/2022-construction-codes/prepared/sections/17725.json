@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178802\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178802\"><\/AnnotationDrawer><div>The design pressure rating of exterior windows and doors in buildings shall be determined in accordance with Section 1709.5.1 or Section 1709.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178803\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178803\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Structural wind load design pressures for window units smaller than the size tested in accordance with Section 1709.5.1 or Section 1709.5.2 shall be permitted to be higher than the design value of the tested unit provided such higher pressures are determined by accepted engineering analysis. All components of the small unit shall be the same as the tested unit. Where such calculated design pressures are used, they shall be validated by an additional test of the window unit having the highest allowable design pressure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17725-html-1",
+      "kind" : "html",
+      "plainText" : "The design pressure rating of exterior windows and doors in buildings shall be determined in accordance with Section 1709.5.1 or Section 1709.5.2.\n\n Exception: Structural wind load design pressures for window units smaller than the size tested in accordance with Section 1709.5.1 or Section 1709.5.2 shall be permitted to be higher than the design value of the tested unit provided such higher pressures are determined by accepted engineering analysis. All components of the small unit shall be the same as the tested unit. Where such calculated design pressures are used, they shall be validated by an additional test of the window unit having the highest allowable design pressure."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17725
+}

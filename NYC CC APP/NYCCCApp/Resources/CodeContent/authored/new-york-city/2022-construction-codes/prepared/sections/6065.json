@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185476\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185476\"><\/AnnotationDrawer><div>\"Call before you dig\" notification shall be provided in accordance with the requirements of 16 NYCRR Part 753. The notification must address all street frontages associated with the soil and foundation work.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6065-html-1",
+      "kind" : "html",
+      "plainText" : "\"Call before you dig\" notification shall be provided in accordance with the requirements of 16 NYCRR Part 753. The notification must address all street frontages associated with the soil and foundation work."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6065
+}

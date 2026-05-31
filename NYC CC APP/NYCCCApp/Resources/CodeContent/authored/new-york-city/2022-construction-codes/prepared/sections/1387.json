@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170344\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170344\"><\/AnnotationDrawer><div>For a wall having no finish on one side or different types or thicknesses of finish on each side, the calculation procedures of Sections 722.2.1.4.1 and 722.2.1.4.2 shall be performed twice, assuming either side of the wall to be the fire-exposed side. The fire-resistance rating of the wall shall not exceed the lower of the two values.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170345\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> For an exterior wall with a fire separation distance greater than 5 feet (1524 mm), the fire shall be assumed to occur on the interior side only.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1387-html-1",
+      "kind" : "html",
+      "plainText" : "For a wall having no finish on one side or different types or thicknesses of finish on each side, the calculation procedures of Sections 722.2.1.4.1 and 722.2.1.4.2 shall be performed twice, assuming either side of the wall to be the fire-exposed side. The fire-resistance rating of the wall shall not exceed the lower of the two values.\n\n Exception: For an exterior wall with a fire separation distance greater than 5 feet (1524 mm), the fire shall be assumed to occur on the interior side only."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1387
+}

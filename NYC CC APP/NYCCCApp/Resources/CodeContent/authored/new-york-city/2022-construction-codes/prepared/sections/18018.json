@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179732\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179732\"><\/AnnotationDrawer><div>Caisson pile rock sockets shall be subject to special inspection in accordance with Section 1705.19. All caisson pile rock sockets shall be inspected to verify rock quality. Inspection may be accomplished by direct observation, by video methods or by a core boring performed prior to the drilling of the socket.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18018-html-1",
+      "kind" : "html",
+      "plainText" : "Caisson pile rock sockets shall be subject to special inspection in accordance with Section 1705.19. All caisson pile rock sockets shall be inspected to verify rock quality. Inspection may be accomplished by direct observation, by video methods or by a core boring performed prior to the drilling of the socket."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 18018
+}

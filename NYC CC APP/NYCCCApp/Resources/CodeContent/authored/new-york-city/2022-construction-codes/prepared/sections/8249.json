@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198183\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198183\"><\/AnnotationDrawer><div>Combustible gas detectors shall be listed and shall be calibrated or tested in accordance with the manufacturer's instructions. Combustible gas detectors shall be capable of indicating the presence of fuel gas.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8249-html-1",
+      "kind" : "html",
+      "plainText" : "Combustible gas detectors shall be listed and shall be calibrated or tested in accordance with the manufacturer's instructions. Combustible gas detectors shall be capable of indicating the presence of fuel gas."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8249
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194926\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194926\"><\/AnnotationDrawer><div>Appliances requiring a controlled chimney draft shall be permitted to be equipped with a listed barometric draft regulator or automatic damper installed and adjusted in accordance with the manufacturers' instructions. Automatic dampers shall be installed in accordance with Section 803.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23747-html-1",
+      "kind" : "html",
+      "plainText" : "Appliances requiring a controlled chimney draft shall be permitted to be equipped with a listed barometric draft regulator or automatic damper installed and adjusted in accordance with the manufacturers' instructions. Automatic dampers shall be installed in accordance with Section 803.6."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 23747
+}

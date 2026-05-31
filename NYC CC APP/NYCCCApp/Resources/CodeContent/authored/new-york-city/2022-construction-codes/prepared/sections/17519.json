@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178216\"><\/AnnotationDrawer><div>For all work where approval is sought based upon Section 1704.2.2, the approved fabricator shall submit a certificate of intent to fabricate such work to the department identifying the work to be performed as an approved fabricator, and that such work shall be performed in accordance with the approved construction documents, referenced standards and applicable provisions of law and for which site the work is being fabricated prior to fabricating any items for such project.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17519-html-1",
+      "kind" : "html",
+      "plainText" : "For all work where approval is sought based upon Section 1704.2.2, the approved fabricator shall submit a certificate of intent to fabricate such work to the department identifying the work to be performed as an approved fabricator, and that such work shall be performed in accordance with the approved construction documents, referenced standards and applicable provisions of law and for which site the work is being fabricated prior to fabricating any items for such project."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17519
+}

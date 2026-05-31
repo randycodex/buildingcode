@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193009\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193009\"><\/AnnotationDrawer><div>In concealed locations where piping, other than cast-iron or steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38.1 mm) from the nearest edge of the member, the pipe shall be protected by shield plates. Protective steel shield plates having a minimum thickness of 0.0575 inch (1.463 mm) (No. 16 gage) shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (50.8 mm) above sole plates and below top plates.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193010\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193010\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193010\"><\/AnnotationDrawer><h6><a name=\"JD_MC306\" id=\"JD_MC306\" title=\"MC 306\"><\/a>Section MC 306: Access and Service Space<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23102-html-1",
+      "kind" : "html",
+      "plainText" : "In concealed locations where piping, other than cast-iron or steel, is installed through holes or notches in studs, joists, rafters or similar members less than 1 1\/2 inches (38.1 mm) from the nearest edge of the member, the pipe shall be protected by shield plates. Protective steel shield plates having a minimum thickness of 0.0575 inch (1.463 mm) (No. 16 gage) shall cover the area of the pipe where the member is notched or bored, and shall extend not less than 2 inches (50.8 mm) above sole plates and below top plates.\n\n Section MC 306: Access and Service Space"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23102
+}

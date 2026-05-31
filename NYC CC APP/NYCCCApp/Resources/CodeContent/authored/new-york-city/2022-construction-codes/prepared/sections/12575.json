@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163323\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163323\"><\/AnnotationDrawer><div>Access shall be provided to each interceptor and separator for service and maintenance, and for inspection by the department and the Department of Environmental Protection. Interceptors and separators shall be maintained by periodic removal of accumulated grease, scum, oil, or other floating substances and solids deposited in the interceptor or separator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163324\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163324\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163324\"><\/AnnotationDrawer><h6><a name=\"JD_PC1004\" id=\"JD_PC1004\" title=\"PC 1004\"><\/a>Section PC 1004: Materials, Joints and Connections<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12575-html-1",
+      "kind" : "html",
+      "plainText" : "Access shall be provided to each interceptor and separator for service and maintenance, and for inspection by the department and the Department of Environmental Protection. Interceptors and separators shall be maintained by periodic removal of accumulated grease, scum, oil, or other floating substances and solids deposited in the interceptor or separator.\n\n Section PC 1004: Materials, Joints and Connections"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 12575
+}

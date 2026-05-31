@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185675\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185675\"><\/AnnotationDrawer><div>Where shore height exceeds 10 feet (3048 mm), or when necessary to provide structural stability, diagonal bracing shall be provided. Struts, anchored into masonry or to panel joints of adjacent braced bays may be used to prevent buckling of individual members not supported by the diagonal bracing, but bracing an entire tier of shores with struts without diagonal bracing shall be prohibited unless the system can be demonstrated to be braced by other rigid construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19961-html-1",
+      "kind" : "html",
+      "plainText" : "Where shore height exceeds 10 feet (3048 mm), or when necessary to provide structural stability, diagonal bracing shall be provided. Struts, anchored into masonry or to panel joints of adjacent braced bays may be used to prevent buckling of individual members not supported by the diagonal bracing, but bracing an entire tier of shores with struts without diagonal bracing shall be prohibited unless the system can be demonstrated to be braced by other rigid construction."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19961
+}

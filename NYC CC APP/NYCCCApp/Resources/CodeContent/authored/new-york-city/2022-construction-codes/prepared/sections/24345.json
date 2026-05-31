@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196478\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196478\"><\/AnnotationDrawer><div>A metal drain pan shall be installed at the base of every vertical shaft enclosing the fuel-oil piping. Where the bottom of the shaft is located outside the fuel oil storage tank room, the drain pan shall be connected to and drained into a containment enclosure at the horizontal offset of fuel-oil piping. On the lowest level in the building, the outer containment of horizontal offsets shall be terminated inside the main storage tank room or transfer pump room. A drain pipe shall be provided from the lowest point in the containment enclosure to a minimum 55-gallon (208.2 L) container with a leak detection alarm, arranged so as to sound an alarm and stop the transfer pump.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24345-html-1",
+      "kind" : "html",
+      "plainText" : "A metal drain pan shall be installed at the base of every vertical shaft enclosing the fuel-oil piping. Where the bottom of the shaft is located outside the fuel oil storage tank room, the drain pan shall be connected to and drained into a containment enclosure at the horizontal offset of fuel-oil piping. On the lowest level in the building, the outer containment of horizontal offsets shall be terminated inside the main storage tank room or transfer pump room. A drain pipe shall be provided from the lowest point in the containment enclosure to a minimum 55-gallon (208.2 L) container with a leak detection alarm, arranged so as to sound an alarm and stop the transfer pump."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24345
+}

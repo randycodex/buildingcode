@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173346\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173346\"><\/AnnotationDrawer><div>Doors shall swing in the direction of egress travel where serving:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173347\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173347\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Group F or H occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173348\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173348\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Rooms or spaces with an occupant load of 75 or more persons.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173349\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173349\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Rooms or spaces requiring more than one exit door.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173350\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173350\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Automatic teller machines in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-6544', hash: '#JD_10-160' }}\">10-160<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173351\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173351\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Doors need not swing in the direction of egress travel for exterior street floor exit doors from lobbies serving only Group R-2 or R-3 occupancies.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16079-html-1",
+      "kind" : "html",
+      "plainText" : "Doors shall swing in the direction of egress travel where serving:\n\n 1. Group F or H occupancies.\n\n 2. Rooms or spaces with an occupant load of 75 or more persons.\n\n 3. Rooms or spaces requiring more than one exit door.\n\n 4. Automatic teller machines in accordance with Section 10-160 of the Administrative Code .\n\n Exception: Doors need not swing in the direction of egress travel for exterior street floor exit doors from lobbies serving only Group R-2 or R-3 occupancies."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16079
+}

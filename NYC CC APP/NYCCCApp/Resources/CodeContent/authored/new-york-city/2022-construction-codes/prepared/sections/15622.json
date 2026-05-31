@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171904\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171904\"><\/AnnotationDrawer><div>The following minimum system actuations and responses shall be required upon approval by the department and the Fire Department. The activation of two or more smoke detectors, a single smoke detector equipped with an alarm verification feature, the automatic sprinkler system or other approved fire detection device shall automatically do all of the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171905\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171905\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Cause illumination of the means of egress with light of not less than 1 footcandle (11 lux) at the walking surface level.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171906\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171906\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Stop any conflicting or confusing sounds and visual distractions.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171907\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171907\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Activate an approved directional exit marking that will become apparent in an emergency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15622-html-1",
+      "kind" : "html",
+      "plainText" : "The following minimum system actuations and responses shall be required upon approval by the department and the Fire Department. The activation of two or more smoke detectors, a single smoke detector equipped with an alarm verification feature, the automatic sprinkler system or other approved fire detection device shall automatically do all of the following:\n\n 1. Cause illumination of the means of egress with light of not less than 1 footcandle (11 lux) at the walking surface level.\n\n 2. Stop any conflicting or confusing sounds and visual distractions.\n\n 3. Activate an approved directional exit marking that will become apparent in an emergency."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15622
+}

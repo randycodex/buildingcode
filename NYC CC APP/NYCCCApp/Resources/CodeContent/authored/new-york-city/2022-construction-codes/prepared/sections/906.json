@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168651\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168651\"><\/AnnotationDrawer><div>Notwithstanding the provisions of Sections 507.3 and 507.4, the area of a Group S-2 building of Type IB, IIA, IIIA or IV construction shall not be limited where the building is protected throughout with an approved automatic sprinkler system in accordance with Section 903.3.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-168652\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-168652\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-168652\"><\/AnnotationDrawer><h6><a name=\"JD_BC508\" id=\"JD_BC508\" title=\"BC 508\"><\/a>Section BC 508: Mixed Use and Occupancy<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "906-html-1",
+      "kind" : "html",
+      "plainText" : "Notwithstanding the provisions of Sections 507.3 and 507.4, the area of a Group S-2 building of Type IB, IIA, IIIA or IV construction shall not be limited where the building is protected throughout with an approved automatic sprinkler system in accordance with Section 903.3.1.1.\n\n Section BC 508: Mixed Use and Occupancy"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 906
+}

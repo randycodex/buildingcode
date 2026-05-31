@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163299\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163299\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">At repair garages where floor or trench drains are provided, car washing facilities with engine or undercarriage cleaning capability, factories where oily and flammable liquid wastes are produced and hydraulic elevator pits, oil separators shall be installed into which oil-bearing, grease-bearing or flammable wastes shall be discharged before emptying into the building drainage system or other point of disposal.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163300\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163300\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception: <\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">An oil separator is not required in hydraulic elevator pits where an automatic shut-down system is installed for the prevention of accidental discharge of oil-laden waste water into the sanitary system. Such systems shall not terminate the operation of pumps utilized to maintain emergency operation of the elevator by fire fighters.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25390-html-1",
+      "kind" : "html",
+      "plainText" : "At repair garages where floor or trench drains are provided, car washing facilities with engine or undercarriage cleaning capability, factories where oily and flammable liquid wastes are produced and hydraulic elevator pits, oil separators shall be installed into which oil-bearing, grease-bearing or flammable wastes shall be discharged before emptying into the building drainage system or other point of disposal. \n\n Exception: An oil separator is not required in hydraulic elevator pits where an automatic shut-down system is installed for the prevention of accidental discharge of oil-laden waste water into the sanitary system. Such systems shall not terminate the operation of pumps utilized to maintain emergency operation of the elevator by fire fighters."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 25390
+}

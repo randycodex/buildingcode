@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187281\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187281\"><\/AnnotationDrawer><div>At the end of the shift, and when otherwise required by Section 3314.4.4.6, the suspended scaffold shall be cleared of all equipment and material susceptible to dislodgement and shall be lowered to the street, sidewalk shed, or other location specified in the design drawings required by Section 3314.3.3, or shall be secured to the roof, building, or other structure in accordance with the design drawings required by Section 3314.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20488-html-1",
+      "kind" : "html",
+      "plainText" : "At the end of the shift, and when otherwise required by Section 3314.4.4.6, the suspended scaffold shall be cleared of all equipment and material susceptible to dislodgement and shall be lowered to the street, sidewalk shed, or other location specified in the design drawings required by Section 3314.3.3, or shall be secured to the roof, building, or other structure in accordance with the design drawings required by Section 3314.3.3."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20488
+}

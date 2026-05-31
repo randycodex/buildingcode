@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182903\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182903\"><\/AnnotationDrawer><div>Wood supports for lath, gypsum board or gypsum panel products, as well as wood stripping or furring, shall be not less than 2 inches (51 mm) nominal thickness in the least dimension.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182904\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182904\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The minimum nominal dimension of wood furring strips installed over solid backing shall be not less than 1 inch by 2 inches (25 mm by 51 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5167-html-1",
+      "kind" : "html",
+      "plainText" : "Wood supports for lath, gypsum board or gypsum panel products, as well as wood stripping or furring, shall be not less than 2 inches (51 mm) nominal thickness in the least dimension.\n\n Exception: The minimum nominal dimension of wood furring strips installed over solid backing shall be not less than 1 inch by 2 inches (25 mm by 51 mm)."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5167
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198807\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198807\"><\/AnnotationDrawer><div>Where the size of a vent connector is increased to overcome installation limitations and obtain connector capacity equal to the appliance input, the size increase shall be made at the appliance draft hood outlet.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21306-html-1",
+      "kind" : "html",
+      "plainText" : "Where the size of a vent connector is increased to overcome installation limitations and obtain connector capacity equal to the appliance input, the size increase shall be made at the appliance draft hood outlet."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21306
+}

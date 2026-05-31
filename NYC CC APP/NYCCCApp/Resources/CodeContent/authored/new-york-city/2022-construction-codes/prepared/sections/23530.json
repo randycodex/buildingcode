@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194271\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194271\"><\/AnnotationDrawer><div>Plastic piping and tubing shall be listed and shall exhibit a flame spread index of not more than 25 and a smoke-developed index of not more than 50 when tested in accordance with ASTM E 84 or UL 723.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23530-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic piping and tubing shall be listed and shall exhibit a flame spread index of not more than 25 and a smoke-developed index of not more than 50 when tested in accordance with ASTM E 84 or UL 723."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23530
+}

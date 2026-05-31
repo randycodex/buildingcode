@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193701\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193701\"><\/AnnotationDrawer><div>Installations exhausting more than 200 cfm (0.09 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">3<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\/s) shall be provided with makeup air. Where a closet is designed for the installation of a clothes dryer, an opening having an area of not less than 100 square inches (0.0645 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) shall be provided in the closet enclosure or makeup air shall be provided by other approved means.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10523-html-1",
+      "kind" : "html",
+      "plainText" : "Installations exhausting more than 200 cfm (0.09 m\n 3 \n \/s) shall be provided with makeup air. Where a closet is designed for the installation of a clothes dryer, an opening having an area of not less than 100 square inches (0.0645 m\n\n 2 \n\n ) shall be provided in the closet enclosure or makeup air shall be provided by other approved means."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10523
+}

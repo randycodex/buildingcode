@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180889\"><\/AnnotationDrawer><div>Existing walls of masonry units that are structurally sound, but that are of insufficient thickness when increased in height, may be strengthened by an addition of similar masonry units laid in Type M or S mortar. The foundations and lateral support shall be equivalent to those required for newly constructed walls under similar conditions. All such linings shall be thoroughly bonded into existing masonry by toothings to assure combined action of wall and lining. Toothings shall be distributed uniformly throughout the wall, and shall aggregate in vertical cross-sectional area at least 15 percent of the total surface area of the lining. Stresses in the masonry under the new conditions shall not exceed the allowable stresses.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18433-html-1",
+      "kind" : "html",
+      "plainText" : "Existing walls of masonry units that are structurally sound, but that are of insufficient thickness when increased in height, may be strengthened by an addition of similar masonry units laid in Type M or S mortar. The foundations and lateral support shall be equivalent to those required for newly constructed walls under similar conditions. All such linings shall be thoroughly bonded into existing masonry by toothings to assure combined action of wall and lining. Toothings shall be distributed uniformly throughout the wall, and shall aggregate in vertical cross-sectional area at least 15 percent of the total surface area of the lining. Stresses in the masonry under the new conditions shall not exceed the allowable stresses."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18433
+}

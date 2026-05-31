@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181425\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181425\"><\/AnnotationDrawer><div>The design, fabrication and erection including related connections, and protective coatings of steel cables for buildings shall be in accordance with ASCE 19.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181426\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181426\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181426\"><\/AnnotationDrawer><h6><a name=\"JD_BC2209\" id=\"JD_BC2209\" title=\"BC 2209\"><\/a>Section BC 2209: Steel Storage Racks<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4803-html-1",
+      "kind" : "html",
+      "plainText" : "The design, fabrication and erection including related connections, and protective coatings of steel cables for buildings shall be in accordance with ASCE 19.\n\n Section BC 2209: Steel Storage Racks"
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4803
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176972\"><\/AnnotationDrawer><div>Tanks having a capacity of more than 500 gallons (1892.7 L) located on the roof deck of a building shall be supported on masonry, reinforced concrete, steel or Type IV construction provided that, where such supports are located in the building above the lowest story, the support shall be fire-resistance rated as required for Type IA construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3383-html-1",
+      "kind" : "html",
+      "plainText" : "Tanks having a capacity of more than 500 gallons (1892.7 L) located on the roof deck of a building shall be supported on masonry, reinforced concrete, steel or Type IV construction provided that, where such supports are located in the building above the lowest story, the support shall be fire-resistance rated as required for Type IA construction."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3383
+}

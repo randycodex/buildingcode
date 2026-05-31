@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178491\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178491\"><\/AnnotationDrawer><div>Bond tests to qualify a primer, paint or encapsulant shall be conducted when the sprayed fire-resistant material is applied to a primed, painted or encapsulated surface for which acceptable bond-strength performance between these coatings and the fire-resistant material has not been determined. A bonding agent approved by the SFRM manufacturer shall be applied to a primed, painted or encapsulated surface where the bond strengths are found to be less than required values.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3781-html-1",
+      "kind" : "html",
+      "plainText" : "Bond tests to qualify a primer, paint or encapsulant shall be conducted when the sprayed fire-resistant material is applied to a primed, painted or encapsulated surface for which acceptable bond-strength performance between these coatings and the fire-resistant material has not been determined. A bonding agent approved by the SFRM manufacturer shall be applied to a primed, painted or encapsulated surface where the bond strengths are found to be less than required values."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3781
+}

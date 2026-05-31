@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181644\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181644\"><\/AnnotationDrawer><div>The effect of treatment and the method of redrying after treatment, and exposure to high temperatures and high humidities on the flexure properties of fire-retardant-treated softwood plywood shall be determined in accordance with ASTM D 5516. The test data developed by ASTM D 5516 shall be used to develop adjustment factors, maximum loads and spans, or both, for untreated plywood design values in accordance with ASTM D 6305. Each manufacturer shall publish the allowable maximum loads and spans for service as floor and roof sheathing for its treatment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18689-html-1",
+      "kind" : "html",
+      "plainText" : "The effect of treatment and the method of redrying after treatment, and exposure to high temperatures and high humidities on the flexure properties of fire-retardant-treated softwood plywood shall be determined in accordance with ASTM D 5516. The test data developed by ASTM D 5516 shall be used to develop adjustment factors, maximum loads and spans, or both, for untreated plywood design values in accordance with ASTM D 6305. Each manufacturer shall publish the allowable maximum loads and spans for service as floor and roof sheathing for its treatment."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18689
+}

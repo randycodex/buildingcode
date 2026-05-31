@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163275\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163275\"><\/AnnotationDrawer><div>In mental health centers, pipes and traps shall not be exposed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163276\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163276\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163276\"><\/AnnotationDrawer><h6><a name=\"JD_PC1003\" id=\"JD_PC1003\" title=\"PC 1003\"><\/a>Section PC 1003: Interceptors and Separators<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25378-html-1",
+      "kind" : "html",
+      "plainText" : "In mental health centers, pipes and traps shall not be exposed.\n\n Section PC 1003: Interceptors and Separators"
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 25378
+}

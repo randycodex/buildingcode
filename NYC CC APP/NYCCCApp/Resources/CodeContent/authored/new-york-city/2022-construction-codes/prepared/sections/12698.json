@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163704\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where the soil can become saturated, an underground storage tank shall be ballasted, or otherwise secured, to prevent the tank from floating out of the ground when empty. The combined weight of the tank and hold down ballast shall meet or exceed the buoyancy force of the tank. Where the installation requires a foundation, the foundation shall be flat and shall be designed to support the weight of the storage tank when full, consistent with the bearing capability of adjacent soil.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12698-html-1",
+      "kind" : "html",
+      "plainText" : "Where the soil can become saturated, an underground storage tank shall be ballasted, or otherwise secured, to prevent the tank from floating out of the ground when empty. The combined weight of the tank and hold down ballast shall meet or exceed the buoyancy force of the tank. Where the installation requires a foundation, the foundation shall be flat and shall be designed to support the weight of the storage tank when full, consistent with the bearing capability of adjacent soil."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12698
+}

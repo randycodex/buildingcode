@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161959\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161959\"><\/AnnotationDrawer><div>The service pipe between the house control valve and the meter shall be kept exposed. All meter locations shall be subject to approval by the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12050-html-1",
+      "kind" : "html",
+      "plainText" : "The service pipe between the house control valve and the meter shall be kept exposed. All meter locations shall be subject to approval by the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12050
+}

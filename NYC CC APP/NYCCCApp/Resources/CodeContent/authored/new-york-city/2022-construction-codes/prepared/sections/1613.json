@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171338\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171338\"><\/AnnotationDrawer><div>Such windows shall be openable from the inside or breakable from both the inside and the outside, and shall have a size when open of at least 24 inches by 36 inches (609.6 mm by 914.4 mm). Such panels shall be openable from both the inside and outside and shall have a height when open of 48 inches (1220 mm) and a width of at least 32 inches (812.8 mm). The sill of the window or panel shall not be higher than 36 inches (914.4 mm) above the inside floor. Where not all of the windows are openable or breakable, the windows intended to satisfy the requirements of this section shall be readily identifiable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1613-html-1",
+      "kind" : "html",
+      "plainText" : "Such windows shall be openable from the inside or breakable from both the inside and the outside, and shall have a size when open of at least 24 inches by 36 inches (609.6 mm by 914.4 mm). Such panels shall be openable from both the inside and outside and shall have a height when open of 48 inches (1220 mm) and a width of at least 32 inches (812.8 mm). The sill of the window or panel shall not be higher than 36 inches (914.4 mm) above the inside floor. Where not all of the windows are openable or breakable, the windows intended to satisfy the requirements of this section shall be readily identifiable."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1613
+}

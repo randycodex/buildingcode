@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178800\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178800\"><\/AnnotationDrawer><div>Load-bearing wall and partition assemblies shall sustain the test load both with and without window framing. The test load shall include all design load components. Wall and partition assemblies shall be tested both with and without door and window framing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3896-html-1",
+      "kind" : "html",
+      "plainText" : "Load-bearing wall and partition assemblies shall sustain the test load both with and without window framing. The test load shall include all design load components. Wall and partition assemblies shall be tested both with and without door and window framing."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3896
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169895\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169895\"><\/AnnotationDrawer><div>Damper testing ratings and actuation shall be in accordance with Sections 717.3.1 through 717.3.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1286-html-1",
+      "kind" : "html",
+      "plainText" : "Damper testing ratings and actuation shall be in accordance with Sections 717.3.1 through 717.3.3."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1286
+}

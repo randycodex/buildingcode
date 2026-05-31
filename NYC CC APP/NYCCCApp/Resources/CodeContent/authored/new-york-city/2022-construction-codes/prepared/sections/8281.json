@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198274\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198274\"><\/AnnotationDrawer><div>Commercial cooking appliances installed on casters and appliances that are moved for cleaning and sanitation purposes shall be connected to the piping system with an appliance connector listed as complying with ANSI Z21.69\/CSA 6.16 and NSF\/ANSI 169 or in accordance with Item 1 of Section 411.1. The commercial cooking appliance connector installation shall be configured in accordance with the manufacturer's instructions. Movement of appliances with casters shall be limited by a restraining device installed in accordance with the connector and appliance manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8281-html-1",
+      "kind" : "html",
+      "plainText" : "Commercial cooking appliances installed on casters and appliances that are moved for cleaning and sanitation purposes shall be connected to the piping system with an appliance connector listed as complying with ANSI Z21.69\/CSA 6.16 and NSF\/ANSI 169 or in accordance with Item 1 of Section 411.1. The commercial cooking appliance connector installation shall be configured in accordance with the manufacturer's instructions. Movement of appliances with casters shall be limited by a restraining device installed in accordance with the connector and appliance manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8281
+}

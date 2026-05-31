@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197760\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197760\"><\/AnnotationDrawer><div>The volumetric flow rate of gas to be provided shall be the sum of the maximum input of the appliances served.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197761\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197761\"><\/AnnotationDrawer><div>The total connected hourly load shall be used as the basis for pipe sizing, assuming that all appliances could be operating at full capacity simultaneously. Where a diversity of load can be established, pipe sizing shall be permitted to be based on such loads.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197762\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197762\"><\/AnnotationDrawer><div>The volumetric flow rate of gas to be provided shall be adjusted for altitude where the installation is above 2,000 feet (610 m) in elevation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20930-html-1",
+      "kind" : "html",
+      "plainText" : "The volumetric flow rate of gas to be provided shall be the sum of the maximum input of the appliances served.\n\n The total connected hourly load shall be used as the basis for pipe sizing, assuming that all appliances could be operating at full capacity simultaneously. Where a diversity of load can be established, pipe sizing shall be permitted to be based on such loads.\n\n The volumetric flow rate of gas to be provided shall be adjusted for altitude where the installation is above 2,000 feet (610 m) in elevation."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20930
+}

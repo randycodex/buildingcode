@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171509\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171509\"><\/AnnotationDrawer><div>Automatic fire-extinguishing systems shall be automatically actuated and provided with a manual means of actuation in accordance with Section 904.12.1. Where more than one hazard could be simultaneously involved in fire due to their proximity, all hazards shall be protected by a single system designed to protect all hazards that could become involved.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171510\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171510\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Multiple systems shall be permitted to be installed if they are designed to operate simultaneously.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15500-html-1",
+      "kind" : "html",
+      "plainText" : "Automatic fire-extinguishing systems shall be automatically actuated and provided with a manual means of actuation in accordance with Section 904.12.1. Where more than one hazard could be simultaneously involved in fire due to their proximity, all hazards shall be protected by a single system designed to protect all hazards that could become involved.\n\n Exception: Multiple systems shall be permitted to be installed if they are designed to operate simultaneously."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15500
+}

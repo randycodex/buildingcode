@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162533\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162533\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Horizontal branches shall connect to the bases of stacks at a point located not less than 10 times the diameter of the drainage stack downstream from the stack. Horizontal branches shall connect to horizontal stack offsets at a point located not less than 10 times the diameter of the drainage stack downstream from the upper stack.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25096-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal branches shall connect to the bases of stacks at a point located not less than 10 times the diameter of the drainage stack downstream from the stack. Horizontal branches shall connect to horizontal stack offsets at a point located not less than 10 times the diameter of the drainage stack downstream from the upper stack."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25096
+}

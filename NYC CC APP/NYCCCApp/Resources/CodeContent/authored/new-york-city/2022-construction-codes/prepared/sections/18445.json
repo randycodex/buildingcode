@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180923\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180923\"><\/AnnotationDrawer><div>Add the following to Chapter 8:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180924\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180924\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">8.3.6 &#8211; Maximum bar size. The bar diameter shall not exceed one-eighth of the nominal wall thickness and shall not exceed one-quarter of the least dimension of the cell, course or collar joint in which it is placed.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-180925\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-180925\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-180925\"><\/AnnotationDrawer><h6><a name=\"JD_BC2108\" id=\"JD_BC2108\" title=\"BC 2108\"><\/a>Section BC 2108: Strength Design of Masonry<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18445-html-1",
+      "kind" : "html",
+      "plainText" : "Add the following to Chapter 8:\n\n 8.3.6 - Maximum bar size. The bar diameter shall not exceed one-eighth of the nominal wall thickness and shall not exceed one-quarter of the least dimension of the cell, course or collar joint in which it is placed.\n\n Section BC 2108: Strength Design of Masonry"
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18445
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180254\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180254\"><\/AnnotationDrawer><div>The following admixture modifications to concrete proportions can be made without requiring prior acceptance by the registered design professional of record:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180255\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180255\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Air-entraining admixtures.<\/span> Air-entraining admixture dosages can be increased or decreased as needed to obtain the air content specified in the construction documents<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180256\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180256\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Water reducing admixtures.<\/span> Water reducing admixture dosages can be increased or decreased to produce the specified workability, provided that the design water is not exceeded and the changes do not segregate the concrete mix.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4367-html-1",
+      "kind" : "html",
+      "plainText" : "The following admixture modifications to concrete proportions can be made without requiring prior acceptance by the registered design professional of record:\n\n 1. Air-entraining admixtures. Air-entraining admixture dosages can be increased or decreased as needed to obtain the air content specified in the construction documents\n\n 2. Water reducing admixtures. Water reducing admixture dosages can be increased or decreased to produce the specified workability, provided that the design water is not exceeded and the changes do not segregate the concrete mix."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 4367
+}

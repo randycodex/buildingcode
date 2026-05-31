@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196269\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196269\"><\/AnnotationDrawer><div>The tank, piping and valves for appliances burning oil shall be installed in accordance with the requirements of this chapter. Where oil-burning appliances are served by a tank located such that any part of the tank is above the level of the burner inlet connection and where the fuel supply line is taken from the top of the tank, an approved anti-siphon valve or other siphon-breaking device shall be installed. The anti-siphon valve or siphon-breaking device shall be located at the highest point in the supply line.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196270\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196270\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span> An anti-siphon valve or other siphon-breaking device shall not be required where either:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196271\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196271\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;An approved foot valve is used in the tank, or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196272\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196272\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;No. 6 fuel oil is used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11431-html-1",
+      "kind" : "html",
+      "plainText" : "The tank, piping and valves for appliances burning oil shall be installed in accordance with the requirements of this chapter. Where oil-burning appliances are served by a tank located such that any part of the tank is above the level of the burner inlet connection and where the fuel supply line is taken from the top of the tank, an approved anti-siphon valve or other siphon-breaking device shall be installed. The anti-siphon valve or siphon-breaking device shall be located at the highest point in the supply line.\n\n Exceptions: An anti-siphon valve or other siphon-breaking device shall not be required where either:\n\n 1. An approved foot valve is used in the tank, or\n\n 2. No. 6 fuel oil is used."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11431
+}

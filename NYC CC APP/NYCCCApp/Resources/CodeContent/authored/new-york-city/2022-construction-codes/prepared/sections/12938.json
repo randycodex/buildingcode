@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188377\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188377\"><\/AnnotationDrawer><div>Until such time that the department by rule adopts revised FEMA FIS 360497 and FEMA FIRMs 360497 with a final effective date later than May 1, 2014, the following flood hazard maps and supporting data are also adopted as a referenced standard and declared a part of this appendix.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188378\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;FEMA PFIS 360497.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188379\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188379\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;FEMA PFIRMs 360497.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12938-html-1",
+      "kind" : "html",
+      "plainText" : "Until such time that the department by rule adopts revised FEMA FIS 360497 and FEMA FIRMs 360497 with a final effective date later than May 1, 2014, the following flood hazard maps and supporting data are also adopted as a referenced standard and declared a part of this appendix.\n\n 1. FEMA PFIS 360497.\n\n 2. FEMA PFIRMs 360497."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 12938
+}

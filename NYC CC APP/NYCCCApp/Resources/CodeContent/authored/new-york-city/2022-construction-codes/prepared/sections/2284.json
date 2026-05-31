@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173554\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173554\"><\/AnnotationDrawer><div>If balanced doors are used and panic hardware is required, the panic hardware shall be the push-pad type and the pad shall not extend more than one-half the width of the door measured from the latch side.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2284-html-1",
+      "kind" : "html",
+      "plainText" : "If balanced doors are used and panic hardware is required, the panic hardware shall be the push-pad type and the pad shall not extend more than one-half the width of the door measured from the latch side."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2284
+}

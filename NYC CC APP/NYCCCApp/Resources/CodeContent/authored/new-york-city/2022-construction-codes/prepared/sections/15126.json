@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169938\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169938\"><\/AnnotationDrawer><div>Fire dampers, smoke dampers, combination fire\/smoke dampers, and ceiling radiation dampers shall be provided as specified in Sections 717.5.1 through 717.5.7 and 717.6. Where an assembly is required to have both fire dampers and smoke dampers, combination fire\/smoke dampers or a fire damper and a smoke damper shall be provided.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169939\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169939\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Ducts 20 square inches (12 903.2 mm\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) or less passing through fire-resistance rated assemblies shall not require fire dampers or fire smoke dampers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15126-html-1",
+      "kind" : "html",
+      "plainText" : "Fire dampers, smoke dampers, combination fire\/smoke dampers, and ceiling radiation dampers shall be provided as specified in Sections 717.5.1 through 717.5.7 and 717.6. Where an assembly is required to have both fire dampers and smoke dampers, combination fire\/smoke dampers or a fire damper and a smoke damper shall be provided.\n\n Exception: Ducts 20 square inches (12 903.2 mm\n\n 2 \n\n ) or less passing through fire-resistance rated assemblies shall not require fire dampers or fire smoke dampers."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15126
+}

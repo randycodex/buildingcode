@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182946\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182946\"><\/AnnotationDrawer><div>Gypsum wallboard, gypsum lath or gypsum plaster shall not be installed until weather protection for the installation is provided.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5179-html-1",
+      "kind" : "html",
+      "plainText" : "Gypsum wallboard, gypsum lath or gypsum plaster shall not be installed until weather protection for the installation is provided."
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5179
+}

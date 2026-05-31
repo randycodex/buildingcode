@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182681\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182681\"><\/AnnotationDrawer><div>For designs outside the scope of this section, an analysis or test data for the specific installation shall be prepared by a registered design professional.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-182682\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-182682\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-182682\"><\/AnnotationDrawer><h6><a name=\"JD_BC2405\" id=\"JD_BC2405\" title=\"BC 2405\"><\/a>Section BC 2405: Sloped Glazing and Skylights<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5109-html-1",
+      "kind" : "html",
+      "plainText" : "For designs outside the scope of this section, an analysis or test data for the specific installation shall be prepared by a registered design professional.\n\n Section BC 2405: Sloped Glazing and Skylights"
+    }
+  ],
+  "chapterNumber" : "24",
+  "schemaVersion" : 1,
+  "sectionID" : 5109
+}

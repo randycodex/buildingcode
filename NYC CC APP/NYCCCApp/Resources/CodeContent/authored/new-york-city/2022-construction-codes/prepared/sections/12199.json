@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162337\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162337\"><\/AnnotationDrawer><div>Heat exchangers utilizing an essentially toxic transfer fluid shall be separated from the potable water by double-wall construction. An air gap open to the atmosphere shall be provided between the two walls. Heat exchangers utilizing an essentially nontoxic transfer fluid shall be permitted to be of single-wall construction.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162338\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162338\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span> Double-wall construction shall not be required for the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162339\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162339\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Heat exchangers supplied directly from the Consolidated Edison steam system; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162340\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162340\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Low-pressure steam-heating boilers.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12199-html-1",
+      "kind" : "html",
+      "plainText" : "Heat exchangers utilizing an essentially toxic transfer fluid shall be separated from the potable water by double-wall construction. An air gap open to the atmosphere shall be provided between the two walls. Heat exchangers utilizing an essentially nontoxic transfer fluid shall be permitted to be of single-wall construction.\n\n Exceptions: Double-wall construction shall not be required for the following:\n\n 1. Heat exchangers supplied directly from the Consolidated Edison steam system; and\n\n 2. Low-pressure steam-heating boilers."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12199
+}

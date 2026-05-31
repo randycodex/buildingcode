@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176275\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176275\"><\/AnnotationDrawer><div>The thickness of thin exterior structural glass veneer shall be not less than 0.344 inch (8.7 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3136-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of thin exterior structural glass veneer shall be not less than 0.344 inch (8.7 mm)."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3136
+}

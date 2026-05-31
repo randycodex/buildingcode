@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164438\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164438\"><\/AnnotationDrawer><div>A post-construction stormwater management facility that is constructed as a part of a covered development project shall comply with the rules of the Department of Environmental Protection and with this code. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164439\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164439\"><\/AnnotationDrawer><div>(L.L. 2017\/097, 5\/30\/2017, eff. 6\/1\/2019; Am. L.L. 2020\/091, 9\/27\/2020, eff. 3\/26\/2021) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164440\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164440\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-130645', hash: '#JD_L.L.2020\/091' }}\">L.L. 2020\/091<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13901-html-1",
+      "kind" : "html",
+      "plainText" : "A post-construction stormwater management facility that is constructed as a part of a covered development project shall comply with the rules of the Department of Environmental Protection and with this code. \n\n (L.L. 2017\/097, 5\/30\/2017, eff. 6\/1\/2019; Am. L.L. 2020\/091, 9\/27\/2020, eff. 3\/26\/2021) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/091 ."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13901
+}

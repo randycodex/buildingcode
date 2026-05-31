@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161938\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161938\"><\/AnnotationDrawer><div>Water from an individual water supply shall be approved as potable by the authority having jurisdiction prior to connection to the plumbing system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24867-html-1",
+      "kind" : "html",
+      "plainText" : "Water from an individual water supply shall be approved as potable by the authority having jurisdiction prior to connection to the plumbing system."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 24867
+}

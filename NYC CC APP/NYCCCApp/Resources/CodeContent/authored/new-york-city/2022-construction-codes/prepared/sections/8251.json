@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198188\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198188\"><\/AnnotationDrawer><div>Piping shall be provided with support in accordance with Section 407.2. In addition, when earthquake loads are applicable in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code,<\/span> a detailed piping system stress analysis including seismic analysis shall be performed. The pipe supports and restraints shall be designed and installed to accommodate the resultant seismic forces, moments and displacements from this stress analysis in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8251-html-1",
+      "kind" : "html",
+      "plainText" : "Piping shall be provided with support in accordance with Section 407.2. In addition, when earthquake loads are applicable in accordance with the New York City Building Code, a detailed piping system stress analysis including seismic analysis shall be performed. The pipe supports and restraints shall be designed and installed to accommodate the resultant seismic forces, moments and displacements from this stress analysis in accordance with the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8251
+}

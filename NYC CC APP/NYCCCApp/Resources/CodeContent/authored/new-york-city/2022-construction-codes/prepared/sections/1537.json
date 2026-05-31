@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171008\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171008\"><\/AnnotationDrawer><div>Where this code makes reference to the nationally recognized standards NFPA 13, NFPA 13D, NFPA 13R, NFPA 14, NFPA 20, NFPA 72, or NFPA 92, such standard shall be as modified for New York City in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-191144', hash: '#JD_BCAppQ' }}\">Appendix Q<\/Link> of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1537-html-1",
+      "kind" : "html",
+      "plainText" : "Where this code makes reference to the nationally recognized standards NFPA 13, NFPA 13D, NFPA 13R, NFPA 14, NFPA 20, NFPA 72, or NFPA 92, such standard shall be as modified for New York City in accordance with Appendix Q of this code."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1537
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174238\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174238\"><\/AnnotationDrawer><div>The vertical centerline of the sign shall be centered with the door, or shall be in that half of the door, either the right or left, that contains the latch. In case of double-doors, both doors shall be marked and the signs shall be centered with the doors. Arrows may be omitted on door-mounted signs. Door-mounted signs shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192262', hash: '#JD_BCFigureS101.1(1)' }}\">Figure S101.1(1)<\/Link> in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192260', hash: '#JD_BCAppS' }}\">Appendix S<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2470-html-1",
+      "kind" : "html",
+      "plainText" : "The vertical centerline of the sign shall be centered with the door, or shall be in that half of the door, either the right or left, that contains the latch. In case of double-doors, both doors shall be marked and the signs shall be centered with the doors. Arrows may be omitted on door-mounted signs. Door-mounted signs shall comply with Figure S101.1(1) in Appendix S ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2470
+}

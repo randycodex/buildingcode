@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185560\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185560\"><\/AnnotationDrawer><div>Every excavation shall be provided with at least one safe means of ingress and egress that is kept available at all times. For a trench that has a depth of 4 feet (1219 mm) or greater, and with a width of 15 feet (4572 mm) or less, as measured between the soil, forms, or structure at the bottom of the trench, one or more stairways, ladders, ramps, or other safe means of ingress and egress shall be located in the trench so as to require no more than 25 feet (7620 mm) of lateral travel.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19916-html-1",
+      "kind" : "html",
+      "plainText" : "Every excavation shall be provided with at least one safe means of ingress and egress that is kept available at all times. For a trench that has a depth of 4 feet (1219 mm) or greater, and with a width of 15 feet (4572 mm) or less, as measured between the soil, forms, or structure at the bottom of the trench, one or more stairways, ladders, ramps, or other safe means of ingress and egress shall be located in the trench so as to require no more than 25 feet (7620 mm) of lateral travel."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19916
+}

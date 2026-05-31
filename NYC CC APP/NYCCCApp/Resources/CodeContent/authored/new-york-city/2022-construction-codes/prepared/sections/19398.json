@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184053\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184053\"><\/AnnotationDrawer><div>The design and construction shall be in accordance with ASCE 55. The provisions of Sections 3102.1 through 3102.6 shall also apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19398-html-1",
+      "kind" : "html",
+      "plainText" : "The design and construction shall be in accordance with ASCE 55. The provisions of Sections 3102.1 through 3102.6 shall also apply."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19398
+}

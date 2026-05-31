@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167962\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167962\"><\/AnnotationDrawer><div>Storage of HPM in fabrication areas shall be within approved or listed storage cabinets or gas cabinets, or within a workstation. The storage of HPM in quantities greater than those listed in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> shall be in liquid storage rooms, HPM rooms or gas rooms as appropriate for the materials stored. The storage of other hazardous materials shall be in accordance with other applicable provisions of this code and the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "686-html-1",
+      "kind" : "html",
+      "plainText" : "Storage of HPM in fabrication areas shall be within approved or listed storage cabinets or gas cabinets, or within a workstation. The storage of HPM in quantities greater than those listed in the New York City Fire Code shall be in liquid storage rooms, HPM rooms or gas rooms as appropriate for the materials stored. The storage of other hazardous materials shall be in accordance with other applicable provisions of this code and the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 686
+}

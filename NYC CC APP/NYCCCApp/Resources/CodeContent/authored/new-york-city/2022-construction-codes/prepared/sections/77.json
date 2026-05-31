@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164451\" class=\"rbox Normal-Level\"><annotationdrawer recordid=\"0-0-0-164451\"><\/annotationdrawer><div>Construction documents for plumbing work to be performed shall be submitted as per the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "77-html-1",
+      "kind" : "html",
+      "plainText" : "Construction documents for plumbing work to be performed shall be submitted as per the New York City Plumbing Code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 77
+}

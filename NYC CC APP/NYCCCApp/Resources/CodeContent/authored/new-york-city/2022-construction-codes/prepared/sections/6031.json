@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185378\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185378\"><\/AnnotationDrawer><div>A fence meeting the requirements of Section 3307.7 shall be maintained throughout the duration of time that operations at the site are interrupted or abandoned and discontinued.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6031-html-1",
+      "kind" : "html",
+      "plainText" : "A fence meeting the requirements of Section 3307.7 shall be maintained throughout the duration of time that operations at the site are interrupted or abandoned and discontinued."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6031
+}

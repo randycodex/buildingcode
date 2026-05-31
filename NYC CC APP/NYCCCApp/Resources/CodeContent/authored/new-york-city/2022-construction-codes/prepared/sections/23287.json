@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193546\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193546\"><\/AnnotationDrawer><div>Exhaust ventilation systems for specific hazardous materials shall be provided as required in Section 502.8 and Sections 502.9.1 through 502.9.11 and shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23287-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust ventilation systems for specific hazardous materials shall be provided as required in Section 502.8 and Sections 502.9.1 through 502.9.11 and shall comply with the New York City Fire Code."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23287
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180877\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180877\"><\/AnnotationDrawer><div>Concentrated loads shall be supported upon construction of solid masonry, concrete, or masonry of hollow units with cells filled with mortar, grout, or concrete. In addition, construction supporting concentrated loads shall be of sufficient height to distribute safely the loads to the wall or column, or other adequate provisions shall be made to distribute the loads.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18427-html-1",
+      "kind" : "html",
+      "plainText" : "Concentrated loads shall be supported upon construction of solid masonry, concrete, or masonry of hollow units with cells filled with mortar, grout, or concrete. In addition, construction supporting concentrated loads shall be of sufficient height to distribute safely the loads to the wall or column, or other adequate provisions shall be made to distribute the loads."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18427
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195748\"><\/AnnotationDrawer><div>In addition to the requirements of Section 9.7.8 of ASHRAE 15, pressure relief devices, fusible plugs and purge systems located within the machinery room shall terminate outside of the structure at a location not less than 15 feet (4572 mm) above the adjoining grade level and not less than 20 feet (6096 mm) from any window, ventilation opening or exit.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11201-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of Section 9.7.8 of ASHRAE 15, pressure relief devices, fusible plugs and purge systems located within the machinery room shall terminate outside of the structure at a location not less than 15 feet (4572 mm) above the adjoining grade level and not less than 20 feet (6096 mm) from any window, ventilation opening or exit."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 11201
+}

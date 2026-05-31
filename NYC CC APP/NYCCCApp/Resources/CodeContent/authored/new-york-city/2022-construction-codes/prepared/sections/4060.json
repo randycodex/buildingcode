@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179339\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179339\"><\/AnnotationDrawer><div>Deep foundations shall be installed in such a manner and sequence as to prevent distortion or damage that affects the structural integrity of the deep foundations being installed, or previously installed adjacent deep foundations. The sequence of the installation shall avoid compacting the surrounding soil to the extent that other deep foundations cannot be installed properly, and shall prevent ground movements that are capable of damaging adjacent structures. Deep foundations shall be installed with adequate provision for the protection of adjacent buildings and property.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4060-html-1",
+      "kind" : "html",
+      "plainText" : "Deep foundations shall be installed in such a manner and sequence as to prevent distortion or damage that affects the structural integrity of the deep foundations being installed, or previously installed adjacent deep foundations. The sequence of the installation shall avoid compacting the surrounding soil to the extent that other deep foundations cannot be installed properly, and shall prevent ground movements that are capable of damaging adjacent structures. Deep foundations shall be installed with adequate provision for the protection of adjacent buildings and property."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4060
+}

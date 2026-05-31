@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186080\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186080\"><\/AnnotationDrawer><div>Streets, including bicycle lanes and sidewalks, as well as walkways and pathways, either within the public way or within a site, shall meet the requirements of Sections 3307.2.1 through 3307.2.6, and the requirements of the Department of Transportation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20118-html-1",
+      "kind" : "html",
+      "plainText" : "Streets, including bicycle lanes and sidewalks, as well as walkways and pathways, either within the public way or within a site, shall meet the requirements of Sections 3307.2.1 through 3307.2.6, and the requirements of the Department of Transportation."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20118
+}

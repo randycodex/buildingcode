@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193731\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193731\"><\/AnnotationDrawer><div>The installation of dryer exhaust ducts serving commercial clothes dryers shall comply with the appliance manufacturer's instructions and NFPA 54. Exhaust fan motors installed in exhaust systems shall be located outside of the airstream. In multiple installations, the fan shall operate continuously or be interlocked to operate when any individual unit is operating. Ducts shall have a minimum clearance of 6 inches (152.4 mm) to combustible materials. Clothes dryer transition ducts used to connect the appliance to the exhaust duct system shall be limited to single lengths not to exceed 8 feet (2438.4 mm) in length and shall be listed and labeled for the application. Transition ducts shall not be concealed within construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10535-html-1",
+      "kind" : "html",
+      "plainText" : "The installation of dryer exhaust ducts serving commercial clothes dryers shall comply with the appliance manufacturer's instructions and NFPA 54. Exhaust fan motors installed in exhaust systems shall be located outside of the airstream. In multiple installations, the fan shall operate continuously or be interlocked to operate when any individual unit is operating. Ducts shall have a minimum clearance of 6 inches (152.4 mm) to combustible materials. Clothes dryer transition ducts used to connect the appliance to the exhaust duct system shall be limited to single lengths not to exceed 8 feet (2438.4 mm) in length and shall be listed and labeled for the application. Transition ducts shall not be concealed within construction."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10535
+}

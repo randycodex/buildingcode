@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185269\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185269\"><\/AnnotationDrawer><div>Fire-rated enclosures (e.g. corridors, fire compartmentalization, fire-rated doors), noncombustible exterior walls, heat detectors required by Section 3303.7.7.5, and sprinkler systems, if required for the building, shall be installed as soon as practical, and in no case shall they lag more than two floors below the topmost walkable surface. Sprinkler systems shall be temporary or permanent and shall be maintained as a dry system during construction. Openings in the facade for hoists or material loading platforms are permitted provided the opening is covered at the end of the shift with a flame resistant tarp made tight so that no smoke can penetrate.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5981-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-rated enclosures (e.g. corridors, fire compartmentalization, fire-rated doors), noncombustible exterior walls, heat detectors required by Section 3303.7.7.5, and sprinkler systems, if required for the building, shall be installed as soon as practical, and in no case shall they lag more than two floors below the topmost walkable surface. Sprinkler systems shall be temporary or permanent and shall be maintained as a dry system during construction. Openings in the facade for hoists or material loading platforms are permitted provided the opening is covered at the end of the shift with a flame resistant tarp made tight so that no smoke can penetrate."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5981
+}

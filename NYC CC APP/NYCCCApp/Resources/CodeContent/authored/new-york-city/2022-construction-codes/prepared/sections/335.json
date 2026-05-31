@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166879\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166879\"><\/AnnotationDrawer><div>A standby power system complying with Section 2702 shall be provided for the standby power loads specified in Section 405.8.1. An emergency power system complying with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183487', hash: '#JD_BC2702' }}\">2702<\/Link> shall be provided for the emergency power loads specified in Section 405.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "335-html-1",
+      "kind" : "html",
+      "plainText" : "A standby power system complying with Section 2702 shall be provided for the standby power loads specified in Section 405.8.1. An emergency power system complying with Section 2702 shall be provided for the emergency power loads specified in Section 405.8.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 335
+}

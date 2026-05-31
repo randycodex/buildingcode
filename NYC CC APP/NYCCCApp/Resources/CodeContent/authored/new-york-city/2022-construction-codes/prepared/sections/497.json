@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167368\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167368\"><\/AnnotationDrawer><div>The following terms are defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167369\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167369\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;FLY GALLERY.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167370\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167370\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;GRIDIRON.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167371\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167371\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;PINRAIL.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167372\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;PROSCENIUM WALL.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167373\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167373\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;STAGE.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167374\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;TECHNICAL PRODUCTION AREA.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "497-html-1",
+      "kind" : "html",
+      "plainText" : "The following terms are defined in Chapter 2 :\n\n FLY GALLERY. \n\n GRIDIRON. \n\n PINRAIL. \n\n PROSCENIUM WALL. \n\n STAGE. \n\n TECHNICAL PRODUCTION AREA."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 497
+}

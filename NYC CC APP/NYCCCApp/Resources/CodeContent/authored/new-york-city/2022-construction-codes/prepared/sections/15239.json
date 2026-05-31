@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170457\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170457\"><\/AnnotationDrawer><div>See Section 722.5.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15239-html-1",
+      "kind" : "html",
+      "plainText" : "See Section 722.5.1.4."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15239
+}

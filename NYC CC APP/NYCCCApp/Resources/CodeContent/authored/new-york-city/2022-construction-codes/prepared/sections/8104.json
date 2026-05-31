@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197758\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197758\"><\/AnnotationDrawer><div>Piping systems shall be of such size and so installed as to provide a supply of gas sufficient to meet the maximum demand and supply gas to each appliance inlet at not less than the minimum supply pressure required by the appliance. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8104-html-1",
+      "kind" : "html",
+      "plainText" : "Piping systems shall be of such size and so installed as to provide a supply of gas sufficient to meet the maximum demand and supply gas to each appliance inlet at not less than the minimum supply pressure required by the appliance."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8104
+}

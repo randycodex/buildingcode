@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-160688\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-160688\"><\/AnnotationDrawer><div>For prior code buildings, the number of required plumbing fixtures shall be permitted to be calculated based on the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">1968 Building Code<\/span> utilizing the occupant load figures for the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">1968 Building Code<\/span>, or shall be permitted to be calculated based on the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span> utilizing the occupant load figures from the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11676-html-1",
+      "kind" : "html",
+      "plainText" : "For prior code buildings, the number of required plumbing fixtures shall be permitted to be calculated based on the 1968 Building Code utilizing the occupant load figures for the 1968 Building Code , or shall be permitted to be calculated based on the New York City Plumbing Code utilizing the occupant load figures from the New York City Plumbing Code."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 11676
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167117\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167117\"><\/AnnotationDrawer><div>Driveways serving passenger vehicles shall be a minimum of 8 feet (2438 mm) in width and shall not exceed the length of the curb cut, not including the lengths of the splays. For all other motor vehicles, the minimum width of driveways shall be 10 feet (3048 mm). Portions of the driveway located between the curb line and the lot line shall be paved in accordance with the requirements of the Department of Transportation for the construction of sidewalks.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "416-html-1",
+      "kind" : "html",
+      "plainText" : "Driveways serving passenger vehicles shall be a minimum of 8 feet (2438 mm) in width and shall not exceed the length of the curb cut, not including the lengths of the splays. For all other motor vehicles, the minimum width of driveways shall be 10 feet (3048 mm). Portions of the driveway located between the curb line and the lot line shall be paved in accordance with the requirements of the Department of Transportation for the construction of sidewalks."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 416
+}

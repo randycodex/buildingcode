@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172656\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172656\"><\/AnnotationDrawer><div>Carbon monoxide alarms or detectors shall be required within the following dwelling units:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172657\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172657\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Units on the same story where carbon monoxide-producing equipment or enclosed parking is located.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172658\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172658\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Units on the stories immediately above and below the floor where carbon monoxide-producing equipment or enclosed parking is located.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172659\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172659\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Units in a building containing a carbon monoxide-producing furnace, boiler, or water heater as part of a central system.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172660\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172660\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Units in a building served by a carbon monoxide-producing furnace, boiler, or water heater as part of a central system that is located in an adjoining or attached building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15893-html-1",
+      "kind" : "html",
+      "plainText" : "Carbon monoxide alarms or detectors shall be required within the following dwelling units:\n\n 1. Units on the same story where carbon monoxide-producing equipment or enclosed parking is located.\n\n 2. Units on the stories immediately above and below the floor where carbon monoxide-producing equipment or enclosed parking is located.\n\n 3. Units in a building containing a carbon monoxide-producing furnace, boiler, or water heater as part of a central system.\n\n 4. Units in a building served by a carbon monoxide-producing furnace, boiler, or water heater as part of a central system that is located in an adjoining or attached building."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15893
+}

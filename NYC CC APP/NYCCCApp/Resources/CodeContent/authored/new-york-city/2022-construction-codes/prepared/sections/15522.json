@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171560\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171560\"><\/AnnotationDrawer><div>Monitoring shall be provided as required for automatic sprinkler systems in accordance with Section 903.4.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15522-html-1",
+      "kind" : "html",
+      "plainText" : "Monitoring shall be provided as required for automatic sprinkler systems in accordance with Section 903.4.1."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15522
+}

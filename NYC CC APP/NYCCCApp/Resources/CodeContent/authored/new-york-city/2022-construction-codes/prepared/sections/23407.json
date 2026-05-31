@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193909\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193909\"><\/AnnotationDrawer><div>Exhaust fan motors shall be located outside of the exhaust airstream.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23407-html-1",
+      "kind" : "html",
+      "plainText" : "Exhaust fan motors shall be located outside of the exhaust airstream."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23407
+}

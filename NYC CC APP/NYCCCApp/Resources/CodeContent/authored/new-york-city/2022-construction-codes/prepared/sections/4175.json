@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179702\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179702\"><\/AnnotationDrawer><div>The placement of concrete shall conform to Section 1812.1.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4175-html-1",
+      "kind" : "html",
+      "plainText" : "The placement of concrete shall conform to Section 1812.1.3."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4175
+}

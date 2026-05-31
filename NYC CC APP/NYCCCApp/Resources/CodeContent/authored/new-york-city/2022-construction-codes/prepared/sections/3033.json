@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175979\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175979\"><\/AnnotationDrawer><div>Walls, floors and partitions in toilet and bathrooms shall comply with Sections 1210.2.1 through 1210.2.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3033-html-1",
+      "kind" : "html",
+      "plainText" : "Walls, floors and partitions in toilet and bathrooms shall comply with Sections 1210.2.1 through 1210.2.4."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 3033
+}

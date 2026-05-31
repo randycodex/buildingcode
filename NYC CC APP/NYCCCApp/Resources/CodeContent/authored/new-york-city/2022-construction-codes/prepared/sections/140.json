@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165967\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165967\"><\/AnnotationDrawer><div>The following terms are defined in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-164534', hash: '#JD_BCCh.2' }}\">Chapter 2<\/Link>:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165968\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;AMBULATORY CARE FACILITY.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-165969\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-165969\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;CLINIC, OUTPATIENT.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-165970\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-165970\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-165970\"><\/AnnotationDrawer><h6><a name=\"JD_BC305\" id=\"JD_BC305\" title=\"BC 305\"><\/a>Section BC 305: Educational Group E<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "140-html-1",
+      "kind" : "html",
+      "plainText" : "The following terms are defined in Chapter 2 :\n\n AMBULATORY CARE FACILITY. \n\n CLINIC, OUTPATIENT. \n\n Section BC 305: Educational Group E"
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 140
+}

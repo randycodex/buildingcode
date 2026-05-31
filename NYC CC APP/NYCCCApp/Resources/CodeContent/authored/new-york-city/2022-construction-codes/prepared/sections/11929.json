@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161670\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161670\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Sheet copper shall conform to ASTM B 152 and shall weigh not less than 12 ounces per square foot (3.7 kg\/m<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-family:&quot;Arial&quot;,serif;font-size:8pt;\">2<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">). The copper sheet shall be insulated from conducting substances other than the connecting drain by 15-pound (6.80 kg) asphalt felt or an equivalent. Sheet copper shall be joined by brazing or soldering.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11929-html-1",
+      "kind" : "html",
+      "plainText" : "Sheet copper shall conform to ASTM B 152 and shall weigh not less than 12 ounces per square foot (3.7 kg\/m 2 ). The copper sheet shall be insulated from conducting substances other than the connecting drain by 15-pound (6.80 kg) asphalt felt or an equivalent. Sheet copper shall be joined by brazing or soldering."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11929
+}

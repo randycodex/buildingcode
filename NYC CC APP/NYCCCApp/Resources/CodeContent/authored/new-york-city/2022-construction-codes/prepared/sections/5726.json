@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184471\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184471\"><\/AnnotationDrawer><div>Any encroachment into the public right-of-way that exceeds the limitation provided for in this chapter shall require the approval of the Department of Transportation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-184472\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-184472\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-184472\"><\/AnnotationDrawer><h6><a name=\"JD_BC3202\" id=\"JD_BC3202\" title=\"BC 3202\"><\/a>Section BC 3202: Encroachments<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5726-html-1",
+      "kind" : "html",
+      "plainText" : "Any encroachment into the public right-of-way that exceeds the limitation provided for in this chapter shall require the approval of the Department of Transportation.\n\n Section BC 3202: Encroachments"
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5726
+}

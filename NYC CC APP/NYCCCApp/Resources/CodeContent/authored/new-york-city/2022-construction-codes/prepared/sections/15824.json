@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172485\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172485\"><\/AnnotationDrawer><div>Detection and control systems shall be marked in accordance with Section 909.14.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15824-html-1",
+      "kind" : "html",
+      "plainText" : "Detection and control systems shall be marked in accordance with Section 909.14."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15824
+}

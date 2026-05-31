@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163894\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163894\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Mechanical equipment including pumps, valves and filters shall be easily accessible and removable in order to perform repair, maintenance and cleaning. The minimum flow rate and flow pressure delivered by the pumping system shall be appropriate for the application and in accordance with Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-161966', hash: '#JD_PC604' }}\">604<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12777-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical equipment including pumps, valves and filters shall be easily accessible and removable in order to perform repair, maintenance and cleaning. The minimum flow rate and flow pressure delivered by the pumping system shall be appropriate for the application and in accordance with Section 604 ."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12777
+}

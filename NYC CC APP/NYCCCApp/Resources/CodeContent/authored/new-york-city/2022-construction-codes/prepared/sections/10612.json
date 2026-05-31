@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193994\"><\/AnnotationDrawer><div>Type II hood supports shall be adequate for the applied load of the hood, the unsupported ductwork, the effluent loading and the possible weight of personnel working in or on the hood.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10612-html-1",
+      "kind" : "html",
+      "plainText" : "Type II hood supports shall be adequate for the applied load of the hood, the unsupported ductwork, the effluent loading and the possible weight of personnel working in or on the hood."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10612
+}

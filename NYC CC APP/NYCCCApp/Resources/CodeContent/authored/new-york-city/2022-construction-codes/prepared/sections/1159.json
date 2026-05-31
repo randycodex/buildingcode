@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169525\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169525\"><\/AnnotationDrawer><div>Access doors shall be permitted in ceilings of fire-resistance-rated floor\/ceiling and roof\/ceiling assemblies, provided such doors are tested in accordance with ASTM E 119 or UL 263 as horizontal assemblies and labeled by an approved agency for such purpose.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1159-html-1",
+      "kind" : "html",
+      "plainText" : "Access doors shall be permitted in ceilings of fire-resistance-rated floor\/ceiling and roof\/ceiling assemblies, provided such doors are tested in accordance with ASTM E 119 or UL 263 as horizontal assemblies and labeled by an approved agency for such purpose."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1159
+}

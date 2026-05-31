@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174843\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174843\"><\/AnnotationDrawer><div>Raised areas used for purposes of security, life safety or fire safety including, but not limited to, observation galleries, prison guard towers, fire towers or lifeguard stands are not required to comply with this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16472-html-1",
+      "kind" : "html",
+      "plainText" : "Raised areas used for purposes of security, life safety or fire safety including, but not limited to, observation galleries, prison guard towers, fire towers or lifeguard stands are not required to comply with this chapter."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16472
+}

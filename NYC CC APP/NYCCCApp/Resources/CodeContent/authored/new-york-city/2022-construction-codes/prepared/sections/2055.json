@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172631\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172631\"><\/AnnotationDrawer><div>Temperature of the pump room, pump house or area where engines are installed shall never be less than the minimum recommended by the engine manufacturer. The engine manufacturer's recommendations for oil heaters shall be followed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2055-html-1",
+      "kind" : "html",
+      "plainText" : "Temperature of the pump room, pump house or area where engines are installed shall never be less than the minimum recommended by the engine manufacturer. The engine manufacturer's recommendations for oil heaters shall be followed."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2055
+}

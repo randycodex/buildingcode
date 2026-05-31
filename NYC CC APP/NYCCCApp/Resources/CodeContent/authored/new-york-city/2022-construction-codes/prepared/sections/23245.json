@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193444\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193444\"><\/AnnotationDrawer><div>Mechanical ventilation systems required by Section 502.4 shall be supervised with proof of airflow by a central, proprietary system or remote station service or shall initiate an audible and visual signal at a constantly attended on-site location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23245-html-1",
+      "kind" : "html",
+      "plainText" : "Mechanical ventilation systems required by Section 502.4 shall be supervised with proof of airflow by a central, proprietary system or remote station service or shall initiate an audible and visual signal at a constantly attended on-site location."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23245
+}

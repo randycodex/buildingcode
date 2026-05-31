@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188216\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188216\"><\/AnnotationDrawer><div>Where a public pay telephone is provided in or adjacent to a hospital emergency room, hospital recovery room or hospital waiting room, at least one public TTY shall be provided at each such location.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12874-html-1",
+      "kind" : "html",
+      "plainText" : "Where a public pay telephone is provided in or adjacent to a hospital emergency room, hospital recovery room or hospital waiting room, at least one public TTY shall be provided at each such location."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12874
+}

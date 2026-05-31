@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167432\"><\/AnnotationDrawer><div>Technical production areas shall be provided with means of egress and means of escape in accordance with Sections 410.6.3.1 through 410.6.3.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "521-html-1",
+      "kind" : "html",
+      "plainText" : "Technical production areas shall be provided with means of egress and means of escape in accordance with Sections 410.6.3.1 through 410.6.3.5."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 521
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194853\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194853\"><\/AnnotationDrawer><div>Except as otherwise provided for in this chapter, the size of the chimney or vent, serving a single appliance, except engineered systems, shall have a minimum area equal to the area of the appliance connection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10894-html-1",
+      "kind" : "html",
+      "plainText" : "Except as otherwise provided for in this chapter, the size of the chimney or vent, serving a single appliance, except engineered systems, shall have a minimum area equal to the area of the appliance connection."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10894
+}

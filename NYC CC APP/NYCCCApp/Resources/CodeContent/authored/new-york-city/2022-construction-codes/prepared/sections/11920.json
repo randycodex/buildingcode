@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161649\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161649\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Shower compartments shall be not less than 900 square inches (0.58 m<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-family:&quot;Arial&quot;,serif;font-size:8pt;\">2<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">) in interior cross-sectional area. Shower compartments shall be not less than 30 inches (762 mm) in least dimension as measured from the finished interior dimension of the compartment, exclusive of fixture valves, showerheads, soap dishes and safety grab bars or rails. Except as required in Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-161505', hash: '#JD_PC404' }}\">404<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">, the minimum required area and dimension shall be measured from the finished interior dimension at a height equal to the top of the threshold and at a point tangent to its centerline and shall be continued to a height not less than 70 inches (1778 mm) above the shower drain outlet.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11920-html-1",
+      "kind" : "html",
+      "plainText" : "Shower compartments shall be not less than 900 square inches (0.58 m 2 ) in interior cross-sectional area. Shower compartments shall be not less than 30 inches (762 mm) in least dimension as measured from the finished interior dimension of the compartment, exclusive of fixture valves, showerheads, soap dishes and safety grab bars or rails. Except as required in Section 404 , the minimum required area and dimension shall be measured from the finished interior dimension at a height equal to the top of the threshold and at a point tangent to its centerline and shall be continued to a height not less than 70 inches (1778 mm) above the shower drain outlet."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11920
+}

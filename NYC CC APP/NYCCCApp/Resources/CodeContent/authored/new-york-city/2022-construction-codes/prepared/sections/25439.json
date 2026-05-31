@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163433\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Floor drains provided in open or enclosed parking garages shall drain to the storm drainage system.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163434\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163434\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> Where the storm drainage system discharges to a dedicated storm sewer, parking garage floor drains shall be connected to the sanitary drainage system.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163435\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163435\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163435\"><\/AnnotationDrawer><h6><a name=\"JD_PC1105\" id=\"JD_PC1105\" title=\"PC 1105\"><\/a>Section PC 1105: Roof Drains<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25439-html-1",
+      "kind" : "html",
+      "plainText" : "Floor drains provided in open or enclosed parking garages shall drain to the storm drainage system. \n\n Exception: Where the storm drainage system discharges to a dedicated storm sewer, parking garage floor drains shall be connected to the sanitary drainage system. \n\n Section PC 1105: Roof Drains"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 25439
+}

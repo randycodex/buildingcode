@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179155\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179155\"><\/AnnotationDrawer><div>Where a structure is assigned to Seismic Design Category D in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-177795', hash: '#JD_BC1613' }}\">1613<\/Link>, individual spread footings founded on soil defined in Section 1613.3.2 as Site Class E or F shall be interconnected by ties. Ties shall be capable of carrying, in tension or compression, a force equal to the product of the larger footing load times the seismic coefficient SDS divided by 10 unless it is demonstrated that equivalent restraint is provided by reinforced concrete beams within slabs on grade or reinforced concrete slabs on grade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17821-html-1",
+      "kind" : "html",
+      "plainText" : "Where a structure is assigned to Seismic Design Category D in accordance with Section 1613 , individual spread footings founded on soil defined in Section 1613.3.2 as Site Class E or F shall be interconnected by ties. Ties shall be capable of carrying, in tension or compression, a force equal to the product of the larger footing load times the seismic coefficient SDS divided by 10 unless it is demonstrated that equivalent restraint is provided by reinforced concrete beams within slabs on grade or reinforced concrete slabs on grade."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17821
+}

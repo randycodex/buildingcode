@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177029\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177029\"><\/AnnotationDrawer><div>Roof replacement shall include the removal of all existing layers of roof coverings down to the roof deck.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177030\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177030\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where the existing roof assembly includes an ice barrier membrane that is adhered to the roof deck, the existing ice barrier membrane shall be permitted to remain in place and covered with an additional layer of ice barrier membrane in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-176637', hash: '#JD_BC1507' }}\">1507<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3406-html-1",
+      "kind" : "html",
+      "plainText" : "Roof replacement shall include the removal of all existing layers of roof coverings down to the roof deck.\n\n Exception: Where the existing roof assembly includes an ice barrier membrane that is adhered to the roof deck, the existing ice barrier membrane shall be permitted to remain in place and covered with an additional layer of ice barrier membrane in accordance with Section 1507 ."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3406
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174182\"><\/AnnotationDrawer><div>Exit passageways on the level of exit discharge shall terminate at an exit discharge. Exit passageways on other levels shall terminate at an exit component.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2454-html-1",
+      "kind" : "html",
+      "plainText" : "Exit passageways on the level of exit discharge shall terminate at an exit discharge. Exit passageways on other levels shall terminate at an exit component."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2454
+}

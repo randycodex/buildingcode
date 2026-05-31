@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167299\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167299\"><\/AnnotationDrawer><div>Any vertical opening shall be protected by a shaft enclosure in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169532', hash: '#JD_BC713' }}\">713<\/Link>, or shall be in accordance with Sections 408.5.1 and 408.5.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14298-html-1",
+      "kind" : "html",
+      "plainText" : "Any vertical opening shall be protected by a shaft enclosure in accordance with Section 713 , or shall be in accordance with Sections 408.5.1 and 408.5.2."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14298
+}

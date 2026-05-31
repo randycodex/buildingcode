@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177392\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177392\"><\/AnnotationDrawer><div>Garages designed to accommodate vehicles that exceed a 10,000 pound (4535.9 kg) gross vehicle weight rating, shall be designed using the live loading specified by Section 1607.7.1. Vertical impact shall be taken as 10 percent of the vertical load.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177393\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177393\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The vehicular live loads and load placement are allowed to be determined using the actual vehicle weights for the vehicles allowed onto the garage floors, provided such loads and placement are based on rational engineering principles and are approved by the department, but shall not be less than 50 psf (2.9 kN\/m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t). This live load shall not be reduced.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3486-html-1",
+      "kind" : "html",
+      "plainText" : "Garages designed to accommodate vehicles that exceed a 10,000 pound (4535.9 kg) gross vehicle weight rating, shall be designed using the live loading specified by Section 1607.7.1. Vertical impact shall be taken as 10 percent of the vertical load.\n\n Exception: The vehicular live loads and load placement are allowed to be determined using the actual vehicle weights for the vehicles allowed onto the garage floors, provided such loads and placement are based on rational engineering principles and are approved by the department, but shall not be less than 50 psf (2.9 kN\/m\n\n 2 \n\n ). This live load shall not be reduced."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3486
+}

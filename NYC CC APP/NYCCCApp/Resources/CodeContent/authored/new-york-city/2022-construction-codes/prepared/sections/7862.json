@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230013\"><\/AnnotationDrawer><div>An ADU detached from the primary dwelling shall be constructed in accordance with the New York City Zoning Resolution and all requirements of Group R-3 occupancy in this code, except as provided by Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-230212', hash: '#JD_BCU103' }}\">U103<\/Link>, Sections U203.2 and U203.4 through U203.7, and Section U204.2. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7862-html-1",
+      "kind" : "html",
+      "plainText" : "An ADU detached from the primary dwelling shall be constructed in accordance with the New York City Zoning Resolution and all requirements of Group R-3 occupancy in this code, except as provided by Section U103 , Sections U203.2 and U203.4 through U203.7, and Section U204.2."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7862
+}

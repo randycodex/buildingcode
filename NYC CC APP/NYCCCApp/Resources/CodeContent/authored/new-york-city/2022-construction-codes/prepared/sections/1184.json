@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169605\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169605\"><\/AnnotationDrawer><div>A shaft enclosure containing a recycling, or waste or linen chute, and any associated discharge room, shall not be used for any other purpose and shall have a fire-resistance rating of 2 hours. Openings into the shaft, including those from access rooms and discharge rooms, shall be protected in accordance with this section and Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169727', hash: '#JD_BC716' }}\">716<\/Link>. Openings into chutes shall not be located in corridors. Doors into chutes shall be self-closing. Discharge doors shall be self- or automatic-closing upon the actuation of a smoke detector in accordance with Section 716.5.9.3, except that heat-activated closing devices shall be permitted between the shaft and the discharge room.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1184-html-1",
+      "kind" : "html",
+      "plainText" : "A shaft enclosure containing a recycling, or waste or linen chute, and any associated discharge room, shall not be used for any other purpose and shall have a fire-resistance rating of 2 hours. Openings into the shaft, including those from access rooms and discharge rooms, shall be protected in accordance with this section and Section 716 . Openings into chutes shall not be located in corridors. Doors into chutes shall be self-closing. Discharge doors shall be self- or automatic-closing upon the actuation of a smoke detector in accordance with Section 716.5.9.3, except that heat-activated closing devices shall be permitted between the shaft and the discharge room."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1184
+}

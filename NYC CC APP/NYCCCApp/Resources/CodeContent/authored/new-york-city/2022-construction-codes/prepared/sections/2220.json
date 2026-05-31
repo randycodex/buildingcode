@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173224\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173224\"><\/AnnotationDrawer><div>Where an exit discharge is not accessible, an exterior area for assisted rescue shall be provided in accordance with Section 1009.7. An exterior area for assisted rescue shall not be required where an exit discharge is on an assisted rescue path from a stairway or an elevator.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2220-html-1",
+      "kind" : "html",
+      "plainText" : "Where an exit discharge is not accessible, an exterior area for assisted rescue shall be provided in accordance with Section 1009.7. An exterior area for assisted rescue shall not be required where an exit discharge is on an assisted rescue path from a stairway or an elevator."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2220
+}

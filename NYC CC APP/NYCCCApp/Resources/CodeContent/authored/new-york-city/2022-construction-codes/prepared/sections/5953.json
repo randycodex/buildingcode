@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185189\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185189\"><\/AnnotationDrawer><div>Precautions shall be taken to prevent concrete or mortar washings, sand, grit, or any other material that would cause clogging from entering a sewer, drain, vault, or subsurface structure. Concrete washout water shall also meet the requirements of Section 3303.15.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5953-html-1",
+      "kind" : "html",
+      "plainText" : "Precautions shall be taken to prevent concrete or mortar washings, sand, grit, or any other material that would cause clogging from entering a sewer, drain, vault, or subsurface structure. Concrete washout water shall also meet the requirements of Section 3303.15."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5953
+}

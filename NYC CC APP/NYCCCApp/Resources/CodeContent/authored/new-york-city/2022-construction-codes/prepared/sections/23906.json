@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195361\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195361\"><\/AnnotationDrawer><div>Unit heaters shall be installed in accordance with the listing and the manufacturer's instructions. Oil-fired unit heaters shall be tested in accordance with UL 731.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23906-html-1",
+      "kind" : "html",
+      "plainText" : "Unit heaters shall be installed in accordance with the listing and the manufacturer's instructions. Oil-fired unit heaters shall be tested in accordance with UL 731."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23906
+}

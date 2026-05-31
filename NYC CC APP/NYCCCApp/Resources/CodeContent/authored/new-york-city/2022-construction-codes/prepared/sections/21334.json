@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198881\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198881\"><\/AnnotationDrawer><div>Where vents, including those for direct-vent appliances, penetrate outside walls of buildings, the annular spaces around such penetrations shall be permanently sealed using approved materials to prevent entry of combustion products into the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-198882\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-198882\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-198882\"><\/AnnotationDrawer><h6><a name=\"JD_FGC504\" id=\"JD_FGC504\" title=\"FGC 504\"><\/a>Section FGC 504: Sizing of Category I Appliance Venting Systems<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "21334-html-1",
+      "kind" : "html",
+      "plainText" : "Where vents, including those for direct-vent appliances, penetrate outside walls of buildings, the annular spaces around such penetrations shall be permanently sealed using approved materials to prevent entry of combustion products into the building.\n\n Section FGC 504: Sizing of Category I Appliance Venting Systems"
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 21334
+}

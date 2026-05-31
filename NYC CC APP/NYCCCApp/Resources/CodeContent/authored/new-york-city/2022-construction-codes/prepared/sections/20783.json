@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197345\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197345\"><\/AnnotationDrawer><div>A permanent factory-applied nameplate(s) shall be affixed to appliances on which shall appear in legible lettering: the manufacturer's name or trademark, the model number, serial number and, for listed appliances, the seal or mark of the testing agency. A label shall include the hourly rating in British thermal units per hour (Btu\/h) (W), the type of fuel approved for use with the appliance, and the minimum clearance requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20783-html-1",
+      "kind" : "html",
+      "plainText" : "A permanent factory-applied nameplate(s) shall be affixed to appliances on which shall appear in legible lettering: the manufacturer's name or trademark, the model number, serial number and, for listed appliances, the seal or mark of the testing agency. A label shall include the hourly rating in British thermal units per hour (Btu\/h) (W), the type of fuel approved for use with the appliance, and the minimum clearance requirements."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 20783
+}

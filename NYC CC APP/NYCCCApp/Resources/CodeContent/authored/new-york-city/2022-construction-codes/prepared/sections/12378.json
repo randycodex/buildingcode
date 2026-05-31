@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162821\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162821\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Sterilizers, steamers and condensers shall discharge to the drainage through an indirect waste pipe by means of an air gap. Where a battery of not more than three sterilizers discharges to an individual receptor, the distance between the receptor and a sterilizer shall not exceed 8 feet (2438 mm). The indirect waste pipe on a bedpan steamer shall be trapped.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12378-html-1",
+      "kind" : "html",
+      "plainText" : "Sterilizers, steamers and condensers shall discharge to the drainage through an indirect waste pipe by means of an air gap. Where a battery of not more than three sterilizers discharges to an individual receptor, the distance between the receptor and a sterilizer shall not exceed 8 feet (2438 mm). The indirect waste pipe on a bedpan steamer shall be trapped."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12378
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172372\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172372\"><\/AnnotationDrawer><div>Inlets and outlets shall be read using generally accepted practices to determine air quantities.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1948-html-1",
+      "kind" : "html",
+      "plainText" : "Inlets and outlets shall be read using generally accepted practices to determine air quantities."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1948
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184754\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184754\"><\/AnnotationDrawer><div>Sidewalk shed parapet information panels shall be 3 feet (914 mm) high and 6 feet (1829 mm) wide, with the content required by Section 3301.9.2.1 arranged in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-184737', hash: '#JD_BCFigure3301.9.2.1' }}\">Figure 3301.9.2.1<\/Link>. The sign shall have a white background. The content required by Section 3301.9.2.1 must be written in Calibri font or similar sans serif font style, and such letters shall be blue, with such blue color a shade matching Pantone 296, or RGB 15, 43, 84, or CMYK 100, 88, 38, 35.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19692-html-1",
+      "kind" : "html",
+      "plainText" : "Sidewalk shed parapet information panels shall be 3 feet (914 mm) high and 6 feet (1829 mm) wide, with the content required by Section 3301.9.2.1 arranged in accordance with Figure 3301.9.2.1 . The sign shall have a white background. The content required by Section 3301.9.2.1 must be written in Calibri font or similar sans serif font style, and such letters shall be blue, with such blue color a shade matching Pantone 296, or RGB 15, 43, 84, or CMYK 100, 88, 38, 35."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19692
+}

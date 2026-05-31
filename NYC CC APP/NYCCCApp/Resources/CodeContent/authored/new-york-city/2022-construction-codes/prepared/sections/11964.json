@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161745\"><\/AnnotationDrawer><div>Control valves, vacuum outlets and devices protruding from a wall of an operating, emergency, recovery, examining or delivery room, or in a corridor or other location where patients are transported on a wheeled stretcher, shall be located at an elevation that prevents bumping the patient or stretcher against the device.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161746\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161746\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161746\"><\/AnnotationDrawer><h6><a name=\"JD_PC423\" id=\"JD_PC423\" title=\"PC 423\"><\/a>Section PC 423: Specialty Plumbing Fixtures<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11964-html-1",
+      "kind" : "html",
+      "plainText" : "Control valves, vacuum outlets and devices protruding from a wall of an operating, emergency, recovery, examining or delivery room, or in a corridor or other location where patients are transported on a wheeled stretcher, shall be located at an elevation that prevents bumping the patient or stretcher against the device.\n\n Section PC 423: Specialty Plumbing Fixtures"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 11964
+}

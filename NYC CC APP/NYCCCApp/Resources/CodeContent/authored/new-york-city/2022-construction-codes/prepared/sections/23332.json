@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193666\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193666\"><\/AnnotationDrawer><div>Each buffing machine shall be connected to a dust-collecting system that prevents the accumulation of the dust produced by the buffing process.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23332-html-1",
+      "kind" : "html",
+      "plainText" : "Each buffing machine shall be connected to a dust-collecting system that prevents the accumulation of the dust produced by the buffing process."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 23332
+}

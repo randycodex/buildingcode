@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167002\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167002\"><\/AnnotationDrawer><div>A mechanical ventilation system shall be provided in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "377-html-1",
+      "kind" : "html",
+      "plainText" : "A mechanical ventilation system shall be provided in accordance with the New York City Mechanical Code."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 377
+}

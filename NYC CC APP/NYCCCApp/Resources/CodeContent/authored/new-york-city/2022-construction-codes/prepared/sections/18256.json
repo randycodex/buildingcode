@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180405\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180405\"><\/AnnotationDrawer><div>Concrete shall be thoroughly consolidated by suitable means during placement and shall be thoroughly worked around reinforcement and embedded fixtures and into corners of the forms.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18256-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete shall be thoroughly consolidated by suitable means during placement and shall be thoroughly worked around reinforcement and embedded fixtures and into corners of the forms."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18256
+}

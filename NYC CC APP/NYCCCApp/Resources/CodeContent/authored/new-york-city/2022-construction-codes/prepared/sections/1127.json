@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169449\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169449\"><\/AnnotationDrawer><div>Horizontal assemblies serving as dwelling or sleeping unit separations in accordance with Section 420.3, located in Group I-1 and R occupancies, shall be not less than 1-hour fire-resistance-rated construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1127-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal assemblies serving as dwelling or sleeping unit separations in accordance with Section 420.3, located in Group I-1 and R occupancies, shall be not less than 1-hour fire-resistance-rated construction."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1127
+}

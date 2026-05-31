@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163855\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163855\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water drained from the roof washer or debris excluder shall not be drained to the sanitary sewer. Such water shall be diverted from the storage tank and discharge in a location that will not cause erosion or damage to property in accordance with the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Building Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">. Roof washers and debris excluders shall be provided with an automatic means of self-draining between rain events, and shall not drain onto roof surfaces.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12759-html-1",
+      "kind" : "html",
+      "plainText" : "Water drained from the roof washer or debris excluder shall not be drained to the sanitary sewer. Such water shall be diverted from the storage tank and discharge in a location that will not cause erosion or damage to property in accordance with the New York City Building Code . Roof washers and debris excluders shall be provided with an automatic means of self-draining between rain events, and shall not drain onto roof surfaces."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12759
+}

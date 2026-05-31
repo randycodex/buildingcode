@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186320\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186320\"><\/AnnotationDrawer><div>Fences and related windscreens or netting shall be visually inspected at least once a week, or where a sidewalk shed is installed at the site, daily, by a person designated by the general contractor, or where there is no general contractor, the contractor causing the work to be performed, or where there is no active work, by the building owner to verify the fence and related windscreens or netting remains in a safe condition in accordance with Section 3307.7.7.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6366-html-1",
+      "kind" : "html",
+      "plainText" : "Fences and related windscreens or netting shall be visually inspected at least once a week, or where a sidewalk shed is installed at the site, daily, by a person designated by the general contractor, or where there is no general contractor, the contractor causing the work to be performed, or where there is no active work, by the building owner to verify the fence and related windscreens or netting remains in a safe condition in accordance with Section 3307.7.7."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6366
+}

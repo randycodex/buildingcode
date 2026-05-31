@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185411\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185411\"><\/AnnotationDrawer><div>All concrete washout water shall be collected and contained in or on the concrete mixer truck or in pre-manufactured watertight containers specifically designed and fabricated for the purpose of collecting and containing concrete washout water on-site. Such containers shall be of sufficient quantity and size to accommodate all rinsing operations required on-site so as not to delay the timely return of concrete ready mix trucks to the concrete plant and shall be protected from breach or overflow at all times.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6042-html-1",
+      "kind" : "html",
+      "plainText" : "All concrete washout water shall be collected and contained in or on the concrete mixer truck or in pre-manufactured watertight containers specifically designed and fabricated for the purpose of collecting and containing concrete washout water on-site. Such containers shall be of sufficient quantity and size to accommodate all rinsing operations required on-site so as not to delay the timely return of concrete ready mix trucks to the concrete plant and shall be protected from breach or overflow at all times."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6042
+}

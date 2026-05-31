@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180873\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180873\"><\/AnnotationDrawer><div>Parapets shall be reinforced vertically and shall be anchored to the roof and floors that provide lateral support for the wall in accordance with Section 1604.8.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18425-html-1",
+      "kind" : "html",
+      "plainText" : "Parapets shall be reinforced vertically and shall be anchored to the roof and floors that provide lateral support for the wall in accordance with Section 1604.8.2."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18425
+}

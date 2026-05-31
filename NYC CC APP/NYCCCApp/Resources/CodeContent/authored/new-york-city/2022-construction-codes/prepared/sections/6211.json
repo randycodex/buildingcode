@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185858\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185858\"><\/AnnotationDrawer><div>Construction loads shall only be placed in areas and to the extent as indicated on the drawings required by Section 3305.8.6.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6211-html-1",
+      "kind" : "html",
+      "plainText" : "Construction loads shall only be placed in areas and to the extent as indicated on the drawings required by Section 3305.8.6.1."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6211
+}

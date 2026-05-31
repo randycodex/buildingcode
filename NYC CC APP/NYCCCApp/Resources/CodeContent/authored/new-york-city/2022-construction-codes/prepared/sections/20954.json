@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197869\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197869\"><\/AnnotationDrawer><div>Metallic pipe and fitting threads shall be taper pipe threads and shall comply with ASME B1.20.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20954-html-1",
+      "kind" : "html",
+      "plainText" : "Metallic pipe and fitting threads shall be taper pipe threads and shall comply with ASME B1.20.1."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 20954
+}

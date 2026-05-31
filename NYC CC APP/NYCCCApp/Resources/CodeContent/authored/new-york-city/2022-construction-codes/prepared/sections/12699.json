@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163706\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163706\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Where installed below grade, storage tank installations shall be designed to withstand earth and surface structural loads without damage and with minimal deformation when empty or filled with water.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12699-html-1",
+      "kind" : "html",
+      "plainText" : "Where installed below grade, storage tank installations shall be designed to withstand earth and surface structural loads without damage and with minimal deformation when empty or filled with water."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 12699
+}

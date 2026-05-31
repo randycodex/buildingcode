@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173672\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173672\"><\/AnnotationDrawer><div>The walls and soffits within enclosed usable spaces under enclosed and unenclosed stairways shall be protected by 1-hour fire-resistance-rated construction or the fire-resistance rating of the stairway enclosure, whichever is greater. Access to the enclosed space shall not be directly from within the stairway enclosure.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173673\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173673\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Spaces under stairways serving and contained within a single residential dwelling unit in Group R-2 or R-3 shall be permitted to be protected on the enclosed side with 1\/2-inch (12.7 mm) gypsum board.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2324-html-1",
+      "kind" : "html",
+      "plainText" : "The walls and soffits within enclosed usable spaces under enclosed and unenclosed stairways shall be protected by 1-hour fire-resistance-rated construction or the fire-resistance rating of the stairway enclosure, whichever is greater. Access to the enclosed space shall not be directly from within the stairway enclosure.\n\n Exception: Spaces under stairways serving and contained within a single residential dwelling unit in Group R-2 or R-3 shall be permitted to be protected on the enclosed side with 1\/2-inch (12.7 mm) gypsum board."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2324
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163035\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163035\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">An open vent terminal from a drainage system of the new or altered building shall not be located directly beneath any door, operable window, or other air intake opening of the building or of an adjacent building, and any such vent terminal shall not be within 10 feet (3048 mm) horizontally of such an opening unless it is at least 3 feet (914 mm) above the top of such opening. When the consent of the owner of an adjoining taller building is obtained, the owner of the new or altered building shall be permitted to carry the new vent stack, with adequate support, to a level above the higher existing roof.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25295-html-1",
+      "kind" : "html",
+      "plainText" : "An open vent terminal from a drainage system of the new or altered building shall not be located directly beneath any door, operable window, or other air intake opening of the building or of an adjacent building, and any such vent terminal shall not be within 10 feet (3048 mm) horizontally of such an opening unless it is at least 3 feet (914 mm) above the top of such opening. When the consent of the owner of an adjoining taller building is obtained, the owner of the new or altered building shall be permitted to carry the new vent stack, with adequate support, to a level above the higher existing roof."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 25295
+}

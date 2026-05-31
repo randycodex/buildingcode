@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183432\"><\/AnnotationDrawer><div>Plastic composites shall consist of either wood\/plastic composites or plastic lumber. Plastic composites shall comply with the provisions of this code and with the additional requirements of Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183430', hash: '#JD_BC2612' }}\">2612<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19160-html-1",
+      "kind" : "html",
+      "plainText" : "Plastic composites shall consist of either wood\/plastic composites or plastic lumber. Plastic composites shall comply with the provisions of this code and with the additional requirements of Section 2612 ."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19160
+}

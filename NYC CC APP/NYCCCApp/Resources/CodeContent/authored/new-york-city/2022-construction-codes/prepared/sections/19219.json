@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183556\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183556\"><\/AnnotationDrawer><div>Emergency power shall be provided for doors in Group I-3 occupancies in accordance with Section 408.4.2.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19219-html-1",
+      "kind" : "html",
+      "plainText" : "Emergency power shall be provided for doors in Group I-3 occupancies in accordance with Section 408.4.2."
+    }
+  ],
+  "chapterNumber" : "27",
+  "schemaVersion" : 1,
+  "sectionID" : 19219
+}

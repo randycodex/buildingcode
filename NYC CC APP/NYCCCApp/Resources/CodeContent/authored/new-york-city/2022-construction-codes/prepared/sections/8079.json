@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197704\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197704\"><\/AnnotationDrawer><div>Air-conditioning appliances shall be installed with clearances in accordance with the terms of their listing and the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8079-html-1",
+      "kind" : "html",
+      "plainText" : "Air-conditioning appliances shall be installed with clearances in accordance with the terms of their listing and the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 8079
+}

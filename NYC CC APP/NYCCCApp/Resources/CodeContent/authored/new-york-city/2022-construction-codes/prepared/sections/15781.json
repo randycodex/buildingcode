@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172382\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172382\"><\/AnnotationDrawer><div>Special inspections shall be conducted in accordance with the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172383\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172383\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;During erection of ductwork and prior to concealment for the purposes of leakage testing and recording of device location.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172384\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172384\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Prior to occupancy and after sufficient completion for the purposes of pressure-difference testing, flow measurements, and detection and control verification.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15781-html-1",
+      "kind" : "html",
+      "plainText" : "Special inspections shall be conducted in accordance with the following:\n\n 1. During erection of ductwork and prior to concealment for the purposes of leakage testing and recording of device location.\n\n 2. Prior to occupancy and after sufficient completion for the purposes of pressure-difference testing, flow measurements, and detection and control verification."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15781
+}

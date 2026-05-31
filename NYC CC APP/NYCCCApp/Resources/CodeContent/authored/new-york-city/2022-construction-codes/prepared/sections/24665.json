@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161433\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161433\"><\/AnnotationDrawer><div>Plumbing fixtures shall be constructed of approved materials, with smooth, impervious surfaces, free from defects and concealed fouling surfaces, and shall conform to standards cited in this code. All porcelain enameled surfaces on plumbing fixtures shall be acid resistant.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24665-html-1",
+      "kind" : "html",
+      "plainText" : "Plumbing fixtures shall be constructed of approved materials, with smooth, impervious surfaces, free from defects and concealed fouling surfaces, and shall conform to standards cited in this code. All porcelain enameled surfaces on plumbing fixtures shall be acid resistant."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24665
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187398\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187398\"><\/AnnotationDrawer><div>The inboard ends of outrigger beams shall be securely fixed to resist all vertical, horizontal and torsional forces. Pull-out tests for adhesive and expansions anchors, if used, shall be approved by the commissioner.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6698-html-1",
+      "kind" : "html",
+      "plainText" : "The inboard ends of outrigger beams shall be securely fixed to resist all vertical, horizontal and torsional forces. Pull-out tests for adhesive and expansions anchors, if used, shall be approved by the commissioner."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6698
+}

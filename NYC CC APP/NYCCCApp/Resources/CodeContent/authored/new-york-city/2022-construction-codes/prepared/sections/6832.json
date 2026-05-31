@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187894\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187894\"><\/AnnotationDrawer><div>Where conveyor belts cross any traveled way, trays shall be installed to catch spillage and overhead protection shall be provided for persons or traffic passing beneath.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6832-html-1",
+      "kind" : "html",
+      "plainText" : "Where conveyor belts cross any traveled way, trays shall be installed to catch spillage and overhead protection shall be provided for persons or traffic passing beneath."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6832
+}

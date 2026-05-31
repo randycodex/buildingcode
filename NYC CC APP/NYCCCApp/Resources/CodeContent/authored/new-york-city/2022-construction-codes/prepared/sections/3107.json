@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176211\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176211\"><\/AnnotationDrawer><div>Wood veneers on exterior walls of buildings of Type I, II, III and IV construction shall be not less than 1-inch (25.4 mm) nominal thickness, 0.438-inch (11.1 mm) exterior hardboard siding or 0.375-inch (9.5 mm) exterior-type wood structural panels or particleboard and shall conform to the following:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176212\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176212\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The veneer shall not exceed 40 feet (12190 mm) in height above grade. Where fire-retardant-treated wood is used, the height shall not exceed 60 feet (18290 mm) in height above grade.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176213\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176213\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The veneer is attached to or furred from a noncombustible backing that is fire-resistance rated as required by other provisions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176214\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176214\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Where open or spaced wood veneers (without concealed spaces) are used, they shall not project more than 24 inches (609.6 mm) from the building wall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3107-html-1",
+      "kind" : "html",
+      "plainText" : "Wood veneers on exterior walls of buildings of Type I, II, III and IV construction shall be not less than 1-inch (25.4 mm) nominal thickness, 0.438-inch (11.1 mm) exterior hardboard siding or 0.375-inch (9.5 mm) exterior-type wood structural panels or particleboard and shall conform to the following:\n\n 1. The veneer shall not exceed 40 feet (12190 mm) in height above grade. Where fire-retardant-treated wood is used, the height shall not exceed 60 feet (18290 mm) in height above grade.\n\n 2. The veneer is attached to or furred from a noncombustible backing that is fire-resistance rated as required by other provisions of this code.\n\n 3. Where open or spaced wood veneers (without concealed spaces) are used, they shall not project more than 24 inches (609.6 mm) from the building wall."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3107
+}

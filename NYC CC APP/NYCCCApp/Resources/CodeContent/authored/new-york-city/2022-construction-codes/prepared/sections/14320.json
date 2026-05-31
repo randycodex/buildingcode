@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167357\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167357\"><\/AnnotationDrawer><div>Each projection machine shall be provided with an exhaust duct that will draw air from each lamp and exhaust it directly to the outside of the building. The lamp exhaust is permitted to serve to exhaust air from the projection room to provide room air circulation. Such ducts shall be of rigid materials, except for a flexible connector approved for the purpose. The projection lamp or projection room exhaust system, or both, is permitted to be combined but shall not be interconnected with any other exhaust or return system, or both, within the building.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14320-html-1",
+      "kind" : "html",
+      "plainText" : "Each projection machine shall be provided with an exhaust duct that will draw air from each lamp and exhaust it directly to the outside of the building. The lamp exhaust is permitted to serve to exhaust air from the projection room to provide room air circulation. Such ducts shall be of rigid materials, except for a flexible connector approved for the purpose. The projection lamp or projection room exhaust system, or both, is permitted to be combined but shall not be interconnected with any other exhaust or return system, or both, within the building."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14320
+}

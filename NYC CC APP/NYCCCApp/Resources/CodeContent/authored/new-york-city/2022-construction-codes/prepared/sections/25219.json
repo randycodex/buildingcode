@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162858\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162858\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The size of a sterilizer vent stack shall be not less than 2 inches (51 mm) in diameter where serving a utensil sterilizer and not less than 1 1\/2 inches (38 mm) in diameter where serving an instrument sterilizer. Combinations of boiling-type sterilizer vent connections shall be sized in accordance with <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162850', hash: '#JD_PCTable713.11.1' }}\">Table 713.11.1<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25219-html-1",
+      "kind" : "html",
+      "plainText" : "The size of a sterilizer vent stack shall be not less than 2 inches (51 mm) in diameter where serving a utensil sterilizer and not less than 1 1\/2 inches (38 mm) in diameter where serving an instrument sterilizer. Combinations of boiling-type sterilizer vent connections shall be sized in accordance with Table 713.11.1 ."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25219
+}

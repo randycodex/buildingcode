@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-199081\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-199081\"><\/AnnotationDrawer><div>Where a table permits more than one diameter of pipe to be used for a connector or vent, all the permitted sizes shall be permitted to be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8554-html-1",
+      "kind" : "html",
+      "plainText" : "Where a table permits more than one diameter of pipe to be used for a connector or vent, all the permitted sizes shall be permitted to be used."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 8554
+}

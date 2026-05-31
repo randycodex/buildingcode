@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174828\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174828\"><\/AnnotationDrawer><div>Sites, buildings, structures, facilities, elements and spaces shall be exempt from this chapter to the extent specified in this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2638-html-1",
+      "kind" : "html",
+      "plainText" : "Sites, buildings, structures, facilities, elements and spaces shall be exempt from this chapter to the extent specified in this section."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2638
+}

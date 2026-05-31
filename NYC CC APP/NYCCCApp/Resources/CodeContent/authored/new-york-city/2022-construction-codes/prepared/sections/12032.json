@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161915\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161915\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The water distribution system shall be connected to a public water main if available. Where a public water main is not available, an individual potable water supply shall be provided. Any such private system shall be provided subject to the approval of the commissioner and of any other agency or agencies having jurisdiction.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12032-html-1",
+      "kind" : "html",
+      "plainText" : "The water distribution system shall be connected to a public water main if available. Where a public water main is not available, an individual potable water supply shall be provided. Any such private system shall be provided subject to the approval of the commissioner and of any other agency or agencies having jurisdiction."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12032
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167533\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167533\"><\/AnnotationDrawer><div>Wires or cables that provide normal or standby power, control signals, communication with the car, lighting, heating, air conditioning, ventilation and fire detecting systems to elevators shall be protected by construction having a fire-resistance rating of not less than 1 hour, or shall be circuit integrity cable having a fire-resistance rating of not less than 1 hour.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "552-html-1",
+      "kind" : "html",
+      "plainText" : "Wires or cables that provide normal or standby power, control signals, communication with the car, lighting, heating, air conditioning, ventilation and fire detecting systems to elevators shall be protected by construction having a fire-resistance rating of not less than 1 hour, or shall be circuit integrity cable having a fire-resistance rating of not less than 1 hour."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 552
+}

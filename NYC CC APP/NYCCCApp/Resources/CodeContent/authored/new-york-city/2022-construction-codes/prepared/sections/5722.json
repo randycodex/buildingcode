@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184452\"><\/AnnotationDrawer><div>Any part of a building that projects beyond a street line on January 1, 1938 may be maintained as constructed until its removal is directed in accordance with applicable law.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5722-html-1",
+      "kind" : "html",
+      "plainText" : "Any part of a building that projects beyond a street line on January 1, 1938 may be maintained as constructed until its removal is directed in accordance with applicable law."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 5722
+}

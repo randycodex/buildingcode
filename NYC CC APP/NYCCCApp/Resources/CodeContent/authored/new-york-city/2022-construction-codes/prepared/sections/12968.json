@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188461\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188461\"><\/AnnotationDrawer><div>The permit application shall include documentation required by Section G103.6 and, if applicable, a description of the extent to which any watercourse will be altered or relocated as a result of proposed development.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12968-html-1",
+      "kind" : "html",
+      "plainText" : "The permit application shall include documentation required by Section G103.6 and, if applicable, a description of the extent to which any watercourse will be altered or relocated as a result of proposed development."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 12968
+}

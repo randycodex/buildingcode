@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171035\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171035\"><\/AnnotationDrawer><div>Manual fire alarm, automatic fire-extinguishing and emergency alarm systems in Group H occupancies shall be monitored by a central supervising station.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171036\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171036\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> When approved by the Fire Department, on-site monitoring at a constantly attended location shall be permitted provided that notifications to the Fire Department will be equal to those provided by a central supervising station.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15374-html-1",
+      "kind" : "html",
+      "plainText" : "Manual fire alarm, automatic fire-extinguishing and emergency alarm systems in Group H occupancies shall be monitored by a central supervising station.\n\n Exception: When approved by the Fire Department, on-site monitoring at a constantly attended location shall be permitted provided that notifications to the Fire Department will be equal to those provided by a central supervising station."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15374
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187073\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187073\"><\/AnnotationDrawer><div>Scaffolds, including all components of and attachments to the scaffold, and all supports and anchorages of the scaffold, shall be provided to the site in a safe working order by their respective owner, with no known hazardous conditions, defective repairs, or maintenance problems that could compromise the safety of the public or property. All scaffolds shall be kept in a safe condition at the site by the scaffold controlling entity. Every damaged or weakened scaffold shall be immediately repaired or secured and shall not be used until satisfactory repairs have been completed, and the scaffold is inspected under the provisions of Section 3314.4.3. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187074\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187074\"><\/AnnotationDrawer><div>(Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-224573\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224573\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-224061', hash: '#JD_L.L.2023\/077' }}\">L.L. 2023\/077<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20418-html-1",
+      "kind" : "html",
+      "plainText" : "Scaffolds, including all components of and attachments to the scaffold, and all supports and anchorages of the scaffold, shall be provided to the site in a safe working order by their respective owner, with no known hazardous conditions, defective repairs, or maintenance problems that could compromise the safety of the public or property. All scaffolds shall be kept in a safe condition at the site by the scaffold controlling entity. Every damaged or weakened scaffold shall be immediately repaired or secured and shall not be used until satisfactory repairs have been completed, and the scaffold is inspected under the provisions of Section 3314.4.3. \n\n (Am. L.L. 2023\/077, 6\/11\/2023, eff. 6\/11\/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023\/077 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20418
+}

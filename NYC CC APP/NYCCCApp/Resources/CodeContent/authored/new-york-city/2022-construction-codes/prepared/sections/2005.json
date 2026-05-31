@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172510\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172510\"><\/AnnotationDrawer><div>Smoke and heat vents shall be listed and labeled to indicate compliance with UL 793 or FM 4430.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2005-html-1",
+      "kind" : "html",
+      "plainText" : "Smoke and heat vents shall be listed and labeled to indicate compliance with UL 793 or FM 4430."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 2005
+}

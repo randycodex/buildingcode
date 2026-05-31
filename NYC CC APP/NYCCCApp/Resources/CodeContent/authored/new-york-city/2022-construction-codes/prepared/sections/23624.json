@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194542\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194542\"><\/AnnotationDrawer><div>A listed smoke damper designed to resist the passage of smoke shall be provided at each point that a duct or air transfer opening penetrates a fire wall that serves as a horizontal exit.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194543\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194543\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Smoke dampers shall not be required in ducts where the air continues to move and the air-handling system installed is arranged to prevent recirculation of exhaust or return air under fire emergency conditions or loss of normal power by provision of standby power in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183483', hash: '#JD_BCCh.27' }}\">Chapter 27<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23624-html-1",
+      "kind" : "html",
+      "plainText" : "A listed smoke damper designed to resist the passage of smoke shall be provided at each point that a duct or air transfer opening penetrates a fire wall that serves as a horizontal exit.\n\n Exception: Smoke dampers shall not be required in ducts where the air continues to move and the air-handling system installed is arranged to prevent recirculation of exhaust or return air under fire emergency conditions or loss of normal power by provision of standby power in accordance with Chapter 27 of the New York City Building Code ."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23624
+}

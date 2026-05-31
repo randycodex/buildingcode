@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187288\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187288\"><\/AnnotationDrawer><div>When winding drum hoists are used on a suspended scaffold, they shall contain not fewer than four wraps of the suspension rope at the lowest point of scaffold travel. When other types of hoists are used, the suspension ropes shall be long enough to allow the scaffold to be lowered to the level below without the rope end passing through the hoist, or the rope end shall be configured or provided with means to prevent the end from passing through the hoist.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6663-html-1",
+      "kind" : "html",
+      "plainText" : "When winding drum hoists are used on a suspended scaffold, they shall contain not fewer than four wraps of the suspension rope at the lowest point of scaffold travel. When other types of hoists are used, the suspension ropes shall be long enough to allow the scaffold to be lowered to the level below without the rope end passing through the hoist, or the rope end shall be configured or provided with means to prevent the end from passing through the hoist."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6663
+}

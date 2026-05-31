@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195977\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195977\"><\/AnnotationDrawer><div>Grooved and shouldered mechanical joints shall conform to the requirements of ASTM F 1476 and shall be installed in accordance with the manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11297-html-1",
+      "kind" : "html",
+      "plainText" : "Grooved and shouldered mechanical joints shall conform to the requirements of ASTM F 1476 and shall be installed in accordance with the manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 11297
+}

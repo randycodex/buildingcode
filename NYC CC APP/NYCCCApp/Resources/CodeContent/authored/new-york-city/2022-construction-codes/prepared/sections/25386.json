@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163291\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163291\"><\/AnnotationDrawer><div>Grease interceptors shall have a grease retention capacity in accordance with the rules of the Department of Environmental Protection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25386-html-1",
+      "kind" : "html",
+      "plainText" : "Grease interceptors shall have a grease retention capacity in accordance with the rules of the Department of Environmental Protection."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 25386
+}

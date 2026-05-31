@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-163636\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-163636\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The storage, handling, and use of medical and nonmedical gases shall be in accordance with the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Fire Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-163637\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-163637\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-163637\"><\/AnnotationDrawer><h6><a name=\"JD_PC1202\" id=\"JD_PC1202\" title=\"PC 1202\"><\/a>Section PC 1202: Medical and Nonmedical Gases<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25498-html-1",
+      "kind" : "html",
+      "plainText" : "The storage, handling, and use of medical and nonmedical gases shall be in accordance with the New York City Fire Code. \n\n Section PC 1202: Medical and Nonmedical Gases"
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 25498
+}

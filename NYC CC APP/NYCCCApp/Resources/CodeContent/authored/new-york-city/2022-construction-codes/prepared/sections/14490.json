@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167889\"><\/AnnotationDrawer><div>Fabrication areas shall comply with Sections 415.11.1.1 through 415.11.1.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14490-html-1",
+      "kind" : "html",
+      "plainText" : "Fabrication areas shall comply with Sections 415.11.1.1 through 415.11.1.8."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14490
+}

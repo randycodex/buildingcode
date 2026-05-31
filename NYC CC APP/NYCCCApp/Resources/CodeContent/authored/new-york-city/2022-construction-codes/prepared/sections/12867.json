@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188201\"><\/AnnotationDrawer><div>All public telephones provided shall have accessible volume control complying with Section 704.3 (Volume-Control Telephones) of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12867-html-1",
+      "kind" : "html",
+      "plainText" : "All public telephones provided shall have accessible volume control complying with Section 704.3 (Volume-Control Telephones) of ICC A117.1."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12867
+}

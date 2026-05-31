@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171639\"><\/AnnotationDrawer><div>Underground buildings shall be equipped throughout with a Class I automatic wet or manual wet standpipe system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1718-html-1",
+      "kind" : "html",
+      "plainText" : "Underground buildings shall be equipped throughout with a Class I automatic wet or manual wet standpipe system."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1718
+}

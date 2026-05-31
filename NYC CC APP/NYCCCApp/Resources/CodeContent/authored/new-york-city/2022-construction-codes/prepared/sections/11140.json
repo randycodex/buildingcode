@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195526\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195526\"><\/AnnotationDrawer><div>An expansion tank shall be installed in every hot water system. For multiple boiler installations, not less than one expansion tank is required. Expansion tanks shall be of the closed or open type. Tanks shall be rated for the pressure of the hot water system. Lockable shutoff valves shall be installed at connections to all expansion tanks. Valves shall remain locked in the open position.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11140-html-1",
+      "kind" : "html",
+      "plainText" : "An expansion tank shall be installed in every hot water system. For multiple boiler installations, not less than one expansion tank is required. Expansion tanks shall be of the closed or open type. Tanks shall be rated for the pressure of the hot water system. Lockable shutoff valves shall be installed at connections to all expansion tanks. Valves shall remain locked in the open position."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 11140
+}

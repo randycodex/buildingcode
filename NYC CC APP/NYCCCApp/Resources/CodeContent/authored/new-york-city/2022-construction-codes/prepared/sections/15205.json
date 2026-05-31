@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170289\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170289\"><\/AnnotationDrawer><div>The thickness of panels with tapered cross sections shall be that determined at a distance 2<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">t<\/span> or 6 inches (152.4 mm), whichever is less, from the point of minimum thickness, where t is the minimum thickness.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15205-html-1",
+      "kind" : "html",
+      "plainText" : "The thickness of panels with tapered cross sections shall be that determined at a distance 2 t or 6 inches (152.4 mm), whichever is less, from the point of minimum thickness, where t is the minimum thickness."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15205
+}

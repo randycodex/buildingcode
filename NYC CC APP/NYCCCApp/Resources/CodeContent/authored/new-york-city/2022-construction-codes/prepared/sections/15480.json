@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171450\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171450\"><\/AnnotationDrawer><div>Alarm, supervisory and trouble signals shall be distinctly different and shall be automatically transmitted to a central supervising station or when approved by the Fire Department, shall sound an audible signal at a constantly attended location.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171451\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171451\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171452\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171452\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Underground key or hub valves in roadway boxes provided by the city or a public utility are not required to be monitored.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171453\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171453\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Backflow prevention device test valves, located in limited area sprinkler system supply piping, shall be locked in the open position. In occupancies required to be equipped with a fire alarm system, the back flow preventer valves shall be electrically supervised by a tamper switch installed in accordance with NFPA 72 and separately annunciated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15480-html-1",
+      "kind" : "html",
+      "plainText" : "Alarm, supervisory and trouble signals shall be distinctly different and shall be automatically transmitted to a central supervising station or when approved by the Fire Department, shall sound an audible signal at a constantly attended location.\n\n Exceptions: \n\n 1. Underground key or hub valves in roadway boxes provided by the city or a public utility are not required to be monitored.\n\n 2. Backflow prevention device test valves, located in limited area sprinkler system supply piping, shall be locked in the open position. In occupancies required to be equipped with a fire alarm system, the back flow preventer valves shall be electrically supervised by a tamper switch installed in accordance with NFPA 72 and separately annunciated."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15480
+}

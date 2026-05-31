@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197815\"><\/AnnotationDrawer><div>Pipe shall be sized as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197816\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197816\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Pipe size of each section of the longest pipe run from the point of delivery to the most remote outlet shall be determined using the longest run of piping and the load of the section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197817\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197817\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The pipe size of each section of branch piping not previously sized shall be determined using the length of piping from the point of delivery to the most remote outlet in each branch and the load of the section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8109-html-1",
+      "kind" : "html",
+      "plainText" : "Pipe shall be sized as follows:\n\n 1. Pipe size of each section of the longest pipe run from the point of delivery to the most remote outlet shall be determined using the longest run of piping and the load of the section.\n\n 2. The pipe size of each section of branch piping not previously sized shall be determined using the length of piping from the point of delivery to the most remote outlet in each branch and the load of the section."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8109
+}

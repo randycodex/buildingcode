@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198100\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198100\"><\/AnnotationDrawer><div>This section establishes minimum standards for gauges used to test gas piping.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198101\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198101\"><\/AnnotationDrawer><div>Each gauge shall meet the following requirements:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198102\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198102\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;The gauge shall be manufactured and used in accordance with ASME B40.100, which incorporates ASME B40.1 and ASME B40.7, and the manufacturer shall provide with the gauge a written statement that the gauge is manufactured in accordance with such ASME standard;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198103\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198103\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;The gauge shall be labeled with the name of the manufacturer;<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198104\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198104\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;The units of measurement \"psig\" shall appear on the face of the gauge; and<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-198105\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-198105\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;The gauge shall be kept in good working order.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "8221-html-1",
+      "kind" : "html",
+      "plainText" : "This section establishes minimum standards for gauges used to test gas piping.\n\n Each gauge shall meet the following requirements:\n\n 1. The gauge shall be manufactured and used in accordance with ASME B40.100, which incorporates ASME B40.1 and ASME B40.7, and the manufacturer shall provide with the gauge a written statement that the gauge is manufactured in accordance with such ASME standard;\n\n 2. The gauge shall be labeled with the name of the manufacturer;\n\n 3. The units of measurement \"psig\" shall appear on the face of the gauge; and\n\n 4. The gauge shall be kept in good working order."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 8221
+}

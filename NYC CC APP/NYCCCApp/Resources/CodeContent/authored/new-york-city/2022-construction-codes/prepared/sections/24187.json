@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196116\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196116\"><\/AnnotationDrawer><div>Ground-source heat pump ground-loop piping and tubing material for water-based systems shall conform to the standards cited in this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24187-html-1",
+      "kind" : "html",
+      "plainText" : "Ground-source heat pump ground-loop piping and tubing material for water-based systems shall conform to the standards cited in this section."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 24187
+}

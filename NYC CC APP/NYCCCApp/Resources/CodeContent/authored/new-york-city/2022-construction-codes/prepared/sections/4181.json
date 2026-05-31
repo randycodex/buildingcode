@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179714\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179714\"><\/AnnotationDrawer><div>The depth of the rock socket in Class 1c rock or better shall be sufficient to develop the full load-bearing capacity of the caisson pile based upon the sum of the allowable bearing pressure on the bottom of the socket in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-179057', hash: '#JD_BCTable1806.1' }}\">Table 1806.1<\/Link> plus an allowable bond stress of 200 psi (1379 kPa) on the sides of the socket. The depth of the socket in Class 1c rock or better below the bottom of the pipe shall not be less than 3 feet (914.4 mm) or the outside diameter of the pipe.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4181-html-1",
+      "kind" : "html",
+      "plainText" : "The depth of the rock socket in Class 1c rock or better shall be sufficient to develop the full load-bearing capacity of the caisson pile based upon the sum of the allowable bearing pressure on the bottom of the socket in accordance with Table 1806.1 plus an allowable bond stress of 200 psi (1379 kPa) on the sides of the socket. The depth of the socket in Class 1c rock or better below the bottom of the pipe shall not be less than 3 feet (914.4 mm) or the outside diameter of the pipe."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 4181
+}

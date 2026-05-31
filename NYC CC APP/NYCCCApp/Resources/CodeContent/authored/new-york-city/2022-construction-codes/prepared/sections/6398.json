@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186419\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186419\"><\/AnnotationDrawer><div>Where required, vertical safety netting shall extend to cover all openings in the unenclosed perimeter to a height of at least 60 inches (1524 mm) above the floor or, where installed at the roof level, the roof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6398-html-1",
+      "kind" : "html",
+      "plainText" : "Where required, vertical safety netting shall extend to cover all openings in the unenclosed perimeter to a height of at least 60 inches (1524 mm) above the floor or, where installed at the roof level, the roof."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6398
+}

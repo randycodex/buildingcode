@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181516\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181516\"><\/AnnotationDrawer><div>For the purposes of this chapter, where dimensions of lumber are specified, they shall be deemed to be nominal dimensions unless specifically designated as actual dimensions (see Section 2304.2).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-181517\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-181517\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-181517\"><\/AnnotationDrawer><h6><a name=\"JD_BC2302\" id=\"JD_BC2302\" title=\"BC 2302\"><\/a>Section BC 2302: Definitions<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4830-html-1",
+      "kind" : "html",
+      "plainText" : "For the purposes of this chapter, where dimensions of lumber are specified, they shall be deemed to be nominal dimensions unless specifically designated as actual dimensions (see Section 2304.2).\n\n Section BC 2302: Definitions"
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4830
+}

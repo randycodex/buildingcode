@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161588\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161588\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Drinking fountains shall conform to ASME A112.19.1\/CSA B45.2 or ASME A112.19.2\/CSA B45.1 and water coolers shall conform to AHRI 1010. Drinking fountains and water coolers shall conform to NSF 61, Section 9 and ICC A117.1. Drinking fountains required by <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-161441', hash: '#JD_PCTable403.1' }}\">Table 403.1<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> shall be equipped with both a bubbler faucet for drinking and a separate faucet designed for filling a container at least 10 inches (254 mm) in height. Drinking fountains and water coolers shall comply with the lead requirements of Section <\/span><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"><Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-162017', hash: '#JD_PC605' }}\">605<\/Link><\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24719-html-1",
+      "kind" : "html",
+      "plainText" : "Drinking fountains shall conform to ASME A112.19.1\/CSA B45.2 or ASME A112.19.2\/CSA B45.1 and water coolers shall conform to AHRI 1010. Drinking fountains and water coolers shall conform to NSF 61, Section 9 and ICC A117.1. Drinking fountains required by Table 403.1 shall be equipped with both a bubbler faucet for drinking and a separate faucet designed for filling a container at least 10 inches (254 mm) in height. Drinking fountains and water coolers shall comply with the lead requirements of Section 605 ."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24719
+}

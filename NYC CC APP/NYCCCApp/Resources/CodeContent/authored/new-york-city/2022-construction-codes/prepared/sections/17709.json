@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178760\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178760\"><\/AnnotationDrawer><div>Visual inspection shall confirm that joints, seams, and connections of covered mechanical systems are securely fastened and sealed with welds, gaskets, mastics (adhesives), mastic-plus-embedded-fabric systems, liquid sealants or tapes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17709-html-1",
+      "kind" : "html",
+      "plainText" : "Visual inspection shall confirm that joints, seams, and connections of covered mechanical systems are securely fastened and sealed with welds, gaskets, mastics (adhesives), mastic-plus-embedded-fabric systems, liquid sealants or tapes."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17709
+}

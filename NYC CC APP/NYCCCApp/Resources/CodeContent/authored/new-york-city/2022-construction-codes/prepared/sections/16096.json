@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173446\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173446\"><\/AnnotationDrawer><div>Door handles, pulls, latches, locks and other operating devices on doors required to be accessible by <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-174748', hash: '#JD_BCCh.11' }}\">Chapter 11<\/Link> shall not require tight grasping, tight pinching or twisting of the wrist to operate.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16096-html-1",
+      "kind" : "html",
+      "plainText" : "Door handles, pulls, latches, locks and other operating devices on doors required to be accessible by Chapter 11 shall not require tight grasping, tight pinching or twisting of the wrist to operate."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16096
+}

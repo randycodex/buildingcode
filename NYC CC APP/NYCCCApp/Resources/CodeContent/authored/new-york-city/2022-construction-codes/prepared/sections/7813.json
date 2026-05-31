@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-230143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-230143\"><\/AnnotationDrawer><div>A primary dwelling and an ADU may share a common potable water system, provided that there are separate, accessible main shutoff valves allowing the water to be turned off for each unit without affecting any other unit. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7813-html-1",
+      "kind" : "html",
+      "plainText" : "A primary dwelling and an ADU may share a common potable water system, provided that there are separate, accessible main shutoff valves allowing the water to be turned off for each unit without affecting any other unit."
+    }
+  ],
+  "chapterNumber" : "U",
+  "schemaVersion" : 1,
+  "sectionID" : 7813
+}

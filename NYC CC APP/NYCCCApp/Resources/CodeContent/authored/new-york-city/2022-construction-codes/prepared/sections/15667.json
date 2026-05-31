@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172044\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172044\"><\/AnnotationDrawer><div>The maximum sound pressure level for audible alarm notification appliances shall be 110 dBA at the minimum hearing distance from the audible appliance. Where the average ambient noise is greater than 95 dBA, visible alarm notification appliances shall be provided in accordance with NFPA 72 and audible alarm notification appliances shall not be required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15667-html-1",
+      "kind" : "html",
+      "plainText" : "The maximum sound pressure level for audible alarm notification appliances shall be 110 dBA at the minimum hearing distance from the audible appliance. Where the average ambient noise is greater than 95 dBA, visible alarm notification appliances shall be provided in accordance with NFPA 72 and audible alarm notification appliances shall not be required."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15667
+}

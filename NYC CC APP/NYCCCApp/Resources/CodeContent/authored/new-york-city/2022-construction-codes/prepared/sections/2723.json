@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175066\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175066\"><\/AnnotationDrawer><div>Grab bars for bathtubs shall comply with Section 609 of ICC A117.1 and shall be provided in accordance with Section 607.4 of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175067\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175067\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Grab bars are not required to be installed where reinforcement for such grab bars is installed and located to permit future installation of grab bars complying with Section 1107.2.2.8.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2723-html-1",
+      "kind" : "html",
+      "plainText" : "Grab bars for bathtubs shall comply with Section 609 of ICC A117.1 and shall be provided in accordance with Section 607.4 of ICC A117.1.\n\n Exception: Grab bars are not required to be installed where reinforcement for such grab bars is installed and located to permit future installation of grab bars complying with Section 1107.2.2.8.1.1."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2723
+}

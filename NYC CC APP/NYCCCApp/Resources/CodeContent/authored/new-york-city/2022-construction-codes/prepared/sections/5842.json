@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184676\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184676\"><\/AnnotationDrawer><div>Whenever design is required by this chapter, the design shall be in accordance with the requirements of this code. This requirement does not alleviate any other design requirements imposed by law or the manufacturer.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5842-html-1",
+      "kind" : "html",
+      "plainText" : "Whenever design is required by this chapter, the design shall be in accordance with the requirements of this code. This requirement does not alleviate any other design requirements imposed by law or the manufacturer."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5842
+}

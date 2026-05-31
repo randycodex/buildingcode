@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185244\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185244\"><\/AnnotationDrawer><div>Existing sprinkler systems in buildings undergoing an alteration shall be maintained in accordance with Section 3303.9, except as provided in Section 3303.7.4.3. The red paint required pursuant to Section 903.6 shall be maintained during any alteration operation.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5970-html-1",
+      "kind" : "html",
+      "plainText" : "Existing sprinkler systems in buildings undergoing an alteration shall be maintained in accordance with Section 3303.9, except as provided in Section 3303.7.4.3. The red paint required pursuant to Section 903.6 shall be maintained during any alteration operation."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5970
+}

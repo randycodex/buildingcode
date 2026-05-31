@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179366\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179366\"><\/AnnotationDrawer><div>All pile caps supported by deep foundations that penetrate less than 10 feet (3048 mm) below cutoff level or less than 10 feet (3048 mm) below ground level shall be braced against lateral movement. Such bracing may consist of connection to other pile caps that encompass deep foundations embedded more than 10 feet (3048 mm) below those levels. The heads of the deep foundations shall be fixed in the cap. In no case shall more than fifty percent of the deep foundations in the foundation of any building penetrate less than 10 feet (3048 mm) below cut-off level or less than 10 feet (3048 mm) below ground level.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-179367\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-179367\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> The requirements of this section shall not apply to caisson piles.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17901-html-1",
+      "kind" : "html",
+      "plainText" : "All pile caps supported by deep foundations that penetrate less than 10 feet (3048 mm) below cutoff level or less than 10 feet (3048 mm) below ground level shall be braced against lateral movement. Such bracing may consist of connection to other pile caps that encompass deep foundations embedded more than 10 feet (3048 mm) below those levels. The heads of the deep foundations shall be fixed in the cap. In no case shall more than fifty percent of the deep foundations in the foundation of any building penetrate less than 10 feet (3048 mm) below cut-off level or less than 10 feet (3048 mm) below ground level.\n\n Exception: The requirements of this section shall not apply to caisson piles."
+    }
+  ],
+  "chapterNumber" : "18",
+  "schemaVersion" : 1,
+  "sectionID" : 17901
+}

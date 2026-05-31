@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194404\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194404\"><\/AnnotationDrawer><div>Where ducts used for cooling are externally insulated, the insulation shall be covered with a vapor retarder having a maximum permeance of 0.05 perm (2.87 ng\/(Pa &#8226; s &#8226; m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t)) or aluminum foil having a minimum thickness of 2 mils (0.051 mm). Insulations having a permeance of 0.05 perm (2.87 ng\/(Pa &#8226; s &#8226; m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t)) or less shall not be required to be covered. All joints and seams shall be sealed to maintain the continuity of the vapor retarder.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23577-html-1",
+      "kind" : "html",
+      "plainText" : "Where ducts used for cooling are externally insulated, the insulation shall be covered with a vapor retarder having a maximum permeance of 0.05 perm (2.87 ng\/(Pa &#8226; s &#8226; m\n\n 2 \n\n )) or aluminum foil having a minimum thickness of 2 mils (0.051 mm). Insulations having a permeance of 0.05 perm (2.87 ng\/(Pa &#8226; s &#8226; m\n\n 2 \n\n )) or less shall not be required to be covered. All joints and seams shall be sealed to maintain the continuity of the vapor retarder."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 23577
+}

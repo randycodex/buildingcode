@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193813\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193813\"><\/AnnotationDrawer><div>Grease duct bracing and supports shall be of noncombustible material securely attached to the structure and designed to carry gravity and seismic loads within the stress limitations of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span> Bolts, screws, rivets and other mechanical fasteners shall not penetrate duct walls.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10554-html-1",
+      "kind" : "html",
+      "plainText" : "Grease duct bracing and supports shall be of noncombustible material securely attached to the structure and designed to carry gravity and seismic loads within the stress limitations of the New York City Building Code. Bolts, screws, rivets and other mechanical fasteners shall not penetrate duct walls."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10554
+}

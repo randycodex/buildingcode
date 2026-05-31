@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164242\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164242\"><\/AnnotationDrawer><div>This code shall be known and may be cited as the \"<span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span>,\" \"NYCBC\" or \"BC\". All section numbers in this code shall be deemed to be preceded by the designation \"BC\".<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13829-html-1",
+      "kind" : "html",
+      "plainText" : "This code shall be known and may be cited as the \" New York City Building Code ,\" \"NYCBC\" or \"BC\". All section numbers in this code shall be deemed to be preceded by the designation \"BC\"."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13829
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195225\"><\/AnnotationDrawer><div>Cooling towers, evaporative condensers and fluid coolers shall be provided with an approved water supply, sized for peak demand. The quality of water shall be provided in accordance with the equipment manufacturer's recommendations. The piping system and protection of the potable water supply system shall be installed as required by the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11024-html-1",
+      "kind" : "html",
+      "plainText" : "Cooling towers, evaporative condensers and fluid coolers shall be provided with an approved water supply, sized for peak demand. The quality of water shall be provided in accordance with the equipment manufacturer's recommendations. The piping system and protection of the potable water supply system shall be installed as required by the New York City Plumbing Code ."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 11024
+}

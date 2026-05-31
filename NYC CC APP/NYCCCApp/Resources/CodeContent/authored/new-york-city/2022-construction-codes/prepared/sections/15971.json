@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172954\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172954\"><\/AnnotationDrawer><div>Rooms, areas or spaces that are accessory to a Group R-2 occupancy and that comply with the conditions below may have occupant loads calculated individually per room, area, or space, and be classified as Occupancy Group R-2. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15971-html-1",
+      "kind" : "html",
+      "plainText" : "Rooms, areas or spaces that are accessory to a Group R-2 occupancy and that comply with the conditions below may have occupant loads calculated individually per room, area, or space, and be classified as Occupancy Group R-2."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 15971
+}

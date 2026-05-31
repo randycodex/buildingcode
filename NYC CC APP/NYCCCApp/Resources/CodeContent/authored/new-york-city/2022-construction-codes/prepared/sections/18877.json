@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182363\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182363\"><\/AnnotationDrawer><div>Braced wall panel joints shall occur over studs or blocking. Braced wall panels shall be fastened to studs, top and bottom plates and at panel edges. Braced wall panels shall be applied to nominal 2-inch-wide (actual 1 1\/2-inch (38 mm)) or larger stud framing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18877-html-1",
+      "kind" : "html",
+      "plainText" : "Braced wall panel joints shall occur over studs or blocking. Braced wall panels shall be fastened to studs, top and bottom plates and at panel edges. Braced wall panels shall be applied to nominal 2-inch-wide (actual 1 1\/2-inch (38 mm)) or larger stud framing."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18877
+}

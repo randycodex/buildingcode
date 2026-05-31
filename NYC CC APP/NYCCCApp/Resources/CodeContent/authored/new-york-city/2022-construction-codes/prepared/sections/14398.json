@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167591\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167591\"><\/AnnotationDrawer><div>Electrical, mechanical and plumbing drain, waste and vent (DWV) systems installed within the hangar shall be independent of the systems installed within the dwelling. Building sewer lines shall be permitted to be connected outside the structures.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167592\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167592\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Smoke detector wiring and feed for electrical subpanels in the hangar.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14398-html-1",
+      "kind" : "html",
+      "plainText" : "Electrical, mechanical and plumbing drain, waste and vent (DWV) systems installed within the hangar shall be independent of the systems installed within the dwelling. Building sewer lines shall be permitted to be connected outside the structures.\n\n Exception: Smoke detector wiring and feed for electrical subpanels in the hangar."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14398
+}

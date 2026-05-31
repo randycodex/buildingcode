@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184646\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184646\"><\/AnnotationDrawer><div>In flood hazard areas and shaded X-Zones, temporary flood shields, stairs and ramps shall comply with Sections G308.9 and G308.10 of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-188316', hash: '#JD_BCAppG' }}\">Appendix G<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> and shall be permitted in accordance with plans approved by the department subject to the following conditions:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184647\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184647\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Such flood shields, stairs and ramps shall project no more than one foot (305 mm) beyond the street line.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184648\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184648\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Such flood shields, stairs and ramps shall be removed in a timely manner after a flood event.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n\n  <\/body>\n<\/html>",
+      "id" : "19657-html-1",
+      "kind" : "html",
+      "plainText" : "In flood hazard areas and shaded X-Zones, temporary flood shields, stairs and ramps shall comply with Sections G308.9 and G308.10 of Appendix G of the New York City Building Code and shall be permitted in accordance with plans approved by the department subject to the following conditions:\n\n 1. Such flood shields, stairs and ramps shall project no more than one foot (305 mm) beyond the street line.\n\n 2. Such flood shields, stairs and ramps shall be removed in a timely manner after a flood event."
+    }
+  ],
+  "chapterNumber" : "32",
+  "schemaVersion" : 1,
+  "sectionID" : 19657
+}

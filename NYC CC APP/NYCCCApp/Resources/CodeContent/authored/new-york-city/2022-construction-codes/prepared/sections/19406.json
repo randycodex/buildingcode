@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184077\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184077\"><\/AnnotationDrawer><div>In addition to the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-172809', hash: '#JD_BCCh.10' }}\">Chapter 10<\/Link>, travel distance to an exit from any point within a tent, air-supported structure, or air-inflated structure shall not exceed 75 feet (22 860 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19406-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of Chapter 10 , travel distance to an exit from any point within a tent, air-supported structure, or air-inflated structure shall not exceed 75 feet (22 860 mm)."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19406
+}

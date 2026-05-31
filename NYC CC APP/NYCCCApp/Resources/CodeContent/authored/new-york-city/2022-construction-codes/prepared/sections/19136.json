@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183339\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183339\"><\/AnnotationDrawer><div>Light-transmitting plastics shall be permitted to be used as wall panels in exterior walls, provided that the walls are not required to have a fire-resistance rating and the installation conforms to the requirements of this section. Such panels shall be erected and anchored on a foundation, waterproofed or otherwise protected from moisture absorption and sealed with a coat of mastic or other approved waterproof coating. Light-transmitting plastic wall panels shall comply with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-183294', hash: '#JD_BC2606' }}\">2606<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183340\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183340\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Light-transmitting plastics shall not be used as wall panels in exterior walls in occupancies in Groups A-l, A-2, H, I-2 and I-3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19136-html-1",
+      "kind" : "html",
+      "plainText" : "Light-transmitting plastics shall be permitted to be used as wall panels in exterior walls, provided that the walls are not required to have a fire-resistance rating and the installation conforms to the requirements of this section. Such panels shall be erected and anchored on a foundation, waterproofed or otherwise protected from moisture absorption and sealed with a coat of mastic or other approved waterproof coating. Light-transmitting plastic wall panels shall comply with Section 2606 .\n\n Exception: Light-transmitting plastics shall not be used as wall panels in exterior walls in occupancies in Groups A-l, A-2, H, I-2 and I-3."
+    }
+  ],
+  "chapterNumber" : "26",
+  "schemaVersion" : 1,
+  "sectionID" : 19136
+}

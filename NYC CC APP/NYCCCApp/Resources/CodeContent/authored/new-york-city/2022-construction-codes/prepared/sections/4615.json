@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180920\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180920\"><\/AnnotationDrawer><div>Modify Section 6.1.6.1 as follows:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180921\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180921\"><\/AnnotationDrawer><div><div style=\"margin-left:36pt;\">6.1.6.1 &#8211; Splices of reinforcement. Lap splices, welded splices or mechanical splices are permitted in accordance with the provisions of this section. All welding shall conform to AWS D1.4. Welded splices shall be of ASTM A706 steel reinforcement. Reinforcement larger than No. 9 (M #29) shall be spliced using mechanical connections in accordance with Section 6.1.6.1.3.<\/div><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4615-html-1",
+      "kind" : "html",
+      "plainText" : "Modify Section 6.1.6.1 as follows:\n\n 6.1.6.1 - Splices of reinforcement. Lap splices, welded splices or mechanical splices are permitted in accordance with the provisions of this section. All welding shall conform to AWS D1.4. Welded splices shall be of ASTM A706 steel reinforcement. Reinforcement larger than No. 9 (M #29) shall be spliced using mechanical connections in accordance with Section 6.1.6.1.3."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 4615
+}

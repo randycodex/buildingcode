@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175472\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175472\"><\/AnnotationDrawer><div>Passenger transit platform edges bordering a drop-off and not protected by platform screens or guards shall have a detectable warning.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175473\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175473\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Detectable warnings are not required at bus stops.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16697-html-1",
+      "kind" : "html",
+      "plainText" : "Passenger transit platform edges bordering a drop-off and not protected by platform screens or guards shall have a detectable warning.\n\n Exception: Detectable warnings are not required at bus stops."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16697
+}

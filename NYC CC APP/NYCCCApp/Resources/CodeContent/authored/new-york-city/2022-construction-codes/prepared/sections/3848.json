@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178675\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178675\"><\/AnnotationDrawer><div>Soil borings, testpits and soil percolation testing shall be subject to the special inspection requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3848-html-1",
+      "kind" : "html",
+      "plainText" : "Soil borings, testpits and soil percolation testing shall be subject to the special inspection requirements of this section."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3848
+}

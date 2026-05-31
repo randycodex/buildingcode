@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172469\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172469\"><\/AnnotationDrawer><div>The fan system provided for the pressurization system shall be as required by Sections 909.21.4.1 through 909.21.4.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15816-html-1",
+      "kind" : "html",
+      "plainText" : "The fan system provided for the pressurization system shall be as required by Sections 909.21.4.1 through 909.21.4.4."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15816
+}

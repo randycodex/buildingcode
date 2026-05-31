@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185876\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185876\"><\/AnnotationDrawer><div>The results of the verification inspections required by Sections 3305.8.6.8, 3305.8.7.5 and 3305.8.7.6 shall be documented on a verification inspection checklist signed and dated by the person who performed the inspection. The verification inspection checklist shall be developed by the designer who prepared the drawings required by Section 3305.8.6.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185877\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185877\"><\/AnnotationDrawer><div>(Am. L.L. 2021\/148, 12\/11\/2021, eff. 11\/7\/2022)<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185878\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185878\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-135879', hash: '#JD_L.L.2021\/148' }}\">L.L. 2021\/148<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-185879\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-185879\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-185879\"><\/AnnotationDrawer><h6><a name=\"JD_BC3306\" id=\"JD_BC3306\" title=\"BC 3306\"><\/a>Section BC 3306: Demolition<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6218-html-1",
+      "kind" : "html",
+      "plainText" : "The results of the verification inspections required by Sections 3305.8.6.8, 3305.8.7.5 and 3305.8.7.6 shall be documented on a verification inspection checklist signed and dated by the person who performed the inspection. The verification inspection checklist shall be developed by the designer who prepared the drawings required by Section 3305.8.6.1.\n\n (Am. L.L. 2021\/148, 12\/11\/2021, eff. 11\/7\/2022)\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021\/148 .\n\n Section BC 3306: Demolition"
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6218
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169996\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169996\"><\/AnnotationDrawer><div>Ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings in accordance with Section 705.10 shall be protected with listed fire dampers installed in accordance with their listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1312-html-1",
+      "kind" : "html",
+      "plainText" : "Ducts and air transfer openings in fire-resistance-rated exterior walls required to have protected openings in accordance with Section 705.10 shall be protected with listed fire dampers installed in accordance with their listing."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1312
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161199\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161199\"><\/AnnotationDrawer><div>Every building intended for human habitation, occupancy or use shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code. Every plumbing fixture, device or appliance requiring or using water for its proper operation shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24575-html-1",
+      "kind" : "html",
+      "plainText" : "Every building intended for human habitation, occupancy or use shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code. Every plumbing fixture, device or appliance requiring or using water for its proper operation shall be directly or indirectly connected to the water supply system in accordance with the provisions of this code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 24575
+}

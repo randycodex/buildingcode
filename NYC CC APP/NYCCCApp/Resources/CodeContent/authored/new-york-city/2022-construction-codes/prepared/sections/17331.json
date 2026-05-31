@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177432\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177432\"><\/AnnotationDrawer><div>Seating areas in grandstands, stadiums, and similar assembly structures shall be designed to resist the simultaneous application of a horizontal swaying load of at least 24 plf (36 kg\/m) of seats applied in a direction parallel to the row of the seats, and of at least 10 plf (15 kg\/m) of seats in a direction perpendicular to the row of the seats. When this load is used in combination with wind for outdoor structures, the wind load shall be one-half of the design wind load.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17331-html-1",
+      "kind" : "html",
+      "plainText" : "Seating areas in grandstands, stadiums, and similar assembly structures shall be designed to resist the simultaneous application of a horizontal swaying load of at least 24 plf (36 kg\/m) of seats applied in a direction parallel to the row of the seats, and of at least 10 plf (15 kg\/m) of seats in a direction perpendicular to the row of the seats. When this load is used in combination with wind for outdoor structures, the wind load shall be one-half of the design wind load."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17331
+}

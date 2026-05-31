@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177191\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177191\"><\/AnnotationDrawer><div>Special loads that are applicable to the design of the building, structure or portions thereof, including but not limited to the loads of machinery or equipment, and that are greater than the specified floor and roof loads shall be specified by their descriptions and locations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3433-html-1",
+      "kind" : "html",
+      "plainText" : "Special loads that are applicable to the design of the building, structure or portions thereof, including but not limited to the loads of machinery or equipment, and that are greater than the specified floor and roof loads shall be specified by their descriptions and locations."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 3433
+}

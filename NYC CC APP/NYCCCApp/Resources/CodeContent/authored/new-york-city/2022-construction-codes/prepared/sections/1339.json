@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170098\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170098\"><\/AnnotationDrawer><div>In noncombustible construction, draftstopping shall be of noncombustible materials. In combustible construction, draftstopping materials shall be not less than 1\/2 inch (12.7 mm) gypsum board, 3\/8-inch (9.5 mm) wood structural panel, 3\/8-inch (9.5 mm) particleboard, 1-inch (25-mm) nominal lumber, cement fiberboard, batts or blankets of mineral wool or glass fiber, or other approved materials adequately supported. The integrity of draftstops shall be maintained.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1339-html-1",
+      "kind" : "html",
+      "plainText" : "In noncombustible construction, draftstopping shall be of noncombustible materials. In combustible construction, draftstopping materials shall be not less than 1\/2 inch (12.7 mm) gypsum board, 3\/8-inch (9.5 mm) wood structural panel, 3\/8-inch (9.5 mm) particleboard, 1-inch (25-mm) nominal lumber, cement fiberboard, batts or blankets of mineral wool or glass fiber, or other approved materials adequately supported. The integrity of draftstops shall be maintained."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1339
+}

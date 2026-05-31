@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176200\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176200\"><\/AnnotationDrawer><div>For the purposes of this section, vented cladding shall include the following minimum clear airspaces:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176201\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Vinyl lap or horizontal aluminum siding applied over a weather-resistive barrier as specified in this chapter.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176202\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176202\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Brick veneer with a clear airspace as specified in this code.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176203\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176203\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Other approved vented claddings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3103-html-1",
+      "kind" : "html",
+      "plainText" : "For the purposes of this section, vented cladding shall include the following minimum clear airspaces:\n\n 1. Vinyl lap or horizontal aluminum siding applied over a weather-resistive barrier as specified in this chapter.\n\n 2. Brick veneer with a clear airspace as specified in this code.\n\n 3. Other approved vented claddings."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3103
+}

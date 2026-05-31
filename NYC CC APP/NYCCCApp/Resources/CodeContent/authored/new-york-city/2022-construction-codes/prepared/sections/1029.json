@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169182\"><\/AnnotationDrawer><div>Parapets shall have the same fire-resistance rating as that required for the supporting wall, and on any side adjacent to a roof surface, shall have noncombustible faces for the uppermost 18 inches (457.2 mm), including counterflashing and coping materials. The height of the parapet shall be not less than 30 inches (762 mm) above the point where the roof surface and the wall intersect. Where the roof slopes toward a parapet at a slope greater than two units vertical in 12 units horizontal (16.7-percent slope), the parapet shall extend to the same height as any portion of the roof within a fire separation distance where protection of wall openings is required, but in no case shall the height be less than 30 inches (762 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1029-html-1",
+      "kind" : "html",
+      "plainText" : "Parapets shall have the same fire-resistance rating as that required for the supporting wall, and on any side adjacent to a roof surface, shall have noncombustible faces for the uppermost 18 inches (457.2 mm), including counterflashing and coping materials. The height of the parapet shall be not less than 30 inches (762 mm) above the point where the roof surface and the wall intersect. Where the roof slopes toward a parapet at a slope greater than two units vertical in 12 units horizontal (16.7-percent slope), the parapet shall extend to the same height as any portion of the roof within a fire separation distance where protection of wall openings is required, but in no case shall the height be less than 30 inches (762 mm)."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1029
+}

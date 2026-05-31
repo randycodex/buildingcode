@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-192869\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-192869\"><\/AnnotationDrawer><div>The approval and installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fuel Gas Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23044-html-1",
+      "kind" : "html",
+      "plainText" : "The approval and installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be in accordance with the New York City Fuel Gas Code."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 23044
+}

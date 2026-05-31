@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181590\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181590\"><\/AnnotationDrawer><div>To ensure tight-fitting assemblies, edges shall be manufactured with square, shiplapped, beveled, tongue-and-groove or U-shaped joints.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4841-html-1",
+      "kind" : "html",
+      "plainText" : "To ensure tight-fitting assemblies, edges shall be manufactured with square, shiplapped, beveled, tongue-and-groove or U-shaped joints."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 4841
+}

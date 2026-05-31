@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176900\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176900\"><\/AnnotationDrawer><div>Vegetative roofs, roof gardens and landscaped roofs shall comply with ANSI\/SPRI RP-14 and ANSI\/SPRI VF-1, or with FM DS 1-35.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176901\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176901\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span> The aggregate area of landscaping materials or growth media or both on any single roof level of a building or structure is 250 square feet (23.2 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t)or less.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176902\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176902\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;The roof area is 22 feet (6705.6 mm) or less from grade.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176903\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176903\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;The vegetative roof system is a container garden.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3355-html-1",
+      "kind" : "html",
+      "plainText" : "Vegetative roofs, roof gardens and landscaped roofs shall comply with ANSI\/SPRI RP-14 and ANSI\/SPRI VF-1, or with FM DS 1-35.\n\n Exceptions: The aggregate area of landscaping materials or growth media or both on any single roof level of a building or structure is 250 square feet (23.2 m\n\n 2 \n\n )or less.\n\n 1. The roof area is 22 feet (6705.6 mm) or less from grade.\n\n 2. The vegetative roof system is a container garden."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3355
+}

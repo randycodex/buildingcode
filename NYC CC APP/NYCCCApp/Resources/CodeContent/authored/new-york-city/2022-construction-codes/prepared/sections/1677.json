@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171520\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171520\"><\/AnnotationDrawer><div>Prior to conducting final acceptance tests, all of the following items shall be inspected:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171521\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171521\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Hazard specification for consistency with design hazard.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171522\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171522\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Type, location and spacing of automatic- and manual-initiating devices.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171523\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171523\"><\/AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Size, placement and position of nozzles or discharge orifices.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171524\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171524\"><\/AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Location and identification of audible and visible alarm devices.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171525\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171525\"><\/AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Identification of devices with proper designations.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171526\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171526\"><\/AnnotationDrawer><div>&#160;&#160;&#160;6.&#160;&#160;&#160;Operating instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1677-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to conducting final acceptance tests, all of the following items shall be inspected:\n\n 1. Hazard specification for consistency with design hazard.\n\n 2. Type, location and spacing of automatic- and manual-initiating devices.\n\n 3. Size, placement and position of nozzles or discharge orifices.\n\n 4. Location and identification of audible and visible alarm devices.\n\n 5. Identification of devices with proper designations.\n\n 6. Operating instructions."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1677
+}

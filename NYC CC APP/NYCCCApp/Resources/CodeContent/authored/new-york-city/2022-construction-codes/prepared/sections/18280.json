@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180460\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180460\"><\/AnnotationDrawer><div>Tolerance for longitudinal location of bends and ends of reinforcement shall be as required by ACI 318, Section 26.6.2.1(b).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18280-html-1",
+      "kind" : "html",
+      "plainText" : "Tolerance for longitudinal location of bends and ends of reinforcement shall be as required by ACI 318, Section 26.6.2.1(b)."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18280
+}

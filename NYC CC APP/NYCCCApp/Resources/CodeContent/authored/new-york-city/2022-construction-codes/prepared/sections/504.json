@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167392\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167392\"><\/AnnotationDrawer><div>Where the stage height is greater than 40 feet (12 192 mm), all portions of the stage shall be completely separated from the seating area by a proscenium wall with not less than a 2-hour fire-resistance rating extending continuously from the foundation to the roof.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "504-html-1",
+      "kind" : "html",
+      "plainText" : "Where the stage height is greater than 40 feet (12 192 mm), all portions of the stage shall be completely separated from the seating area by a proscenium wall with not less than a 2-hour fire-resistance rating extending continuously from the foundation to the roof."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 504
+}

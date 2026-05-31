@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185365\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185365\"><\/AnnotationDrawer><div>During the alteration of a building that would require a permanent elevator and where the scope of work does not constitute an enlargement or involve the removal of one or more floors from the building, all floors in the building that are closed to the public shall be served by an elevator or hoist meeting the requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19853-html-1",
+      "kind" : "html",
+      "plainText" : "During the alteration of a building that would require a permanent elevator and where the scope of work does not constitute an enlargement or involve the removal of one or more floors from the building, all floors in the building that are closed to the public shall be served by an elevator or hoist meeting the requirements of this section."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 19853
+}

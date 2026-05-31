@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187269\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187269\"><\/AnnotationDrawer><div>Counterweights shall not be removed from an outrigger beam until the scaffold is disassembled.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20484-html-1",
+      "kind" : "html",
+      "plainText" : "Counterweights shall not be removed from an outrigger beam until the scaffold is disassembled."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20484
+}

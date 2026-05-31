@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162334\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162334\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The potable supply to the boiler shall be protected by an air gap or a reduced pressure principle backflow preventer, complying with ASSE 1013, CSA B64.4 or AWWA C511.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162335\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162335\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: bold;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;&#160;&#160;Exception:<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\"> An atmospheric vent complying with ASSE 1012 or CSA B64.3 may be installed in buildings classified as Occupancy Group R-3 and which do not utilize conditioning chemicals.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162336\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162336\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-205238', hash: '#JD_L.L.2010\/056' }}\">L.L. 2010\/056<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12198-html-1",
+      "kind" : "html",
+      "plainText" : "The potable supply to the boiler shall be protected by an air gap or a reduced pressure principle backflow preventer, complying with ASSE 1013, CSA B64.4 or AWWA C511. \n\n Exception: An atmospheric vent complying with ASSE 1012 or CSA B64.3 may be installed in buildings classified as Occupancy Group R-3 and which do not utilize conditioning chemicals. \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2010\/056 ."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 12198
+}

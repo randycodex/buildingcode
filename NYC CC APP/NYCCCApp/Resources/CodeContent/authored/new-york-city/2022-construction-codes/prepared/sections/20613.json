@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187664\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187664\"><\/AnnotationDrawer><div>Personnel hoists shall require a permit in accordance with Section 3316.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20613-html-1",
+      "kind" : "html",
+      "plainText" : "Personnel hoists shall require a permit in accordance with Section 3316.4."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20613
+}

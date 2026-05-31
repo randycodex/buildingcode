@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181437\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181437\"><\/AnnotationDrawer><div>Noncomposite steel floor decks shall be permitted to be designed and constructed in accordance with ANSI\/SDI-NC.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "4808-html-1",
+      "kind" : "html",
+      "plainText" : "Noncomposite steel floor decks shall be permitted to be designed and constructed in accordance with ANSI\/SDI-NC."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 4808
+}

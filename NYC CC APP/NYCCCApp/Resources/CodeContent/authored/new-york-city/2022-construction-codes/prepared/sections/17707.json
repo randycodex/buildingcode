@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178756\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178756\"><\/AnnotationDrawer><div>Inlets and vents to the system shall be inspected in accordance with Sections 1302.12.5 and 1303.15.7 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Plumbing Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17707-html-1",
+      "kind" : "html",
+      "plainText" : "Inlets and vents to the system shall be inspected in accordance with Sections 1302.12.5 and 1303.15.7 of the New York City Plumbing Code ."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17707
+}

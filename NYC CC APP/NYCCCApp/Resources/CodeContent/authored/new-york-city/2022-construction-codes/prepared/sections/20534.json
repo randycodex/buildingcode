@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187415\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187415\"><\/AnnotationDrawer><div>Two or more two-point adjustable suspended scaffolds shall not be combined into one by bridging the distance between them or by any other form of connection.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20534-html-1",
+      "kind" : "html",
+      "plainText" : "Two or more two-point adjustable suspended scaffolds shall not be combined into one by bridging the distance between them or by any other form of connection."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20534
+}

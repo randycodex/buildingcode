@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161676\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161676\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Windows and doors within a shower enclosure shall conform to the safety glazing requirements of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Building Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-161677\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-161677\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-161677\"><\/AnnotationDrawer><h6><a name=\"JD_PC418\" id=\"JD_PC418\" title=\"PC 418\"><\/a>Section PC 418: Sinks<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24757-html-1",
+      "kind" : "html",
+      "plainText" : "Windows and doors within a shower enclosure shall conform to the safety glazing requirements of the New York City Building Code . \n\n Section PC 418: Sinks"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24757
+}

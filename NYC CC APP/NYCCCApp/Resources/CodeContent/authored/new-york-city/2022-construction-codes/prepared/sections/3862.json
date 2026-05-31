@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178717\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178717\"><\/AnnotationDrawer><div>Fire pump tests associated with standpipe systems shall be tested in accordance with Section 913.5 of this code. The special inspector shall witness all required tests and shall verify that all installations comply with NFPA 20 and are in accordance with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3862-html-1",
+      "kind" : "html",
+      "plainText" : "Fire pump tests associated with standpipe systems shall be tested in accordance with Section 913.5 of this code. The special inspector shall witness all required tests and shall verify that all installations comply with NFPA 20 and are in accordance with the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3862
+}

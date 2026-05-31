@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173815\"><\/AnnotationDrawer><div>Every exit sign and directional exit sign shall have plainly legible letters not less than 6 inches (152.4 mm) high with the principal strokes of the letters not less than 3\/4 inch (19.1 mm) wide. The word \"EXIT\" shall have letters having a width not less than 2 inches (50.8 mm) wide except the letter \"I,\" and the minimum spacing between letters shall not be less than 3\/8 inch (9.5 mm). In Group A and R- 1 occupancies letters shall be not less than 8 inches (203.2 mm) high. Signs larger than the minimum established in this section shall have letter widths, strokes and spacing in proportion to their height.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173816\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173816\"><\/AnnotationDrawer><div>The word \"EXIT\" shall be in high contrast with the background and shall be clearly discernible when the means of exit sign illumination is or is not energized. The letters of exit signs shall be red. If a chevron directional indicator is provided as part of the exit sign, the construction shall be such that the direction of the chevron directional indicator cannot be readily changed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2370-html-1",
+      "kind" : "html",
+      "plainText" : "Every exit sign and directional exit sign shall have plainly legible letters not less than 6 inches (152.4 mm) high with the principal strokes of the letters not less than 3\/4 inch (19.1 mm) wide. The word \"EXIT\" shall have letters having a width not less than 2 inches (50.8 mm) wide except the letter \"I,\" and the minimum spacing between letters shall not be less than 3\/8 inch (9.5 mm). In Group A and R- 1 occupancies letters shall be not less than 8 inches (203.2 mm) high. Signs larger than the minimum established in this section shall have letter widths, strokes and spacing in proportion to their height.\n\n The word \"EXIT\" shall be in high contrast with the background and shall be clearly discernible when the means of exit sign illumination is or is not energized. The letters of exit signs shall be red. If a chevron directional indicator is provided as part of the exit sign, the construction shall be such that the direction of the chevron directional indicator cannot be readily changed."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2370
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188837\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188837\"><\/AnnotationDrawer><div>Garages and accessory structures shall be designed and constructed in accordance with ASCE 24, Section 9.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13091-html-1",
+      "kind" : "html",
+      "plainText" : "Garages and accessory structures shall be designed and constructed in accordance with ASCE 24, Section 9.4."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13091
+}

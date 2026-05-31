@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186838\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186838\"><\/AnnotationDrawer><div>Design and construction of the tool must be such as to safely retain all internal pressures that may occur during its operation. The discharge mechanism shall be such that the projectile cannot be discharged by dropping the tool. The discharge mechanism shall be such that the discharge of each projectile shall be dependent on a separate and distinct act by the operator, and all safety features shall be durable. A tool shall have such other characteristics as the commissioner may find necessary. Such other characteristics may include devices and materials external to the tool itself but associated with its function, and may also include, in respect to high velocity projectile tools, the basic requirements set forth above for explosive powered tools that discharge projectiles with comparable velocities. <\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6519-html-1",
+      "kind" : "html",
+      "plainText" : "Design and construction of the tool must be such as to safely retain all internal pressures that may occur during its operation. The discharge mechanism shall be such that the projectile cannot be discharged by dropping the tool. The discharge mechanism shall be such that the discharge of each projectile shall be dependent on a separate and distinct act by the operator, and all safety features shall be durable. A tool shall have such other characteristics as the commissioner may find necessary. Such other characteristics may include devices and materials external to the tool itself but associated with its function, and may also include, in respect to high velocity projectile tools, the basic requirements set forth above for explosive powered tools that discharge projectiles with comparable velocities."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6519
+}

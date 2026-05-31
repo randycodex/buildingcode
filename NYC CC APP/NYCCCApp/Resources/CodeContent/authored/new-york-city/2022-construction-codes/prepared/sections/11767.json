@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161237\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161237\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Water, soil and waste pipes shall not be installed outside of a building, in attics or crawl spaces, concealed in outside walls, or in any other place subjected to freezing temperatures unless adequate provision is made to protect such pipes from freezing by insulation or heat or both. Exterior water supply system piping shall be installed not less than 48 inches (1219 mm) below grade.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11767-html-1",
+      "kind" : "html",
+      "plainText" : "Water, soil and waste pipes shall not be installed outside of a building, in attics or crawl spaces, concealed in outside walls, or in any other place subjected to freezing temperatures unless adequate provision is made to protect such pipes from freezing by insulation or heat or both. Exterior water supply system piping shall be installed not less than 48 inches (1219 mm) below grade."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 11767
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169763\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169763\"><\/AnnotationDrawer><div>Fire door assemblies with side-hinged and pivoted swinging doors shall be tested in accordance with NFPA 252 or UL 10C. After 5 minutes into the NFPA 252 test, the neutral pressure level in the furnace shall be established at 40 inches (1016 mm) or less above the sill.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1233-html-1",
+      "kind" : "html",
+      "plainText" : "Fire door assemblies with side-hinged and pivoted swinging doors shall be tested in accordance with NFPA 252 or UL 10C. After 5 minutes into the NFPA 252 test, the neutral pressure level in the furnace shall be established at 40 inches (1016 mm) or less above the sill."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1233
+}

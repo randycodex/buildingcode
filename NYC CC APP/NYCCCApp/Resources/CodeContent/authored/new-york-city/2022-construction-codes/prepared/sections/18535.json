@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181179\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181179\"><\/AnnotationDrawer><div>Decorative shrouds shall not be installed at the termination of factory-built chimneys except where such shrouds are listed and labeled for use with the specific factory-built chimney system and are installed in accordance with the manufacturers' installation instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18535-html-1",
+      "kind" : "html",
+      "plainText" : "Decorative shrouds shall not be installed at the termination of factory-built chimneys except where such shrouds are listed and labeled for use with the specific factory-built chimney system and are installed in accordance with the manufacturers' installation instructions."
+    }
+  ],
+  "chapterNumber" : "21",
+  "schemaVersion" : 1,
+  "sectionID" : 18535
+}

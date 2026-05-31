@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181483\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181483\"><\/AnnotationDrawer><div>Steel structures shall be designed to meet all of the requirements of this section. However, details provided for gravity, seismic and wind forces and for other purposes may be regarded as forming part of, or the whole of, these requirements. Detailing provided for one requirement may be counted towards the other requirements.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181484\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181484\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181485\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181485\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;One-story structures less than 5,000 square feet (465 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) not to exceed 15 feet (4572 mm) in height.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181486\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181486\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Structures containing only Group R-3 occupancy not more than three stories in height.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18652-html-1",
+      "kind" : "html",
+      "plainText" : "Steel structures shall be designed to meet all of the requirements of this section. However, details provided for gravity, seismic and wind forces and for other purposes may be regarded as forming part of, or the whole of, these requirements. Detailing provided for one requirement may be counted towards the other requirements.\n\n Exceptions: \n\n 1. One-story structures less than 5,000 square feet (465 m\n\n 2 \n\n ) not to exceed 15 feet (4572 mm) in height.\n\n 2. Structures containing only Group R-3 occupancy not more than three stories in height."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18652
+}

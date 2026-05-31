@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193571\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193571\"><\/AnnotationDrawer><div>Ventilation shall be provided for rooms, buildings and enclosures in which Class I liquids are pumped, used or transferred. Design of ventilation systems shall consider the relatively high specific gravity of the vapors. Where natural ventilation is used, adequate openings in outside walls at floor level, unobstructed except by louvers or coarse screens, shall be provided. Where natural ventilation is inadequate, mechanical ventilation shall be provided. The natural ventilation design shall be approved for each specific application by the commissioner prior to installation and\/or use.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10473-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation shall be provided for rooms, buildings and enclosures in which Class I liquids are pumped, used or transferred. Design of ventilation systems shall consider the relatively high specific gravity of the vapors. Where natural ventilation is used, adequate openings in outside walls at floor level, unobstructed except by louvers or coarse screens, shall be provided. Where natural ventilation is inadequate, mechanical ventilation shall be provided. The natural ventilation design shall be approved for each specific application by the commissioner prior to installation and\/or use."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10473
+}

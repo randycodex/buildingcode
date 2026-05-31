@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186013\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186013\"><\/AnnotationDrawer><div>All enclosed vertical shafts and stairs shall be maintained enclosed at all floors except the topmost floor being demolished, and all work on the topmost floor shall be completed before stair and shaft enclosures on the floor below are disturbed. All hand rails and banisters shall be left in place until actual demolition of such floor is in progress.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6264-html-1",
+      "kind" : "html",
+      "plainText" : "All enclosed vertical shafts and stairs shall be maintained enclosed at all floors except the topmost floor being demolished, and all work on the topmost floor shall be completed before stair and shaft enclosures on the floor below are disturbed. All hand rails and banisters shall be left in place until actual demolition of such floor is in progress."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6264
+}

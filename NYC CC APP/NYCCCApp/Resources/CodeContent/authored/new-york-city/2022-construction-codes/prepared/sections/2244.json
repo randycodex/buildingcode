@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173309\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173309\"><\/AnnotationDrawer><div>Means of egress doors shall meet the requirements of this section. Doors serving a means of egress system shall meet the requirements of this section and Section 1022.2. Doors provided for egress purposes in numbers greater than required by this code shall meet the requirements of this section.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173310\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173310\"><\/AnnotationDrawer><div>Means of egress doors shall be readily distinguishable from the adjacent construction and finishes such that the doors are easily recognizable as doors. Mirrors or similar reflecting materials shall not be used on means of egress doors. Means of egress doors shall not be concealed by curtains, drapes, decorations or similar materials.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2244-html-1",
+      "kind" : "html",
+      "plainText" : "Means of egress doors shall meet the requirements of this section. Doors serving a means of egress system shall meet the requirements of this section and Section 1022.2. Doors provided for egress purposes in numbers greater than required by this code shall meet the requirements of this section.\n\n Means of egress doors shall be readily distinguishable from the adjacent construction and finishes such that the doors are easily recognizable as doors. Mirrors or similar reflecting materials shall not be used on means of egress doors. Means of egress doors shall not be concealed by curtains, drapes, decorations or similar materials."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2244
+}

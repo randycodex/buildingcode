@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193470\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193470\"><\/AnnotationDrawer><div>Positive mechanical ventilation that provides not less than six complete air changes per hour shall be installed in limited spraying spaces. Such system shall meet the requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Fire Code<\/span> for handling flammable vapors. Explosion venting is not required.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10431-html-1",
+      "kind" : "html",
+      "plainText" : "Positive mechanical ventilation that provides not less than six complete air changes per hour shall be installed in limited spraying spaces. Such system shall meet the requirements of the New York City Fire Code for handling flammable vapors. Explosion venting is not required."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10431
+}

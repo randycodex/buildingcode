@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-177978\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-177978\"><\/AnnotationDrawer><div>Where a structure is divided by joints that allow for movement, each portion of the structure between joints shall be considered as a separate structure.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17450-html-1",
+      "kind" : "html",
+      "plainText" : "Where a structure is divided by joints that allow for movement, each portion of the structure between joints shall be considered as a separate structure."
+    }
+  ],
+  "chapterNumber" : "16",
+  "schemaVersion" : 1,
+  "sectionID" : 17450
+}

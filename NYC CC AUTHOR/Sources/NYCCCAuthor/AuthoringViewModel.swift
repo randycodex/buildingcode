@@ -42,6 +42,19 @@ final class AuthoringViewModel: ObservableObject {
         let generatedAt: String
     }
 
+    private struct CascadeDeleteResult {
+        var codeCount = 0
+        var codeSectionCount = 0
+        var chapterCount = 0
+        var codeSectionNames: Set<String> = []
+    }
+
+    private struct InferredDocumentHierarchy {
+        let jurisdictionName: String
+        let codeVersionName: String
+        let codeSectionName: String
+    }
+
     @Published private(set) var documents: [EditorDocument] = []
     @Published private(set) var outlineByDocumentID: [UUID: [OutlineItem]] = [:]
     @Published private(set) var loadingDocumentIDs: Set<UUID> = []
@@ -66,11 +79,9 @@ final class AuthoringViewModel: ObservableObject {
 
     init() {
         authoringProject = (try? authoringStore.load()) ?? EditorAuthoringProject()
-        Self.ensureDefaultJurisdiction(in: &authoringProject)
+        Self.migrateJurisdictionsIfNeeded(in: &authoringProject)
         tableManifest = authoringProject.tableManifest
-        selectedJurisdictionID = authoringProject.jurisdictions.first?.id
-        selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == selectedJurisdictionID })?.id ?? authoringProject.codes.first?.id
-        selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == selectedCodeID })?.id
+        selectFirstAvailableHierarchy()
     }
 
     var documentTitle: String {
@@ -137,6 +148,7 @@ final class AuthoringViewModel: ObservableObject {
             statusMessage = "No HTML files were found."
             return
         }
+        ensureHierarchyForImportedDocuments(at: standardizedURLs)
         upsertPlaceholderDocuments(for: standardizedURLs)
         selectedDocumentID = documents.first(where: {
             $0.fileURL.standardizedFileURL == standardizedURLs.first
@@ -182,12 +194,30 @@ final class AuthoringViewModel: ObservableObject {
     }
 
     private nonisolated static func inferredCodeSectionName(for url: URL) -> String? {
-        let parent = url.deletingLastPathComponent()
-        let root = parent.deletingLastPathComponent()
-        guard root.lastPathComponent.caseInsensitiveCompare("2022 Construction Codes") == .orderedSame else {
+        inferredHierarchy(for: url)?.codeSectionName
+    }
+
+    private nonisolated static func inferredHierarchy(for url: URL) -> InferredDocumentHierarchy? {
+        let codeSectionURL = url.deletingLastPathComponent()
+        let codeVersionURL = codeSectionURL.deletingLastPathComponent()
+        let jurisdictionURL = codeVersionURL.deletingLastPathComponent()
+
+        let codeSectionName = codeSectionURL.lastPathComponent.trimmingCharacters(in: .whitespacesAndNewlines)
+        let codeVersionName = codeVersionURL.lastPathComponent.trimmingCharacters(in: .whitespacesAndNewlines)
+        let jurisdictionName = jurisdictionURL.lastPathComponent.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !jurisdictionName.isEmpty,
+              !codeVersionName.isEmpty,
+              !codeSectionName.isEmpty,
+              codeVersionName.range(of: "code", options: [.caseInsensitive]) != nil else {
             return nil
         }
-        return parent.lastPathComponent
+
+        return InferredDocumentHierarchy(
+            jurisdictionName: jurisdictionName,
+            codeVersionName: codeVersionName,
+            codeSectionName: codeSectionName
+        )
     }
 
     func importTableManifest() {
@@ -310,84 +340,41 @@ final class AuthoringViewModel: ObservableObject {
 
     func deleteSelectedJurisdiction() {
         guard let selectedJurisdictionID else { return }
-        guard authoringProject.jurisdictions.count > 1 else {
-            statusMessage = "At least one jurisdiction must remain."
-            return
-        }
 
-        let codeIDs = Set(
-            authoringProject.codes
-                .filter { $0.jurisdictionID == selectedJurisdictionID }
-                .map(\.id)
-        )
-        let codeSectionIDs = Set(
-            authoringProject.codeSections
-                .filter { codeIDs.contains($0.codeID) }
-                .map(\.id)
-        )
+        let deleted = cascadeDeleteJurisdiction(id: selectedJurisdictionID)
+        selectFirstAvailableHierarchy()
+        pruneOpenDocuments(matchingCodeSectionNames: deleted.codeSectionNames)
 
-        authoringProject.jurisdictions.removeAll { $0.id == selectedJurisdictionID }
-        authoringProject.codes.removeAll { codeIDs.contains($0.id) }
-        authoringProject.codeSections.removeAll { codeSectionIDs.contains($0.id) }
-        authoringProject.chapters.removeAll {
-            codeIDs.contains($0.codeID) || codeSectionIDs.contains($0.codeSectionID)
-        }
-
-        let fallbackJurisdiction = authoringProject.jurisdictions.first
-        self.selectedJurisdictionID = fallbackJurisdiction?.id
-        self.selectedCodeID = fallbackJurisdiction.flatMap { jurisdiction in
-            authoringProject.codes.first(where: { $0.jurisdictionID == jurisdiction.id })?.id
-        }
-        self.selectedCodeSectionID = self.selectedCodeID.flatMap { codeID in
-            authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
-        }
-
+        persistOpenDocumentPaths()
         persistAuthoringProject()
-        statusMessage = "Deleted jurisdiction."
+        statusMessage = "Deleted jurisdiction and \(deleted.codeCount) code version(s), \(deleted.codeSectionCount) code section(s), and \(deleted.chapterCount) chapter(s)."
     }
 
     func deleteSelectedCodeVersion() {
         guard let selectedCodeID else { return }
 
-        let codeSectionIDs = Set(
-            authoringProject.codeSections
-                .filter { $0.codeID == selectedCodeID }
-                .map(\.id)
-        )
+        let deleted = cascadeDeleteCodeVersion(id: selectedCodeID)
+        repairSelectionAfterHierarchyMutation(preferredJurisdictionID: selectedJurisdictionID)
+        pruneOpenDocuments(matchingCodeSectionNames: deleted.codeSectionNames)
 
-        authoringProject.codes.removeAll { $0.id == selectedCodeID }
-        authoringProject.codeSections.removeAll { codeSectionIDs.contains($0.id) }
-        authoringProject.chapters.removeAll {
-            $0.codeID == selectedCodeID || codeSectionIDs.contains($0.codeSectionID)
-        }
-
-        if let jurisdictionID = selectedJurisdictionID {
-            self.selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == jurisdictionID })?.id
-        } else {
-            self.selectedCodeID = authoringProject.codes.first?.id
-        }
-        self.selectedCodeSectionID = self.selectedCodeID.flatMap { codeID in
-            authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
-        }
-
+        persistOpenDocumentPaths()
         persistAuthoringProject()
-        statusMessage = "Deleted code version."
+        statusMessage = "Deleted code version and \(deleted.codeSectionCount) code section(s), and \(deleted.chapterCount) chapter(s)."
     }
 
     func deleteSelectedCodeSection() {
         guard let selectedCodeSectionID else { return }
 
-        authoringProject.codeSections.removeAll { $0.id == selectedCodeSectionID }
-        authoringProject.chapters.removeAll { $0.codeSectionID == selectedCodeSectionID }
+        let deleted = cascadeDeleteCodeSection(id: selectedCodeSectionID)
+        repairSelectionAfterHierarchyMutation(
+            preferredJurisdictionID: selectedJurisdictionID,
+            preferredCodeID: selectedCodeID
+        )
+        pruneOpenDocuments(matchingCodeSectionNames: deleted.codeSectionNames)
 
-        if let codeID = selectedCodeID {
-            self.selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
-        } else {
-            self.selectedCodeSectionID = authoringProject.codeSections.first?.id
-        }
-
+        persistOpenDocumentPaths()
         persistAuthoringProject()
-        statusMessage = "Deleted code section."
+        statusMessage = "Deleted code section and \(deleted.chapterCount) chapter(s)."
     }
 
     func createCodeSection(name: String) {
@@ -686,6 +673,8 @@ final class AuthoringViewModel: ObservableObject {
         }
         guard !isPublishing else { return }
 
+        ensureHierarchyForImportedDocuments(at: documents.map(\.fileURL))
+
         let documentSnapshots = documents.map {
             PublishDocumentSnapshot(
                 filePath: $0.fileURL.path,
@@ -859,7 +848,7 @@ final class AuthoringViewModel: ObservableObject {
         scope: PublishScope
     ) throws -> EditorAuthoringProject {
         var project = baseProject
-        Self.ensureDefaultJurisdiction(in: &project)
+        Self.migrateJurisdictionsIfNeeded(in: &project)
         project.chapters.removeAll {
             $0.codeID == scope.codeID && $0.codeSectionID == scope.codeSectionID
         }
@@ -1046,8 +1035,10 @@ final class AuthoringViewModel: ObservableObject {
             }
             try FileManager.default.createDirectory(at: outputURL, withIntermediateDirectories: true)
             let destinationURL = outputURL.appendingPathComponent(sourceURL.lastPathComponent)
-            let localizedHTML = try localizingRemoteAssets(
+            let localizedHTML = try localizingAuthoredAssets(
                 in: snapshot.htmlContent,
+                sourceDirectoryURL: sourceURL.deletingLastPathComponent(),
+                outputDirectoryURL: outputURL,
                 assetsDirectoryURL: assetsURL
             )
             try Data(localizedHTML.utf8).write(to: destinationURL, options: .atomic)
@@ -1155,11 +1146,13 @@ final class AuthoringViewModel: ObservableObject {
         }
     }
 
-    private nonisolated static func localizingRemoteAssets(
+    private nonisolated static func localizingAuthoredAssets(
         in html: String,
+        sourceDirectoryURL: URL,
+        outputDirectoryURL: URL,
         assetsDirectoryURL: URL
     ) throws -> String {
-        let pattern = #"(src|href)\s*=\s*"((?:https?:)?//[^"]+)""#
+        let pattern = ##"(src|href)\s*=\s*"([^"#]+)""##
         let regex = try NSRegularExpression(pattern: pattern, options: [.caseInsensitive])
         let nsHTML = html as NSString
         let matches = regex.matches(in: html, options: [], range: NSRange(location: 0, length: nsHTML.length))
@@ -1172,15 +1165,18 @@ final class AuthoringViewModel: ObservableObject {
         for match in matches.reversed() {
             guard match.numberOfRanges >= 3 else { continue }
             let urlString = nsHTML.substring(with: match.range(at: 2))
-            guard urlString.contains("export.amlegal.com") else { continue }
+            guard shouldLocalizeAssetReference(urlString) else { continue }
 
             let replacementPath: String
             if let cached = cache[urlString] {
                 replacementPath = cached
             } else {
-                let remoteURL = try normalizedRemoteURL(from: urlString)
-                let localURL = try localAssetURL(for: remoteURL, in: assetsDirectoryURL)
-                replacementPath = "../assets/" + localURL.lastPathComponent
+                let localURL = try localizedAssetURL(
+                    for: urlString,
+                    sourceDirectoryURL: sourceDirectoryURL,
+                    assetsDirectoryURL: assetsDirectoryURL
+                )
+                replacementPath = relativePath(from: outputDirectoryURL, to: localURL)
                 cache[urlString] = replacementPath
             }
             replacements.append((original: urlString, replacement: replacementPath))
@@ -1190,6 +1186,75 @@ final class AuthoringViewModel: ObservableObject {
             localizedHTML = localizedHTML.replacingOccurrences(of: replacement.original, with: replacement.replacement)
         }
         return localizedHTML
+    }
+
+    private nonisolated static func shouldLocalizeAssetReference(_ value: String) -> Bool {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        let lowercased = trimmed.lowercased()
+        if lowercased.hasPrefix("data:") ||
+            lowercased.hasPrefix("mailto:") ||
+            lowercased.hasPrefix("tel:") ||
+            lowercased.hasPrefix("javascript:") {
+            return false
+        }
+        if lowercased.contains("export.amlegal.com") {
+            return true
+        }
+        return lowercased.hasPrefix("assets/") ||
+            lowercased.hasPrefix("./assets/") ||
+            lowercased.contains("/assets/")
+    }
+
+    private nonisolated static func localizedAssetURL(
+        for reference: String,
+        sourceDirectoryURL: URL,
+        assetsDirectoryURL: URL
+    ) throws -> URL {
+        if reference.contains("export.amlegal.com") {
+            let remoteURL = try normalizedRemoteURL(from: reference)
+            return try localAssetURL(for: remoteURL, in: assetsDirectoryURL)
+        }
+
+        return try copyLocalAsset(
+            reference,
+            sourceDirectoryURL: sourceDirectoryURL,
+            assetsDirectoryURL: assetsDirectoryURL
+        )
+    }
+
+    private nonisolated static func copyLocalAsset(
+        _ reference: String,
+        sourceDirectoryURL: URL,
+        assetsDirectoryURL: URL
+    ) throws -> URL {
+        let cleanedReference = reference
+            .components(separatedBy: "#")[0]
+            .components(separatedBy: "?")[0]
+        let sourceURL = URL(fileURLWithPath: cleanedReference, relativeTo: sourceDirectoryURL).standardizedFileURL
+        guard FileManager.default.fileExists(atPath: sourceURL.path) else {
+            throw NSError(
+                domain: "NYCCCAuthor",
+                code: 1106,
+                userInfo: [NSLocalizedDescriptionKey: "Could not find local authored asset: \(reference)"]
+            )
+        }
+
+        let fileName = sourceURL.lastPathComponent
+        let outputURL = assetsDirectoryURL.appendingPathComponent(fileName, isDirectory: false)
+        if !FileManager.default.fileExists(atPath: outputURL.path) {
+            try FileManager.default.copyItem(at: sourceURL, to: outputURL)
+        }
+        return outputURL
+    }
+
+    private nonisolated static func relativePath(from directoryURL: URL, to fileURL: URL) -> String {
+        let directoryComponents = directoryURL.standardizedFileURL.pathComponents
+        let fileComponents = fileURL.standardizedFileURL.pathComponents
+        let sharedCount = zip(directoryComponents, fileComponents).prefix { $0 == $1 }.count
+        let upLevels = max(0, directoryComponents.count - sharedCount)
+        let relativeComponents = Array(repeating: "..", count: upLevels) + fileComponents.dropFirst(sharedCount)
+        return relativeComponents.joined(separator: "/")
     }
 
     private nonisolated static func normalizedRemoteURL(from urlString: String) throws -> URL {
@@ -1609,6 +1674,220 @@ final class AuthoringViewModel: ObservableObject {
         }
     }
 
+    private func cascadeDeleteJurisdiction(id jurisdictionID: Int64) -> CascadeDeleteResult {
+        let codeIDs = Set(
+            authoringProject.codes
+                .filter { $0.jurisdictionID == jurisdictionID }
+                .map(\.id)
+        )
+        let codeSectionIDs = Set(
+            authoringProject.codeSections
+                .filter { codeIDs.contains($0.codeID) }
+                .map(\.id)
+        )
+        let codeSectionNames = Set(
+            authoringProject.codeSections
+                .filter { codeSectionIDs.contains($0.id) }
+                .map { normalizedCodeSectionName($0.name) }
+        )
+        let chapterCount = authoringProject.chapters.filter {
+            codeIDs.contains($0.codeID) || codeSectionIDs.contains($0.codeSectionID)
+        }.count
+
+        authoringProject.jurisdictions.removeAll { $0.id == jurisdictionID }
+        authoringProject.codes.removeAll { codeIDs.contains($0.id) }
+        authoringProject.codeSections.removeAll { codeSectionIDs.contains($0.id) }
+        authoringProject.chapters.removeAll {
+            codeIDs.contains($0.codeID) || codeSectionIDs.contains($0.codeSectionID)
+        }
+
+        return CascadeDeleteResult(
+            codeCount: codeIDs.count,
+            codeSectionCount: codeSectionIDs.count,
+            chapterCount: chapterCount,
+            codeSectionNames: codeSectionNames
+        )
+    }
+
+    private func cascadeDeleteCodeVersion(id codeID: Int64) -> CascadeDeleteResult {
+        let codeSectionIDs = Set(
+            authoringProject.codeSections
+                .filter { $0.codeID == codeID }
+                .map(\.id)
+        )
+        let codeSectionNames = Set(
+            authoringProject.codeSections
+                .filter { codeSectionIDs.contains($0.id) }
+                .map { normalizedCodeSectionName($0.name) }
+        )
+        let chapterCount = authoringProject.chapters.filter {
+            $0.codeID == codeID || codeSectionIDs.contains($0.codeSectionID)
+        }.count
+
+        authoringProject.codes.removeAll { $0.id == codeID }
+        authoringProject.codeSections.removeAll { codeSectionIDs.contains($0.id) }
+        authoringProject.chapters.removeAll {
+            $0.codeID == codeID || codeSectionIDs.contains($0.codeSectionID)
+        }
+
+        return CascadeDeleteResult(
+            codeCount: 1,
+            codeSectionCount: codeSectionIDs.count,
+            chapterCount: chapterCount,
+            codeSectionNames: codeSectionNames
+        )
+    }
+
+    private func cascadeDeleteCodeSection(id codeSectionID: Int64) -> CascadeDeleteResult {
+        let codeSectionNames = Set(
+            authoringProject.codeSections
+                .filter { $0.id == codeSectionID }
+                .map { normalizedCodeSectionName($0.name) }
+        )
+        let chapterCount = authoringProject.chapters.filter { $0.codeSectionID == codeSectionID }.count
+
+        authoringProject.codeSections.removeAll { $0.id == codeSectionID }
+        authoringProject.chapters.removeAll { $0.codeSectionID == codeSectionID }
+
+        return CascadeDeleteResult(
+            codeSectionCount: 1,
+            chapterCount: chapterCount,
+            codeSectionNames: codeSectionNames
+        )
+    }
+
+    private func ensureHierarchyForImportedDocuments(at urls: [URL]) {
+        let hierarchies = urls.compactMap { Self.inferredHierarchy(for: $0.standardizedFileURL) }
+        guard !hierarchies.isEmpty else {
+            if selectedJurisdictionID == nil {
+                selectFirstAvailableHierarchy()
+            }
+            return
+        }
+
+        let groupedByJurisdiction = Dictionary(grouping: hierarchies, by: { normalizedCodeSectionName($0.jurisdictionName) })
+        let primaryJurisdictionGroup = groupedByJurisdiction
+            .sorted { lhs, rhs in
+                lhs.value.count == rhs.value.count
+                    ? lhs.key.localizedStandardCompare(rhs.key) == .orderedAscending
+                    : lhs.value.count > rhs.value.count
+            }
+            .first?
+            .value ?? hierarchies
+
+        guard let primary = primaryJurisdictionGroup.first else { return }
+        let jurisdictionID = ensureJurisdiction(named: primary.jurisdictionName)
+        let codeID = ensureCodeVersion(named: primary.codeVersionName, jurisdictionID: jurisdictionID)
+
+        let codeSectionNames = Set(primaryJurisdictionGroup.map(\.codeSectionName))
+        for codeSectionName in codeSectionNames.sorted(by: { $0.localizedStandardCompare($1) == .orderedAscending }) {
+            _ = ensureCodeSection(named: codeSectionName, codeID: codeID)
+        }
+
+        selectedJurisdictionID = jurisdictionID
+        selectedCodeID = codeID
+        selectedCodeSectionID = authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
+        persistAuthoringProject()
+    }
+
+    private func ensureJurisdiction(named name: String) -> Int64 {
+        let normalizedName = normalizedCodeSectionName(name)
+        if let existing = authoringProject.jurisdictions.first(where: { normalizedCodeSectionName($0.name) == normalizedName }) {
+            return existing.id
+        }
+
+        let id = authoringProject.nextJurisdictionID
+        authoringProject.nextJurisdictionID += 1
+        authoringProject.jurisdictions.append(EditorAuthoredJurisdiction(id: id, name: name))
+        return id
+    }
+
+    private func ensureCodeVersion(named name: String, jurisdictionID: Int64) -> Int64 {
+        let normalizedName = normalizedCodeSectionName(name)
+        if let existing = authoringProject.codes.first(where: {
+            $0.jurisdictionID == jurisdictionID && normalizedCodeSectionName($0.name) == normalizedName
+        }) {
+            return existing.id
+        }
+
+        let id = authoringProject.nextCodeID
+        authoringProject.nextCodeID += 1
+        authoringProject.codes.append(EditorAuthoredCode(id: id, jurisdictionID: jurisdictionID, name: name))
+        return id
+    }
+
+    private func ensureCodeSection(named name: String, codeID: Int64) -> Int64 {
+        let normalizedName = normalizedCodeSectionName(name)
+        if let existing = authoringProject.codeSections.first(where: {
+            $0.codeID == codeID && normalizedCodeSectionName($0.name) == normalizedName
+        }) {
+            return existing.id
+        }
+
+        let id = authoringProject.nextCodeSectionID
+        authoringProject.nextCodeSectionID += 1
+        authoringProject.codeSections.append(EditorAuthoredCodeSection(id: id, codeID: codeID, name: name))
+        return id
+    }
+
+    private func pruneOpenDocuments(matchingCodeSectionNames codeSectionNames: Set<String>) {
+        guard !codeSectionNames.isEmpty else { return }
+        let removedDocumentIDs = Set(
+            documents
+                .filter { codeSectionNames.contains(normalizedCodeSectionName(documentCodeSectionName(for: $0))) }
+                .map(\.id)
+        )
+        guard !removedDocumentIDs.isEmpty else { return }
+
+        documents.removeAll { removedDocumentIDs.contains($0.id) }
+        outlineByDocumentID = outlineByDocumentID.filter { !removedDocumentIDs.contains($0.key) }
+        loadingDocumentIDs.subtract(removedDocumentIDs)
+        if let selectedDocumentID, removedDocumentIDs.contains(selectedDocumentID) {
+            self.selectedDocumentID = nil
+        }
+        selectedOutlineItemID = nil
+        collapsedOutlineItemIDs = []
+        syncSelectedDocumentToCurrentCodeSection()
+    }
+
+    private func selectFirstAvailableHierarchy() {
+        selectedJurisdictionID = authoringProject.jurisdictions.first?.id
+        selectedCodeID = selectedJurisdictionID.flatMap { jurisdictionID in
+            authoringProject.codes.first(where: { $0.jurisdictionID == jurisdictionID })?.id
+        } ?? authoringProject.codes.first?.id
+        selectedCodeSectionID = selectedCodeID.flatMap { codeID in
+            authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
+        }
+        syncSelectedDocumentToCurrentCodeSection()
+    }
+
+    private func repairSelectionAfterHierarchyMutation(
+        preferredJurisdictionID: Int64? = nil,
+        preferredCodeID: Int64? = nil
+    ) {
+        if let preferredJurisdictionID,
+           authoringProject.jurisdictions.contains(where: { $0.id == preferredJurisdictionID }) {
+            selectedJurisdictionID = preferredJurisdictionID
+        } else {
+            selectedJurisdictionID = authoringProject.jurisdictions.first?.id
+        }
+
+        if let preferredCodeID,
+           authoringProject.codes.contains(where: { $0.id == preferredCodeID }),
+           selectedJurisdictionID == nil || authoringProject.codes.contains(where: { $0.id == preferredCodeID && $0.jurisdictionID == selectedJurisdictionID }) {
+            selectedCodeID = preferredCodeID
+        } else if let selectedJurisdictionID {
+            selectedCodeID = authoringProject.codes.first(where: { $0.jurisdictionID == selectedJurisdictionID })?.id
+        } else {
+            selectedCodeID = authoringProject.codes.first?.id
+        }
+
+        selectedCodeSectionID = selectedCodeID.flatMap { codeID in
+            authoringProject.codeSections.first(where: { $0.codeID == codeID })?.id
+        }
+        syncSelectedDocumentToCurrentCodeSection()
+    }
+
     private func refreshAuthoringProjectFromLoadedDocumentsIfPossible() {
         guard !documents.isEmpty else { return }
         guard documents.allSatisfy(\.isLoaded) else { return }
@@ -1655,14 +1934,19 @@ final class AuthoringViewModel: ObservableObject {
         if let selectedJurisdictionID {
             return selectedJurisdictionID
         }
-        Self.ensureDefaultJurisdiction(in: &authoringProject)
+        if authoringProject.jurisdictions.isEmpty {
+            let newJurisdiction = EditorAuthoredJurisdiction(id: authoringProject.nextJurisdictionID, name: "New Jurisdiction")
+            authoringProject.nextJurisdictionID += 1
+            authoringProject.jurisdictions.append(newJurisdiction)
+        }
         let id = authoringProject.jurisdictions.first?.id ?? 1
         selectedJurisdictionID = id
         return id
     }
 
-    private nonisolated static func ensureDefaultJurisdiction(in project: inout EditorAuthoringProject) {
-        if project.jurisdictions.isEmpty {
+    private nonisolated static func migrateJurisdictionsIfNeeded(in project: inout EditorAuthoringProject) {
+        if project.jurisdictions.isEmpty,
+           !project.codes.isEmpty || !project.codeSections.isEmpty || !project.chapters.isEmpty {
             project.jurisdictions = [EditorAuthoredJurisdiction(id: 1, name: "New York City")]
             project.nextJurisdictionID = max(project.nextJurisdictionID, 2)
         }

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188267\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188267\"><\/AnnotationDrawer><div>Station platforms shall be positioned to coordinate with vehicles in accordance with the applicable provisions of 36 CFR, Part 1192. Low-level platforms shall be 8 inches (203 mm) minimum above top of rail.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188268\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188268\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where vehicles are boarded from sidewalks or street level, low-level platforms shall be permitted to be less than 8 inches (203 mm).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6928-html-1",
+      "kind" : "html",
+      "plainText" : "Station platforms shall be positioned to coordinate with vehicles in accordance with the applicable provisions of 36 CFR, Part 1192. Low-level platforms shall be 8 inches (203 mm) minimum above top of rail.\n\n Exception: Where vehicles are boarded from sidewalks or street level, low-level platforms shall be permitted to be less than 8 inches (203 mm)."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 6928
+}

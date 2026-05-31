@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185326\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185326\"><\/AnnotationDrawer><div>When construction or demolition activity occurs in an occupied building, barricades, signs, drop cloths, and other protective means shall be installed and maintained as necessary to provide reasonable protection for the occupants against hazard and nuisance. Such protective means shall be indicated on an occupant protection plan, or where a tenant protection plan is required by Section 3303.10.1, on a tenant protection plan.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6011-html-1",
+      "kind" : "html",
+      "plainText" : "When construction or demolition activity occurs in an occupied building, barricades, signs, drop cloths, and other protective means shall be installed and maintained as necessary to provide reasonable protection for the occupants against hazard and nuisance. Such protective means shall be indicated on an occupant protection plan, or where a tenant protection plan is required by Section 3303.10.1, on a tenant protection plan."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6011
+}

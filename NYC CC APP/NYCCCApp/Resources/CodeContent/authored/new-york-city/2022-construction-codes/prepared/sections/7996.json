@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-197428\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-197428\"><\/AnnotationDrawer><div>Such unit is factory assembled and manufactured with an integral, factory assembled and hard-wired carbon monoxide detector interlock and automatic main gas shut-off valve. The appliance shall be tested, designed and evaluated in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-199339', hash: '#JD_FGC622' }}\">622<\/Link> of this code. Acceptable gas-fired direct vent space-heating appliances shall be listed and labeled by an approved agency in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-156797', hash: '#JD_28-113.2.3' }}\">28-113.2.3<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code<\/span>. Installation shall be in accordance with the manufacturer's instructions and the applicable listing.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7996-html-1",
+      "kind" : "html",
+      "plainText" : "Such unit is factory assembled and manufactured with an integral, factory assembled and hard-wired carbon monoxide detector interlock and automatic main gas shut-off valve. The appliance shall be tested, designed and evaluated in accordance with Section 622 of this code. Acceptable gas-fired direct vent space-heating appliances shall be listed and labeled by an approved agency in accordance with Section 28-113.2.3 of the Administrative Code . Installation shall be in accordance with the manufacturer's instructions and the applicable listing."
+    }
+  ],
+  "chapterNumber" : "3",
+  "schemaVersion" : 1,
+  "sectionID" : 7996
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188804\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188804\"><\/AnnotationDrawer><div>Underground tanks in special flood hazard areas shall be designed, constructed, installed, and anchored to prevent flotation, collapse and lateral movement resulting from hydrostatic loads, including the effects of buoyancy, during conditions of flooding to the design flood elevation, in accordance with ASCE 24.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13083-html-1",
+      "kind" : "html",
+      "plainText" : "Underground tanks in special flood hazard areas shall be designed, constructed, installed, and anchored to prevent flotation, collapse and lateral movement resulting from hydrostatic loads, including the effects of buoyancy, during conditions of flooding to the design flood elevation, in accordance with ASCE 24."
+    }
+  ],
+  "chapterNumber" : "G",
+  "schemaVersion" : 1,
+  "sectionID" : 13083
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186813\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186813\"><\/AnnotationDrawer><div>Prior to the start of the subsequent work day, the previous day's entries in the site safety log shall be reviewed by the construction superintendent, and an entry shall be made in the site safety log, signed and dated by the construction superintendent, that he or she has reviewed all of the previous day's entries.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186814\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186814\"><\/AnnotationDrawer><div>(L.L. 2021\/149, 12\/11\/2021, eff. 11\/7\/2022)<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-186815\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-186815\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-135890', hash: '#JD_L.L.2021\/149' }}\">L.L. 2021\/149<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20336-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the start of the subsequent work day, the previous day's entries in the site safety log shall be reviewed by the construction superintendent, and an entry shall be made in the site safety log, signed and dated by the construction superintendent, that he or she has reviewed all of the previous day's entries.\n\n (L.L. 2021\/149, 12\/11\/2021, eff. 11\/7\/2022)\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021\/149 ."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20336
+}

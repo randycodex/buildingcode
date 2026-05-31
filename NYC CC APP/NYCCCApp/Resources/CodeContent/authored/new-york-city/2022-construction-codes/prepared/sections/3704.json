@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178252\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178252\"><\/AnnotationDrawer><div>Welding inspection and welding inspector qualification for cold-formed steel floor and roof decks shall be in accordance with SDI QA\/QC.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3704-html-1",
+      "kind" : "html",
+      "plainText" : "Welding inspection and welding inspector qualification for cold-formed steel floor and roof decks shall be in accordance with SDI QA\/QC."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 3704
+}

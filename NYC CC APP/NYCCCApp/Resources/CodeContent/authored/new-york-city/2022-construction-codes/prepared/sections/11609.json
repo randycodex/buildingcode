@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196744\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196744\"><\/AnnotationDrawer><div>Where mounted on or above the roof covering, the collector array and supporting construction shall be constructed of noncombustible materials or fire-retardant-treated wood conforming to the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> to the extent required for the type of roof construction of the building to which the collectors are accessory.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196745\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> The use of plastic solar collector covers shall be limited to those approved plastics meeting the requirements for plastic roof panels in the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code.<\/span>&#160;<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11609-html-1",
+      "kind" : "html",
+      "plainText" : "Where mounted on or above the roof covering, the collector array and supporting construction shall be constructed of noncombustible materials or fire-retardant-treated wood conforming to the New York City Building Code to the extent required for the type of roof construction of the building to which the collectors are accessory.\n\n Exception: The use of plastic solar collector covers shall be limited to those approved plastics meeting the requirements for plastic roof panels in the New York City Building Code."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 11609
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169609\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169609\"><\/AnnotationDrawer><div>Access openings for waste and linen chutes shall be located in dedicated rooms or compartments enclosed by not less than 2-hour fire barriers constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169272', hash: '#JD_BC707' }}\">707<\/Link> or horizontal assemblies constructed in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169425', hash: '#JD_BC711' }}\">711<\/Link> or both. Openings into the access rooms shall be protected by opening protectives having a fire protection rating of not less than 1 1\/2 hours. Doors to access rooms shall be self-closing, except where the storage of waste, including recyclables, or linen and other laundry, is not permitted in such access room, doors may be automatic-closing upon the detection of smoke in accordance with Section 716.5.9.3.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169610\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169610\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Access openings for waste or linen chutes located within a dwelling unit need not be located within a separate room or compartment.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1186-html-1",
+      "kind" : "html",
+      "plainText" : "Access openings for waste and linen chutes shall be located in dedicated rooms or compartments enclosed by not less than 2-hour fire barriers constructed in accordance with Section 707 or horizontal assemblies constructed in accordance with Section 711 or both. Openings into the access rooms shall be protected by opening protectives having a fire protection rating of not less than 1 1\/2 hours. Doors to access rooms shall be self-closing, except where the storage of waste, including recyclables, or linen and other laundry, is not permitted in such access room, doors may be automatic-closing upon the detection of smoke in accordance with Section 716.5.9.3.\n\n Exception: Access openings for waste or linen chutes located within a dwelling unit need not be located within a separate room or compartment."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1186
+}

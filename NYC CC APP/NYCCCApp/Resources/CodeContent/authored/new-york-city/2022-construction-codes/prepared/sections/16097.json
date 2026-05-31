@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173448\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173448\"><\/AnnotationDrawer><div>Door handles, pulls, latches, locks and other operating devices shall be installed 34 inches (863.4 mm) minimum and 48 inches (1220 mm) maximum above the finished floor. Locks used only for security purposes and not used for normal operation are permitted at any height.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173449\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173449\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Access doors or gates in barrier walls and fences protecting pools, spas and hot tubs shall be permitted to have operable parts in compliance with Section 3109.4.2 or 3109.5.1.7, as applicable.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16097-html-1",
+      "kind" : "html",
+      "plainText" : "Door handles, pulls, latches, locks and other operating devices shall be installed 34 inches (863.4 mm) minimum and 48 inches (1220 mm) maximum above the finished floor. Locks used only for security purposes and not used for normal operation are permitted at any height.\n\n Exception: Access doors or gates in barrier walls and fences protecting pools, spas and hot tubs shall be permitted to have operable parts in compliance with Section 3109.4.2 or 3109.5.1.7, as applicable."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16097
+}

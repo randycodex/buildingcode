@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176145\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176145\"><\/AnnotationDrawer><div>Hardboard siding shall conform to the requirements of ANSI A135.6 and, where used structurally, shall be so identified by the label of an approved agency.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3081-html-1",
+      "kind" : "html",
+      "plainText" : "Hardboard siding shall conform to the requirements of ANSI A135.6 and, where used structurally, shall be so identified by the label of an approved agency."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3081
+}

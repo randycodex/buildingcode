@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178587\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178587\"><\/AnnotationDrawer><div>Hydrostatic testing shall be performed on the completed installation of new and altered systems in accordance with Section 1211.2.3 of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Mechanical Code<\/span>. The special inspector shall witness all required hydrostatic tests.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-178588\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-178588\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Testing requirements shall not apply to alteration or repairs to existing piping systems in which the integrity of the piping is not affected. Such alterations shall be visually inspected for compliance with the approved construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "17640-html-1",
+      "kind" : "html",
+      "plainText" : "Hydrostatic testing shall be performed on the completed installation of new and altered systems in accordance with Section 1211.2.3 of the New York City Mechanical Code . The special inspector shall witness all required hydrostatic tests.\n\n Exception: Testing requirements shall not apply to alteration or repairs to existing piping systems in which the integrity of the piping is not affected. Such alterations shall be visually inspected for compliance with the approved construction documents."
+    }
+  ],
+  "chapterNumber" : "17",
+  "schemaVersion" : 1,
+  "sectionID" : 17640
+}

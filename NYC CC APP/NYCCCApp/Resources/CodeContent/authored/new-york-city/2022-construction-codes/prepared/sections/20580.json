@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187577\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187577\"><\/AnnotationDrawer><div>Wind speed shall be determined based on data from the nearest United States weather bureau reporting station, or an anemometer located at the site, freely exposed to the wind, and calibrated in accordance with ASTM D 5096-02.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187578\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187578\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> For cranes and derricks, the requirements of Section 3319.13 shall apply.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20580-html-1",
+      "kind" : "html",
+      "plainText" : "Wind speed shall be determined based on data from the nearest United States weather bureau reporting station, or an anemometer located at the site, freely exposed to the wind, and calibrated in accordance with ASTM D 5096-02.\n\n Exception: For cranes and derricks, the requirements of Section 3319.13 shall apply."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20580
+}

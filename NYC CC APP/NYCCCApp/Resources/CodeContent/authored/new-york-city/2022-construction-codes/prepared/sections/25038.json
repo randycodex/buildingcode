@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162374\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162374\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Drilled or driven well casings shall be of steel or other approved<\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">&#160;<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">material. Where drilled wells extend into a rock formation, the well casing shall extend to and set firmly in the formation. The annular space between the earth and the outside of the casing shall be filled with cement grout to a depth of not less than 10 feet (3048 mm) below the ground surface. In an instance of casing to rock installation, the grout shall extend to the rock surface.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25038-html-1",
+      "kind" : "html",
+      "plainText" : "Drilled or driven well casings shall be of steel or other approved material. Where drilled wells extend into a rock formation, the well casing shall extend to and set firmly in the formation. The annular space between the earth and the outside of the casing shall be filled with cement grout to a depth of not less than 10 feet (3048 mm) below the ground surface. In an instance of casing to rock installation, the grout shall extend to the rock surface."
+    }
+  ],
+  "chapterNumber" : "6",
+  "schemaVersion" : 1,
+  "sectionID" : 25038
+}

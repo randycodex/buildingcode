@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181891\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181891\"><\/AnnotationDrawer><div>Minimum dimensions of floor framing shall be in accordance with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-181879', hash: '#JD_BCTable2304.11' }}\">Table 2304.11<\/Link>. Approved wall plate boxes or hangers shall be provided where wood beams, girders or trusses rest on masonry or concrete walls. Where intermediate beams are used to support a floor, they shall rest on top of girders, or shall be supported by an approved metal hanger into which the ends of the beams shall be closely fitted. Where traditional heavy timber detailing is used, these connections shall be permitted to be supported by ledgers or blocks securely fastened to the sides of the girders.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18771-html-1",
+      "kind" : "html",
+      "plainText" : "Minimum dimensions of floor framing shall be in accordance with Table 2304.11 . Approved wall plate boxes or hangers shall be provided where wood beams, girders or trusses rest on masonry or concrete walls. Where intermediate beams are used to support a floor, they shall rest on top of girders, or shall be supported by an approved metal hanger into which the ends of the beams shall be closely fitted. Where traditional heavy timber detailing is used, these connections shall be permitted to be supported by ledgers or blocks securely fastened to the sides of the girders."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 18771
+}

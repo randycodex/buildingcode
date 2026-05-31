@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166579\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166579\"><\/AnnotationDrawer><div>Foam plastics used in signs shall have flame-retardant characteristics such that the sign has a maximum heat-release rate of 150 kilowatts when tested in accordance with UL 1975 or when tested in accordance with NFPA 289 using the 20 kW ignition source, and the foam plastics shall have the physical characteristics specified in this section. Foam plastics used in signs installed in accordance with Section 402.6.4 shall not be required to comply with the flame spread and smoke-developed indices specified in Section 2603.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14048-html-1",
+      "kind" : "html",
+      "plainText" : "Foam plastics used in signs shall have flame-retardant characteristics such that the sign has a maximum heat-release rate of 150 kilowatts when tested in accordance with UL 1975 or when tested in accordance with NFPA 289 using the 20 kW ignition source, and the foam plastics shall have the physical characteristics specified in this section. Foam plastics used in signs installed in accordance with Section 402.6.4 shall not be required to comply with the flame spread and smoke-developed indices specified in Section 2603.3."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14048
+}

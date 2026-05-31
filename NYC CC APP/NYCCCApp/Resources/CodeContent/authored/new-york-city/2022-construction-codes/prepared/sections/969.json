@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168972\"><\/AnnotationDrawer><div>Fire-resistance-rated assemblies tested under ASTM E 119 or UL 263 shall not be considered to be restrained unless evidence satisfactory to the commissioner is furnished by the registered design professional showing that the construction qualifies for a restrained classification in accordance with ASTM E 119 or UL 263. Restrained construction shall be identified on the construction documents.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "969-html-1",
+      "kind" : "html",
+      "plainText" : "Fire-resistance-rated assemblies tested under ASTM E 119 or UL 263 shall not be considered to be restrained unless evidence satisfactory to the commissioner is furnished by the registered design professional showing that the construction qualifies for a restrained classification in accordance with ASTM E 119 or UL 263. Restrained construction shall be identified on the construction documents."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 969
+}

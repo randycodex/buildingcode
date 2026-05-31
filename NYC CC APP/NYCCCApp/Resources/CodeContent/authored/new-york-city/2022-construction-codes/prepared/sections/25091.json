@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162519\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162519\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">Building house traps shall be installed on all building drains in accordance with Section 1002.6.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "25091-html-1",
+      "kind" : "html",
+      "plainText" : "Building house traps shall be installed on all building drains in accordance with Section 1002.6."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 25091
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175721\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175721\"><\/AnnotationDrawer><div>Ventilation areas shall be as set forth in Sections 1203.5.1.1 through 1203.5.1.4.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16771-html-1",
+      "kind" : "html",
+      "plainText" : "Ventilation areas shall be as set forth in Sections 1203.5.1.1 through 1203.5.1.4."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16771
+}

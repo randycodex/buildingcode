@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175402\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175402\"><\/AnnotationDrawer><div>Accessibility function buttons shall be visibly and tactilely identified. The visible identification shall consist of the International Symbol of Accessibility or the dynamic accessibility symbol and shall be a minimum height of 5\/8 inch (15.9 mm). The visible symbol shall contrast with its background, light-on-dark or dark-on-light. The tactile identification shall consist of three raised dots. All dots shall be the same size and shall have a base diameter of 0.059 inch (1.5 mm) minimum and 0.063 inch (1.6 mm) maximum. Dot height shall be 0.025 inch (0.6 mm) minimum and 0.037 inch (0.9 mm) maximum. The dots shall be spaced 1\/4 inch (6.4 mm) at base diameter, measured center to center, and shall be arranged in the form of an equilateral triangle with the vertex pointing up.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16668-html-1",
+      "kind" : "html",
+      "plainText" : "Accessibility function buttons shall be visibly and tactilely identified. The visible identification shall consist of the International Symbol of Accessibility or the dynamic accessibility symbol and shall be a minimum height of 5\/8 inch (15.9 mm). The visible symbol shall contrast with its background, light-on-dark or dark-on-light. The tactile identification shall consist of three raised dots. All dots shall be the same size and shall have a base diameter of 0.059 inch (1.5 mm) minimum and 0.063 inch (1.6 mm) maximum. Dot height shall be 0.025 inch (0.6 mm) minimum and 0.037 inch (0.9 mm) maximum. The dots shall be spaced 1\/4 inch (6.4 mm) at base diameter, measured center to center, and shall be arranged in the form of an equilateral triangle with the vertex pointing up."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16668
+}

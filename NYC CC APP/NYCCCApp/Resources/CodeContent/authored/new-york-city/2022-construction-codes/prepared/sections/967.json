@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168968\"><\/AnnotationDrawer><div>Interior walls and partitions of nonsymmetrical construction shall be tested with both faces exposed to the furnace, and the assigned fire-resistance rating shall be the shortest duration obtained from the two tests conducted in compliance with ASTM E 119 or UL 263. When evidence is furnished to show that the wall was tested with the least fire-resistant side exposed to the furnace, subject to acceptance of the commissioner, the wall need not be subjected to tests from the opposite side (see Section 705.5 of this code for exterior walls).<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "967-html-1",
+      "kind" : "html",
+      "plainText" : "Interior walls and partitions of nonsymmetrical construction shall be tested with both faces exposed to the furnace, and the assigned fire-resistance rating shall be the shortest duration obtained from the two tests conducted in compliance with ASTM E 119 or UL 263. When evidence is furnished to show that the wall was tested with the least fire-resistant side exposed to the furnace, subject to acceptance of the commissioner, the wall need not be subjected to tests from the opposite side (see Section 705.5 of this code for exterior walls)."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 967
+}

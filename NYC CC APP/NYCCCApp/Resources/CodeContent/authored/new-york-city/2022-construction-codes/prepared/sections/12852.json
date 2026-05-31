@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-188163\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-188163\"><\/AnnotationDrawer><div>Where dwelling units and sleeping units are altered or added, the requirements of Section E104.2 shall apply only to the units being altered or added until the number of units with accessible communication features complies with the minimum number required for new construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12852-html-1",
+      "kind" : "html",
+      "plainText" : "Where dwelling units and sleeping units are altered or added, the requirements of Section E104.2 shall apply only to the units being altered or added until the number of units with accessible communication features complies with the minimum number required for new construction."
+    }
+  ],
+  "chapterNumber" : "E",
+  "schemaVersion" : 1,
+  "sectionID" : 12852
+}

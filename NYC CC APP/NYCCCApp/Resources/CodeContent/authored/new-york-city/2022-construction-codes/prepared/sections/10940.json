@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194970\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194970\"><\/AnnotationDrawer><div>Branch connections to the vent connector shall be made in accordance with the vent manufacturer's instructions.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10940-html-1",
+      "kind" : "html",
+      "plainText" : "Branch connections to the vent connector shall be made in accordance with the vent manufacturer's instructions."
+    }
+  ],
+  "chapterNumber" : "8",
+  "schemaVersion" : 1,
+  "sectionID" : 10940
+}

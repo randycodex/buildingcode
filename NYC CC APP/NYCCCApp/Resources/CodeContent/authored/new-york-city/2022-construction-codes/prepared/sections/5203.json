@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-183016\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-183016\"><\/AnnotationDrawer><div>Surfaces shall be clean, free from efflorescence, sufficiently damp and rough for proper bond. If the surface is insufficiently rough, approved bonding agents or a portland cement dash bond coat mixed in proportions of not more than two parts volume of sand to one part volume of portland cement or plastic cement shall be applied. The dash bond coat shall be left undisturbed and shall be moist cured not less than 24 hours.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-183017\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-183017\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-183017\"><\/AnnotationDrawer><h6><a name=\"JD_BC2511\" id=\"JD_BC2511\" title=\"BC 2511\"><\/a>Section BC 2511: Interior Plaster<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5203-html-1",
+      "kind" : "html",
+      "plainText" : "Surfaces shall be clean, free from efflorescence, sufficiently damp and rough for proper bond. If the surface is insufficiently rough, approved bonding agents or a portland cement dash bond coat mixed in proportions of not more than two parts volume of sand to one part volume of portland cement or plastic cement shall be applied. The dash bond coat shall be left undisturbed and shall be moist cured not less than 24 hours.\n\n Section BC 2511: Interior Plaster"
+    }
+  ],
+  "chapterNumber" : "25",
+  "schemaVersion" : 1,
+  "sectionID" : 5203
+}

@@ -1,0 +1,25 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175057\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175057\"><\/AnnotationDrawer><div>Toilet paper dispensers shall comply with this section. The outlet of the dispenser shall be located within an area 24 inches (609.2 mm) minimum and 42 inches (1066.8 mm) maximum from the rear wall. The outlet of the dispenser shall be located 18 inches (457.2 mm) minimum above the floor. Dispensers shall comply with Section 609.3 of ICC A117.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175058\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175058\"><\/AnnotationDrawer><div>",
+      "id" : "2720-html-1",
+      "kind" : "html",
+      "plainText" : "Toilet paper dispensers shall comply with this section. The outlet of the dispenser shall be located within an area 24 inches (609.2 mm) minimum and 42 inches (1066.8 mm) maximum from the rear wall. The outlet of the dispenser shall be located 18 inches (457.2 mm) minimum above the floor. Dispensers shall comply with Section 609.3 of ICC A117.1."
+    },
+    {
+      "html" : "<span class=\"img\"><img border=\"0\" src=\"..\/..\/..\/assets\/building-code-figure-1107-2-2-7-6-dispenser-outlet-location.jpg\" width=\"576\" height=\"587.533333333333\"><\/img><\/span>",
+      "id" : "2720-image-2",
+      "imageID" : "building-code-figure-1107-2-2-7-6-dispenser-outlet-location.jpg",
+      "kind" : "image"
+    },
+    {
+      "html" : "<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175059\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175059\"><\/AnnotationDrawer><div><a name=\"JD_BCFigure1107.2.2.7.6\" id=\"JD_BCFigure1107.2.2.7.6\" title=\"BC Figure 1107.2.2.7.6\"><\/a><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Figure 1107.2.2.7.6<br><\/br>Dispenser Outlet Location<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2720-html-3",
+      "kind" : "html",
+      "plainText" : "Figure 1107.2.2.7.6\n Dispenser Outlet Location"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 2720
+}

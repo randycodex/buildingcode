@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174248\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174248\"><\/AnnotationDrawer><div>Luminous directional signs designed in compliance with Section 1025.6.1 and installed at heights indicated in Section 1025.2.7 shall be placed on the wall at transfer levels and wherever egress direction is not clear; including at turns along horizontal extensions, at transitions from vertical to horizontal direction and at a \"T\" intersection. These directional signs shall include arrows indicating the direction of travel. The word \"EXIT\" shall not be required. Directional signs at transfer levels shall comply with <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192262', hash: '#JD_BCFigureS101.1(9)' }}\">Figure S101.1(9)<\/Link> in <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-192260', hash: '#JD_BCAppS' }}\">Appendix S<\/Link>.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2475-html-1",
+      "kind" : "html",
+      "plainText" : "Luminous directional signs designed in compliance with Section 1025.6.1 and installed at heights indicated in Section 1025.2.7 shall be placed on the wall at transfer levels and wherever egress direction is not clear; including at turns along horizontal extensions, at transitions from vertical to horizontal direction and at a \"T\" intersection. These directional signs shall include arrows indicating the direction of travel. The word \"EXIT\" shall not be required. Directional signs at transfer levels shall comply with Figure S101.1(9) in Appendix S ."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2475
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171457\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171457\"><\/AnnotationDrawer><div>Approved supervised indicating control valves shall be provided at the point of connection to the riser on each floor in high-rise buildings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1654-html-1",
+      "kind" : "html",
+      "plainText" : "Approved supervised indicating control valves shall be provided at the point of connection to the riser on each floor in high-rise buildings."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1654
+}

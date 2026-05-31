@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195182\"><\/AnnotationDrawer><div>Pellet fuel-burning appliances shall be listed and labeled in accordance with ASTM E 1509 and shall be installed in accordance with the terms of the listing. If permitted, such appliances shall be operated in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Air Pollution Control Code.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195183\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195183\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195183\"><\/AnnotationDrawer><h6><a name=\"JD_MC905\" id=\"JD_MC905\" title=\"MC 905\"><\/a>Section MC 905: Fireplace Stoves and Room Heaters<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23829-html-1",
+      "kind" : "html",
+      "plainText" : "Pellet fuel-burning appliances shall be listed and labeled in accordance with ASTM E 1509 and shall be installed in accordance with the terms of the listing. If permitted, such appliances shall be operated in accordance with the New York City Air Pollution Control Code. \n\n Section MC 905: Fireplace Stoves and Room Heaters"
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 23829
+}

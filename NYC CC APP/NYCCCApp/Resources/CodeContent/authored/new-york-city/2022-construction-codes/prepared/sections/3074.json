@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176126\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176126\"><\/AnnotationDrawer><div>Fly-through conditions located 75 feet (22 860 mm) or less above grade shall be constructed with bird friendly materials. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176127\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176127\"><\/AnnotationDrawer><div>(L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021) \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176128\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176128\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-130053', hash: '#JD_L.L.2020\/015' }}\">L.L. 2020\/015<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3074-html-1",
+      "kind" : "html",
+      "plainText" : "Fly-through conditions located 75 feet (22 860 mm) or less above grade shall be constructed with bird friendly materials. \n\n (L.L. 2020\/015, 1\/10\/2020, eff. 1\/10\/2021) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020\/015 ."
+    }
+  ],
+  "chapterNumber" : "14",
+  "schemaVersion" : 1,
+  "sectionID" : 3074
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-181376\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-181376\"><\/AnnotationDrawer><div>Concrete-filled steel columns shall have a minimum of four 1\/2 in. (12.7 mm) diameter holes that shall be placed opposite each other with two at the top and two at the bottom of the column. The two bottom holes shall be rotated 90&#176; relative to the two top holes.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18608-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete-filled steel columns shall have a minimum of four 1\/2 in. (12.7 mm) diameter holes that shall be placed opposite each other with two at the top and two at the bottom of the column. The two bottom holes shall be rotated 90° relative to the two top holes."
+    }
+  ],
+  "chapterNumber" : "22",
+  "schemaVersion" : 1,
+  "sectionID" : 18608
+}

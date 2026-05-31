@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187143\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187143\"><\/AnnotationDrawer><div>Scaffolds, all components of and attachments to the scaffold, and all supports and anchorages of the scaffold installed at a site shall be adjusted under the supervision of a competent person designated by the contractor or licensee who installed the scaffold. Individuals who perform adjustments, and the person supervising such, shall be trained in accordance with Section 3314.4.5. Following the adjustment, the scaffold shall be inspected in accordance with Section 3314.4.3.6.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187144\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187144\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Where a sidewalk shed provides the base for a supported scaffold, the sidewalk shed shall be adjusted in accordance with the requirements of Section 3307.6.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20444-html-1",
+      "kind" : "html",
+      "plainText" : "Scaffolds, all components of and attachments to the scaffold, and all supports and anchorages of the scaffold installed at a site shall be adjusted under the supervision of a competent person designated by the contractor or licensee who installed the scaffold. Individuals who perform adjustments, and the person supervising such, shall be trained in accordance with Section 3314.4.5. Following the adjustment, the scaffold shall be inspected in accordance with Section 3314.4.3.6.\n\n Exception: Where a sidewalk shed provides the base for a supported scaffold, the sidewalk shed shall be adjusted in accordance with the requirements of Section 3307.6."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20444
+}

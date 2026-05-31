@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176987\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176987\"><\/AnnotationDrawer><div>Steeples, minarets, spires, domes and cupolas greater than 60 feet (18 288 mm) in height above the highest point at which such structure contacts the roof as measured to the highest point on such structure, or that exceeds 200 square feet (18.6 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in area at any horizontal section, or which is intended to be used for any purpose other than as a belfry or architectural embellishment, or is located on the top of a building greater than 50 feet (1524 mm) in building height shall be constructed of and supported by noncombustible materials and shall be separated from the building below by construction having a fire-resistance rating of not less than 1.5 hours with openings protected in accordance with Section <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-169468', hash: '#JD_BC712' }}\">712<\/Link>. Such structures located on the top of a building greater than 50 feet (15 240 mm) in building height, shall be supported by noncombustible construction.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "3389-html-1",
+      "kind" : "html",
+      "plainText" : "Steeples, minarets, spires, domes and cupolas greater than 60 feet (18 288 mm) in height above the highest point at which such structure contacts the roof as measured to the highest point on such structure, or that exceeds 200 square feet (18.6 m\n\n 2 \n\n ) in area at any horizontal section, or which is intended to be used for any purpose other than as a belfry or architectural embellishment, or is located on the top of a building greater than 50 feet (1524 mm) in building height shall be constructed of and supported by noncombustible materials and shall be separated from the building below by construction having a fire-resistance rating of not less than 1.5 hours with openings protected in accordance with Section 712 . Such structures located on the top of a building greater than 50 feet (15 240 mm) in building height, shall be supported by noncombustible construction."
+    }
+  ],
+  "chapterNumber" : "15",
+  "schemaVersion" : 1,
+  "sectionID" : 3389
+}

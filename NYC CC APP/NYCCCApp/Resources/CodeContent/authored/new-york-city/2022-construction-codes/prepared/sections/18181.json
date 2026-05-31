@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-180208\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-180208\"><\/AnnotationDrawer><div>Concrete proportions shall be determined in accordance with ACI 318 and the provisions of Sections 1905.2.1 through 1905.2.4 of this code.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "18181-html-1",
+      "kind" : "html",
+      "plainText" : "Concrete proportions shall be determined in accordance with ACI 318 and the provisions of Sections 1905.2.1 through 1905.2.4 of this code."
+    }
+  ],
+  "chapterNumber" : "19",
+  "schemaVersion" : 1,
+  "sectionID" : 18181
+}

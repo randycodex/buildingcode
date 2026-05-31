@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-162889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-162889\"><\/AnnotationDrawer><div>Backwater valves, when fully opened, shall have a capacity not less than that of the pipes in which they are installed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "12406-html-1",
+      "kind" : "html",
+      "plainText" : "Backwater valves, when fully opened, shall have a capacity not less than that of the pipes in which they are installed."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 12406
+}

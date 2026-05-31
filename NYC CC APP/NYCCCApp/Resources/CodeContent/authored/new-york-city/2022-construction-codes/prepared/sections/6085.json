@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185554\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185554\"><\/AnnotationDrawer><div>All sides or slopes of excavations or embankments shall be inspected after rainstorms, or any other hazard-increasing event, and safe conditions shall be restored.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6085-html-1",
+      "kind" : "html",
+      "plainText" : "All sides or slopes of excavations or embankments shall be inspected after rainstorms, or any other hazard-increasing event, and safe conditions shall be restored."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6085
+}

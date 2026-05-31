@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189068\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189068\"><\/AnnotationDrawer><div>Signs erected to cover doors or windows required by Section 501.3.2 for Fire Department access to existing buildings shall be provided with access panels to such openings.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-189069\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-189069\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-189069\"><\/AnnotationDrawer><h6><a name=\"JD_BCH104\" id=\"JD_BCH104\" title=\"BC H104\"><\/a>Section BC H104: Identification<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13161-html-1",
+      "kind" : "html",
+      "plainText" : "Signs erected to cover doors or windows required by Section 501.3.2 for Fire Department access to existing buildings shall be provided with access panels to such openings.\n\n Section BC H104: Identification"
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 13161
+}

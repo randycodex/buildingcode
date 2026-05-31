@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-194097\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-194097\"><\/AnnotationDrawer><div>Hazardous exhaust duct systems that penetrate fire-resistance-rated wall assemblies shall be enclosed in fire-resistance-rated construction from the point of penetration to the outlet terminal, except where the interior of the duct is equipped with an approved automatic fire suppression system. Ducts shall be enclosed in accordance with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Building Code<\/span> requirements for shaft construction and such enclosure shall have a minimum fire-resistance rating of not less than the highest fire-resistance-rated wall assembly penetrated.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10650-html-1",
+      "kind" : "html",
+      "plainText" : "Hazardous exhaust duct systems that penetrate fire-resistance-rated wall assemblies shall be enclosed in fire-resistance-rated construction from the point of penetration to the outlet terminal, except where the interior of the duct is equipped with an approved automatic fire suppression system. Ducts shall be enclosed in accordance with the New York City Building Code requirements for shaft construction and such enclosure shall have a minimum fire-resistance rating of not less than the highest fire-resistance-rated wall assembly penetrated."
+    }
+  ],
+  "chapterNumber" : "5",
+  "schemaVersion" : 1,
+  "sectionID" : 10650
+}

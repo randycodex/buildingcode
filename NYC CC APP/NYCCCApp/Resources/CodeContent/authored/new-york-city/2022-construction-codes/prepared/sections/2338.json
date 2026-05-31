@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173718\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173718\"><\/AnnotationDrawer><div>Handrails shall be provided on both sides of ships ladders.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "2338-html-1",
+      "kind" : "html",
+      "plainText" : "Handrails shall be provided on both sides of ships ladders."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 2338
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170668\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170668\"><\/AnnotationDrawer><div>The application of these procedures shall be limited to column assemblies in which the fire-resistant material is not designed to carry any of the load acting on the column.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15271-html-1",
+      "kind" : "html",
+      "plainText" : "The application of these procedures shall be limited to column assemblies in which the fire-resistant material is not designed to carry any of the load acting on the column."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 15271
+}

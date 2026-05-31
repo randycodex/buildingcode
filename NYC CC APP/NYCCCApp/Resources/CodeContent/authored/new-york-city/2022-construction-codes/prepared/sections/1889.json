@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-172201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-172201\"><\/AnnotationDrawer><div>The system shall be designed such that the maximum probable normal or reverse stack effect will not adversely interfere with the system's capabilities. In determining the maximum probable stack effect, altitude, elevation, weather history and interior temperatures shall be used.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1889-html-1",
+      "kind" : "html",
+      "plainText" : "The system shall be designed such that the maximum probable normal or reverse stack effect will not adversely interfere with the system's capabilities. In determining the maximum probable stack effect, altitude, elevation, weather history and interior temperatures shall be used."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 1889
+}

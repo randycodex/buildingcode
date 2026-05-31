@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-166630\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-166630\"><\/AnnotationDrawer><div>Required means of egress for anchor buildings shall be provided independently from the mall means of egress system. The occupant load of anchor buildings opening into the mall shall not be included in determining means of egress requirements for the mall. The path of egress travel of malls shall not exit through anchor buildings. Malls terminating at an anchor building where no other means of egress has been provided shall be considered as a dead-end mall.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14071-html-1",
+      "kind" : "html",
+      "plainText" : "Required means of egress for anchor buildings shall be provided independently from the mall means of egress system. The occupant load of anchor buildings opening into the mall shall not be included in determining means of egress requirements for the mall. The path of egress travel of malls shall not exit through anchor buildings. Malls terminating at an anchor building where no other means of egress has been provided shall be considered as a dead-end mall."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 14071
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-164342\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-164342\"><\/AnnotationDrawer><div>In addition to the requirements of <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-236279', hash: '#JD_28-104' }}\">Article 104 of Title 28<\/Link> of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">Administrative Code,<\/span> the applicant shall submit any and all of the documents specified in Sections 107.3 through 107.16 as appropriate to the nature and extent of the work proposed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "13870-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of Article 104 of Title 28 of the Administrative Code, the applicant shall submit any and all of the documents specified in Sections 107.3 through 107.16 as appropriate to the nature and extent of the work proposed."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 13870
+}

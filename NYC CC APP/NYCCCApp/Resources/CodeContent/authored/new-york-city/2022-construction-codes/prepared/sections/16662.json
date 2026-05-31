@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175389\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175389\"><\/AnnotationDrawer><div>Hall call consoles shall be located and provided in a number complying with Section 1109.7.2.1.1 or 1109.7.2.1.2, as applicable. Where provided, hall call consoles shall be located on accessible routes connecting to the elevator landings they serve.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-175390\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-175390\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Where hall call consoles are an integral part of security barriers, at least one console for each type of use at each distinct location shall be located on an accessible route connecting to the elevator landings served by all such consoles.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16662-html-1",
+      "kind" : "html",
+      "plainText" : "Hall call consoles shall be located and provided in a number complying with Section 1109.7.2.1.1 or 1109.7.2.1.2, as applicable. Where provided, hall call consoles shall be located on accessible routes connecting to the elevator landings they serve.\n\n Exception: Where hall call consoles are an integral part of security barriers, at least one console for each type of use at each distinct location shall be located on an accessible route connecting to the elevator landings served by all such consoles."
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 16662
+}

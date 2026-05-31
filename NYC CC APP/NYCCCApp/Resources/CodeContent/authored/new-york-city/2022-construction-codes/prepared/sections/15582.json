@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171770\"><\/AnnotationDrawer><div>Fire areas containing ambulatory care facilities shall be provided with an electronically supervised automatic partial-coverage smoke detection system installed within the ambulatory care facility and in public use areas outside of tenant spaces and along the path of egress, including public corridors and elevator lobbies.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-171771\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-171771\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> Buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, provided the occupant notification appliances will activate throughout the notification zones upon sprinkler waterflow.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "15582-html-1",
+      "kind" : "html",
+      "plainText" : "Fire areas containing ambulatory care facilities shall be provided with an electronically supervised automatic partial-coverage smoke detection system installed within the ambulatory care facility and in public use areas outside of tenant spaces and along the path of egress, including public corridors and elevator lobbies.\n\n Exception: Buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1, provided the occupant notification appliances will activate throughout the notification zones upon sprinkler waterflow."
+    }
+  ],
+  "chapterNumber" : "9",
+  "schemaVersion" : 1,
+  "sectionID" : 15582
+}

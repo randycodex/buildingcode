@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174542\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174542\"><\/AnnotationDrawer><div>Aisles, stepped aisles and ramped aisles shall be built of materials consistent with the types permitted for the type of construction of the building.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-174543\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-174543\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> Wood handrails shall be permitted for all types of construction. Bleachers, grandstands and folding and telescopic seating shall be built of materials permitted by Section 1029.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16386-html-1",
+      "kind" : "html",
+      "plainText" : "Aisles, stepped aisles and ramped aisles shall be built of materials consistent with the types permitted for the type of construction of the building.\n\n Exception: Wood handrails shall be permitted for all types of construction. Bleachers, grandstands and folding and telescopic seating shall be built of materials permitted by Section 1029.1.1."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16386
+}

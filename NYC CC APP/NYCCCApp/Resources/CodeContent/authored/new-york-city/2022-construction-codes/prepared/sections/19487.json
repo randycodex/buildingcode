@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-184283\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-184283\"><\/AnnotationDrawer><div>Walls surrounding indoor private swimming pools shall not be required to comply with Section 3109.5.1.8.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "19487-html-1",
+      "kind" : "html",
+      "plainText" : "Walls surrounding indoor private swimming pools shall not be required to comply with Section 3109.5.1.8."
+    }
+  ],
+  "chapterNumber" : "31",
+  "schemaVersion" : 1,
+  "sectionID" : 19487
+}

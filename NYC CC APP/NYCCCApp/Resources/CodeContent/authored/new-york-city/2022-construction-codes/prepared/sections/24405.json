@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196669\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196669\"><\/AnnotationDrawer><div>Above-ground nonmetallic fuel-oil storage tanks shall be marked in accordance with Sections 40, 41 and 42 of UL 2258. The label shall also include the biodiesel percentage as identified in the scope of UL 2258.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24405-html-1",
+      "kind" : "html",
+      "plainText" : "Above-ground nonmetallic fuel-oil storage tanks shall be marked in accordance with Sections 40, 41 and 42 of UL 2258. The label shall also include the biodiesel percentage as identified in the scope of UL 2258."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 24405
+}

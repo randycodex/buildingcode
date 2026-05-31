@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185546\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185546\"><\/AnnotationDrawer><div>To provide necessary openings for intermittent operations, one or more sections of the guardrail system or solid enclosure may be hinged or supported in sockets. When supported in sockets, rails shall be so constructed that they cannot be jolted out. A button or hook may be used to hold the guardrail system or solid enclosure in a fixed position. As an alternative to hinged or socketed sections, substantial chains or ropes may be used to guard such openings in such guardrail system or solid enclosure. Where so used, the chains or ropes shall meet the tautness and height requirements as the rails of a standard guardrail system.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6081-html-1",
+      "kind" : "html",
+      "plainText" : "To provide necessary openings for intermittent operations, one or more sections of the guardrail system or solid enclosure may be hinged or supported in sockets. When supported in sockets, rails shall be so constructed that they cannot be jolted out. A button or hook may be used to hold the guardrail system or solid enclosure in a fixed position. As an alternative to hinged or socketed sections, substantial chains or ropes may be used to guard such openings in such guardrail system or solid enclosure. Where so used, the chains or ropes shall meet the tautness and height requirements as the rails of a standard guardrail system."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6081
+}

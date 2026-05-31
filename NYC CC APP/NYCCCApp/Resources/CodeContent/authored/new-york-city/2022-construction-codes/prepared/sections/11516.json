@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196466\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196466\"><\/AnnotationDrawer><div>Horizontal offsets shall be arranged to drain by gravity toward the tank room on the lowest level. Where the length of the horizontal offset exceeds 25 feet (7620 mm), the containment enclosure shall be constructed with an integral leakage collection reservoir of a cross-section area equal to the containment enclosure and at a minimum 6 inches (152.4 mm) deep. The reservoir shall be provided with a leak detection alarm. Where provided, all leak detection alarms shall be connected to a local audible alarm and to a remote alarm located at a supervising station. The wiring shall comply with the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Electrical Code<\/span>.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196467\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196467\"><\/AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:<\/span> A leak collection reservoir is not required where double metallic wall flexible fuel-oil piping is installed as a horizontal offset in accordance with Section 1302.9.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11516-html-1",
+      "kind" : "html",
+      "plainText" : "Horizontal offsets shall be arranged to drain by gravity toward the tank room on the lowest level. Where the length of the horizontal offset exceeds 25 feet (7620 mm), the containment enclosure shall be constructed with an integral leakage collection reservoir of a cross-section area equal to the containment enclosure and at a minimum 6 inches (152.4 mm) deep. The reservoir shall be provided with a leak detection alarm. Where provided, all leak detection alarms shall be connected to a local audible alarm and to a remote alarm located at a supervising station. The wiring shall comply with the New York City Electrical Code .\n\n Exception: A leak collection reservoir is not required where double metallic wall flexible fuel-oil piping is installed as a horizontal offset in accordance with Section 1302.9."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11516
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170107\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170107\"><\/AnnotationDrawer><div>In occupancies other than Group R, draftstopping shall be installed so that horizontal floor areas do not exceed 3,000 square feet (278.7 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t).<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170108\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170108\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170109\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;Draftstopping is not required in buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-170110\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-170110\"><\/AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Draftstopping shall not be required where the structural members within the concealed ceiling space are individually protected on all sides for their full length with materials having the required fire-resistance rating.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "1341-html-1",
+      "kind" : "html",
+      "plainText" : "In occupancies other than Group R, draftstopping shall be installed so that horizontal floor areas do not exceed 3,000 square feet (278.7 m\n\n 2 \n\n ).\n\n Exceptions: \n\n 1. Draftstopping is not required in buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.\n\n 2. Draftstopping shall not be required where the structural members within the concealed ceiling space are individually protected on all sides for their full length with materials having the required fire-resistance rating."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 1341
+}

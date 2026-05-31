@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185181\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185181\"><\/AnnotationDrawer><div>A daily inspection shall be made by a competent person to verify compliance with the housekeeping requirements of Sections 3303.4.1 through 3303.4.10. If the building is a major building, the occurrence of this inspection shall be noted in the site safety log. If the building is not a major building but requires a construction superintendent, the occurrence of this inspection shall be noted in the construction superintendent's log.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5949-html-1",
+      "kind" : "html",
+      "plainText" : "A daily inspection shall be made by a competent person to verify compliance with the housekeeping requirements of Sections 3303.4.1 through 3303.4.10. If the building is a major building, the occurrence of this inspection shall be noted in the site safety log. If the building is not a major building but requires a construction superintendent, the occurrence of this inspection shall be noted in the construction superintendent's log."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 5949
+}

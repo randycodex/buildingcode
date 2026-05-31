@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-193341\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-193341\"><\/AnnotationDrawer><div>Connecting offices, waiting rooms, ticket booths and similar uses that are accessory to a public garage shall be maintained at a positive pressure and shall be provided with ventilation in accordance with Section 403.3.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-193342\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-193342\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-193342\"><\/AnnotationDrawer><h6><a name=\"JD_MC405\" id=\"JD_MC405\" title=\"MC 405\"><\/a>Section MC 405: Systems Control<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "10377-html-1",
+      "kind" : "html",
+      "plainText" : "Connecting offices, waiting rooms, ticket booths and similar uses that are accessory to a public garage shall be maintained at a positive pressure and shall be provided with ventilation in accordance with Section 403.3.\n\n Section MC 405: Systems Control"
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 10377
+}

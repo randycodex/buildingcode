@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187023\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187023\"><\/AnnotationDrawer><div>Prior to the installation of a suspended scaffold, all suspended scaffold support devices, including but not limited to outrigger beams and C-hooks, along with the support surface\/structure upon which they rest (e.g. roof, parapet), shall be inspected by a qualified person. The qualified person shall:<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187024\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187024\"><\/AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Where the installation or removal occurs under the direct and continuing supervision of a licensed rigger or sign hanger, be designated by such licensee; or<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187025\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187025\"><\/AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Where the installation or removal does not occur under the direct and continuing supervision of a licensed rigger or sign hanger, be designated by the designer of the scaffold.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-187026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-187026\"><\/AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exception:<\/span> An inspection is not required for a nonadjustable suspended scaffold that, pursuant to Section 3314.3.2, is not required to be designed.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "6578-html-1",
+      "kind" : "html",
+      "plainText" : "Prior to the installation of a suspended scaffold, all suspended scaffold support devices, including but not limited to outrigger beams and C-hooks, along with the support surface\/structure upon which they rest (e.g. roof, parapet), shall be inspected by a qualified person. The qualified person shall:\n\n 1. Where the installation or removal occurs under the direct and continuing supervision of a licensed rigger or sign hanger, be designated by such licensee; or\n\n 2. Where the installation or removal does not occur under the direct and continuing supervision of a licensed rigger or sign hanger, be designated by the designer of the scaffold.\n\n Exception: An inspection is not required for a nonadjustable suspended scaffold that, pursuant to Section 3314.3.2, is not required to be designed."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 6578
+}

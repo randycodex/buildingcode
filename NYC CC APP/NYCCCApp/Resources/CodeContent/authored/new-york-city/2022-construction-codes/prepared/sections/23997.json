@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-195631\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-195631\"><\/AnnotationDrawer><div>Refrigerant access ports shall be protected in accordance with Section 1101.12 whenever refrigerant is added to or recovered from refrigeration or air-conditioning systems.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-195632\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-195632\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-195632\"><\/AnnotationDrawer><h6><a name=\"JD_MC1103\" id=\"JD_MC1103\" title=\"MC 1103\"><\/a>Section MC 1103: Refrigeration System Classification<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "23997-html-1",
+      "kind" : "html",
+      "plainText" : "Refrigerant access ports shall be protected in accordance with Section 1101.12 whenever refrigerant is added to or recovered from refrigeration or air-conditioning systems.\n\n Section MC 1103: Refrigeration System Classification"
+    }
+  ],
+  "chapterNumber" : "11",
+  "schemaVersion" : 1,
+  "sectionID" : 23997
+}

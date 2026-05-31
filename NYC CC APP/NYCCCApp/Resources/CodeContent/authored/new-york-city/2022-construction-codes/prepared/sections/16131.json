@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-173590\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-173590\"><\/AnnotationDrawer><div>All openable windows shall be equipped with sash locks designed to be openable from the inside only. Grilles lockable from the inside only may be placed on the inside or outside of windows that are accessible from grade but that do not serve to provide access to exits.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16131-html-1",
+      "kind" : "html",
+      "plainText" : "All openable windows shall be equipped with sash locks designed to be openable from the inside only. Grilles lockable from the inside only may be placed on the inside or outside of windows that are accessible from grade but that do not serve to provide access to exits."
+    }
+  ],
+  "chapterNumber" : "10",
+  "schemaVersion" : 1,
+  "sectionID" : 16131
+}

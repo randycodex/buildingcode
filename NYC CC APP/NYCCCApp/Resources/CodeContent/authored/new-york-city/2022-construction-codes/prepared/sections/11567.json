@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196636\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196636\"><\/AnnotationDrawer><div>All tanks shall have full penetration 5\/16 welds at all seams.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "11567-html-1",
+      "kind" : "html",
+      "plainText" : "All tanks shall have full penetration 5\/16 welds at all seams."
+    }
+  ],
+  "chapterNumber" : "13",
+  "schemaVersion" : 1,
+  "sectionID" : 11567
+}

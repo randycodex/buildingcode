@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-161487\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-161487\"><\/AnnotationDrawer><div><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">The route to the public toilet facilities required by Section 403.3 shall not pass through kitchens, storage rooms or closets. Access to the required facilities shall be from within the building or from the exterior of the building. Routes shall comply with the accessibility requirements of the <\/span><span style=\"color: #000000;font-weight: normal;font-style: italic;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">New York City Building Code<\/span><span style=\"color: #000000;font-weight: normal;font-style: normal;text-decoration:none;display: inline;font-family:&quot;Arial&quot;,serif;font-size:10pt;\">. The public shall have access to the required toilet facilities at all times that the building is occupied.<\/span><\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "24677-html-1",
+      "kind" : "html",
+      "plainText" : "The route to the public toilet facilities required by Section 403.3 shall not pass through kitchens, storage rooms or closets. Access to the required facilities shall be from within the building or from the exterior of the building. Routes shall comply with the accessibility requirements of the New York City Building Code . The public shall have access to the required toilet facilities at all times that the building is occupied."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 24677
+}

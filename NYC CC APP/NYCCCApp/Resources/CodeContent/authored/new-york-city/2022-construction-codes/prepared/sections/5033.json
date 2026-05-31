@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-182277\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-182277\"><\/AnnotationDrawer><div>Unless covered by interior or exterior wall coverings or sheathing meeting the minimum requirements of this code, stud partitions or walls with studs having a height-to-least-thickness ratio exceeding 50 shall have bridging that is not less than 2 inches (51 mm) in thickness and of the same width as the studs fitted snugly and nailed thereto to provide adequate lateral support. Bridging shall be placed in every stud cavity and at a frequency such that no stud so braced shall have a height-to-least-thickness ratio exceeding 50 with the height of the stud measured between horizontal framing and bridging or between bridging, whichever is greater.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "5033-html-1",
+      "kind" : "html",
+      "plainText" : "Unless covered by interior or exterior wall coverings or sheathing meeting the minimum requirements of this code, stud partitions or walls with studs having a height-to-least-thickness ratio exceeding 50 shall have bridging that is not less than 2 inches (51 mm) in thickness and of the same width as the studs fitted snugly and nailed thereto to provide adequate lateral support. Bridging shall be placed in every stud cavity and at a frequency such that no stud so braced shall have a height-to-least-thickness ratio exceeding 50 with the height of the stud measured between horizontal framing and bridging or between bridging, whichever is greater."
+    }
+  ],
+  "chapterNumber" : "23",
+  "schemaVersion" : 1,
+  "sectionID" : 5033
+}

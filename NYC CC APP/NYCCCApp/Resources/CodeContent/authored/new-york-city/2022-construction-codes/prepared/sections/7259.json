@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-189209\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-189209\"><\/AnnotationDrawer><div>The length of the fabric or safety wire perpendicular to any edge of the sign structure shall be dimensioned such that in the event of failure of any part of the flexible sign structure, no load spreader bars, mechanical tensioning devices, clamps, or wires will strike any nearby doors, windows, vents, chimneys, grilles, skylights, light fixtures, decorations or other wall appurtenances, or mechanical equipment, nor shall any load spreader bar fall within 10 feet (3048 mm) of grade.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>\n<div><span depth=\"6\"><\/span><CodeOptions destID=\"rid-0-0-0-189210\" class=\"Section\"><\/CodeOptions><div id=\"rid-0-0-0-189210\" class=\"Section toc-destination rbox\" style=\"margin-top: .5rem\"><AnnotationDrawer recordId=\"0-0-0-189210\"><\/AnnotationDrawer><h6><a name=\"JD_BCH115\" id=\"JD_BCH115\" title=\"BC H115\"><\/a>Section BC H115: Portable Signs<\/h6><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "7259-html-1",
+      "kind" : "html",
+      "plainText" : "The length of the fabric or safety wire perpendicular to any edge of the sign structure shall be dimensioned such that in the event of failure of any part of the flexible sign structure, no load spreader bars, mechanical tensioning devices, clamps, or wires will strike any nearby doors, windows, vents, chimneys, grilles, skylights, light fixtures, decorations or other wall appurtenances, or mechanical equipment, nor shall any load spreader bar fall within 10 feet (3048 mm) of grade.\n\n Section BC H115: Portable Signs"
+    }
+  ],
+  "chapterNumber" : "H",
+  "schemaVersion" : 1,
+  "sectionID" : 7259
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-196873\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-196873\"><\/AnnotationDrawer><div>Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in a specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20708-html-1",
+      "kind" : "html",
+      "plainText" : "Where there is a conflict between a general requirement and a specific requirement, the specific requirement shall govern. Where, in a specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern."
+    }
+  ],
+  "chapterNumber" : "1",
+  "schemaVersion" : 1,
+  "sectionID" : 20708
+}

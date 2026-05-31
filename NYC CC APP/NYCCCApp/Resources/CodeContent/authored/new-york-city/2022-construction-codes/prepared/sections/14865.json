@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-169201\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-169201\"><\/AnnotationDrawer><div>The fire protection peer reviewer shall submit a report to the department stating that the fire engineering analysis conforms to the requirements of this code without exception.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "14865-html-1",
+      "kind" : "html",
+      "plainText" : "The fire protection peer reviewer shall submit a report to the department stating that the fire engineering analysis conforms to the requirements of this code without exception."
+    }
+  ],
+  "chapterNumber" : "7",
+  "schemaVersion" : 1,
+  "sectionID" : 14865
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176025\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176025\"><\/AnnotationDrawer><div>Where space is provided on the exterior of a building for the storage of refuse and recyclables, such refuse and recyclables storage space shall include a minimum of 4 square feet (0.372 m\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span style=\"font-weight: normal;font-style: normal;text-decoration:none;vertical-align: super;display: inline;font-size:8pt;\">2<\/span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\t\t\t\t\t\t\t) in addition to the space per dwelling unit required by Section 1213.1, shall be clearly identified on the construction documents, and shall not be located in the public right-of-way.<\/div><\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-176026\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-176026\"><\/AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:<\/span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '\/codes\/newyorkcity\/latest\/NYCadmin\/0-0-0-204149', hash: '#JD_L.L.2012\/060' }}\">L.L. 2012\/060<\/Link>. \n\t\t\t\t\t\t\t\t\t\t\t\t<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "16875-html-1",
+      "kind" : "html",
+      "plainText" : "Where space is provided on the exterior of a building for the storage of refuse and recyclables, such refuse and recyclables storage space shall include a minimum of 4 square feet (0.372 m\n\n 2 \n\n ) in addition to the space per dwelling unit required by Section 1213.1, shall be clearly identified on the construction documents, and shall not be located in the public right-of-way.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012\/060 ."
+    }
+  ],
+  "chapterNumber" : "12",
+  "schemaVersion" : 1,
+  "sectionID" : 16875
+}

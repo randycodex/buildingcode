@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-167775\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-167775\"><\/AnnotationDrawer><div>Group H occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.5.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "619-html-1",
+      "kind" : "html",
+      "plainText" : "Group H occupancies shall be equipped throughout with an automatic sprinkler system in accordance with Section 903.2.5."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 619
+}

@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-168325\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-168325\"><\/AnnotationDrawer><div>In addition to the requirements of this section, occupancies involving radioactive materials and radiation-producing equipment shall also comply with applicable requirements of the <span style=\"font-weight: normal;font-style: italic;text-decoration:none;display: inline;\">New York City Health Code<\/span>, and applicable state and federal regulations.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "814-html-1",
+      "kind" : "html",
+      "plainText" : "In addition to the requirements of this section, occupancies involving radioactive materials and radiation-producing equipment shall also comply with applicable requirements of the New York City Health Code , and applicable state and federal regulations."
+    }
+  ],
+  "chapterNumber" : "4",
+  "schemaVersion" : 1,
+  "sectionID" : 814
+}

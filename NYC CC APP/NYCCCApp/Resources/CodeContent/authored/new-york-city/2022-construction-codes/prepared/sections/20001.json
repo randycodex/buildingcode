@@ -1,0 +1,13 @@
+{
+  "blocks" : [
+    {
+      "html" : "<\/div><div class=\"clearfix\"><\/div><div id=\"rid-0-0-0-185764\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-185764\"><\/AnnotationDrawer><div>Lateral bracing shall be provided during reshoring operations, and reshores shall be located as close as practical to the same position on each floor to provide continuous support from floor to floor.<\/div><\/div><div class=\"clearfix\"><\/div><div class=\"clearfix\"><\/div><\/div>",
+      "id" : "20001-html-1",
+      "kind" : "html",
+      "plainText" : "Lateral bracing shall be provided during reshoring operations, and reshores shall be located as close as practical to the same position on each floor to provide continuous support from floor to floor."
+    }
+  ],
+  "chapterNumber" : "33",
+  "schemaVersion" : 1,
+  "sectionID" : 20001
+}
