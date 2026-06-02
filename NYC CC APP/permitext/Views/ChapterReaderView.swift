@@ -28,6 +28,7 @@ struct ChapterReaderView: View {
     @State private var lastBlockOffsets: [Int64: CGFloat] = [:]
     @State private var loadedBlocksChapterID: Int64?
     @State private var isChapterSearchPresented = false
+    @State private var chapterSearchQuery = ""
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @StateObject private var expandedMediaTracker = ExpandedMediaTracker()
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
@@ -194,10 +195,11 @@ struct ChapterReaderView: View {
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet(proxy: proxy)
         }
-        .sheet(isPresented: $isChapterSearchPresented) {
+        .fullScreenCover(isPresented: $isChapterSearchPresented) {
             ChapterSearchSheet(
                 title: chapter.displayLabel,
                 entries: chapterSearchEntries,
+                query: $chapterSearchQuery,
                 onSelect: { entry in
                     jumpToSection(id: entry.sectionID, with: proxy)
                 }
@@ -207,6 +209,7 @@ struct ChapterReaderView: View {
         .task(id: chapter.id) {
             library.noteChapterOpened(chapter: chapter)
             noteTarget = nil
+            chapterSearchQuery = ""
             await loadBlocks(with: proxy)
         }
         .onAppear {
@@ -226,6 +229,7 @@ struct ChapterReaderView: View {
             focusedSectionUpdateTask = nil
             backgroundPrefetchTask?.cancel()
             backgroundPrefetchTask = nil
+            chapterSearchQuery = ""
         }
         .overlay(alignment: .top) {
             CodeTopContentFade(alwaysVisible: true)

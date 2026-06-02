@@ -33,11 +33,11 @@ private struct ChapterSearchResult: Identifiable, Hashable, Sendable {
 struct ChapterSearchSheet: View {
     let title: String
     let entries: [ChapterSearchSourceEntry]
+    @Binding var query: String
     let onSelect: (ChapterSearchSourceEntry) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var library: CodeLibraryViewModel
-    @State private var query = ""
     @State private var indexedEntries: [ChapterSearchIndexedEntry] = []
     @State private var isLoading = false
 
@@ -99,12 +99,12 @@ struct ChapterSearchSheet: View {
                             dismiss()
                         } label: {
                             VStack(alignment: .leading, spacing: 6) {
-                                Text("\(result.sectionNumber) \(result.title)")
+                                Text(highlightedSearchText(displayTitle(for: result)))
                                     .font(.headline)
                                     .foregroundStyle(.primary)
                                     .multilineTextAlignment(.leading)
 
-                                Text(result.snippet)
+                                Text(highlightedSearchText(result.snippet))
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .multilineTextAlignment(.leading)
@@ -123,6 +123,11 @@ struct ChapterSearchSheet: View {
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search this chapter")
             .autocorrectionDisabled()
             .textInputAutocapitalization(.never)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Done") { dismiss() }
+                }
+            }
             .task(id: entries) {
                 await loadIndexIfNeeded()
             }
@@ -181,5 +186,49 @@ struct ChapterSearchSheet: View {
             value += "…"
         }
         return value.replacingOccurrences(of: "\n", with: " ")
+    }
+
+    private func displayTitle(for result: ChapterSearchResult) -> String {
+        let sectionNumber = result.sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        let title = result.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !sectionNumber.isEmpty else { return title }
+        guard !title.isEmpty else { return sectionNumber }
+
+        let normalizedTitle = title
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+        let normalizedSection = sectionNumber.lowercased()
+
+        if normalizedTitle.hasPrefix(normalizedSection)
+            || normalizedTitle.hasPrefix("section \(normalizedSection)")
+            || normalizedTitle.hasPrefix("section bc \(normalizedSection)")
+            || normalizedTitle.hasPrefix("section mc \(normalizedSection)")
+            || normalizedTitle.hasPrefix("section pc \(normalizedSection)")
+            || normalizedTitle.hasPrefix("section fc \(normalizedSection)") {
+            return title
+        }
+
+        return "\(sectionNumber) \(title)"
+    }
+
+    private func highlightedSearchText(_ text: String) -> AttributedString {
+        var attributed = AttributedString(text)
+        let tokens = trimmedQuery
+            .split(whereSeparator: \.isWhitespace)
+            .map(String.init)
+            .filter { !$0.isEmpty }
+
+        guard !tokens.isEmpty else { return attributed }
+
+        for token in tokens {
+            var searchRange = attributed.startIndex..<attributed.endIndex
+            while let range = attributed[searchRange].range(of: token, options: [.caseInsensitive, .diacriticInsensitive]) {
+                attributed[range].backgroundColor = UIColor(Color.appChrome.opacity(0.28))
+                attributed[range].foregroundColor = UIColor(Color.primary)
+                searchRange = range.upperBound..<attributed.endIndex
+            }
+        }
+
+        return attributed
     }
 }

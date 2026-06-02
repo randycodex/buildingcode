@@ -11,10 +11,13 @@ private enum SettingsControlMetrics {
     static let switchHeight: CGFloat = 32
     static let switchThumbInset: CGFloat = 3
     static let switchThumbCornerRadius: CGFloat = 12
+    static let switchThumbSize: CGFloat = switchHeight - (switchThumbInset * 2)
+    static let switchThumbTravel: CGFloat = switchWidth - switchThumbSize - (switchThumbInset * 2)
 }
 
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.colorScheme) private var colorScheme
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
@@ -219,21 +222,7 @@ struct SettingsView: View {
 
     private var planCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                CodeEyebrow(text: "Plan", accent: settingsChromeColor)
-
-                Spacer(minLength: 0)
-
-                Text(library.currentPlan.label)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(library.currentPlan == .pro ? Color.appChrome : .secondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(library.currentPlan == .pro ? Color.appChrome.opacity(0.14) : Color(uiColor: .tertiarySystemGroupedBackground))
-                    )
-            }
+            CodeEyebrow(text: "Plan", accent: settingsChromeColor)
 
             Text(planSummaryText)
                 .font(.subheadline)
@@ -255,10 +244,16 @@ struct SettingsView: View {
                 Label(upgradeButtonTitle, systemImage: "sparkles")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
+                    .foregroundStyle(upgradeButtonForegroundColor)
+                    .padding(.vertical, 12)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(upgradeButtonBackgroundColor)
+                    )
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Color.appChrome)
+            .buttonStyle(.plain)
             .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
+            .opacity(library.isStoreKitBusy || library.currentPlan == .pro ? 0.55 : 1)
 
             Button {
                 Task { await library.restorePurchases() }
@@ -316,6 +311,20 @@ struct SettingsView: View {
 
     private var upgradeButtonTitle: String {
         library.upgradeCallToActionTitle
+    }
+
+    private var upgradeButtonBackgroundColor: Color {
+        if library.currentPlan == .pro || library.isStoreKitBusy {
+            return Color(uiColor: .tertiarySystemGroupedBackground)
+        }
+        return colorScheme == .dark ? Color.white.opacity(0.96) : Color.appChrome
+    }
+
+    private var upgradeButtonForegroundColor: Color {
+        if library.currentPlan == .pro || library.isStoreKitBusy {
+            return Color.secondary
+        }
+        return colorScheme == .dark ? Color.black.opacity(0.9) : Color.white
     }
 
     #if DEBUG
@@ -649,18 +658,34 @@ private struct SettingsSwitchToggleStyle: ToggleStyle {
                     configuration.isOn.toggle()
                 }
             } label: {
-                ZStack(alignment: configuration.isOn ? .trailing : .leading) {
+                ZStack(alignment: .leading) {
                     Capsule(style: .continuous)
-                        .fill(configuration.isOn ? Color.appChrome : Color(uiColor: .tertiarySystemGroupedBackground))
-                        .overlay(
+                        .fill(Color.black.opacity(0.86))
+                        .overlay {
                             Capsule(style: .continuous)
-                                .strokeBorder(Color(uiColor: .separator).opacity(configuration.isOn ? 0.55 : 0.95), lineWidth: 1)
-                        )
+                                .strokeBorder(
+                                    configuration.isOn
+                                    ? Color.appChrome.opacity(0.52)
+                                    : Color.white.opacity(0.14),
+                                    lineWidth: 1.5
+                                )
+                        }
+
+                    Capsule(style: .continuous)
+                        .fill(Color.appChrome)
+                        .padding(3)
+                        .frame(width: configuration.isOn ? SettingsControlMetrics.switchWidth : SettingsControlMetrics.switchHeight)
+                        .opacity(configuration.isOn ? 1 : 0)
 
                     RoundedRectangle(cornerRadius: SettingsControlMetrics.switchThumbCornerRadius, style: .continuous)
-                        .fill(Color(uiColor: .systemBackground))
-                        .shadow(color: Color.black.opacity(0.18), radius: 2, x: 0, y: 1)
+                        .fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.28), radius: 4, x: 0, y: 1)
+                        .frame(
+                            width: SettingsControlMetrics.switchThumbSize,
+                            height: SettingsControlMetrics.switchThumbSize
+                        )
                         .padding(SettingsControlMetrics.switchThumbInset)
+                        .offset(x: configuration.isOn ? SettingsControlMetrics.switchThumbTravel : 0)
                 }
                 .frame(width: SettingsControlMetrics.switchWidth, height: SettingsControlMetrics.switchHeight)
             }

@@ -29,6 +29,7 @@ struct ChapterHTMLReaderView: View {
     @State private var scrollProgressSyncTrigger = 0
     @State private var lastRecordedVisibleAnchorID: String?
     @State private var isChapterSearchPresented = false
+    @State private var chapterSearchQuery = ""
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -283,6 +284,7 @@ struct ChapterHTMLReaderView: View {
         .onChange(of: chapter.id) { _, _ in
             scrollProgress = 0
             lastRecordedVisibleAnchorID = nil
+            chapterSearchQuery = ""
         }
         .task(id: chapter.id) {
             guard hasActivatedHTMLReader else { return }
@@ -312,10 +314,11 @@ struct ChapterHTMLReaderView: View {
                 }
             )
         }
-        .sheet(isPresented: $isChapterSearchPresented) {
+        .fullScreenCover(isPresented: $isChapterSearchPresented) {
             ChapterSearchSheet(
                 title: chapter.displayLabel,
                 entries: chapterSearchEntries,
+                query: $chapterSearchQuery,
                 onSelect: { entry in
                     if let anchorID = entry.anchorID {
                         targetAnchorID = anchorID
@@ -346,6 +349,9 @@ struct ChapterHTMLReaderView: View {
             if chapterURL != nil, readAccessURL != nil, hasActivatedHTMLReader {
                 CodeTopContentFade(alwaysVisible: true)
             }
+        }
+        .onDisappear {
+            chapterSearchQuery = ""
         }
     }
 

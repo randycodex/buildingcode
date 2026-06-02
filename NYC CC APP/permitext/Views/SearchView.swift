@@ -636,6 +636,18 @@ struct SearchView: View {
         let resultAccent = Color(uiColor: library.accentColor(for: result.codeSectionID))
         let displayTitle = result.displayTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         let snippet = result.snippet.trimmingCharacters(in: .whitespacesAndNewlines)
+        let highlightedTitle = highlightedSearchText(
+            displayTitle,
+            query: query,
+            accent: resultAccent,
+            highlightedForeground: Color.appChrome
+        )
+        let highlightedSnippet = highlightedSearchText(
+            snippet,
+            query: query,
+            accent: resultAccent.opacity(0.22),
+            highlightedForeground: .primary
+        )
         let showsSeparateTitle = !displayTitle.isEmpty
             && !snippet.isEmpty
             && displayTitle.caseInsensitiveCompare(snippet) != .orderedSame
@@ -666,14 +678,14 @@ struct SearchView: View {
                 }
 
                 if showsSeparateTitle {
-                    Text(displayTitle)
+                    Text(highlightedTitle)
                         .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
                         .foregroundStyle(resultAccent)
                         .multilineTextAlignment(.leading)
                 }
 
                 if !snippet.isEmpty {
-                    Text(snippet)
+                    Text(highlightedSnippet)
                         .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
@@ -684,6 +696,33 @@ struct SearchView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+    }
+
+    private func highlightedSearchText(
+        _ text: String,
+        query: String,
+        accent: Color,
+        highlightedForeground: Color
+    ) -> AttributedString {
+        var attributed = AttributedString(text)
+        let tokens = query
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(whereSeparator: \.isWhitespace)
+            .map(String.init)
+            .filter { !$0.isEmpty }
+
+        guard !tokens.isEmpty else { return attributed }
+
+        for token in tokens {
+            var searchRange = attributed.startIndex..<attributed.endIndex
+            while let range = attributed[searchRange].range(of: token, options: [.caseInsensitive, .diacriticInsensitive]) {
+                attributed[range].backgroundColor = UIColor(accent)
+                attributed[range].foregroundColor = UIColor(highlightedForeground)
+                searchRange = range.upperBound..<attributed.endIndex
+            }
+        }
+
+        return attributed
     }
 
     private func dismissKeyboard() {
