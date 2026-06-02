@@ -926,7 +926,7 @@ struct EntitlementLimits: Hashable, Sendable {
     static let free = EntitlementLimits(
         savedSectionLimit: 25,
         noteLimit: 10,
-        projectLimit: 3,
+        projectLimit: 0,
         premiumExportsEnabled: false,
         advancedOrganizationEnabled: false,
         continuityEnabled: false,
@@ -1039,6 +1039,9 @@ struct LocalEntitlementService: EntitlementService {
 
     func canCreateProject(currentCount: Int) -> EntitlementDecision {
         guard let limit = limits.projectLimit, currentCount >= limit else { return .allowed }
+        if limit == 0 {
+            return denied(.unlimitedProjects, "Upgrade to Pro to create and manage projects.")
+        }
         return denied(.unlimitedProjects, "Free includes up to \(limit) projects. Upgrade to Pro for unlimited projects.")
     }
 

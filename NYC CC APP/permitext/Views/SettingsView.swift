@@ -234,7 +234,7 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 10) {
-                planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, 10 notes, and 3 projects.")
+                planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, and 10 notes.")
                 planFeatureRow("Pro", details: "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and future cross-device sync.")
             }
 
@@ -272,8 +272,6 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            CodeHairline()
-
             Picker("Local Test Plan", selection: Binding(
                 get: { library.currentPlan },
                 set: { library.setDebugPlan($0) }
@@ -282,15 +280,6 @@ struct SettingsView: View {
                 Text(AppPlan.pro.label).tag(AppPlan.pro)
             }
             .pickerStyle(.segmented)
-
-            Toggle(isOn: Binding(
-                get: { library.currentEntitlementSource == .lifetimeGrant },
-                set: { library.setDebugLifetimeGrant(enabled: $0) }
-            )) {
-                Text("Debug Lifetime Grant")
-                    .font(.footnote.weight(.semibold))
-            }
-            .toggleStyle(SettingsSwitchToggleStyle())
             #endif
         }
         .frame(maxWidth: .infinity, alignment: .leading)
