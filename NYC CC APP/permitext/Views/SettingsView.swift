@@ -315,9 +315,7 @@ struct SettingsView: View {
     }
 
     private var upgradeButtonTitle: String {
-        if library.currentPlan == .pro { return "Pro Active" }
-        if let price = library.proProductDisplayPrice { return "Upgrade to Pro - \(price)/month" }
-        return library.isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
+        library.upgradeCallToActionTitle
     }
 
     #if DEBUG

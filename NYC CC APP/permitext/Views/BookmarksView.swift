@@ -103,7 +103,11 @@ struct BookmarksView: View {
     }
 
     private var hasSavedHeaderContentBelowTitle: Bool {
-        !library.folders.isEmpty || showsSavedInlineFilters
+        showsProjectsSection || showsSavedInlineFilters
+    }
+
+    private var showsProjectsSection: Bool {
+        library.hasProjectAccess || !library.folders.isEmpty
     }
 
     var body: some View {
@@ -207,13 +211,13 @@ private var savedScreenHeader: some View {
 
         if !library.bookmarks.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
-                if !library.folders.isEmpty {
+                if showsProjectsSection {
                     projectTilesSection
                 }
 
                 if showsSavedInlineFilters {
                     savedInlineFilters
-                        .padding(.top, library.folders.isEmpty ? 0 : CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                        .padding(.top, showsProjectsSection ? 0 : CodeScreenMetrics.sectionSpacingBelowEyebrow)
                         .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 }
             }
@@ -371,40 +375,75 @@ private var savedBookmarkList: some View {
             CodeScreenSectionEyebrow(text: "Projects", accent: accentColor)
                 .overlay(alignment: .trailing) {
                     Button {
-                        folderEditorTarget = .new
+                        if library.hasProjectAccess {
+                            folderEditorTarget = .new
+                        } else {
+                            library.requireProjectAccess()
+                        }
                     } label: {
                         Image(systemName: "plus")
                             .font(.caption.weight(.bold))
                             .foregroundStyle(accentColor)
                             .frame(width: 28, height: 28)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("New project")
+                .buttonStyle(.plain)
+                .accessibilityLabel("New project")
                 }
 
-            GeometryReader { proxy in
-                let pageWidth = proxy.size.width
-                TabView(selection: $projectPageIndex) {
-                    ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
-                        projectPageGrid(page, pageWidth: pageWidth)
-                            .frame(
-                                width: pageWidth,
-                                height: projectGridViewportHeight,
-                                alignment: .topLeading
-                            )
-                            .tag(index)
+            if library.hasProjectAccess {
+                GeometryReader { proxy in
+                    let pageWidth = proxy.size.width
+                    TabView(selection: $projectPageIndex) {
+                        ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
+                            projectPageGrid(page, pageWidth: pageWidth)
+                                .frame(
+                                    width: pageWidth,
+                                    height: projectGridViewportHeight,
+                                    alignment: .topLeading
+                                )
+                                .tag(index)
+                        }
                     }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
+                    .clipped()
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
-                .clipped()
+                .frame(height: projectGridViewportHeight)
+            } else {
+                projectUpgradeTile
             }
-            .frame(height: projectGridViewportHeight)
 
-            if projectPages.count > 1 {
+            if library.hasProjectAccess && projectPages.count > 1 {
                 projectPageDots
             }
         }
+    }
+
+    private var projectUpgradeTile: some View {
+        Button {
+            library.requireProjectAccess()
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Image(systemName: "folder.badge.plus")
+                        .font(.caption.weight(.semibold))
+                    Text("Projects")
+                        .font(.caption.weight(.semibold))
+                }
+
+                Text("Organize saved sections into project folders with Pro.")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.leading)
+            }
+            .foregroundStyle(Color.appChrome)
+            .padding(CodeScreenMetrics.compactCardPadding)
+            .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.savedProjectTileHeight, alignment: .leading)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Upgrade to use projects")
     }
 
     private var projectPageDots: some View {
@@ -457,19 +496,29 @@ private var savedBookmarkList: some View {
     @ViewBuilder
     private func projectTileSlot(_ folder: CodeFolder?, tileWidth: CGFloat) -> some View {
         if let folder {
-            NavigationLink {
-                ProjectView(folderID: folder.id)
-            } label: {
-                projectTile(folder)
-                    .frame(width: tileWidth)
-            }
-            .buttonStyle(.plain)
-            .contextMenu {
-                Button {
-                    folderEditorTarget = .edit(folder)
+            if library.hasProjectAccess {
+                NavigationLink {
+                    ProjectView(folderID: folder.id)
                 } label: {
-                    Label("Edit project", systemImage: "pencil")
+                    projectTile(folder)
+                        .frame(width: tileWidth)
                 }
+                .buttonStyle(.plain)
+                .contextMenu {
+                    Button {
+                        folderEditorTarget = .edit(folder)
+                    } label: {
+                        Label("Edit project", systemImage: "pencil")
+                    }
+                }
+            } else {
+                Button {
+                    library.requireProjectAccess()
+                } label: {
+                    projectTile(folder)
+                        .frame(width: tileWidth)
+                }
+                .buttonStyle(.plain)
             }
         } else {
             Color.clear
@@ -957,7 +1006,7 @@ struct ProjectView: View {
             .padding(.bottom, 40)
         }
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-        .navigationTitle(folder?.name ?? "Project")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {

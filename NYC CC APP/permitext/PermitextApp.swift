@@ -52,6 +52,14 @@ struct PermitextApp: App {
                 ),
                 presenting: library.entitlementPrompt
             ) { _ in
+                if library.currentPlan != .pro && !library.isStoreKitBusy {
+                    Button(library.upgradeCallToActionTitle) {
+                        library.dismissEntitlementPrompt()
+                        Task {
+                            await library.purchasePro()
+                        }
+                    }
+                }
                 Button("Not Now", role: .cancel) { library.dismissEntitlementPrompt() }
             } message: { requirement in
                 Text(requirement.message)

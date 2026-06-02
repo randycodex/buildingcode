@@ -341,15 +341,25 @@ struct ReaderView: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            FolderMembershipRow(
-                memberFolders: library.folders(containing: sectionID),
-                onRemove: { folder in
-                    library.removeSection(sectionID, fromFolder: folder.id)
-                },
-                onAdd: {
-                    isFolderPickerOpen = true
-                }
-            )
+            if library.hasProjectAccess {
+                FolderMembershipRow(
+                    memberFolders: library.folders(containing: sectionID),
+                    onRemove: { folder in
+                        library.removeSection(sectionID, fromFolder: folder.id)
+                    },
+                    onAdd: {
+                        isFolderPickerOpen = true
+                    }
+                )
+            } else {
+                FolderMembershipRow(
+                    memberFolders: [],
+                    onRemove: { _ in },
+                    onAdd: {
+                        library.requireProjectAccess()
+                    }
+                )
+            }
         }
     }
 
@@ -511,13 +521,21 @@ struct ReaderView: View {
         let cleaned = tag.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleaned.isEmpty else { return }
         guard !sectionTags.contains(where: { $0.caseInsensitiveCompare(cleaned) == .orderedSame }) else { return }
-        sectionTags.append(cleaned)
-        library.setTags(sectionTags, sectionID: sectionID)
+        let updatedTags = sectionTags + [cleaned]
+        if library.setTags(updatedTags, sectionID: sectionID) {
+            sectionTags = updatedTags
+        } else {
+            sectionTags = library.tags(sectionID: sectionID)
+        }
     }
 
     private func removeTag(_ tag: String) {
-        sectionTags.removeAll { $0.caseInsensitiveCompare(tag) == .orderedSame }
-        library.setTags(sectionTags, sectionID: sectionID)
+        let updatedTags = sectionTags.filter { $0.caseInsensitiveCompare(tag) != .orderedSame }
+        if library.setTags(updatedTags, sectionID: sectionID) {
+            sectionTags = updatedTags
+        } else {
+            sectionTags = library.tags(sectionID: sectionID)
+        }
     }
 
     private func loadContent() async {

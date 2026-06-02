@@ -1431,6 +1431,29 @@ final class CodeLibraryViewModel: ObservableObject {
         entitlementPrompt = nil
     }
 
+    var upgradeCallToActionTitle: String {
+        if currentPlan == .pro { return "Pro Active" }
+        if let price = proProductDisplayPrice { return "Upgrade to Pro - \(price)/month" }
+        return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
+    }
+
+    var hasProjectAccess: Bool {
+        currentPlan == .pro
+    }
+
+    @discardableResult
+    func requireProjectAccess() -> Bool {
+        guard currentPlan != .pro else { return true }
+        let requirement = EntitlementRequirement(
+            feature: .unlimitedProjects,
+            requiredPlan: .pro,
+            message: "Upgrade to Pro to create and manage projects."
+        )
+        entitlementPrompt = requirement
+        statusMessage = requirement.message
+        return false
+    }
+
     func showUpgradePlaceholder() {
         entitlementPrompt = EntitlementRequirement(
             feature: .unlimitedSavedItems,
@@ -1619,7 +1642,7 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
         guard !denyIfNeeded(entitlementService.canUse(.premiumExports)) else {
-            exportState = .failed(entitlementPrompt?.message ?? "Upgrade to Pro to export saved sections.")
+            exportState = .idle
             return
         }
         activeExportTask?.cancel()
@@ -1796,18 +1819,21 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     /// Replaces a section's tag set. Empty array clears all tags for it.
-    func setTags(_ tags: [String], sectionID: Int64) {
-        guard let selectedVersion, let userContentRepository else { return }
+    @discardableResult
+    func setTags(_ tags: [String], sectionID: Int64) -> Bool {
+        guard let selectedVersion, let userContentRepository else { return false }
         do {
             if !tags.isEmpty {
                 guard !denyIfNeeded(entitlementService.canUse(.advancedOrganization)) else {
-                    return
+                    return false
                 }
             }
             try userContentRepository.setTags(tags, sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
+            return true
         } catch {
             statusMessage = error.localizedDescription
+            return false
         }
     }
 
