@@ -389,7 +389,7 @@ struct ReaderView: View {
 
             // Tags applied to this section, shown as removable accent chips.
             if sectionTags.isEmpty {
-                Text("No tags yet — tap Add to choose from the starter set or type your own.")
+                Text("No tags yet — tap Add to create one.")
                     .font(.footnote)
                     .foregroundStyle(.tertiary)
             } else {
@@ -451,48 +451,7 @@ struct ReaderView: View {
                 RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
                     .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
             )
-
-            // Starter set + the user's previously used tags. Already-applied
-            // tags are dimmed and disabled so users don't double-add.
-            let suggestions = suggestedTagOptions
-            if !suggestions.isEmpty {
-                Text("Suggestions")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 2)
-                tagChipFlow(tags: suggestions) { tag in
-                    let applied = sectionTags.contains { $0.caseInsensitiveCompare(tag) == .orderedSame }
-                    Button {
-                        if !applied { addTag(tag) }
-                    } label: {
-                        Text(tag)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(applied ? Color.secondary : accentColor)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 5)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill((applied ? Color.secondary : accentColor).opacity(applied ? 0.08 : 0.12))
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(applied)
-                }
-            }
         }
-    }
-
-    /// Starter tags first (in their canonical order), then any tags the
-    /// user has applied elsewhere that aren't already in the starter set.
-    /// Already-applied tags on THIS section appear too but are dimmed.
-    private var suggestedTagOptions: [String] {
-        let starter = CodeLibraryViewModel.starterBookmarkTags
-        let extras = library.tagUsageCounts()
-            .map(\.tag)
-            .filter { extra in
-                !starter.contains { $0.caseInsensitiveCompare(extra) == .orderedSame }
-            }
-        return starter + extras
     }
 
     /// Lightweight flowing chip layout: wraps to multiple lines without

@@ -107,7 +107,7 @@ struct BookmarksView: View {
     }
 
     private var showsProjectsSection: Bool {
-        library.hasProjectAccess || !library.folders.isEmpty
+        library.hasProjectAccess
     }
 
     var body: some View {
@@ -390,60 +390,55 @@ private var savedBookmarkList: some View {
                 .accessibilityLabel("New project")
                 }
 
-            if library.hasProjectAccess {
-                GeometryReader { proxy in
-                    let pageWidth = proxy.size.width
-                    TabView(selection: $projectPageIndex) {
-                        ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
-                            projectPageGrid(page, pageWidth: pageWidth)
-                                .frame(
-                                    width: pageWidth,
-                                    height: projectGridViewportHeight,
-                                    alignment: .topLeading
-                                )
-                                .tag(index)
-                        }
+            GeometryReader { proxy in
+                let pageWidth = proxy.size.width
+                TabView(selection: $projectPageIndex) {
+                    ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
+                        projectPageGrid(page, pageWidth: pageWidth)
+                            .frame(
+                                width: pageWidth,
+                                height: projectGridViewportHeight,
+                                alignment: .topLeading
+                            )
+                            .tag(index)
                     }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
-                    .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
-                    .clipped()
+                    if projectPages.isEmpty {
+                        emptyProjectPage(pageWidth: pageWidth)
+                            .frame(
+                                width: pageWidth,
+                                height: projectGridViewportHeight,
+                                alignment: .topLeading
+                            )
+                            .tag(0)
+                    }
                 }
-                .frame(height: projectGridViewportHeight)
-            } else {
-                projectUpgradeTile
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
+                .clipped()
             }
+            .frame(height: projectGridViewportHeight)
 
-            if library.hasProjectAccess && projectPages.count > 1 {
+            if projectPages.count > 1 {
                 projectPageDots
             }
         }
     }
 
-    private var projectUpgradeTile: some View {
-        Button {
-            library.requireProjectAccess()
-        } label: {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
-                    Image(systemName: "folder.badge.plus")
-                        .font(.caption.weight(.semibold))
-                    Text("Projects")
-                        .font(.caption.weight(.semibold))
-                }
+    private func emptyProjectPage(pageWidth: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("No Projects Yet")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
 
-                Text("Organize saved sections into project folders with Pro.")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.leading)
-            }
-            .foregroundStyle(Color.appChrome)
-            .padding(CodeScreenMetrics.compactCardPadding)
-            .frame(maxWidth: .infinity, minHeight: CodeScreenMetrics.savedProjectTileHeight, alignment: .leading)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
+            Text("Create a project to organize saved sections by job, issue, or review.")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.leading)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Upgrade to use projects")
+        .padding(CodeScreenMetrics.compactCardPadding)
+        .frame(width: pageWidth, height: CodeScreenMetrics.savedProjectTileHeight, alignment: .leading)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
     }
 
     private var projectPageDots: some View {
@@ -729,7 +724,7 @@ private var savedBookmarkList: some View {
         let topPadding: CGFloat = {
             guard isFirst else { return 18 }
             if !followsSavedHeader { return CodeScreenMetrics.contentSpacingBelowTitle }
-            if hasFiltersAbove { return 0 }
+            if hasFiltersAbove { return CodeScreenMetrics.sectionSpacingBelowEyebrow }
             return CodeScreenMetrics.sectionSpacingBelowEyebrow
         }()
 
