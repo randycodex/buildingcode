@@ -34,46 +34,7 @@ struct PermitextApp: App {
         WindowGroup {
             Group {
                 if library.isInitialContentLoaded {
-                    TabView(selection: $library.selectedTab) {
-                        BrowseView(browserContext: .primary)
-                            .environment(\.isBrowserTabActive, library.selectedTab == .browse)
-                            .tabItem {
-                                Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                                Text("")
-                            }
-                            .tag(AppTab.browse)
-
-                        if library.comparisonModeEnabled {
-                            BrowseView(browserContext: .secondary)
-                                .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
-                                .tabItem {
-                                    Image(systemName: "text.line.last.and.arrowtriangle.forward")
-                                    Text("")
-                                }
-                                .tag(AppTab.browseSecondary)
-                        }
-
-                        SearchView()
-                            .tabItem {
-                                Image(systemName: "sparkle.magnifyingglass")
-                                Text("")
-                            }
-                            .tag(AppTab.search)
-
-                        BookmarksView()
-                            .tabItem {
-                                Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
-                                Text("")
-                            }
-                            .tag(AppTab.bookmarks)
-
-                        SettingsView()
-                            .tabItem {
-                                Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
-                                Text("")
-                            }
-                            .tag(AppTab.settings)
-                    }
+                    PermitextRootNavigation()
                 } else {
                     AppLaunchLoadingView(
                         progress: library.initialLoadProgress,
@@ -83,6 +44,18 @@ struct PermitextApp: App {
             }
             .environmentObject(library)
             .tint(Color.appChrome)
+            .alert(
+                "Upgrade to Pro",
+                isPresented: Binding(
+                    get: { library.entitlementPrompt != nil },
+                    set: { if !$0 { library.dismissEntitlementPrompt() } }
+                ),
+                presenting: library.entitlementPrompt
+            ) { _ in
+                Button("Not Now", role: .cancel) { library.dismissEntitlementPrompt() }
+            } message: { requirement in
+                Text(requirement.message)
+            }
             .onChange(of: library.comparisonModeEnabled) { _, isEnabled in
                 if !isEnabled, library.selectedTab == .browseSecondary {
                     library.selectedTab = .browse
@@ -121,6 +94,9 @@ struct PermitextApp: App {
                 }
             }
             .onAppear {
+                Task {
+                    await library.refreshStoreKitEntitlements()
+                }
                 guard library.isInitialContentLoaded else { return }
                 switch library.selectedTab {
                 case .browse:
@@ -131,6 +107,74 @@ struct PermitextApp: App {
                     break
                 }
             }
+        }
+    }
+}
+
+private struct PermitextRootNavigation: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @EnvironmentObject private var library: CodeLibraryViewModel
+
+    var body: some View {
+        switch layoutMode {
+        case .compactTabs, .regularPreparedTabs:
+            PermitextTabNavigation()
+        }
+    }
+
+    private var layoutMode: PermitextRootLayoutMode {
+        horizontalSizeClass == .regular ? .regularPreparedTabs : .compactTabs
+    }
+}
+
+private enum PermitextRootLayoutMode {
+    case compactTabs
+    case regularPreparedTabs
+}
+
+private struct PermitextTabNavigation: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+
+    var body: some View {
+        TabView(selection: $library.selectedTab) {
+            BrowseView(browserContext: .primary)
+                .environment(\.isBrowserTabActive, library.selectedTab == .browse)
+                .tabItem {
+                    Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                    Text("")
+                }
+                .tag(AppTab.browse)
+
+            if library.comparisonModeEnabled {
+                BrowseView(browserContext: .secondary)
+                    .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
+                    .tabItem {
+                        Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                        Text("")
+                    }
+                    .tag(AppTab.browseSecondary)
+            }
+
+            SearchView()
+                .tabItem {
+                    Image(systemName: "sparkle.magnifyingglass")
+                    Text("")
+                }
+                .tag(AppTab.search)
+
+            BookmarksView()
+                .tabItem {
+                    Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
+                    Text("")
+                }
+                .tag(AppTab.bookmarks)
+
+            SettingsView()
+                .tabItem {
+                    Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
+                    Text("")
+                }
+                .tag(AppTab.settings)
         }
     }
 }

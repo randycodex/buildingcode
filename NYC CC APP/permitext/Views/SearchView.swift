@@ -253,7 +253,7 @@ struct SearchView: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            TextField("Search sections, chapters, terms", text: $query)
+            TextField("", text: $query)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
@@ -634,6 +634,11 @@ struct SearchView: View {
 
     private func resultRow(_ result: CodeSearchResult) -> some View {
         let resultAccent = Color(uiColor: library.accentColor(for: result.codeSectionID))
+        let displayTitle = result.displayTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let snippet = result.snippet.trimmingCharacters(in: .whitespacesAndNewlines)
+        let showsSeparateTitle = !displayTitle.isEmpty
+            && !snippet.isEmpty
+            && displayTitle.caseInsensitiveCompare(snippet) != .orderedSame
 
         return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
@@ -660,16 +665,20 @@ struct SearchView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Text(result.displayTitle)
-                    .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
-                    .foregroundStyle(resultAccent)
-                    .multilineTextAlignment(.leading)
+                if showsSeparateTitle {
+                    Text(displayTitle)
+                        .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
+                        .foregroundStyle(resultAccent)
+                        .multilineTextAlignment(.leading)
+                }
 
-                Text(result.snippet)
-                    .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.leading)
-                    .lineLimit(4)
+                if !snippet.isEmpty {
+                    Text(snippet)
+                        .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(4)
+                }
             }
 
             Spacer(minLength: 0)

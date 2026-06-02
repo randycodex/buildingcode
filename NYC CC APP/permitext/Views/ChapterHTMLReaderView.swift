@@ -28,6 +28,7 @@ struct ChapterHTMLReaderView: View {
     @State private var scrollProgress: CGFloat = 0
     @State private var scrollProgressSyncTrigger = 0
     @State private var lastRecordedVisibleAnchorID: String?
+    @State private var isChapterSearchPresented = false
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -35,6 +36,20 @@ struct ChapterHTMLReaderView: View {
 
     private var pageBackgroundColor: Color {
         colorScheme == .dark ? .black : Color(uiColor: .systemGroupedBackground)
+    }
+
+    private var chapterSearchToolbarButton: some View {
+        Button {
+            isChapterSearchPresented = true
+        } label: {
+            Image(systemName: "text.page.badge.magnifyingglass")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .background(Color(uiColor: .systemBackground))
+                .clipShape(Capsule(style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Search this chapter")
     }
 
     private var htmlStore: PublishedHTMLContentStore {
@@ -91,6 +106,23 @@ struct ChapterHTMLReaderView: View {
                 title: group.displayLabel(codeSectionName: codeSectionName),
                 anchorID: nil,
                 level: 2
+            )
+        }
+    }
+
+    private var chapterSearchEntries: [ChapterSearchSourceEntry] {
+        jumpTargets.compactMap { target in
+            let sectionNumber = target.sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !sectionNumber.isEmpty,
+                  let summary = library.sectionSummary(sectionNumber: sectionNumber, codeSectionID: chapter.codeSectionID) else {
+                return nil
+            }
+
+            return ChapterSearchSourceEntry(
+                sectionID: summary.id,
+                sectionNumber: summary.sectionNumber,
+                title: summary.title,
+                anchorID: target.anchorID
             )
         }
     }
@@ -155,6 +187,27 @@ struct ChapterHTMLReaderView: View {
         return initialAnchor
     }
 
+    private var firstContentAnchor: PublishedHTMLAnchor? {
+        let chapterNumber = normalizedSectionNumber(chapter.chapterNumber)
+        return anchors.first {
+            $0.level >= 2 && normalizedSectionNumber($0.sectionNumber) != chapterNumber
+        }
+    }
+
+    private var shouldRestoreAtChapterTop: Bool {
+        guard (rememberedScrollOffset.wrappedValue ?? 0) <= 0,
+              let restoredInitialAnchor,
+              let firstContentAnchor else {
+            return false
+        }
+
+        return restoredInitialAnchor.anchorID == firstContentAnchor.anchorID
+    }
+
+    private var effectiveTargetAnchorID: String? {
+        shouldRestoreAtChapterTop ? nil : targetAnchorID
+    }
+
     var body: some View {
         Group {
             if let chapterURL, let readAccessURL {
@@ -197,6 +250,10 @@ struct ChapterHTMLReaderView: View {
                 }
                 .frame(maxWidth: 250)
                 .multilineTextAlignment(.center)
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                chapterSearchToolbarButton
             }
         }
         .tint(accentColor)
@@ -255,6 +312,27 @@ struct ChapterHTMLReaderView: View {
                 }
             )
         }
+        .sheet(isPresented: $isChapterSearchPresented) {
+            ChapterSearchSheet(
+                title: chapter.displayLabel,
+                entries: chapterSearchEntries,
+                onSelect: { entry in
+                    if let anchorID = entry.anchorID {
+                        targetAnchorID = anchorID
+                        selectedAnchor = anchors.first(where: { $0.anchorID == anchorID })
+                        rememberedAnchorID.wrappedValue = anchorID
+                    } else {
+                        let normalized = normalizedSectionNumber(entry.sectionNumber)
+                        let anchor = anchors.first { normalizedSectionNumber($0.sectionNumber) == normalized }
+                        targetAnchorID = anchor?.anchorID
+                        selectedAnchor = anchor
+                        rememberedAnchorID.wrappedValue = anchor?.anchorID
+                    }
+                    rememberedNativeSectionID.wrappedValue = entry.sectionID
+                }
+            )
+            .environmentObject(library)
+        }
         .navigationDestination(item: $openedSection) { section in
             ReaderView(sectionID: section.id)
                 .environmentObject(library)
@@ -309,7 +387,7 @@ struct ChapterHTMLReaderView: View {
         ChapterHTMLWebView(
             chapterURL: chapterURL,
             readAccessURL: readAccessURL,
-            targetAnchorID: targetAnchorID,
+            targetAnchorID: effectiveTargetAnchorID,
             readerTheme: library.readerTheme,
             accentHex: library.accentHex(for: chapter.codeSectionID, colorScheme: colorScheme),
             colorScheme: colorScheme,

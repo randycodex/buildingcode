@@ -1,0 +1,64 @@
+{
+  "identifier" : "9D2A0A3E-80E6-43E5-B3B5-54F54D4B58C1",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_developerTeamID" : "",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 770749200,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "3A08492E-C0C4-455D-9506-CAC386B21721",
+      "localizations" : [
+        {
+          "description" : "Unlock unlimited saved work, tags, PDF export, continuity, and future cross-device sync.",
+          "displayName" : "Permitext Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "Permitext Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "4.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "1",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and future cross-device sync.",
+              "displayName" : "Permitext Pro Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "com.randycodex.permitext.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Permitext Pro Monthly",
+          "subscriptionGroupID" : "3A08492E-C0C4-455D-9506-CAC386B21721",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

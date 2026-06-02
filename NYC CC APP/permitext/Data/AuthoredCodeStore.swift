@@ -469,7 +469,12 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         } else {
             contentBlocks = synthesizedContentBlocks(for: indexed)
         }
-        let officialText = preparedData?.officialText ?? indexed.section.officialText
+        let officialText = resolvedOfficialText(
+            preparedOfficialText: preparedData?.officialText,
+            fallbackOfficialText: indexed.section.officialText,
+            contentBlocks: contentBlocks,
+            fallbackTitle: indexed.section.title.displayTitle(for: indexed.section.sectionNumber)
+        )
         let richTextOverrideData = preparedData?.richTextOverrideData ?? indexed.section.richTextOverrideData
         return ReaderSectionDetail(
             id: indexed.section.id,
@@ -585,9 +590,68 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     private func officialText(for indexed: IndexedSection) -> String {
         if bundleUsesExternalSectionText {
-            return preparedSectionData(sectionID: indexed.section.id)?.officialText ?? indexed.section.officialText
+            let prepared = preparedSectionData(sectionID: indexed.section.id)
+            let blocks: [CodeContentBlock]
+            if let preparedBlocks = prepared?.blocks, !preparedBlocks.isEmpty {
+                blocks = preparedBlocks
+            } else if !indexed.section.contentBlocks.isEmpty {
+                blocks = indexed.section.contentBlocks
+            } else {
+                blocks = synthesizedContentBlocks(for: indexed)
+            }
+            return resolvedOfficialText(
+                preparedOfficialText: prepared?.officialText,
+                fallbackOfficialText: indexed.section.officialText,
+                contentBlocks: blocks,
+                fallbackTitle: indexed.section.title.displayTitle(for: indexed.section.sectionNumber)
+            )
         }
-        return indexed.section.officialText
+        return resolvedOfficialText(
+            preparedOfficialText: nil,
+            fallbackOfficialText: indexed.section.officialText,
+            contentBlocks: indexed.section.contentBlocks,
+            fallbackTitle: indexed.section.title.displayTitle(for: indexed.section.sectionNumber)
+        )
+    }
+
+    private func resolvedOfficialText(
+        preparedOfficialText: String?,
+        fallbackOfficialText: String,
+        contentBlocks: [CodeContentBlock],
+        fallbackTitle: String = ""
+    ) -> String {
+        let prepared = preparedOfficialText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !prepared.isEmpty {
+            return prepared
+        }
+
+        let fallback = fallbackOfficialText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !fallback.isEmpty {
+            return fallback
+        }
+
+        let blockText = plainText(from: contentBlocks)
+        if !blockText.isEmpty {
+            return blockText
+        }
+
+        return fallbackTitle.titleThroughFirstPeriod
+    }
+
+    private func plainText(from contentBlocks: [CodeContentBlock]) -> String {
+        contentBlocks
+            .compactMap { block in
+                let directText = block.plainText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                if !directText.isEmpty {
+                    return directText
+                }
+
+                let html = block.html?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                guard !html.isEmpty else { return nil }
+                let stripped = Self.plainText(fromHTML: html).trimmingCharacters(in: .whitespacesAndNewlines)
+                return stripped.isEmpty ? nil : stripped
+            }
+            .joined(separator: "\n\n")
     }
 
     private func previewText(for sectionID: Int64, fallbackOfficialText: String) -> String {
@@ -601,7 +665,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         if bundleUsesExternalSectionText, let prepared = preparedSectionData(sectionID: sectionID) {
             return prepared.previewText
         }
-        return fallbackOfficialText.titleThroughFirstPeriod
+        if !fallbackOfficialText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return fallbackOfficialText.titleThroughFirstPeriod
+        }
+        guard let section = sectionIndex[sectionID]?.section else { return "" }
+        return section.title.displayTitle(for: section.sectionNumber)
     }
 
     private func synthesizedContentBlocks(for indexed: IndexedSection) -> [CodeContentBlock] {
@@ -663,6 +731,16 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .compactMap { sectionID -> SearchHit? in
                 guard let entry = entriesByID[sectionID] else { return nil }
                 let indexed = entry.indexed
+                let resolvedOfficialText = officialText(for: indexed)
+                guard Self.matchesVisibleSearchContent(
+                    query: trimmed,
+                    queryTokens: queryTokens,
+                    sectionNumber: indexed.section.sectionNumber,
+                    title: indexed.section.title,
+                    officialText: resolvedOfficialText
+                ) else {
+                    return nil
+                }
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
                 let rank: Int
@@ -1424,6 +1502,32 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return lhsNumeric
         }
         return lhs.chapterNumber.compare(rhs.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+    }
+
+    private static func matchesVisibleSearchContent(
+        query: String,
+        queryTokens: [String],
+        sectionNumber: String,
+        title: String,
+        officialText: String
+    ) -> Bool {
+        let normalizedQuery = query.lowercased()
+        let normalizedSectionNumber = sectionNumber.lowercased()
+        let normalizedTitle = title.lowercased()
+        let normalizedOfficialText = officialText.lowercased()
+
+        if normalizedSectionNumber == normalizedQuery || normalizedSectionNumber.hasPrefix(normalizedQuery) {
+            return true
+        }
+        if normalizedTitle.contains(normalizedQuery) || normalizedOfficialText.contains(normalizedQuery) {
+            return true
+        }
+
+        return queryTokens.allSatisfy { token in
+            normalizedSectionNumber.contains(token)
+                || normalizedTitle.contains(token)
+                || normalizedOfficialText.contains(token)
+        }
     }
 
     private static func snippet(in text: String, query: String) -> String {

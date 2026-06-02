@@ -19,6 +19,37 @@ private enum HTMLAssetPathResolver {
                 options: .regularExpression
             )
     }
+
+    static func injectInitialReaderStyle(
+        into html: String,
+        colorScheme: ColorScheme
+    ) -> String {
+        let isDark = colorScheme == .dark
+        let backgroundColor = isDark ? "#000000" : "#f2f2f7"
+        let textColor = isDark ? "#f5f5f7" : "#111111"
+        let bootstrapStyle = """
+        <style id="nyccc-initial-reader-style">
+        html {
+          background: \(backgroundColor) !important;
+          color-scheme: \(isDark ? "dark" : "light");
+        }
+        body {
+          background: \(backgroundColor) !important;
+          color: \(textColor) !important;
+        }
+        </style>
+        """
+
+        if html.range(of: "</head>", options: .caseInsensitive) != nil {
+            return html.replacingOccurrences(
+                of: "</head>",
+                with: "\(bootstrapStyle)</head>",
+                options: .caseInsensitive
+            )
+        }
+
+        return bootstrapStyle + html
+    }
 }
 
 struct ChapterHTMLSectionTarget: Hashable {
@@ -56,16 +87,24 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         configuration.userContentController.add(context.coordinator, name: Coordinator.visibleAnchorMessageName)
         configuration.userContentController.add(context.coordinator, name: Coordinator.scrollProgressMessageName)
         configuration.userContentController.add(context.coordinator, name: Coordinator.openSectionMessageName)
+        configuration.userContentController.addUserScript(
+            WKUserScript(
+                source: Coordinator.initialReaderBootstrapScript(for: colorScheme),
+                injectionTime: .atDocumentStart,
+                forMainFrameOnly: true
+            )
+        )
 
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = context.coordinator
         webView.scrollView.delegate = context.coordinator
-        webView.backgroundColor = .clear
-        webView.scrollView.backgroundColor = .clear
+        let pageBackgroundColor = Coordinator.pageBackgroundUIColor(for: colorScheme)
+        webView.backgroundColor = pageBackgroundColor
+        webView.scrollView.backgroundColor = pageBackgroundColor
         webView.scrollView.minimumZoomScale = 1
         webView.scrollView.maximumZoomScale = 1
         webView.scrollView.bouncesZoom = false
-        webView.isOpaque = false
+        webView.isOpaque = true
         webView.allowsBackForwardNavigationGestures = false
         context.coordinator.parent = self
         context.coordinator.webView = webView
@@ -75,8 +114,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {
         context.coordinator.parent = self
         context.coordinator.webView = webView
-        webView.backgroundColor = .clear
-        webView.scrollView.backgroundColor = .clear
+        let pageBackgroundColor = Coordinator.pageBackgroundUIColor(for: colorScheme)
+        webView.backgroundColor = pageBackgroundColor
+        webView.scrollView.backgroundColor = pageBackgroundColor
 
         if context.coordinator.loadedURL != chapterURL {
             context.coordinator.loadedURL = chapterURL
@@ -153,16 +193,21 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
             htmlLoadTask?.cancel()
+            let colorScheme = parent?.colorScheme ?? .light
             htmlLoadTask = Task.detached(priority: .userInitiated) { [weak webView] in
                 guard let webView else { return }
                 if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
-                    let normalized = HTMLAssetPathResolver.resolveSharedAssetPaths(
+                    let normalizedAssetsHTML = HTMLAssetPathResolver.resolveSharedAssetPaths(
                         in: html,
                         readAccessURL: readAccessURL
                     )
+                    let preparedHTML = HTMLAssetPathResolver.injectInitialReaderStyle(
+                        into: normalizedAssetsHTML,
+                        colorScheme: colorScheme
+                    )
                     guard !Task.isCancelled else { return }
                     await MainActor.run { () -> Void in
-                        webView.loadHTMLString(normalized, baseURL: readAccessURL)
+                        webView.loadHTMLString(preparedHTML, baseURL: readAccessURL)
                     }
                 } else {
                     guard !Task.isCancelled else { return }
@@ -1272,6 +1317,38 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 return "[]"
             }
             return encoded
+        }
+
+        static func pageBackgroundUIColor(for colorScheme: ColorScheme) -> UIColor {
+            colorScheme == .dark ? .black : .systemGroupedBackground
+        }
+
+        static func initialReaderBootstrapScript(for colorScheme: ColorScheme) -> String {
+            let isDark = colorScheme == .dark
+            let backgroundColor = isDark ? "#000000" : "#f2f2f7"
+            let textColor = isDark ? "#f5f5f7" : "#111111"
+
+            return """
+            (function() {
+              var root = document.documentElement;
+              if (root) {
+                root.style.background = '\(backgroundColor)';
+                root.style.colorScheme = '\(isDark ? "dark" : "light")';
+              }
+              var body = document.body;
+              if (body) {
+                body.style.background = '\(backgroundColor)';
+                body.style.color = '\(textColor)';
+              } else {
+                document.addEventListener('DOMContentLoaded', function() {
+                  if (document.body) {
+                    document.body.style.background = '\(backgroundColor)';
+                    document.body.style.color = '\(textColor)';
+                  }
+                }, { once: true });
+              }
+            })();
+            """
         }
     }
 }

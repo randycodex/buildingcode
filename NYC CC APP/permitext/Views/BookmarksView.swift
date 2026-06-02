@@ -7,7 +7,6 @@ struct BookmarksView: View {
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var selectedTagFilter: String? = nil
     @State private var folderEditorTarget: FolderEditorTarget?
-    @State private var isExportActionSheetPresented = false
     @State private var savedSortMode: BookmarkSortMode = .codeOrder
     @State private var projectPageIndex: Int = 0
     @State private var scrollOffset: CGFloat = 0
@@ -59,8 +58,8 @@ struct BookmarksView: View {
     }
 
     private var exportButton: some View {
-        Button {
-            isExportActionSheetPresented = true
+        Menu {
+            exportMenuContent
         } label: {
             Image(systemName: "square.and.arrow.up")
                 .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
@@ -134,13 +133,6 @@ struct BookmarksView: View {
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .confirmationDialog(
-                "Export saved sections",
-                isPresented: $isExportActionSheetPresented,
-                titleVisibility: .visible
-            ) {
-                exportActionSheetButtons
-            }
             .onAppear {
                 library.refreshBookmarks()
                 rebuildBookmarkCaches()
@@ -264,8 +256,7 @@ private var savedBookmarkList: some View {
     private var exportProgressSheet: some View {
         if case let .building(progress, sectionTitle) = library.exportState {
             VStack(spacing: 20) {
-                ProgressView(value: progress)
-                    .tint(Color.appChrome)
+                ExportProgressLine(progress: progress)
                     .padding(.horizontal, 24)
 
                 VStack(spacing: 4) {
@@ -302,7 +293,7 @@ private var savedBookmarkList: some View {
     /// the list), all saved sections, and per-folder exports for each
     /// existing project.
     @ViewBuilder
-    private var exportActionSheetButtons: some View {
+    private var exportMenuContent: some View {
         let filteredCount = cachedFilteredBookmarks.count
         let totalCount = library.bookmarks.count
         let isFiltered = filteredCount > 0 && filteredCount < totalCount
@@ -333,8 +324,6 @@ private var savedBookmarkList: some View {
                 )
             }
         }
-
-        Button("Cancel", role: .cancel) { }
     }
 
     private func folderHasBookmarks(_ folder: CodeFolder) -> Bool {
@@ -918,7 +907,6 @@ struct ProjectView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var sortMode: BookmarkSortMode = .codeOrder
-    @State private var isExportActionSheetPresented = false
     @State private var isSelecting = false
     @State private var selectedSectionIDs: Set<Int64> = []
     @State private var folderEditorTarget: ProjectFolderEditorTarget?
@@ -977,26 +965,6 @@ struct ProjectView: View {
                 exportButton
                 selectionButton
             }
-        }
-        .confirmationDialog(
-            "Project actions",
-            isPresented: $isExportActionSheetPresented,
-            titleVisibility: .visible
-        ) {
-            if isSelecting && !selectedSectionIDs.isEmpty {
-                Button("Export selected (\(selectedSectionIDs.count))") {
-                    library.startBookmarkExport(bookmarks: selectedBookmarks, contextLabel: folder?.name)
-                }
-                Button("Remove selected from project", role: .destructive) {
-                    library.removeSections(selectedSectionIDs, fromFolder: folderID)
-                    selectedSectionIDs.removeAll()
-                    isSelecting = false
-                }
-            }
-            Button("Export project (\(projectBookmarks.count))") {
-                library.startBookmarkExport(bookmarks: projectBookmarks, contextLabel: folder?.name)
-            }
-            Button("Cancel", role: .cancel) { }
         }
         .sheet(item: $folderEditorTarget) { target in
             FolderEditorSheet(
@@ -1090,8 +1058,8 @@ struct ProjectView: View {
     }
 
     private var exportButton: some View {
-        Button {
-            isExportActionSheetPresented = true
+        Menu {
+            projectExportMenuContent
         } label: {
             Image(systemName: "square.and.arrow.up")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
@@ -1126,8 +1094,7 @@ struct ProjectView: View {
     private var exportProgressSheet: some View {
         if case let .building(progress, sectionTitle) = library.exportState {
             VStack(spacing: 20) {
-                ProgressView(value: progress)
-                    .tint(Color.appChrome)
+                ExportProgressLine(progress: progress)
                     .padding(.horizontal, 24)
 
                 VStack(spacing: 4) {
@@ -1154,6 +1121,24 @@ struct ProjectView: View {
             .padding(.vertical, 32)
             .presentationDetents([.height(220)])
             .interactiveDismissDisabled()
+        }
+    }
+
+    @ViewBuilder
+    private var projectExportMenuContent: some View {
+        if isSelecting && !selectedSectionIDs.isEmpty {
+            Button("Export selected (\(selectedSectionIDs.count))") {
+                library.startBookmarkExport(bookmarks: selectedBookmarks, contextLabel: folder?.name)
+            }
+            Button("Remove selected from project", role: .destructive) {
+                library.removeSections(selectedSectionIDs, fromFolder: folderID)
+                selectedSectionIDs.removeAll()
+                isSelecting = false
+            }
+        }
+
+        Button("Export project (\(projectBookmarks.count))") {
+            library.startBookmarkExport(bookmarks: projectBookmarks, contextLabel: folder?.name)
         }
     }
 
@@ -1259,6 +1244,26 @@ struct ProjectView: View {
         } else {
             selectedSectionIDs.insert(sectionID)
         }
+    }
+}
+
+private struct ExportProgressLine: View {
+    let progress: Double
+
+    var body: some View {
+        GeometryReader { proxy in
+            Capsule()
+                .fill(Color.appChrome)
+                .frame(
+                    width: max(0, proxy.size.width * min(max(progress, 0), 1)),
+                    height: 5
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(height: 5)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Export progress")
+        .accessibilityValue("\(Int((min(max(progress, 0), 1) * 100).rounded())) percent")
     }
 }
 

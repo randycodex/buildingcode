@@ -1,4 +1,5 @@
 import Foundation
+import AuthenticationServices
 import os.signpost
 import SwiftUI
 
@@ -45,6 +46,14 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var bookmarks: [BookmarkedSection] = []
     @Published private(set) var exportState: BookmarkExportState = .idle
     @Published private(set) var folders: [CodeFolder] = []
+    @Published private(set) var currentPlan: AppPlan
+    @Published private(set) var currentEntitlementSource: EntitlementSource
+    @Published private(set) var entitlementPrompt: EntitlementRequirement?
+    @Published private(set) var signedInAccount: SignedInAccount?
+    @Published private(set) var isAccountBusy = false
+    @Published private(set) var proProductDisplayPrice: String?
+    @Published private(set) var storeKitLoadedProductIDs: [String] = []
+    @Published private(set) var isStoreKitBusy = false
     /// sectionID → ordered list of folderIDs containing that section. Cached
     /// up front so the Reader and Saved screens don't make per-section DB
     /// round trips when rendering the Projects row.
@@ -63,8 +72,13 @@ final class CodeLibraryViewModel: ObservableObject {
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
     private let referenceResolver = CodeReferenceResolver()
-    private let userDataStore: UserDataStore?
+    private let userContentRepository: UserContentRepository?
+    private let syncEngine: UserContentSyncEngine
+    private let continuityStore: ContinuityStore
     private let readerThemeStore: ReaderThemeStore
+    private let entitlementService: EntitlementService
+    private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
+    private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let recentSearchesDefaultsKey = "recentSearches"
     private let pinnedSearchesDefaultsKey = "pinnedSearches"
     private let recentlyViewedSectionsDefaultsKey = "recentlyViewedSections"
@@ -112,21 +126,36 @@ final class CodeLibraryViewModel: ObservableObject {
     init(
         locator: BundleDatabaseLocator = BundleDatabaseLocator(),
         formattingEngine: FormattingEngine = FormattingEngine(),
+        userContentRepository: UserContentRepository? = nil,
+        continuityStore: ContinuityStore = .shared,
         readerThemeStore: ReaderThemeStore = ReaderThemeStore(),
+        entitlementService: EntitlementService = LocalEntitlementService(),
+        lifetimeGrantLookupClient: LifetimeGrantLookupClient = LocalLifetimeGrantLookupClient(),
         loadsInitialContent: Bool = true
     ) {
         self.locator = locator
         self.formattingEngine = formattingEngine
+        self.userContentRepository = userContentRepository ?? (try? UserDataStore())
+        self.syncEngine = UserContentSyncEngine(repository: self.userContentRepository)
+        self.continuityStore = continuityStore
         self.readerThemeStore = readerThemeStore
+        self.entitlementService = entitlementService
+        self.lifetimeGrantLookupClient = lifetimeGrantLookupClient
+        self.currentPlan = entitlementService.currentPlan
+        self.currentEntitlementSource = entitlementService.currentEntitlement.source
+        self.signedInAccount = Self.loadSignedInAccount()
         self.readerTheme = readerThemeStore.load()
-        self.userDataStore = try? UserDataStore()
         self.recentSearches = Self.loadRecentSearches()
         self.pinnedSearches = Self.loadPinnedSearches()
-        self.recentlyViewedSections = Self.loadRecentlyViewedSections()
-        self.comparisonModeEnabled = UserDefaults.standard.bool(forKey: comparisonModeDefaultsKey)
+        let continuityContext = continuityStore.load()
+        self.recentlyViewedSections = continuityContext.recentlyViewedSections
+        self.comparisonModeEnabled = continuityContext.comparisonModeEnabled
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         initialLoadProgress = 0
+        #if DEBUG
+        runStartupDiagnostics()
+        #endif
         if loadsInitialContent {
             reload()
         }
@@ -201,7 +230,7 @@ final class CodeLibraryViewModel: ObservableObject {
         isInitialContentLoaded = false
         initialLoadProgress = 0
 
-        versionLoadTask = Task { [selectedVersionDefaultsKey] in
+        versionLoadTask = Task {
             let availableVersions = await Task.detached(priority: .userInitiated) {
                 BundleDatabaseLocator().availableCodeVersions()
             }.value
@@ -210,8 +239,9 @@ final class CodeLibraryViewModel: ObservableObject {
 
             self.availableVersions = availableVersions
             self.availableJurisdictions = self.buildJurisdictions(from: availableVersions)
-            let storedSelection = UserDefaults.standard.string(forKey: selectedVersionDefaultsKey)
-            let storedJurisdiction = UserDefaults.standard.string(forKey: self.selectedJurisdictionDefaultsKey)
+            let continuityContext = self.continuityStore.load()
+            let storedSelection = continuityContext.selectedVersionFileName.isEmpty ? nil : continuityContext.selectedVersionFileName
+            let storedJurisdiction = continuityContext.selectedJurisdictionKey.isEmpty ? nil : continuityContext.selectedJurisdictionKey
             let authoredSelection = availableVersions.first(where: { $0.contentKind == .authored })?.fileName
             let defaultJurisdictionKey = storedJurisdiction
                 .flatMap { stored in
@@ -243,31 +273,31 @@ final class CodeLibraryViewModel: ObservableObject {
                 ?? ""
 
             self.selectedVersionFileName = resolvedSelection
+            self.persistContinuityContext()
             self.openSelectedContent()
         }
     }
 
     func updateSelectedJurisdiction(key: String) {
         selectedJurisdictionKey = key
-        UserDefaults.standard.set(key, forKey: selectedJurisdictionDefaultsKey)
         let candidateVersions = filteredVersions
         if candidateVersions.contains(where: { $0.fileName == selectedVersionFileName }) == false {
             selectedVersionFileName = candidateVersions.first?.fileName ?? ""
-            UserDefaults.standard.set(selectedVersionFileName, forKey: selectedVersionDefaultsKey)
         }
+        persistContinuityContext()
         openSelectedContent()
     }
 
     func updateSelectedVersion(fileName: String) {
         selectedVersionFileName = fileName
-        UserDefaults.standard.set(fileName, forKey: selectedVersionDefaultsKey)
+        persistContinuityContext()
         openSelectedContent()
     }
 
     // MARK: - Idle preload of last-opened chapter
 
     func noteChapterOpened(chapter: CodeChapter) {
-        UserDefaults.standard.set(chapter.id, forKey: lastOpenedChapterIDDefaultsKey)
+        persistContinuityContext(lastOpenedChapterID: chapter.id)
         // The chapter is already being opened, so a pending idle preload is stale.
         lastChapterPreloadTask?.cancel()
     }
@@ -326,23 +356,56 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func persistRecentlyViewedSections() {
-        guard let data = try? JSONEncoder().encode(recentlyViewedSections) else { return }
-        UserDefaults.standard.set(data, forKey: recentlyViewedSectionsDefaultsKey)
+        persistContinuityContext()
     }
 
-    private static func loadRecentlyViewedSections() -> [RecentlyViewedEntry] {
-        guard let data = UserDefaults.standard.data(forKey: "recentlyViewedSections"),
-              let decoded = try? JSONDecoder().decode([RecentlyViewedEntry].self, from: data)
-        else {
-            return []
+    private func persistContinuityContext(lastOpenedChapterID: Int64? = nil) {
+        continuityStore.update { context in
+            context.selectedJurisdictionKey = selectedJurisdictionKey
+            context.selectedVersionFileName = selectedVersionFileName
+            context.selectedCodeSectionID = selectedCodeSectionID
+            if let lastOpenedChapterID {
+                context.lastOpenedChapterID = lastOpenedChapterID
+            }
+            context.comparisonModeEnabled = comparisonModeEnabled
+            context.recentlyViewedSections = recentlyViewedSections
         }
-        return decoded.sorted { $0.viewedAt > $1.viewedAt }
+    }
+
+    #if DEBUG
+    private func runStartupDiagnostics() {
+        var messages = continuityStore.debugValidationMessages()
+        if let userDataStore = userContentRepository as? UserDataStore {
+            do {
+                messages.append(contentsOf: try userDataStore.debugSchemaValidationMessages())
+                messages.append(contentsOf: try userDataStore.debugSyncQueueLifecycleValidationMessages())
+            } catch {
+                messages.append("UserDataStore schema validation failed: \(error.localizedDescription)")
+            }
+        }
+        do {
+            let report = try syncEngine.previewPendingWork(limit: 25)
+            if report.pendingCount > 0 {
+                messages.append("Sync queue pending items: \(report.pendingCount) via \(report.backendName)")
+            }
+        } catch {
+            messages.append("Sync queue preview failed: \(error.localizedDescription)")
+        }
+
+        if messages.isEmpty {
+            print("permitext diagnostics: startup validation passed")
+        } else {
+            print("permitext diagnostics: " + messages.joined(separator: " | "))
+        }
+    }
+    #endif
+
+    private static func loadRecentlyViewedSections() -> [RecentlyViewedEntry] {
+        ContinuityStore.shared.load().recentlyViewedSections
     }
 
     private func preloadLastOpenedChapterIfNeeded() {
-        let storedID = UserDefaults.standard.object(forKey: lastOpenedChapterIDDefaultsKey) as? Int64
-            ?? (UserDefaults.standard.object(forKey: lastOpenedChapterIDDefaultsKey) as? Int)
-                .map(Int64.init)
+        let storedID = continuityStore.load().lastOpenedChapterID
         guard let chapterID = storedID else { return }
         guard let chapter = chapters.first(where: { $0.id == chapterID }) else { return }
 
@@ -360,11 +423,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func updateSelectedCodeSection(id: Int64?) {
         selectedCodeSectionID = id
-        if let id {
-            UserDefaults.standard.set(id, forKey: selectedCodeSectionDefaultsKey)
-        } else {
-            UserDefaults.standard.removeObject(forKey: selectedCodeSectionDefaultsKey)
-        }
+        persistContinuityContext()
         // Keep the primary browser context in sync so BrowseView always opens
         // on the section chosen here when comparison mode is off.
         if !comparisonModeEnabled {
@@ -383,7 +442,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func setComparisonMode(enabled: Bool, keeping tab: AppTab? = nil) {
         let tabToKeep = tab ?? selectedTab
         comparisonModeEnabled = enabled
-        UserDefaults.standard.set(enabled, forKey: comparisonModeDefaultsKey)
+        persistContinuityContext()
         selectedTab = tabToKeep
 
         // Inserting/removing the secondary browse tab can leave UIKit on a
@@ -1170,7 +1229,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func refreshBookmarks() {
-        guard let selectedVersion, let userDataStore else {
+        guard let selectedVersion, let userContentRepository else {
             let didChange = !bookmarkedSectionIDs.isEmpty || !bookmarks.isEmpty
             bookmarkedSectionIDs = []
             bookmarks = []
@@ -1184,10 +1243,10 @@ final class CodeLibraryViewModel: ObservableObject {
         let previousBookmarks = bookmarks
 
         do {
-            let ids = try userDataStore.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
-            let noteEntries = try userDataStore.noteEntries(codeVersion: selectedVersion.codeVersion)
-            let tagEntries = (try? userDataStore.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
-            let bookmarkDates = (try? userDataStore.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            let ids = try userContentRepository.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
+            let noteEntries = try userContentRepository.noteEntries(codeVersion: selectedVersion.codeVersion)
+            let tagEntries = (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            let bookmarkDates = (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
             let savedSectionIDs = Array(Set(ids).union(noteEntries.keys)).sorted()
             if let authoredCodeStore {
@@ -1228,18 +1287,22 @@ final class CodeLibraryViewModel: ObservableObject {
     // MARK: - Folders
 
     func refreshFolders() {
-        guard let selectedVersion, let userDataStore else {
+        guard let selectedVersion, let userContentRepository else {
             folders = []
             folderMembership = [:]
             return
         }
 
         do {
-            let records = try userDataStore.folders(codeVersion: selectedVersion.codeVersion)
+            let records = try userContentRepository.folders(codeVersion: selectedVersion.codeVersion)
             folders = records.map { record in
                 CodeFolder(
                     id: record.id,
                     clientID: record.clientID,
+                    ownerID: record.ownerID.isEmpty ? UserDataDefaults.localOwnerID : record.ownerID,
+                    visibility: UserContentVisibility(rawValue: record.visibility) ?? .personal,
+                    syncState: UserContentSyncState(rawValue: record.syncState) ?? .localOnly,
+                    deletedAt: record.deletedAt.flatMap { ISO8601DateFormatter().date(from: $0) },
                     name: record.name,
                     description: record.description,
                     colorHex: record.colorHex,
@@ -1248,7 +1311,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     updatedAt: ISO8601DateFormatter().date(from: record.updatedAt) ?? Date()
                 )
             }
-            folderMembership = (try? userDataStore.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            folderMembership = (try? userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
         } catch {
             statusMessage = error.localizedDescription
             folders = []
@@ -1258,9 +1321,13 @@ final class CodeLibraryViewModel: ObservableObject {
 
     @discardableResult
     func createFolder(name: String, description: String = "", colorHex: String = CodeFolder.defaultColorHex) -> CodeFolder? {
-        guard let selectedVersion, let userDataStore else { return nil }
+        guard let selectedVersion, let userContentRepository else { return nil }
         do {
-            let id = try userDataStore.createFolder(
+            let folderCount = try folderCountForEntitlements(codeVersion: selectedVersion.codeVersion)
+            guard !denyIfNeeded(entitlementService.canCreateProject(currentCount: folderCount)) else {
+                return nil
+            }
+            let id = try userContentRepository.createFolder(
                 name: name,
                 description: description,
                 colorHex: colorHex,
@@ -1275,9 +1342,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateFolder(_ folder: CodeFolder, name: String, description: String, colorHex: String) {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.updateFolder(
+            try userContentRepository.updateFolder(
                 id: folder.id,
                 name: name,
                 description: description,
@@ -1291,9 +1358,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func deleteFolder(id: Int64) {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.deleteFolder(id: id, codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.deleteFolder(id: id, codeVersion: selectedVersion.codeVersion)
             refreshFolders()
         } catch {
             statusMessage = error.localizedDescription
@@ -1301,16 +1368,17 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func addSection(_ sectionID: Int64, toFolder folderID: Int64) {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         // Adding a section to a folder implicitly bookmarks it — folders are
         // a *grouping* of saved sections, so an unbookmarked section in a
         // folder makes no sense. The DB cleanup goes the other way too
         // (unbookmark wipes folder rows), so this keeps the invariant tight.
         if !isBookmarked(sectionID: sectionID) {
             _ = toggleBookmark(sectionID: sectionID)
+            guard isBookmarked(sectionID: sectionID) else { return }
         }
         do {
-            try userDataStore.addSection(sectionID, toFolder: folderID, codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.addSection(sectionID, toFolder: folderID, codeVersion: selectedVersion.codeVersion)
             refreshFolders()
         } catch {
             statusMessage = error.localizedDescription
@@ -1318,9 +1386,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64) {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.removeSection(sectionID, fromFolder: folderID, codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.removeSection(sectionID, fromFolder: folderID, codeVersion: selectedVersion.codeVersion)
             refreshFolders()
         } catch {
             statusMessage = error.localizedDescription
@@ -1348,6 +1416,186 @@ final class CodeLibraryViewModel: ObservableObject {
         bookmarks(inFolder: folderID).count
     }
 
+    private func denyIfNeeded(_ decision: EntitlementDecision) -> Bool {
+        switch decision {
+        case .allowed:
+            return false
+        case .denied(let requirement):
+            entitlementPrompt = requirement
+            statusMessage = requirement.message
+            return true
+        }
+    }
+
+    func dismissEntitlementPrompt() {
+        entitlementPrompt = nil
+    }
+
+    func showUpgradePlaceholder() {
+        entitlementPrompt = EntitlementRequirement(
+            feature: .unlimitedSavedItems,
+            requiredPlan: .pro,
+            message: "Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and future cross-device sync."
+        )
+    }
+
+    func refreshStoreKitEntitlements() async {
+        let snapshot = await storeKitSubscriptionService.snapshot()
+        let entitlement = entitlementService.currentEntitlement
+        currentPlan = entitlement.plan
+        currentEntitlementSource = entitlement.source
+        proProductDisplayPrice = snapshot.proDisplayPrice
+        storeKitLoadedProductIDs = snapshot.loadedProductIDs
+    }
+
+    func purchasePro() async {
+        guard !isStoreKitBusy else { return }
+        isStoreKitBusy = true
+        defer { isStoreKitBusy = false }
+
+        do {
+            let snapshot = try await storeKitSubscriptionService.purchasePro()
+            let entitlement = entitlementService.currentEntitlement
+            currentPlan = entitlement.plan
+            currentEntitlementSource = entitlement.source
+            proProductDisplayPrice = snapshot.proDisplayPrice
+            storeKitLoadedProductIDs = snapshot.loadedProductIDs
+            statusMessage = currentPlan == .pro ? "Pro is active." : "Purchase cancelled."
+        } catch {
+            statusMessage = error.localizedDescription
+            entitlementPrompt = EntitlementRequirement(
+                feature: .unlimitedSavedItems,
+                requiredPlan: .pro,
+                message: error.localizedDescription
+            )
+        }
+    }
+
+    func restorePurchases() async {
+        guard !isStoreKitBusy else { return }
+        isStoreKitBusy = true
+        defer { isStoreKitBusy = false }
+
+        let snapshot = await storeKitSubscriptionService.restorePurchases()
+        let entitlement = entitlementService.currentEntitlement
+        currentPlan = entitlement.plan
+        currentEntitlementSource = entitlement.source
+        proProductDisplayPrice = snapshot.proDisplayPrice
+        storeKitLoadedProductIDs = snapshot.loadedProductIDs
+        statusMessage = currentPlan == .pro ? "Pro purchase restored." : "No active Pro subscription found."
+    }
+
+    func handleAppleSignIn(result: Result<ASAuthorization, Error>) async {
+        switch result {
+        case .success(let authorization):
+            guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                statusMessage = "Sign in with Apple did not return an Apple ID credential."
+                return
+            }
+            let displayName = [credential.fullName?.givenName, credential.fullName?.familyName]
+                .compactMap { $0 }
+                .joined(separator: " ")
+            let account = SignedInAccount(
+                appleUserID: credential.user,
+                displayName: displayName.isEmpty ? nil : displayName,
+                signedInAt: Date()
+            )
+            signedInAccount = account
+            Self.saveSignedInAccount(account)
+            await refreshLifetimeGrant()
+        case .failure(let error):
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func refreshLifetimeGrant() async {
+        guard let signedInAccount else { return }
+        guard !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let result = try await lifetimeGrantLookupClient.lookupLifetimeGrant(appleUserID: signedInAccount.appleUserID)
+            if result.hasLifetimeGrant {
+                LocalEntitlementService.setLifetimeGrant(userID: result.grantedUserID ?? signedInAccount.appleUserID)
+                statusMessage = "Lifetime Pro grant applied."
+            } else if currentEntitlementSource == .lifetimeGrant {
+                LocalEntitlementService.clearLifetimeGrant()
+                statusMessage = "No lifetime Pro grant found for this account."
+            } else {
+                statusMessage = "Signed in. No lifetime Pro grant found for this account."
+            }
+            refreshCurrentEntitlement()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func signOut() {
+        signedInAccount = nil
+        Self.clearSignedInAccount()
+        if currentEntitlementSource == .lifetimeGrant {
+            LocalEntitlementService.clearLifetimeGrant()
+        }
+        refreshCurrentEntitlement()
+        statusMessage = "Signed out."
+    }
+
+    #if DEBUG
+    func setDebugPlan(_ plan: AppPlan) {
+        LocalEntitlementService.setDebugPlan(plan)
+        let entitlement = entitlementService.currentEntitlement
+        currentPlan = entitlement.plan
+        currentEntitlementSource = entitlement.source
+        statusMessage = "Plan set to \(plan.label) for local testing."
+    }
+
+    func setDebugLifetimeGrant(enabled: Bool) {
+        if enabled {
+            LocalEntitlementService.setLifetimeGrant(userID: "debug-lifetime-grant")
+        } else {
+            LocalEntitlementService.clearLifetimeGrant()
+        }
+        let entitlement = entitlementService.currentEntitlement
+        currentPlan = entitlement.plan
+        currentEntitlementSource = entitlement.source
+        statusMessage = enabled ? "Lifetime Pro grant enabled for local testing." : "Lifetime Pro grant cleared."
+    }
+    #endif
+
+    private func refreshCurrentEntitlement() {
+        let entitlement = entitlementService.currentEntitlement
+        currentPlan = entitlement.plan
+        currentEntitlementSource = entitlement.source
+    }
+
+    private static func loadSignedInAccount() -> SignedInAccount? {
+        guard let data = UserDefaults.standard.data(forKey: AccountDefaults.signedInAccountKey) else { return nil }
+        return try? JSONDecoder().decode(SignedInAccount.self, from: data)
+    }
+
+    private static func saveSignedInAccount(_ account: SignedInAccount) {
+        if let data = try? JSONEncoder().encode(account) {
+            UserDefaults.standard.set(data, forKey: AccountDefaults.signedInAccountKey)
+        }
+    }
+
+    private static func clearSignedInAccount() {
+        UserDefaults.standard.removeObject(forKey: AccountDefaults.signedInAccountKey)
+    }
+
+    private func bookmarkCountForEntitlements(codeVersion: String) throws -> Int {
+        try userContentRepository?.bookmarkCount(codeVersion: codeVersion) ?? bookmarkedSectionIDs.count
+    }
+
+    private func noteCountForEntitlements(codeVersion: String) throws -> Int {
+        try userContentRepository?.noteCount(codeVersion: codeVersion) ?? bookmarks.filter(\.hasNote).count
+    }
+
+    private func folderCountForEntitlements(codeVersion: String) throws -> Int {
+        try userContentRepository?.folderCount(codeVersion: codeVersion) ?? folders.count
+    }
+
     func removeSections(_ sectionIDs: Set<Int64>, fromFolder folderID: Int64) {
         guard !sectionIDs.isEmpty else { return }
         sectionIDs.forEach { sectionID in
@@ -1368,6 +1616,10 @@ final class CodeLibraryViewModel: ObservableObject {
     ) {
         guard !selection.isEmpty else {
             exportState = .failed("No saved sections to export.")
+            return
+        }
+        guard !denyIfNeeded(entitlementService.canUse(.premiumExports)) else {
+            exportState = .failed(entitlementPrompt?.message ?? "Upgrade to Pro to export saved sections.")
             return
         }
         activeExportTask?.cancel()
@@ -1455,9 +1707,9 @@ final class CodeLibraryViewModel: ObservableObject {
     /// clear-data flow so users can reset their organization without losing
     /// the underlying bookmarks.
     func clearAllFolders() {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.clearAllFolders(codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.clearAllFolders(codeVersion: selectedVersion.codeVersion)
             refreshFolders()
         } catch {
             statusMessage = error.localizedDescription
@@ -1466,9 +1718,15 @@ final class CodeLibraryViewModel: ObservableObject {
 
     @discardableResult
     func toggleBookmark(sectionID: Int64) -> Bool {
-        guard let selectedVersion, let userDataStore else { return false }
+        guard let selectedVersion, let userContentRepository else { return false }
         do {
-            try userDataStore.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            if !bookmarkedSectionIDs.contains(sectionID) {
+                let bookmarkCount = try bookmarkCountForEntitlements(codeVersion: selectedVersion.codeVersion)
+                guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
+                    return false
+                }
+            }
+            try userContentRepository.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
             return bookmarkedSectionIDs.contains(sectionID)
         } catch {
@@ -1478,23 +1736,31 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func isBookmarked(sectionID: Int64) -> Bool {
-        guard selectedVersion != nil, userDataStore != nil else { return false }
+        guard selectedVersion != nil, userContentRepository != nil else { return false }
         return bookmarkedSectionIDs.contains(sectionID)
     }
 
     func noteBody(sectionID: Int64) -> String {
-        guard let selectedVersion, let userDataStore else { return "" }
-        return (try? userDataStore.noteBody(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? ""
+        guard let selectedVersion, let userContentRepository else { return "" }
+        return (try? userContentRepository.noteBody(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? ""
     }
 
     func saveNote(sectionID: Int64, body: String) {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
+            let trimmedBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
+            let existingBody = try userContentRepository.noteBody(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            if !trimmedBody.isEmpty && existingBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                let noteCount = try noteCountForEntitlements(codeVersion: selectedVersion.codeVersion)
+                guard !denyIfNeeded(entitlementService.canCreateNote(currentCount: noteCount)) else {
+                    return
+                }
+            }
             // Note edits do not change the bookmark set, so we skip the heavy
             // `refreshBookmarks` pass that previously fired on every keystroke.
             // BookmarksView re-reads notes from disk on appear, and the note
             // editor re-reads via `noteBody(sectionID:)` when it opens.
-            try userDataStore.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
+            try userContentRepository.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -1525,15 +1791,20 @@ final class CodeLibraryViewModel: ObservableObject {
 
     /// Returns the tags currently saved for one section.
     func tags(sectionID: Int64) -> [String] {
-        guard let selectedVersion, let userDataStore else { return [] }
-        return (try? userDataStore.tags(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
+        guard let selectedVersion, let userContentRepository else { return [] }
+        return (try? userContentRepository.tags(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
     }
 
     /// Replaces a section's tag set. Empty array clears all tags for it.
     func setTags(_ tags: [String], sectionID: Int64) {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.setTags(tags, sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            if !tags.isEmpty {
+                guard !denyIfNeeded(entitlementService.canUse(.advancedOrganization)) else {
+                    return
+                }
+            }
+            try userContentRepository.setTags(tags, sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
         } catch {
             statusMessage = error.localizedDescription
@@ -1543,14 +1814,14 @@ final class CodeLibraryViewModel: ObservableObject {
     /// Every tag in use for the current code version with how many bookmarks
     /// carry it. Sorted by usage (most-used first), then alphabetically.
     func tagUsageCounts() -> [(tag: String, count: Int)] {
-        guard let selectedVersion, let userDataStore else { return [] }
-        return (try? userDataStore.tagUsageCounts(codeVersion: selectedVersion.codeVersion)) ?? []
+        guard let selectedVersion, let userContentRepository else { return [] }
+        return (try? userContentRepository.tagUsageCounts(codeVersion: selectedVersion.codeVersion)) ?? []
     }
 
     func clearAllBookmarks() {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.clearBookmarks(codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.clearBookmarks(codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
         } catch {
             statusMessage = error.localizedDescription
@@ -1558,9 +1829,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func clearAllNotes() {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.clearNotes(codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.clearNotes(codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
         } catch {
             statusMessage = error.localizedDescription
@@ -1568,9 +1839,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func clearAllTags() {
-        guard let selectedVersion, let userDataStore else { return }
+        guard let selectedVersion, let userContentRepository else { return }
         do {
-            try userDataStore.clearAllTags(codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.clearAllTags(codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
         } catch {
             statusMessage = error.localizedDescription
@@ -1729,13 +2000,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func storedCodeSectionID() -> Int64? {
-        if let number = UserDefaults.standard.object(forKey: selectedCodeSectionDefaultsKey) as? NSNumber {
-            return number.int64Value
-        }
-        if let value = UserDefaults.standard.object(forKey: selectedCodeSectionDefaultsKey) as? Int64 {
-            return value
-        }
-        return nil
+        continuityStore.load().selectedCodeSectionID
     }
 
     private nonisolated static func inlineHTMLTextBlock(

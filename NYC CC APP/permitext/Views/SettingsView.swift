@@ -6,18 +6,18 @@ private enum SettingsRowTypography {
     static let toggleTitle = Font.body.weight(.medium)
 }
 
+private enum SettingsControlMetrics {
+    static let switchWidth: CGFloat = 54
+    static let switchHeight: CGFloat = 32
+    static let switchThumbInset: CGFloat = 3
+    static let switchThumbCornerRadius: CGFloat = 12
+}
+
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
-    @State private var expandedPicker: ExpandedPicker?
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
-
-    private enum ExpandedPicker: Hashable {
-        case jurisdiction
-        case version
-        case codeSection
-    }
 
     private var readerPreviewAccent: Color {
         Color(uiColor: library.accentColor())
@@ -53,6 +53,10 @@ struct SettingsView: View {
                             Divider()
                             comparisonModeToggle
                         }
+                    }
+
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                        planCard
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
@@ -102,31 +106,6 @@ struct SettingsView: View {
         }
         .coordinateSpace(name: "settingsScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
-        .confirmationDialog(
-            pendingClearAction?.confirmationTitle ?? "",
-            isPresented: Binding(
-                get: { pendingClearAction != nil },
-                set: { isPresented in
-                    if !isPresented {
-                        pendingClearAction = nil
-                    }
-                }
-            ),
-            titleVisibility: .visible
-        ) {
-            if let pendingClearAction {
-                Button(pendingClearAction.buttonTitle, role: .destructive) {
-                    performClearAction(pendingClearAction)
-                }
-            }
-            Button("Cancel", role: .cancel) {
-                pendingClearAction = nil
-            }
-        } message: {
-            if let pendingClearAction {
-                Text(pendingClearAction.message)
-            }
-        }
     }
 
     private var jurisdictionPicker: some View {
@@ -139,25 +118,19 @@ struct SettingsView: View {
                 }
                 .padding(CodeScreenMetrics.cardPadding)
             } else {
-                expandableSettingsRow(
-                    label: "Jurisdiction",
-                    picker: .jurisdiction,
-                    value: {
-                        Text(selectedJurisdictionName)
-                            .font(SettingsRowTypography.value)
-                            .foregroundStyle(.primary)
-                    },
-                    options: {
-                        ForEach(library.availableJurisdictions) { jurisdiction in
-                            expandableSettingsOption(
-                                title: jurisdiction.name,
-                                isSelected: jurisdiction.id == library.selectedJurisdictionKey
-                            ) {
-                                library.updateSelectedJurisdiction(key: jurisdiction.id)
-                            }
+                settingsMenuRow(label: "Jurisdiction") {
+                    Text(selectedJurisdictionName)
+                        .font(SettingsRowTypography.value)
+                        .foregroundStyle(.primary)
+                } content: {
+                    ForEach(library.availableJurisdictions) { jurisdiction in
+                        Button {
+                            library.updateSelectedJurisdiction(key: jurisdiction.id)
+                        } label: {
+                            Label(jurisdiction.name, systemImage: jurisdiction.id == library.selectedJurisdictionKey ? "checkmark" : "")
                         }
                     }
-                )
+                }
             }
         }
     }
@@ -172,26 +145,23 @@ struct SettingsView: View {
                 }
                 .padding(CodeScreenMetrics.cardPadding)
             } else {
-                expandableSettingsRow(
-                    label: "Version",
-                    picker: .version,
-                    value: {
-                        Text(selectedVersionPrimaryText)
-                            .font(SettingsRowTypography.value)
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.trailing)
-                    },
-                    options: {
-                        ForEach(library.filteredVersions) { version in
-                            expandableSettingsOption(
-                                title: versionOptionTitle(for: version),
-                                isSelected: version.fileName == library.selectedVersionFileName
-                            ) {
-                                library.updateSelectedVersion(fileName: version.fileName)
-                            }
+                settingsMenuRow(label: "Version") {
+                    Text(selectedVersionPrimaryText)
+                        .font(SettingsRowTypography.value)
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.trailing)
+                } content: {
+                    ForEach(library.filteredVersions) { version in
+                        Button {
+                            library.updateSelectedVersion(fileName: version.fileName)
+                        } label: {
+                            Label(
+                                versionOptionTitle(for: version),
+                                systemImage: version.fileName == library.selectedVersionFileName ? "checkmark" : ""
+                            )
                         }
                     }
-                )
+                }
             }
         }
     }
@@ -206,33 +176,29 @@ struct SettingsView: View {
                 }
                 .padding(CodeScreenMetrics.cardPadding)
             } else {
-                expandableSettingsRow(
-                    label: "Code Section",
-                    picker: .codeSection,
-                    value: {
-                        Text(selectedCodeSectionName)
-                            .font(SettingsRowTypography.value)
-                            .foregroundStyle(.primary)
-                            .multilineTextAlignment(.trailing)
-                    },
-                    options: {
-                        expandableSettingsOption(
-                            title: "All Sections",
-                            isSelected: library.selectedCodeSectionID == nil
-                        ) {
-                            library.updateSelectedCodeSection(id: nil)
-                        }
+                settingsMenuRow(label: "Code Section") {
+                    Text(selectedCodeSectionName)
+                        .font(SettingsRowTypography.value)
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.trailing)
+                } content: {
+                    Button {
+                        library.updateSelectedCodeSection(id: nil)
+                    } label: {
+                        Label("All Sections", systemImage: library.selectedCodeSectionID == nil ? "checkmark" : "")
+                    }
 
-                        ForEach(library.codeSections) { codeSection in
-                            expandableSettingsOption(
-                                title: CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                                isSelected: codeSection.id == library.selectedCodeSectionID
-                            ) {
-                                library.updateSelectedCodeSection(id: codeSection.id)
-                            }
+                    ForEach(library.codeSections) { codeSection in
+                        Button {
+                            library.updateSelectedCodeSection(id: codeSection.id)
+                        } label: {
+                            Label(
+                                CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
+                                systemImage: codeSection.id == library.selectedCodeSectionID ? "checkmark" : ""
+                            )
                         }
                     }
-                )
+                }
             }
         }
     }
@@ -242,19 +208,145 @@ struct SettingsView: View {
             get: { library.comparisonModeEnabled },
             set: { library.setComparisonMode(enabled: $0, keeping: .settings) }
         )) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Comparison Mode")
-                    .font(SettingsRowTypography.toggleTitle)
-                    .foregroundStyle(.primary)
-
-                Text("Adds a second browser tab for side-by-side code review.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
+            Text("Comparison Mode")
+                .font(SettingsRowTypography.toggleTitle)
+                .foregroundStyle(.primary)
         }
         .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
         .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
         .toggleStyle(SettingsSwitchToggleStyle())
+    }
+
+    private var planCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                CodeEyebrow(text: "Plan", accent: settingsChromeColor)
+
+                Spacer(minLength: 0)
+
+                Text(library.currentPlan.label)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(library.currentPlan == .pro ? Color.appChrome : .secondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(library.currentPlan == .pro ? Color.appChrome.opacity(0.14) : Color(uiColor: .tertiarySystemGroupedBackground))
+                    )
+            }
+
+            Text(planSummaryText)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("Source: \(library.currentEntitlementSource.label)")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            VStack(alignment: .leading, spacing: 10) {
+                planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, 10 notes, and 3 projects.")
+                planFeatureRow("Pro", details: "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and future cross-device sync.")
+            }
+
+            Button {
+                Task { await library.purchasePro() }
+            } label: {
+                Label(upgradeButtonTitle, systemImage: "sparkles")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color.appChrome)
+            .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
+
+            Button {
+                Task { await library.restorePurchases() }
+            } label: {
+                Text(library.isStoreKitBusy ? "Checking purchases..." : "Restore Purchases")
+                    .font(.footnote.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .disabled(library.isStoreKitBusy)
+
+            #if DEBUG
+            Text(storeKitDebugText)
+                .font(.caption2.monospaced())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            CodeHairline()
+
+            Picker("Local Test Plan", selection: Binding(
+                get: { library.currentPlan },
+                set: { library.setDebugPlan($0) }
+            )) {
+                Text(AppPlan.free.label).tag(AppPlan.free)
+                Text(AppPlan.pro.label).tag(AppPlan.pro)
+            }
+            .pickerStyle(.segmented)
+
+            Toggle(isOn: Binding(
+                get: { library.currentEntitlementSource == .lifetimeGrant },
+                set: { library.setDebugLifetimeGrant(enabled: $0) }
+            )) {
+                Text("Debug Lifetime Grant")
+                    .font(.footnote.weight(.semibold))
+            }
+            .toggleStyle(SettingsSwitchToggleStyle())
+            #endif
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .task {
+            await library.refreshStoreKitEntitlements()
+        }
+    }
+
+    private var planSummaryText: String {
+        if library.currentPlan == .pro {
+            if library.currentEntitlementSource == .lifetimeGrant {
+                return "Lifetime Pro is active. This account has gifted access and does not need an App Store subscription."
+            }
+            return "Pro is active. Unlimited saved work, PDF export, tags, continuity, and future cross-device sync are unlocked."
+        }
+        return "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity."
+    }
+
+    private var upgradeButtonTitle: String {
+        if library.currentPlan == .pro { return "Pro Active" }
+        if let price = library.proProductDisplayPrice { return "Upgrade to Pro - \(price)/month" }
+        return library.isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
+    }
+
+    #if DEBUG
+    private var storeKitDebugText: String {
+        if library.storeKitLoadedProductIDs.isEmpty {
+            return "StoreKit: 0 products loaded"
+        }
+        return "StoreKit: \(library.storeKitLoadedProductIDs.joined(separator: ", "))"
+    }
+    #endif
+
+    private func planFeatureRow(_ title: String, details: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: title == "Pro" ? "checkmark.seal.fill" : "checkmark.circle")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(title == "Pro" ? Color.appChrome : .secondary)
+                .frame(width: 20)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+
+                Text(details)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 
     private var themePreviewCard: some View {
@@ -331,7 +423,7 @@ struct SettingsView: View {
                     theme.lineSpacing = newValue
                     library.updateReaderTheme(theme)
                 }
-            ), in: 0...12, step: 1)
+            ), in: ReaderTheme.minimumLineSpacing...ReaderTheme.maximumLineSpacing, step: 1)
         }
     }
 
@@ -396,79 +488,30 @@ struct SettingsView: View {
         return "All Sections"
     }
 
-    private func expandableSettingsRow<Value: View, Options: View>(
+    private func settingsMenuRow<Value: View, Content: View>(
         label: String,
-        picker: ExpandedPicker,
         @ViewBuilder value: () -> Value,
-        @ViewBuilder options: () -> Options
+        @ViewBuilder content: () -> Content
     ) -> some View {
-        let isExpanded = expandedPicker == picker
-
-        return VStack(alignment: .leading, spacing: 0) {
-            Button {
-                withAnimation(.easeInOut(duration: 0.22)) {
-                    expandedPicker = isExpanded ? nil : picker
-                }
-            } label: {
-                HStack(alignment: .center, spacing: 12) {
-                    Text(label)
-                        .font(SettingsRowTypography.label)
-                        .foregroundStyle(.primary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Spacer(minLength: 0)
-
-                    value()
-
-                    Image(systemName: "chevron.down")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.tertiary)
-                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                }
-                .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
-                .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            if isExpanded {
-                VStack(spacing: 0) {
-                    options()
-                }
-                .padding(.bottom, 6)
-                .transition(.opacity.combined(with: .move(edge: .top)))
-            }
-        }
-    }
-
-    private func expandableSettingsOption(
-        title: String,
-        isSelected: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button {
-            action()
-            withAnimation(.easeInOut(duration: 0.22)) {
-                expandedPicker = nil
-            }
+        Menu {
+            content()
         } label: {
-            HStack(spacing: 10) {
-                Text(title)
-                    .font(.subheadline)
+            HStack(alignment: .center, spacing: 12) {
+                Text(label)
+                    .font(SettingsRowTypography.label)
                     .foregroundStyle(.primary)
-                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Spacer(minLength: 0)
 
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(Color.appChrome)
-                }
+                value()
+
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
             }
-            .padding(.horizontal, CodeScreenMetrics.cardPadding)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
+            .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -495,6 +538,42 @@ struct SettingsView: View {
             }
         }
         .buttonStyle(.plain)
+        .popover(
+            isPresented: Binding(
+                get: { pendingClearAction == action },
+                set: { isPresented in
+                    if !isPresented, pendingClearAction == action {
+                        pendingClearAction = nil
+                    }
+                }
+            ),
+            attachmentAnchor: .rect(.bounds),
+            arrowEdge: .bottom
+        ) {
+            clearActionPopover(action)
+                .presentationCompactAdaptation(.popover)
+        }
+    }
+
+    private func clearActionPopover(_ action: ClearSettingsAction) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text(action.confirmationTitle)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.primary)
+
+            Text(action.message)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button(action.buttonTitle, role: .destructive) {
+                performClearAction(action)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+        }
+        .frame(width: 280, alignment: .leading)
+        .padding(24)
     }
 
     private func performClearAction(_ action: ClearSettingsAction) {
@@ -512,7 +591,7 @@ struct SettingsView: View {
     }
 }
 
-private enum ClearSettingsAction: Identifiable {
+private enum ClearSettingsAction: Identifiable, Equatable {
     case clearSearches
     case clearBookmarks
     case clearNotes
@@ -580,12 +659,12 @@ private struct SettingsSwitchToggleStyle: ToggleStyle {
                                 .strokeBorder(Color(uiColor: .separator).opacity(configuration.isOn ? 0.55 : 0.95), lineWidth: 1)
                         )
 
-                    Circle()
+                    RoundedRectangle(cornerRadius: SettingsControlMetrics.switchThumbCornerRadius, style: .continuous)
                         .fill(Color(uiColor: .systemBackground))
                         .shadow(color: Color.black.opacity(0.18), radius: 2, x: 0, y: 1)
-                        .padding(3)
+                        .padding(SettingsControlMetrics.switchThumbInset)
                 }
-                .frame(width: 54, height: 32)
+                .frame(width: SettingsControlMetrics.switchWidth, height: SettingsControlMetrics.switchHeight)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Comparison Mode")

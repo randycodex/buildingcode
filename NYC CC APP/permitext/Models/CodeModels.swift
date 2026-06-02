@@ -1,4 +1,5 @@
 import Foundation
+import StoreKit
 
 enum BundledCodeContentKind: String, Hashable, Sendable {
     case sqlite
@@ -319,12 +320,85 @@ struct CodeSectionCategory: Identifiable, Hashable, Sendable {
     let name: String
 }
 
+enum UserContentVisibility: String, Hashable, Sendable {
+    case personal
+    case project
+    case `public`
+}
+
+enum UserContentSyncState: String, Hashable, Sendable {
+    case localOnly
+    case pendingUpload
+    case synced
+}
+
+enum SyncEntityType: String, Codable, Hashable, Sendable {
+    case bookmark
+    case note
+    case tagSet
+    case folder
+    case folderSection
+    case codeVersionUserData
+}
+
+enum SyncOperationType: String, Codable, Hashable, Sendable {
+    case upsert
+    case delete
+    case replace
+}
+
+enum SyncQueueState: String, Codable, Hashable, Sendable {
+    case pending
+    case inFlight
+    case failed
+    case synced
+}
+
+struct SyncQueuePayload: Codable, Hashable, Sendable {
+    var codeVersion: String
+    var sectionID: Int64?
+    var folderID: Int64?
+    var clientID: String?
+    var values: [String: String]
+
+    init(
+        codeVersion: String,
+        sectionID: Int64? = nil,
+        folderID: Int64? = nil,
+        clientID: String? = nil,
+        values: [String: String] = [:]
+    ) {
+        self.codeVersion = codeVersion
+        self.sectionID = sectionID
+        self.folderID = folderID
+        self.clientID = clientID
+        self.values = values
+    }
+}
+
+struct SyncQueueItem: Identifiable, Hashable, Sendable {
+    let id: Int64
+    let clientID: String
+    let entityType: SyncEntityType
+    let operationType: SyncOperationType
+    let payload: SyncQueuePayload
+    let state: SyncQueueState
+    let attemptCount: Int
+    let createdAt: Date
+    let updatedAt: Date
+    let lastError: String?
+}
+
 /// A user-created Project folder. Bookmarks can be assigned to many folders;
 /// each folder is just a named, colored, ordered grouping the user defines
 /// for their own organizational workflow.
 struct CodeFolder: Identifiable, Hashable, Sendable {
     let id: Int64
     let clientID: String
+    let ownerID: String
+    let visibility: UserContentVisibility
+    let syncState: UserContentSyncState
+    let deletedAt: Date?
     let name: String
     let description: String
     let colorHex: String
@@ -413,6 +487,26 @@ struct RecentlyViewedEntry: Identifiable, Codable, Hashable, Sendable {
         case previewText
         case viewedAt
     }
+}
+
+struct ContinuityContext: Codable, Hashable, Sendable {
+    var selectedJurisdictionKey: String
+    var selectedVersionFileName: String
+    var selectedCodeSectionID: Int64?
+    var lastOpenedChapterID: Int64?
+    var activeProjectID: Int64?
+    var comparisonModeEnabled: Bool
+    var recentlyViewedSections: [RecentlyViewedEntry]
+
+    static let empty = ContinuityContext(
+        selectedJurisdictionKey: "",
+        selectedVersionFileName: "",
+        selectedCodeSectionID: nil,
+        lastOpenedChapterID: nil,
+        activeProjectID: nil,
+        comparisonModeEnabled: false,
+        recentlyViewedSections: []
+    )
 }
 
 struct CodeSectionSummary: Identifiable, Hashable, Sendable {
@@ -641,6 +735,12 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let id: Int64
     let codeVersion: String
     let codeSectionID: Int64?
+    let clientID: String?
+    let ownerID: String
+    let visibility: UserContentVisibility
+    let syncState: UserContentSyncState
+    let updatedAt: Date?
+    let deletedAt: Date?
     let chapterNumber: String
     let chapterTitle: String
     let sectionNumber: String
@@ -656,6 +756,12 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         id: Int64,
         codeVersion: String,
         codeSectionID: Int64? = nil,
+        clientID: String? = nil,
+        ownerID: String = UserDataDefaults.localOwnerID,
+        visibility: UserContentVisibility = .personal,
+        syncState: UserContentSyncState = .localOnly,
+        updatedAt: Date? = nil,
+        deletedAt: Date? = nil,
         chapterNumber: String,
         chapterTitle: String,
         sectionNumber: String,
@@ -670,6 +776,12 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         self.id = id
         self.codeVersion = codeVersion
         self.codeSectionID = codeSectionID
+        self.clientID = clientID
+        self.ownerID = ownerID
+        self.visibility = visibility
+        self.syncState = syncState
+        self.updatedAt = updatedAt
+        self.deletedAt = deletedAt
         self.chapterNumber = chapterNumber
         self.chapterTitle = chapterTitle
         self.sectionNumber = sectionNumber
@@ -688,6 +800,393 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
 
     var hasNote: Bool {
         !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+}
+
+enum UserDataDefaults {
+    static let localOwnerID = "local"
+}
+
+enum AppPlan: String, Codable, Hashable, Sendable {
+    case free
+    case pro
+
+    var label: String {
+        switch self {
+        case .free: return "Free"
+        case .pro: return "Pro"
+        }
+    }
+}
+
+enum EntitlementSource: String, Codable, Hashable, Sendable {
+    case none
+    case subscription
+    case lifetimeGrant
+    case debugOverride
+
+    var label: String {
+        switch self {
+        case .none: return "None"
+        case .subscription: return "Subscription"
+        case .lifetimeGrant: return "Lifetime Grant"
+        case .debugOverride: return "Debug Override"
+        }
+    }
+}
+
+struct AppEntitlement: Codable, Hashable, Sendable {
+    let plan: AppPlan
+    let source: EntitlementSource
+    let grantedUserID: String?
+
+    static let free = AppEntitlement(plan: .free, source: .none, grantedUserID: nil)
+    static let subscriptionPro = AppEntitlement(plan: .pro, source: .subscription, grantedUserID: nil)
+
+    static func lifetimeGrant(userID: String) -> AppEntitlement {
+        AppEntitlement(plan: .pro, source: .lifetimeGrant, grantedUserID: userID)
+    }
+
+    #if DEBUG
+    static func debugOverride(_ plan: AppPlan) -> AppEntitlement {
+        AppEntitlement(plan: plan, source: .debugOverride, grantedUserID: nil)
+    }
+    #endif
+}
+
+struct SignedInAccount: Codable, Hashable, Sendable {
+    let appleUserID: String
+    let displayName: String?
+    let signedInAt: Date
+}
+
+struct LifetimeGrantLookupResult: Codable, Hashable, Sendable {
+    let hasLifetimeGrant: Bool
+    let grantedUserID: String?
+}
+
+enum AccountDefaults {
+    static let signedInAccountKey = "permitext.account.signedIn"
+}
+
+protocol LifetimeGrantLookupClient {
+    func lookupLifetimeGrant(appleUserID: String) async throws -> LifetimeGrantLookupResult
+}
+
+struct LocalLifetimeGrantLookupClient: LifetimeGrantLookupClient {
+    private let defaults: UserDefaults
+    private let debugGrantedAppleUserIDsKey = "permitext.debug.grantedAppleUserIDs"
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    func lookupLifetimeGrant(appleUserID: String) async throws -> LifetimeGrantLookupResult {
+        #if DEBUG
+        let grantedIDs = Set(defaults.stringArray(forKey: debugGrantedAppleUserIDsKey) ?? [])
+        if grantedIDs.contains(appleUserID) {
+            return LifetimeGrantLookupResult(hasLifetimeGrant: true, grantedUserID: appleUserID)
+        }
+        #endif
+        return LifetimeGrantLookupResult(hasLifetimeGrant: false, grantedUserID: nil)
+    }
+}
+
+enum EntitlementFeature: String, Hashable, Sendable {
+    case unlimitedSavedItems
+    case unlimitedNotes
+    case unlimitedProjects
+    case premiumExports
+    case advancedOrganization
+    case continuity
+    case crossDeviceSync
+
+    var label: String {
+        switch self {
+        case .unlimitedSavedItems: return "unlimited saved sections"
+        case .unlimitedNotes: return "unlimited notes"
+        case .unlimitedProjects: return "unlimited projects"
+        case .premiumExports: return "PDF exports"
+        case .advancedOrganization: return "advanced organization"
+        case .continuity: return "reading continuity"
+        case .crossDeviceSync: return "cross-device sync"
+        }
+    }
+}
+
+struct EntitlementLimits: Hashable, Sendable {
+    let savedSectionLimit: Int?
+    let noteLimit: Int?
+    let projectLimit: Int?
+    let premiumExportsEnabled: Bool
+    let advancedOrganizationEnabled: Bool
+    let continuityEnabled: Bool
+    let crossDeviceSyncEnabled: Bool
+
+    static let free = EntitlementLimits(
+        savedSectionLimit: 25,
+        noteLimit: 10,
+        projectLimit: 3,
+        premiumExportsEnabled: false,
+        advancedOrganizationEnabled: false,
+        continuityEnabled: false,
+        crossDeviceSyncEnabled: false
+    )
+
+    static let pro = EntitlementLimits(
+        savedSectionLimit: nil,
+        noteLimit: nil,
+        projectLimit: nil,
+        premiumExportsEnabled: true,
+        advancedOrganizationEnabled: true,
+        continuityEnabled: true,
+        crossDeviceSyncEnabled: true
+    )
+}
+
+struct EntitlementRequirement: Hashable, Sendable {
+    let feature: EntitlementFeature
+    let requiredPlan: AppPlan
+    let message: String
+}
+
+enum EntitlementDecision: Hashable, Sendable {
+    case allowed
+    case denied(EntitlementRequirement)
+}
+
+protocol EntitlementService {
+    var currentEntitlement: AppEntitlement { get }
+    var currentPlan: AppPlan { get }
+    var limits: EntitlementLimits { get }
+    func canUse(_ feature: EntitlementFeature) -> EntitlementDecision
+    func canCreateSavedSection(currentCount: Int) -> EntitlementDecision
+    func canCreateNote(currentCount: Int) -> EntitlementDecision
+    func canCreateProject(currentCount: Int) -> EntitlementDecision
+}
+
+struct LocalEntitlementService: EntitlementService {
+    private let defaults: UserDefaults
+    static let planDefaultsKey = "permitext.appPlan"
+    static let verifiedPlanDefaultsKey = "permitext.verifiedAppPlan"
+    static let entitlementDefaultsKey = "permitext.entitlement"
+    static let lifetimeGrantUserIDDefaultsKey = "permitext.lifetimeGrant.userID"
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    var currentEntitlement: AppEntitlement {
+        if let data = defaults.data(forKey: Self.entitlementDefaultsKey),
+           let entitlement = try? JSONDecoder().decode(AppEntitlement.self, from: data) {
+            return entitlement
+        }
+        if let lifetimeGrantUserID = defaults.string(forKey: Self.lifetimeGrantUserIDDefaultsKey),
+           !lifetimeGrantUserID.isEmpty {
+            return .lifetimeGrant(userID: lifetimeGrantUserID)
+        }
+        if defaults.string(forKey: Self.verifiedPlanDefaultsKey).flatMap(AppPlan.init(rawValue:)) == .pro {
+            return .subscriptionPro
+        }
+        #if DEBUG
+        if let debugPlan = defaults.string(forKey: Self.planDefaultsKey).flatMap(AppPlan.init(rawValue:)) {
+            return .debugOverride(debugPlan)
+        }
+        #else
+        #endif
+        return .free
+    }
+
+    var currentPlan: AppPlan {
+        currentEntitlement.plan
+    }
+
+    var limits: EntitlementLimits {
+        switch currentPlan {
+        case .free: return .free
+        case .pro: return .pro
+        }
+    }
+
+    func canUse(_ feature: EntitlementFeature) -> EntitlementDecision {
+        switch feature {
+        case .unlimitedSavedItems:
+            return limits.savedSectionLimit == nil ? .allowed : denied(feature, "Upgrade to Pro for unlimited saved sections.")
+        case .unlimitedNotes:
+            return limits.noteLimit == nil ? .allowed : denied(feature, "Upgrade to Pro for unlimited notes.")
+        case .unlimitedProjects:
+            return limits.projectLimit == nil ? .allowed : denied(feature, "Upgrade to Pro for unlimited projects.")
+        case .premiumExports:
+            return limits.premiumExportsEnabled ? .allowed : denied(feature, "Upgrade to Pro to export saved sections.")
+        case .advancedOrganization:
+            return limits.advancedOrganizationEnabled ? .allowed : denied(feature, "Upgrade to Pro to use tags and advanced organization.")
+        case .continuity:
+            return limits.continuityEnabled ? .allowed : denied(feature, "Upgrade to Pro for reading continuity.")
+        case .crossDeviceSync:
+            return limits.crossDeviceSyncEnabled ? .allowed : denied(feature, "Upgrade to Pro for cross-device sync.")
+        }
+    }
+
+    func canCreateSavedSection(currentCount: Int) -> EntitlementDecision {
+        guard let limit = limits.savedSectionLimit, currentCount >= limit else { return .allowed }
+        return denied(.unlimitedSavedItems, "Free includes up to \(limit) saved sections. Upgrade to Pro for unlimited saved sections.")
+    }
+
+    func canCreateNote(currentCount: Int) -> EntitlementDecision {
+        guard let limit = limits.noteLimit, currentCount >= limit else { return .allowed }
+        return denied(.unlimitedNotes, "Free includes up to \(limit) notes. Upgrade to Pro for unlimited notes.")
+    }
+
+    func canCreateProject(currentCount: Int) -> EntitlementDecision {
+        guard let limit = limits.projectLimit, currentCount >= limit else { return .allowed }
+        return denied(.unlimitedProjects, "Free includes up to \(limit) projects. Upgrade to Pro for unlimited projects.")
+    }
+
+    private func denied(_ feature: EntitlementFeature, _ message: String) -> EntitlementDecision {
+        .denied(EntitlementRequirement(feature: feature, requiredPlan: .pro, message: message))
+    }
+
+    #if DEBUG
+    static func setDebugPlan(_ plan: AppPlan, defaults: UserDefaults = .standard) {
+        defaults.set(plan.rawValue, forKey: planDefaultsKey)
+        setEntitlement(.debugOverride(plan), defaults: defaults)
+    }
+    #endif
+
+    static func setVerifiedPlan(_ plan: AppPlan, defaults: UserDefaults = .standard) {
+        defaults.set(plan.rawValue, forKey: verifiedPlanDefaultsKey)
+        if plan == .pro {
+            setEntitlement(.subscriptionPro, defaults: defaults)
+        } else if currentStoredEntitlement(defaults: defaults).source == .subscription {
+            setEntitlement(.free, defaults: defaults)
+        }
+    }
+
+    static func setLifetimeGrant(userID: String, defaults: UserDefaults = .standard) {
+        defaults.set(userID, forKey: lifetimeGrantUserIDDefaultsKey)
+        setEntitlement(.lifetimeGrant(userID: userID), defaults: defaults)
+    }
+
+    static func clearLifetimeGrant(defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: lifetimeGrantUserIDDefaultsKey)
+        if currentStoredEntitlement(defaults: defaults).source == .lifetimeGrant {
+            setEntitlement(.free, defaults: defaults)
+        }
+    }
+
+    static func setEntitlement(_ entitlement: AppEntitlement, defaults: UserDefaults = .standard) {
+        if let data = try? JSONEncoder().encode(entitlement) {
+            defaults.set(data, forKey: entitlementDefaultsKey)
+        }
+    }
+
+    private static func currentStoredEntitlement(defaults: UserDefaults) -> AppEntitlement {
+        guard let data = defaults.data(forKey: entitlementDefaultsKey),
+              let entitlement = try? JSONDecoder().decode(AppEntitlement.self, from: data) else {
+            return .free
+        }
+        return entitlement
+    }
+}
+
+enum StoreKitProductID {
+    static let proMonthly = "com.randycodex.permitext.pro.monthly"
+}
+
+struct StoreKitSubscriptionSnapshot: Sendable {
+    let plan: AppPlan
+    let proDisplayPrice: String?
+    let loadedProductIDs: [String]
+}
+
+enum StoreKitSubscriptionServiceError: LocalizedError {
+    case proProductUnavailable
+    case unverifiedTransaction
+    case pendingApproval
+    case unknownPurchaseResult
+
+    var errorDescription: String? {
+        switch self {
+        case .proProductUnavailable:
+            return "The Pro monthly subscription is not available yet. Check the App Store product setup."
+        case .unverifiedTransaction:
+            return "The purchase could not be verified."
+        case .pendingApproval:
+            return "The purchase is pending approval."
+        case .unknownPurchaseResult:
+            return "The purchase did not complete."
+        }
+    }
+}
+
+actor StoreKitSubscriptionService {
+    private let proProductID = StoreKitProductID.proMonthly
+    private var cachedProProduct: Product?
+
+    func snapshot() async -> StoreKitSubscriptionSnapshot {
+        async let plan = verifiedPlan()
+        async let products = proProducts()
+        let loadedProducts = await products
+        return StoreKitSubscriptionSnapshot(
+            plan: await plan,
+            proDisplayPrice: loadedProducts.first { $0.id == proProductID }?.displayPrice,
+            loadedProductIDs: loadedProducts.map(\.id)
+        )
+    }
+
+    func purchasePro() async throws -> StoreKitSubscriptionSnapshot {
+        guard let product = await proProducts().first(where: { $0.id == proProductID }) else {
+            throw StoreKitSubscriptionServiceError.proProductUnavailable
+        }
+
+        let result = try await product.purchase()
+        switch result {
+        case .success(let verification):
+            let transaction = try verifiedTransaction(from: verification)
+            await transaction.finish()
+            return await snapshot()
+        case .userCancelled:
+            return await snapshot()
+        case .pending:
+            throw StoreKitSubscriptionServiceError.pendingApproval
+        @unknown default:
+            throw StoreKitSubscriptionServiceError.unknownPurchaseResult
+        }
+    }
+
+    func restorePurchases() async -> StoreKitSubscriptionSnapshot {
+        try? await AppStore.sync()
+        return await snapshot()
+    }
+
+    private func proProducts() async -> [Product] {
+        if let cachedProProduct { return [cachedProProduct] }
+        let products = (try? await Product.products(for: [proProductID])) ?? []
+        cachedProProduct = products.first { $0.id == proProductID }
+        return products
+    }
+
+    private func verifiedPlan() async -> AppPlan {
+        for await entitlement in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = entitlement else { continue }
+            guard transaction.productID == proProductID, transaction.revocationDate == nil else { continue }
+            LocalEntitlementService.setVerifiedPlan(.pro)
+            return .pro
+        }
+        if LocalEntitlementService().currentEntitlement.source == .lifetimeGrant {
+            return .pro
+        }
+        LocalEntitlementService.setVerifiedPlan(.free)
+        return .free
+    }
+
+    private func verifiedTransaction(from result: VerificationResult<Transaction>) throws -> Transaction {
+        switch result {
+        case .verified(let transaction):
+            return transaction
+        case .unverified:
+            throw StoreKitSubscriptionServiceError.unverifiedTransaction
+        }
     }
 }
 

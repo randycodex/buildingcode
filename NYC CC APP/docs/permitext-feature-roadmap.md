@@ -81,6 +81,10 @@ Monetization should begin with private utility, not community features.
   - export availability
   - project count limits
   - advanced organization features
+- Add entitlement source support:
+  - App Store subscription
+  - internal lifetime Pro grant for gifted users
+  - debug override for local testing
 - Keep the reader itself useful in free tier so the product can still grow organically.
 
 ### Phase 4: Add Account System and Synchronization Backend
@@ -94,6 +98,7 @@ Once the private workflow is solid, introduce the server-backed model required f
 - Build backend ownership of:
   - users
   - entitlements
+  - lifetime Pro grants for gifted users
   - projects
   - saved items / annotations
   - continuity state

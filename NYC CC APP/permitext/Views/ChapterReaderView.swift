@@ -27,6 +27,7 @@ struct ChapterReaderView: View {
     @State private var scrollProgress: CGFloat = 0
     @State private var lastBlockOffsets: [Int64: CGFloat] = [:]
     @State private var loadedBlocksChapterID: Int64?
+    @State private var isChapterSearchPresented = false
     @Environment(\.isBrowserTabActive) private var isBrowserTabActive
     @StateObject private var expandedMediaTracker = ExpandedMediaTracker()
     private let chapterReaderCoordinateSpace: String = "chapterReaderScroll"
@@ -36,6 +37,20 @@ struct ChapterReaderView: View {
     private let backgroundPrefetchSectionLimit = 12
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
+    }
+
+    private var chapterSearchToolbarButton: some View {
+        Button {
+            isChapterSearchPresented = true
+        } label: {
+            Image(systemName: "text.page.badge.magnifyingglass")
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .background(Color(uiColor: .systemBackground))
+                .clipShape(Capsule(style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Search this chapter")
     }
 
     private var currentJumpLabel: String {
@@ -48,6 +63,17 @@ struct ChapterReaderView: View {
             return jumpLabel(for: first)
         }
         return ""
+    }
+
+    private var chapterSearchEntries: [ChapterSearchSourceEntry] {
+        visibleJumpBlocks.map { block in
+            ChapterSearchSourceEntry(
+                sectionID: block.id,
+                sectionNumber: block.sectionNumber,
+                title: block.displayTitle,
+                anchorID: nil
+            )
+        }
     }
 
     var body: some View {
@@ -127,6 +153,10 @@ struct ChapterReaderView: View {
                 .frame(maxWidth: 260)
                 .multilineTextAlignment(.center)
             }
+
+            ToolbarItem(placement: .topBarTrailing) {
+                chapterSearchToolbarButton
+            }
         }
         .tint(accentColor)
         .safeAreaInset(edge: .top, spacing: 0) {
@@ -163,6 +193,16 @@ struct ChapterReaderView: View {
         }
         .sheet(isPresented: $isJumpPickerPresented) {
             jumpPickerSheet(proxy: proxy)
+        }
+        .sheet(isPresented: $isChapterSearchPresented) {
+            ChapterSearchSheet(
+                title: chapter.displayLabel,
+                entries: chapterSearchEntries,
+                onSelect: { entry in
+                    jumpToSection(id: entry.sectionID, with: proxy)
+                }
+            )
+            .environmentObject(library)
         }
         .task(id: chapter.id) {
             library.noteChapterOpened(chapter: chapter)

@@ -130,6 +130,24 @@ These affect rule-based rendering. Rich-text overrides may visually diverge from
 - The app bundles figures as individual resources, not as a folder reference blob.
 - The app uses a real `Info.plist` because generated plist/bundle-id behavior caused earlier simulator install issues.
 
+## Recent weekend changes to verify
+
+- Search results should now show content previews.
+- Opening a search result should also show the expected preview text in the destination view.
+- Chapter-only search should stay scoped to the current chapter and should not pull sections from other chapters.
+- Authored HTML image assets should resolve correctly in chapter content.
+- Saved sorter and export flows should feel visually consistent and aligned.
+- Export progress UI and sort menu behavior should be checked together during regression testing.
+
+Suggested verification pass:
+
+- Confirm preview text appears in the search list.
+- Confirm preview text still appears when opening a result.
+- Confirm chapter-only search does not return sections from other chapters.
+- Confirm authored images load correctly inside chapter content.
+- Confirm the Saved export progress UI behaves correctly.
+- Confirm the Saved sort menu behaves correctly and remains aligned with the rest of the flow.
+
 ## Known current gaps / likely next tasks
 
 - Inline tappable references inside the body text are not implemented yet.

@@ -72,10 +72,12 @@ enum ReaderAccentPalette: String, Codable, Sendable {
 struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
     static let minimumFontSize: Double = 10
     static let maximumFontSize: Double = 26
+    static let minimumLineSpacing: Double = 0
+    static let maximumLineSpacing: Double = 12
 
     var fontChoice: ReaderFontChoice = .sfPro
-    var fontSize: Double = 12
-    var lineSpacing: Double = 2
+    var fontSize: Double = minimumFontSize
+    var lineSpacing: Double = minimumLineSpacing
     var paragraphSpacing: Double = 9
     var accentPalette: ReaderAccentPalette = .codeBased
 
@@ -86,6 +88,7 @@ struct ReaderTheme: Codable, Equatable, Hashable, Sendable {
         theme.fontChoice = theme.fontChoice.normalizedChoice
         theme.accentPalette = .codeBased
         theme.fontSize = min(max(theme.fontSize, Self.minimumFontSize), Self.maximumFontSize)
+        theme.lineSpacing = min(max(theme.lineSpacing, Self.minimumLineSpacing), Self.maximumLineSpacing)
         return theme
     }
 
