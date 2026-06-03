@@ -122,6 +122,7 @@ struct FolderMembershipRow: View {
     let memberFolders: [CodeFolder]
     let onRemove: (CodeFolder) -> Void
     let onAdd: () -> Void
+    var addButtonTitle: String? = nil
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -160,7 +161,7 @@ struct FolderMembershipRow: View {
                     HStack(spacing: 4) {
                         Image(systemName: "folder.badge.plus")
                             .font(.caption.weight(.semibold))
-                        Text(memberFolders.isEmpty ? "Add to project" : "Project")
+                        Text(addButtonTitle ?? (memberFolders.isEmpty ? "Add to project" : "Manage projects"))
                             .font(.caption.weight(.semibold))
                     }
                     .foregroundStyle(Color.secondary)

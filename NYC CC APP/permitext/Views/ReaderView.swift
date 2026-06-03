@@ -83,10 +83,10 @@ struct ReaderView: View {
                         FigureListSection(title: "Practice Diagrams", figures: detail.customDiagrams)
                     }
 
-                    if isBookmarked {
-                        CodeHairline().padding(.top, 2)
-                        projectsEditor
+                    CodeHairline().padding(.top, 2)
+                    projectsEditor
 
+                    if isBookmarked {
                         CodeHairline().padding(.top, 2)
                         tagsEditor
                     }
@@ -336,20 +336,29 @@ struct ReaderView: View {
     }
 
     private var projectsEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Projects")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+        let memberFolders = library.folders(containing: sectionID)
+
+        return VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Projects")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                Text(projectMembershipSummary(memberFolders: memberFolders))
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
 
             if library.hasProjectAccess {
                 FolderMembershipRow(
-                    memberFolders: library.folders(containing: sectionID),
+                    memberFolders: memberFolders,
                     onRemove: { folder in
                         library.removeSection(sectionID, fromFolder: folder.id)
                     },
                     onAdd: {
                         isFolderPickerOpen = true
-                    }
+                    },
+                    addButtonTitle: memberFolders.isEmpty ? "Add to project" : "Manage projects"
                 )
             } else {
                 FolderMembershipRow(
@@ -357,9 +366,25 @@ struct ReaderView: View {
                     onRemove: { _ in },
                     onAdd: {
                         library.requireProjectAccess()
-                    }
+                    },
+                    addButtonTitle: "Unlock projects"
                 )
             }
+        }
+    }
+
+    private func projectMembershipSummary(memberFolders: [CodeFolder]) -> String {
+        guard library.hasProjectAccess else {
+            return "Projects are available with Pro."
+        }
+
+        switch memberFolders.count {
+        case 0:
+            return "This saved section is not in a project yet."
+        case 1:
+            return "This saved section is in \(memberFolders[0].name)."
+        default:
+            return "This saved section is in \(memberFolders.count) projects."
         }
     }
 
