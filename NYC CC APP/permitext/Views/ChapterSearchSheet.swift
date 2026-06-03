@@ -14,7 +14,7 @@ private struct ChapterSearchIndexedEntry: Identifiable, Hashable, Sendable {
     let sectionNumber: String
     let title: String
     let anchorID: String?
-    let officialText: String
+    let displayText: String
     let searchText: String
 
     var id: Int64 { sectionID }
@@ -49,12 +49,13 @@ struct ChapterSearchSheet: View {
         let trimmed = trimmedQuery
         guard !trimmed.isEmpty else { return [] }
 
-        let loweredQuery = trimmed.lowercased()
-        let tokens = loweredQuery.split(whereSeparator: \.isWhitespace).map(String.init)
+        let normalizedQuery = normalizedSearchText(trimmed)
+        let tokens = normalizedQuery.split(whereSeparator: \.isWhitespace).map(String.init)
+        guard !tokens.isEmpty else { return [] }
 
         return indexedEntries.compactMap { entry in
             let text = entry.searchText
-            guard text.contains(loweredQuery) || tokens.allSatisfy({ text.contains($0) }) else {
+            guard text.contains(normalizedQuery) || tokens.allSatisfy({ text.contains($0) }) else {
                 return nil
             }
 
@@ -63,7 +64,7 @@ struct ChapterSearchSheet: View {
                 sectionNumber: entry.sectionNumber,
                 title: entry.title,
                 anchorID: entry.anchorID,
-                snippet: snippet(in: entry.officialText, query: trimmed)
+                snippet: snippet(in: entry.displayText, query: trimmed)
             )
         }
         .sorted { lhs, rhs in
@@ -142,26 +143,103 @@ struct ChapterSearchSheet: View {
         let detailByID = Dictionary(uniqueKeysWithValues: details.map { ($0.id, $0) })
 
         indexedEntries = entries.map { entry in
-            let officialText = detailByID[entry.sectionID]?.officialText ?? ""
-            let title = detailByID[entry.sectionID]?.title ?? entry.title
+            let detail = detailByID[entry.sectionID]
+            let officialText = detail?.officialText ?? ""
+            let searchableDetailText = detail.map(searchableText(for:)) ?? officialText
+            let title = detail?.title ?? entry.title
             return ChapterSearchIndexedEntry(
                 sectionID: entry.sectionID,
                 sectionNumber: entry.sectionNumber,
                 title: title,
                 anchorID: entry.anchorID,
-                officialText: officialText,
-                searchText: "\(entry.sectionNumber) \(title) \(officialText)".lowercased()
+                displayText: searchableDetailText,
+                searchText: normalizedSearchText("\(entry.sectionNumber) \(title) \(searchableDetailText)")
             )
         }
         isLoading = false
+    }
+
+    private func searchableText(for detail: ReaderSectionDetail) -> String {
+        var parts = [
+            detail.title,
+            detail.officialText
+        ]
+
+        for block in detail.contentBlocks {
+            if let plainText = block.plainText {
+                parts.append(plainText)
+            }
+            if let html = block.html {
+                parts.append(plainText(fromHTML: html))
+            }
+            if let caption = block.caption {
+                parts.append(caption)
+            }
+            if let tableID = block.tableID,
+               let table = detail.tableBlocks.first(where: { $0.id == tableID }) {
+                parts.append(searchableText(for: table))
+            }
+        }
+
+        for table in detail.tableBlocks {
+            parts.append(searchableText(for: table))
+        }
+
+        for figure in detail.figures + detail.customDiagrams {
+            parts.append(figure.titleText)
+        }
+
+        return parts
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n\n")
+    }
+
+    private func searchableText(for table: CodeTableBlock) -> String {
+        var parts: [String] = []
+        if let caption = table.caption {
+            parts.append(caption)
+        }
+        parts.append(contentsOf: table.cells.map { cell in
+            cell.plainText.isEmpty ? plainText(fromHTML: cell.html) : cell.plainText
+        })
+        parts.append(contentsOf: table.footnotes)
+        return parts
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+
+    private func plainText(fromHTML html: String) -> String {
+        html
+            .replacingOccurrences(of: #"<br\s*/?>"#, with: "\n", options: [.regularExpression, .caseInsensitive])
+            .replacingOccurrences(of: #"</(p|div|li|tr|h[1-6])>"#, with: "\n", options: [.regularExpression, .caseInsensitive])
+            .replacingOccurrences(of: #"<[^>]+>"#, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
+    }
+
+    private func normalizedSearchText(_ text: String) -> String {
+        text
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func foldedSearchText(_ text: String) -> String {
+        text.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
     }
 
     private func snippet(in text: String, query: String) -> String {
         let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else { return "" }
 
-        let lowercasedText = trimmedText.lowercased()
-        let lowercasedQuery = query.lowercased()
+        let lowercasedText = foldedSearchText(trimmedText)
+        let lowercasedQuery = foldedSearchText(query.trimmingCharacters(in: .whitespacesAndNewlines))
         let nsText = trimmedText as NSString
         let range = lowercasedText.range(of: lowercasedQuery)
             ?? lowercasedQuery
