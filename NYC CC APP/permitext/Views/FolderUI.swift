@@ -216,7 +216,7 @@ struct FolderEditorSheet: View {
                     .padding(.vertical, 4)
                 }
 
-                Section("Notes (optional)") {
+                Section("Description (optional)") {
                     TextField("Short description", text: $description, axis: .vertical)
                         .lineLimit(2...4)
                 }

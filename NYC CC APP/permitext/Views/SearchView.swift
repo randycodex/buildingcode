@@ -87,7 +87,7 @@ struct SearchView: View {
                 CodeTopContentFade(title: "Search", progress: collapseProgress)
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                VStack(spacing: 10) {
+                VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
                     if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                        !library.codeSections.isEmpty {
                         searchCodeSectionFilter
@@ -96,8 +96,8 @@ struct SearchView: View {
                 }
                 .frame(minHeight: dockContentMinHeight, alignment: .bottom)
                 .padding(.horizontal, contentHorizontalInset)
-                .padding(.top, 10)
-                .padding(.bottom, 6)
+                .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 .background(bottomSearchDock)
             }
             .background {

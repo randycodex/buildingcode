@@ -467,55 +467,31 @@ private var savedBookmarkList: some View {
                 .accessibilityLabel("New project")
                 }
 
-            GeometryReader { proxy in
-                let pageWidth = proxy.size.width
-                TabView(selection: $projectPageIndex) {
-                    ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
-                        projectPageGrid(page, pageWidth: pageWidth)
-                            .frame(
-                                width: pageWidth,
-                                height: projectGridViewportHeight,
-                                alignment: .topLeading
-                            )
-                            .tag(index)
+            if !projectPages.isEmpty {
+                GeometryReader { proxy in
+                    let pageWidth = proxy.size.width
+                    TabView(selection: $projectPageIndex) {
+                        ForEach(Array(projectPages.enumerated()), id: \.offset) { index, page in
+                            projectPageGrid(page, pageWidth: pageWidth)
+                                .frame(
+                                    width: pageWidth,
+                                    height: projectGridViewportHeight,
+                                    alignment: .topLeading
+                                )
+                                .tag(index)
+                        }
                     }
-                    if projectPages.isEmpty {
-                        emptyProjectPage(pageWidth: pageWidth)
-                            .frame(
-                                width: pageWidth,
-                                height: projectGridViewportHeight,
-                                alignment: .topLeading
-                            )
-                            .tag(0)
-                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
+                    .clipped()
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
-                .clipped()
-            }
-            .frame(height: projectGridViewportHeight)
+                .frame(height: projectGridViewportHeight)
 
-            if projectPages.count > 1 {
-                projectPageDots
+                if projectPages.count > 1 {
+                    projectPageDots
+                }
             }
         }
-    }
-
-    private func emptyProjectPage(pageWidth: CGFloat) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("No Projects Yet")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-
-            Text("Create a project to organize saved sections by job, issue, or review.")
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.leading)
-        }
-        .padding(CodeScreenMetrics.compactCardPadding)
-        .frame(width: pageWidth, height: CodeScreenMetrics.savedProjectTileHeight, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
     }
 
     private var projectPageDots: some View {
@@ -1055,6 +1031,9 @@ struct ProjectView: View {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                 projectHeader
 
+                CodeHairline()
+                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+
                 if projectBookmarks.isEmpty {
                     CodeEmptyStateCard(
                         title: "No Saved Sections",
@@ -1062,7 +1041,7 @@ struct ProjectView: View {
                         description: "Add saved sections to this project from any section reader.",
                         accent: accentColor
                     )
-                    .padding(.top, 24)
+                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 } else {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(projectBookmarks) { bookmark in
@@ -1070,6 +1049,7 @@ struct ProjectView: View {
                             CodeHairline()
                         }
                     }
+                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -1128,7 +1108,7 @@ struct ProjectView: View {
     }
 
     private var projectHeader: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             HStack(alignment: .center, spacing: 10) {
                 Circle()
                     .fill(accentColor)
@@ -1160,11 +1140,52 @@ struct ProjectView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            HStack(spacing: 8) {
-                CodeMetaBadge(text: "\(projectBookmarks.count) saved", accent: accentColor)
-                CodeMetaBadge(text: sortMode.label, accent: accentColor)
+            projectActionRow
+        }
+    }
+
+    private var projectActionRow: some View {
+        HStack(spacing: 8) {
+            projectHeaderActionButton(
+                title: isSelecting ? "Done" : "Select",
+                systemImage: isSelecting ? "checkmark.circle.fill" : "checklist",
+                isDisabled: projectBookmarks.isEmpty,
+                action: toggleSelectionMode
+            )
+
+            if projectBookmarks.isEmpty {
+                projectHeaderActionButton(
+                    title: "Back to Saved",
+                    systemImage: "bookmark",
+                    action: { dismiss() }
+                )
             }
         }
+    }
+
+    private func projectHeaderActionButton(
+        title: String,
+        systemImage: String,
+        isDisabled: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.caption.weight(.semibold))
+                Text(title)
+                    .font(.caption.weight(.semibold))
+            }
+            .foregroundStyle(isDisabled ? Color.secondary.opacity(0.65) : accentColor)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(accentColor.opacity(isDisabled ? 0.08 : 0.12))
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isDisabled)
     }
 
     private var sortMenu: some View {
@@ -1202,12 +1223,7 @@ struct ProjectView: View {
 
     private var selectionButton: some View {
         Button {
-            withAnimation(.easeInOut(duration: 0.18)) {
-                isSelecting.toggle()
-                if !isSelecting {
-                    selectedSectionIDs.removeAll()
-                }
-            }
+            toggleSelectionMode()
         } label: {
             Image(systemName: isSelecting ? "checkmark.circle.fill" : "checklist")
                 .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
@@ -1268,6 +1284,15 @@ struct ProjectView: View {
 
         Button("Export project (\(projectBookmarks.count))") {
             library.startBookmarkExport(bookmarks: projectBookmarks, contextLabel: folder?.name)
+        }
+    }
+
+    private func toggleSelectionMode() {
+        withAnimation(.easeInOut(duration: 0.18)) {
+            isSelecting.toggle()
+            if !isSelecting {
+                selectedSectionIDs.removeAll()
+            }
         }
     }
 
