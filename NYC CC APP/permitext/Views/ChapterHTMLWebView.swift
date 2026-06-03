@@ -52,6 +52,46 @@ private enum HTMLAssetPathResolver {
     }
 }
 
+enum PreparedChapterHTMLCache {
+    private static let cache: NSCache<NSString, NSString> = {
+        let cache = NSCache<NSString, NSString>()
+        cache.countLimit = 16
+        return cache
+    }()
+
+    static func preparedHTML(chapterURL: URL, readAccessURL: URL, colorScheme: ColorScheme) -> String? {
+        let key = cacheKey(chapterURL: chapterURL, colorScheme: colorScheme)
+        if let cached = cache.object(forKey: key) {
+            return cached as String
+        }
+
+        guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
+            return nil
+        }
+
+        let normalizedAssetsHTML = HTMLAssetPathResolver.resolveSharedAssetPaths(
+            in: html,
+            readAccessURL: readAccessURL
+        )
+        let preparedHTML = HTMLAssetPathResolver.injectInitialReaderStyle(
+            into: normalizedAssetsHTML,
+            colorScheme: colorScheme
+        )
+        cache.setObject(preparedHTML as NSString, forKey: key)
+        return preparedHTML
+    }
+
+    static func preload(chapterURL: URL, readAccessURL: URL, colorSchemes: [ColorScheme] = [.light, .dark]) {
+        for colorScheme in colorSchemes {
+            _ = preparedHTML(chapterURL: chapterURL, readAccessURL: readAccessURL, colorScheme: colorScheme)
+        }
+    }
+
+    private static func cacheKey(chapterURL: URL, colorScheme: ColorScheme) -> NSString {
+        "\(chapterURL.path)|\(colorScheme == .dark ? "dark" : "light")" as NSString
+    }
+}
+
 struct ChapterHTMLSectionTarget: Hashable {
     let anchorID: String
     let sectionNumber: String?
@@ -196,15 +236,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             let colorScheme = parent?.colorScheme ?? .light
             htmlLoadTask = Task.detached(priority: .userInitiated) { [weak webView] in
                 guard let webView else { return }
-                if let html = try? String(contentsOf: chapterURL, encoding: .utf8) {
-                    let normalizedAssetsHTML = HTMLAssetPathResolver.resolveSharedAssetPaths(
-                        in: html,
-                        readAccessURL: readAccessURL
-                    )
-                    let preparedHTML = HTMLAssetPathResolver.injectInitialReaderStyle(
-                        into: normalizedAssetsHTML,
-                        colorScheme: colorScheme
-                    )
+                if let preparedHTML = PreparedChapterHTMLCache.preparedHTML(
+                    chapterURL: chapterURL,
+                    readAccessURL: readAccessURL,
+                    colorScheme: colorScheme
+                ) {
                     guard !Task.isCancelled else { return }
                     await MainActor.run { () -> Void in
                         webView.loadHTMLString(preparedHTML, baseURL: readAccessURL)

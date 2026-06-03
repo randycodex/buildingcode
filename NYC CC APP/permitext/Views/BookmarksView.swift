@@ -103,11 +103,19 @@ struct BookmarksView: View {
     }
 
     private var hasSavedHeaderContentBelowTitle: Bool {
-        showsProjectsSection || showsSavedInlineFilters
+        showsContinueProjectSection || showsProjectsSection || showsSavedInlineFilters
     }
 
     private var showsProjectsSection: Bool {
         library.hasProjectAccess
+    }
+
+    private var activeProject: CodeFolder? {
+        library.hasProjectAccess ? library.activeProject : nil
+    }
+
+    private var showsContinueProjectSection: Bool {
+        activeProject != nil
     }
 
     var body: some View {
@@ -211,13 +219,17 @@ private var savedScreenHeader: some View {
 
         if !library.bookmarks.isEmpty {
             VStack(alignment: .leading, spacing: 0) {
+                if showsContinueProjectSection {
+                    continueProjectSection
+                }
+
                 if showsProjectsSection {
                     projectTilesSection
                 }
 
                 if showsSavedInlineFilters {
                     savedInlineFilters
-                        .padding(.top, showsProjectsSection ? 0 : CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                         .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 }
             }
@@ -363,6 +375,71 @@ private var savedBookmarkList: some View {
         stride(from: 0, to: library.folders.count, by: projectTilePageSize).map { start in
             Array(library.folders[start..<min(start + projectTilePageSize, library.folders.count)])
         }
+    }
+
+    @ViewBuilder
+    private var continueProjectSection: some View {
+        if let activeProject {
+            VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
+                CodeScreenSectionEyebrow(text: "Continue Project", accent: accentColor)
+
+                NavigationLink {
+                    ProjectView(folderID: activeProject.id)
+                } label: {
+                    continueProjectCard(activeProject)
+                }
+                .buttonStyle(.plain)
+                .contextMenu {
+                    Button {
+                        library.clearActiveProject(ifMatches: activeProject.id)
+                    } label: {
+                        Label("Clear project continuity", systemImage: "clock.arrow.circlepath")
+                    }
+                }
+            }
+            .padding(.bottom, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+        }
+    }
+
+    private func continueProjectCard(_ folder: CodeFolder) -> some View {
+        let color = Color(uiColor: PlatformColor(hex: folder.colorHex) ?? .systemBlue)
+        let count = library.bookmarkCount(inFolder: folder.id)
+        let description = folder.description.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return HStack(alignment: .top, spacing: 12) {
+            Circle()
+                .fill(color)
+                .frame(width: 10, height: 10)
+                .padding(.top, 4)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(folder.name)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(2)
+
+                if !description.isEmpty {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+
+                HStack(spacing: 8) {
+                    CodeMetaBadge(text: "\(count) saved", accent: color)
+                    CodeMetaBadge(text: "Last active", accent: color)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Image(systemName: "arrow.up.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
+                .padding(.top, 2)
+        }
+        .padding(CodeScreenMetrics.compactCardPadding)
+        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
     }
 
     /// Always reserves a full 2×2 page so swiping never shrinks the projects block.
@@ -601,7 +678,7 @@ private var savedBookmarkList: some View {
 
     @ViewBuilder
     private var savedInlineFilters: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             if !availableFilterSections.isEmpty {
                 savedFilterControl
             }
@@ -1029,11 +1106,19 @@ struct ProjectView: View {
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         .onAppear {
             library.refreshBookmarks()
+            library.noteProjectOpened(folderID)
         }
         .onChange(of: projectBookmarks) { _, _ in
             selectedSectionIDs = selectedSectionIDs.intersection(Set(projectBookmarks.map(\.id)))
             if selectedSectionIDs.isEmpty {
                 isSelecting = false
+            }
+        }
+        .onChange(of: folder?.id) { _, newFolderID in
+            if let newFolderID {
+                library.noteProjectOpened(newFolderID)
+            } else {
+                dismiss()
             }
         }
     }

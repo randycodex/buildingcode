@@ -141,6 +141,12 @@ struct BrowseView: View {
                                         }
                                         .buttonStyle(.plain)
                                         .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
+                                        .simultaneousGesture(TapGesture().onEnded {
+                                            library.prewarmChapterForOpening(chapter)
+                                        })
+                                        .onAppear {
+                                            library.prewarmChapterForBrowsing(chapter)
+                                        }
                                     }
                                 }
                             }
@@ -164,6 +170,12 @@ struct BrowseView: View {
                                         }
                                         .buttonStyle(.plain)
                                         .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
+                                        .simultaneousGesture(TapGesture().onEnded {
+                                            library.prewarmChapterForOpening(chapter)
+                                        })
+                                        .onAppear {
+                                            library.prewarmChapterForBrowsing(chapter)
+                                        }
                                     }
                                 }
                             }
@@ -321,6 +333,7 @@ struct BrowseView: View {
     private func updateCodeSection(_ id: Int64?) {
         browseCodeSectionID = id
         BrowserContextID.persistCodeSectionID(id, for: browserContext)
+        library.prewarmCodeSectionForBrowsing(id: id)
         // In comparison mode each browser keeps its own section; updating the
         // global selection re-tints the tab bar and can desync the selected tab.
         guard !library.comparisonModeEnabled else { return }
@@ -427,6 +440,7 @@ struct BrowseView: View {
         }
 
         BrowserContextID.persistCodeSectionID(browseCodeSectionID, for: browserContext)
+        library.prewarmCodeSectionForBrowsing(id: browseCodeSectionID)
     }
 
     private func isAppendix(_ chapter: CodeChapter) -> Bool {

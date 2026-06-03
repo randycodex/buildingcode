@@ -87,7 +87,25 @@ Monetization should begin with private utility, not community features.
   - debug override for local testing
 - Keep the reader itself useful in free tier so the product can still grow organically.
 
-### Phase 4: Add Account System and Synchronization Backend
+### Phase 4: Deepen Pro Workflow and On-Device Continuity
+Make Pro feel like a serious private workspace before adding accounts or sync infrastructure.
+
+- Polish project workflow:
+  - Make project continuity visible so users can jump back into their active workspace quickly.
+  - Improve project detail actions, editing, and empty-state guidance.
+  - Keep project organization feeling intentional rather than like a thin folder wrapper.
+- Improve export workflows:
+  - Make project exports feel like client-ready packets, not only a raw section dump.
+  - Add clearer export context, project labeling, and note inclusion rules.
+- Make continuity features visible in the product:
+  - continue reading
+  - continue active project
+  - preserve recent working context inside the app
+- Keep monetization quiet:
+  - show upgrade prompts at the moment of friction
+  - avoid turning the app into a constant subscription pitch
+
+### Phase 5: Add Account System and Synchronization Backend
 Once the private workflow is solid, introduce the server-backed model required for web and collaboration.
 
 - Add account identity with no email requirement as the default:
@@ -115,7 +133,7 @@ Once the private workflow is solid, introduce the server-backed model required f
   - first sign-in can attach local data to new account
   - no destructive replacement of local data without explicit migration behavior
 
-### Phase 5: Ship iPad Support and Web Continuity
+### Phase 6: Ship iPad Support and Web Continuity
 Once sync exists, the product can become a real multi-device workspace.
 
 - Enable iPad target support and adapt the UI for larger layouts:
@@ -132,7 +150,7 @@ Once sync exists, the product can become a real multi-device workspace.
   - continuing work started on mobile
 - Web should be productivity-first, not marketing-first.
 
-### Phase 6: Add Private Collaboration
+### Phase 7: Add Private Collaboration
 Collaboration should begin in private projects, not public discussion.
 
 - Convert projects into shareable workspaces:
@@ -149,7 +167,7 @@ Collaboration should begin in private projects, not public discussion.
   - model annotations as authored objects instead
   - support multiple notes on the same section rather than concurrent editing conflicts
 
-### Phase 7: Add Public Discussion Layer
+### Phase 8: Add Public Discussion Layer
 Only after the product is trusted as a serious tool.
 
 - Public discussion should be section-anchored, version-aware, and structurally distinct from private workflow.

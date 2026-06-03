@@ -46,6 +46,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var bookmarks: [BookmarkedSection] = []
     @Published private(set) var exportState: BookmarkExportState = .idle
     @Published private(set) var folders: [CodeFolder] = []
+    @Published private(set) var activeProjectID: Int64?
     @Published private(set) var currentPlan: AppPlan
     @Published private(set) var currentEntitlementSource: EntitlementSource
     @Published private(set) var entitlementPrompt: EntitlementRequirement?
@@ -91,6 +92,9 @@ final class CodeLibraryViewModel: ObservableObject {
     private let lastOpenedChapterIDDefaultsKey = "lastOpenedChapterID"
     private let comparisonModeDefaultsKey = "comparisonModeEnabled"
     private var lastChapterPreloadTask: Task<Void, Never>?
+    private var codeSectionWarmupTask: Task<Void, Never>?
+    private var chapterWarmupTasks: [Int64: Task<Void, Never>] = [:]
+    private var warmedChapterIDs: Set<Int64> = []
     private var sectionsCache: [Int64: [CodeSectionSummary]] = [:]
     private var sectionGroupsCache: [Int64: [CodeSectionGroup]] = [:]
     private let sectionDetailCache: NSCache<NSNumber, CachedReaderSectionDetail> = {
@@ -149,6 +153,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.pinnedSearches = Self.loadPinnedSearches()
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
+        self.activeProjectID = continuityContext.activeProjectID
         self.comparisonModeEnabled = continuityContext.comparisonModeEnabled
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
@@ -334,6 +339,21 @@ final class CodeLibraryViewModel: ObservableObject {
         )
     }
 
+    func noteProjectOpened(_ folderID: Int64) {
+        guard activeProjectID != folderID else { return }
+        activeProjectID = folderID
+        persistContinuityContext()
+    }
+
+    func clearActiveProject(ifMatches folderID: Int64? = nil) {
+        if let folderID, activeProjectID != folderID {
+            return
+        }
+        guard activeProjectID != nil else { return }
+        activeProjectID = nil
+        persistContinuityContext()
+    }
+
     func sectionPreviewSnippet(from officialText: String) -> String {
         let normalized = officialText
             .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
@@ -367,6 +387,7 @@ final class CodeLibraryViewModel: ObservableObject {
             if let lastOpenedChapterID {
                 context.lastOpenedChapterID = lastOpenedChapterID
             }
+            context.activeProjectID = activeProjectID
             context.comparisonModeEnabled = comparisonModeEnabled
             context.recentlyViewedSections = recentlyViewedSections
         }
@@ -414,10 +435,51 @@ final class CodeLibraryViewModel: ObservableObject {
             // Small delay so this does not compete with the first interaction.
             try? await Task.sleep(nanoseconds: 600_000_000)
             guard !Task.isCancelled, let self else { return }
-            let descriptors = await self.chapterBlockDescriptors(for: chapter)
+            await self.warmChapterReaderEntry(chapter: chapter, sectionLimit: 8)
+        }
+    }
+
+    func prewarmCodeSectionForBrowsing(id codeSectionID: Int64?) {
+        let targetChapters = chapters(for: codeSectionID)
+        guard !targetChapters.isEmpty else { return }
+
+        codeSectionWarmupTask?.cancel()
+        codeSectionWarmupTask = Task { [weak self] in
+            guard let self else { return }
+            for chapter in targetChapters.prefix(4) {
+                if Task.isCancelled { return }
+                await self.warmChapterReaderEntry(chapter: chapter, sectionLimit: 6)
+                await Task.yield()
+            }
+        }
+    }
+
+    func prewarmChapterForBrowsing(_ chapter: CodeChapter) {
+        guard warmedChapterIDs.contains(chapter.id) == false,
+              chapterWarmupTasks[chapter.id] == nil
+        else {
+            return
+        }
+
+        chapterWarmupTasks[chapter.id] = Task { [weak self] in
+            guard let self else { return }
+            await self.warmChapterReaderEntry(chapter: chapter, sectionLimit: 6)
             guard !Task.isCancelled else { return }
-            let firstIDs = Array(descriptors.prefix(8)).map(\.sectionID)
-            _ = await self.loadSectionDetailsAsync(sectionIDs: firstIDs)
+            self.warmedChapterIDs.insert(chapter.id)
+            self.chapterWarmupTasks[chapter.id] = nil
+        }
+    }
+
+    func prewarmChapterForOpening(_ chapter: CodeChapter) {
+        guard warmedChapterIDs.contains(chapter.id) == false else { return }
+
+        chapterWarmupTasks[chapter.id]?.cancel()
+        chapterWarmupTasks[chapter.id] = Task { [weak self] in
+            guard let self else { return }
+            await self.warmChapterReaderEntry(chapter: chapter, sectionLimit: 10)
+            guard !Task.isCancelled else { return }
+            self.warmedChapterIDs.insert(chapter.id)
+            self.chapterWarmupTasks[chapter.id] = nil
         }
     }
 
@@ -433,6 +495,7 @@ final class CodeLibraryViewModel: ObservableObject {
         codeSections = Self.sortedCodeSections(authoredCodeStore.codeSections())
         chapters = authoredCodeStore.chapters(codeSectionID: id)
         searchResults = []
+        prewarmCodeSectionForBrowsing(id: id)
     }
 
     func updateComparisonMode(enabled: Bool) {
@@ -1290,6 +1353,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let selectedVersion, let userContentRepository else {
             folders = []
             folderMembership = [:]
+            clearActiveProject()
             return
         }
 
@@ -1312,10 +1376,14 @@ final class CodeLibraryViewModel: ObservableObject {
                 )
             }
             folderMembership = (try? userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
+                clearActiveProject(ifMatches: activeProjectID)
+            }
         } catch {
             statusMessage = error.localizedDescription
             folders = []
             folderMembership = [:]
+            clearActiveProject()
         }
     }
 
@@ -1404,6 +1472,11 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func folder(id: Int64) -> CodeFolder? {
         folders.first { $0.id == id }
+    }
+
+    var activeProject: CodeFolder? {
+        guard let activeProjectID else { return nil }
+        return folder(id: activeProjectID)
     }
 
     func bookmarks(inFolder folderID: Int64) -> [BookmarkedSection] {
@@ -2315,6 +2388,8 @@ final class CodeLibraryViewModel: ObservableObject {
             store.warmSearchIndex()
         }.value
 
+        await prewarmStartupPriorityChapters(chapters)
+
         let chapterIDs = chapters.map(\.id)
         let sectionIDs = await Task.detached(priority: .utility) {
             store.firstSectionIDs(chapterIDs: chapterIDs)
@@ -2323,6 +2398,8 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
+        await prewarmStartupPriorityChapters(chapters)
+
         guard let sqliteChapterLoader else { return }
         do {
             let sectionIDs = try await sqliteChapterLoader.firstSectionIDs(chapterIDs: chapters.map(\.id))
@@ -2330,6 +2407,83 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             statusMessage = error.localizedDescription
         }
+    }
+
+    private func prewarmStartupPriorityChapters(_ chapters: [CodeChapter]) async {
+        let prioritized = startupPriorityChapters(from: chapters)
+        guard !prioritized.isEmpty else { return }
+
+        for chapter in prioritized {
+            if Task.isCancelled { return }
+            await warmChapterReaderEntry(chapter: chapter, sectionLimit: 8)
+            initialLoadProgress = min(0.72, initialLoadProgress + 0.04)
+            await Task.yield()
+        }
+    }
+
+    private func startupPriorityChapters(from chapters: [CodeChapter]) -> [CodeChapter] {
+        guard !chapters.isEmpty else { return [] }
+
+        var prioritized: [CodeChapter] = []
+        let lastOpenedChapterID = continuityStore.load().lastOpenedChapterID
+
+        func append(_ chapter: CodeChapter?) {
+            guard let chapter,
+                  prioritized.contains(where: { $0.id == chapter.id }) == false
+            else {
+                return
+            }
+            prioritized.append(chapter)
+        }
+
+        append(chapters.first { $0.id == lastOpenedChapterID })
+        append(chapters.first)
+        for chapter in chapters.prefix(4) {
+            append(chapter)
+        }
+
+        return prioritized
+    }
+
+    private func warmChapterReaderEntry(chapter: CodeChapter, sectionLimit: Int) async {
+        if let htmlTarget = authoredHTMLWarmupTarget(for: chapter) {
+            await Task.detached(priority: .utility) {
+                PreparedChapterHTMLCache.preload(
+                    chapterURL: htmlTarget.chapterURL,
+                    readAccessURL: htmlTarget.readAccessURL
+                )
+                _ = PublishedHTMLContentStore.anchors(in: htmlTarget.chapterURL)
+            }.value
+        }
+
+        let descriptors = await chapterBlockDescriptors(for: chapter)
+        guard !descriptors.isEmpty else {
+            warmedChapterIDs.insert(chapter.id)
+            return
+        }
+
+        let sectionIDs = Array(descriptors.prefix(sectionLimit).map(\.sectionID))
+        let details = await loadSectionDetailsAsync(sectionIDs: sectionIDs)
+
+        if authoredHTMLWarmupTarget(for: chapter) == nil {
+            for detail in details {
+                if Task.isCancelled { return }
+                _ = await chapterBodyNSTextAsync(for: detail)
+            }
+        }
+
+        warmedChapterIDs.insert(chapter.id)
+    }
+
+    private func authoredHTMLWarmupTarget(for chapter: CodeChapter) -> (chapterURL: URL, readAccessURL: URL)? {
+        guard selectedVersion?.contentKind == .authored else { return nil }
+        let htmlStore = authoredHTMLStore(for: chapter)
+        guard let chapterURL = htmlStore.chapterURL(chapterNumber: chapter.chapterNumber),
+              let readAccessURL = htmlStore.readAccessURL()
+        else {
+            return nil
+        }
+        return (chapterURL, readAccessURL)
     }
 
     private func prewarmSectionDetails(_ sectionIDs: [Int64]) async {
@@ -2490,6 +2644,13 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func clearCaches() {
+        lastChapterPreloadTask?.cancel()
+        codeSectionWarmupTask?.cancel()
+        chapterWarmupTasks.values.forEach { $0.cancel() }
+        lastChapterPreloadTask = nil
+        codeSectionWarmupTask = nil
+        chapterWarmupTasks.removeAll()
+        warmedChapterIDs.removeAll()
         sectionsCache.removeAll()
         sectionGroupsCache.removeAll()
         sectionDetailCache.removeAllObjects()
