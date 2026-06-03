@@ -30,6 +30,7 @@ struct ChapterHTMLReaderView: View {
     @State private var lastRecordedVisibleAnchorID: String?
     @State private var isChapterSearchPresented = false
     @State private var chapterSearchQuery = ""
+    @State private var chapterSearchScrollQuery: String?
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -320,6 +321,7 @@ struct ChapterHTMLReaderView: View {
                 entries: chapterSearchEntries,
                 query: $chapterSearchQuery,
                 onSelect: { entry in
+                    chapterSearchScrollQuery = chapterSearchQuery
                     if let anchorID = entry.anchorID {
                         targetAnchorID = anchorID
                         selectedAnchor = anchors.first(where: { $0.anchorID == anchorID })
@@ -394,6 +396,7 @@ struct ChapterHTMLReaderView: View {
             chapterURL: chapterURL,
             readAccessURL: readAccessURL,
             targetAnchorID: effectiveTargetAnchorID,
+            targetSearchText: chapterSearchScrollQuery,
             readerTheme: library.readerTheme,
             accentHex: library.accentHex(for: chapter.codeSectionID, colorScheme: colorScheme),
             colorScheme: colorScheme,
@@ -473,6 +476,7 @@ struct ChapterHTMLReaderView: View {
             List {
                 ForEach(jumpTargets) { target in
                     Button {
+                        chapterSearchScrollQuery = nil
                         selectedAnchor = target.publishedAnchor
                         targetAnchorID = target.scrollTarget
                         isJumpPickerPresented = false

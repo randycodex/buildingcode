@@ -101,6 +101,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let chapterURL: URL
     let readAccessURL: URL
     let targetAnchorID: String?
+    let targetSearchText: String?
     let readerTheme: ReaderTheme
     let accentHex: String
     let colorScheme: ColorScheme
@@ -192,8 +193,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             context.coordinator.appliedCollapseAllTrigger = collapseAllTrigger
             context.coordinator.setAllSectionCollapsed(to: true, in: webView)
         }
-        if context.coordinator.lastScrolledAnchorID != targetAnchorID {
-            context.coordinator.scroll(to: targetAnchorID, in: webView)
+        let searchScrollTarget = Coordinator.SearchScrollTarget(anchorID: targetAnchorID, query: targetSearchText)
+        if context.coordinator.lastSearchScrollTarget != searchScrollTarget {
+            context.coordinator.scroll(to: targetAnchorID, matching: targetSearchText, in: webView)
         }
         if context.coordinator.appliedScrollToTopTrigger != scrollToTopTrigger {
             context.coordinator.appliedScrollToTopTrigger = scrollToTopTrigger
@@ -215,6 +217,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var loadedURL: URL?
         var pendingAnchorID: String?
         var lastScrolledAnchorID: String?
+        var lastSearchScrollTarget: SearchScrollTarget?
         var appliedTheme: ReaderTheme?
         var appliedAccentHex: String?
         var appliedColorScheme: ColorScheme?
@@ -260,7 +263,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             if let offset = parent?.restoreScrollOffset, offset > 0 {
                 scroll(toOffset: CGFloat(offset), in: webView)
             } else {
-                scroll(to: pendingAnchorID ?? parent?.targetAnchorID, in: webView)
+                scroll(to: pendingAnchorID ?? parent?.targetAnchorID, matching: parent?.targetSearchText, in: webView)
             }
             pendingAnchorID = nil
             lastReportedScrollProgress = -1
@@ -775,13 +778,20 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             webView.evaluateJavaScript(javascript)
         }
 
-        func scroll(to anchorID: String?, in webView: WKWebView) {
+        struct SearchScrollTarget: Equatable {
+            let anchorID: String?
+            let query: String?
+        }
+
+        func scroll(to anchorID: String?, matching query: String? = nil, in webView: WKWebView) {
             guard let anchorID, !anchorID.isEmpty else { return }
             lastScrolledAnchorID = anchorID
+            lastSearchScrollTarget = SearchScrollTarget(anchorID: anchorID, query: query)
             suppressVisibleAnchorReportsUntil = Date().addingTimeInterval(0.65)
             suppressScrollOffsetReportsUntil = Date().addingTimeInterval(0.65)
             let javascript = """
             (function() {
+              var query = String(\(Self.javascriptString(query ?? ""))).trim();
               var target = document.getElementById(\(Self.javascriptString(anchorID)));
               if (!target) {
                 var requested = String(\(Self.javascriptString(anchorID))).trim().toUpperCase();
@@ -797,7 +807,61 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               if (window.__nycccRevealAnchor) {
                 target = window.__nycccRevealAnchor(\(Self.javascriptString(anchorID))) || target;
               }
-              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+              function normalized(value) {
+                return String(value || '').toLowerCase().replace(/\\s+/g, ' ').trim();
+              }
+
+              function candidateTerms(value) {
+                var exact = normalized(value);
+                var terms = [];
+                if (exact.length > 0) { terms.push(exact); }
+                exact.split(/\\s+/).forEach(function(token) {
+                  if (token.length > 0 && terms.indexOf(token) === -1) {
+                    terms.push(token);
+                  }
+                });
+                return terms;
+              }
+
+              function searchRootForTarget(value) {
+                if (!value || !value.closest) { return document.body || document.documentElement; }
+                return value.closest('.nyccc-section-card') || value.parentElement || document.body || document.documentElement;
+              }
+
+              function textMatchNode(root, terms) {
+                if (!root || terms.length === 0) { return null; }
+                var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                  acceptNode: function(node) {
+                    var text = normalized(node.nodeValue);
+                    if (!text) { return NodeFilter.FILTER_REJECT; }
+                    return terms.some(function(term) { return text.indexOf(term) !== -1; })
+                      ? NodeFilter.FILTER_ACCEPT
+                      : NodeFilter.FILTER_REJECT;
+                  }
+                });
+                return walker.nextNode();
+              }
+
+              function scrollTextNode(node) {
+                if (!node) { return false; }
+                var range = document.createRange();
+                range.selectNodeContents(node);
+                var rect = range.getBoundingClientRect();
+                if (!rect || rect.height === 0) { return false; }
+                var y = rect.top + window.scrollY - Math.max(80, window.innerHeight * 0.22);
+                window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+                return true;
+              }
+
+              var terms = candidateTerms(query);
+              var matched = scrollTextNode(textMatchNode(searchRootForTarget(target), terms));
+              if (!matched) {
+                matched = scrollTextNode(textMatchNode(document.body || document.documentElement, terms));
+              }
+              if (!matched) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
               return true;
             })();
             """
