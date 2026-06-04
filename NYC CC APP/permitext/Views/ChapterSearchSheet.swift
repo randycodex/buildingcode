@@ -5,8 +5,25 @@ struct ChapterSearchSourceEntry: Identifiable, Hashable, Sendable {
     let sectionNumber: String
     let title: String
     let anchorID: String?
+    let displayText: String?
 
-    var id: Int64 { sectionID }
+    var id: String {
+        "\(sectionID):\(anchorID ?? sectionNumber)"
+    }
+
+    init(
+        sectionID: Int64,
+        sectionNumber: String,
+        title: String,
+        anchorID: String?,
+        displayText: String? = nil
+    ) {
+        self.sectionID = sectionID
+        self.sectionNumber = sectionNumber
+        self.title = title
+        self.anchorID = anchorID
+        self.displayText = displayText
+    }
 }
 
 private struct ChapterSearchIndexedEntry: Identifiable, Hashable, Sendable {
@@ -17,7 +34,9 @@ private struct ChapterSearchIndexedEntry: Identifiable, Hashable, Sendable {
     let displayText: String
     let searchText: String
 
-    var id: Int64 { sectionID }
+    var id: String {
+        "\(sectionID):\(anchorID ?? sectionNumber)"
+    }
 }
 
 private struct ChapterSearchResult: Identifiable, Hashable, Sendable {
@@ -27,7 +46,9 @@ private struct ChapterSearchResult: Identifiable, Hashable, Sendable {
     let anchorID: String?
     let snippet: String
 
-    var id: Int64 { sectionID }
+    var id: String {
+        "\(sectionID):\(anchorID ?? sectionNumber)"
+    }
 }
 
 struct ChapterSearchSheet: View {
@@ -132,11 +153,8 @@ struct ChapterSearchSheet: View {
             ProgressView()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if trimmedQuery.isEmpty {
-            ContentUnavailableView(
-                "Search This Chapter",
-                systemImage: "text.page.badge.magnifyingglass",
-                description: Text("Find section titles and text only within \(title).")
-            )
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if results.isEmpty {
             ContentUnavailableView.search(text: trimmedQuery)
         } else {
@@ -182,9 +200,9 @@ struct ChapterSearchSheet: View {
 
         indexedEntries = entries.map { entry in
             let detail = detailByID[entry.sectionID]
-            let officialText = detail?.officialText ?? ""
-            let searchableDetailText = detail.map(searchableText(for:)) ?? officialText
-            let title = detail?.title ?? entry.title
+            let fallbackText = detail.map(searchableText(for:)) ?? detail?.officialText ?? ""
+            let searchableDetailText = entry.displayText ?? fallbackText
+            let title = entry.displayText == nil ? detail?.title ?? entry.title : entry.title
             return ChapterSearchIndexedEntry(
                 sectionID: entry.sectionID,
                 sectionNumber: entry.sectionNumber,

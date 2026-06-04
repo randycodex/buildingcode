@@ -32,6 +32,7 @@ struct ChapterHTMLReaderView: View {
     @State private var chapterSearchQuery = ""
     @State private var chapterSearchScrollQuery: String?
     @State private var chapterSearchScrollRequestID = 0
+    @State private var htmlChapterSearchEntries: [ChapterSearchSourceEntry] = []
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -114,7 +115,11 @@ struct ChapterHTMLReaderView: View {
     }
 
     private var chapterSearchEntries: [ChapterSearchSourceEntry] {
-        jumpTargets.compactMap { target in
+        if !htmlChapterSearchEntries.isEmpty {
+            return htmlChapterSearchEntries
+        }
+
+        return jumpTargets.compactMap { target -> ChapterSearchSourceEntry? in
             let sectionNumber = target.sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !sectionNumber.isEmpty,
                   let summary = library.sectionSummary(sectionNumber: sectionNumber, codeSectionID: chapter.codeSectionID) else {
@@ -556,6 +561,22 @@ struct ChapterHTMLReaderView: View {
         guard !Task.isCancelled else { return }
         anchors = loadedAnchors
 
+        let sectionIDByNumber = Dictionary(
+            uniqueKeysWithValues: loadedAnchors.compactMap { anchor in
+                library.sectionSummary(sectionNumber: anchor.sectionNumber, codeSectionID: chapter.codeSectionID)
+                    .map { (anchor.sectionNumber, $0.id) }
+            }
+        )
+        htmlChapterSearchEntries = await Task.detached(priority: .userInitiated) {
+            Self.makeHTMLChapterSearchEntries(
+                chapterURL: chapterURL,
+                anchors: loadedAnchors,
+                chapter: chapter,
+                initialSectionID: initialSection.id,
+                sectionIDByNumber: sectionIDByNumber
+            )
+        }.value
+
         if targetAnchorID == nil {
             let anchor = restoredInitialAnchor
             selectedAnchor = anchor
@@ -611,6 +632,137 @@ struct ChapterHTMLReaderView: View {
             return headerLine
         }
         return nsHeader.substring(with: match.range(at: 1))
+    }
+
+    private static func makeHTMLChapterSearchEntries(
+        chapterURL: URL,
+        anchors: [PublishedHTMLAnchor],
+        chapter: CodeChapter,
+        initialSectionID: Int64,
+        sectionIDByNumber: [String: Int64]
+    ) -> [ChapterSearchSourceEntry] {
+        guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
+            return []
+        }
+
+        var entries: [ChapterSearchSourceEntry] = []
+        let chapterNumber = normalizedSectionNumberStatic(chapter.chapterNumber)
+        for anchor in anchors where anchor.level >= 2 && normalizedSectionNumberStatic(anchor.sectionNumber) != chapterNumber {
+            guard let sectionID = sectionIDByNumber[anchor.sectionNumber] else { continue }
+            entries.append(
+                ChapterSearchSourceEntry(
+                    sectionID: sectionID,
+                    sectionNumber: anchor.sectionNumber,
+                    title: anchor.title,
+                    anchorID: anchor.anchorID,
+                    displayText: anchor.displayLabel
+                )
+            )
+        }
+
+        entries.append(
+            contentsOf: normalLevelSearchEntries(
+                in: html,
+                initialSectionID: initialSectionID,
+                nativeSectionIDByNumber: sectionIDByNumber
+            )
+        )
+
+        var seenIDs: Set<String> = []
+        return entries.filter { entry in
+            guard !seenIDs.contains(entry.id) else { return false }
+            seenIDs.insert(entry.id)
+            return true
+        }
+    }
+
+    private static func normalLevelSearchEntries(
+        in html: String,
+        initialSectionID: Int64,
+        nativeSectionIDByNumber: [String: Int64]
+    ) -> [ChapterSearchSourceEntry] {
+        let pattern = #"<div\s+id="([^"]+)"[^>]*class="[^"]*\bNormal-Level\b[^"]*"[^>]*>.*?</div>\s*</div>"#
+        guard let expression = try? NSRegularExpression(
+            pattern: pattern,
+            options: [.caseInsensitive, .dotMatchesLineSeparators]
+        ) else {
+            return []
+        }
+
+        let nsHTML = html as NSString
+        let matches = expression.matches(in: html, range: NSRange(location: 0, length: nsHTML.length))
+        var currentSectionNumber = nativeSectionIDByNumber.keys.sorted {
+            $0.compare($1, options: [.numeric, .caseInsensitive]) == .orderedAscending
+        }.first ?? ""
+
+        return matches.compactMap { match in
+            guard match.numberOfRanges >= 2 else { return nil }
+            let id = nsHTML.substring(with: match.range(at: 1))
+            let blockHTML = nsHTML.substring(with: match.range(at: 0))
+            let text = plainTextFromHTML(blockHTML)
+            guard text.count > 2 else { return nil }
+
+            if let sectionNumber = firstSectionReference(in: text),
+               nativeSectionIDByNumber[sectionNumber] != nil {
+                currentSectionNumber = sectionNumber
+            }
+
+            let title = definitionTitle(from: text) ?? text
+            let sectionID = nativeSectionIDByNumber[currentSectionNumber] ?? initialSectionID
+            return ChapterSearchSourceEntry(
+                sectionID: sectionID,
+                sectionNumber: title,
+                title: title,
+                anchorID: id,
+                displayText: text
+            )
+        }
+    }
+
+    private static func definitionTitle(from text: String) -> String? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let pattern = #"^([A-Z0-9][A-Z0-9\s,'’()/-]{1,90})\.\s+"#
+        guard let expression = try? NSRegularExpression(pattern: pattern),
+              let match = expression.firstMatch(in: trimmed, range: NSRange(location: 0, length: (trimmed as NSString).length)),
+              match.numberOfRanges > 1 else {
+            return nil
+        }
+        return (trimmed as NSString)
+            .substring(with: match.range(at: 1))
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func firstSectionReference(in text: String) -> String? {
+        let pattern = #"^\s*(\d{3}(?:\.\d+)*)\b"#
+        guard let expression = try? NSRegularExpression(pattern: pattern),
+              let match = expression.firstMatch(in: text, range: NSRange(location: 0, length: (text as NSString).length)),
+              match.numberOfRanges > 1 else {
+            return nil
+        }
+        return (text as NSString).substring(with: match.range(at: 1))
+    }
+
+    private static func plainTextFromHTML(_ html: String) -> String {
+        html
+            .replacingOccurrences(of: #"<br\s*/?>"#, with: " ", options: [.regularExpression, .caseInsensitive])
+            .replacingOccurrences(of: #"<[^>]+>"#, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&#160;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private static func normalizedSectionNumberStatic(_ value: String) -> String {
+        value
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))
+            .uppercased()
     }
 }
 
