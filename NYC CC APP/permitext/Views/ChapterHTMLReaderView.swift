@@ -562,10 +562,11 @@ struct ChapterHTMLReaderView: View {
         anchors = loadedAnchors
 
         let sectionIDByNumber = Dictionary(
-            uniqueKeysWithValues: loadedAnchors.compactMap { anchor in
+            loadedAnchors.compactMap { anchor in
                 library.sectionSummary(sectionNumber: anchor.sectionNumber, codeSectionID: chapter.codeSectionID)
                     .map { (anchor.sectionNumber, $0.id) }
-            }
+            },
+            uniquingKeysWith: { first, _ in first }
         )
         htmlChapterSearchEntries = await Task.detached(priority: .userInitiated) {
             Self.makeHTMLChapterSearchEntries(
@@ -634,7 +635,7 @@ struct ChapterHTMLReaderView: View {
         return nsHeader.substring(with: match.range(at: 1))
     }
 
-    private static func makeHTMLChapterSearchEntries(
+    nonisolated private static func makeHTMLChapterSearchEntries(
         chapterURL: URL,
         anchors: [PublishedHTMLAnchor],
         chapter: CodeChapter,
@@ -676,7 +677,7 @@ struct ChapterHTMLReaderView: View {
         }
     }
 
-    private static func normalLevelSearchEntries(
+    nonisolated private static func normalLevelSearchEntries(
         in html: String,
         initialSectionID: Int64,
         nativeSectionIDByNumber: [String: Int64]
@@ -719,7 +720,7 @@ struct ChapterHTMLReaderView: View {
         }
     }
 
-    private static func definitionTitle(from text: String) -> String? {
+    nonisolated private static func definitionTitle(from text: String) -> String? {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         let pattern = #"^([A-Z0-9][A-Z0-9\s,'’()/-]{1,90})\.\s+"#
         guard let expression = try? NSRegularExpression(pattern: pattern),
@@ -733,7 +734,7 @@ struct ChapterHTMLReaderView: View {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private static func firstSectionReference(in text: String) -> String? {
+    nonisolated private static func firstSectionReference(in text: String) -> String? {
         let pattern = #"^\s*(\d{3}(?:\.\d+)*)\b"#
         guard let expression = try? NSRegularExpression(pattern: pattern),
               let match = expression.firstMatch(in: text, range: NSRange(location: 0, length: (text as NSString).length)),
@@ -743,7 +744,7 @@ struct ChapterHTMLReaderView: View {
         return (text as NSString).substring(with: match.range(at: 1))
     }
 
-    private static func plainTextFromHTML(_ html: String) -> String {
+    nonisolated private static func plainTextFromHTML(_ html: String) -> String {
         html
             .replacingOccurrences(of: #"<br\s*/?>"#, with: " ", options: [.regularExpression, .caseInsensitive])
             .replacingOccurrences(of: #"<[^>]+>"#, with: " ", options: .regularExpression)
@@ -758,7 +759,7 @@ struct ChapterHTMLReaderView: View {
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    private static func normalizedSectionNumberStatic(_ value: String) -> String {
+    nonisolated private static func normalizedSectionNumberStatic(_ value: String) -> String {
         value
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: ".:;"))

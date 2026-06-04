@@ -194,9 +194,9 @@ struct ChapterSearchSheet: View {
     private func loadIndexIfNeeded() async {
         guard indexedEntries.isEmpty, !isLoading else { return }
         isLoading = true
-        let sectionIDs = entries.map(\.sectionID)
+        let sectionIDs = Array(Set(entries.map(\.sectionID))).sorted()
         let details = await library.loadSectionDetailsAsync(sectionIDs: sectionIDs)
-        let detailByID = Dictionary(uniqueKeysWithValues: details.map { ($0.id, $0) })
+        let detailByID = Dictionary(details.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
 
         indexedEntries = entries.map { entry in
             let detail = detailByID[entry.sectionID]
