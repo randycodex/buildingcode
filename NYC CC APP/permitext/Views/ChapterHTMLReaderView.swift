@@ -31,6 +31,7 @@ struct ChapterHTMLReaderView: View {
     @State private var isChapterSearchPresented = false
     @State private var chapterSearchQuery = ""
     @State private var chapterSearchScrollQuery: String?
+    @State private var chapterSearchScrollRequestID = 0
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -322,6 +323,7 @@ struct ChapterHTMLReaderView: View {
                 query: $chapterSearchQuery,
                 onSelect: { entry in
                     chapterSearchScrollQuery = chapterSearchQuery
+                    chapterSearchScrollRequestID &+= 1
                     if let anchorID = entry.anchorID {
                         targetAnchorID = anchorID
                         selectedAnchor = anchors.first(where: { $0.anchorID == anchorID })
@@ -397,6 +399,7 @@ struct ChapterHTMLReaderView: View {
             readAccessURL: readAccessURL,
             targetAnchorID: effectiveTargetAnchorID,
             targetSearchText: chapterSearchScrollQuery,
+            targetSearchRequestID: chapterSearchScrollRequestID,
             readerTheme: library.readerTheme,
             accentHex: library.accentHex(for: chapter.codeSectionID, colorScheme: colorScheme),
             colorScheme: colorScheme,

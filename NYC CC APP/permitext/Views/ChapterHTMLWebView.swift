@@ -102,6 +102,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let readAccessURL: URL
     let targetAnchorID: String?
     let targetSearchText: String?
+    let targetSearchRequestID: Int
     let readerTheme: ReaderTheme
     let accentHex: String
     let colorScheme: ColorScheme
@@ -193,7 +194,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             context.coordinator.appliedCollapseAllTrigger = collapseAllTrigger
             context.coordinator.setAllSectionCollapsed(to: true, in: webView)
         }
-        let searchScrollTarget = Coordinator.SearchScrollTarget(anchorID: targetAnchorID, query: targetSearchText)
+        let searchScrollTarget = Coordinator.SearchScrollTarget(anchorID: targetAnchorID, query: targetSearchText, requestID: targetSearchRequestID)
         if context.coordinator.lastSearchScrollTarget != searchScrollTarget {
             context.coordinator.scroll(to: targetAnchorID, matching: targetSearchText, in: webView)
         }
@@ -574,30 +575,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 var headings = Array.prototype.slice.call(document.querySelectorAll('.Section, .Subsection'));
                 if (!headings.length) { return null; }
 
-                var sampleY = Math.min(window.innerHeight * 0.42, 320);
-                var sampleX = Math.max(16, Math.min(window.innerWidth - 16, window.innerWidth * 0.18));
-                var sampledElement = document.elementFromPoint(sampleX, sampleY) ||
-                  document.elementFromPoint(Math.floor(window.innerWidth / 2), sampleY);
-                if (sampledElement) {
-                  var directHeading = sampledElement.closest && sampledElement.closest('.Section, .Subsection');
-                  if (directHeading) {
-                    return anchorIDForHeading(directHeading);
-                  }
-
-                  var visibleHeading = headings[0];
-                  for (var h = 0; h < headings.length; h++) {
-                    var relation = headings[h].compareDocumentPosition(sampledElement);
-                    if (headings[h] === sampledElement || (relation & Node.DOCUMENT_POSITION_FOLLOWING)) {
-                      visibleHeading = headings[h];
-                    } else if (relation & Node.DOCUMENT_POSITION_PRECEDING) {
-                      break;
-                    }
-                  }
-                  return anchorIDForHeading(visibleHeading);
-                }
-
-                var viewportTop = window.scrollY + sampleY;
+                var baseline = Math.min(window.innerHeight * 0.32, 260);
+                var viewportTop = window.scrollY + baseline;
                 var candidate = headings[0];
+                var nextHeading = null;
 
                 for (var i = 0; i < headings.length; i++) {
                   var heading = headings[i];
@@ -605,7 +586,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   if (top <= viewportTop) {
                     candidate = heading;
                   } else {
+                    nextHeading = heading;
                     break;
+                  }
+                }
+
+                if (nextHeading) {
+                  var nextTop = nextHeading.getBoundingClientRect().top + window.scrollY;
+                  if (nextTop - viewportTop < 18) {
+                    candidate = nextHeading;
                   }
                 }
 
@@ -781,12 +770,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         struct SearchScrollTarget: Equatable {
             let anchorID: String?
             let query: String?
+            let requestID: Int
         }
 
         func scroll(to anchorID: String?, matching query: String? = nil, in webView: WKWebView) {
             guard let anchorID, !anchorID.isEmpty else { return }
             lastScrolledAnchorID = anchorID
-            lastSearchScrollTarget = SearchScrollTarget(anchorID: anchorID, query: query)
+            lastSearchScrollTarget = SearchScrollTarget(anchorID: anchorID, query: query, requestID: parent?.targetSearchRequestID ?? 0)
             suppressVisibleAnchorReportsUntil = Date().addingTimeInterval(0.65)
             suppressScrollOffsetReportsUntil = Date().addingTimeInterval(0.65)
             let javascript = """
@@ -812,16 +802,16 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 return String(value || '').toLowerCase().replace(/\\s+/g, ' ').trim();
               }
 
-              function candidateTerms(value) {
+              function strippedToken(value) {
+                return String(value || '').replace(/^[^a-z0-9]+|[^a-z0-9]+$/gi, '');
+              }
+
+              function queryParts(value) {
                 var exact = normalized(value);
-                var terms = [];
-                if (exact.length > 0) { terms.push(exact); }
-                exact.split(/\\s+/).forEach(function(token) {
-                  if (token.length > 0 && terms.indexOf(token) === -1) {
-                    terms.push(token);
-                  }
-                });
-                return terms;
+                var tokens = exact.split(/\\s+/)
+                  .map(strippedToken)
+                  .filter(function(token) { return token.length > 0; });
+                return { exact: exact, tokens: tokens };
               }
 
               function searchRootForTarget(value) {
@@ -829,15 +819,22 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 return value.closest('.nyccc-section-card') || value.parentElement || document.body || document.documentElement;
               }
 
-              function textMatchNode(root, terms) {
-                if (!root || terms.length === 0) { return null; }
+              function textMatchNode(root, parts, mode) {
+                if (!root || !parts || (!parts.exact && parts.tokens.length === 0)) { return null; }
                 var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
                   acceptNode: function(node) {
                     var text = normalized(node.nodeValue);
                     if (!text) { return NodeFilter.FILTER_REJECT; }
-                    return terms.some(function(term) { return text.indexOf(term) !== -1; })
-                      ? NodeFilter.FILTER_ACCEPT
-                      : NodeFilter.FILTER_REJECT;
+                    if (mode === 'exact' && parts.exact && text.indexOf(parts.exact) !== -1) {
+                      return NodeFilter.FILTER_ACCEPT;
+                    }
+                    if (mode === 'allTokens' && parts.tokens.length > 0 && parts.tokens.every(function(token) { return text.indexOf(token) !== -1; })) {
+                      return NodeFilter.FILTER_ACCEPT;
+                    }
+                    if (mode === 'anyToken' && parts.tokens.some(function(token) { return text.indexOf(token) !== -1; })) {
+                      return NodeFilter.FILTER_ACCEPT;
+                    }
+                    return NodeFilter.FILTER_REJECT;
                   }
                 });
                 return walker.nextNode();
@@ -854,10 +851,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 return true;
               }
 
-              var terms = candidateTerms(query);
-              var matched = scrollTextNode(textMatchNode(searchRootForTarget(target), terms));
-              if (!matched) {
-                matched = scrollTextNode(textMatchNode(document.body || document.documentElement, terms));
+              var parts = queryParts(query);
+              var root = searchRootForTarget(target);
+              var matched = scrollTextNode(textMatchNode(root, parts, 'exact')) ||
+                scrollTextNode(textMatchNode(document.body || document.documentElement, parts, 'exact')) ||
+                scrollTextNode(textMatchNode(root, parts, 'allTokens')) ||
+                scrollTextNode(textMatchNode(document.body || document.documentElement, parts, 'allTokens'));
+              if (!matched && parts.tokens.length === 1) {
+                matched = scrollTextNode(textMatchNode(root, parts, 'anyToken')) ||
+                  scrollTextNode(textMatchNode(document.body || document.documentElement, parts, 'anyToken'));
               }
               if (!matched) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });

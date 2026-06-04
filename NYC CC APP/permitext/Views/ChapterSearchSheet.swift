@@ -40,6 +40,7 @@ struct ChapterSearchSheet: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var indexedEntries: [ChapterSearchIndexedEntry] = []
     @State private var isLoading = false
+    @FocusState private var isSearchFocused: Bool
 
     private var trimmedQuery: String {
         query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -73,65 +74,102 @@ struct ChapterSearchSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if isLoading && indexedEntries.isEmpty {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if trimmedQuery.isEmpty {
-                    ContentUnavailableView(
-                        "Search This Chapter",
-                        systemImage: "text.page.badge.magnifyingglass",
-                        description: Text("Find section titles and text only within \(title).")
-                    )
-                } else if results.isEmpty {
-                    ContentUnavailableView.search(text: trimmedQuery)
-                } else {
-                    List(results) { result in
-                        Button {
-                            onSelect(
-                                ChapterSearchSourceEntry(
-                                    sectionID: result.sectionID,
-                                    sectionNumber: result.sectionNumber,
-                                    title: result.title,
-                                    anchorID: result.anchorID
-                                )
-                            )
-                            dismiss()
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(highlightedSearchText(displayTitle(for: result)))
-                                    .font(.headline)
-                                    .foregroundStyle(.primary)
-                                    .multilineTextAlignment(.leading)
+        VStack(spacing: 0) {
+            searchHeader
+            Divider()
+            searchContent
+        }
+        .background(Color(uiColor: .systemBackground))
+        .task(id: entries) {
+            await loadIndexIfNeeded()
+        }
+        .onAppear {
+            isSearchFocused = true
+        }
+    }
 
-                                Text(highlightedSearchText(result.snippet))
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    .multilineTextAlignment(.leading)
-                                    .lineLimit(3)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 4)
-                        }
-                        .buttonStyle(.plain)
+    private var searchHeader: some View {
+        HStack(spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: "magnifyingglass")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                TextField("Search this chapter", text: $query)
+                    .font(.title3)
+                    .foregroundStyle(.primary)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .submitLabel(.search)
+                    .focused($isSearchFocused)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color(uiColor: .secondarySystemBackground))
+            .clipShape(Capsule(style: .continuous))
+
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.title2.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .frame(width: 54, height: 54)
+                    .background(Color(uiColor: .secondarySystemBackground))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Close search")
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+        .padding(.bottom, 14)
+    }
+
+    @ViewBuilder
+    private var searchContent: some View {
+        if isLoading && indexedEntries.isEmpty {
+            ProgressView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if trimmedQuery.isEmpty {
+            ContentUnavailableView(
+                "Search This Chapter",
+                systemImage: "text.page.badge.magnifyingglass",
+                description: Text("Find section titles and text only within \(title).")
+            )
+        } else if results.isEmpty {
+            ContentUnavailableView.search(text: trimmedQuery)
+        } else {
+            List(results) { result in
+                Button {
+                    onSelect(
+                        ChapterSearchSourceEntry(
+                            sectionID: result.sectionID,
+                            sectionNumber: result.sectionNumber,
+                            title: result.title,
+                            anchorID: result.anchorID
+                        )
+                    )
+                    dismiss()
+                } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(highlightedSearchText(displayTitle(for: result)))
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .multilineTextAlignment(.leading)
+
+                        Text(highlightedSearchText(result.snippet))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(3)
                     }
-                    .listStyle(.plain)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 4)
                 }
+                .buttonStyle(.plain)
             }
-            .navigationTitle("Search Chapter")
-            .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search this chapter")
-            .autocorrectionDisabled()
-            .textInputAutocapitalization(.never)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Done") { dismiss() }
-                }
-            }
-            .task(id: entries) {
-                await loadIndexIfNeeded()
-            }
+            .listStyle(.plain)
         }
     }
 
