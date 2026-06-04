@@ -816,6 +816,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
               function searchRootForTarget(value) {
                 if (!value || !value.closest) { return document.body || document.documentElement; }
+                if (!value.classList || (!value.classList.contains('Section') && !value.classList.contains('Subsection'))) {
+                  return value;
+                }
                 return value.closest('.nyccc-section-card') || value.parentElement || document.body || document.documentElement;
               }
 
@@ -854,9 +857,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               var parts = queryParts(query);
               var root = searchRootForTarget(target);
               var matched = scrollTextNode(textMatchNode(root, parts, 'exact')) ||
-                scrollTextNode(textMatchNode(document.body || document.documentElement, parts, 'exact')) ||
                 scrollTextNode(textMatchNode(root, parts, 'allTokens')) ||
+                scrollTextNode(textMatchNode(document.body || document.documentElement, parts, 'exact')) ||
                 scrollTextNode(textMatchNode(document.body || document.documentElement, parts, 'allTokens'));
+              if (!matched && root !== target) {
+                matched = scrollTextNode(textMatchNode(target, parts, 'exact')) ||
+                  scrollTextNode(textMatchNode(target, parts, 'allTokens'));
+              }
               if (!matched && parts.tokens.length === 1) {
                 matched = scrollTextNode(textMatchNode(root, parts, 'anyToken')) ||
                   scrollTextNode(textMatchNode(document.body || document.documentElement, parts, 'anyToken'));
