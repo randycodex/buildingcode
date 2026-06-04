@@ -136,27 +136,58 @@ final class UserDataStore: UserContentRepository {
 
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws {
         if try isBookmarked(sectionID: sectionID, codeVersion: codeVersion) {
-            let statement = try connection.prepare(
-                """
-                DELETE FROM bookmarks
-                WHERE section_id = ? AND code_version = ?;
-                """
-            )
-            defer { connection.finalize(statement) }
-            sqlite3_bind_int64(statement, 1, sectionID)
-            try connection.bind(text: codeVersion, index: 2, to: statement)
-            _ = try connection.step(statement)
-            // Drop the section's tags too so they don't show as ghost
-            // entries on the Saved tag filter after the bookmark is gone.
-            try? clearTags(sectionID: sectionID, codeVersion: codeVersion)
-            // Also strip folder membership for the same reason — a project
-            // folder shouldn't keep referencing a section the user just
-            // unbookmarked.
-            try? removeSectionFromAllFolders(sectionID: sectionID, codeVersion: codeVersion)
+            try performTransaction {
+                let statement = try connection.prepare(
+                    """
+                    DELETE FROM bookmarks
+                    WHERE section_id = ? AND code_version = ?;
+                    """
+                )
+                defer { connection.finalize(statement) }
+                sqlite3_bind_int64(statement, 1, sectionID)
+                try connection.bind(text: codeVersion, index: 2, to: statement)
+                _ = try connection.step(statement)
+
+                let tags = try connection.prepare(
+                    """
+                    DELETE FROM bookmark_tags
+                    WHERE code_version = ? AND section_id = ?;
+                    """
+                )
+                defer { connection.finalize(tags) }
+                try connection.bind(text: codeVersion, index: 1, to: tags)
+                sqlite3_bind_int64(tags, 2, sectionID)
+                _ = try connection.step(tags)
+
+                let folders = try connection.prepare(
+                    """
+                    DELETE FROM folder_sections
+                    WHERE section_id = ? AND code_version = ?;
+                    """
+                )
+                defer { connection.finalize(folders) }
+                sqlite3_bind_int64(folders, 1, sectionID)
+                try connection.bind(text: codeVersion, index: 2, to: folders)
+                _ = try connection.step(folders)
+            }
             enqueueSyncOperationIfPossible(
                 entityType: .bookmark,
                 operationType: .delete,
                 payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
+            )
+            enqueueSyncOperationIfPossible(
+                entityType: .tagSet,
+                operationType: .delete,
+                payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
+            )
+            enqueueSyncOperationIfPossible(
+                entityType: .folderSection,
+                operationType: .delete,
+                payload: SyncQueuePayload(
+                    codeVersion: codeVersion,
+                    sectionID: sectionID,
+                    values: ["scope": "allFolders"]
+                )
             )
             return
         }
@@ -310,6 +341,9 @@ final class UserDataStore: UserContentRepository {
                 UNIQUE(code_version, section_id)
             );
 
+            CREATE INDEX IF NOT EXISTS idx_bookmarks_version_created
+                ON bookmarks(code_version, created_at DESC);
+
             CREATE TABLE IF NOT EXISTS notes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 client_id TEXT NOT NULL DEFAULT '',
@@ -380,6 +414,12 @@ final class UserDataStore: UserContentRepository {
 
             CREATE INDEX IF NOT EXISTS idx_folder_sections_folder
                 ON folder_sections(folder_id);
+
+            CREATE INDEX IF NOT EXISTS idx_folder_sections_version_section
+                ON folder_sections(code_version, section_id);
+
+            CREATE INDEX IF NOT EXISTS idx_folder_sections_folder_version_added
+                ON folder_sections(folder_id, code_version, added_at);
 
             CREATE TABLE IF NOT EXISTS sync_queue (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -944,39 +984,41 @@ final class UserDataStore: UserContentRepository {
     }
 
     func clearBookmarks(codeVersion: String) throws {
-        let statement = try connection.prepare(
-            """
-            DELETE FROM bookmarks
-            WHERE code_version = ?;
-            """
-        )
-        defer { connection.finalize(statement) }
-        try connection.bind(text: codeVersion, index: 1, to: statement)
-        _ = try connection.step(statement)
+        try performTransaction {
+            let statement = try connection.prepare(
+                """
+                DELETE FROM bookmarks
+                WHERE code_version = ?;
+                """
+            )
+            defer { connection.finalize(statement) }
+            try connection.bind(text: codeVersion, index: 1, to: statement)
+            _ = try connection.step(statement)
 
-        // Tags belong to bookmarks; remove them as well so the tag filter
-        // doesn't keep showing stale chips.
-        let tagWipe = try connection.prepare(
-            """
-            DELETE FROM bookmark_tags
-            WHERE code_version = ?;
-            """
-        )
-        defer { connection.finalize(tagWipe) }
-        try connection.bind(text: codeVersion, index: 1, to: tagWipe)
-        _ = try connection.step(tagWipe)
+            // Tags belong to bookmarks; remove them as well so the tag filter
+            // doesn't keep showing stale chips.
+            let tagWipe = try connection.prepare(
+                """
+                DELETE FROM bookmark_tags
+                WHERE code_version = ?;
+                """
+            )
+            defer { connection.finalize(tagWipe) }
+            try connection.bind(text: codeVersion, index: 1, to: tagWipe)
+            _ = try connection.step(tagWipe)
 
-        // Folder membership references bookmarks. Wipe the junction so
-        // folders don't keep ghost section IDs after Clear Bookmarks.
-        let folderMembershipWipe = try connection.prepare(
-            """
-            DELETE FROM folder_sections
-            WHERE code_version = ?;
-            """
-        )
-        defer { connection.finalize(folderMembershipWipe) }
-        try connection.bind(text: codeVersion, index: 1, to: folderMembershipWipe)
-        _ = try connection.step(folderMembershipWipe)
+            // Folder membership references bookmarks. Wipe the junction so
+            // folders don't keep ghost section IDs after Clear Bookmarks.
+            let folderMembershipWipe = try connection.prepare(
+                """
+                DELETE FROM folder_sections
+                WHERE code_version = ?;
+                """
+            )
+            defer { connection.finalize(folderMembershipWipe) }
+            try connection.bind(text: codeVersion, index: 1, to: folderMembershipWipe)
+            _ = try connection.step(folderMembershipWipe)
+        }
 
         enqueueSyncOperationIfPossible(
             entityType: .codeVersionUserData,
@@ -986,7 +1028,6 @@ final class UserDataStore: UserContentRepository {
                 values: ["scope": "bookmarks"]
             )
         )
-        try vacuumIfNeeded()
     }
 
     func clearNotes(codeVersion: String) throws {
@@ -1007,7 +1048,6 @@ final class UserDataStore: UserContentRepository {
                 values: ["scope": "notes"]
             )
         )
-        try vacuumIfNeeded()
     }
 
     /// Removes every tag for the given code version. Bookmarks and notes are kept.
@@ -1029,7 +1069,6 @@ final class UserDataStore: UserContentRepository {
                 values: ["scope": "tags"]
             )
         )
-        try vacuumIfNeeded()
     }
 
     // MARK: - Folders
@@ -1240,28 +1279,30 @@ final class UserDataStore: UserContentRepository {
     }
 
     func deleteFolder(id: Int64, codeVersion: String) throws {
-        // Manual cascade — folder_sections doesn't have a FK constraint, so
-        // we wipe membership rows first.
-        let cascade = try connection.prepare(
-            """
-            DELETE FROM folder_sections
-            WHERE folder_id = ?;
-            """
-        )
-        defer { connection.finalize(cascade) }
-        sqlite3_bind_int64(cascade, 1, id)
-        _ = try connection.step(cascade)
+        try performTransaction {
+            // Manual cascade — folder_sections doesn't have a FK constraint, so
+            // we wipe membership rows first.
+            let cascade = try connection.prepare(
+                """
+                DELETE FROM folder_sections
+                WHERE folder_id = ?;
+                """
+            )
+            defer { connection.finalize(cascade) }
+            sqlite3_bind_int64(cascade, 1, id)
+            _ = try connection.step(cascade)
 
-        let statement = try connection.prepare(
-            """
-            DELETE FROM folders
-            WHERE id = ? AND code_version = ?;
-            """
-        )
-        defer { connection.finalize(statement) }
-        sqlite3_bind_int64(statement, 1, id)
-        try connection.bind(text: codeVersion, index: 2, to: statement)
-        _ = try connection.step(statement)
+            let statement = try connection.prepare(
+                """
+                DELETE FROM folders
+                WHERE id = ? AND code_version = ?;
+                """
+            )
+            defer { connection.finalize(statement) }
+            sqlite3_bind_int64(statement, 1, id)
+            try connection.bind(text: codeVersion, index: 2, to: statement)
+            _ = try connection.step(statement)
+        }
         enqueueSyncOperationIfPossible(
             entityType: .folder,
             operationType: .delete,
@@ -1353,25 +1394,27 @@ final class UserDataStore: UserContentRepository {
     /// Wipes every folder + membership row. Wired into Settings' clear-data
     /// flow so users can reset their organization without losing bookmarks.
     func clearAllFolders(codeVersion: String) throws {
-        let folderStmt = try connection.prepare(
-            """
-            DELETE FROM folder_sections
-            WHERE code_version = ?;
-            """
-        )
-        defer { connection.finalize(folderStmt) }
-        try connection.bind(text: codeVersion, index: 1, to: folderStmt)
-        _ = try connection.step(folderStmt)
+        try performTransaction {
+            let folderStmt = try connection.prepare(
+                """
+                DELETE FROM folder_sections
+                WHERE code_version = ?;
+                """
+            )
+            defer { connection.finalize(folderStmt) }
+            try connection.bind(text: codeVersion, index: 1, to: folderStmt)
+            _ = try connection.step(folderStmt)
 
-        let cleanup = try connection.prepare(
-            """
-            DELETE FROM folders
-            WHERE code_version = ?;
-            """
-        )
-        defer { connection.finalize(cleanup) }
-        try connection.bind(text: codeVersion, index: 1, to: cleanup)
-        _ = try connection.step(cleanup)
+            let cleanup = try connection.prepare(
+                """
+                DELETE FROM folders
+                WHERE code_version = ?;
+                """
+            )
+            defer { connection.finalize(cleanup) }
+            try connection.bind(text: codeVersion, index: 1, to: cleanup)
+            _ = try connection.step(cleanup)
+        }
 
         enqueueSyncOperationIfPossible(
             entityType: .codeVersionUserData,
@@ -1381,11 +1424,17 @@ final class UserDataStore: UserContentRepository {
                 values: ["scope": "folders"]
             )
         )
-        try vacuumIfNeeded()
     }
 
-    private func vacuumIfNeeded() throws {
-        try connection.execute("VACUUM;")
+    private func performTransaction(_ updates: () throws -> Void) throws {
+        try connection.execute("BEGIN IMMEDIATE TRANSACTION;")
+        do {
+            try updates()
+            try connection.execute("COMMIT;")
+        } catch {
+            try? connection.execute("ROLLBACK;")
+            throw error
+        }
     }
 
     private func countRows(sql: String, codeVersion: String) throws -> Int {

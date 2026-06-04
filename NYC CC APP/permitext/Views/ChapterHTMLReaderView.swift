@@ -1,5 +1,56 @@
 import SwiftUI
 
+private final class CachedChapterSearchEntries: NSObject {
+    let entries: [ChapterSearchSourceEntry]
+
+    init(_ entries: [ChapterSearchSourceEntry]) {
+        self.entries = entries
+    }
+}
+
+private enum ChapterSearchEntryCache {
+    private static let cache: NSCache<NSString, CachedChapterSearchEntries> = {
+        let cache = NSCache<NSString, CachedChapterSearchEntries>()
+        cache.countLimit = 24
+        cache.totalCostLimit = 12 * 1024 * 1024
+        return cache
+    }()
+
+    static func entries(for key: NSString) -> [ChapterSearchSourceEntry]? {
+        cache.object(forKey: key)?.entries
+    }
+
+    static func store(_ entries: [ChapterSearchSourceEntry], for key: NSString) {
+        cache.setObject(CachedChapterSearchEntries(entries), forKey: key, cost: memoryCost(entries))
+    }
+
+    static func key(
+        chapterURL: URL,
+        chapterID: Int64,
+        initialSectionID: Int64,
+        anchorCount: Int,
+        mappedSectionCount: Int
+    ) -> NSString {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: chapterURL.path)
+        let modifiedAt = (attributes?[.modificationDate] as? Date)?.timeIntervalSince1970 ?? 0
+        return "\(chapterID)|\(chapterURL.path)|\(modifiedAt)|\(initialSectionID)|\(anchorCount)|\(mappedSectionCount)" as NSString
+    }
+
+    private static func memoryCost(_ entries: [ChapterSearchSourceEntry]) -> Int {
+        entries.reduce(0) { total, entry in
+            total
+                + stringMemoryCost(entry.sectionNumber)
+                + stringMemoryCost(entry.title)
+                + stringMemoryCost(entry.anchorID ?? "")
+                + stringMemoryCost(entry.displayText ?? "")
+        }
+    }
+
+    private static func stringMemoryCost(_ value: String) -> Int {
+        max(value.utf8.count, value.utf16.count * 2)
+    }
+}
+
 struct ChapterHTMLReaderView: View {
     let chapter: CodeChapter
     let initialSection: CodeSectionSummary
@@ -642,6 +693,17 @@ struct ChapterHTMLReaderView: View {
         initialSectionID: Int64,
         sectionIDByNumber: [String: Int64]
     ) -> [ChapterSearchSourceEntry] {
+        let cacheKey = ChapterSearchEntryCache.key(
+            chapterURL: chapterURL,
+            chapterID: chapter.id,
+            initialSectionID: initialSectionID,
+            anchorCount: anchors.count,
+            mappedSectionCount: sectionIDByNumber.count
+        )
+        if let cached = ChapterSearchEntryCache.entries(for: cacheKey) {
+            return cached
+        }
+
         guard let html = try? String(contentsOf: chapterURL, encoding: .utf8) else {
             return []
         }
@@ -662,7 +724,7 @@ struct ChapterHTMLReaderView: View {
         }
 
         entries.append(
-            contentsOf: normalLevelSearchEntries(
+            contentsOf: textBlockSearchEntries(
                 in: html,
                 initialSectionID: initialSectionID,
                 nativeSectionIDByNumber: sectionIDByNumber
@@ -670,19 +732,21 @@ struct ChapterHTMLReaderView: View {
         )
 
         var seenIDs: Set<String> = []
-        return entries.filter { entry in
+        let uniqueEntries = entries.filter { entry in
             guard !seenIDs.contains(entry.id) else { return false }
             seenIDs.insert(entry.id)
             return true
         }
+        ChapterSearchEntryCache.store(uniqueEntries, for: cacheKey)
+        return uniqueEntries
     }
 
-    nonisolated private static func normalLevelSearchEntries(
+    nonisolated private static func textBlockSearchEntries(
         in html: String,
         initialSectionID: Int64,
         nativeSectionIDByNumber: [String: Int64]
     ) -> [ChapterSearchSourceEntry] {
-        let pattern = #"<div\s+id="([^"]+)"[^>]*class="[^"]*\bNormal-Level\b[^"]*"[^>]*>.*?</div>\s*</div>"#
+        let pattern = #"<div\s+id="([^"]+)"(?=[^>]*\brbox\b)(?![^>]*\btoc-destination\b)[^>]*>.*?</div>\s*</div>"#
         guard let expression = try? NSRegularExpression(
             pattern: pattern,
             options: [.caseInsensitive, .dotMatchesLineSeparators]

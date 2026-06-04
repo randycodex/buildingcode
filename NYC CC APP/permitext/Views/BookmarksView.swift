@@ -13,6 +13,7 @@ struct BookmarksView: View {
     @State private var cachedFilteredBookmarks: [BookmarkedSection] = []
     @State private var cachedAvailableTags: [String] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
+    @State private var cachedBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
@@ -329,15 +330,11 @@ private var savedBookmarkList: some View {
     }
 
     private func folderHasBookmarks(_ folder: CodeFolder) -> Bool {
-        library.bookmarks.contains { bookmark in folderContains(bookmark, folderID: folder.id) }
+        !(cachedBookmarksByFolderID[folder.id]?.isEmpty ?? true)
     }
 
     private func bookmarks(inFolder folder: CodeFolder) -> [BookmarkedSection] {
-        library.bookmarks.filter { bookmark in folderContains(bookmark, folderID: folder.id) }
-    }
-
-    private func folderContains(_ bookmark: BookmarkedSection, folderID: Int64) -> Bool {
-        library.folderMembership[bookmark.id]?.contains(folderID) == true
+        cachedBookmarksByFolderID[folder.id] ?? []
     }
 
     /// Short label for the "Current filter" export so its PDF header shows
@@ -643,6 +640,17 @@ private var savedBookmarkList: some View {
         cachedFilteredBookmarks = filtered
         cachedAvailableTags = makeAvailableTags()
         cachedBookmarkCodeGroups = makeBookmarkCodeGroups(from: filtered)
+        cachedBookmarksByFolderID = makeBookmarksByFolderID()
+    }
+
+    private func makeBookmarksByFolderID() -> [Int64: [BookmarkedSection]] {
+        var grouped: [Int64: [BookmarkedSection]] = [:]
+        for bookmark in library.bookmarks {
+            for folderID in library.folderMembership[bookmark.id] ?? [] {
+                grouped[folderID, default: []].append(bookmark)
+            }
+        }
+        return grouped
     }
 
     private func makeBookmarkCodeGroups(from bookmarks: [BookmarkedSection]) -> [BookmarkCodeGroup] {

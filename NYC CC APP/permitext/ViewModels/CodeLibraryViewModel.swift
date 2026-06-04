@@ -100,16 +100,19 @@ final class CodeLibraryViewModel: ObservableObject {
     private let sectionDetailCache: NSCache<NSNumber, CachedReaderSectionDetail> = {
         let cache = NSCache<NSNumber, CachedReaderSectionDetail>()
         cache.countLimit = 192
+        cache.totalCostLimit = 24 * 1024 * 1024
         return cache
     }()
     private let formattedNSTextCache: NSCache<NSString, NSAttributedString> = {
         let cache = NSCache<NSString, NSAttributedString>()
         cache.countLimit = 192
+        cache.totalCostLimit = 16 * 1024 * 1024
         return cache
     }()
     private let chapterBodyNSTextCache: NSCache<NSString, NSAttributedString> = {
         let cache = NSCache<NSString, NSAttributedString>()
         cache.countLimit = 192
+        cache.totalCostLimit = 16 * 1024 * 1024
         return cache
     }()
     private var bookmarkedSectionIDs: Set<Int64> = []
@@ -324,7 +327,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func noteSectionOpened(anchor: PublishedHTMLAnchor, chapter: CodeChapter) {
         guard let summary = sectionSummary(sectionNumber: anchor.sectionNumber, codeSectionID: chapter.codeSectionID) else { return }
-        let officialText = loadSectionDetail(sectionID: summary.id)?.officialText ?? ""
+        let lightweightPreview = anchor.title.isEmpty ? anchor.displayLabel : anchor.title
         recordRecentlyViewed(
             RecentlyViewedEntry(
                 sectionID: summary.id,
@@ -333,7 +336,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 chapterTitle: chapter.title,
                 codeSectionID: chapter.codeSectionID,
                 codeSectionName: codeSectionName(id: chapter.codeSectionID),
-                previewText: sectionPreviewSnippet(from: officialText),
+                previewText: sectionPreviewSnippet(from: lightweightPreview),
                 viewedAt: Date()
             )
         )
@@ -888,7 +891,7 @@ final class CodeLibraryViewModel: ObservableObject {
             renderedText = Self.fallbackChapterBodyText(for: detail, formattedText: attributed)
         }
 
-        chapterBodyNSTextCache.setObject(renderedText, forKey: cacheKey)
+        chapterBodyNSTextCache.setObject(renderedText, forKey: cacheKey, cost: Self.attributedTextMemoryCost(renderedText))
         return renderedText
     }
 
@@ -937,7 +940,7 @@ final class CodeLibraryViewModel: ObservableObject {
             Self.chapterBodyText(detail: detail, theme: theme)
         }.value
         let renderedText = NSAttributedString(renderedBody)
-        chapterBodyNSTextCache.setObject(renderedText, forKey: cacheKey)
+        chapterBodyNSTextCache.setObject(renderedText, forKey: cacheKey, cost: Self.attributedTextMemoryCost(renderedText))
         return renderedText
     }
 
@@ -2640,7 +2643,11 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func storeSectionDetailInCache(_ detail: ReaderSectionDetail, sectionID: Int64) {
-        sectionDetailCache.setObject(CachedReaderSectionDetail(detail), forKey: NSNumber(value: sectionID))
+        sectionDetailCache.setObject(
+            CachedReaderSectionDetail(detail),
+            forKey: NSNumber(value: sectionID),
+            cost: Self.sectionDetailMemoryCost(detail)
+        )
     }
 
     private func clearCaches() {
@@ -2662,6 +2669,30 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private static func formattedTextCacheKey(sectionID: Int64, theme: ReaderTheme) -> NSString {
         "\(sectionID)|\(theme.hashValue)" as NSString
+    }
+
+    private static func sectionDetailMemoryCost(_ detail: ReaderSectionDetail) -> Int {
+        var cost = stringMemoryCost(detail.officialText)
+            + stringMemoryCost(detail.title)
+            + stringMemoryCost(detail.chapterTitle)
+        for block in detail.contentBlocks {
+            cost += stringMemoryCost(block.html ?? "")
+            cost += stringMemoryCost(block.plainText ?? "")
+            cost += stringMemoryCost(block.caption ?? "")
+        }
+        for table in detail.tableBlocks {
+            cost += stringMemoryCost(table.caption ?? "")
+            cost += table.cells.reduce(0) { $0 + stringMemoryCost($1.plainText) + stringMemoryCost($1.html) }
+        }
+        return max(cost, 1)
+    }
+
+    private static func attributedTextMemoryCost(_ value: NSAttributedString) -> Int {
+        max(stringMemoryCost(value.string) * 3, 1)
+    }
+
+    private static func stringMemoryCost(_ value: String) -> Int {
+        max(value.utf8.count, value.utf16.count * 2)
     }
 
     private func buildJurisdictions(from versions: [BundledCodeVersion]) -> [BundledJurisdiction] {

@@ -871,7 +871,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     }
 
     private static func makeSearchEntryLookup(_ entries: [SearchIndexEntry]) -> [Int64: SearchIndexEntry] {
-        Dictionary(uniqueKeysWithValues: entries.map { ($0.indexed.section.id, $0) })
+        Dictionary(entries.map { ($0.indexed.section.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
     private static func buildSearchEntries(

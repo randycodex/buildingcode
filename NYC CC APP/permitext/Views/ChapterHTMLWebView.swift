@@ -56,6 +56,7 @@ enum PreparedChapterHTMLCache {
     private static let cache: NSCache<NSString, NSString> = {
         let cache = NSCache<NSString, NSString>()
         cache.countLimit = 16
+        cache.totalCostLimit = 24 * 1024 * 1024
         return cache
     }()
 
@@ -77,7 +78,7 @@ enum PreparedChapterHTMLCache {
             into: normalizedAssetsHTML,
             colorScheme: colorScheme
         )
-        cache.setObject(preparedHTML as NSString, forKey: key)
+        cache.setObject(preparedHTML as NSString, forKey: key, cost: stringMemoryCost(preparedHTML))
         return preparedHTML
     }
 
@@ -89,6 +90,10 @@ enum PreparedChapterHTMLCache {
 
     private static func cacheKey(chapterURL: URL, colorScheme: ColorScheme) -> NSString {
         "\(chapterURL.path)|\(colorScheme == .dark ? "dark" : "light")" as NSString
+    }
+
+    private static func stringMemoryCost(_ value: String) -> Int {
+        max(value.utf8.count, value.utf16.count * 2)
     }
 }
 
