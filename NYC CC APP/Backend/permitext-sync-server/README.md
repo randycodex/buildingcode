@@ -56,6 +56,18 @@ When a Neon database is connected through Vercel, the server uses the first avai
 
 The `permitext_sync_state` table is created automatically on first request. Local development still falls back to the JSON file store if no database URL is present.
 
+Verify the deployed backend is reachable and using durable storage:
+
+```sh
+npm run verify:production
+```
+
+Override the target URL when needed:
+
+```sh
+PERMITEXT_SYNC_PRODUCTION_URL=https://your-deployment.vercel.app npm run verify:production
+```
+
 ## Endpoints
 
 - `GET /health`
@@ -74,7 +86,7 @@ Admin routes require:
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
 
-This is intentionally simple and file-backed. It is for local integration testing before choosing production hosting, auth verification, and durable storage.
+The local development path is intentionally simple and file-backed. Hosted testing should use the Neon-backed Postgres adapter.
 
 ## iOS Local HTTP Mode
 
