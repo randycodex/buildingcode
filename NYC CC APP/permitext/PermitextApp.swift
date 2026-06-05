@@ -3,9 +3,20 @@ import UIKit
 
 @main
 struct PermitextApp: App {
+#if DEBUG
+    init() {
+        PermitextBackendConfiguration.setDebugHTTPBaseURL("https://permitext-sync.vercel.app")
+        Self.configureTabBarAppearance()
+    }
+#else
+    init() {
+        Self.configureTabBarAppearance()
+    }
+#endif
+
     @StateObject private var library = CodeLibraryViewModel()
 
-    init() {
+    private static func configureTabBarAppearance() {
         let appearance = UITabBarAppearance()
         appearance.configureWithTransparentBackground()
         appearance.backgroundEffect = UIBlurEffect(style: .systemUltraThinMaterial)
