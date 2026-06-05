@@ -176,9 +176,13 @@ Response:
 ```json
 {
   "acceptedMutationIDs": [],
+  "rejectedMutationIDs": [],
   "serverTime": "2026-06-04T00:00:00Z"
 }
 ```
+
+`acceptedMutationIDs` confirms which local queue items can be marked synced.
+`rejectedMutationIDs` confirms which local queue items must stay unresolved because the server has newer data or refused the write.
 
 Supported mutation kinds:
 
@@ -192,10 +196,12 @@ Supported mutation kinds:
 Backend validation rules:
 
 - Each mutation must be a single-key object.
+- `auth.accountUserID` and `batch.user.id` must match.
 - The mutation kind must be one of the supported kinds above.
 - `record.userID` must match the authenticated `accountUserID`.
 - Every mutation must expose a stable record ID.
 - Every mutation must include a valid `updatedAt` timestamp.
+- Incoming mutations older than the stored server record must be rejected, not silently accepted.
 
 Swift encodes each mutation as a single-key object:
 

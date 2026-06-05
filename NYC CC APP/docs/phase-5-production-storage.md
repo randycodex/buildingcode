@@ -56,8 +56,10 @@ The local sync server is intentionally file-backed. A production backend should 
 ## Conflict Rules
 
 - The backend must reject mutations where `record.userID` does not match the authenticated user.
+- The backend must reject pushes where the authenticated user does not match the batch user.
 - The backend must reject unknown mutation kinds before writing.
 - Last-write-wins is acceptable only when the incoming `updatedAt` is newer than the stored record.
+- Rejected writes must be returned to the app as `rejectedMutationIDs` so local queue items are not incorrectly marked synced.
 - Deleted records remain as tombstones until every active device has had a chance to pull them.
 - Public usernames are never derived from Apple identity.
 
