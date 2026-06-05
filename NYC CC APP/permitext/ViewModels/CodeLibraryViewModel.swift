@@ -1650,22 +1650,53 @@ final class CodeLibraryViewModel: ObservableObject {
                         signedInAt: Date()
                     )
                 )
-                let account = backendRecord.account
-                signedInAccount = account
-                Self.saveSignedInAccount(account)
-                refreshUserContentSyncCheckpoint()
-                if let entitlement = backendRecord.entitlement {
-                    LocalEntitlementService.setEntitlement(entitlement)
-                    refreshCurrentEntitlement()
-                }
-                await attachLocalDataIfNeeded()
-                await refreshLifetimeGrant()
+                await completeBackendSignIn(backendRecord)
             } catch {
                 statusMessage = error.localizedDescription
             }
         case .failure(let error):
             statusMessage = error.localizedDescription
         }
+    }
+
+    func handlePasskeySignIn(result: Result<ASAuthorization, Error>) async {
+        switch result {
+        case .success(let authorization):
+            guard #available(iOS 16.0, *),
+                  let credential = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion
+            else {
+                statusMessage = "Passkey sign-in did not return a passkey credential."
+                return
+            }
+            do {
+                let backendRecord = try await accountBackendClient.signIn(
+                    credential: AccountSignInCredential(
+                        provider: .passkey,
+                        providerUserID: credential.credentialID.base64EncodedString(),
+                        displayName: nil,
+                        signedInAt: Date()
+                    )
+                )
+                await completeBackendSignIn(backendRecord)
+            } catch {
+                statusMessage = error.localizedDescription
+            }
+        case .failure(let error):
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    private func completeBackendSignIn(_ backendRecord: BackendAccountRecord) async {
+        let account = backendRecord.account
+        signedInAccount = account
+        Self.saveSignedInAccount(account)
+        refreshUserContentSyncCheckpoint()
+        if let entitlement = backendRecord.entitlement {
+            LocalEntitlementService.setEntitlement(entitlement)
+            refreshCurrentEntitlement()
+        }
+        await attachLocalDataIfNeeded()
+        await refreshLifetimeGrant()
     }
 
     func attachLocalDataIfNeeded() async {
@@ -1750,6 +1781,33 @@ final class CodeLibraryViewModel: ObservableObject {
     private func refreshUserContentSyncCheckpoint() {
         userContentSyncCheckpoint = syncEngine.checkpoint(account: signedInAccount)
     }
+
+    #if DEBUG
+    var accountSyncDebugSummary: String {
+        let accountText: String
+        if let signedInAccount {
+            accountText = "\(signedInAccount.authProvider.rawValue): \(signedInAccount.appUserID)"
+        } else {
+            accountText = "not signed in"
+        }
+
+        let checkpointText: String
+        if let userContentSyncCheckpoint {
+            let pending = userContentSyncCheckpoint.lastPendingCount.map(String.init) ?? "unknown"
+            checkpointText = "pending: \(pending), last error: \(userContentSyncCheckpoint.lastErrorMessage ?? "none")"
+        } else {
+            checkpointText = "none"
+        }
+
+        let backendConfiguration = PermitextBackendConfiguration.load()
+        let backendBaseURL = backendConfiguration.apiBaseURLString ?? "none"
+        return [
+            "Account: \(accountText)",
+            "Backend: \(accountBackendClient.name) (\(backendConfiguration.mode.rawValue), base URL: \(backendBaseURL))",
+            "Sync checkpoint: \(checkpointText)"
+        ].joined(separator: "\n")
+    }
+    #endif
 
     func refreshLifetimeGrant() async {
         guard let signedInAccount else { return }

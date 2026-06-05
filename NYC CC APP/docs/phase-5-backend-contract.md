@@ -49,6 +49,8 @@ Response:
 
 The backend owns `appUserID`. Login identity and public identity must stay separate.
 
+Passkey support uses the same endpoint with `credential.provider = "passkey"`. A production passkey flow also requires the app's Associated Domains entitlement and a valid `apple-app-site-association` file on the relying-party domain before the UI can be enabled.
+
 ### `POST /account/attach-local-data`
 
 Request:
