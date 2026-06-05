@@ -1700,6 +1700,10 @@ final class CodeLibraryViewModel: ObservableObject {
                         signedInAt: Date()
                     )
                 )
+                guard backendRecord.account.authProvider != .passkey else {
+                    statusMessage = "This passkey is not linked to your Apple account yet. Sign in with Apple, then create the passkey again."
+                    return
+                }
                 await completeBackendSignIn(backendRecord)
             } catch {
                 statusMessage = error.localizedDescription
