@@ -79,6 +79,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let readerThemeStore: ReaderThemeStore
     private let entitlementService: EntitlementService
     private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
+    private let accountBackendClient: AccountBackendClient
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let recentSearchesDefaultsKey = "recentSearches"
     private let pinnedSearchesDefaultsKey = "pinnedSearches"
@@ -129,6 +130,7 @@ final class CodeLibraryViewModel: ObservableObject {
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
     private var pendingTabAssertionToken: Int = 0
     @Published private(set) var bookmarkRevision: Int = 0
+    @Published private(set) var userContentSyncCheckpoint: UserContentSyncCheckpoint?
 
     init(
         locator: BundleDatabaseLocator = BundleDatabaseLocator(),
@@ -138,19 +140,27 @@ final class CodeLibraryViewModel: ObservableObject {
         readerThemeStore: ReaderThemeStore = ReaderThemeStore(),
         entitlementService: EntitlementService = LocalEntitlementService(),
         lifetimeGrantLookupClient: LifetimeGrantLookupClient = LocalLifetimeGrantLookupClient(),
+        accountBackendClient: AccountBackendClient = PermitextBackendFactory.makeClient(),
+        syncBackend: UserContentSyncBackend? = nil,
         loadsInitialContent: Bool = true
     ) {
         self.locator = locator
         self.formattingEngine = formattingEngine
         self.userContentRepository = userContentRepository ?? (try? UserDataStore())
-        self.syncEngine = UserContentSyncEngine(repository: self.userContentRepository)
+        self.syncEngine = UserContentSyncEngine(
+            repository: self.userContentRepository,
+            backend: syncBackend ?? (accountBackendClient as? UserContentSyncBackend) ?? NoOpUserContentSyncBackend()
+        )
         self.continuityStore = continuityStore
         self.readerThemeStore = readerThemeStore
         self.entitlementService = entitlementService
         self.lifetimeGrantLookupClient = lifetimeGrantLookupClient
+        self.accountBackendClient = accountBackendClient
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
-        self.signedInAccount = Self.loadSignedInAccount()
+        let loadedSignedInAccount = Self.loadSignedInAccount()
+        self.signedInAccount = loadedSignedInAccount
+        self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
         self.readerTheme = readerThemeStore.load()
         self.recentSearches = Self.loadRecentSearches()
         self.pinnedSearches = Self.loadPinnedSearches()
@@ -394,6 +404,43 @@ final class CodeLibraryViewModel: ObservableObject {
             context.comparisonModeEnabled = comparisonModeEnabled
             context.recentlyViewedSections = recentlyViewedSections
         }
+        queueContinuityContextForSync()
+    }
+
+    private func queueContinuityContextForSync() {
+        let context = continuityStore.load()
+        do {
+            try userContentRepository?.queueContinuityContext(
+                codeVersion: context.selectedVersionFileName,
+                values: continuitySyncValues(from: context)
+            )
+        } catch {
+            #if DEBUG
+            print("permitext diagnostics: continuity sync queue failed: \(error.localizedDescription)")
+            #endif
+        }
+    }
+
+    private func continuitySyncValues(from context: ContinuityContext) -> [String: String] {
+        var values: [String: String] = [
+            "selectedJurisdictionKey": context.selectedJurisdictionKey,
+            "selectedVersionFileName": context.selectedVersionFileName,
+            "comparisonModeEnabled": context.comparisonModeEnabled ? "true" : "false"
+        ]
+        if let selectedCodeSectionID = context.selectedCodeSectionID {
+            values["selectedCodeSectionID"] = String(selectedCodeSectionID)
+        }
+        if let lastOpenedChapterID = context.lastOpenedChapterID {
+            values["lastOpenedChapterID"] = String(lastOpenedChapterID)
+        }
+        if let activeProjectID = context.activeProjectID {
+            values["activeProjectID"] = String(activeProjectID)
+        }
+        if let data = try? JSONEncoder().encode(context.recentlyViewedSections),
+           let json = String(data: data, encoding: .utf8) {
+            values["recentlyViewedSectionsJSON"] = json
+        }
+        return values
     }
 
     #if DEBUG
@@ -1594,17 +1641,114 @@ final class CodeLibraryViewModel: ObservableObject {
             let displayName = [credential.fullName?.givenName, credential.fullName?.familyName]
                 .compactMap { $0 }
                 .joined(separator: " ")
-            let account = SignedInAccount(
-                appleUserID: credential.user,
-                displayName: displayName.isEmpty ? nil : displayName,
-                signedInAt: Date()
-            )
-            signedInAccount = account
-            Self.saveSignedInAccount(account)
-            await refreshLifetimeGrant()
+            do {
+                let backendRecord = try await accountBackendClient.signIn(
+                    credential: AccountSignInCredential(
+                        provider: .apple,
+                        providerUserID: credential.user,
+                        displayName: displayName.isEmpty ? nil : displayName,
+                        signedInAt: Date()
+                    )
+                )
+                let account = backendRecord.account
+                signedInAccount = account
+                Self.saveSignedInAccount(account)
+                refreshUserContentSyncCheckpoint()
+                if let entitlement = backendRecord.entitlement {
+                    LocalEntitlementService.setEntitlement(entitlement)
+                    refreshCurrentEntitlement()
+                }
+                await attachLocalDataIfNeeded()
+                await refreshLifetimeGrant()
+            } catch {
+                statusMessage = error.localizedDescription
+            }
         case .failure(let error):
             statusMessage = error.localizedDescription
         }
+    }
+
+    func attachLocalDataIfNeeded() async {
+        guard let signedInAccount else { return }
+        guard signedInAccount.migrationState == .notStarted else { return }
+        do {
+            let migrationState = try await accountBackendClient.attachLocalData(account: signedInAccount)
+            let migratedAccount = SignedInAccount(
+                appUserID: signedInAccount.appUserID,
+                authProvider: signedInAccount.authProvider,
+                authProviderUserID: signedInAccount.authProviderUserID,
+                appleUserID: signedInAccount.appleUserID,
+                publicUsername: signedInAccount.publicUsername,
+                displayName: signedInAccount.displayName,
+                signedInAt: signedInAccount.signedInAt,
+                migrationState: migrationState
+            )
+            self.signedInAccount = migratedAccount
+            Self.saveSignedInAccount(migratedAccount)
+            refreshUserContentSyncCheckpoint()
+        } catch {
+            statusMessage = "Signed in. Local data is still only on this device."
+        }
+    }
+
+    func syncPendingUserContentIfPossible() async {
+        guard !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let report = try await syncEngine.processPendingWork(account: signedInAccount)
+            refreshUserContentSyncCheckpoint()
+            if let skippedReason = report.skippedReason {
+                statusMessage = skippedReason
+            } else if report.completedCount > 0 {
+                statusMessage = "Synced \(report.completedCount) local changes."
+            }
+        } catch {
+            refreshUserContentSyncCheckpoint()
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func previewRemoteUserContentMergeIfPossible() async -> UserContentMergePlan? {
+        guard !isAccountBusy else { return nil }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let report = try await syncEngine.pullRemoteChanges(account: signedInAccount)
+            refreshUserContentSyncCheckpoint()
+            return report.mergePlan
+        } catch {
+            refreshUserContentSyncCheckpoint()
+            statusMessage = error.localizedDescription
+            return nil
+        }
+    }
+
+    func pullRemoteUserContentIfPossible() async {
+        guard !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let report = try await syncEngine.pullRemoteChanges(account: signedInAccount, applySafeChanges: true)
+            refreshUserContentSyncCheckpoint()
+            if let skippedReason = report.skippedReason {
+                statusMessage = skippedReason
+            } else if report.appliedCount > 0 {
+                statusMessage = "Applied \(report.appliedCount) remote changes."
+            } else if report.conflictCount > 0 {
+                statusMessage = "\(report.conflictCount) remote changes need review."
+            }
+        } catch {
+            refreshUserContentSyncCheckpoint()
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    private func refreshUserContentSyncCheckpoint() {
+        userContentSyncCheckpoint = syncEngine.checkpoint(account: signedInAccount)
     }
 
     func refreshLifetimeGrant() async {

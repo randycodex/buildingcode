@@ -18,6 +18,7 @@ protocol UserContentRepository {
     func clearBookmarks(codeVersion: String) throws
     func clearNotes(codeVersion: String) throws
     func clearAllTags(codeVersion: String) throws
+    func queueContinuityContext(codeVersion: String, values: [String: String]) throws
     func folders(codeVersion: String) throws -> [FolderRecord]
     func folderCount(codeVersion: String) throws -> Int
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]]
@@ -34,6 +35,8 @@ protocol UserContentRepository {
     func markSyncQueueItemSynced(id: Int64) throws
     func markSyncQueueItemFailed(id: Int64, errorMessage: String) throws
     func resetFailedSyncQueueItems() throws
+    func localMergeCandidates(for mutations: [ServerUserContentMutation]) throws -> [String: UserContentMergeCandidate]
+    func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws
 }
 
 final class UserDataStore: UserContentRepository {
@@ -45,6 +48,7 @@ final class UserDataStore: UserContentRepository {
     private let personalVisibility = UserContentVisibility.personal.rawValue
     private let pendingSyncState = UserContentSyncState.pendingUpload.rawValue
     private let localOnlySyncState = UserContentSyncState.localOnly.rawValue
+    private let syncedContentState = UserContentSyncState.synced.rawValue
     private let pendingQueueState = SyncQueueState.pending.rawValue
     private let inFlightQueueState = SyncQueueState.inFlight.rawValue
     private let failedQueueState = SyncQueueState.failed.rawValue
@@ -770,6 +774,30 @@ final class UserDataStore: UserContentRepository {
         }
     }
 
+    func queueContinuityContext(codeVersion: String, values: [String: String]) throws {
+        guard !codeVersion.isEmpty else { return }
+        try coalescePendingContinuityQueueItems()
+        try enqueueSyncOperation(
+            entityType: .continuity,
+            operationType: .replace,
+            payload: SyncQueuePayload(codeVersion: codeVersion, values: values)
+        )
+    }
+
+    private func coalescePendingContinuityQueueItems() throws {
+        let statement = try connection.prepare(
+            """
+            DELETE FROM sync_queue
+            WHERE entity_type = ?
+              AND state = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: SyncEntityType.continuity.rawValue, index: 1, to: statement)
+        try connection.bind(text: pendingQueueState, index: 2, to: statement)
+        _ = try connection.step(statement)
+    }
+
     private func syncQueueItem(id: Int64) throws -> SyncQueueItem? {
         let statement = try connection.prepare(
             """
@@ -1426,6 +1454,342 @@ final class UserDataStore: UserContentRepository {
         )
     }
 
+    func localMergeCandidates(for mutations: [ServerUserContentMutation]) throws -> [String: UserContentMergeCandidate] {
+        var candidates: [String: UserContentMergeCandidate] = [:]
+        for mutation in mutations {
+            if let candidate = try localMergeCandidate(for: mutation) {
+                candidates[mutation.recordID] = candidate
+            }
+        }
+        return candidates
+    }
+
+    private func localMergeCandidate(for mutation: ServerUserContentMutation) throws -> UserContentMergeCandidate? {
+        switch mutation {
+        case .savedItem(let record):
+            return try localMergeCandidate(
+                mutation: mutation,
+                sql: "SELECT sync_state, updated_at, deleted_at FROM bookmarks WHERE code_version = ? AND section_id = ? LIMIT 1;",
+                codeVersion: record.codeVersion,
+                firstID: record.sectionID
+            )
+        case .annotation(let record):
+            if record.tags != nil {
+                return try localMergeCandidate(
+                    mutation: mutation,
+                    sql: "SELECT sync_state, MAX(updated_at), MAX(deleted_at) FROM bookmark_tags WHERE code_version = ? AND section_id = ?;",
+                    codeVersion: record.codeVersion,
+                    firstID: record.sectionID
+                )
+            }
+            return try localMergeCandidate(
+                mutation: mutation,
+                sql: "SELECT sync_state, updated_at, deleted_at FROM notes WHERE code_version = ? AND section_id = ? LIMIT 1;",
+                codeVersion: record.codeVersion,
+                firstID: record.sectionID
+            )
+        case .project(let record):
+            return try localMergeCandidate(
+                mutation: mutation,
+                sql: "SELECT sync_state, updated_at, deleted_at FROM folders WHERE code_version = ? AND id = ? LIMIT 1;",
+                codeVersion: record.codeVersion,
+                firstID: record.localFolderID
+            )
+        case .projectSection(let record):
+            guard let folderID = record.localFolderID else { return nil }
+            return try localMergeCandidate(
+                mutation: mutation,
+                sql: "SELECT sync_state, updated_at, deleted_at FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ? LIMIT 1;",
+                codeVersion: record.codeVersion,
+                firstID: folderID,
+                secondID: record.sectionID
+            )
+        case .continuity, .codeVersionClear:
+            return nil
+        }
+    }
+
+    private func localMergeCandidate(
+        mutation: ServerUserContentMutation,
+        sql: String,
+        codeVersion: String,
+        firstID: Int64,
+        secondID: Int64? = nil
+    ) throws -> UserContentMergeCandidate? {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, firstID)
+        if let secondID {
+            sqlite3_bind_int64(statement, 3, secondID)
+        }
+
+        guard try connection.step(statement) == SQLITE_ROW else { return nil }
+        let syncStateRaw = connection.stringOrNil(at: 0, in: statement) ?? syncedContentState
+        let updatedAt = connection.stringOrNil(at: 1, in: statement).flatMap { isoFormatter.date(from: $0) }
+        guard updatedAt != nil || connection.stringOrNil(at: 0, in: statement) != nil else { return nil }
+        let deletedAt = connection.stringOrNil(at: 2, in: statement).flatMap { isoFormatter.date(from: $0) }
+        return UserContentMergeCandidate(
+            recordID: mutation.recordID,
+            entityKind: mutation.entityKind,
+            localUpdatedAt: updatedAt,
+            serverUpdatedAt: mutation.updatedAt,
+            localDeletedAt: deletedAt,
+            serverDeletedAt: mutation.deletedAt,
+            localSyncState: UserContentSyncState(rawValue: syncStateRaw) ?? .synced
+        )
+    }
+
+    func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws {
+        switch mutation {
+        case .savedItem(let record):
+            if record.deletedAt != nil {
+                try deleteServerBookmark(sectionID: record.sectionID, codeVersion: record.codeVersion)
+            } else {
+                try upsertServerBookmark(record)
+            }
+        case .annotation(let record):
+            if record.deletedAt != nil {
+                try deleteServerAnnotation(record)
+            } else {
+                try upsertServerAnnotation(record)
+            }
+        case .project(let record):
+            if record.deletedAt != nil {
+                try deleteServerProject(folderID: record.localFolderID, codeVersion: record.codeVersion)
+            } else {
+                try upsertServerProject(record)
+            }
+        case .projectSection(let record):
+            if record.deletedAt != nil {
+                try deleteServerProjectSection(record)
+            } else {
+                try upsertServerProjectSection(record)
+            }
+        case .continuity:
+            break
+        case .codeVersionClear(let record):
+            try applyServerCodeVersionClear(record)
+        }
+    }
+
+    private func upsertServerBookmark(_ record: ServerSavedItemRecord) throws {
+        let timestamp = isoFormatter.string(from: record.updatedAt)
+        let statement = try connection.prepare(
+            """
+            INSERT INTO bookmarks (
+                code_version, section_id, created_at, updated_at, client_id,
+                owner_id, visibility, sync_state, deleted_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            ON CONFLICT(code_version, section_id) DO UPDATE SET
+                updated_at = excluded.updated_at,
+                sync_state = excluded.sync_state,
+                deleted_at = NULL;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: record.codeVersion, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, record.sectionID)
+        try connection.bind(text: timestamp, index: 3, to: statement)
+        try connection.bind(text: timestamp, index: 4, to: statement)
+        try connection.bind(text: record.id, index: 5, to: statement)
+        try connection.bind(text: record.userID, index: 6, to: statement)
+        try connection.bind(text: personalVisibility, index: 7, to: statement)
+        try connection.bind(text: syncedContentState, index: 8, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    private func deleteServerBookmark(sectionID: Int64, codeVersion: String) throws {
+        try performTransaction {
+            try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
+            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
+            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
+        }
+    }
+
+    private func upsertServerAnnotation(_ record: ServerAnnotationRecord) throws {
+        if let noteBody = record.noteBody {
+            try upsertServerNote(record, body: noteBody)
+        }
+        if let tags = record.tags {
+            try setServerTags(tags, sectionID: record.sectionID, codeVersion: record.codeVersion, userID: record.userID, updatedAt: record.updatedAt)
+        }
+    }
+
+    private func upsertServerNote(_ record: ServerAnnotationRecord, body: String) throws {
+        let timestamp = isoFormatter.string(from: record.updatedAt)
+        if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            try deleteRows(sql: "DELETE FROM notes WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+            return
+        }
+
+        let statement = try connection.prepare(
+            """
+            INSERT INTO notes (
+                code_version, section_id, body, created_at, updated_at, client_id,
+                owner_id, visibility, sync_state, deleted_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            ON CONFLICT(code_version, section_id) DO UPDATE SET
+                body = excluded.body,
+                updated_at = excluded.updated_at,
+                sync_state = excluded.sync_state,
+                deleted_at = NULL;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: record.codeVersion, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, record.sectionID)
+        try connection.bind(text: body, index: 3, to: statement)
+        try connection.bind(text: timestamp, index: 4, to: statement)
+        try connection.bind(text: timestamp, index: 5, to: statement)
+        try connection.bind(text: record.id, index: 6, to: statement)
+        try connection.bind(text: record.userID, index: 7, to: statement)
+        try connection.bind(text: personalVisibility, index: 8, to: statement)
+        try connection.bind(text: syncedContentState, index: 9, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    private func setServerTags(_ tags: [String], sectionID: Int64, codeVersion: String, userID: String, updatedAt: Date) throws {
+        let cleaned = tags
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        let timestamp = isoFormatter.string(from: updatedAt)
+
+        try performTransaction {
+            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
+            guard !cleaned.isEmpty else { return }
+
+            let insert = try connection.prepare(
+                """
+                INSERT INTO bookmark_tags (
+                    code_version, section_id, tag, created_at, updated_at, client_id,
+                    owner_id, visibility, sync_state, deleted_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
+                """
+            )
+            defer { connection.finalize(insert) }
+            for tag in cleaned {
+                sqlite3_reset(insert)
+                sqlite3_clear_bindings(insert)
+                try connection.bind(text: codeVersion, index: 1, to: insert)
+                sqlite3_bind_int64(insert, 2, sectionID)
+                try connection.bind(text: tag, index: 3, to: insert)
+                try connection.bind(text: timestamp, index: 4, to: insert)
+                try connection.bind(text: timestamp, index: 5, to: insert)
+                try connection.bind(text: "\(userID):tags:\(codeVersion):\(sectionID):\(tag)", index: 6, to: insert)
+                try connection.bind(text: userID, index: 7, to: insert)
+                try connection.bind(text: personalVisibility, index: 8, to: insert)
+                try connection.bind(text: syncedContentState, index: 9, to: insert)
+                _ = try connection.step(insert)
+            }
+        }
+    }
+
+    private func deleteServerAnnotation(_ record: ServerAnnotationRecord) throws {
+        try performTransaction {
+            try deleteRows(sql: "DELETE FROM notes WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+        }
+    }
+
+    private func upsertServerProject(_ record: ServerProjectRecord) throws {
+        let timestamp = isoFormatter.string(from: record.updatedAt)
+        let statement = try connection.prepare(
+            """
+            INSERT INTO folders (
+                id, client_id, owner_id, visibility, sync_state, code_version, name,
+                description, color_hex, sort_order, created_at, updated_at, deleted_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            ON CONFLICT(id) DO UPDATE SET
+                name = excluded.name,
+                description = excluded.description,
+                color_hex = excluded.color_hex,
+                sort_order = excluded.sort_order,
+                updated_at = excluded.updated_at,
+                sync_state = excluded.sync_state,
+                deleted_at = NULL;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, record.localFolderID)
+        try connection.bind(text: record.id, index: 2, to: statement)
+        try connection.bind(text: record.userID, index: 3, to: statement)
+        try connection.bind(text: personalVisibility, index: 4, to: statement)
+        try connection.bind(text: syncedContentState, index: 5, to: statement)
+        try connection.bind(text: record.codeVersion, index: 6, to: statement)
+        try connection.bind(text: record.name ?? "Project", index: 7, to: statement)
+        try connection.bind(text: record.description ?? "", index: 8, to: statement)
+        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 9, to: statement)
+        sqlite3_bind_int64(statement, 10, Int64(record.sortOrder ?? 0))
+        try connection.bind(text: timestamp, index: 11, to: statement)
+        try connection.bind(text: timestamp, index: 12, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    private func deleteServerProject(folderID: Int64, codeVersion: String) throws {
+        try performTransaction {
+            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ?;", codeVersion: codeVersion, sectionID: folderID)
+            try deleteRows(sql: "DELETE FROM folders WHERE code_version = ? AND id = ?;", codeVersion: codeVersion, sectionID: folderID)
+        }
+    }
+
+    private func upsertServerProjectSection(_ record: ServerProjectSectionRecord) throws {
+        guard let folderID = record.localFolderID else { return }
+        let timestamp = isoFormatter.string(from: record.updatedAt)
+        let statement = try connection.prepare(
+            """
+            INSERT OR REPLACE INTO folder_sections (
+                client_id, owner_id, visibility, sync_state, folder_id,
+                code_version, section_id, added_at, updated_at, deleted_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: record.id, index: 1, to: statement)
+        try connection.bind(text: record.userID, index: 2, to: statement)
+        try connection.bind(text: personalVisibility, index: 3, to: statement)
+        try connection.bind(text: syncedContentState, index: 4, to: statement)
+        sqlite3_bind_int64(statement, 5, folderID)
+        try connection.bind(text: record.codeVersion, index: 6, to: statement)
+        sqlite3_bind_int64(statement, 7, record.sectionID)
+        try connection.bind(text: timestamp, index: 8, to: statement)
+        try connection.bind(text: timestamp, index: 9, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    private func deleteServerProjectSection(_ record: ServerProjectSectionRecord) throws {
+        if let folderID = record.localFolderID {
+            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ?;", codeVersion: record.codeVersion, firstID: folderID, secondID: record.sectionID)
+        } else {
+            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+        }
+    }
+
+    private func applyServerCodeVersionClear(_ record: ServerContinuityRecord) throws {
+        switch record.values["scope"] {
+        case "bookmarks":
+            try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ?;", codeVersion: record.codeVersion)
+            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ?;", codeVersion: record.codeVersion)
+            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: record.codeVersion)
+        case "notes":
+            try deleteRows(sql: "DELETE FROM notes WHERE code_version = ?;", codeVersion: record.codeVersion)
+        case "tags":
+            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ?;", codeVersion: record.codeVersion)
+        case "folders":
+            try performTransaction {
+                try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: record.codeVersion)
+                try deleteRows(sql: "DELETE FROM folders WHERE code_version = ?;", codeVersion: record.codeVersion)
+            }
+        default:
+            break
+        }
+    }
+
     private func performTransaction(_ updates: () throws -> Void) throws {
         try connection.execute("BEGIN IMMEDIATE TRANSACTION;")
         do {
@@ -1435,6 +1799,30 @@ final class UserDataStore: UserContentRepository {
             try? connection.execute("ROLLBACK;")
             throw error
         }
+    }
+
+    private func deleteRows(sql: String, codeVersion: String) throws {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    private func deleteRows(sql: String, codeVersion: String, sectionID: Int64) throws {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, sectionID)
+        _ = try connection.step(statement)
+    }
+
+    private func deleteRows(sql: String, codeVersion: String, firstID: Int64, secondID: Int64) throws {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, firstID)
+        sqlite3_bind_int64(statement, 3, secondID)
+        _ = try connection.step(statement)
     }
 
     private func countRows(sql: String, codeVersion: String) throws -> Int {
