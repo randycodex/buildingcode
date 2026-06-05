@@ -1,6 +1,11 @@
 # Phase 5 Production Storage Plan
 
-The local sync server is intentionally file-backed. A production backend should keep the same HTTP contract while moving storage to durable tables with per-user ownership and server-side conflict checks.
+The sync server now supports two storage modes behind the same HTTP contract:
+
+- Local development uses a JSON file for fast integration testing.
+- Hosted production uses Neon/Postgres when a database URL is present.
+
+The current hosted Postgres adapter is a transitional durable store: it persists users, entitlements, sessions, and mutation queues in a single `permitext_sync_state` JSONB row. That is acceptable for early Phase 5 production testing because it survives app reinstalls and deployment restarts, but it is not the final production schema. The next hardening step is to move the same contract into the normalized tables below so per-user records, indexes, conflict checks, and data export/delete operations can scale cleanly.
 
 ## Tables
 
