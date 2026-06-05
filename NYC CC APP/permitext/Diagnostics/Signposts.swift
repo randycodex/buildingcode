@@ -384,7 +384,7 @@ struct UserContentSyncEngine {
         guard let repository else { return 0 }
         let decisionsByID = Dictionary(uniqueKeysWithValues: mergePlan.decisions.map { ($0.recordID, $0) })
         var appliedCount = 0
-        for mutation in incoming.mutations {
+        for mutation in incoming.mutations.sortedForLocalApplication {
             guard let decision = decisionsByID[mutation.recordID] else { continue }
             switch decision.action {
             case .applyServer, .deleteLocal:
@@ -395,6 +395,32 @@ struct UserContentSyncEngine {
             }
         }
         return appliedCount
+    }
+}
+
+private extension Array where Element == ServerUserContentMutation {
+    var sortedForLocalApplication: [ServerUserContentMutation] {
+        sorted { lhs, rhs in
+            let lhsPriority = lhs.localApplicationPriority
+            let rhsPriority = rhs.localApplicationPriority
+            guard lhsPriority == rhsPriority else { return lhsPriority < rhsPriority }
+            return lhs.recordID < rhs.recordID
+        }
+    }
+}
+
+private extension ServerUserContentMutation {
+    var localApplicationPriority: Int {
+        switch self {
+        case .codeVersionClear:
+            return 0
+        case .project:
+            return 1
+        case .savedItem, .annotation, .continuity:
+            return 2
+        case .projectSection:
+            return 3
+        }
     }
 }
 

@@ -1600,11 +1600,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func refreshStoreKitEntitlements() async {
         let snapshot = await storeKitSubscriptionService.snapshot()
-        let entitlement = entitlementService.currentEntitlement
-        currentPlan = entitlement.plan
-        currentEntitlementSource = entitlement.source
-        proProductDisplayPrice = snapshot.proDisplayPrice
-        storeKitLoadedProductIDs = snapshot.loadedProductIDs
+        applyStoreKitSnapshot(snapshot)
     }
 
     func purchasePro() async {
@@ -1614,11 +1610,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         do {
             let snapshot = try await storeKitSubscriptionService.purchasePro()
-            let entitlement = entitlementService.currentEntitlement
-            currentPlan = entitlement.plan
-            currentEntitlementSource = entitlement.source
-            proProductDisplayPrice = snapshot.proDisplayPrice
-            storeKitLoadedProductIDs = snapshot.loadedProductIDs
+            applyStoreKitSnapshot(snapshot)
             statusMessage = currentPlan == .pro ? "Pro is active." : "Purchase cancelled."
         } catch {
             statusMessage = error.localizedDescription
@@ -1636,11 +1628,7 @@ final class CodeLibraryViewModel: ObservableObject {
         defer { isStoreKitBusy = false }
 
         let snapshot = await storeKitSubscriptionService.restorePurchases()
-        let entitlement = entitlementService.currentEntitlement
-        currentPlan = entitlement.plan
-        currentEntitlementSource = entitlement.source
-        proProductDisplayPrice = snapshot.proDisplayPrice
-        storeKitLoadedProductIDs = snapshot.loadedProductIDs
+        applyStoreKitSnapshot(snapshot)
         statusMessage = currentPlan == .pro ? "Pro purchase restored." : "No active Pro subscription found."
     }
 
@@ -1977,6 +1965,22 @@ final class CodeLibraryViewModel: ObservableObject {
         let entitlement = entitlementService.currentEntitlement
         currentPlan = entitlement.plan
         currentEntitlementSource = entitlement.source
+    }
+
+    private func applyStoreKitSnapshot(_ snapshot: StoreKitSubscriptionSnapshot) {
+        let entitlement = entitlementService.currentEntitlement
+        let resolvedEntitlement: AppEntitlement
+        if entitlement.plan == .pro {
+            resolvedEntitlement = entitlement
+        } else if snapshot.plan == .pro {
+            resolvedEntitlement = .subscriptionPro
+        } else {
+            resolvedEntitlement = entitlement
+        }
+        currentPlan = resolvedEntitlement.plan
+        currentEntitlementSource = resolvedEntitlement.source
+        proProductDisplayPrice = snapshot.proDisplayPrice
+        storeKitLoadedProductIDs = snapshot.loadedProductIDs
     }
 
     private static func loadSignedInAccount() -> SignedInAccount? {

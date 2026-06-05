@@ -2247,7 +2247,13 @@ actor StoreKitSubscriptionService {
     private func verifiedPlan() async -> AppPlan {
         for await entitlement in Transaction.currentEntitlements {
             guard case .verified(let transaction) = entitlement else { continue }
-            guard transaction.productID == proProductID, transaction.revocationDate == nil else { continue }
+            guard isActiveProTransaction(transaction) else { continue }
+            LocalEntitlementService.setVerifiedPlan(.pro)
+            return .pro
+        }
+        if let latest = await Transaction.latest(for: proProductID),
+           case .verified(let transaction) = latest,
+           isActiveProTransaction(transaction) {
             LocalEntitlementService.setVerifiedPlan(.pro)
             return .pro
         }
@@ -2256,6 +2262,16 @@ actor StoreKitSubscriptionService {
         }
         LocalEntitlementService.setVerifiedPlan(.free)
         return .free
+    }
+
+    private func isActiveProTransaction(_ transaction: Transaction) -> Bool {
+        guard transaction.productID == proProductID, transaction.revocationDate == nil else {
+            return false
+        }
+        if let expirationDate = transaction.expirationDate, expirationDate <= Date() {
+            return false
+        }
+        return true
     }
 
     private func verifiedTransaction(from result: VerificationResult<Transaction>) throws -> Transaction {

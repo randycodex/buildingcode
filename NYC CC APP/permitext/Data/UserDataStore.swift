@@ -1562,7 +1562,7 @@ final class UserDataStore: UserContentRepository {
             guard let folderID = try localFolderID(
                 clientID: record.folderClientID ?? legacyClientID,
                 codeVersion: record.codeVersion
-            ) ?? record.localFolderID else {
+            ) else {
                 return nil
             }
             return try localMergeCandidate(
@@ -1847,7 +1847,7 @@ final class UserDataStore: UserContentRepository {
         guard let folderID = try localFolderID(
             clientID: record.folderClientID ?? legacyClientID,
             codeVersion: record.codeVersion
-        ) ?? record.localFolderID else {
+        ) else {
             return
         }
         let timestamp = isoFormatter.string(from: record.updatedAt)
@@ -1874,7 +1874,13 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func deleteServerProjectSection(_ record: ServerProjectSectionRecord) throws {
-        if let folderID = record.localFolderID {
+        let legacyClientID = record.localFolderID.map {
+            "\(record.userID):project:\(record.codeVersion):\($0)"
+        }
+        if let folderID = try localFolderID(
+            clientID: record.folderClientID ?? legacyClientID,
+            codeVersion: record.codeVersion
+        ) ?? record.localFolderID {
             try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ?;", codeVersion: record.codeVersion, firstID: folderID, secondID: record.sectionID)
         } else {
             try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
