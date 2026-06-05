@@ -892,6 +892,16 @@ struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
 
+struct BackendProfileUpdateRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let publicUsername: String?
+    let displayName: String?
+}
+
+struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
+    let account: SignedInAccount
+}
+
 struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let batch: ServerUserContentBatch
@@ -911,6 +921,7 @@ protocol PermitextBackendTransport {
     var name: String { get }
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
+    func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
 }
@@ -1025,6 +1036,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("account/attach-local-data", body: request)
     }
 
+    func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse {
+        try await post("account/profile", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
         try await post("sync/push", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -1079,6 +1094,21 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
         .localDataAttached
+    }
+
+    func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse {
+        BackendProfileUpdateResponse(
+            account: SignedInAccount(
+                appUserID: request.auth.accountUserID,
+                authProvider: .guest,
+                appleUserID: "",
+                publicUsername: request.publicUsername,
+                displayName: request.displayName,
+                signedInAt: Date(),
+                migrationState: .localDataAttached,
+                backendSessionToken: request.auth.bearerToken
+            )
+        )
     }
 
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
@@ -1850,6 +1880,7 @@ protocol AccountBackendClient {
     var name: String { get }
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
+    func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
 }
 
 struct LocalAccountBackendClient: AccountBackendClient {
@@ -1869,6 +1900,20 @@ struct LocalAccountBackendClient: AccountBackendClient {
 
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState {
         .localDataAttached
+    }
+
+    func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount {
+        SignedInAccount(
+            appUserID: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            appleUserID: account.appleUserID,
+            publicUsername: publicUsername,
+            displayName: displayName,
+            signedInAt: account.signedInAt,
+            migrationState: account.migrationState,
+            backendSessionToken: account.backendSessionToken
+        )
     }
 }
 

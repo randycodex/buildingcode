@@ -114,6 +114,17 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         try await transport.attachLocalData(BackendAttachLocalDataRequest(account: account))
     }
 
+    func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount {
+        let response = try await transport.updateProfile(
+            BackendProfileUpdateRequest(
+                auth: authContext(for: account),
+                publicUsername: publicUsername,
+                displayName: displayName
+            )
+        )
+        return response.account
+    }
+
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
         UserContentSyncPreviewReport(
             pendingCount: items.count,
