@@ -60,7 +60,7 @@ Response:
 
 The backend owns `appUserID`. Login identity and public identity must stay separate.
 
-`backendSessionToken` is an opaque local-scaffold session token used as the bearer token for sync calls. Production should store the equivalent token in Keychain and rotate/expire it server-side.
+`backendSessionToken` is an opaque local-scaffold session token used as the bearer token for sync calls. The app persists this token in Keychain rather than in the account metadata stored in `UserDefaults`. Production should rotate and expire equivalent tokens server-side.
 
 Passkey support uses the same endpoint with `credential.provider = "passkey"`. A production passkey flow also requires the app's Associated Domains entitlement and a valid `apple-app-site-association` file on the relying-party domain before the UI can be enabled.
 

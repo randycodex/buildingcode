@@ -1,6 +1,7 @@
 import Foundation
 import AuthenticationServices
 import os.signpost
+import Security
 import SwiftUI
 
 @MainActor
@@ -1875,16 +1876,43 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private static func loadSignedInAccount() -> SignedInAccount? {
         guard let data = UserDefaults.standard.data(forKey: AccountDefaults.signedInAccountKey) else { return nil }
-        return try? JSONDecoder().decode(SignedInAccount.self, from: data)
+        guard let account = try? JSONDecoder().decode(SignedInAccount.self, from: data) else { return nil }
+        let token = AccountSessionTokenStore.loadToken(accountUserID: account.appUserID)
+        return SignedInAccount(
+            appUserID: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            appleUserID: account.appleUserID,
+            publicUsername: account.publicUsername,
+            displayName: account.displayName,
+            signedInAt: account.signedInAt,
+            migrationState: account.migrationState,
+            backendSessionToken: token ?? account.backendSessionToken
+        )
     }
 
     private static func saveSignedInAccount(_ account: SignedInAccount) {
-        if let data = try? JSONEncoder().encode(account) {
+        AccountSessionTokenStore.saveToken(account.backendSessionToken, accountUserID: account.appUserID)
+        let persistedAccount = SignedInAccount(
+            appUserID: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            appleUserID: account.appleUserID,
+            publicUsername: account.publicUsername,
+            displayName: account.displayName,
+            signedInAt: account.signedInAt,
+            migrationState: account.migrationState,
+            backendSessionToken: nil
+        )
+        if let data = try? JSONEncoder().encode(persistedAccount) {
             UserDefaults.standard.set(data, forKey: AccountDefaults.signedInAccountKey)
         }
     }
 
     private static func clearSignedInAccount() {
+        if let account = loadSignedInAccount() {
+            AccountSessionTokenStore.deleteToken(accountUserID: account.appUserID)
+        }
         UserDefaults.standard.removeObject(forKey: AccountDefaults.signedInAccountKey)
     }
 
@@ -2951,6 +2979,50 @@ private final class CachedReaderSectionDetail: NSObject {
 
     init(_ detail: ReaderSectionDetail) {
         self.detail = detail
+    }
+}
+
+private enum AccountSessionTokenStore {
+    private static let service = "com.randycodex.permitext.backend-session"
+
+    static func loadToken(accountUserID: String) -> String? {
+        var query = baseQuery(accountUserID: accountUserID)
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess, let data = item as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    static func saveToken(_ token: String?, accountUserID: String) {
+        guard let token, let data = token.data(using: .utf8) else {
+            deleteToken(accountUserID: accountUserID)
+            return
+        }
+
+        let query = baseQuery(accountUserID: accountUserID)
+        let update = [kSecValueData as String: data]
+        let status = SecItemUpdate(query as CFDictionary, update as CFDictionary)
+        if status == errSecItemNotFound {
+            var item = query
+            item[kSecValueData as String] = data
+            item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            SecItemAdd(item as CFDictionary, nil)
+        }
+    }
+
+    static func deleteToken(accountUserID: String) {
+        SecItemDelete(baseQuery(accountUserID: accountUserID) as CFDictionary)
+    }
+
+    private static func baseQuery(accountUserID: String) -> [String: Any] {
+        [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: accountUserID
+        ]
     }
 }
 
