@@ -445,6 +445,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String
     let codeVersion: String
+    let clientID: String?
     let localFolderID: Int64
     let name: String?
     let description: String?
@@ -458,6 +459,7 @@ struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String
     let codeVersion: String
+    let folderClientID: String?
     let localFolderID: Int64?
     let sectionID: Int64
     let scope: String?
@@ -598,11 +600,19 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             guard let folderID = payload.folderID else {
                 throw UserContentServerMappingError.missingFolderID(item.entityType)
             }
+            let projectClientID = payload.clientID ?? payload.values["clientID"]
             self = .project(
                 ServerProjectRecord(
-                    id: Self.recordID(account: account, type: "project", codeVersion: payload.codeVersion, folderID: folderID),
+                    id: Self.recordID(
+                        account: account,
+                        type: "project",
+                        codeVersion: payload.codeVersion,
+                        clientID: projectClientID,
+                        folderID: folderID
+                    ),
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
+                    clientID: projectClientID,
                     localFolderID: folderID,
                     name: item.operationType == .delete ? nil : payload.values["name"],
                     description: item.operationType == .delete ? nil : payload.values["description"],
@@ -616,18 +626,21 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             guard let sectionID = payload.sectionID else {
                 throw UserContentServerMappingError.missingSectionID(item.entityType)
             }
+            let folderClientID = payload.values["folderClientID"]
             self = .projectSection(
                 ServerProjectSectionRecord(
                     id: Self.recordID(
                         account: account,
                         type: "project-section",
                         codeVersion: payload.codeVersion,
+                        clientID: folderClientID,
                         folderID: payload.folderID,
                         sectionID: sectionID,
                         scope: payload.values["scope"]
                     ),
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
+                    folderClientID: folderClientID,
                     localFolderID: payload.folderID,
                     sectionID: sectionID,
                     scope: payload.values["scope"],
@@ -668,6 +681,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         account: SignedInAccount,
         type: String,
         codeVersion: String,
+        clientID: String? = nil,
         folderID: Int64? = nil,
         sectionID: Int64? = nil,
         scope: String? = nil
@@ -676,6 +690,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             account.appUserID,
             type,
             codeVersion,
+            clientID,
             folderID.map(String.init),
             sectionID.map(String.init),
             scope

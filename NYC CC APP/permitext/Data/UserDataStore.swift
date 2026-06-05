@@ -399,6 +399,10 @@ final class UserDataStore: UserContentRepository {
             CREATE INDEX IF NOT EXISTS idx_folders_version
                 ON folders(code_version);
 
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_folders_client_id
+                ON folders(client_id)
+                WHERE client_id <> '';
+
             CREATE TABLE IF NOT EXISTS folder_sections (
                 client_id TEXT NOT NULL DEFAULT '',
                 owner_id TEXT NOT NULL DEFAULT 'local',
@@ -1217,6 +1221,7 @@ final class UserDataStore: UserContentRepository {
                 : 0
         }()
 
+        let clientID = UUID().uuidString
         let statement = try connection.prepare(
             """
             INSERT INTO folders (
@@ -1228,7 +1233,7 @@ final class UserDataStore: UserContentRepository {
         )
         defer { connection.finalize(statement) }
         let now = isoFormatter.string(from: Date())
-        try connection.bind(text: UUID().uuidString, index: 1, to: statement)
+        try connection.bind(text: clientID, index: 1, to: statement)
         try connection.bind(text: localOwnerID, index: 2, to: statement)
         try connection.bind(text: personalVisibility, index: 3, to: statement)
         try connection.bind(text: pendingSyncState, index: 4, to: statement)
@@ -1248,6 +1253,7 @@ final class UserDataStore: UserContentRepository {
             payload: SyncQueuePayload(
                 codeVersion: codeVersion,
                 folderID: folderID,
+                clientID: clientID,
                 values: [
                     "name": trimmedName,
                     "description": description,
@@ -1274,6 +1280,7 @@ final class UserDataStore: UserContentRepository {
                 userInfo: [NSLocalizedDescriptionKey: "Folder name cannot be empty."]
             )
         }
+        let clientID = try folderClientID(id: id, codeVersion: codeVersion)
 
         let statement = try connection.prepare(
             """
@@ -1297,6 +1304,7 @@ final class UserDataStore: UserContentRepository {
             payload: SyncQueuePayload(
                 codeVersion: codeVersion,
                 folderID: id,
+                clientID: clientID,
                 values: [
                     "name": trimmedName,
                     "description": description,
@@ -1307,6 +1315,7 @@ final class UserDataStore: UserContentRepository {
     }
 
     func deleteFolder(id: Int64, codeVersion: String) throws {
+        let clientID = try folderClientID(id: id, codeVersion: codeVersion)
         try performTransaction {
             // Manual cascade — folder_sections doesn't have a FK constraint, so
             // we wipe membership rows first.
@@ -1334,11 +1343,51 @@ final class UserDataStore: UserContentRepository {
         enqueueSyncOperationIfPossible(
             entityType: .folder,
             operationType: .delete,
-            payload: SyncQueuePayload(codeVersion: codeVersion, folderID: id)
+            payload: SyncQueuePayload(codeVersion: codeVersion, folderID: id, clientID: clientID)
         )
     }
 
+    private func folderClientID(id: Int64, codeVersion: String) throws -> String {
+        let statement = try connection.prepare(
+            """
+            SELECT client_id
+            FROM folders
+            WHERE id = ? AND code_version = ?
+            LIMIT 1;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, id)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        guard try connection.step(statement) == SQLITE_ROW else {
+            throw NSError(
+                domain: "UserDataStore",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "Project folder was not found."]
+            )
+        }
+        return connection.string(at: 0, in: statement)
+    }
+
+    private func localFolderID(clientID: String?, codeVersion: String) throws -> Int64? {
+        guard let clientID, !clientID.isEmpty else { return nil }
+        let statement = try connection.prepare(
+            """
+            SELECT id
+            FROM folders
+            WHERE client_id = ? AND code_version = ?
+            LIMIT 1;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: clientID, index: 1, to: statement)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+        guard try connection.step(statement) == SQLITE_ROW else { return nil }
+        return connection.int64(at: 0, in: statement)
+    }
+
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws {
+        let folderClientID = try folderClientID(id: folderID, codeVersion: codeVersion)
         let statement = try connection.prepare(
             """
             INSERT OR IGNORE INTO folder_sections (
@@ -1366,12 +1415,14 @@ final class UserDataStore: UserContentRepository {
             payload: SyncQueuePayload(
                 codeVersion: codeVersion,
                 sectionID: sectionID,
-                folderID: folderID
+                folderID: folderID,
+                values: ["folderClientID": folderClientID]
             )
         )
     }
 
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws {
+        let folderClientID = try folderClientID(id: folderID, codeVersion: codeVersion)
         let statement = try connection.prepare(
             """
             DELETE FROM folder_sections
@@ -1389,7 +1440,8 @@ final class UserDataStore: UserContentRepository {
             payload: SyncQueuePayload(
                 codeVersion: codeVersion,
                 sectionID: sectionID,
-                folderID: folderID
+                folderID: folderID,
+                values: ["folderClientID": folderClientID]
             )
         )
     }
@@ -1489,6 +1541,14 @@ final class UserDataStore: UserContentRepository {
                 firstID: record.sectionID
             )
         case .project(let record):
+            if let localFolderID = try localFolderID(clientID: record.clientID ?? record.id, codeVersion: record.codeVersion) {
+                return try localMergeCandidate(
+                    mutation: mutation,
+                    sql: "SELECT sync_state, updated_at, deleted_at FROM folders WHERE code_version = ? AND id = ? LIMIT 1;",
+                    codeVersion: record.codeVersion,
+                    firstID: localFolderID
+                )
+            }
             return try localMergeCandidate(
                 mutation: mutation,
                 sql: "SELECT sync_state, updated_at, deleted_at FROM folders WHERE code_version = ? AND id = ? LIMIT 1;",
@@ -1496,7 +1556,15 @@ final class UserDataStore: UserContentRepository {
                 firstID: record.localFolderID
             )
         case .projectSection(let record):
-            guard let folderID = record.localFolderID else { return nil }
+            let legacyClientID = record.localFolderID.map {
+                "\(record.userID):project:\(record.codeVersion):\($0)"
+            }
+            guard let folderID = try localFolderID(
+                clientID: record.folderClientID ?? legacyClientID,
+                codeVersion: record.codeVersion
+            ) ?? record.localFolderID else {
+                return nil
+            }
             return try localMergeCandidate(
                 mutation: mutation,
                 sql: "SELECT sync_state, updated_at, deleted_at FROM folder_sections WHERE code_version = ? AND folder_id = ? AND section_id = ? LIMIT 1;",
@@ -1556,7 +1624,7 @@ final class UserDataStore: UserContentRepository {
             }
         case .project(let record):
             if record.deletedAt != nil {
-                try deleteServerProject(folderID: record.localFolderID, codeVersion: record.codeVersion)
+                try deleteServerProject(record)
             } else {
                 try upsertServerProject(record)
             }
@@ -1696,49 +1764,92 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func upsertServerProject(_ record: ServerProjectRecord) throws {
+        let clientID = record.clientID ?? record.id
+        if let localID = try localFolderID(clientID: clientID, codeVersion: record.codeVersion) {
+            try updateServerProject(record, localFolderID: localID, clientID: clientID)
+            return
+        }
+        try insertServerProject(record)
+    }
+
+    private func insertServerProject(_ record: ServerProjectRecord) throws {
         let timestamp = isoFormatter.string(from: record.updatedAt)
         let statement = try connection.prepare(
             """
             INSERT INTO folders (
-                id, client_id, owner_id, visibility, sync_state, code_version, name,
+                client_id, owner_id, visibility, sync_state, code_version, name,
                 description, color_hex, sort_order, created_at, updated_at, deleted_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
-            ON CONFLICT(id) DO UPDATE SET
-                name = excluded.name,
-                description = excluded.description,
-                color_hex = excluded.color_hex,
-                sort_order = excluded.sort_order,
-                updated_at = excluded.updated_at,
-                sync_state = excluded.sync_state,
-                deleted_at = NULL;
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
             """
         )
         defer { connection.finalize(statement) }
-        sqlite3_bind_int64(statement, 1, record.localFolderID)
-        try connection.bind(text: record.id, index: 2, to: statement)
-        try connection.bind(text: record.userID, index: 3, to: statement)
-        try connection.bind(text: personalVisibility, index: 4, to: statement)
-        try connection.bind(text: syncedContentState, index: 5, to: statement)
-        try connection.bind(text: record.codeVersion, index: 6, to: statement)
-        try connection.bind(text: record.name ?? "Project", index: 7, to: statement)
-        try connection.bind(text: record.description ?? "", index: 8, to: statement)
-        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 9, to: statement)
-        sqlite3_bind_int64(statement, 10, Int64(record.sortOrder ?? 0))
+        try connection.bind(text: record.clientID ?? record.id, index: 1, to: statement)
+        try connection.bind(text: record.userID, index: 2, to: statement)
+        try connection.bind(text: personalVisibility, index: 3, to: statement)
+        try connection.bind(text: syncedContentState, index: 4, to: statement)
+        try connection.bind(text: record.codeVersion, index: 5, to: statement)
+        try connection.bind(text: record.name ?? "Project", index: 6, to: statement)
+        try connection.bind(text: record.description ?? "", index: 7, to: statement)
+        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 8, to: statement)
+        sqlite3_bind_int64(statement, 9, Int64(record.sortOrder ?? 0))
+        try connection.bind(text: timestamp, index: 10, to: statement)
         try connection.bind(text: timestamp, index: 11, to: statement)
-        try connection.bind(text: timestamp, index: 12, to: statement)
         _ = try connection.step(statement)
     }
 
-    private func deleteServerProject(folderID: Int64, codeVersion: String) throws {
+    private func updateServerProject(_ record: ServerProjectRecord, localFolderID: Int64, clientID: String) throws {
+        let timestamp = isoFormatter.string(from: record.updatedAt)
+        let statement = try connection.prepare(
+            """
+            UPDATE folders
+            SET
+                client_id = ?,
+                owner_id = ?,
+                visibility = ?,
+                sync_state = ?,
+                name = ?,
+                description = ?,
+                color_hex = ?,
+                sort_order = ?,
+                updated_at = ?,
+                deleted_at = NULL
+            WHERE id = ? AND code_version = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: clientID, index: 1, to: statement)
+        try connection.bind(text: record.userID, index: 2, to: statement)
+        try connection.bind(text: personalVisibility, index: 3, to: statement)
+        try connection.bind(text: syncedContentState, index: 4, to: statement)
+        try connection.bind(text: record.name ?? "Project", index: 5, to: statement)
+        try connection.bind(text: record.description ?? "", index: 6, to: statement)
+        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 7, to: statement)
+        sqlite3_bind_int64(statement, 8, Int64(record.sortOrder ?? 0))
+        try connection.bind(text: timestamp, index: 9, to: statement)
+        sqlite3_bind_int64(statement, 10, localFolderID)
+        try connection.bind(text: record.codeVersion, index: 11, to: statement)
+        _ = try connection.step(statement)
+    }
+
+    private func deleteServerProject(_ record: ServerProjectRecord) throws {
+        let folderID = try localFolderID(clientID: record.clientID ?? record.id, codeVersion: record.codeVersion) ?? record.localFolderID
         try performTransaction {
-            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ?;", codeVersion: codeVersion, sectionID: folderID)
-            try deleteRows(sql: "DELETE FROM folders WHERE code_version = ? AND id = ?;", codeVersion: codeVersion, sectionID: folderID)
+            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ?;", codeVersion: record.codeVersion, sectionID: folderID)
+            try deleteRows(sql: "DELETE FROM folders WHERE code_version = ? AND id = ?;", codeVersion: record.codeVersion, sectionID: folderID)
         }
     }
 
     private func upsertServerProjectSection(_ record: ServerProjectSectionRecord) throws {
-        guard let folderID = record.localFolderID else { return }
+        let legacyClientID = record.localFolderID.map {
+            "\(record.userID):project:\(record.codeVersion):\($0)"
+        }
+        guard let folderID = try localFolderID(
+            clientID: record.folderClientID ?? legacyClientID,
+            codeVersion: record.codeVersion
+        ) ?? record.localFolderID else {
+            return
+        }
         let timestamp = isoFormatter.string(from: record.updatedAt)
         let statement = try connection.prepare(
             """
