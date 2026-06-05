@@ -1696,7 +1696,9 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshCurrentEntitlement()
         }
         await attachLocalDataIfNeeded()
-        await refreshLifetimeGrant()
+        await syncPendingUserContentIfPossible()
+        await pullRemoteUserContentIfPossible()
+        await refreshLifetimeGrant(announcesMissingGrant: false)
     }
 
     func attachLocalDataIfNeeded() async {
@@ -1809,7 +1811,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
     #endif
 
-    func refreshLifetimeGrant() async {
+    func refreshLifetimeGrant(announcesMissingGrant: Bool = true) async {
         guard let signedInAccount else { return }
         guard !isAccountBusy else { return }
         isAccountBusy = true
@@ -1823,7 +1825,7 @@ final class CodeLibraryViewModel: ObservableObject {
             } else if currentEntitlementSource == .lifetimeGrant {
                 LocalEntitlementService.clearLifetimeGrant()
                 statusMessage = "No lifetime Pro grant found for this account."
-            } else {
+            } else if announcesMissingGrant {
                 statusMessage = "Signed in. No lifetime Pro grant found for this account."
             }
             refreshCurrentEntitlement()
