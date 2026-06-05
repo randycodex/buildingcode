@@ -326,7 +326,7 @@ enum UserContentVisibility: String, Hashable, Sendable {
     case `public`
 }
 
-enum UserContentSyncState: String, Hashable, Sendable {
+enum UserContentSyncState: String, Codable, Hashable, Sendable {
     case localOnly
     case pendingUpload
     case synced
@@ -338,6 +338,7 @@ enum SyncEntityType: String, Codable, Hashable, Sendable {
     case tagSet
     case folder
     case folderSection
+    case continuity
     case codeVersionUserData
 }
 
@@ -387,6 +388,940 @@ struct SyncQueueItem: Identifiable, Hashable, Sendable {
     let createdAt: Date
     let updatedAt: Date
     let lastError: String?
+}
+
+enum UserContentServerMappingError: LocalizedError {
+    case missingSectionID(SyncEntityType)
+    case missingFolderID(SyncEntityType)
+
+    var errorDescription: String? {
+        switch self {
+        case .missingSectionID(let entityType):
+            return "Cannot sync \(entityType.rawValue): missing section ID."
+        case .missingFolderID(let entityType):
+            return "Cannot sync \(entityType.rawValue): missing project ID."
+        }
+    }
+}
+
+struct ServerUserRecord: Codable, Hashable, Sendable {
+    let id: String
+    let authProvider: AccountAuthProvider
+    let authProviderUserID: String
+    let publicUsername: String?
+    let displayName: String?
+    let updatedAt: Date
+}
+
+struct ServerEntitlementRecord: Codable, Hashable, Sendable {
+    let userID: String
+    let plan: AppPlan
+    let source: EntitlementSource
+    let grantedUserID: String?
+    let updatedAt: Date
+}
+
+struct ServerSavedItemRecord: Codable, Hashable, Sendable {
+    let id: String
+    let userID: String
+    let codeVersion: String
+    let sectionID: Int64
+    let updatedAt: Date
+    let deletedAt: Date?
+}
+
+struct ServerAnnotationRecord: Codable, Hashable, Sendable {
+    let id: String
+    let userID: String
+    let codeVersion: String
+    let sectionID: Int64
+    let noteBody: String?
+    let tags: [String]?
+    let updatedAt: Date
+    let deletedAt: Date?
+}
+
+struct ServerProjectRecord: Codable, Hashable, Sendable {
+    let id: String
+    let userID: String
+    let codeVersion: String
+    let localFolderID: Int64
+    let name: String?
+    let description: String?
+    let colorHex: String?
+    let sortOrder: Int?
+    let updatedAt: Date
+    let deletedAt: Date?
+}
+
+struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
+    let id: String
+    let userID: String
+    let codeVersion: String
+    let localFolderID: Int64?
+    let sectionID: Int64
+    let scope: String?
+    let updatedAt: Date
+    let deletedAt: Date?
+}
+
+struct ServerContinuityRecord: Codable, Hashable, Sendable {
+    let userID: String
+    let codeVersion: String
+    let values: [String: String]
+    let updatedAt: Date
+}
+
+enum ServerUserContentEntityKind: String, Codable, Hashable, Sendable {
+    case savedItem
+    case annotation
+    case project
+    case projectSection
+    case continuity
+    case codeVersionClear
+}
+
+enum ServerUserContentMutation: Codable, Hashable, Sendable {
+    case savedItem(ServerSavedItemRecord)
+    case annotation(ServerAnnotationRecord)
+    case project(ServerProjectRecord)
+    case projectSection(ServerProjectSectionRecord)
+    case continuity(ServerContinuityRecord)
+    case codeVersionClear(ServerContinuityRecord)
+
+    private enum CodingKeys: String, CodingKey {
+        case savedItem
+        case annotation
+        case project
+        case projectSection
+        case continuity
+        case codeVersionClear
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let presentKeys = container.allKeys
+        guard presentKeys.count == 1, let key = presentKeys.first else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "ServerUserContentMutation must contain exactly one mutation kind."
+                )
+            )
+        }
+
+        switch key {
+        case .savedItem:
+            self = .savedItem(try container.decode(ServerSavedItemRecord.self, forKey: .savedItem))
+        case .annotation:
+            self = .annotation(try container.decode(ServerAnnotationRecord.self, forKey: .annotation))
+        case .project:
+            self = .project(try container.decode(ServerProjectRecord.self, forKey: .project))
+        case .projectSection:
+            self = .projectSection(try container.decode(ServerProjectSectionRecord.self, forKey: .projectSection))
+        case .continuity:
+            self = .continuity(try container.decode(ServerContinuityRecord.self, forKey: .continuity))
+        case .codeVersionClear:
+            self = .codeVersionClear(try container.decode(ServerContinuityRecord.self, forKey: .codeVersionClear))
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .savedItem(let record):
+            try container.encode(record, forKey: .savedItem)
+        case .annotation(let record):
+            try container.encode(record, forKey: .annotation)
+        case .project(let record):
+            try container.encode(record, forKey: .project)
+        case .projectSection(let record):
+            try container.encode(record, forKey: .projectSection)
+        case .continuity(let record):
+            try container.encode(record, forKey: .continuity)
+        case .codeVersionClear(let record):
+            try container.encode(record, forKey: .codeVersionClear)
+        }
+    }
+
+    init(syncQueueItem item: SyncQueueItem, account: SignedInAccount) throws {
+        let payload = item.payload
+        let deletedAt = item.operationType == .delete ? item.updatedAt : nil
+        switch item.entityType {
+        case .bookmark:
+            guard let sectionID = payload.sectionID else {
+                throw UserContentServerMappingError.missingSectionID(item.entityType)
+            }
+            self = .savedItem(
+                ServerSavedItemRecord(
+                    id: Self.recordID(account: account, type: "saved", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    userID: account.appUserID,
+                    codeVersion: payload.codeVersion,
+                    sectionID: sectionID,
+                    updatedAt: item.updatedAt,
+                    deletedAt: deletedAt
+                )
+            )
+        case .note:
+            guard let sectionID = payload.sectionID else {
+                throw UserContentServerMappingError.missingSectionID(item.entityType)
+            }
+            self = .annotation(
+                ServerAnnotationRecord(
+                    id: Self.recordID(account: account, type: "note", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    userID: account.appUserID,
+                    codeVersion: payload.codeVersion,
+                    sectionID: sectionID,
+                    noteBody: item.operationType == .delete ? nil : payload.values["body"],
+                    tags: nil,
+                    updatedAt: item.updatedAt,
+                    deletedAt: deletedAt
+                )
+            )
+        case .tagSet:
+            guard let sectionID = payload.sectionID else {
+                throw UserContentServerMappingError.missingSectionID(item.entityType)
+            }
+            self = .annotation(
+                ServerAnnotationRecord(
+                    id: Self.recordID(account: account, type: "tags", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    userID: account.appUserID,
+                    codeVersion: payload.codeVersion,
+                    sectionID: sectionID,
+                    noteBody: nil,
+                    tags: item.operationType == .delete ? nil : Self.tags(from: payload.values["tags"]),
+                    updatedAt: item.updatedAt,
+                    deletedAt: deletedAt
+                )
+            )
+        case .folder:
+            guard let folderID = payload.folderID else {
+                throw UserContentServerMappingError.missingFolderID(item.entityType)
+            }
+            self = .project(
+                ServerProjectRecord(
+                    id: Self.recordID(account: account, type: "project", codeVersion: payload.codeVersion, folderID: folderID),
+                    userID: account.appUserID,
+                    codeVersion: payload.codeVersion,
+                    localFolderID: folderID,
+                    name: item.operationType == .delete ? nil : payload.values["name"],
+                    description: item.operationType == .delete ? nil : payload.values["description"],
+                    colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
+                    sortOrder: payload.values["sortOrder"].flatMap(Int.init),
+                    updatedAt: item.updatedAt,
+                    deletedAt: deletedAt
+                )
+            )
+        case .folderSection:
+            guard let sectionID = payload.sectionID else {
+                throw UserContentServerMappingError.missingSectionID(item.entityType)
+            }
+            self = .projectSection(
+                ServerProjectSectionRecord(
+                    id: Self.recordID(
+                        account: account,
+                        type: "project-section",
+                        codeVersion: payload.codeVersion,
+                        folderID: payload.folderID,
+                        sectionID: sectionID,
+                        scope: payload.values["scope"]
+                    ),
+                    userID: account.appUserID,
+                    codeVersion: payload.codeVersion,
+                    localFolderID: payload.folderID,
+                    sectionID: sectionID,
+                    scope: payload.values["scope"],
+                    updatedAt: item.updatedAt,
+                    deletedAt: deletedAt
+                )
+            )
+        case .continuity:
+            self = .continuity(
+                ServerContinuityRecord(
+                    userID: account.appUserID,
+                    codeVersion: payload.codeVersion,
+                    values: payload.values,
+                    updatedAt: item.updatedAt
+                )
+            )
+        case .codeVersionUserData:
+            self = .codeVersionClear(
+                ServerContinuityRecord(
+                    userID: account.appUserID,
+                    codeVersion: payload.codeVersion,
+                    values: payload.values,
+                    updatedAt: item.updatedAt
+                )
+            )
+        }
+    }
+
+    private static func tags(from rawValue: String?) -> [String]? {
+        guard let rawValue else { return [] }
+        return rawValue
+            .split(separator: "\n")
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+
+    private static func recordID(
+        account: SignedInAccount,
+        type: String,
+        codeVersion: String,
+        folderID: Int64? = nil,
+        sectionID: Int64? = nil,
+        scope: String? = nil
+    ) -> String {
+        [
+            account.appUserID,
+            type,
+            codeVersion,
+            folderID.map(String.init),
+            sectionID.map(String.init),
+            scope
+        ]
+        .compactMap { $0 }
+        .joined(separator: ":")
+    }
+
+    var entityKind: ServerUserContentEntityKind {
+        switch self {
+        case .savedItem:
+            return .savedItem
+        case .annotation:
+            return .annotation
+        case .project:
+            return .project
+        case .projectSection:
+            return .projectSection
+        case .continuity:
+            return .continuity
+        case .codeVersionClear:
+            return .codeVersionClear
+        }
+    }
+
+    var recordID: String {
+        switch self {
+        case .savedItem(let record):
+            return record.id
+        case .annotation(let record):
+            return record.id
+        case .project(let record):
+            return record.id
+        case .projectSection(let record):
+            return record.id
+        case .continuity(let record):
+            return [record.userID, "continuity", record.codeVersion].joined(separator: ":")
+        case .codeVersionClear(let record):
+            return [record.userID, "code-version-clear", record.codeVersion].joined(separator: ":")
+        }
+    }
+
+    var updatedAt: Date {
+        switch self {
+        case .savedItem(let record):
+            return record.updatedAt
+        case .annotation(let record):
+            return record.updatedAt
+        case .project(let record):
+            return record.updatedAt
+        case .projectSection(let record):
+            return record.updatedAt
+        case .continuity(let record), .codeVersionClear(let record):
+            return record.updatedAt
+        }
+    }
+
+    var deletedAt: Date? {
+        switch self {
+        case .savedItem(let record):
+            return record.deletedAt
+        case .annotation(let record):
+            return record.deletedAt
+        case .project(let record):
+            return record.deletedAt
+        case .projectSection(let record):
+            return record.deletedAt
+        case .continuity, .codeVersionClear:
+            return nil
+        }
+    }
+}
+
+struct ServerUserContentBatch: Codable, Hashable, Sendable {
+    let user: ServerUserRecord
+    let entitlement: ServerEntitlementRecord?
+    let mutations: [ServerUserContentMutation]
+
+    init(
+        account: SignedInAccount,
+        entitlement: AppEntitlement? = nil,
+        syncQueueItems: [SyncQueueItem]
+    ) throws {
+        self.user = ServerUserRecord(
+            id: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            publicUsername: account.publicUsername,
+            displayName: account.displayName,
+            updatedAt: account.signedInAt
+        )
+        self.entitlement = entitlement.map {
+            ServerEntitlementRecord(
+                userID: account.appUserID,
+                plan: $0.plan,
+                source: $0.source,
+                grantedUserID: $0.grantedUserID,
+                updatedAt: Date()
+            )
+        }
+        self.mutations = try syncQueueItems.map {
+            try ServerUserContentMutation(syncQueueItem: $0, account: account)
+        }
+    }
+}
+
+struct ServerUserContentPullResult: Codable, Hashable, Sendable {
+    let userID: String
+    let pulledAt: Date
+    let mutations: [ServerUserContentMutation]
+}
+
+struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
+    let accountUserID: String
+    let backendName: String
+    let lastSuccessfulPushAt: Date?
+    let lastSuccessfulPullAt: Date?
+    let lastAttemptedSyncAt: Date?
+    let lastErrorMessage: String?
+
+    init(
+        accountUserID: String,
+        backendName: String,
+        lastSuccessfulPushAt: Date? = nil,
+        lastSuccessfulPullAt: Date? = nil,
+        lastAttemptedSyncAt: Date? = nil,
+        lastErrorMessage: String? = nil
+    ) {
+        self.accountUserID = accountUserID
+        self.backendName = backendName
+        self.lastSuccessfulPushAt = lastSuccessfulPushAt
+        self.lastSuccessfulPullAt = lastSuccessfulPullAt
+        self.lastAttemptedSyncAt = lastAttemptedSyncAt
+        self.lastErrorMessage = lastErrorMessage
+    }
+
+    func markingPushSucceeded(at date: Date) -> UserContentSyncCheckpoint {
+        UserContentSyncCheckpoint(
+            accountUserID: accountUserID,
+            backendName: backendName,
+            lastSuccessfulPushAt: date,
+            lastSuccessfulPullAt: lastSuccessfulPullAt,
+            lastAttemptedSyncAt: date,
+            lastErrorMessage: nil
+        )
+    }
+
+    func markingPullSucceeded(at date: Date) -> UserContentSyncCheckpoint {
+        UserContentSyncCheckpoint(
+            accountUserID: accountUserID,
+            backendName: backendName,
+            lastSuccessfulPushAt: lastSuccessfulPushAt,
+            lastSuccessfulPullAt: date,
+            lastAttemptedSyncAt: date,
+            lastErrorMessage: nil
+        )
+    }
+
+    func markingFailed(error: Error, at date: Date) -> UserContentSyncCheckpoint {
+        UserContentSyncCheckpoint(
+            accountUserID: accountUserID,
+            backendName: backendName,
+            lastSuccessfulPushAt: lastSuccessfulPushAt,
+            lastSuccessfulPullAt: lastSuccessfulPullAt,
+            lastAttemptedSyncAt: date,
+            lastErrorMessage: error.localizedDescription
+        )
+    }
+}
+
+struct UserContentSyncCheckpointStore {
+    private let defaults: UserDefaults
+    private let keyPrefix = "permitext.sync.checkpoint"
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
+    func load(accountUserID: String, backendName: String) -> UserContentSyncCheckpoint {
+        let key = storageKey(accountUserID: accountUserID, backendName: backendName)
+        guard
+            let data = defaults.data(forKey: key),
+            let checkpoint = try? JSONDecoder().decode(UserContentSyncCheckpoint.self, from: data)
+        else {
+            return UserContentSyncCheckpoint(accountUserID: accountUserID, backendName: backendName)
+        }
+        return checkpoint
+    }
+
+    func save(_ checkpoint: UserContentSyncCheckpoint) {
+        guard let data = try? JSONEncoder().encode(checkpoint) else { return }
+        defaults.set(data, forKey: storageKey(accountUserID: checkpoint.accountUserID, backendName: checkpoint.backendName))
+    }
+
+    func clear(accountUserID: String, backendName: String) {
+        defaults.removeObject(forKey: storageKey(accountUserID: accountUserID, backendName: backendName))
+    }
+
+    private func storageKey(accountUserID: String, backendName: String) -> String {
+        "\(keyPrefix).\(backendName).\(accountUserID)"
+    }
+}
+
+struct BackendAuthContext: Codable, Hashable, Sendable {
+    let accountUserID: String
+    let bearerToken: String?
+}
+
+struct BackendSignInRequest: Codable, Hashable, Sendable {
+    let credential: AccountSignInCredential
+}
+
+struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
+    let account: SignedInAccount
+}
+
+struct BackendProfileUpdateRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let publicUsername: String?
+    let displayName: String?
+}
+
+struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
+    let account: SignedInAccount
+}
+
+struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let batch: ServerUserContentBatch
+}
+
+struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
+    let acceptedMutationIDs: [String]
+    let serverTime: Date
+}
+
+struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let since: Date?
+}
+
+protocol PermitextBackendTransport {
+    var name: String { get }
+    func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord
+    func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
+    func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
+    func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
+    func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
+}
+
+enum PermitextBackendMode: String, Codable, Hashable, Sendable {
+    case localDev
+    case http
+}
+
+struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
+    static let modeDefaultsKey = "permitext.backend.mode"
+    static let apiBaseURLDefaultsKey = "permitext.backend.apiBaseURL"
+    static let apiBaseURLInfoPlistKey = "PermitextBackendAPIBaseURL"
+
+    let mode: PermitextBackendMode
+    let apiBaseURLString: String?
+
+    static func load(
+        defaults: UserDefaults = .standard,
+        bundle: Bundle = .main
+    ) -> PermitextBackendConfiguration {
+        let mode = defaults.string(forKey: modeDefaultsKey)
+            .flatMap(PermitextBackendMode.init(rawValue:)) ?? .localDev
+        let defaultsBaseURL = defaults.string(forKey: apiBaseURLDefaultsKey)
+        let bundleBaseURL = bundle.object(forInfoDictionaryKey: apiBaseURLInfoPlistKey) as? String
+        let trimmedDefaultsBaseURL = defaultsBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedBundleBaseURL = bundleBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let apiBaseURLString = trimmedDefaultsBaseURL?.isEmpty == false
+            ? trimmedDefaultsBaseURL
+            : (trimmedBundleBaseURL?.isEmpty == false ? trimmedBundleBaseURL : nil)
+
+        return PermitextBackendConfiguration(
+            mode: mode,
+            apiBaseURLString: apiBaseURLString
+        )
+    }
+
+    func makeTransport() -> PermitextBackendTransport {
+        switch mode {
+        case .http:
+            guard let apiBaseURLString, let baseURL = URL(string: apiBaseURLString) else {
+                return LocalPermitextBackendTransport()
+            }
+            return PermitextBackendHTTPTransport(baseURL: baseURL)
+        case .localDev:
+            return LocalPermitextBackendTransport()
+        }
+    }
+
+    #if DEBUG
+    static func setDebugHTTPBaseURL(_ baseURLString: String?, defaults: UserDefaults = .standard) {
+        if let baseURLString = baseURLString?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !baseURLString.isEmpty {
+            defaults.set(PermitextBackendMode.http.rawValue, forKey: modeDefaultsKey)
+            defaults.set(baseURLString, forKey: apiBaseURLDefaultsKey)
+        } else {
+            defaults.set(PermitextBackendMode.localDev.rawValue, forKey: modeDefaultsKey)
+            defaults.removeObject(forKey: apiBaseURLDefaultsKey)
+        }
+    }
+    #endif
+}
+
+enum PermitextBackendFactory {
+    static func makeClient(configuration: PermitextBackendConfiguration = .load()) -> PermitextBackendClient {
+        PermitextBackendClient(transport: configuration.makeTransport())
+    }
+}
+
+enum PermitextBackendHTTPError: LocalizedError {
+    case invalidResponse
+    case serverStatus(Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidResponse:
+            return "The backend returned an invalid response."
+        case .serverStatus(let statusCode):
+            return "The backend returned HTTP \(statusCode)."
+        }
+    }
+}
+
+struct PermitextBackendHTTPTransport: PermitextBackendTransport {
+    let name: String
+    private let baseURL: URL
+    private let session: URLSession
+    private let encoder: JSONEncoder
+    private let decoder: JSONDecoder
+
+    init(
+        baseURL: URL,
+        name: String = "http-backend",
+        session: URLSession = .shared
+    ) {
+        self.name = name
+        self.baseURL = baseURL
+        self.session = session
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        self.encoder = encoder
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        self.decoder = decoder
+    }
+
+    func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord {
+        try await post("account/sign-in", body: request)
+    }
+
+    func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
+        try await post("account/attach-local-data", body: request)
+    }
+
+    func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse {
+        try await post("account/profile", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
+        try await post("sync/push", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult {
+        try await post("sync/pull", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    private func post<RequestBody: Encodable, ResponseBody: Decodable>(
+        _ path: String,
+        body: RequestBody,
+        bearerToken: String? = nil
+    ) async throws -> ResponseBody {
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if let bearerToken, !bearerToken.isEmpty {
+            request.setValue("Bearer \(bearerToken)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = try encoder.encode(body)
+
+        let (data, response) = try await session.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode)
+        }
+        return try decoder.decode(ResponseBody.self, from: data)
+    }
+}
+
+actor LocalPermitextBackendTransport: PermitextBackendTransport {
+    nonisolated let name = "local-dev-backend"
+    private var userContentByUserID: [String: [ServerUserContentMutation]] = [:]
+
+    func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord {
+        let credential = request.credential
+        let account = SignedInAccount(
+            appUserID: "\(credential.provider.rawValue):\(credential.providerUserID)",
+            authProvider: credential.provider,
+            authProviderUserID: credential.providerUserID,
+            appleUserID: credential.provider == .apple ? credential.providerUserID : "",
+            publicUsername: nil,
+            displayName: credential.displayName,
+            signedInAt: credential.signedInAt,
+            migrationState: .notStarted
+        )
+        return BackendAccountRecord(account: account, entitlement: nil)
+    }
+
+    func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
+        .localDataAttached
+    }
+
+    func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse {
+        BackendProfileUpdateResponse(
+            account: SignedInAccount(
+                appUserID: request.auth.accountUserID,
+                authProvider: .guest,
+                appleUserID: "",
+                publicUsername: request.publicUsername,
+                displayName: request.displayName,
+                signedInAt: Date(),
+                migrationState: .localDataAttached,
+                backendSessionToken: request.auth.bearerToken
+            )
+        )
+    }
+
+    func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
+        let userID = request.auth.accountUserID
+        var existingByID = Dictionary(uniqueKeysWithValues: (userContentByUserID[userID] ?? []).map { ($0.recordID, $0) })
+        for mutation in request.batch.mutations {
+            existingByID[mutation.recordID] = mutation
+        }
+        userContentByUserID[userID] = existingByID.values.sorted { $0.recordID < $1.recordID }
+        return BackendUserContentPushResponse(
+            acceptedMutationIDs: request.batch.mutations.map(\.recordID),
+            serverTime: Date()
+        )
+    }
+
+    func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult {
+        let allMutations = userContentByUserID[request.auth.accountUserID] ?? []
+        let mutations = request.since.map { since in
+            allMutations.filter { $0.updatedAt > since || ($0.deletedAt.map { $0 > since } ?? false) }
+        } ?? allMutations
+        return ServerUserContentPullResult(
+            userID: request.auth.accountUserID,
+            pulledAt: Date(),
+            mutations: mutations
+        )
+    }
+}
+
+enum UserContentMergeAction: String, Codable, Hashable, Sendable {
+    case applyServer
+    case keepLocal
+    case uploadLocal
+    case deleteLocal
+    case noChange
+    case flagConflict
+}
+
+struct UserContentMergeCandidate: Codable, Hashable, Sendable {
+    let recordID: String
+    let entityKind: ServerUserContentEntityKind
+    let localUpdatedAt: Date?
+    let serverUpdatedAt: Date?
+    let localDeletedAt: Date?
+    let serverDeletedAt: Date?
+    let localSyncState: UserContentSyncState
+
+    init(
+        recordID: String,
+        entityKind: ServerUserContentEntityKind,
+        localUpdatedAt: Date? = nil,
+        serverUpdatedAt: Date? = nil,
+        localDeletedAt: Date? = nil,
+        serverDeletedAt: Date? = nil,
+        localSyncState: UserContentSyncState = .synced
+    ) {
+        self.recordID = recordID
+        self.entityKind = entityKind
+        self.localUpdatedAt = localUpdatedAt
+        self.serverUpdatedAt = serverUpdatedAt
+        self.localDeletedAt = localDeletedAt
+        self.serverDeletedAt = serverDeletedAt
+        self.localSyncState = localSyncState
+    }
+
+    init(serverMutation: ServerUserContentMutation, localUpdatedAt: Date? = nil, localDeletedAt: Date? = nil, localSyncState: UserContentSyncState = .synced) {
+        self.init(
+            recordID: serverMutation.recordID,
+            entityKind: serverMutation.entityKind,
+            localUpdatedAt: localUpdatedAt,
+            serverUpdatedAt: serverMutation.updatedAt,
+            localDeletedAt: localDeletedAt,
+            serverDeletedAt: serverMutation.deletedAt,
+            localSyncState: localSyncState
+        )
+    }
+}
+
+struct UserContentMergeDecision: Codable, Hashable, Sendable {
+    let recordID: String
+    let entityKind: ServerUserContentEntityKind
+    let action: UserContentMergeAction
+    let reason: String
+}
+
+struct UserContentMergePlan: Codable, Hashable, Sendable {
+    let decisions: [UserContentMergeDecision]
+
+    var applyServerCount: Int { count(.applyServer) }
+    var keepLocalCount: Int { count(.keepLocal) }
+    var uploadLocalCount: Int { count(.uploadLocal) }
+    var deleteLocalCount: Int { count(.deleteLocal) }
+    var conflictCount: Int { count(.flagConflict) }
+    var noChangeCount: Int { count(.noChange) }
+
+    private func count(_ action: UserContentMergeAction) -> Int {
+        decisions.filter { $0.action == action }.count
+    }
+}
+
+enum UserContentMergeResolver {
+    static func plan(for candidates: [UserContentMergeCandidate]) -> UserContentMergePlan {
+        UserContentMergePlan(decisions: candidates.map(decision(for:)))
+    }
+
+    static func plan(
+        incomingServerMutations: [ServerUserContentMutation],
+        localCandidates: [String: UserContentMergeCandidate] = [:]
+    ) -> UserContentMergePlan {
+        let candidates = incomingServerMutations.map { mutation in
+            if let local = localCandidates[mutation.recordID] {
+                return UserContentMergeCandidate(
+                    recordID: mutation.recordID,
+                    entityKind: mutation.entityKind,
+                    localUpdatedAt: local.localUpdatedAt,
+                    serverUpdatedAt: mutation.updatedAt,
+                    localDeletedAt: local.localDeletedAt,
+                    serverDeletedAt: mutation.deletedAt,
+                    localSyncState: local.localSyncState
+                )
+            }
+            return UserContentMergeCandidate(serverMutation: mutation)
+        }
+        return plan(for: candidates)
+    }
+
+    static func decision(for candidate: UserContentMergeCandidate) -> UserContentMergeDecision {
+        if candidate.localSyncState == .pendingUpload || candidate.localSyncState == .localOnly {
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .uploadLocal,
+                reason: "Local edit has not reached the server yet."
+            )
+        }
+
+        if candidate.localDeletedAt != nil, candidate.serverDeletedAt == nil {
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .deleteLocal,
+                reason: "Local delete is authoritative until it uploads."
+            )
+        }
+
+        if let serverDeletedAt = candidate.serverDeletedAt {
+            if let localUpdatedAt = candidate.localUpdatedAt, localUpdatedAt > serverDeletedAt {
+                return UserContentMergeDecision(
+                    recordID: candidate.recordID,
+                    entityKind: candidate.entityKind,
+                    action: .flagConflict,
+                    reason: "Server deleted this record after sync, but local has a newer edit."
+                )
+            }
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .deleteLocal,
+                reason: "Server deletion is newer than the synced local record."
+            )
+        }
+
+        guard let serverUpdatedAt = candidate.serverUpdatedAt else {
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .keepLocal,
+                reason: "No server update is available."
+            )
+        }
+
+        guard let localUpdatedAt = candidate.localUpdatedAt else {
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .applyServer,
+                reason: "Server has a record that is missing locally."
+            )
+        }
+
+        if serverUpdatedAt > localUpdatedAt {
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .applyServer,
+                reason: "Server record is newer than the synced local record."
+            )
+        }
+
+        if localUpdatedAt > serverUpdatedAt {
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .uploadLocal,
+                reason: "Local record is newer and should be pushed back to the server."
+            )
+        }
+
+        if candidate.localDeletedAt != candidate.serverDeletedAt {
+            return UserContentMergeDecision(
+                recordID: candidate.recordID,
+                entityKind: candidate.entityKind,
+                action: .flagConflict,
+                reason: "Delete state differs even though update timestamps match."
+            )
+        }
+
+        return UserContentMergeDecision(
+            recordID: candidate.recordID,
+            entityKind: candidate.entityKind,
+            action: .noChange,
+            reason: "Local and server records are already aligned."
+        )
+    }
 }
 
 /// A user-created Project folder. Bookmarks can be assigned to many folders;
@@ -854,10 +1789,132 @@ struct AppEntitlement: Codable, Hashable, Sendable {
     #endif
 }
 
-struct SignedInAccount: Codable, Hashable, Sendable {
-    let appleUserID: String
+enum AccountAuthProvider: String, Codable, Hashable, Sendable {
+    case apple
+    case passkey
+    case guest
+}
+
+enum AccountMigrationState: String, Codable, Hashable, Sendable {
+    case notStarted
+    case localDataAttached
+    case skipped
+}
+
+struct AccountSignInCredential: Codable, Hashable, Sendable {
+    let provider: AccountAuthProvider
+    let providerUserID: String
     let displayName: String?
     let signedInAt: Date
+}
+
+struct SignedInAccount: Codable, Hashable, Sendable {
+    let appUserID: String
+    let authProvider: AccountAuthProvider
+    let authProviderUserID: String
+    let appleUserID: String
+    let publicUsername: String?
+    let displayName: String?
+    let signedInAt: Date
+    let migrationState: AccountMigrationState
+    let backendSessionToken: String?
+
+    init(
+        appUserID: String,
+        authProvider: AccountAuthProvider = .apple,
+        authProviderUserID: String? = nil,
+        appleUserID: String,
+        publicUsername: String? = nil,
+        displayName: String?,
+        signedInAt: Date,
+        migrationState: AccountMigrationState = .notStarted,
+        backendSessionToken: String? = nil
+    ) {
+        self.appUserID = appUserID
+        self.authProvider = authProvider
+        self.authProviderUserID = authProviderUserID ?? appleUserID
+        self.appleUserID = appleUserID
+        self.publicUsername = publicUsername
+        self.displayName = displayName
+        self.signedInAt = signedInAt
+        self.migrationState = migrationState
+        self.backendSessionToken = backendSessionToken
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case appUserID
+        case authProvider
+        case authProviderUserID
+        case appleUserID
+        case publicUsername
+        case displayName
+        case signedInAt
+        case migrationState
+        case backendSessionToken
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let appleUserID = try container.decodeIfPresent(String.self, forKey: .appleUserID) ?? ""
+        let authProvider = try container.decodeIfPresent(AccountAuthProvider.self, forKey: .authProvider)
+            ?? (appleUserID.isEmpty ? .guest : .apple)
+        let authProviderUserID = try container.decodeIfPresent(String.self, forKey: .authProviderUserID) ?? appleUserID
+        self.authProvider = authProvider
+        self.authProviderUserID = authProviderUserID
+        self.appleUserID = appleUserID
+        self.appUserID = try container.decodeIfPresent(String.self, forKey: .appUserID) ?? "\(authProvider.rawValue):\(authProviderUserID)"
+        self.publicUsername = try container.decodeIfPresent(String.self, forKey: .publicUsername)
+        self.displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        self.signedInAt = try container.decode(Date.self, forKey: .signedInAt)
+        self.migrationState = try container.decodeIfPresent(AccountMigrationState.self, forKey: .migrationState) ?? .notStarted
+        self.backendSessionToken = try container.decodeIfPresent(String.self, forKey: .backendSessionToken)
+    }
+}
+
+struct BackendAccountRecord: Codable, Hashable, Sendable {
+    let account: SignedInAccount
+    let entitlement: AppEntitlement?
+}
+
+protocol AccountBackendClient {
+    var name: String { get }
+    func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
+    func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
+    func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
+}
+
+struct LocalAccountBackendClient: AccountBackendClient {
+    let name = "local"
+
+    func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord {
+        let account = SignedInAccount(
+            appUserID: "\(credential.provider.rawValue):\(credential.providerUserID)",
+            appleUserID: credential.provider == .apple ? credential.providerUserID : "",
+            publicUsername: nil,
+            displayName: credential.displayName,
+            signedInAt: credential.signedInAt,
+            migrationState: .notStarted
+        )
+        return BackendAccountRecord(account: account, entitlement: nil)
+    }
+
+    func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState {
+        .localDataAttached
+    }
+
+    func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount {
+        SignedInAccount(
+            appUserID: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            appleUserID: account.appleUserID,
+            publicUsername: publicUsername,
+            displayName: displayName,
+            signedInAt: account.signedInAt,
+            migrationState: account.migrationState,
+            backendSessionToken: account.backendSessionToken
+        )
+    }
 }
 
 struct LifetimeGrantLookupResult: Codable, Hashable, Sendable {

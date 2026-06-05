@@ -1,6 +1,7 @@
 import Foundation
 import AuthenticationServices
 import os.signpost
+import Security
 import SwiftUI
 
 @MainActor
@@ -79,6 +80,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let readerThemeStore: ReaderThemeStore
     private let entitlementService: EntitlementService
     private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
+    private let accountBackendClient: AccountBackendClient
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let recentSearchesDefaultsKey = "recentSearches"
     private let pinnedSearchesDefaultsKey = "pinnedSearches"
@@ -125,10 +127,12 @@ final class CodeLibraryViewModel: ObservableObject {
     // detached child.
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
+    private var didRunStartupAccountSync = false
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
     private var pendingTabAssertionToken: Int = 0
     @Published private(set) var bookmarkRevision: Int = 0
+    @Published private(set) var userContentSyncCheckpoint: UserContentSyncCheckpoint?
 
     init(
         locator: BundleDatabaseLocator = BundleDatabaseLocator(),
@@ -138,19 +142,27 @@ final class CodeLibraryViewModel: ObservableObject {
         readerThemeStore: ReaderThemeStore = ReaderThemeStore(),
         entitlementService: EntitlementService = LocalEntitlementService(),
         lifetimeGrantLookupClient: LifetimeGrantLookupClient = LocalLifetimeGrantLookupClient(),
+        accountBackendClient: AccountBackendClient = PermitextBackendFactory.makeClient(),
+        syncBackend: UserContentSyncBackend? = nil,
         loadsInitialContent: Bool = true
     ) {
         self.locator = locator
         self.formattingEngine = formattingEngine
         self.userContentRepository = userContentRepository ?? (try? UserDataStore())
-        self.syncEngine = UserContentSyncEngine(repository: self.userContentRepository)
+        self.syncEngine = UserContentSyncEngine(
+            repository: self.userContentRepository,
+            backend: syncBackend ?? (accountBackendClient as? UserContentSyncBackend) ?? NoOpUserContentSyncBackend()
+        )
         self.continuityStore = continuityStore
         self.readerThemeStore = readerThemeStore
         self.entitlementService = entitlementService
         self.lifetimeGrantLookupClient = lifetimeGrantLookupClient
+        self.accountBackendClient = accountBackendClient
         self.currentPlan = entitlementService.currentPlan
         self.currentEntitlementSource = entitlementService.currentEntitlement.source
-        self.signedInAccount = Self.loadSignedInAccount()
+        let loadedSignedInAccount = Self.loadSignedInAccount()
+        self.signedInAccount = loadedSignedInAccount
+        self.userContentSyncCheckpoint = syncEngine.checkpoint(account: loadedSignedInAccount)
         self.readerTheme = readerThemeStore.load()
         self.recentSearches = Self.loadRecentSearches()
         self.pinnedSearches = Self.loadPinnedSearches()
@@ -394,6 +406,43 @@ final class CodeLibraryViewModel: ObservableObject {
             context.comparisonModeEnabled = comparisonModeEnabled
             context.recentlyViewedSections = recentlyViewedSections
         }
+        queueContinuityContextForSync()
+    }
+
+    private func queueContinuityContextForSync() {
+        let context = continuityStore.load()
+        do {
+            try userContentRepository?.queueContinuityContext(
+                codeVersion: context.selectedVersionFileName,
+                values: continuitySyncValues(from: context)
+            )
+        } catch {
+            #if DEBUG
+            print("permitext diagnostics: continuity sync queue failed: \(error.localizedDescription)")
+            #endif
+        }
+    }
+
+    private func continuitySyncValues(from context: ContinuityContext) -> [String: String] {
+        var values: [String: String] = [
+            "selectedJurisdictionKey": context.selectedJurisdictionKey,
+            "selectedVersionFileName": context.selectedVersionFileName,
+            "comparisonModeEnabled": context.comparisonModeEnabled ? "true" : "false"
+        ]
+        if let selectedCodeSectionID = context.selectedCodeSectionID {
+            values["selectedCodeSectionID"] = String(selectedCodeSectionID)
+        }
+        if let lastOpenedChapterID = context.lastOpenedChapterID {
+            values["lastOpenedChapterID"] = String(lastOpenedChapterID)
+        }
+        if let activeProjectID = context.activeProjectID {
+            values["activeProjectID"] = String(activeProjectID)
+        }
+        if let data = try? JSONEncoder().encode(context.recentlyViewedSections),
+           let json = String(data: data, encoding: .utf8) {
+            values["recentlyViewedSectionsJSON"] = json
+        }
+        return values
     }
 
     #if DEBUG
@@ -1594,20 +1643,187 @@ final class CodeLibraryViewModel: ObservableObject {
             let displayName = [credential.fullName?.givenName, credential.fullName?.familyName]
                 .compactMap { $0 }
                 .joined(separator: " ")
-            let account = SignedInAccount(
-                appleUserID: credential.user,
-                displayName: displayName.isEmpty ? nil : displayName,
-                signedInAt: Date()
-            )
-            signedInAccount = account
-            Self.saveSignedInAccount(account)
-            await refreshLifetimeGrant()
+            do {
+                let backendRecord = try await accountBackendClient.signIn(
+                    credential: AccountSignInCredential(
+                        provider: .apple,
+                        providerUserID: credential.user,
+                        displayName: displayName.isEmpty ? nil : displayName,
+                        signedInAt: Date()
+                    )
+                )
+                await completeBackendSignIn(backendRecord)
+            } catch {
+                statusMessage = error.localizedDescription
+            }
         case .failure(let error):
             statusMessage = error.localizedDescription
         }
     }
 
-    func refreshLifetimeGrant() async {
+    func handlePasskeySignIn(result: Result<ASAuthorization, Error>) async {
+        switch result {
+        case .success(let authorization):
+            guard #available(iOS 16.0, *),
+                  let credential = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion
+            else {
+                statusMessage = "Passkey sign-in did not return a passkey credential."
+                return
+            }
+            do {
+                let backendRecord = try await accountBackendClient.signIn(
+                    credential: AccountSignInCredential(
+                        provider: .passkey,
+                        providerUserID: credential.credentialID.base64EncodedString(),
+                        displayName: nil,
+                        signedInAt: Date()
+                    )
+                )
+                await completeBackendSignIn(backendRecord)
+            } catch {
+                statusMessage = error.localizedDescription
+            }
+        case .failure(let error):
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    private func completeBackendSignIn(_ backendRecord: BackendAccountRecord) async {
+        let account = backendRecord.account
+        signedInAccount = account
+        Self.saveSignedInAccount(account)
+        refreshUserContentSyncCheckpoint()
+        if let entitlement = backendRecord.entitlement {
+            LocalEntitlementService.setEntitlement(entitlement)
+            refreshCurrentEntitlement()
+        }
+        await attachLocalDataIfNeeded()
+        await syncPendingUserContentIfPossible()
+        await pullRemoteUserContentIfPossible()
+        await refreshLifetimeGrant(announcesMissingGrant: false)
+    }
+
+    func attachLocalDataIfNeeded() async {
+        guard let signedInAccount else { return }
+        guard signedInAccount.migrationState == .notStarted else { return }
+        do {
+            let migrationState = try await accountBackendClient.attachLocalData(account: signedInAccount)
+            let migratedAccount = SignedInAccount(
+                appUserID: signedInAccount.appUserID,
+                authProvider: signedInAccount.authProvider,
+                authProviderUserID: signedInAccount.authProviderUserID,
+                appleUserID: signedInAccount.appleUserID,
+                publicUsername: signedInAccount.publicUsername,
+                displayName: signedInAccount.displayName,
+                signedInAt: signedInAccount.signedInAt,
+                migrationState: migrationState,
+                backendSessionToken: signedInAccount.backendSessionToken
+            )
+            self.signedInAccount = migratedAccount
+            Self.saveSignedInAccount(migratedAccount)
+            refreshUserContentSyncCheckpoint()
+        } catch {
+            statusMessage = "Signed in. Local data is still only on this device."
+        }
+    }
+
+    func syncPendingUserContentIfPossible() async {
+        guard !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let report = try await syncEngine.processPendingWork(account: signedInAccount)
+            refreshUserContentSyncCheckpoint()
+            if let skippedReason = report.skippedReason {
+                statusMessage = skippedReason
+            } else if report.completedCount > 0 {
+                statusMessage = "Synced \(report.completedCount) local changes."
+            }
+        } catch {
+            refreshUserContentSyncCheckpoint()
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func previewRemoteUserContentMergeIfPossible() async -> UserContentMergePlan? {
+        guard !isAccountBusy else { return nil }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let report = try await syncEngine.pullRemoteChanges(account: signedInAccount)
+            refreshUserContentSyncCheckpoint()
+            return report.mergePlan
+        } catch {
+            refreshUserContentSyncCheckpoint()
+            statusMessage = error.localizedDescription
+            return nil
+        }
+    }
+
+    func pullRemoteUserContentIfPossible() async {
+        guard !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let report = try await syncEngine.pullRemoteChanges(account: signedInAccount, applySafeChanges: true)
+            refreshUserContentSyncCheckpoint()
+            if let skippedReason = report.skippedReason {
+                statusMessage = skippedReason
+            } else if report.appliedCount > 0 {
+                statusMessage = "Applied \(report.appliedCount) remote changes."
+            } else if report.conflictCount > 0 {
+                statusMessage = "\(report.conflictCount) remote changes need review."
+            }
+        } catch {
+            refreshUserContentSyncCheckpoint()
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func performStartupAccountSyncIfNeeded() async {
+        guard isInitialContentLoaded else { return }
+        guard signedInAccount != nil else { return }
+        guard !didRunStartupAccountSync else { return }
+        didRunStartupAccountSync = true
+        await syncPendingUserContentIfPossible()
+        await pullRemoteUserContentIfPossible()
+    }
+
+    private func refreshUserContentSyncCheckpoint() {
+        userContentSyncCheckpoint = syncEngine.checkpoint(account: signedInAccount)
+    }
+
+    #if DEBUG
+    var accountSyncDebugSummary: String {
+        let accountText: String
+        if let signedInAccount {
+            accountText = "\(signedInAccount.authProvider.rawValue): \(signedInAccount.appUserID)"
+        } else {
+            accountText = "not signed in"
+        }
+
+        let checkpointText: String
+        if let userContentSyncCheckpoint {
+            let pending = userContentSyncCheckpoint.lastPendingCount.map(String.init) ?? "unknown"
+            checkpointText = "pending: \(pending), last error: \(userContentSyncCheckpoint.lastErrorMessage ?? "none")"
+        } else {
+            checkpointText = "none"
+        }
+
+        let backendConfiguration = PermitextBackendConfiguration.load()
+        let backendBaseURL = backendConfiguration.apiBaseURLString ?? "none"
+        return [
+            "Account: \(accountText)",
+            "Backend: \(accountBackendClient.name) (\(backendConfiguration.mode.rawValue), base URL: \(backendBaseURL))",
+            "Sync checkpoint: \(checkpointText)"
+        ].joined(separator: "\n")
+    }
+    #endif
+
+    func refreshLifetimeGrant(announcesMissingGrant: Bool = true) async {
         guard let signedInAccount else { return }
         guard !isAccountBusy else { return }
         isAccountBusy = true
@@ -1621,7 +1837,7 @@ final class CodeLibraryViewModel: ObservableObject {
             } else if currentEntitlementSource == .lifetimeGrant {
                 LocalEntitlementService.clearLifetimeGrant()
                 statusMessage = "No lifetime Pro grant found for this account."
-            } else {
+            } else if announcesMissingGrant {
                 statusMessage = "Signed in. No lifetime Pro grant found for this account."
             }
             refreshCurrentEntitlement()
@@ -1670,16 +1886,43 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private static func loadSignedInAccount() -> SignedInAccount? {
         guard let data = UserDefaults.standard.data(forKey: AccountDefaults.signedInAccountKey) else { return nil }
-        return try? JSONDecoder().decode(SignedInAccount.self, from: data)
+        guard let account = try? JSONDecoder().decode(SignedInAccount.self, from: data) else { return nil }
+        let token = AccountSessionTokenStore.loadToken(accountUserID: account.appUserID)
+        return SignedInAccount(
+            appUserID: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            appleUserID: account.appleUserID,
+            publicUsername: account.publicUsername,
+            displayName: account.displayName,
+            signedInAt: account.signedInAt,
+            migrationState: account.migrationState,
+            backendSessionToken: token ?? account.backendSessionToken
+        )
     }
 
     private static func saveSignedInAccount(_ account: SignedInAccount) {
-        if let data = try? JSONEncoder().encode(account) {
+        AccountSessionTokenStore.saveToken(account.backendSessionToken, accountUserID: account.appUserID)
+        let persistedAccount = SignedInAccount(
+            appUserID: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            appleUserID: account.appleUserID,
+            publicUsername: account.publicUsername,
+            displayName: account.displayName,
+            signedInAt: account.signedInAt,
+            migrationState: account.migrationState,
+            backendSessionToken: nil
+        )
+        if let data = try? JSONEncoder().encode(persistedAccount) {
             UserDefaults.standard.set(data, forKey: AccountDefaults.signedInAccountKey)
         }
     }
 
     private static func clearSignedInAccount() {
+        if let account = loadSignedInAccount() {
+            AccountSessionTokenStore.deleteToken(accountUserID: account.appUserID)
+        }
         UserDefaults.standard.removeObject(forKey: AccountDefaults.signedInAccountKey)
     }
 
@@ -2746,6 +2989,50 @@ private final class CachedReaderSectionDetail: NSObject {
 
     init(_ detail: ReaderSectionDetail) {
         self.detail = detail
+    }
+}
+
+private enum AccountSessionTokenStore {
+    private static let service = "com.randycodex.permitext.backend-session"
+
+    static func loadToken(accountUserID: String) -> String? {
+        var query = baseQuery(accountUserID: accountUserID)
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess, let data = item as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    static func saveToken(_ token: String?, accountUserID: String) {
+        guard let token, let data = token.data(using: .utf8) else {
+            deleteToken(accountUserID: accountUserID)
+            return
+        }
+
+        let query = baseQuery(accountUserID: accountUserID)
+        let update = [kSecValueData as String: data]
+        let status = SecItemUpdate(query as CFDictionary, update as CFDictionary)
+        if status == errSecItemNotFound {
+            var item = query
+            item[kSecValueData as String] = data
+            item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            SecItemAdd(item as CFDictionary, nil)
+        }
+    }
+
+    static func deleteToken(accountUserID: String) {
+        SecItemDelete(baseQuery(accountUserID: accountUserID) as CFDictionary)
+    }
+
+    private static func baseQuery(accountUserID: String) -> [String: Any] {
+        [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: accountUserID
+        ]
     }
 }
 

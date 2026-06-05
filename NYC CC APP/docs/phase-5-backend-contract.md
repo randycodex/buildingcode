@@ -1,0 +1,257 @@
+# Phase 5 Backend Contract
+
+This contract captures the backend surface expected by the Permitext iOS app during Phase 5. The app keeps SQLite as the fast offline cache, but signed-in users sync through these endpoints.
+
+## Backend Mode
+
+The iOS app defaults to the local development backend.
+
+- `permitext.backend.mode`: `localDev` or `http`
+- `permitext.backend.apiBaseURL`: runtime override for the HTTP base URL
+- `PermitextBackendAPIBaseURL`: optional Info.plist fallback for the HTTP base URL
+
+When mode is `http`, the app posts JSON to the paths below under the configured base URL. Dates are ISO 8601.
+
+Local HTTP scaffold:
+
+- Path: `NYC CC APP/Backend/permitext-sync-server`
+- Default URL: `http://localhost:8787`
+- Storage: local JSON file for integration testing only
+
+Production storage plan:
+
+- `docs/phase-5-production-storage.md`
+
+## Account
+
+### `POST /account/sign-in`
+
+Request:
+
+```json
+{
+  "credential": {
+    "provider": "apple",
+    "providerUserID": "apple-user-id",
+    "displayName": "Optional Name",
+    "signedInAt": "2026-06-04T00:00:00Z"
+  }
+}
+```
+
+Response:
+
+```json
+{
+  "account": {
+    "appUserID": "stable-backend-user-id",
+    "authProvider": "apple",
+    "authProviderUserID": "apple-user-id",
+    "appleUserID": "apple-user-id",
+    "publicUsername": null,
+    "displayName": "Optional Name",
+    "signedInAt": "2026-06-04T00:00:00Z",
+    "migrationState": "notStarted",
+    "backendSessionToken": "opaque-session-token"
+  },
+  "entitlement": null
+}
+```
+
+The backend owns `appUserID`. Login identity and public identity must stay separate.
+
+`backendSessionToken` is an opaque local-scaffold session token used as the bearer token for sync calls. The app persists this token in Keychain rather than in the account metadata stored in `UserDefaults`. Production should rotate and expire equivalent tokens server-side.
+
+Passkey support uses the same endpoint with `credential.provider = "passkey"`. A production passkey flow also requires the app's Associated Domains entitlement and a valid `apple-app-site-association` file on the relying-party domain before the UI can be enabled.
+
+The local scaffold serves:
+
+- `GET /.well-known/apple-app-site-association`
+
+Configure it with:
+
+- `APPLE_TEAM_ID`
+- `APPLE_BUNDLE_ID`
+
+Production requirements:
+
+- The public API domain must use HTTPS.
+- The iOS target needs `com.apple.developer.associated-domains`.
+- The entitlement must include `webcredentials:<domain>`.
+- The same domain must serve the Apple App Site Association file at `/.well-known/apple-app-site-association`.
+
+### `POST /account/attach-local-data`
+
+Request:
+
+```json
+{
+  "account": {
+    "appUserID": "stable-backend-user-id",
+    "authProvider": "apple",
+    "authProviderUserID": "apple-user-id",
+    "appleUserID": "apple-user-id",
+    "publicUsername": null,
+    "displayName": "Optional Name",
+    "signedInAt": "2026-06-04T00:00:00Z",
+    "migrationState": "notStarted",
+    "backendSessionToken": "opaque-session-token"
+  }
+}
+```
+
+Response:
+
+```json
+"localDataAttached"
+```
+
+The first sign-in must attach local data without destructive replacement.
+
+### `POST /account/profile`
+
+Request:
+
+```json
+{
+  "auth": {
+    "accountUserID": "stable-backend-user-id",
+    "bearerToken": "opaque-session-token"
+  },
+  "publicUsername": "optional-public-handle",
+  "displayName": "Optional Name"
+}
+```
+
+Response:
+
+```json
+{
+  "account": {
+    "appUserID": "stable-backend-user-id",
+    "publicUsername": "optional-public-handle"
+  }
+}
+```
+
+The backend owns public username uniqueness. Public username remains separate from Apple or passkey login identity.
+
+## Sync
+
+All sync endpoints include bearer auth when available:
+
+```http
+Authorization: Bearer <token>
+```
+
+The local scaffold requires this bearer token after a user has signed in.
+
+### `POST /sync/push`
+
+Request:
+
+```json
+{
+  "auth": {
+    "accountUserID": "stable-backend-user-id",
+    "bearerToken": null
+  },
+  "batch": {
+    "user": {
+      "id": "stable-backend-user-id",
+      "authProvider": "apple",
+      "authProviderUserID": "apple-user-id",
+      "publicUsername": null,
+      "displayName": "Optional Name",
+      "updatedAt": "2026-06-04T00:00:00Z"
+    },
+    "entitlement": null,
+    "mutations": []
+  }
+}
+```
+
+Response:
+
+```json
+{
+  "acceptedMutationIDs": [],
+  "serverTime": "2026-06-04T00:00:00Z"
+}
+```
+
+Supported mutation kinds:
+
+- `savedItem`: bookmarked/saved sections
+- `annotation`: notes and tags
+- `project`: project folders
+- `projectSection`: project membership
+- `continuity`: selected jurisdiction/version/section, active project, comparison mode, recently viewed sections
+- `codeVersionClear`: destructive local clear actions by scope
+
+Backend validation rules:
+
+- Each mutation must be a single-key object.
+- The mutation kind must be one of the supported kinds above.
+- `record.userID` must match the authenticated `accountUserID`.
+- Every mutation must expose a stable record ID.
+- Every mutation must include a valid `updatedAt` timestamp.
+
+Swift encodes each mutation as a single-key object:
+
+```json
+{ "savedItem": { "id": "user:saved:version:section", "userID": "stable-backend-user-id" } }
+```
+
+### `POST /sync/pull`
+
+Request:
+
+```json
+{
+  "auth": {
+    "accountUserID": "stable-backend-user-id",
+    "bearerToken": null
+  },
+  "since": "2026-06-04T00:00:00Z"
+}
+```
+
+Response:
+
+```json
+{
+  "userID": "stable-backend-user-id",
+  "pulledAt": "2026-06-04T00:00:00Z",
+  "mutations": []
+}
+```
+
+The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten.
+
+## Internal Lifetime Grants
+
+The local scaffold exposes internal admin routes when `PERMITEXT_SYNC_ADMIN_TOKEN` is set:
+
+- `POST /admin/lifetime-grants/grant`
+- `POST /admin/lifetime-grants/revoke`
+
+Request:
+
+```json
+{ "userID": "stable-backend-user-id" }
+```
+
+Required header:
+
+```http
+Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
+```
+
+## Ownership Rules
+
+- Backend owns users, entitlements, lifetime Pro grants, projects, saved items, annotations, and continuity for signed-in users.
+- SQLite remains the offline cache and local write path.
+- Server state becomes source of truth only after sign-in and safe migration.
+- Public username is optional and separate from Apple identity.
+- Lifetime grants are entitlement records, not hard-coded client flags.

@@ -272,6 +272,11 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
+            Text(library.accountSyncDebugSummary)
+                .font(.caption2.monospaced())
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
             Picker("Local Test Plan", selection: Binding(
                 get: { library.currentPlan },
                 set: { library.setDebugPlan($0) }
