@@ -127,6 +127,7 @@ final class CodeLibraryViewModel: ObservableObject {
     // detached child.
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
+    private var didRunStartupAccountSync = false
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
     private var pendingTabAssertionToken: Int = 0
@@ -1780,6 +1781,15 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
         }
+    }
+
+    func performStartupAccountSyncIfNeeded() async {
+        guard isInitialContentLoaded else { return }
+        guard signedInAccount != nil else { return }
+        guard !didRunStartupAccountSync else { return }
+        didRunStartupAccountSync = true
+        await syncPendingUserContentIfPossible()
+        await pullRemoteUserContentIfPossible()
     }
 
     private func refreshUserContentSyncCheckpoint() {

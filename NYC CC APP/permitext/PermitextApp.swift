@@ -100,6 +100,9 @@ struct PermitextApp: App {
                 default:
                     break
                 }
+                Task {
+                    await library.performStartupAccountSyncIfNeeded()
+                }
             }
             .onAppear {
                 Task {
@@ -113,6 +116,9 @@ struct PermitextApp: App {
                     library.syncSelectedCodeSection(from: .secondary)
                 default:
                     break
+                }
+                Task {
+                    await library.performStartupAccountSyncIfNeeded()
                 }
             }
         }
