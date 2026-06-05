@@ -943,8 +943,8 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
         defaults: UserDefaults = .standard,
         bundle: Bundle = .main
     ) -> PermitextBackendConfiguration {
-        let mode = defaults.string(forKey: modeDefaultsKey)
-            .flatMap(PermitextBackendMode.init(rawValue:)) ?? .localDev
+        let storedMode = defaults.string(forKey: modeDefaultsKey)
+            .flatMap(PermitextBackendMode.init(rawValue:))
         let defaultsBaseURL = defaults.string(forKey: apiBaseURLDefaultsKey)
         let bundleBaseURL = bundle.object(forInfoDictionaryKey: apiBaseURLInfoPlistKey) as? String
         let trimmedDefaultsBaseURL = defaultsBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -952,6 +952,7 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
         let apiBaseURLString = trimmedDefaultsBaseURL?.isEmpty == false
             ? trimmedDefaultsBaseURL
             : (trimmedBundleBaseURL?.isEmpty == false ? trimmedBundleBaseURL : nil)
+        let mode = apiBaseURLString == nil ? (storedMode ?? .localDev) : .http
 
         return PermitextBackendConfiguration(
             mode: mode,

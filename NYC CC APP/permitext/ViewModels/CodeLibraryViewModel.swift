@@ -1796,7 +1796,6 @@ final class CodeLibraryViewModel: ObservableObject {
         userContentSyncCheckpoint = syncEngine.checkpoint(account: signedInAccount)
     }
 
-    #if DEBUG
     var accountSyncDebugSummary: String {
         let accountText: String
         if let signedInAccount {
@@ -1807,8 +1806,11 @@ final class CodeLibraryViewModel: ObservableObject {
 
         let checkpointText: String
         if let userContentSyncCheckpoint {
-            let pending = userContentSyncCheckpoint.lastPendingCount.map(String.init) ?? "unknown"
-            checkpointText = "pending: \(pending), last error: \(userContentSyncCheckpoint.lastErrorMessage ?? "none")"
+            checkpointText = [
+                "last push: \(userContentSyncCheckpoint.lastSuccessfulPushAt?.formatted() ?? "none")",
+                "last pull: \(userContentSyncCheckpoint.lastSuccessfulPullAt?.formatted() ?? "none")",
+                "last error: \(userContentSyncCheckpoint.lastErrorMessage ?? "none")"
+            ].joined(separator: ", ")
         } else {
             checkpointText = "none"
         }
@@ -1821,7 +1823,6 @@ final class CodeLibraryViewModel: ObservableObject {
             "Sync checkpoint: \(checkpointText)"
         ].joined(separator: "\n")
     }
-    #endif
 
     func refreshLifetimeGrant(announcesMissingGrant: Bool = true) async {
         guard let signedInAccount else { return }
