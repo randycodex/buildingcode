@@ -1301,7 +1301,10 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func clearRecentSearches() {
         recentSearches = []
+        recentlyViewedSections = []
         UserDefaults.standard.removeObject(forKey: recentSearchesDefaultsKey)
+        persistRecentlyViewedSections()
+        scheduleUserContentAutoSync()
     }
 
     func pinSearch(_ query: String) {
