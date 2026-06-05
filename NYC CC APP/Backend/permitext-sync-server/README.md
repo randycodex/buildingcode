@@ -6,6 +6,7 @@ It now supports two runtime shapes:
 
 - local Node server for development and smoke testing
 - Vercel Function deployment for hosted testing
+- Neon Postgres persistence when Vercel provides a database URL
 
 ## Run
 
@@ -16,7 +17,7 @@ node server.mjs
 Defaults:
 
 - URL: `http://localhost:8787`
-- Data file: `data/sync-store.json`
+- Data file: `data/sync-store.json` when no database URL is configured
 
 Override with:
 
@@ -40,12 +41,20 @@ APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mj
 
 This folder is Vercel-ready.
 
-- Root Directory: `NYC CC APP/Backend/permitext-sync-server`
+- Root Directory: `permitext-sync-server`
 - Preset: `Other`
 - Entrypoint: `api/index.mjs`
 - Routing: `vercel.json` rewrites clean paths like `/account/sign-in` to the Vercel function
 
-For the first hosted deploy, leave the local file-backed store in place only as a temporary scaffold. It is acceptable for backend contract testing, but not for production persistence.
+When a Neon database is connected through Vercel, the server uses the first available database URL from:
+
+- `PERMITEXT_SYNC_DATABASE_URL`
+- `DATABASE_URL`
+- `STORAGE_URL`
+- `POSTGRES_URL`
+- `NEON_DATABASE_URL`
+
+The `permitext_sync_state` table is created automatically on first request. Local development still falls back to the JSON file store if no database URL is present.
 
 ## Endpoints
 

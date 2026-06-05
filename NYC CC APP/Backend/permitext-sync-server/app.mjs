@@ -5,6 +5,14 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
+const databaseURL =
+  process.env.PERMITEXT_SYNC_DATABASE_URL ||
+  process.env.DATABASE_URL ||
+  process.env.STORAGE_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.NEON_DATABASE_URL;
+
+let cachedStoreAdapter = null;
 
 const emptyStore = () => ({
   users: {},
@@ -22,21 +30,134 @@ const allowedMutationKinds = new Set([
   "codeVersionClear"
 ]);
 
-async function readStore() {
-  try {
-    const raw = await readFile(dataPath, "utf8");
-    return { ...emptyStore(), ...JSON.parse(raw) };
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      return emptyStore();
-    }
-    throw error;
+function safeJSON(value, fallback) {
+  if (value === null || value === undefined) {
+    return fallback;
   }
+  if (typeof value === "string") {
+    return JSON.parse(value);
+  }
+  return value;
+}
+
+function createFileStoreAdapter() {
+  return {
+    kind: "file",
+    async read() {
+      try {
+        const raw = await readFile(dataPath, "utf8");
+        return { ...emptyStore(), ...JSON.parse(raw) };
+      } catch (error) {
+        if (error.code === "ENOENT") {
+          return emptyStore();
+        }
+        throw error;
+      }
+    },
+    async write(store) {
+      await mkdir(dirname(dataPath), { recursive: true });
+      await writeFile(dataPath, JSON.stringify(store, null, 2) + "\n");
+    }
+  };
+}
+
+async function createPostgresStoreAdapter() {
+  const { neon } = await import("@neondatabase/serverless");
+  const sql = neon(databaseURL);
+  let initialized = false;
+
+  async function ensureSchema() {
+    if (initialized) {
+      return;
+    }
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_sync_state (
+        id TEXT PRIMARY KEY,
+        users JSONB NOT NULL DEFAULT '{}'::jsonb,
+        entitlements JSONB NOT NULL DEFAULT '{}'::jsonb,
+        sessions JSONB NOT NULL DEFAULT '{}'::jsonb,
+        mutations_by_user_id JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      INSERT INTO permitext_sync_state (id)
+      VALUES ('default')
+      ON CONFLICT (id) DO NOTHING
+    `;
+    initialized = true;
+  }
+
+  return {
+    kind: "postgres",
+    async read() {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT users, entitlements, sessions, mutations_by_user_id
+        FROM permitext_sync_state
+        WHERE id = 'default'
+        LIMIT 1
+      `;
+      const row = rows[0] || {};
+      return {
+        users: safeJSON(row.users, {}),
+        entitlements: safeJSON(row.entitlements, {}),
+        sessions: safeJSON(row.sessions, {}),
+        mutationsByUserID: safeJSON(row.mutations_by_user_id, {})
+      };
+    },
+    async write(store) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_sync_state (
+          id,
+          users,
+          entitlements,
+          sessions,
+          mutations_by_user_id,
+          updated_at
+        )
+        VALUES (
+          'default',
+          ${JSON.stringify(store.users || {})}::jsonb,
+          ${JSON.stringify(store.entitlements || {})}::jsonb,
+          ${JSON.stringify(store.sessions || {})}::jsonb,
+          ${JSON.stringify(store.mutationsByUserID || {})}::jsonb,
+          now()
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          users = EXCLUDED.users,
+          entitlements = EXCLUDED.entitlements,
+          sessions = EXCLUDED.sessions,
+          mutations_by_user_id = EXCLUDED.mutations_by_user_id,
+          updated_at = EXCLUDED.updated_at
+      `;
+    }
+  };
+}
+
+async function storeAdapter() {
+  if (!cachedStoreAdapter) {
+    cachedStoreAdapter = databaseURL
+      ? await createPostgresStoreAdapter()
+      : createFileStoreAdapter();
+  }
+  return cachedStoreAdapter;
+}
+
+async function readStore() {
+  const adapter = await storeAdapter();
+  return adapter.read();
 }
 
 async function writeStore(store) {
-  await mkdir(dirname(dataPath), { recursive: true });
-  await writeFile(dataPath, JSON.stringify(store, null, 2) + "\n");
+  const adapter = await storeAdapter();
+  await adapter.write(store);
+}
+
+async function storageKind() {
+  const adapter = await storeAdapter();
+  return adapter.kind;
 }
 
 async function readJSON(request) {
@@ -416,7 +537,8 @@ export async function handleRequest(request, response) {
     const path = normalizePath(request.url);
 
     if (request.method === "GET" && path === "health") {
-      sendJSON(response, 200, { ok: true });
+      await readStore();
+      sendJSON(response, 200, { ok: true, storage: await storageKind() });
       return;
     }
     if (request.method === "GET" && path === ".well-known/apple-app-site-association") {

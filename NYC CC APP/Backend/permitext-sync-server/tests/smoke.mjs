@@ -52,6 +52,11 @@ async function main() {
       ...process.env,
       PORT: String(port),
       PERMITEXT_SYNC_DATA_PATH: dataPath,
+      PERMITEXT_SYNC_DATABASE_URL: "",
+      DATABASE_URL: "",
+      STORAGE_URL: "",
+      POSTGRES_URL: "",
+      NEON_DATABASE_URL: "",
       PERMITEXT_SYNC_ADMIN_TOKEN: adminToken,
       APPLE_TEAM_ID: "ABCDE12345",
       APPLE_BUNDLE_ID: "com.randycodex.permitext"

@@ -8,6 +8,9 @@
     "check": "node --check server.mjs && node --check tests/smoke.mjs",
     "smoke": "node tests/smoke.mjs"
   },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  },
   "engines": {
     "node": ">=20"
   }
