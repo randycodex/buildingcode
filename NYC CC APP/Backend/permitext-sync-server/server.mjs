@@ -51,6 +51,25 @@ function sendError(response, status, message) {
   sendJSON(response, status, { error: message });
 }
 
+function bearerToken(request) {
+  const authorization = request.headers.authorization || "";
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  return match?.[1] || null;
+}
+
+function requireAdmin(request, response) {
+  const adminToken = process.env.PERMITEXT_SYNC_ADMIN_TOKEN;
+  if (!adminToken) {
+    sendError(response, 403, "Admin API is disabled.");
+    return false;
+  }
+  if (bearerToken(request) !== adminToken) {
+    sendError(response, 401, "Unauthorized.");
+    return false;
+  }
+  return true;
+}
+
 function normalizePath(url) {
   return new URL(url, "http://localhost").pathname.replace(/^\/+/, "");
 }
@@ -182,11 +201,54 @@ async function handlePull(request, response) {
   });
 }
 
+async function handleLifetimeGrant(request, response) {
+  if (!requireAdmin(request, response)) {
+    return;
+  }
+
+  const body = await readJSON(request);
+  const userID = body.userID || body.appUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing userID.");
+    return;
+  }
+
+  const store = await readStore();
+  const entitlement = {
+    plan: "pro",
+    source: "lifetimeGrant",
+    grantedUserID: userID
+  };
+  store.entitlements[userID] = entitlement;
+  await writeStore(store);
+  sendJSON(response, 200, { userID, entitlement });
+}
+
+async function handleLifetimeGrantDelete(request, response) {
+  if (!requireAdmin(request, response)) {
+    return;
+  }
+
+  const body = await readJSON(request);
+  const userID = body.userID || body.appUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing userID.");
+    return;
+  }
+
+  const store = await readStore();
+  delete store.entitlements[userID];
+  await writeStore(store);
+  sendJSON(response, 200, { userID, entitlement: null });
+}
+
 const handlers = {
   "account/sign-in": handleSignIn,
   "account/attach-local-data": handleAttachLocalData,
   "sync/push": handlePush,
-  "sync/pull": handlePull
+  "sync/pull": handlePull,
+  "admin/lifetime-grants/grant": handleLifetimeGrant,
+  "admin/lifetime-grants/revoke": handleLifetimeGrantDelete
 };
 
 const server = createServer(async (request, response) => {

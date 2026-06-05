@@ -167,6 +167,25 @@ Response:
 
 The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten.
 
+## Internal Lifetime Grants
+
+The local scaffold exposes internal admin routes when `PERMITEXT_SYNC_ADMIN_TOKEN` is set:
+
+- `POST /admin/lifetime-grants/grant`
+- `POST /admin/lifetime-grants/revoke`
+
+Request:
+
+```json
+{ "userID": "stable-backend-user-id" }
+```
+
+Required header:
+
+```http
+Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
+```
+
 ## Ownership Rules
 
 - Backend owns users, entitlements, lifetime Pro grants, projects, saved items, annotations, and continuity for signed-in users.
