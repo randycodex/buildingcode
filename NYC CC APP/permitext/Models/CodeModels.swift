@@ -489,6 +489,61 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
     case continuity(ServerContinuityRecord)
     case codeVersionClear(ServerContinuityRecord)
 
+    private enum CodingKeys: String, CodingKey {
+        case savedItem
+        case annotation
+        case project
+        case projectSection
+        case continuity
+        case codeVersionClear
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let presentKeys = container.allKeys
+        guard presentKeys.count == 1, let key = presentKeys.first else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "ServerUserContentMutation must contain exactly one mutation kind."
+                )
+            )
+        }
+
+        switch key {
+        case .savedItem:
+            self = .savedItem(try container.decode(ServerSavedItemRecord.self, forKey: .savedItem))
+        case .annotation:
+            self = .annotation(try container.decode(ServerAnnotationRecord.self, forKey: .annotation))
+        case .project:
+            self = .project(try container.decode(ServerProjectRecord.self, forKey: .project))
+        case .projectSection:
+            self = .projectSection(try container.decode(ServerProjectSectionRecord.self, forKey: .projectSection))
+        case .continuity:
+            self = .continuity(try container.decode(ServerContinuityRecord.self, forKey: .continuity))
+        case .codeVersionClear:
+            self = .codeVersionClear(try container.decode(ServerContinuityRecord.self, forKey: .codeVersionClear))
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .savedItem(let record):
+            try container.encode(record, forKey: .savedItem)
+        case .annotation(let record):
+            try container.encode(record, forKey: .annotation)
+        case .project(let record):
+            try container.encode(record, forKey: .project)
+        case .projectSection(let record):
+            try container.encode(record, forKey: .projectSection)
+        case .continuity(let record):
+            try container.encode(record, forKey: .continuity)
+        case .codeVersionClear(let record):
+            try container.encode(record, forKey: .codeVersionClear)
+        }
+    }
+
     init(syncQueueItem item: SyncQueueItem, account: SignedInAccount) throws {
         let payload = item.payload
         let deletedAt = item.operationType == .delete ? item.updatedAt : nil
