@@ -450,7 +450,12 @@ async function handleAttachLocalData(request, response) {
   if (!requireUserSession(request, response, store, account.appUserID, account)) {
     return;
   }
-  const migratedAccount = { ...account, migrationState: "localDataAttached" };
+  const existingAccount = store.users[account.appUserID] || {};
+  const migratedAccount = {
+    ...account,
+    ...existingAccount,
+    migrationState: "localDataAttached"
+  };
   store.users[account.appUserID] = migratedAccount;
   await writeStore(store);
   sendJSON(response, 200, "localDataAttached");
