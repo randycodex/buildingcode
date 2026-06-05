@@ -51,13 +51,16 @@ Response:
     "publicUsername": null,
     "displayName": "Optional Name",
     "signedInAt": "2026-06-04T00:00:00Z",
-    "migrationState": "notStarted"
+    "migrationState": "notStarted",
+    "backendSessionToken": "opaque-session-token"
   },
   "entitlement": null
 }
 ```
 
 The backend owns `appUserID`. Login identity and public identity must stay separate.
+
+`backendSessionToken` is an opaque local-scaffold session token used as the bearer token for sync calls. Production should store the equivalent token in Keychain and rotate/expire it server-side.
 
 Passkey support uses the same endpoint with `credential.provider = "passkey"`. A production passkey flow also requires the app's Associated Domains entitlement and a valid `apple-app-site-association` file on the relying-party domain before the UI can be enabled.
 
@@ -91,7 +94,8 @@ Request:
     "publicUsername": null,
     "displayName": "Optional Name",
     "signedInAt": "2026-06-04T00:00:00Z",
-    "migrationState": "notStarted"
+    "migrationState": "notStarted",
+    "backendSessionToken": "opaque-session-token"
   }
 }
 ```
@@ -111,6 +115,8 @@ All sync endpoints include bearer auth when available:
 ```http
 Authorization: Bearer <token>
 ```
+
+The local scaffold requires this bearer token after a user has signed in.
 
 ### `POST /sync/push`
 

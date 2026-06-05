@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,6 +11,7 @@ const port = Number(process.env.PORT || 8787);
 const emptyStore = () => ({
   users: {},
   entitlements: {},
+  sessions: {},
   mutationsByUserID: {}
 });
 
@@ -81,6 +83,20 @@ function requireAdmin(request, response) {
     return false;
   }
   if (bearerToken(request) !== adminToken) {
+    sendError(response, 401, "Unauthorized.");
+    return false;
+  }
+  return true;
+}
+
+function requireUserSession(request, response, store, userID, requestAccount) {
+  const sessionToken = store.sessions[userID];
+  if (!sessionToken) {
+    return true;
+  }
+
+  const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
+  if (suppliedToken !== sessionToken) {
     sendError(response, 401, "Unauthorized.");
     return false;
   }
@@ -192,8 +208,12 @@ async function handleSignIn(request, response) {
   const body = await readJSON(request);
   const account = accountFromCredential(body.credential);
   const store = await readStore();
+  const sessionToken = store.sessions[account.appUserID] || randomUUID();
+  store.sessions[account.appUserID] = sessionToken;
   const existing = store.users[account.appUserID];
-  const storedAccount = existing ? { ...account, ...existing, signedInAt: account.signedInAt } : account;
+  const storedAccount = existing
+    ? { ...account, ...existing, signedInAt: account.signedInAt, backendSessionToken: sessionToken }
+    : { ...account, backendSessionToken: sessionToken };
   store.users[account.appUserID] = storedAccount;
   await writeStore(store);
   sendJSON(response, 200, {
@@ -211,6 +231,9 @@ async function handleAttachLocalData(request, response) {
   }
 
   const store = await readStore();
+  if (!requireUserSession(request, response, store, account.appUserID, account)) {
+    return;
+  }
   const migratedAccount = { ...account, migrationState: "localDataAttached" };
   store.users[account.appUserID] = migratedAccount;
   await writeStore(store);
@@ -226,6 +249,9 @@ async function handlePush(request, response) {
   }
 
   const store = await readStore();
+  if (!requireUserSession(request, response, store, userID)) {
+    return;
+  }
   store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
   if (body.batch?.entitlement) {
     store.entitlements[userID] = body.batch.entitlement;
@@ -261,6 +287,9 @@ async function handlePull(request, response) {
   }
 
   const store = await readStore();
+  if (!requireUserSession(request, response, store, userID)) {
+    return;
+  }
   const since = body.since ? Date.parse(body.since) : null;
   const allMutations = store.mutationsByUserID[userID] || [];
   const mutations = Number.isFinite(since)

@@ -1787,6 +1787,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
     let displayName: String?
     let signedInAt: Date
     let migrationState: AccountMigrationState
+    let backendSessionToken: String?
 
     init(
         appUserID: String,
@@ -1796,7 +1797,8 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         publicUsername: String? = nil,
         displayName: String?,
         signedInAt: Date,
-        migrationState: AccountMigrationState = .notStarted
+        migrationState: AccountMigrationState = .notStarted,
+        backendSessionToken: String? = nil
     ) {
         self.appUserID = appUserID
         self.authProvider = authProvider
@@ -1806,6 +1808,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         self.displayName = displayName
         self.signedInAt = signedInAt
         self.migrationState = migrationState
+        self.backendSessionToken = backendSessionToken
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -1817,6 +1820,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         case displayName
         case signedInAt
         case migrationState
+        case backendSessionToken
     }
 
     init(from decoder: Decoder) throws {
@@ -1833,6 +1837,7 @@ struct SignedInAccount: Codable, Hashable, Sendable {
         self.displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
         self.signedInAt = try container.decode(Date.self, forKey: .signedInAt)
         self.migrationState = try container.decodeIfPresent(AccountMigrationState.self, forKey: .migrationState) ?? .notStarted
+        self.backendSessionToken = try container.decodeIfPresent(String.self, forKey: .backendSessionToken)
     }
 }
 

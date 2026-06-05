@@ -1714,7 +1714,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 publicUsername: signedInAccount.publicUsername,
                 displayName: signedInAccount.displayName,
                 signedInAt: signedInAccount.signedInAt,
-                migrationState: migrationState
+                migrationState: migrationState,
+                backendSessionToken: signedInAccount.backendSessionToken
             )
             self.signedInAccount = migratedAccount
             Self.saveSignedInAccount(migratedAccount)

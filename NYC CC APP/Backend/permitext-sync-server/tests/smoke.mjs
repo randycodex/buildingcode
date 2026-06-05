@@ -95,6 +95,7 @@ async function main() {
     });
     assert(signIn.response.ok, "Sign-in failed.");
     assert(signIn.json.account.appUserID === userID, "Sign-in returned the wrong user ID.");
+    assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
 
     const attach = await request("/account/attach-local-data", {
@@ -104,8 +105,21 @@ async function main() {
     assert(attach.response.ok, "Attach local data failed.");
     assert(attach.json === "localDataAttached", "Attach local data returned the wrong state.");
 
+    const unauthorizedPush = await request("/sync/push", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: []
+        }
+      }
+    });
+    assert(unauthorizedPush.response.status === 401, "Push allowed a missing session token.");
+
     const malformedPush = await request("/sync/push", {
       method: "POST",
+      token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -128,6 +142,7 @@ async function main() {
     };
     const push = await request("/sync/push", {
       method: "POST",
+      token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -141,6 +156,7 @@ async function main() {
 
     const pull = await request("/sync/pull", {
       method: "POST",
+      token: signIn.json.account.backendSessionToken,
       body: { auth: { accountUserID: userID } }
     });
     assert(pull.response.ok, "Sync pull failed.");

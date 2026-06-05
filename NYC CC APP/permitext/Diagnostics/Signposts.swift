@@ -100,7 +100,7 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
 
     init(
         transport: PermitextBackendTransport = LocalPermitextBackendTransport(),
-        bearerTokenProvider: @escaping @Sendable (SignedInAccount) -> String? = { _ in nil }
+        bearerTokenProvider: @escaping @Sendable (SignedInAccount) -> String? = { $0.backendSessionToken }
     ) {
         self.transport = transport
         self.bearerTokenProvider = bearerTokenProvider
