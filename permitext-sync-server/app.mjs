@@ -18,6 +18,7 @@ const emptyStore = () => ({
   users: {},
   entitlements: {},
   sessions: {},
+  passkeyCredentials: {},
   mutationsByUserID: {}
 });
 
@@ -76,9 +77,14 @@ async function createPostgresStoreAdapter() {
         users JSONB NOT NULL DEFAULT '{}'::jsonb,
         entitlements JSONB NOT NULL DEFAULT '{}'::jsonb,
         sessions JSONB NOT NULL DEFAULT '{}'::jsonb,
+        passkey_credentials JSONB NOT NULL DEFAULT '{}'::jsonb,
         mutations_by_user_id JSONB NOT NULL DEFAULT '{}'::jsonb,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
+    `;
+    await sql`
+      ALTER TABLE permitext_sync_state
+      ADD COLUMN IF NOT EXISTS passkey_credentials JSONB NOT NULL DEFAULT '{}'::jsonb
     `;
     await sql`
       INSERT INTO permitext_sync_state (id)
@@ -93,7 +99,7 @@ async function createPostgresStoreAdapter() {
     async read() {
       await ensureSchema();
       const rows = await sql`
-        SELECT users, entitlements, sessions, mutations_by_user_id
+        SELECT users, entitlements, sessions, passkey_credentials, mutations_by_user_id
         FROM permitext_sync_state
         WHERE id = 'default'
         LIMIT 1
@@ -103,6 +109,7 @@ async function createPostgresStoreAdapter() {
         users: safeJSON(row.users, {}),
         entitlements: safeJSON(row.entitlements, {}),
         sessions: safeJSON(row.sessions, {}),
+        passkeyCredentials: safeJSON(row.passkey_credentials, {}),
         mutationsByUserID: safeJSON(row.mutations_by_user_id, {})
       };
     },
@@ -114,6 +121,7 @@ async function createPostgresStoreAdapter() {
           users,
           entitlements,
           sessions,
+          passkey_credentials,
           mutations_by_user_id,
           updated_at
         )
@@ -122,6 +130,7 @@ async function createPostgresStoreAdapter() {
           ${JSON.stringify(store.users || {})}::jsonb,
           ${JSON.stringify(store.entitlements || {})}::jsonb,
           ${JSON.stringify(store.sessions || {})}::jsonb,
+          ${JSON.stringify(store.passkeyCredentials || {})}::jsonb,
           ${JSON.stringify(store.mutationsByUserID || {})}::jsonb,
           now()
         )
@@ -129,6 +138,7 @@ async function createPostgresStoreAdapter() {
           users = EXCLUDED.users,
           entitlements = EXCLUDED.entitlements,
           sessions = EXCLUDED.sessions,
+          passkey_credentials = EXCLUDED.passkey_credentials,
           mutations_by_user_id = EXCLUDED.mutations_by_user_id,
           updated_at = EXCLUDED.updated_at
       `;
@@ -264,6 +274,32 @@ function validationError(message) {
   return { ok: false, message };
 }
 
+function normalizePublicUsername(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  const withoutAtPrefix = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
+  const normalized = withoutAtPrefix.toLowerCase();
+  return normalized.length ? normalized : null;
+}
+
+function validatePublicUsername(value) {
+  if (!value) {
+    return null;
+  }
+  if (value.length < 3) {
+    return "Use at least 3 characters.";
+  }
+  if (value.length > 30) {
+    return "Use 30 characters or fewer.";
+  }
+  if (!/^[a-z0-9_-]+$/.test(value)) {
+    return "Use letters, numbers, hyphens, or underscores.";
+  }
+  return null;
+}
+
 function validateMutation(mutation, userID) {
   if (!mutation || typeof mutation !== "object" || Array.isArray(mutation)) {
     return validationError("Mutation must be an object.");
@@ -304,19 +340,90 @@ function validateMutations(mutations, userID) {
   return { ok: true };
 }
 
-function compactMutations(mutations) {
+function mergeMutations(existing, incoming) {
   const byID = new Map();
-  for (const mutation of mutations) {
+  for (const mutation of existing) {
+    const id = mutationRecordID(mutation);
+    if (id) {
+      byID.set(id, mutation);
+    }
+  }
+
+  const acceptedMutationIDs = [];
+  const rejectedMutationIDs = [];
+  for (const mutation of incoming) {
     const id = mutationRecordID(mutation);
     if (!id) {
       continue;
     }
-    const existing = byID.get(id);
-    if (!existing || mutationUpdatedAt(mutation) >= mutationUpdatedAt(existing)) {
-      byID.set(id, mutation);
+
+    const existingMutation = byID.get(id);
+    if (existingMutation && mutationUpdatedAt(mutation) < mutationUpdatedAt(existingMutation)) {
+      rejectedMutationIDs.push(id);
+      continue;
+    }
+
+    byID.set(id, mutation);
+    acceptedMutationIDs.push(id);
+  }
+
+  return {
+    mutations: Array.from(byID.values()).sort((left, right) => {
+      const leftID = mutationRecordID(left) || "";
+      const rightID = mutationRecordID(right) || "";
+      return leftID.localeCompare(rightID);
+    }),
+    acceptedMutationIDs,
+    rejectedMutationIDs
+  };
+}
+
+function mutationKindAndRecord(mutation) {
+  const [kind, record] = Object.entries(mutation)[0] || [];
+  return { kind, record };
+}
+
+function projectRecordMatchesSection(projectRecord, sectionRecord) {
+  if (!projectRecord || !sectionRecord) {
+    return false;
+  }
+  if (projectRecord.userID !== sectionRecord.userID || projectRecord.codeVersion !== sectionRecord.codeVersion) {
+    return false;
+  }
+  const sectionFolderClientID = sectionRecord.folderClientID || null;
+  if (sectionFolderClientID && (projectRecord.clientID === sectionFolderClientID || projectRecord.id === sectionFolderClientID)) {
+    return true;
+  }
+  return sectionRecord.localFolderID !== undefined &&
+    sectionRecord.localFolderID !== null &&
+    projectRecord.localFolderID === sectionRecord.localFolderID;
+}
+
+function expandPullMutationsWithDependencies(filteredMutations, allMutations) {
+  const expandedByID = new Map();
+  for (const mutation of filteredMutations) {
+    const id = mutationRecordID(mutation);
+    if (id) {
+      expandedByID.set(id, mutation);
     }
   }
-  return Array.from(byID.values()).sort((left, right) => {
+
+  for (const mutation of filteredMutations) {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (kind !== "projectSection" || !record) {
+      continue;
+    }
+    const parentProject = allMutations.find((candidate) => {
+      const { kind: candidateKind, record: candidateRecord } = mutationKindAndRecord(candidate);
+      return candidateKind === "project" && projectRecordMatchesSection(candidateRecord, record);
+    });
+    const parentID = parentProject ? mutationRecordID(parentProject) : null;
+    if (parentProject && parentID && !expandedByID.has(parentID)) {
+      expandedByID.set(parentID, parentProject);
+    }
+  }
+
+  return Array.from(expandedByID.values()).sort((left, right) => {
     const leftID = mutationRecordID(left) || "";
     const rightID = mutationRecordID(right) || "";
     return leftID.localeCompare(rightID);
@@ -325,8 +432,26 @@ function compactMutations(mutations) {
 
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
-  const account = accountFromCredential(body.credential);
   const store = await readStore();
+  const credential = body.credential || {};
+  const passkeyUserID = credential.provider === "passkey"
+    ? store.passkeyCredentials?.[credential.providerUserID]
+    : null;
+  if (credential.provider === "passkey" && !passkeyUserID) {
+    sendError(response, 404, "Passkey is not linked to an account yet.");
+    return;
+  }
+  if (credential.provider === "passkey" && !store.users[passkeyUserID]) {
+    sendError(response, 404, "Linked passkey account was not found.");
+    return;
+  }
+  const account = passkeyUserID
+    ? { ...store.users[passkeyUserID], signedInAt: credential.signedInAt || new Date().toISOString() }
+    : accountFromCredential(credential);
+  if (!account?.appUserID) {
+    sendError(response, 400, "Missing account.");
+    return;
+  }
   const sessionToken = store.sessions[account.appUserID] || randomUUID();
   store.sessions[account.appUserID] = sessionToken;
   const existing = store.users[account.appUserID];
@@ -341,6 +466,37 @@ async function handleSignIn(request, response) {
   });
 }
 
+async function handlePasskeyLink(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  const credentialID = body.credentialID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  if (!credentialID) {
+    sendError(response, 400, "Missing passkey credential ID.");
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, userID, body.auth)) {
+    return;
+  }
+  const existingAccount = store.users[userID] || body.account;
+  if (!existingAccount) {
+    sendError(response, 404, "User not found.");
+    return;
+  }
+  store.users[userID] = existingAccount;
+  store.passkeyCredentials = {
+    ...(store.passkeyCredentials || {}),
+    [credentialID]: userID
+  };
+  await writeStore(store);
+  sendJSON(response, 200, { account: existingAccount });
+}
+
 async function handleAttachLocalData(request, response) {
   const body = await readJSON(request);
   const account = body.account;
@@ -353,7 +509,12 @@ async function handleAttachLocalData(request, response) {
   if (!requireUserSession(request, response, store, account.appUserID, account)) {
     return;
   }
-  const migratedAccount = { ...account, migrationState: "localDataAttached" };
+  const existingAccount = store.users[account.appUserID] || {};
+  const migratedAccount = {
+    ...account,
+    ...existingAccount,
+    migrationState: "localDataAttached"
+  };
   store.users[account.appUserID] = migratedAccount;
   await writeStore(store);
   sendJSON(response, 200, "localDataAttached");
@@ -372,12 +533,15 @@ async function handleProfileUpdate(request, response) {
     return;
   }
 
-  const publicUsername = typeof body.publicUsername === "string" && body.publicUsername.trim().length
-    ? body.publicUsername.trim()
-    : null;
+  const publicUsername = normalizePublicUsername(body.publicUsername);
   const displayName = typeof body.displayName === "string" && body.displayName.trim().length
     ? body.displayName.trim()
     : null;
+  const usernameValidationMessage = validatePublicUsername(publicUsername);
+  if (usernameValidationMessage) {
+    sendError(response, 400, usernameValidationMessage);
+    return;
+  }
 
   if (publicUsername) {
     const usernameOwner = Object.values(store.users).find((user) =>
@@ -412,6 +576,10 @@ async function handlePush(request, response) {
     sendError(response, 400, "Missing user ID.");
     return;
   }
+  if (body.auth?.accountUserID && body.batch?.user?.id && body.auth.accountUserID !== body.batch.user.id) {
+    sendError(response, 400, "Authenticated user must match the sync batch user.");
+    return;
+  }
 
   const store = await readStore();
   if (!requireUserSession(request, response, store, userID)) {
@@ -435,10 +603,12 @@ async function handlePush(request, response) {
   }
 
   const existing = store.mutationsByUserID[userID] || [];
-  store.mutationsByUserID[userID] = compactMutations([...existing, ...incoming]);
+  const merge = mergeMutations(existing, incoming);
+  store.mutationsByUserID[userID] = merge.mutations;
   await writeStore(store);
   sendJSON(response, 200, {
-    acceptedMutationIDs: incoming.map(mutationRecordID).filter(Boolean),
+    acceptedMutationIDs: merge.acceptedMutationIDs,
+    rejectedMutationIDs: merge.rejectedMutationIDs,
     serverTime: new Date().toISOString()
   });
 }
@@ -457,9 +627,10 @@ async function handlePull(request, response) {
   }
   const since = body.since ? Date.parse(body.since) : null;
   const allMutations = store.mutationsByUserID[userID] || [];
-  const mutations = Number.isFinite(since)
+  const filteredMutations = Number.isFinite(since)
     ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since)
     : allMutations;
+  const mutations = expandPullMutationsWithDependencies(filteredMutations, allMutations);
   sendJSON(response, 200, {
     userID,
     pulledAt: new Date().toISOString(),
@@ -526,6 +697,7 @@ const handlers = {
   "account/sign-in": handleSignIn,
   "account/attach-local-data": handleAttachLocalData,
   "account/profile": handleProfileUpdate,
+  "account/passkeys/link": handlePasskeyLink,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,

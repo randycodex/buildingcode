@@ -15,6 +15,14 @@ function assert(condition, message) {
   }
 }
 
+function mutationKind(mutation) {
+  return Object.keys(mutation)[0];
+}
+
+function mutationRecord(mutation) {
+  return Object.values(mutation)[0];
+}
+
 async function request(path, { method = "GET", body, token } = {}) {
   const response = await fetch(`${baseURL}${path}`, {
     method,
@@ -115,12 +123,43 @@ async function main() {
       token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
-        publicUsername: "smoke-pro",
+        publicUsername: "@Smoke-Pro",
         displayName: "Smoke Pro"
       }
     });
     assert(profile.response.ok, "Profile update failed.");
     assert(profile.json.account.publicUsername === "smoke-pro", "Profile update did not persist public username.");
+
+    const attachAfterProfile = await request("/account/attach-local-data", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        account: {
+          ...signIn.json.account,
+          publicUsername: null,
+          displayName: "Stale Local Name"
+        }
+      }
+    });
+    assert(attachAfterProfile.response.ok, "Attach local data after profile update failed.");
+    const profileAfterAttach = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-user",
+          displayName: "Smoke User Reinstall"
+        }
+      }
+    });
+    assert(
+      profileAfterAttach.json.account.publicUsername === "smoke-pro",
+      "Attach local data should not erase the server-owned public username."
+    );
+    assert(
+      profileAfterAttach.json.entitlement?.source === "lifetimeGrant",
+      "Re-sign-in did not return the persisted entitlement."
+    );
 
     const secondSignIn = await request("/account/sign-in", {
       method: "POST",
@@ -141,6 +180,53 @@ async function main() {
       }
     });
     assert(duplicateProfile.response.status === 409, "Profile update allowed a duplicate public username.");
+
+    const invalidProfile = await request("/account/profile", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        publicUsername: "bad name"
+      }
+    });
+    assert(invalidProfile.response.status === 400, "Profile update allowed an invalid public username.");
+
+    const unlinkedPasskeySignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "passkey",
+          providerUserID: "unlinked-passkey"
+        }
+      }
+    });
+    assert(unlinkedPasskeySignIn.response.status === 404, "Unlinked passkey created a new account.");
+
+    const passkeyCredentialID = "smoke-passkey-credential";
+    const passkeyLink = await request("/account/passkeys/link", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        credentialID: passkeyCredentialID,
+        account: signIn.json.account
+      }
+    });
+    assert(passkeyLink.response.ok, "Passkey link failed.");
+    assert(passkeyLink.json.account.appUserID === userID, "Passkey link returned the wrong account.");
+
+    const passkeySignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "passkey",
+          providerUserID: passkeyCredentialID
+        }
+      }
+    });
+    assert(passkeySignIn.response.ok, "Linked passkey sign-in failed.");
+    assert(passkeySignIn.json.account.appUserID === userID, "Passkey sign-in did not restore the linked account.");
+    assert(passkeySignIn.json.entitlement?.source === "lifetimeGrant", "Passkey sign-in did not restore entitlement.");
 
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",
@@ -167,12 +253,25 @@ async function main() {
     });
     assert(malformedPush.response.status === 400, "Push accepted an unsupported mutation kind.");
 
+    const mismatchedUserPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: "apple:wrong-user" },
+          mutations: []
+        }
+      }
+    });
+    assert(mismatchedUserPush.response.status === 400, "Push accepted a mismatched batch user.");
+
     const mutation = {
       savedItem: {
         id: "saved-smoke",
         userID,
         codeVersion: "nyc-2022",
-        sectionID: "BC 101.1",
+        sectionID: 101,
         createdAt: "2026-06-04T00:00:00Z",
         updatedAt: "2026-06-04T00:00:00Z"
       }
@@ -191,6 +290,26 @@ async function main() {
     assert(push.response.ok, "Sync push failed.");
     assert(push.json.acceptedMutationIDs.includes("saved-smoke"), "Push did not accept the saved item mutation.");
 
+    const stalePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            savedItem: {
+              ...mutation.savedItem,
+              updatedAt: "2026-06-03T00:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(stalePush.response.ok, "Stale push should report rejection without failing the request.");
+    assert(!stalePush.json.acceptedMutationIDs.includes("saved-smoke"), "Stale push was accepted.");
+    assert(stalePush.json.rejectedMutationIDs.includes("saved-smoke"), "Stale push was not reported as rejected.");
+
     const pull = await request("/sync/pull", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -198,6 +317,157 @@ async function main() {
     });
     assert(pull.response.ok, "Sync pull failed.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
+
+    const projectMutation = {
+      project: {
+        id: "project-smoke",
+        userID,
+        codeVersion: "nyc-2022",
+        clientID: "project-client-smoke",
+        localFolderID: 42,
+        name: "Smoke Project",
+        description: "",
+        colorHex: "#FF6B35",
+        sortOrder: 0,
+        updatedAt: "2026-06-04T00:00:00Z"
+      }
+    };
+    const projectSectionMutation = {
+      projectSection: {
+        id: "project-section-smoke",
+        userID,
+        codeVersion: "nyc-2022",
+        folderClientID: "project-client-smoke",
+        localFolderID: 42,
+        sectionID: 101,
+        scope: "manual",
+        updatedAt: "2026-06-06T00:00:00Z"
+      }
+    };
+    const projectPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [projectMutation, projectSectionMutation]
+        }
+      }
+    });
+    assert(projectPush.response.ok, "Project sync push failed.");
+    assert(projectPush.json.acceptedMutationIDs.includes("project-smoke"), "Project mutation was not accepted.");
+    assert(projectPush.json.acceptedMutationIDs.includes("project-section-smoke"), "Project section mutation was not accepted.");
+
+    const tagMutation = {
+      annotation: {
+        id: "tags-smoke",
+        userID,
+        codeVersion: "nyc-2022",
+        sectionID: 101,
+        noteBody: null,
+        tags: ["Concrete", "Permit"],
+        updatedAt: "2026-06-07T00:00:00Z",
+        deletedAt: null
+      }
+    };
+    const continuityMutation = {
+      continuity: {
+        userID,
+        codeVersion: "nyc-2022",
+        values: {
+          selectedCodeSectionID: "building",
+          selectedVersionID: "nyc-2022",
+          activeProjectID: "42"
+        },
+        updatedAt: "2026-06-08T00:00:00Z"
+      }
+    };
+    const fullStatePush = await request("/sync/push", {
+      method: "POST",
+      token: profileAfterAttach.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: {
+            id: userID,
+            publicUsername: "smoke-pro",
+            displayName: "Smoke Pro"
+          },
+          mutations: [tagMutation, continuityMutation]
+        }
+      }
+    });
+    assert(fullStatePush.response.ok, "Full restore-state push failed.");
+    assert(fullStatePush.json.acceptedMutationIDs.includes("tags-smoke"), "Tag mutation was not accepted.");
+    assert(
+      fullStatePush.json.acceptedMutationIDs.includes(`${userID}:continuity:nyc-2022`),
+      "Continuity mutation was not accepted."
+    );
+
+    const projectDependencyPull = await request("/sync/pull", {
+      method: "POST",
+      token: passkeySignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        since: "2026-06-05T00:00:00Z"
+      }
+    });
+    assert(projectDependencyPull.response.ok, "Project dependency pull failed.");
+    const pulledKinds = projectDependencyPull.json.mutations.map(mutationKind);
+    assert(pulledKinds.includes("projectSection"), "Pull did not include the newer project section.");
+    assert(pulledKinds.includes("project"), "Pull did not include the parent project dependency.");
+
+    const reinstallSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-user",
+          displayName: "Smoke User Reinstalled"
+        }
+      }
+    });
+    assert(reinstallSignIn.response.ok, "Reinstall sign-in failed.");
+    assert(
+      reinstallSignIn.json.account.publicUsername === "smoke-pro",
+      "Reinstall sign-in did not restore the profile."
+    );
+    assert(
+      reinstallSignIn.json.entitlement?.plan === "pro",
+      "Reinstall sign-in did not restore the Pro entitlement."
+    );
+
+    const reinstallPull = await request("/sync/pull", {
+      method: "POST",
+      token: reinstallSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(reinstallPull.response.ok, "Reinstall pull failed.");
+    const reinstallRecords = reinstallPull.json.mutations.map((mutation) => ({
+      kind: mutationKind(mutation),
+      record: mutationRecord(mutation)
+    }));
+    assert(
+      reinstallRecords.some((item) => item.kind === "savedItem" && item.record.sectionID === 101),
+      "Reinstall pull did not restore the saved section."
+    );
+    assert(
+      reinstallRecords.some((item) => item.kind === "annotation" && item.record.tags?.includes("Concrete")),
+      "Reinstall pull did not restore tags."
+    );
+    assert(
+      reinstallRecords.some((item) => item.kind === "project" && item.record.clientID === "project-client-smoke"),
+      "Reinstall pull did not restore the project."
+    );
+    assert(
+      reinstallRecords.some((item) => item.kind === "projectSection" && item.record.folderClientID === "project-client-smoke"),
+      "Reinstall pull did not restore the project membership."
+    );
+    assert(
+      reinstallRecords.some((item) => item.kind === "continuity" && item.record.values.activeProjectID === "42"),
+      "Reinstall pull did not restore continuity."
+    );
 
     const revoke = await request("/admin/lifetime-grants/revoke", {
       method: "POST",
