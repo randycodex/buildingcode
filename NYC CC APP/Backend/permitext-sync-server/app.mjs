@@ -18,6 +18,7 @@ const emptyStore = () => ({
   users: {},
   entitlements: {},
   sessions: {},
+  passkeyCredentials: {},
   mutationsByUserID: {}
 });
 
@@ -76,9 +77,14 @@ async function createPostgresStoreAdapter() {
         users JSONB NOT NULL DEFAULT '{}'::jsonb,
         entitlements JSONB NOT NULL DEFAULT '{}'::jsonb,
         sessions JSONB NOT NULL DEFAULT '{}'::jsonb,
+        passkey_credentials JSONB NOT NULL DEFAULT '{}'::jsonb,
         mutations_by_user_id JSONB NOT NULL DEFAULT '{}'::jsonb,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
+    `;
+    await sql`
+      ALTER TABLE permitext_sync_state
+      ADD COLUMN IF NOT EXISTS passkey_credentials JSONB NOT NULL DEFAULT '{}'::jsonb
     `;
     await sql`
       INSERT INTO permitext_sync_state (id)
@@ -93,7 +99,7 @@ async function createPostgresStoreAdapter() {
     async read() {
       await ensureSchema();
       const rows = await sql`
-        SELECT users, entitlements, sessions, mutations_by_user_id
+        SELECT users, entitlements, sessions, passkey_credentials, mutations_by_user_id
         FROM permitext_sync_state
         WHERE id = 'default'
         LIMIT 1
@@ -103,6 +109,7 @@ async function createPostgresStoreAdapter() {
         users: safeJSON(row.users, {}),
         entitlements: safeJSON(row.entitlements, {}),
         sessions: safeJSON(row.sessions, {}),
+        passkeyCredentials: safeJSON(row.passkey_credentials, {}),
         mutationsByUserID: safeJSON(row.mutations_by_user_id, {})
       };
     },
@@ -114,6 +121,7 @@ async function createPostgresStoreAdapter() {
           users,
           entitlements,
           sessions,
+          passkey_credentials,
           mutations_by_user_id,
           updated_at
         )
@@ -122,6 +130,7 @@ async function createPostgresStoreAdapter() {
           ${JSON.stringify(store.users || {})}::jsonb,
           ${JSON.stringify(store.entitlements || {})}::jsonb,
           ${JSON.stringify(store.sessions || {})}::jsonb,
+          ${JSON.stringify(store.passkeyCredentials || {})}::jsonb,
           ${JSON.stringify(store.mutationsByUserID || {})}::jsonb,
           now()
         )
@@ -129,6 +138,7 @@ async function createPostgresStoreAdapter() {
           users = EXCLUDED.users,
           entitlements = EXCLUDED.entitlements,
           sessions = EXCLUDED.sessions,
+          passkey_credentials = EXCLUDED.passkey_credentials,
           mutations_by_user_id = EXCLUDED.mutations_by_user_id,
           updated_at = EXCLUDED.updated_at
       `;
@@ -422,8 +432,26 @@ function expandPullMutationsWithDependencies(filteredMutations, allMutations) {
 
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
-  const account = accountFromCredential(body.credential);
   const store = await readStore();
+  const credential = body.credential || {};
+  const passkeyUserID = credential.provider === "passkey"
+    ? store.passkeyCredentials?.[credential.providerUserID]
+    : null;
+  if (credential.provider === "passkey" && !passkeyUserID) {
+    sendError(response, 404, "Passkey is not linked to an account yet.");
+    return;
+  }
+  if (credential.provider === "passkey" && !store.users[passkeyUserID]) {
+    sendError(response, 404, "Linked passkey account was not found.");
+    return;
+  }
+  const account = passkeyUserID
+    ? { ...store.users[passkeyUserID], signedInAt: credential.signedInAt || new Date().toISOString() }
+    : accountFromCredential(credential);
+  if (!account?.appUserID) {
+    sendError(response, 400, "Missing account.");
+    return;
+  }
   const sessionToken = store.sessions[account.appUserID] || randomUUID();
   store.sessions[account.appUserID] = sessionToken;
   const existing = store.users[account.appUserID];
@@ -436,6 +464,37 @@ async function handleSignIn(request, response) {
     account: storedAccount,
     entitlement: store.entitlements[account.appUserID] ?? null
   });
+}
+
+async function handlePasskeyLink(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  const credentialID = body.credentialID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  if (!credentialID) {
+    sendError(response, 400, "Missing passkey credential ID.");
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, userID, body.auth)) {
+    return;
+  }
+  const existingAccount = store.users[userID] || body.account;
+  if (!existingAccount) {
+    sendError(response, 404, "User not found.");
+    return;
+  }
+  store.users[userID] = existingAccount;
+  store.passkeyCredentials = {
+    ...(store.passkeyCredentials || {}),
+    [credentialID]: userID
+  };
+  await writeStore(store);
+  sendJSON(response, 200, { account: existingAccount });
 }
 
 async function handleAttachLocalData(request, response) {
@@ -638,6 +697,7 @@ const handlers = {
   "account/sign-in": handleSignIn,
   "account/attach-local-data": handleAttachLocalData,
   "account/profile": handleProfileUpdate,
+  "account/passkeys/link": handlePasskeyLink,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,

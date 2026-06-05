@@ -191,6 +191,43 @@ async function main() {
     });
     assert(invalidProfile.response.status === 400, "Profile update allowed an invalid public username.");
 
+    const unlinkedPasskeySignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "passkey",
+          providerUserID: "unlinked-passkey"
+        }
+      }
+    });
+    assert(unlinkedPasskeySignIn.response.status === 404, "Unlinked passkey created a new account.");
+
+    const passkeyCredentialID = "smoke-passkey-credential";
+    const passkeyLink = await request("/account/passkeys/link", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        credentialID: passkeyCredentialID,
+        account: signIn.json.account
+      }
+    });
+    assert(passkeyLink.response.ok, "Passkey link failed.");
+    assert(passkeyLink.json.account.appUserID === userID, "Passkey link returned the wrong account.");
+
+    const passkeySignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "passkey",
+          providerUserID: passkeyCredentialID
+        }
+      }
+    });
+    assert(passkeySignIn.response.ok, "Linked passkey sign-in failed.");
+    assert(passkeySignIn.json.account.appUserID === userID, "Passkey sign-in did not restore the linked account.");
+    assert(passkeySignIn.json.entitlement?.source === "lifetimeGrant", "Passkey sign-in did not restore entitlement.");
+
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",
       body: {
@@ -370,7 +407,7 @@ async function main() {
 
     const projectDependencyPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: passkeySignIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
         since: "2026-06-05T00:00:00Z"
