@@ -2,6 +2,11 @@
 
 Local Phase 5 backend scaffold for the iOS app's account and sync contract.
 
+It now supports two runtime shapes:
+
+- local Node server for development and smoke testing
+- Vercel Function deployment for hosted testing
+
 ## Run
 
 ```sh
@@ -30,6 +35,17 @@ Configure passkey web credentials metadata with:
 ```sh
 APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mjs
 ```
+
+## Deploy To Vercel
+
+This folder is Vercel-ready.
+
+- Root Directory: `NYC CC APP/Backend/permitext-sync-server`
+- Preset: `Other`
+- Entrypoint: `api/index.mjs`
+- Routing: `vercel.json` rewrites clean paths like `/account/sign-in` to the Vercel function
+
+For the first hosted deploy, leave the local file-backed store in place only as a temporary scaffold. It is acceptable for backend contract testing, but not for production persistence.
 
 ## Endpoints
 
