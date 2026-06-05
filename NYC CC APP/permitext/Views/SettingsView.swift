@@ -1,3 +1,4 @@
+import AuthenticationServices
 import SwiftUI
 
 private enum SettingsRowTypography {
@@ -60,6 +61,10 @@ struct SettingsView: View {
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         planCard
+                    }
+
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                        accountCard
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
@@ -293,6 +298,48 @@ struct SettingsView: View {
         }
     }
 
+    private var accountCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            CodeEyebrow(text: "Account", accent: settingsChromeColor)
+
+            Text(accountSummaryText)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if library.signedInAccount == nil {
+                SignInWithAppleButton(.signIn) { request in
+                    request.requestedScopes = [.fullName]
+                } onCompletion: { result in
+                    Task {
+                        await library.handleAppleSignIn(result: result)
+                    }
+                }
+                .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                .frame(height: 46)
+                .clipShape(Capsule(style: .continuous))
+                .disabled(library.isAccountBusy)
+                .opacity(library.isAccountBusy ? 0.55 : 1)
+            } else {
+                Button {
+                    library.signOut()
+                } label: {
+                    Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .foregroundStyle(.primary)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color.primary.opacity(0.08))
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
     private var planSummaryText: String {
         if library.currentPlan == .pro {
             if library.currentEntitlementSource == .lifetimeGrant {
@@ -301,6 +348,16 @@ struct SettingsView: View {
             return "Pro is active. Unlimited saved work, PDF export, tags, continuity, and future cross-device sync are unlocked."
         }
         return "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity."
+    }
+
+    private var accountSummaryText: String {
+        guard let account = library.signedInAccount else {
+            return "Sign in to attach local saved work to your account and test cross-device sync."
+        }
+        if let displayName = account.displayName, !displayName.isEmpty {
+            return "Signed in as \(displayName). Saved work can sync through the connected backend."
+        }
+        return "Signed in with \(account.authProvider.rawValue). Saved work can sync through the connected backend."
     }
 
     private var upgradeButtonTitle: String {
