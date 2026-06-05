@@ -120,6 +120,8 @@ Once the private workflow is solid, introduce the server-backed model required f
   - projects
   - saved items / annotations
   - continuity state
+  - implementation contract: `docs/phase-5-backend-contract.md`
+  - production storage plan: `docs/phase-5-production-storage.md`
 - Keep mobile SQLite as offline cache:
   - local reads stay fast
   - offline work continues to function

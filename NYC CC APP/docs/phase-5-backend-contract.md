@@ -18,6 +18,10 @@ Local HTTP scaffold:
 - Default URL: `http://localhost:8787`
 - Storage: local JSON file for integration testing only
 
+Production storage plan:
+
+- `docs/phase-5-production-storage.md`
+
 ## Account
 
 ### `POST /account/sign-in`
