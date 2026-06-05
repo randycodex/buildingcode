@@ -113,6 +113,10 @@ Once the private workflow is solid, introduce the server-backed model required f
   - passkeys
   - guest/local mode for immediate app access
   - public username separate from login identity
+- Defer expanded identity providers until the core sync system is stable:
+  - email-code login for work emails such as `@uai-ny.com`
+  - optional Google/Gmail OAuth
+  - optional Microsoft/Outlook OAuth
 - Build backend ownership of:
   - users
   - entitlements

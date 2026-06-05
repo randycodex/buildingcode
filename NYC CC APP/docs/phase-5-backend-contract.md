@@ -233,7 +233,7 @@ Response:
 }
 ```
 
-The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten.
+The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten. Preview-only pulls and pulls with skipped or conflicted remote records must not advance the local pull checkpoint, otherwise unapplied server records could be hidden from later sync runs.
 
 ## Internal Lifetime Grants
 

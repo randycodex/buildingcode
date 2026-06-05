@@ -265,11 +265,14 @@ struct UserContentSyncEngine {
             let appliedCount = try applySafeChanges
                 ? applySafeRemoteChanges(incoming: incoming, mergePlan: mergePlan)
                 : 0
-            checkpointStore.save(checkpoint.markingPullSucceeded(at: incoming.pulledAt))
+            let skippedCount = mergePlan.decisions.count - appliedCount
+            if applySafeChanges && skippedCount == 0 && mergePlan.conflictCount == 0 {
+                checkpointStore.save(checkpoint.markingPullSucceeded(at: incoming.pulledAt))
+            }
             return UserContentSyncPullReport(
                 pulledCount: incoming.mutations.count,
                 appliedCount: appliedCount,
-                skippedCount: mergePlan.decisions.count - appliedCount,
+                skippedCount: skippedCount,
                 conflictCount: mergePlan.conflictCount,
                 backendName: backend.name,
                 accountUserID: account.appUserID,
