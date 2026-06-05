@@ -109,3 +109,19 @@ That domain must serve the same Apple App Site Association payload over HTTPS at
 ```text
 https://your-domain.com/.well-known/apple-app-site-association
 ```
+
+Current Permitext values:
+
+```text
+APPLE_TEAM_ID=57BY95X97H
+APPLE_BUNDLE_ID=com.randycodex.permitext
+webcredentials:permitext-sync.vercel.app
+```
+
+After setting `APPLE_TEAM_ID` and `APPLE_BUNDLE_ID` in Vercel and redeploying, verify the hosted Apple App Site Association payload with:
+
+```bash
+PERMITEXT_SYNC_EXPECTED_AASA_APP_ID=57BY95X97H.com.randycodex.permitext npm run verify:production:aasa
+```
+
+Do not add the iOS Associated Domains entitlement until the Apple Developer App ID has the Associated Domains capability enabled, otherwise real-device signing can fail.
