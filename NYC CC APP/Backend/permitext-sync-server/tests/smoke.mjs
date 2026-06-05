@@ -167,6 +167,19 @@ async function main() {
     });
     assert(malformedPush.response.status === 400, "Push accepted an unsupported mutation kind.");
 
+    const mismatchedUserPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: "apple:wrong-user" },
+          mutations: []
+        }
+      }
+    });
+    assert(mismatchedUserPush.response.status === 400, "Push accepted a mismatched batch user.");
+
     const mutation = {
       savedItem: {
         id: "saved-smoke",
@@ -190,6 +203,26 @@ async function main() {
     });
     assert(push.response.ok, "Sync push failed.");
     assert(push.json.acceptedMutationIDs.includes("saved-smoke"), "Push did not accept the saved item mutation.");
+
+    const stalePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            savedItem: {
+              ...mutation.savedItem,
+              updatedAt: "2026-06-03T00:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(stalePush.response.ok, "Stale push should report rejection without failing the request.");
+    assert(!stalePush.json.acceptedMutationIDs.includes("saved-smoke"), "Stale push was accepted.");
+    assert(stalePush.json.rejectedMutationIDs.includes("saved-smoke"), "Stale push was not reported as rejected.");
 
     const pull = await request("/sync/pull", {
       method: "POST",

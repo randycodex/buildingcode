@@ -909,6 +909,7 @@ struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
 
 struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
     let acceptedMutationIDs: [String]
+    let rejectedMutationIDs: [String]?
     let serverTime: Date
 }
 
@@ -1121,6 +1122,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         userContentByUserID[userID] = existingByID.values.sorted { $0.recordID < $1.recordID }
         return BackendUserContentPushResponse(
             acceptedMutationIDs: request.batch.mutations.map(\.recordID),
+            rejectedMutationIDs: [],
             serverTime: Date()
         )
     }

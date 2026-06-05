@@ -53,6 +53,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var entitlementPrompt: EntitlementRequirement?
     @Published private(set) var signedInAccount: SignedInAccount?
     @Published private(set) var isAccountBusy = false
+    @Published private(set) var pendingUserContentSyncCount = 0
     @Published private(set) var proProductDisplayPrice: String?
     @Published private(set) var storeKitLoadedProductIDs: [String] = []
     @Published private(set) var isStoreKitBusy = false
@@ -171,6 +172,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
         self.comparisonModeEnabled = continuityContext.comparisonModeEnabled
+        refreshPendingUserContentSyncCount()
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         initialLoadProgress = 0
@@ -1707,6 +1709,7 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshCurrentEntitlement()
         }
         await attachLocalDataIfNeeded()
+        await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
         await pullRemoteUserContentIfPossible()
         await refreshLifetimeGrant(announcesMissingGrant: false)
@@ -1748,12 +1751,16 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
+            } else if !report.rejectedMutationIDs.isEmpty {
+                statusMessage = "Synced \(report.completedCount) of \(report.attemptedCount) local changes. Pull latest changes before retrying the rest."
             } else if report.completedCount > 0 {
                 statusMessage = "Synced \(report.completedCount) local changes in \(Self.syncDurationText(elapsed))."
             }
+            refreshPendingUserContentSyncCount()
         } catch {
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
+            refreshPendingUserContentSyncCount()
         }
     }
 
@@ -1824,12 +1831,63 @@ final class CodeLibraryViewModel: ObservableObject {
         guard signedInAccount != nil else { return }
         guard !didRunStartupAccountSync else { return }
         didRunStartupAccountSync = true
+        await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
         await pullRemoteUserContentIfPossible()
     }
 
+    func syncNow() async {
+        guard signedInAccount != nil else {
+            statusMessage = "Sign in before syncing saved work."
+            return
+        }
+        await pullRemoteUserContentIfPossible()
+        await syncPendingUserContentIfPossible()
+        await pullRemoteUserContentIfPossible()
+        refreshPendingUserContentSyncCount()
+    }
+
     private func refreshUserContentSyncCheckpoint() {
         userContentSyncCheckpoint = syncEngine.checkpoint(account: signedInAccount)
+        refreshPendingUserContentSyncCount()
+    }
+
+    private func refreshPendingUserContentSyncCount() {
+        do {
+            pendingUserContentSyncCount = try syncEngine.previewPendingWork(limit: 500).pendingCount
+        } catch {
+            pendingUserContentSyncCount = 0
+        }
+    }
+
+    var syncStatusTitle: String {
+        guard signedInAccount != nil else { return "Not signed in" }
+        if isAccountBusy { return "Syncing..." }
+        if userContentSyncCheckpoint?.lastErrorMessage != nil { return "Sync failed" }
+        if pendingUserContentSyncCount > 0 { return "\(pendingUserContentSyncCount) change\(pendingUserContentSyncCount == 1 ? "" : "s") waiting" }
+        return "Synced"
+    }
+
+    var syncStatusDetail: String {
+        guard signedInAccount != nil else {
+            return "Sign in to sync saved work across installs and devices."
+        }
+        if let error = userContentSyncCheckpoint?.lastErrorMessage {
+            return error
+        }
+        let lastPush = userContentSyncCheckpoint?.lastSuccessfulPushAt
+        let lastPull = userContentSyncCheckpoint?.lastSuccessfulPullAt
+        let lastSync = [lastPush, lastPull].compactMap { $0 }.max()
+        if let lastSync {
+            return "Last synced \(lastSync.formatted(date: .abbreviated, time: .shortened))."
+        }
+        return pendingUserContentSyncCount > 0
+            ? "Local changes are queued for upload."
+            : "No sync has completed yet."
+    }
+
+    var canSyncNow: Bool {
+        signedInAccount != nil && !isAccountBusy
     }
 
     var accountSyncDebugSummary: String {

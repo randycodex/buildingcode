@@ -304,23 +304,42 @@ function validateMutations(mutations, userID) {
   return { ok: true };
 }
 
-function compactMutations(mutations) {
+function mergeMutations(existing, incoming) {
   const byID = new Map();
-  for (const mutation of mutations) {
+  for (const mutation of existing) {
+    const id = mutationRecordID(mutation);
+    if (id) {
+      byID.set(id, mutation);
+    }
+  }
+
+  const acceptedMutationIDs = [];
+  const rejectedMutationIDs = [];
+  for (const mutation of incoming) {
     const id = mutationRecordID(mutation);
     if (!id) {
       continue;
     }
-    const existing = byID.get(id);
-    if (!existing || mutationUpdatedAt(mutation) >= mutationUpdatedAt(existing)) {
-      byID.set(id, mutation);
+
+    const existingMutation = byID.get(id);
+    if (existingMutation && mutationUpdatedAt(mutation) < mutationUpdatedAt(existingMutation)) {
+      rejectedMutationIDs.push(id);
+      continue;
     }
+
+    byID.set(id, mutation);
+    acceptedMutationIDs.push(id);
   }
-  return Array.from(byID.values()).sort((left, right) => {
-    const leftID = mutationRecordID(left) || "";
-    const rightID = mutationRecordID(right) || "";
-    return leftID.localeCompare(rightID);
-  });
+
+  return {
+    mutations: Array.from(byID.values()).sort((left, right) => {
+      const leftID = mutationRecordID(left) || "";
+      const rightID = mutationRecordID(right) || "";
+      return leftID.localeCompare(rightID);
+    }),
+    acceptedMutationIDs,
+    rejectedMutationIDs
+  };
 }
 
 async function handleSignIn(request, response) {
@@ -412,6 +431,10 @@ async function handlePush(request, response) {
     sendError(response, 400, "Missing user ID.");
     return;
   }
+  if (body.auth?.accountUserID && body.batch?.user?.id && body.auth.accountUserID !== body.batch.user.id) {
+    sendError(response, 400, "Authenticated user must match the sync batch user.");
+    return;
+  }
 
   const store = await readStore();
   if (!requireUserSession(request, response, store, userID)) {
@@ -435,10 +458,12 @@ async function handlePush(request, response) {
   }
 
   const existing = store.mutationsByUserID[userID] || [];
-  store.mutationsByUserID[userID] = compactMutations([...existing, ...incoming]);
+  const merge = mergeMutations(existing, incoming);
+  store.mutationsByUserID[userID] = merge.mutations;
   await writeStore(store);
   sendJSON(response, 200, {
-    acceptedMutationIDs: incoming.map(mutationRecordID).filter(Boolean),
+    acceptedMutationIDs: merge.acceptedMutationIDs,
+    rejectedMutationIDs: merge.rejectedMutationIDs,
     serverTime: new Date().toISOString()
   });
 }

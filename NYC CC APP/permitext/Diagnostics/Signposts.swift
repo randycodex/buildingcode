@@ -22,6 +22,8 @@ struct UserContentSyncPushReport: Hashable, Sendable {
     let accountUserID: String?
     let skippedReason: String?
     let sampledItemIDs: [Int64]
+    let acceptedMutationIDs: [String]
+    let rejectedMutationIDs: [String]
 }
 
 struct UserContentSyncPullReport: Hashable, Sendable {
@@ -70,7 +72,9 @@ struct NoOpUserContentSyncBackend: UserContentSyncBackend {
             backendName: name,
             accountUserID: account.appUserID,
             skippedReason: nil,
-            sampledItemIDs: batch.items.map(\.id)
+            sampledItemIDs: batch.items.map(\.id),
+            acceptedMutationIDs: serverBatch.mutations.map(\.recordID),
+            rejectedMutationIDs: []
         )
     }
 
@@ -147,7 +151,9 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             backendName: name,
             accountUserID: account.appUserID,
             skippedReason: nil,
-            sampledItemIDs: batch.items.map(\.id)
+            sampledItemIDs: batch.items.map(\.id),
+            acceptedMutationIDs: response.acceptedMutationIDs,
+            rejectedMutationIDs: response.rejectedMutationIDs ?? []
         )
     }
 
@@ -284,7 +290,9 @@ struct UserContentSyncEngine {
                 backendName: backend.name,
                 accountUserID: nil,
                 skippedReason: "No signed-in account.",
-                sampledItemIDs: []
+                sampledItemIDs: [],
+                acceptedMutationIDs: [],
+                rejectedMutationIDs: []
             )
         }
 
@@ -292,6 +300,8 @@ struct UserContentSyncEngine {
         var attemptedCount = 0
         var completedCount = 0
         var sampledItemIDs: [Int64] = []
+        var acceptedMutationIDs: [String] = []
+        var rejectedMutationIDs: [String] = []
         var processedBatchCount = 0
 
         while processedBatchCount < maxBatches {
@@ -306,8 +316,22 @@ struct UserContentSyncEngine {
                 attemptedCount += report.attemptedCount
                 completedCount += report.completedCount
                 sampledItemIDs.append(contentsOf: report.sampledItemIDs)
+                acceptedMutationIDs.append(contentsOf: report.acceptedMutationIDs)
+                rejectedMutationIDs.append(contentsOf: report.rejectedMutationIDs)
+                let acceptedIDs = Set(report.acceptedMutationIDs)
+                let rejectedIDs = Set(report.rejectedMutationIDs)
                 for item in batch.items {
-                    try markCompleted(item)
+                    guard let mutation = try? ServerUserContentMutation(syncQueueItem: item, account: account) else {
+                        try? markFailed(item, error: UserContentSyncError.rejectedByServer("Could not map local sync item to a server record."))
+                        continue
+                    }
+                    if acceptedIDs.contains(mutation.recordID) {
+                        try markCompleted(item)
+                    } else if rejectedIDs.contains(mutation.recordID) {
+                        try? markFailed(item, error: UserContentSyncError.rejectedByServer("Server has newer data for this record. Pull latest changes before retrying."))
+                    } else {
+                        try? markFailed(item, error: UserContentSyncError.rejectedByServer("Server did not accept this sync item."))
+                    }
                 }
             } catch {
                 for item in batch.items {
@@ -325,7 +349,9 @@ struct UserContentSyncEngine {
                 backendName: backend.name,
                 accountUserID: account.appUserID,
                 skippedReason: nil,
-                sampledItemIDs: []
+                sampledItemIDs: [],
+                acceptedMutationIDs: [],
+                rejectedMutationIDs: []
             )
         }
 
@@ -336,7 +362,9 @@ struct UserContentSyncEngine {
             backendName: backend.name,
             accountUserID: account.appUserID,
             skippedReason: nil,
-            sampledItemIDs: Array(sampledItemIDs.prefix(100))
+            sampledItemIDs: Array(sampledItemIDs.prefix(100)),
+            acceptedMutationIDs: acceptedMutationIDs,
+            rejectedMutationIDs: rejectedMutationIDs
         )
     }
 
@@ -367,5 +395,16 @@ struct UserContentSyncEngine {
             }
         }
         return appliedCount
+    }
+}
+
+enum UserContentSyncError: LocalizedError {
+    case rejectedByServer(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .rejectedByServer(let message):
+            return message
+        }
     }
 }

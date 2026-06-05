@@ -68,6 +68,10 @@ struct SettingsView: View {
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                        syncCard
+                    }
+
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         themePreviewCard
 
                         CodeHairline()
@@ -338,6 +342,64 @@ struct SettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var syncCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            CodeEyebrow(text: "Sync", accent: settingsChromeColor)
+
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: syncStatusIconName)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(syncStatusColor)
+                    .frame(width: 26, alignment: .leading)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(library.syncStatusTitle)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text(library.syncStatusDetail)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            Button {
+                Task { await library.syncNow() }
+            } label: {
+                Label(library.isAccountBusy ? "Syncing..." : "Sync Now", systemImage: "arrow.triangle.2.circlepath")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .foregroundStyle(library.canSyncNow ? .primary : .secondary)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color.primary.opacity(library.canSyncNow ? 0.08 : 0.045))
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(!library.canSyncNow)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var syncStatusIconName: String {
+        if library.signedInAccount == nil { return "person.crop.circle.badge.exclamationmark" }
+        if library.isAccountBusy { return "arrow.triangle.2.circlepath" }
+        if library.userContentSyncCheckpoint?.lastErrorMessage != nil { return "exclamationmark.triangle.fill" }
+        if library.pendingUserContentSyncCount > 0 { return "clock.badge.exclamationmark" }
+        return "checkmark.circle.fill"
+    }
+
+    private var syncStatusColor: Color {
+        if library.signedInAccount == nil { return .secondary }
+        if library.userContentSyncCheckpoint?.lastErrorMessage != nil { return .orange }
+        if library.pendingUserContentSyncCount > 0 { return .orange }
+        return settingsChromeColor
     }
 
     private var planSummaryText: String {
