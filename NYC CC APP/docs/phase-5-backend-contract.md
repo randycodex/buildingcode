@@ -12,6 +12,12 @@ The iOS app defaults to the local development backend.
 
 When mode is `http`, the app posts JSON to the paths below under the configured base URL. Dates are ISO 8601.
 
+Local HTTP scaffold:
+
+- Path: `NYC CC APP/Backend/permitext-sync-server`
+- Default URL: `http://localhost:8787`
+- Storage: local JSON file for integration testing only
+
 ## Account
 
 ### `POST /account/sign-in`
