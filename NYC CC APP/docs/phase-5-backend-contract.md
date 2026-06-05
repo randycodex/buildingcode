@@ -108,6 +108,34 @@ Response:
 
 The first sign-in must attach local data without destructive replacement.
 
+### `POST /account/profile`
+
+Request:
+
+```json
+{
+  "auth": {
+    "accountUserID": "stable-backend-user-id",
+    "bearerToken": "opaque-session-token"
+  },
+  "publicUsername": "optional-public-handle",
+  "displayName": "Optional Name"
+}
+```
+
+Response:
+
+```json
+{
+  "account": {
+    "appUserID": "stable-backend-user-id",
+    "publicUsername": "optional-public-handle"
+  }
+}
+```
+
+The backend owns public username uniqueness. Public username remains separate from Apple or passkey login identity.
+
 ## Sync
 
 All sync endpoints include bearer auth when available:

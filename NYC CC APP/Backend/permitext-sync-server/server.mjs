@@ -240,6 +240,52 @@ async function handleAttachLocalData(request, response) {
   sendJSON(response, 200, "localDataAttached");
 }
 
+async function handleProfileUpdate(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID || body.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, userID)) {
+    return;
+  }
+
+  const publicUsername = typeof body.publicUsername === "string" && body.publicUsername.trim().length
+    ? body.publicUsername.trim()
+    : null;
+  const displayName = typeof body.displayName === "string" && body.displayName.trim().length
+    ? body.displayName.trim()
+    : null;
+
+  if (publicUsername) {
+    const usernameOwner = Object.values(store.users).find((user) =>
+      user.publicUsername === publicUsername && user.appUserID !== userID
+    );
+    if (usernameOwner) {
+      sendError(response, 409, "Public username is already taken.");
+      return;
+    }
+  }
+
+  const existingAccount = store.users[userID];
+  if (!existingAccount) {
+    sendError(response, 404, "User not found.");
+    return;
+  }
+
+  const updatedAccount = {
+    ...existingAccount,
+    publicUsername,
+    displayName: displayName ?? existingAccount.displayName ?? null
+  };
+  store.users[userID] = updatedAccount;
+  await writeStore(store);
+  sendJSON(response, 200, { account: updatedAccount });
+}
+
 async function handlePush(request, response) {
   const body = await readJSON(request);
   const userID = body.auth?.accountUserID || body.batch?.user?.id;
@@ -360,6 +406,7 @@ function handleAppleAppSiteAssociation(_request, response) {
 const handlers = {
   "account/sign-in": handleSignIn,
   "account/attach-local-data": handleAttachLocalData,
+  "account/profile": handleProfileUpdate,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,

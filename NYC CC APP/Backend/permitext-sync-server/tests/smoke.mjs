@@ -105,6 +105,38 @@ async function main() {
     assert(attach.response.ok, "Attach local data failed.");
     assert(attach.json === "localDataAttached", "Attach local data returned the wrong state.");
 
+    const profile = await request("/account/profile", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        publicUsername: "smoke-pro",
+        displayName: "Smoke Pro"
+      }
+    });
+    assert(profile.response.ok, "Profile update failed.");
+    assert(profile.json.account.publicUsername === "smoke-pro", "Profile update did not persist public username.");
+
+    const secondSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "second-smoke-user",
+          displayName: "Second Smoke User"
+        }
+      }
+    });
+    const duplicateProfile = await request("/account/profile", {
+      method: "POST",
+      token: secondSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: "apple:second-smoke-user" },
+        publicUsername: "smoke-pro"
+      }
+    });
+    assert(duplicateProfile.response.status === 409, "Profile update allowed a duplicate public username.");
+
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",
       body: {

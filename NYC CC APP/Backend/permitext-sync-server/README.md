@@ -37,6 +37,7 @@ APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mj
 - `GET /.well-known/apple-app-site-association`
 - `POST /account/sign-in`
 - `POST /account/attach-local-data`
+- `POST /account/profile`
 - `POST /sync/push`
 - `POST /sync/pull`
 - `POST /admin/lifetime-grants/grant`
