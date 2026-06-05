@@ -346,6 +346,8 @@ struct FolderPickerSheet: View {
                                         .font(.title3)
                                         .foregroundStyle(memberFolderIDs.contains(folder.id) ? folder.color : Color.secondary.opacity(0.5))
                                 }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
                         }

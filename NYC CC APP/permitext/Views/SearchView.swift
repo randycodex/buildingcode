@@ -539,6 +539,8 @@ struct SearchView: View {
 
                         Spacer(minLength: 0)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
 
@@ -596,6 +598,7 @@ struct SearchView: View {
                 resultRow(result)
             }
             .buttonStyle(.plain)
+            .contentShape(Rectangle())
             .simultaneousGesture(
                 TapGesture().onEnded {
                     library.recordRecentSearch(query)
@@ -696,6 +699,8 @@ struct SearchView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, CodeScreenMetrics.rowVerticalPadding)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
     }
 
     private func highlightedSearchText(
