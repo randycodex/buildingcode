@@ -15,6 +15,7 @@ struct PermitextApp: App {
 #endif
 
     @StateObject private var library = CodeLibraryViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     private static func configureTabBarAppearance() {
         let appearance = UITabBarAppearance()
@@ -113,6 +114,12 @@ struct PermitextApp: App {
                 }
                 Task {
                     await library.performStartupAccountSyncIfNeeded()
+                }
+            }
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .inactive || phase == .background else { return }
+                Task {
+                    await library.syncPendingUserContentIfPossible()
                 }
             }
             .onAppear {

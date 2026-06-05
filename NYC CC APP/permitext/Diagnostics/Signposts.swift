@@ -276,7 +276,7 @@ struct UserContentSyncEngine {
         }
     }
 
-    func processPendingWork(account: SignedInAccount?, limit: Int = 25) async throws -> UserContentSyncPushReport {
+    func processPendingWork(account: SignedInAccount?, limit: Int = 25, maxBatches: Int = 20) async throws -> UserContentSyncPushReport {
         guard let account else {
             return UserContentSyncPushReport(
                 attemptedCount: 0,
@@ -289,8 +289,36 @@ struct UserContentSyncEngine {
         }
 
         let checkpoint = checkpoint(for: account)
-        let batch = try claimNextBatch(limit: limit)
-        guard !batch.isEmpty else {
+        var attemptedCount = 0
+        var completedCount = 0
+        var sampledItemIDs: [Int64] = []
+        var processedBatchCount = 0
+
+        while processedBatchCount < maxBatches {
+            let batch = try claimNextBatch(limit: limit)
+            guard !batch.isEmpty else {
+                break
+            }
+            processedBatchCount += 1
+
+            do {
+                let report = try await backend.push(batch: batch, account: account)
+                attemptedCount += report.attemptedCount
+                completedCount += report.completedCount
+                sampledItemIDs.append(contentsOf: report.sampledItemIDs)
+                for item in batch.items {
+                    try markCompleted(item)
+                }
+            } catch {
+                for item in batch.items {
+                    try? markFailed(item, error: error)
+                }
+                checkpointStore.save(checkpoint.markingFailed(error: error, at: Date()))
+                throw error
+            }
+        }
+
+        guard attemptedCount > 0 else {
             return UserContentSyncPushReport(
                 attemptedCount: 0,
                 completedCount: 0,
@@ -301,20 +329,15 @@ struct UserContentSyncEngine {
             )
         }
 
-        do {
-            let report = try await backend.push(batch: batch, account: account)
-            for item in batch.items {
-                try markCompleted(item)
-            }
-            checkpointStore.save(checkpoint.markingPushSucceeded(at: Date()))
-            return report
-        } catch {
-            for item in batch.items {
-                try? markFailed(item, error: error)
-            }
-            checkpointStore.save(checkpoint.markingFailed(error: error, at: Date()))
-            throw error
-        }
+        checkpointStore.save(checkpoint.markingPushSucceeded(at: Date()))
+        return UserContentSyncPushReport(
+            attemptedCount: attemptedCount,
+            completedCount: completedCount,
+            backendName: backend.name,
+            accountUserID: account.appUserID,
+            skippedReason: nil,
+            sampledItemIDs: Array(sampledItemIDs.prefix(100))
+        )
     }
 
     func checkpoint(account: SignedInAccount?) -> UserContentSyncCheckpoint? {

@@ -127,6 +127,7 @@ final class CodeLibraryViewModel: ObservableObject {
     // detached child.
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
+    private var userContentAutoSyncTask: Task<Void, Never>?
     private var didRunStartupAccountSync = false
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
@@ -1454,6 +1455,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 codeVersion: selectedVersion.codeVersion
             )
             refreshFolders()
+            scheduleUserContentAutoSync()
             return folders.first { $0.id == id }
         } catch {
             statusMessage = error.localizedDescription
@@ -1472,6 +1474,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 codeVersion: selectedVersion.codeVersion
             )
             refreshFolders()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -1482,6 +1485,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try userContentRepository.deleteFolder(id: id, codeVersion: selectedVersion.codeVersion)
             refreshFolders()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -1500,6 +1504,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try userContentRepository.addSection(sectionID, toFolder: folderID, codeVersion: selectedVersion.codeVersion)
             refreshFolders()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -1510,6 +1515,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try userContentRepository.removeSection(sectionID, fromFolder: folderID, codeVersion: selectedVersion.codeVersion)
             refreshFolders()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -1733,17 +1739,44 @@ final class CodeLibraryViewModel: ObservableObject {
         defer { isAccountBusy = false }
 
         do {
+            let startedAt = Date()
             let report = try await syncEngine.processPendingWork(account: signedInAccount)
+            let elapsed = Date().timeIntervalSince(startedAt)
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
             } else if report.completedCount > 0 {
-                statusMessage = "Synced \(report.completedCount) local changes."
+                statusMessage = "Synced \(report.completedCount) local changes in \(Self.syncDurationText(elapsed))."
             }
         } catch {
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
         }
+    }
+
+    private func scheduleUserContentAutoSync() {
+        guard signedInAccount != nil else { return }
+        userContentAutoSyncTask?.cancel()
+        userContentAutoSyncTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            guard !Task.isCancelled else { return }
+            for _ in 0..<5 {
+                guard !Task.isCancelled else { return }
+                guard let self else { return }
+                if !self.isAccountBusy {
+                    await self.syncPendingUserContentIfPossible()
+                    return
+                }
+                try? await Task.sleep(nanoseconds: 600_000_000)
+            }
+        }
+    }
+
+    private static func syncDurationText(_ interval: TimeInterval) -> String {
+        if interval < 1 {
+            return "\(Int((interval * 1_000).rounded())) ms"
+        }
+        return String(format: "%.1f sec", interval)
     }
 
     func previewRemoteUserContentMergeIfPossible() async -> UserContentMergePlan? {
@@ -2071,6 +2104,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
             try userContentRepository.toggleBookmark(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
+            scheduleUserContentAutoSync()
             return bookmarkedSectionIDs.contains(sectionID)
         } catch {
             statusMessage = error.localizedDescription
@@ -2104,6 +2138,7 @@ final class CodeLibraryViewModel: ObservableObject {
             // BookmarksView re-reads notes from disk on appear, and the note
             // editor re-reads via `noteBody(sectionID:)` when it opens.
             try userContentRepository.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -2150,6 +2185,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
             try userContentRepository.setTags(tags, sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
+            scheduleUserContentAutoSync()
             return true
         } catch {
             statusMessage = error.localizedDescription
