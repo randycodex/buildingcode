@@ -47,6 +47,14 @@ function sendJSON(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
+function sendRawJSON(response, status, body) {
+  response.writeHead(status, {
+    "content-type": "application/json",
+    "cache-control": "no-store"
+  });
+  response.end(JSON.stringify(body, null, 2));
+}
+
 function sendError(response, status, message) {
   sendJSON(response, status, { error: message });
 }
@@ -242,6 +250,20 @@ async function handleLifetimeGrantDelete(request, response) {
   sendJSON(response, 200, { userID, entitlement: null });
 }
 
+function handleAppleAppSiteAssociation(_request, response) {
+  const teamID = process.env.APPLE_TEAM_ID || "TEAMID";
+  const bundleID = process.env.APPLE_BUNDLE_ID || "com.randycodex.permitext";
+  sendRawJSON(response, 200, {
+    webcredentials: {
+      apps: [`${teamID}.${bundleID}`]
+    },
+    applinks: {
+      apps: [],
+      details: []
+    }
+  });
+}
+
 const handlers = {
   "account/sign-in": handleSignIn,
   "account/attach-local-data": handleAttachLocalData,
@@ -255,6 +277,10 @@ const server = createServer(async (request, response) => {
   try {
     if (request.method === "GET" && normalizePath(request.url) === "health") {
       sendJSON(response, 200, { ok: true });
+      return;
+    }
+    if (request.method === "GET" && normalizePath(request.url) === ".well-known/apple-app-site-association") {
+      handleAppleAppSiteAssociation(request, response);
       return;
     }
     if (request.method !== "POST") {

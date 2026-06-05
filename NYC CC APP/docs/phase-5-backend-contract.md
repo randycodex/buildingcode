@@ -57,6 +57,22 @@ The backend owns `appUserID`. Login identity and public identity must stay separ
 
 Passkey support uses the same endpoint with `credential.provider = "passkey"`. A production passkey flow also requires the app's Associated Domains entitlement and a valid `apple-app-site-association` file on the relying-party domain before the UI can be enabled.
 
+The local scaffold serves:
+
+- `GET /.well-known/apple-app-site-association`
+
+Configure it with:
+
+- `APPLE_TEAM_ID`
+- `APPLE_BUNDLE_ID`
+
+Production requirements:
+
+- The public API domain must use HTTPS.
+- The iOS target needs `com.apple.developer.associated-domains`.
+- The entitlement must include `webcredentials:<domain>`.
+- The same domain must serve the Apple App Site Association file at `/.well-known/apple-app-site-association`.
+
 ### `POST /account/attach-local-data`
 
 Request:

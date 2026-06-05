@@ -25,9 +25,16 @@ Enable internal lifetime grant admin routes with:
 PERMITEXT_SYNC_ADMIN_TOKEN=dev-secret node server.mjs
 ```
 
+Configure passkey web credentials metadata with:
+
+```sh
+APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mjs
+```
+
 ## Endpoints
 
 - `GET /health`
+- `GET /.well-known/apple-app-site-association`
 - `POST /account/sign-in`
 - `POST /account/attach-local-data`
 - `POST /sync/push`
@@ -52,3 +59,15 @@ PermitextBackendConfiguration.setDebugHTTPBaseURL("http://localhost:8787")
 ```
 
 For a physical iPhone, replace `localhost` with the Mac's LAN IP address.
+
+For production passkeys, the app also needs the Associated Domains entitlement:
+
+```text
+webcredentials:your-domain.com
+```
+
+That domain must serve the same Apple App Site Association payload over HTTPS at:
+
+```text
+https://your-domain.com/.well-known/apple-app-site-association
+```
