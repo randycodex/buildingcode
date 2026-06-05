@@ -237,6 +237,8 @@ The app applies only safe server changes. Local pending edits are protected and 
 
 When a pull includes a `projectSection` mutation, the backend should also include the parent `project` mutation when it can resolve one, even if the parent project is older than the requested `since` checkpoint. Fresh installs need the folder record before they can apply project membership safely.
 
+When a safe pull includes a newer `continuity` mutation, the app writes it into `ContinuityStore` and refreshes the in-memory view model so recent sections, selected code/version, active project, and comparison mode can restore immediately after sign-in or reinstall.
+
 ## Internal Lifetime Grants
 
 The local scaffold exposes internal admin routes when `PERMITEXT_SYNC_ADMIN_TOKEN` is set:

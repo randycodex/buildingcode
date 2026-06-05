@@ -153,7 +153,8 @@ final class CodeLibraryViewModel: ObservableObject {
         self.userContentRepository = userContentRepository ?? (try? UserDataStore())
         self.syncEngine = UserContentSyncEngine(
             repository: self.userContentRepository,
-            backend: syncBackend ?? (accountBackendClient as? UserContentSyncBackend) ?? NoOpUserContentSyncBackend()
+            backend: syncBackend ?? (accountBackendClient as? UserContentSyncBackend) ?? NoOpUserContentSyncBackend(),
+            continuityStore: continuityStore
         )
         self.continuityStore = continuityStore
         self.readerThemeStore = readerThemeStore
@@ -446,6 +447,27 @@ final class CodeLibraryViewModel: ObservableObject {
             values["recentlyViewedSectionsJSON"] = json
         }
         return values
+    }
+
+    private func refreshContinuityStateFromStore() {
+        let context = continuityStore.load()
+        let shouldReloadContent =
+            selectedJurisdictionKey != context.selectedJurisdictionKey ||
+            selectedVersionFileName != context.selectedVersionFileName
+
+        selectedJurisdictionKey = context.selectedJurisdictionKey
+        selectedVersionFileName = context.selectedVersionFileName
+        selectedCodeSectionID = context.selectedCodeSectionID
+        activeProjectID = context.activeProjectID
+        comparisonModeEnabled = context.comparisonModeEnabled
+        recentlyViewedSections = context.recentlyViewedSections
+
+        if !comparisonModeEnabled {
+            BrowserContextID.persistCodeSectionID(context.selectedCodeSectionID, for: .primary)
+        }
+        if shouldReloadContent {
+            openSelectedContent()
+        }
     }
 
     #if DEBUG
@@ -1800,6 +1822,9 @@ final class CodeLibraryViewModel: ObservableObject {
 
         do {
             let report = try await syncEngine.pullRemoteChanges(account: signedInAccount, applySafeChanges: true)
+            if report.appliedRemoteContinuity {
+                refreshContinuityStateFromStore()
+            }
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
