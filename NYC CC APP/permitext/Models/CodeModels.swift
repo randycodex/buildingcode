@@ -917,6 +917,16 @@ struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
 
+struct BackendPasskeyLinkRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let credentialID: String
+    let account: SignedInAccount?
+}
+
+struct BackendPasskeyLinkResponse: Codable, Hashable, Sendable {
+    let account: SignedInAccount
+}
+
 private struct BackendErrorResponse: Codable, Hashable, Sendable {
     let error: String?
 }
@@ -942,6 +952,7 @@ protocol PermitextBackendTransport {
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
+    func linkPasskey(_ request: BackendPasskeyLinkRequest) async throws -> BackendPasskeyLinkResponse
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
 }
@@ -1064,6 +1075,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("account/profile", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func linkPasskey(_ request: BackendPasskeyLinkRequest) async throws -> BackendPasskeyLinkResponse {
+        try await post("account/passkeys/link", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
         try await post("sync/push", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -1100,12 +1115,24 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
 actor LocalPermitextBackendTransport: PermitextBackendTransport {
     nonisolated let name = "local-dev-backend"
+    private var accountsByUserID: [String: SignedInAccount] = [:]
     private var userContentByUserID: [String: [ServerUserContentMutation]] = [:]
+    private var passkeyCredentialUserIDs: [String: String] = [:]
 
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord {
         let credential = request.credential
+        if credential.provider == .passkey,
+           passkeyCredentialUserIDs[credential.providerUserID] == nil {
+            throw PermitextBackendHTTPError.serverStatus(404, "Passkey is not linked to an account yet.")
+        }
+        let appUserID = credential.provider == .passkey
+            ? (passkeyCredentialUserIDs[credential.providerUserID] ?? "\(credential.provider.rawValue):\(credential.providerUserID)")
+            : "\(credential.provider.rawValue):\(credential.providerUserID)"
+        if credential.provider == .passkey, let account = accountsByUserID[appUserID] {
+            return BackendAccountRecord(account: account, entitlement: nil)
+        }
         let account = SignedInAccount(
-            appUserID: "\(credential.provider.rawValue):\(credential.providerUserID)",
+            appUserID: appUserID,
             authProvider: credential.provider,
             authProviderUserID: credential.providerUserID,
             appleUserID: credential.provider == .apple ? credential.providerUserID : "",
@@ -1114,6 +1141,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             signedInAt: credential.signedInAt,
             migrationState: .notStarted
         )
+        accountsByUserID[account.appUserID] = account
         return BackendAccountRecord(account: account, entitlement: nil)
     }
 
@@ -1134,6 +1162,19 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 backendSessionToken: request.auth.bearerToken
             )
         )
+    }
+
+    func linkPasskey(_ request: BackendPasskeyLinkRequest) async throws -> BackendPasskeyLinkResponse {
+        passkeyCredentialUserIDs[request.credentialID] = request.auth.accountUserID
+        let account = request.account ?? SignedInAccount(
+                appUserID: request.auth.accountUserID,
+                appleUserID: "",
+                displayName: nil,
+                signedInAt: Date(),
+                backendSessionToken: request.auth.bearerToken
+            )
+        accountsByUserID[request.auth.accountUserID] = account
+        return BackendPasskeyLinkResponse(account: account)
     }
 
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
@@ -1907,6 +1948,7 @@ protocol AccountBackendClient {
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
+    func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount
 }
 
 struct LocalAccountBackendClient: AccountBackendClient {
@@ -1940,6 +1982,10 @@ struct LocalAccountBackendClient: AccountBackendClient {
             migrationState: account.migrationState,
             backendSessionToken: account.backendSessionToken
         )
+    }
+
+    func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount {
+        account
     }
 }
 

@@ -1700,7 +1700,43 @@ final class CodeLibraryViewModel: ObservableObject {
                         signedInAt: Date()
                     )
                 )
+                guard backendRecord.account.authProvider != .passkey else {
+                    statusMessage = "This passkey is not linked to your Apple account yet. Sign in with Apple, then create the passkey again."
+                    return
+                }
                 await completeBackendSignIn(backendRecord)
+            } catch {
+                statusMessage = error.localizedDescription
+            }
+        case .failure(let error):
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func handlePasskeyRegistration(result: Result<ASAuthorization, Error>) async {
+        guard let account = signedInAccount else {
+            statusMessage = "Sign in with Apple before creating a passkey."
+            return
+        }
+        switch result {
+        case .success(let authorization):
+            guard #available(iOS 16.0, *),
+                  let credential = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration
+            else {
+                statusMessage = "Passkey creation did not return a passkey credential."
+                return
+            }
+            guard !isAccountBusy else { return }
+            isAccountBusy = true
+            defer { isAccountBusy = false }
+            do {
+                let linkedAccount = try await accountBackendClient.linkPasskey(
+                    account: account,
+                    credentialID: credential.credentialID.base64EncodedString()
+                )
+                signedInAccount = linkedAccount
+                Self.saveSignedInAccount(linkedAccount)
+                statusMessage = "Passkey saved for this account."
             } catch {
                 statusMessage = error.localizedDescription
             }

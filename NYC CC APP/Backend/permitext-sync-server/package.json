@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.mjs",
     "check": "node --check server.mjs && node --check tests/smoke.mjs",
-    "smoke": "node tests/smoke.mjs"
+    "smoke": "node tests/smoke.mjs",
+    "verify:production": "node tests/production-health.mjs",
+    "verify:production:aasa": "node tests/production-aasa.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0"

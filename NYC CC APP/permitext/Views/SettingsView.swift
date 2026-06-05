@@ -1,5 +1,7 @@
 import AuthenticationServices
+import Security
 import SwiftUI
+import UIKit
 
 private enum SettingsRowTypography {
     static let label = Font.body.weight(.medium)
@@ -22,6 +24,7 @@ struct SettingsView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var publicUsernameDraft = ""
+    @StateObject private var passkeyCoordinator = SettingsPasskeyAuthorizationCoordinator()
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
 
     private var readerPreviewAccent: Color {
@@ -325,8 +328,53 @@ struct SettingsView: View {
                 .clipShape(Capsule(style: .continuous))
                 .disabled(library.isAccountBusy)
                 .opacity(library.isAccountBusy ? 0.55 : 1)
+
+                Button {
+                    passkeyCoordinator.signIn { result in
+                        Task {
+                            await library.handlePasskeySignIn(result: result)
+                        }
+                    }
+                } label: {
+                    Label("Sign in with Passkey", systemImage: "key.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .foregroundStyle(.primary)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color.primary.opacity(0.08))
+                        )
+                }
+                .buttonStyle(.plain)
+                .disabled(library.isAccountBusy)
+                .opacity(library.isAccountBusy ? 0.55 : 1)
             } else {
                 accountProfileEditor
+
+                Button {
+                    passkeyCoordinator.createPasskey(
+                        userName: passkeyUserName,
+                        displayName: passkeyDisplayName
+                    ) { result in
+                        Task {
+                            await library.handlePasskeyRegistration(result: result)
+                        }
+                    }
+                } label: {
+                    Label("Create Passkey", systemImage: "key.radiowaves.forward.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .foregroundStyle(.primary)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color.primary.opacity(0.08))
+                        )
+                }
+                .buttonStyle(.plain)
+                .disabled(library.isAccountBusy)
+                .opacity(library.isAccountBusy ? 0.55 : 1)
 
                 Button {
                     library.signOut()
@@ -471,6 +519,15 @@ struct SettingsView: View {
             return "Signed in as \(displayName). Saved work can sync through the connected backend."
         }
         return "Signed in with \(account.authProvider.rawValue). Saved work can sync through the connected backend."
+    }
+
+    private var passkeyUserName: String {
+        guard let account = library.signedInAccount else { return "permitext" }
+        return account.publicUsername ?? account.displayName ?? account.appUserID
+    }
+
+    private var passkeyDisplayName: String {
+        library.signedInAccount?.displayName ?? "permitext"
     }
 
     private var accountProfileValidationMessage: String? {
@@ -880,6 +937,91 @@ private struct SettingsSwitchToggleStyle: ToggleStyle {
             .accessibilityLabel("Comparison Mode")
             .accessibilityValue(configuration.isOn ? "On" : "Off")
         }
+    }
+}
+
+private final class SettingsPasskeyAuthorizationCoordinator: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    private let relyingPartyIdentifier = "permitext-sync.vercel.app"
+    private var completion: ((Result<ASAuthorization, Error>) -> Void)?
+
+    func signIn(completion: @escaping (Result<ASAuthorization, Error>) -> Void) {
+        guard #available(iOS 16.0, *) else {
+            completion(.failure(SettingsPasskeyAuthorizationError.unsupported))
+            return
+        }
+        self.completion = completion
+        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyIdentifier)
+        let request = provider.createCredentialAssertionRequest(challenge: randomChallenge())
+        perform(request)
+    }
+
+    func createPasskey(
+        userName: String,
+        displayName: String,
+        completion: @escaping (Result<ASAuthorization, Error>) -> Void
+    ) {
+        guard #available(iOS 16.0, *) else {
+            completion(.failure(SettingsPasskeyAuthorizationError.unsupported))
+            return
+        }
+        self.completion = completion
+        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyIdentifier)
+        let request = provider.createCredentialRegistrationRequest(
+            challenge: randomChallenge(),
+            name: displayName.isEmpty ? userName : displayName,
+            userID: Data(userName.utf8)
+        )
+        perform(request)
+    }
+
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first { $0.isKeyWindow } ?? UIWindow()
+    }
+
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        completion?(.success(authorization))
+        completion = nil
+    }
+
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        completion?(.failure(error))
+        completion = nil
+    }
+
+    @available(iOS 16.0, *)
+    private func perform(_ request: ASAuthorizationPlatformPublicKeyCredentialAssertionRequest) {
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
+    }
+
+    @available(iOS 16.0, *)
+    private func perform(_ request: ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest) {
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
+    }
+
+    private func randomChallenge() -> Data {
+        var bytes = [UInt8](repeating: 0, count: 32)
+        let result = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
+        if result == errSecSuccess {
+            return Data(bytes)
+        }
+        return UUID().uuidString.data(using: .utf8) ?? Data()
+    }
+}
+
+private enum SettingsPasskeyAuthorizationError: LocalizedError {
+    case unsupported
+
+    var errorDescription: String? {
+        "Passkeys require iOS 16 or later."
     }
 }
 

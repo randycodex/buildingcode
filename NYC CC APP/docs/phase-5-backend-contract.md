@@ -18,8 +18,13 @@ Local HTTP scaffold:
 - Default URL: `http://localhost:8787`
 - Storage: local JSON file for integration testing only
 
-Production storage plan:
+Hosted production:
 
+- URL: `https://permitext-sync.vercel.app`
+- Storage: Neon/Postgres when a database URL is configured
+- Health check: `GET /health` returns the active storage kind
+
+Production storage plan:
 - `docs/phase-5-production-storage.md`
 
 ## Account

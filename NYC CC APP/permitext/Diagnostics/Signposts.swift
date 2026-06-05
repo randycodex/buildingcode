@@ -135,6 +135,17 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         return response.account
     }
 
+    func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount {
+        let response = try await transport.linkPasskey(
+            BackendPasskeyLinkRequest(
+                auth: authContext(for: account),
+                credentialID: credentialID,
+                account: account
+            )
+        )
+        return response.account
+    }
+
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
         UserContentSyncPreviewReport(
             pendingCount: items.count,
