@@ -151,6 +151,14 @@ Supported mutation kinds:
 - `continuity`: selected jurisdiction/version/section, active project, comparison mode, recently viewed sections
 - `codeVersionClear`: destructive local clear actions by scope
 
+Backend validation rules:
+
+- Each mutation must be a single-key object.
+- The mutation kind must be one of the supported kinds above.
+- `record.userID` must match the authenticated `accountUserID`.
+- Every mutation must expose a stable record ID.
+- Every mutation must include a valid `updatedAt` timestamp.
+
 Swift encodes each mutation as a single-key object:
 
 ```json

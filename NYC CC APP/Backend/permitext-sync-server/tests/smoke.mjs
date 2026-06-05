@@ -104,9 +104,21 @@ async function main() {
     assert(attach.response.ok, "Attach local data failed.");
     assert(attach.json === "localDataAttached", "Attach local data returned the wrong state.");
 
+    const malformedPush = await request("/sync/push", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{ unknown: { id: "bad", userID, updatedAt: "2026-06-04T00:00:00Z" } }]
+        }
+      }
+    });
+    assert(malformedPush.response.status === 400, "Push accepted an unsupported mutation kind.");
+
     const mutation = {
-      bookmark: {
-        id: "bookmark-smoke",
+      savedItem: {
+        id: "saved-smoke",
         userID,
         codeVersion: "nyc-2022",
         sectionID: "BC 101.1",
@@ -125,7 +137,7 @@ async function main() {
       }
     });
     assert(push.response.ok, "Sync push failed.");
-    assert(push.json.acceptedMutationIDs.includes("bookmark-smoke"), "Push did not accept the bookmark mutation.");
+    assert(push.json.acceptedMutationIDs.includes("saved-smoke"), "Push did not accept the saved item mutation.");
 
     const pull = await request("/sync/pull", {
       method: "POST",

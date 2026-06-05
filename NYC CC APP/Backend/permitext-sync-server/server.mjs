@@ -13,6 +13,15 @@ const emptyStore = () => ({
   mutationsByUserID: {}
 });
 
+const allowedMutationKinds = new Set([
+  "savedItem",
+  "annotation",
+  "project",
+  "projectSection",
+  "continuity",
+  "codeVersionClear"
+]);
+
 async function readStore() {
   try {
     const raw = await readFile(dataPath, "utf8");
@@ -116,6 +125,50 @@ function mutationUpdatedAt(mutation) {
   return Date.parse(record.updatedAt || 0);
 }
 
+function validationError(message) {
+  return { ok: false, message };
+}
+
+function validateMutation(mutation, userID) {
+  if (!mutation || typeof mutation !== "object" || Array.isArray(mutation)) {
+    return validationError("Mutation must be an object.");
+  }
+
+  const entries = Object.entries(mutation);
+  if (entries.length !== 1) {
+    return validationError("Mutation must contain exactly one kind.");
+  }
+
+  const [kind, record] = entries[0];
+  if (!allowedMutationKinds.has(kind)) {
+    return validationError(`Unsupported mutation kind: ${kind}.`);
+  }
+  if (!record || typeof record !== "object" || Array.isArray(record)) {
+    return validationError("Mutation record must be an object.");
+  }
+  if (record.userID !== userID) {
+    return validationError("Mutation userID must match the authenticated user.");
+  }
+  if (!mutationRecordID(mutation)) {
+    return validationError("Mutation record is missing a stable ID.");
+  }
+  if (!Number.isFinite(mutationUpdatedAt(mutation))) {
+    return validationError("Mutation record is missing a valid updatedAt timestamp.");
+  }
+
+  return { ok: true };
+}
+
+function validateMutations(mutations, userID) {
+  for (const mutation of mutations) {
+    const result = validateMutation(mutation, userID);
+    if (!result.ok) {
+      return result;
+    }
+  }
+  return { ok: true };
+}
+
 function compactMutations(mutations) {
   const byID = new Map();
   for (const mutation of mutations) {
@@ -178,7 +231,18 @@ async function handlePush(request, response) {
     store.entitlements[userID] = body.batch.entitlement;
   }
 
-  const incoming = Array.isArray(body.batch?.mutations) ? body.batch.mutations : [];
+  if (body.batch?.mutations !== undefined && !Array.isArray(body.batch.mutations)) {
+    sendError(response, 400, "Mutations must be an array.");
+    return;
+  }
+
+  const incoming = body.batch?.mutations || [];
+  const validation = validateMutations(incoming, userID);
+  if (!validation.ok) {
+    sendError(response, 400, validation.message);
+    return;
+  }
+
   const existing = store.mutationsByUserID[userID] || [];
   store.mutationsByUserID[userID] = compactMutations([...existing, ...incoming]);
   await writeStore(store);
@@ -296,6 +360,10 @@ const server = createServer(async (request, response) => {
     await handler(request, response);
   } catch (error) {
     console.error(error);
+    if (error instanceof SyntaxError) {
+      sendError(response, 400, "Invalid JSON.");
+      return;
+    }
     sendError(response, 500, "Internal server error.");
   }
 });
