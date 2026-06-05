@@ -368,6 +368,58 @@ function mergeMutations(existing, incoming) {
   };
 }
 
+function mutationKindAndRecord(mutation) {
+  const [kind, record] = Object.entries(mutation)[0] || [];
+  return { kind, record };
+}
+
+function projectRecordMatchesSection(projectRecord, sectionRecord) {
+  if (!projectRecord || !sectionRecord) {
+    return false;
+  }
+  if (projectRecord.userID !== sectionRecord.userID || projectRecord.codeVersion !== sectionRecord.codeVersion) {
+    return false;
+  }
+  const sectionFolderClientID = sectionRecord.folderClientID || null;
+  if (sectionFolderClientID && (projectRecord.clientID === sectionFolderClientID || projectRecord.id === sectionFolderClientID)) {
+    return true;
+  }
+  return sectionRecord.localFolderID !== undefined &&
+    sectionRecord.localFolderID !== null &&
+    projectRecord.localFolderID === sectionRecord.localFolderID;
+}
+
+function expandPullMutationsWithDependencies(filteredMutations, allMutations) {
+  const expandedByID = new Map();
+  for (const mutation of filteredMutations) {
+    const id = mutationRecordID(mutation);
+    if (id) {
+      expandedByID.set(id, mutation);
+    }
+  }
+
+  for (const mutation of filteredMutations) {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (kind !== "projectSection" || !record) {
+      continue;
+    }
+    const parentProject = allMutations.find((candidate) => {
+      const { kind: candidateKind, record: candidateRecord } = mutationKindAndRecord(candidate);
+      return candidateKind === "project" && projectRecordMatchesSection(candidateRecord, record);
+    });
+    const parentID = parentProject ? mutationRecordID(parentProject) : null;
+    if (parentProject && parentID && !expandedByID.has(parentID)) {
+      expandedByID.set(parentID, parentProject);
+    }
+  }
+
+  return Array.from(expandedByID.values()).sort((left, right) => {
+    const leftID = mutationRecordID(left) || "";
+    const rightID = mutationRecordID(right) || "";
+    return leftID.localeCompare(rightID);
+  });
+}
+
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
   const account = accountFromCredential(body.credential);
@@ -511,9 +563,10 @@ async function handlePull(request, response) {
   }
   const since = body.since ? Date.parse(body.since) : null;
   const allMutations = store.mutationsByUserID[userID] || [];
-  const mutations = Number.isFinite(since)
+  const filteredMutations = Number.isFinite(since)
     ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since)
     : allMutations;
+  const mutations = expandPullMutationsWithDependencies(filteredMutations, allMutations);
   sendJSON(response, 200, {
     userID,
     pulledAt: new Date().toISOString(),

@@ -265,8 +265,10 @@ struct UserContentSyncEngine {
             let appliedCount = try applySafeChanges
                 ? applySafeRemoteChanges(incoming: incoming, mergePlan: mergePlan)
                 : 0
-            let skippedCount = mergePlan.decisions.count - appliedCount
-            if applySafeChanges && skippedCount == 0 && mergePlan.conflictCount == 0 {
+            let safeNoOpCount = mergePlan.noChangeCount
+            let unresolvedCount = mergePlan.keepLocalCount + mergePlan.uploadLocalCount + mergePlan.conflictCount
+            let skippedCount = max(mergePlan.decisions.count - appliedCount - safeNoOpCount, 0)
+            if applySafeChanges && unresolvedCount == 0 {
                 checkpointStore.save(checkpoint.markingPullSucceeded(at: incoming.pulledAt))
             }
             return UserContentSyncPullReport(
