@@ -917,6 +917,10 @@ struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
 
+private struct BackendErrorResponse: Codable, Hashable, Sendable {
+    let error: String?
+}
+
 struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let batch: ServerUserContentBatch
@@ -1010,13 +1014,16 @@ enum PermitextBackendFactory {
 
 enum PermitextBackendHTTPError: LocalizedError {
     case invalidResponse
-    case serverStatus(Int)
+    case serverStatus(Int, String?)
 
     var errorDescription: String? {
         switch self {
         case .invalidResponse:
             return "The backend returned an invalid response."
-        case .serverStatus(let statusCode):
+        case .serverStatus(let statusCode, let message):
+            if let message, !message.isEmpty {
+                return message
+            }
             return "The backend returned HTTP \(statusCode)."
         }
     }
@@ -1084,7 +1091,8 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
             throw PermitextBackendHTTPError.invalidResponse
         }
         guard (200..<300).contains(httpResponse.statusCode) else {
-            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode)
+            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
+            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
         }
         return try decoder.decode(ResponseBody.self, from: data)
     }

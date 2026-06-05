@@ -1878,6 +1878,58 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount != nil && !isAccountBusy
     }
 
+    static func normalizedPublicUsername(_ value: String) -> String? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let withoutAtPrefix = trimmed.hasPrefix("@") ? String(trimmed.dropFirst()) : trimmed
+        let normalized = withoutAtPrefix.lowercased()
+        return normalized.isEmpty ? nil : normalized
+    }
+
+    static func publicUsernameValidationMessage(_ value: String) -> String? {
+        guard let normalized = normalizedPublicUsername(value) else { return nil }
+        if normalized.count < 3 {
+            return "Use at least 3 characters."
+        }
+        if normalized.count > 30 {
+            return "Use 30 characters or fewer."
+        }
+        let allowedCharacters = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789_-")
+        if normalized.unicodeScalars.contains(where: { !allowedCharacters.contains($0) }) {
+            return "Use letters, numbers, hyphens, or underscores."
+        }
+        return nil
+    }
+
+    func updateAccountProfile(publicUsername: String) async {
+        guard let signedInAccount else {
+            statusMessage = "Sign in before updating your profile."
+            return
+        }
+        guard !isAccountBusy else { return }
+        if let validationMessage = Self.publicUsernameValidationMessage(publicUsername) {
+            statusMessage = validationMessage
+            return
+        }
+
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            let normalizedUsername = Self.normalizedPublicUsername(publicUsername)
+            let updatedAccount = try await accountBackendClient.updateProfile(
+                account: signedInAccount,
+                publicUsername: normalizedUsername,
+                displayName: signedInAccount.displayName
+            )
+            self.signedInAccount = updatedAccount
+            Self.saveSignedInAccount(updatedAccount)
+            refreshUserContentSyncCheckpoint()
+            statusMessage = normalizedUsername == nil ? "Public username cleared." : "Public username saved."
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
     var accountSyncDebugSummary: String {
         let accountText: String
         if let signedInAccount {

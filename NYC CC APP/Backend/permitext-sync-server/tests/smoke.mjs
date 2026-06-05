@@ -115,7 +115,7 @@ async function main() {
       token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
-        publicUsername: "smoke-pro",
+        publicUsername: "@Smoke-Pro",
         displayName: "Smoke Pro"
       }
     });
@@ -141,6 +141,16 @@ async function main() {
       }
     });
     assert(duplicateProfile.response.status === 409, "Profile update allowed a duplicate public username.");
+
+    const invalidProfile = await request("/account/profile", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        publicUsername: "bad name"
+      }
+    });
+    assert(invalidProfile.response.status === 400, "Profile update allowed an invalid public username.");
 
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",

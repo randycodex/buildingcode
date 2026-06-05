@@ -21,6 +21,7 @@ struct SettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
+    @State private var publicUsernameDraft = ""
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
 
     private var readerPreviewAccent: Color {
@@ -325,6 +326,8 @@ struct SettingsView: View {
                 .disabled(library.isAccountBusy)
                 .opacity(library.isAccountBusy ? 0.55 : 1)
             } else {
+                accountProfileEditor
+
                 Button {
                     library.signOut()
                 } label: {
@@ -342,6 +345,54 @@ struct SettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .task(id: library.signedInAccount?.appUserID) {
+            seedPublicUsernameDraft()
+        }
+    }
+
+    private var accountProfileEditor: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Public username")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.primary)
+
+            TextField("username", text: $publicUsernameDraft)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .keyboardType(.asciiCapable)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.primary.opacity(colorScheme == .dark ? 0.08 : 0.05))
+                )
+
+            Text(accountProfileHelperText)
+                .font(.caption)
+                .foregroundStyle(accountProfileValidationMessage == nil ? Color.secondary : Color.orange)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                Task {
+                    await library.updateAccountProfile(publicUsername: publicUsernameDraft)
+                    seedPublicUsernameDraft()
+                }
+            } label: {
+                Text(library.isAccountBusy ? "Saving..." : "Save Public Username")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .foregroundStyle(accountProfileCanSave ? .primary : .secondary)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color.primary.opacity(accountProfileCanSave ? 0.08 : 0.045))
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(!accountProfileCanSave)
+        }
     }
 
     private var syncCard: some View {
@@ -422,6 +473,25 @@ struct SettingsView: View {
         return "Signed in with \(account.authProvider.rawValue). Saved work can sync through the connected backend."
     }
 
+    private var accountProfileValidationMessage: String? {
+        CodeLibraryViewModel.publicUsernameValidationMessage(publicUsernameDraft)
+    }
+
+    private var accountProfileHelperText: String {
+        if let accountProfileValidationMessage {
+            return accountProfileValidationMessage
+        }
+        return "Used later for public and collaboration features. This stays separate from your Apple identity."
+    }
+
+    private var accountProfileCanSave: Bool {
+        guard let account = library.signedInAccount, !library.isAccountBusy else { return false }
+        guard accountProfileValidationMessage == nil else { return false }
+        let currentUsername = account.publicUsername ?? ""
+        let draftUsername = CodeLibraryViewModel.normalizedPublicUsername(publicUsernameDraft) ?? ""
+        return draftUsername != currentUsername
+    }
+
     private var upgradeButtonTitle: String {
         library.upgradeCallToActionTitle
     }
@@ -448,6 +518,10 @@ struct SettingsView: View {
         return "StoreKit: \(library.storeKitLoadedProductIDs.joined(separator: ", "))"
     }
     #endif
+
+    private func seedPublicUsernameDraft() {
+        publicUsernameDraft = library.signedInAccount?.publicUsername ?? ""
+    }
 
     private func planFeatureRow(_ title: String, details: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
