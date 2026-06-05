@@ -35,6 +35,12 @@ struct UserContentSyncPullReport: Hashable, Sendable {
     let accountUserID: String?
     let skippedReason: String?
     let mergePlan: UserContentMergePlan
+
+    var appliedRemoteContinuity: Bool {
+        mergePlan.decisions.contains {
+            $0.entityKind == .continuity && $0.action == .applyServer
+        }
+    }
 }
 
 struct UserContentSyncBatch: Hashable, Sendable {
@@ -185,15 +191,18 @@ struct UserContentSyncEngine {
     private let repository: UserContentRepository?
     private let backend: UserContentSyncBackend
     private let checkpointStore: UserContentSyncCheckpointStore
+    private let continuityStore: ContinuityStore
 
     init(
         repository: UserContentRepository?,
         backend: UserContentSyncBackend = NoOpUserContentSyncBackend(),
-        checkpointStore: UserContentSyncCheckpointStore = UserContentSyncCheckpointStore()
+        checkpointStore: UserContentSyncCheckpointStore = UserContentSyncCheckpointStore(),
+        continuityStore: ContinuityStore = .shared
     ) {
         self.repository = repository
         self.backend = backend
         self.checkpointStore = checkpointStore
+        self.continuityStore = continuityStore
     }
 
     func previewPendingWork(limit: Int = 100) throws -> UserContentSyncPreviewReport {
@@ -265,11 +274,16 @@ struct UserContentSyncEngine {
             let appliedCount = try applySafeChanges
                 ? applySafeRemoteChanges(incoming: incoming, mergePlan: mergePlan)
                 : 0
-            checkpointStore.save(checkpoint.markingPullSucceeded(at: incoming.pulledAt))
+            let safeNoOpCount = mergePlan.noChangeCount
+            let unresolvedCount = mergePlan.keepLocalCount + mergePlan.uploadLocalCount + mergePlan.conflictCount
+            let skippedCount = max(mergePlan.decisions.count - appliedCount - safeNoOpCount, 0)
+            if applySafeChanges && unresolvedCount == 0 {
+                checkpointStore.save(checkpoint.markingPullSucceeded(at: incoming.pulledAt))
+            }
             return UserContentSyncPullReport(
                 pulledCount: incoming.mutations.count,
                 appliedCount: appliedCount,
-                skippedCount: mergePlan.decisions.count - appliedCount,
+                skippedCount: skippedCount,
                 conflictCount: mergePlan.conflictCount,
                 backendName: backend.name,
                 accountUserID: account.appUserID,
@@ -387,14 +401,55 @@ struct UserContentSyncEngine {
         for mutation in incoming.mutations.sortedForLocalApplication {
             guard let decision = decisionsByID[mutation.recordID] else { continue }
             switch decision.action {
-            case .applyServer, .deleteLocal:
+            case .applyServer:
+                if case .continuity(let record) = mutation {
+                    applyServerContinuity(record)
+                } else {
+                    try repository.applyServerUserContentMutation(mutation)
+                }
+                appliedCount += 1
+            case .deleteLocal:
                 try repository.applyServerUserContentMutation(mutation)
                 appliedCount += 1
-            case .keepLocal, .uploadLocal, .noChange, .flagConflict:
+            case .noChange:
+                continue
+            case .keepLocal, .uploadLocal, .flagConflict:
                 continue
             }
         }
         return appliedCount
+    }
+
+    private func applyServerContinuity(_ record: ServerContinuityRecord) {
+        let values = record.values
+        let existingContext = continuityStore.load()
+        let recentlyViewedSections: [RecentlyViewedEntry]
+        if let rawJSON = values["recentlyViewedSectionsJSON"],
+           let data = rawJSON.data(using: .utf8),
+           let decoded = try? JSONDecoder().decode([RecentlyViewedEntry].self, from: data) {
+            recentlyViewedSections = decoded.sorted { $0.viewedAt > $1.viewedAt }
+        } else {
+            recentlyViewedSections = existingContext.recentlyViewedSections
+        }
+
+        let selectedJurisdictionKey = values["selectedJurisdictionKey"].flatMap { $0.isEmpty ? nil : $0 }
+            ?? existingContext.selectedJurisdictionKey
+        let selectedVersionFileName = values["selectedVersionFileName"].flatMap { $0.isEmpty ? nil : $0 }
+            ?? (record.codeVersion.isEmpty ? existingContext.selectedVersionFileName : record.codeVersion)
+        let comparisonModeEnabled = values["comparisonModeEnabled"].map { $0 == "true" }
+            ?? existingContext.comparisonModeEnabled
+
+        continuityStore.save(
+            ContinuityContext(
+                selectedJurisdictionKey: selectedJurisdictionKey,
+                selectedVersionFileName: selectedVersionFileName,
+                selectedCodeSectionID: values["selectedCodeSectionID"].flatMap(Int64.init),
+                lastOpenedChapterID: values["lastOpenedChapterID"].flatMap(Int64.init),
+                activeProjectID: values["activeProjectID"].flatMap(Int64.init),
+                comparisonModeEnabled: comparisonModeEnabled,
+                recentlyViewedSections: recentlyViewedSections
+            )
+        )
     }
 }
 

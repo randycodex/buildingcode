@@ -264,6 +264,32 @@ function validationError(message) {
   return { ok: false, message };
 }
 
+function normalizePublicUsername(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  const withoutAtPrefix = trimmed.startsWith("@") ? trimmed.slice(1) : trimmed;
+  const normalized = withoutAtPrefix.toLowerCase();
+  return normalized.length ? normalized : null;
+}
+
+function validatePublicUsername(value) {
+  if (!value) {
+    return null;
+  }
+  if (value.length < 3) {
+    return "Use at least 3 characters.";
+  }
+  if (value.length > 30) {
+    return "Use 30 characters or fewer.";
+  }
+  if (!/^[a-z0-9_-]+$/.test(value)) {
+    return "Use letters, numbers, hyphens, or underscores.";
+  }
+  return null;
+}
+
 function validateMutation(mutation, userID) {
   if (!mutation || typeof mutation !== "object" || Array.isArray(mutation)) {
     return validationError("Mutation must be an object.");
@@ -342,6 +368,58 @@ function mergeMutations(existing, incoming) {
   };
 }
 
+function mutationKindAndRecord(mutation) {
+  const [kind, record] = Object.entries(mutation)[0] || [];
+  return { kind, record };
+}
+
+function projectRecordMatchesSection(projectRecord, sectionRecord) {
+  if (!projectRecord || !sectionRecord) {
+    return false;
+  }
+  if (projectRecord.userID !== sectionRecord.userID || projectRecord.codeVersion !== sectionRecord.codeVersion) {
+    return false;
+  }
+  const sectionFolderClientID = sectionRecord.folderClientID || null;
+  if (sectionFolderClientID && (projectRecord.clientID === sectionFolderClientID || projectRecord.id === sectionFolderClientID)) {
+    return true;
+  }
+  return sectionRecord.localFolderID !== undefined &&
+    sectionRecord.localFolderID !== null &&
+    projectRecord.localFolderID === sectionRecord.localFolderID;
+}
+
+function expandPullMutationsWithDependencies(filteredMutations, allMutations) {
+  const expandedByID = new Map();
+  for (const mutation of filteredMutations) {
+    const id = mutationRecordID(mutation);
+    if (id) {
+      expandedByID.set(id, mutation);
+    }
+  }
+
+  for (const mutation of filteredMutations) {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (kind !== "projectSection" || !record) {
+      continue;
+    }
+    const parentProject = allMutations.find((candidate) => {
+      const { kind: candidateKind, record: candidateRecord } = mutationKindAndRecord(candidate);
+      return candidateKind === "project" && projectRecordMatchesSection(candidateRecord, record);
+    });
+    const parentID = parentProject ? mutationRecordID(parentProject) : null;
+    if (parentProject && parentID && !expandedByID.has(parentID)) {
+      expandedByID.set(parentID, parentProject);
+    }
+  }
+
+  return Array.from(expandedByID.values()).sort((left, right) => {
+    const leftID = mutationRecordID(left) || "";
+    const rightID = mutationRecordID(right) || "";
+    return leftID.localeCompare(rightID);
+  });
+}
+
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
   const account = accountFromCredential(body.credential);
@@ -391,12 +469,15 @@ async function handleProfileUpdate(request, response) {
     return;
   }
 
-  const publicUsername = typeof body.publicUsername === "string" && body.publicUsername.trim().length
-    ? body.publicUsername.trim()
-    : null;
+  const publicUsername = normalizePublicUsername(body.publicUsername);
   const displayName = typeof body.displayName === "string" && body.displayName.trim().length
     ? body.displayName.trim()
     : null;
+  const usernameValidationMessage = validatePublicUsername(publicUsername);
+  if (usernameValidationMessage) {
+    sendError(response, 400, usernameValidationMessage);
+    return;
+  }
 
   if (publicUsername) {
     const usernameOwner = Object.values(store.users).find((user) =>
@@ -482,9 +563,10 @@ async function handlePull(request, response) {
   }
   const since = body.since ? Date.parse(body.since) : null;
   const allMutations = store.mutationsByUserID[userID] || [];
-  const mutations = Number.isFinite(since)
+  const filteredMutations = Number.isFinite(since)
     ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since)
     : allMutations;
+  const mutations = expandPullMutationsWithDependencies(filteredMutations, allMutations);
   sendJSON(response, 200, {
     userID,
     pulledAt: new Date().toISOString(),

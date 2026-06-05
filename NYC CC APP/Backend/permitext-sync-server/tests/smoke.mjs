@@ -115,7 +115,7 @@ async function main() {
       token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
-        publicUsername: "smoke-pro",
+        publicUsername: "@Smoke-Pro",
         displayName: "Smoke Pro"
       }
     });
@@ -141,6 +141,16 @@ async function main() {
       }
     });
     assert(duplicateProfile.response.status === 409, "Profile update allowed a duplicate public username.");
+
+    const invalidProfile = await request("/account/profile", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        publicUsername: "bad name"
+      }
+    });
+    assert(invalidProfile.response.status === 400, "Profile update allowed an invalid public username.");
 
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",
@@ -231,6 +241,60 @@ async function main() {
     });
     assert(pull.response.ok, "Sync pull failed.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
+
+    const projectMutation = {
+      project: {
+        id: "project-smoke",
+        userID,
+        codeVersion: "nyc-2022",
+        clientID: "project-client-smoke",
+        localFolderID: 42,
+        name: "Smoke Project",
+        description: "",
+        colorHex: "#FF6B35",
+        sortOrder: 0,
+        updatedAt: "2026-06-04T00:00:00Z"
+      }
+    };
+    const projectSectionMutation = {
+      projectSection: {
+        id: "project-section-smoke",
+        userID,
+        codeVersion: "nyc-2022",
+        folderClientID: "project-client-smoke",
+        localFolderID: 42,
+        sectionID: 101,
+        scope: "manual",
+        updatedAt: "2026-06-06T00:00:00Z"
+      }
+    };
+    const projectPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [projectMutation, projectSectionMutation]
+        }
+      }
+    });
+    assert(projectPush.response.ok, "Project sync push failed.");
+    assert(projectPush.json.acceptedMutationIDs.includes("project-smoke"), "Project mutation was not accepted.");
+    assert(projectPush.json.acceptedMutationIDs.includes("project-section-smoke"), "Project section mutation was not accepted.");
+
+    const projectDependencyPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        since: "2026-06-05T00:00:00Z"
+      }
+    });
+    assert(projectDependencyPull.response.ok, "Project dependency pull failed.");
+    const pulledKinds = projectDependencyPull.json.mutations.map((item) => Object.keys(item)[0]);
+    assert(pulledKinds.includes("projectSection"), "Pull did not include the newer project section.");
+    assert(pulledKinds.includes("project"), "Pull did not include the parent project dependency.");
 
     const revoke = await request("/admin/lifetime-grants/revoke", {
       method: "POST",
