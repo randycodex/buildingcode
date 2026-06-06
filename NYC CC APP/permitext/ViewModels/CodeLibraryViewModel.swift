@@ -1738,6 +1738,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 Self.saveSignedInAccount(linkedAccount)
                 statusMessage = "Passkey saved for this account."
             } catch {
+                if handleBackendSessionFailureIfNeeded(error) { return }
                 statusMessage = error.localizedDescription
             }
         case .failure(let error):
@@ -1754,6 +1755,7 @@ final class CodeLibraryViewModel: ObservableObject {
             LocalEntitlementService.setEntitlement(entitlement)
             refreshCurrentEntitlement()
         }
+        await refreshStoreKitEntitlements()
         await attachLocalDataIfNeeded()
         await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
@@ -1781,6 +1783,7 @@ final class CodeLibraryViewModel: ObservableObject {
             Self.saveSignedInAccount(migratedAccount)
             refreshUserContentSyncCheckpoint()
         } catch {
+            if handleBackendSessionFailureIfNeeded(error) { return }
             statusMessage = "Signed in. Local data is still only on this device."
         }
     }
@@ -1804,6 +1807,11 @@ final class CodeLibraryViewModel: ObservableObject {
             }
             refreshPendingUserContentSyncCount()
         } catch {
+            if handleBackendSessionFailureIfNeeded(error) {
+                refreshUserContentSyncCheckpoint()
+                refreshPendingUserContentSyncCount()
+                return
+            }
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
             refreshPendingUserContentSyncCount()
@@ -1845,6 +1853,10 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshUserContentSyncCheckpoint()
             return report.mergePlan
         } catch {
+            if handleBackendSessionFailureIfNeeded(error) {
+                refreshUserContentSyncCheckpoint()
+                return nil
+            }
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
             return nil
@@ -1870,6 +1882,10 @@ final class CodeLibraryViewModel: ObservableObject {
                 statusMessage = "\(report.conflictCount) remote changes need review."
             }
         } catch {
+            if handleBackendSessionFailureIfNeeded(error) {
+                refreshUserContentSyncCheckpoint()
+                return
+            }
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
         }
@@ -1889,6 +1905,11 @@ final class CodeLibraryViewModel: ObservableObject {
         guard signedInAccount != nil else {
             statusMessage = "Sign in before syncing saved work."
             return
+        }
+        do {
+            try syncEngine.retryFailedItems()
+        } catch {
+            statusMessage = "Could not prepare failed sync items for retry. \(error.localizedDescription)"
         }
         await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
@@ -1922,7 +1943,10 @@ final class CodeLibraryViewModel: ObservableObject {
             return "Sign in to sync saved work across installs and devices."
         }
         if let error = userContentSyncCheckpoint?.lastErrorMessage {
-            return error
+            if Self.isBackendAuthenticationFailureMessage(error) {
+                return "Your sync session expired. Sign in again to reconnect saved work."
+            }
+            return "Last sync failed. Tap Sync Now to retry. \(error)"
         }
         let lastPush = userContentSyncCheckpoint?.lastSuccessfulPushAt
         let lastPull = userContentSyncCheckpoint?.lastSuccessfulPullAt
@@ -1987,6 +2011,7 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshUserContentSyncCheckpoint()
             statusMessage = normalizedUsername == nil ? "Public username cleared." : "Public username saved."
         } catch {
+            if handleBackendSessionFailureIfNeeded(error) { return }
             statusMessage = error.localizedDescription
         }
     }
@@ -2052,7 +2077,30 @@ final class CodeLibraryViewModel: ObservableObject {
         statusMessage = "Signed out."
     }
 
+    @discardableResult
+    private func handleBackendSessionFailureIfNeeded(_ error: Error) -> Bool {
+        guard Self.isBackendAuthenticationFailure(error) else { return false }
+        signedInAccount = nil
+        Self.clearSignedInAccount()
+        userContentSyncCheckpoint = nil
+        refreshPendingUserContentSyncCount()
+        statusMessage = "Your sync session expired. Sign in again to reconnect saved work."
+        return true
+    }
+
     #if DEBUG
+    func runDebugRestoreCheck() async {
+        refreshCurrentEntitlement()
+        refreshUserContentSyncCheckpoint()
+        refreshPendingUserContentSyncCount()
+
+        let accountText = signedInAccount == nil ? "account missing" : "account ok"
+        let planText = currentPlan == .pro ? "Pro active" : "Free active"
+        let queueText = "\(pendingUserContentSyncCount) pending"
+        let checkpointText = userContentSyncCheckpoint?.lastErrorMessage == nil ? "sync ok" : "sync has error"
+        statusMessage = "Restore check: \(accountText), \(planText), \(queueText), \(checkpointText)."
+    }
+
     func setDebugPlan(_ plan: AppPlan) {
         LocalEntitlementService.setDebugPlan(plan)
         let entitlement = entitlementService.currentEntitlement
@@ -2094,6 +2142,19 @@ final class CodeLibraryViewModel: ObservableObject {
         currentEntitlementSource = resolvedEntitlement.source
         proProductDisplayPrice = snapshot.proDisplayPrice
         storeKitLoadedProductIDs = snapshot.loadedProductIDs
+    }
+
+    private static func isBackendAuthenticationFailure(_ error: Error) -> Bool {
+        guard let backendError = error as? PermitextBackendHTTPError else { return false }
+        return backendError.isAuthenticationFailure
+    }
+
+    private static func isBackendAuthenticationFailureMessage(_ message: String) -> Bool {
+        let lowercased = message.lowercased()
+        return lowercased.contains("session")
+            || lowercased.contains("sign in")
+            || lowercased.contains("unauthorized")
+            || lowercased.contains("forbidden")
     }
 
     private static func loadSignedInAccount() -> SignedInAccount? {

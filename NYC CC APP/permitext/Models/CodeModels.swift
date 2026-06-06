@@ -1027,6 +1027,15 @@ enum PermitextBackendHTTPError: LocalizedError {
     case invalidResponse
     case serverStatus(Int, String?)
 
+    var statusCode: Int? {
+        guard case .serverStatus(let statusCode, _) = self else { return nil }
+        return statusCode
+    }
+
+    var isAuthenticationFailure: Bool {
+        statusCode == 401 || statusCode == 403
+    }
+
     var errorDescription: String? {
         switch self {
         case .invalidResponse:
