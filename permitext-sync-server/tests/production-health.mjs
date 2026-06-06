@@ -1,5 +1,6 @@
 const baseURL = process.env.PERMITEXT_SYNC_PRODUCTION_URL || "https://permitext-sync.vercel.app";
 const expectedStorage = process.env.PERMITEXT_SYNC_EXPECTED_STORAGE || "postgres";
+const expectedSchema = process.env.PERMITEXT_SYNC_EXPECTED_SCHEMA || null;
 
 function assert(condition, message) {
   if (!condition) {
@@ -18,8 +19,14 @@ async function main() {
     json.storage === expectedStorage,
     `Expected storage "${expectedStorage}", received "${json?.storage ?? "unknown"}".`
   );
+  if (expectedSchema) {
+    assert(
+      json.schema === expectedSchema,
+      `Expected schema "${expectedSchema}", received "${json?.schema ?? "unknown"}".`
+    );
+  }
 
-  console.log(`permitext production health passed: ${baseURL} uses ${json.storage}`);
+  console.log(`permitext production health passed: ${baseURL} uses ${json.storage}${json.schema ? ` (${json.schema})` : ""}`);
 }
 
 main().catch((error) => {
