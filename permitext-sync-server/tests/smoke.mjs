@@ -183,6 +183,38 @@ async function main() {
         }
       }
     });
+    assert(secondSignIn.response.ok, "Second account sign-in failed.");
+
+    const crossAccountProfile = await request("/account/profile", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: "apple:second-smoke-user" },
+        publicUsername: "wrong-token-profile"
+      }
+    });
+    assert(crossAccountProfile.response.status === 401, "Profile update allowed another account's session token.");
+
+    const crossAccountPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: "apple:second-smoke-user" },
+        batch: {
+          user: { id: "apple:second-smoke-user" },
+          mutations: []
+        }
+      }
+    });
+    assert(crossAccountPush.response.status === 401, "Push allowed another account's session token.");
+
+    const crossAccountPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: "apple:second-smoke-user" } }
+    });
+    assert(crossAccountPull.response.status === 401, "Pull allowed another account's session token.");
+
     const duplicateProfile = await request("/account/profile", {
       method: "POST",
       token: secondSignIn.json.account.backendSessionToken,
