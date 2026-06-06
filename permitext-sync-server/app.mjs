@@ -44,6 +44,7 @@ function safeJSON(value, fallback) {
 function createFileStoreAdapter() {
   return {
     kind: "file",
+    schema: "json-file",
     async read() {
       try {
         const raw = await readFile(dataPath, "utf8");
@@ -62,10 +63,51 @@ function createFileStoreAdapter() {
   };
 }
 
+function storeHasData(store) {
+  return Object.values({
+    users: store.users,
+    entitlements: store.entitlements,
+    sessions: store.sessions,
+    passkeyCredentials: store.passkeyCredentials,
+    mutationsByUserID: store.mutationsByUserID
+  }).some((value) => value && Object.keys(value).length > 0);
+}
+
+function dateToISO(value, fallback = null) {
+  if (value === null || value === undefined || value === "") {
+    return fallback;
+  }
+  const timestamp = Date.parse(value);
+  if (!Number.isFinite(timestamp)) {
+    return fallback;
+  }
+  return new Date(timestamp).toISOString();
+}
+
+function normalizedMutationKindAndRecord(mutation) {
+  const [kind, record] = Object.entries(mutation || {})[0] || [];
+  return { kind, record };
+}
+
+function normalizedMutationRecordID(mutation) {
+  const { kind, record } = normalizedMutationKindAndRecord(mutation);
+  if (!kind || !record) {
+    return null;
+  }
+  if (kind === "continuity") {
+    return [record.userID, "continuity", record.codeVersion].join(":");
+  }
+  if (kind === "codeVersionClear") {
+    return [record.userID, "code-version-clear", record.codeVersion].join(":");
+  }
+  return record.id || null;
+}
+
 async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
   let initialized = false;
+  let migrated = false;
 
   async function ensureSchema() {
     if (initialized) {
@@ -87,6 +129,82 @@ async function createPostgresStoreAdapter() {
       ADD COLUMN IF NOT EXISTS passkey_credentials JSONB NOT NULL DEFAULT '{}'::jsonb
     `;
     await sql`
+      CREATE TABLE IF NOT EXISTS permitext_users (
+        id TEXT PRIMARY KEY,
+        auth_provider TEXT NOT NULL,
+        auth_provider_user_id TEXT NOT NULL,
+        apple_user_id TEXT,
+        public_username TEXT,
+        display_name TEXT,
+        migration_state TEXT,
+        account JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS permitext_users_auth_identity_idx
+      ON permitext_users (auth_provider, auth_provider_user_id)
+    `;
+    await sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS permitext_users_public_username_idx
+      ON permitext_users (public_username)
+      WHERE public_username IS NOT NULL
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_entitlements (
+        user_id TEXT PRIMARY KEY,
+        plan TEXT NOT NULL,
+        source TEXT NOT NULL,
+        granted_user_id TEXT,
+        entitlement JSONB NOT NULL DEFAULT '{}'::jsonb,
+        expires_at TIMESTAMPTZ,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_entitlements_source_granted_idx
+      ON permitext_entitlements (source, granted_user_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_sessions (
+        user_id TEXT PRIMARY KEY,
+        session_token TEXT NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_passkey_credentials (
+        credential_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_passkey_credentials_user_idx
+      ON permitext_passkey_credentials (user_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_user_content_records (
+        record_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        entity_kind TEXT NOT NULL,
+        code_version TEXT,
+        mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ,
+        server_version BIGINT NOT NULL DEFAULT 1
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_user_content_user_updated_idx
+      ON permitext_user_content_records (user_id, updated_at)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_user_content_user_version_kind_idx
+      ON permitext_user_content_records (user_id, code_version, entity_kind)
+    `;
+    await sql`
       INSERT INTO permitext_sync_state (id)
       VALUES ('default')
       ON CONFLICT (id) DO NOTHING
@@ -94,54 +212,303 @@ async function createPostgresStoreAdapter() {
     initialized = true;
   }
 
-  return {
-    kind: "postgres",
-    async read() {
-      await ensureSchema();
-      const rows = await sql`
-        SELECT users, entitlements, sessions, passkey_credentials, mutations_by_user_id
-        FROM permitext_sync_state
-        WHERE id = 'default'
-        LIMIT 1
-      `;
-      const row = rows[0] || {};
-      return {
-        users: safeJSON(row.users, {}),
-        entitlements: safeJSON(row.entitlements, {}),
-        sessions: safeJSON(row.sessions, {}),
-        passkeyCredentials: safeJSON(row.passkey_credentials, {}),
-        mutationsByUserID: safeJSON(row.mutations_by_user_id, {})
-      };
-    },
-    async write(store) {
-      await ensureSchema();
+  async function readLegacyStore() {
+    const rows = await sql`
+      SELECT users, entitlements, sessions, passkey_credentials, mutations_by_user_id
+      FROM permitext_sync_state
+      WHERE id = 'default'
+      LIMIT 1
+    `;
+    const row = rows[0] || {};
+    return {
+      users: safeJSON(row.users, {}),
+      entitlements: safeJSON(row.entitlements, {}),
+      sessions: safeJSON(row.sessions, {}),
+      passkeyCredentials: safeJSON(row.passkey_credentials, {}),
+      mutationsByUserID: safeJSON(row.mutations_by_user_id, {})
+    };
+  }
+
+  async function writeLegacyBackup(store) {
+    await sql`
+      INSERT INTO permitext_sync_state (
+        id,
+        users,
+        entitlements,
+        sessions,
+        passkey_credentials,
+        mutations_by_user_id,
+        updated_at
+      )
+      VALUES (
+        'default',
+        ${JSON.stringify(store.users || {})}::jsonb,
+        ${JSON.stringify(store.entitlements || {})}::jsonb,
+        ${JSON.stringify(store.sessions || {})}::jsonb,
+        ${JSON.stringify(store.passkeyCredentials || {})}::jsonb,
+        ${JSON.stringify(store.mutationsByUserID || {})}::jsonb,
+        now()
+      )
+      ON CONFLICT (id) DO UPDATE SET
+        users = EXCLUDED.users,
+        entitlements = EXCLUDED.entitlements,
+        sessions = EXCLUDED.sessions,
+        passkey_credentials = EXCLUDED.passkey_credentials,
+        mutations_by_user_id = EXCLUDED.mutations_by_user_id,
+        updated_at = EXCLUDED.updated_at
+    `;
+  }
+
+  async function writeNormalizedStore(store, { backupLegacy = true } = {}) {
+    const users = store.users || {};
+    const desiredUserIDs = new Set(Object.keys(users));
+    const existingUsers = await sql`SELECT id FROM permitext_users`;
+    for (const row of existingUsers) {
+      if (!desiredUserIDs.has(row.id)) {
+        await sql`DELETE FROM permitext_users WHERE id = ${row.id}`;
+      }
+    }
+    for (const [userID, account] of Object.entries(users)) {
+      const authProvider = account.authProvider || "guest";
+      const authProviderUserID = account.authProviderUserID || account.appleUserID || userID;
       await sql`
-        INSERT INTO permitext_sync_state (
+        INSERT INTO permitext_users (
           id,
-          users,
-          entitlements,
-          sessions,
-          passkey_credentials,
-          mutations_by_user_id,
+          auth_provider,
+          auth_provider_user_id,
+          apple_user_id,
+          public_username,
+          display_name,
+          migration_state,
+          account,
+          created_at,
           updated_at
         )
         VALUES (
-          'default',
-          ${JSON.stringify(store.users || {})}::jsonb,
-          ${JSON.stringify(store.entitlements || {})}::jsonb,
-          ${JSON.stringify(store.sessions || {})}::jsonb,
-          ${JSON.stringify(store.passkeyCredentials || {})}::jsonb,
-          ${JSON.stringify(store.mutationsByUserID || {})}::jsonb,
+          ${userID},
+          ${authProvider},
+          ${authProviderUserID},
+          ${account.appleUserID || null},
+          ${account.publicUsername || null},
+          ${account.displayName || null},
+          ${account.migrationState || null},
+          ${JSON.stringify(account)}::jsonb,
+          ${dateToISO(account.signedInAt, new Date().toISOString())}::timestamptz,
           now()
         )
         ON CONFLICT (id) DO UPDATE SET
-          users = EXCLUDED.users,
-          entitlements = EXCLUDED.entitlements,
-          sessions = EXCLUDED.sessions,
-          passkey_credentials = EXCLUDED.passkey_credentials,
-          mutations_by_user_id = EXCLUDED.mutations_by_user_id,
+          auth_provider = EXCLUDED.auth_provider,
+          auth_provider_user_id = EXCLUDED.auth_provider_user_id,
+          apple_user_id = EXCLUDED.apple_user_id,
+          public_username = EXCLUDED.public_username,
+          display_name = EXCLUDED.display_name,
+          migration_state = EXCLUDED.migration_state,
+          account = EXCLUDED.account,
           updated_at = EXCLUDED.updated_at
       `;
+    }
+
+    const entitlements = store.entitlements || {};
+    const desiredEntitlementUserIDs = new Set(Object.keys(entitlements));
+    const existingEntitlements = await sql`SELECT user_id FROM permitext_entitlements`;
+    for (const row of existingEntitlements) {
+      if (!desiredEntitlementUserIDs.has(row.user_id)) {
+        await sql`DELETE FROM permitext_entitlements WHERE user_id = ${row.user_id}`;
+      }
+    }
+    for (const [userID, entitlement] of Object.entries(entitlements)) {
+      await sql`
+        INSERT INTO permitext_entitlements (
+          user_id,
+          plan,
+          source,
+          granted_user_id,
+          entitlement,
+          expires_at,
+          updated_at
+        )
+        VALUES (
+          ${userID},
+          ${entitlement.plan || "free"},
+          ${entitlement.source || "unknown"},
+          ${entitlement.grantedUserID || null},
+          ${JSON.stringify(entitlement)}::jsonb,
+          ${dateToISO(entitlement.expiresAt)}::timestamptz,
+          now()
+        )
+        ON CONFLICT (user_id) DO UPDATE SET
+          plan = EXCLUDED.plan,
+          source = EXCLUDED.source,
+          granted_user_id = EXCLUDED.granted_user_id,
+          entitlement = EXCLUDED.entitlement,
+          expires_at = EXCLUDED.expires_at,
+          updated_at = EXCLUDED.updated_at
+      `;
+    }
+
+    const sessions = store.sessions || {};
+    const desiredSessionUserIDs = new Set(Object.keys(sessions));
+    const existingSessions = await sql`SELECT user_id FROM permitext_sessions`;
+    for (const row of existingSessions) {
+      if (!desiredSessionUserIDs.has(row.user_id)) {
+        await sql`DELETE FROM permitext_sessions WHERE user_id = ${row.user_id}`;
+      }
+    }
+    for (const [userID, sessionToken] of Object.entries(sessions)) {
+      await sql`
+        INSERT INTO permitext_sessions (user_id, session_token, updated_at)
+        VALUES (${userID}, ${sessionToken}, now())
+        ON CONFLICT (user_id) DO UPDATE SET
+          session_token = EXCLUDED.session_token,
+          updated_at = EXCLUDED.updated_at
+      `;
+    }
+
+    const passkeyCredentials = store.passkeyCredentials || {};
+    const desiredCredentialIDs = new Set(Object.keys(passkeyCredentials));
+    const existingCredentials = await sql`SELECT credential_id FROM permitext_passkey_credentials`;
+    for (const row of existingCredentials) {
+      if (!desiredCredentialIDs.has(row.credential_id)) {
+        await sql`DELETE FROM permitext_passkey_credentials WHERE credential_id = ${row.credential_id}`;
+      }
+    }
+    for (const [credentialID, userID] of Object.entries(passkeyCredentials)) {
+      await sql`
+        INSERT INTO permitext_passkey_credentials (credential_id, user_id, updated_at)
+        VALUES (${credentialID}, ${userID}, now())
+        ON CONFLICT (credential_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          updated_at = EXCLUDED.updated_at
+      `;
+    }
+
+    const mutationsByUserID = store.mutationsByUserID || {};
+    const desiredMutationIDs = new Set();
+    for (const mutations of Object.values(mutationsByUserID)) {
+      for (const mutation of mutations || []) {
+        const recordID = normalizedMutationRecordID(mutation);
+        if (recordID) {
+          desiredMutationIDs.add(recordID);
+        }
+      }
+    }
+    const existingMutations = await sql`SELECT record_id FROM permitext_user_content_records`;
+    for (const row of existingMutations) {
+      if (!desiredMutationIDs.has(row.record_id)) {
+        await sql`DELETE FROM permitext_user_content_records WHERE record_id = ${row.record_id}`;
+      }
+    }
+    for (const [userID, mutations] of Object.entries(mutationsByUserID)) {
+      for (const mutation of mutations || []) {
+        const recordID = normalizedMutationRecordID(mutation);
+        const { kind, record } = normalizedMutationKindAndRecord(mutation);
+        if (!recordID || !kind || !record) {
+          continue;
+        }
+        await sql`
+          INSERT INTO permitext_user_content_records (
+            record_id,
+            user_id,
+            entity_kind,
+            code_version,
+            mutation,
+            updated_at,
+            deleted_at,
+            server_version
+          )
+          VALUES (
+            ${recordID},
+            ${record.userID || userID},
+            ${kind},
+            ${record.codeVersion || null},
+            ${JSON.stringify(mutation)}::jsonb,
+            ${dateToISO(record.updatedAt, new Date().toISOString())}::timestamptz,
+            ${dateToISO(record.deletedAt)}::timestamptz,
+            1
+          )
+          ON CONFLICT (record_id) DO UPDATE SET
+            user_id = EXCLUDED.user_id,
+            entity_kind = EXCLUDED.entity_kind,
+            code_version = EXCLUDED.code_version,
+            mutation = EXCLUDED.mutation,
+            updated_at = EXCLUDED.updated_at,
+            deleted_at = EXCLUDED.deleted_at,
+            server_version = permitext_user_content_records.server_version + 1
+        `;
+      }
+    }
+
+    if (backupLegacy) {
+      await writeLegacyBackup(store);
+    }
+  }
+
+  async function readNormalizedStore() {
+    const store = emptyStore();
+    const [users, entitlements, sessions, passkeyCredentials, mutations] = await Promise.all([
+      sql`SELECT id, account FROM permitext_users ORDER BY id`,
+      sql`SELECT user_id, entitlement FROM permitext_entitlements ORDER BY user_id`,
+      sql`SELECT user_id, session_token FROM permitext_sessions ORDER BY user_id`,
+      sql`SELECT credential_id, user_id FROM permitext_passkey_credentials ORDER BY credential_id`,
+      sql`SELECT user_id, mutation FROM permitext_user_content_records ORDER BY user_id, record_id`
+    ]);
+
+    for (const row of users) {
+      store.users[row.id] = safeJSON(row.account, {});
+    }
+    for (const row of entitlements) {
+      store.entitlements[row.user_id] = safeJSON(row.entitlement, {});
+    }
+    for (const row of sessions) {
+      store.sessions[row.user_id] = row.session_token;
+    }
+    for (const row of passkeyCredentials) {
+      store.passkeyCredentials[row.credential_id] = row.user_id;
+    }
+    for (const row of mutations) {
+      if (!store.mutationsByUserID[row.user_id]) {
+        store.mutationsByUserID[row.user_id] = [];
+      }
+      store.mutationsByUserID[row.user_id].push(safeJSON(row.mutation, {}));
+    }
+
+    return store;
+  }
+
+  async function migrateLegacyStateIfNeeded() {
+    if (migrated) {
+      return;
+    }
+    const [{ count }] = await sql`
+      SELECT (
+        (SELECT count(*) FROM permitext_users) +
+        (SELECT count(*) FROM permitext_entitlements) +
+        (SELECT count(*) FROM permitext_sessions) +
+        (SELECT count(*) FROM permitext_passkey_credentials) +
+        (SELECT count(*) FROM permitext_user_content_records)
+      )::int AS count
+    `;
+    if (Number(count) === 0) {
+      const legacyStore = await readLegacyStore();
+      if (storeHasData(legacyStore)) {
+        await writeNormalizedStore(legacyStore, { backupLegacy: false });
+      }
+    }
+    migrated = true;
+  }
+
+  return {
+    kind: "postgres",
+    schema: "normalized-v1",
+    async read() {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return readNormalizedStore();
+    },
+    async write(store) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      await writeNormalizedStore(store);
     }
   };
 }
@@ -168,6 +535,11 @@ async function writeStore(store) {
 async function storageKind() {
   const adapter = await storeAdapter();
   return adapter.kind;
+}
+
+async function storageSchema() {
+  const adapter = await storeAdapter();
+  return adapter.schema;
 }
 
 async function readJSON(request) {
@@ -828,7 +1200,7 @@ export async function handleRequest(request, response) {
 
     if (request.method === "GET" && path === "health") {
       await readStore();
-      sendJSON(response, 200, { ok: true, storage: await storageKind() });
+      sendJSON(response, 200, { ok: true, storage: await storageKind(), schema: await storageSchema() });
       return;
     }
     if (request.method === "GET" && path === ".well-known/apple-app-site-association") {
