@@ -298,6 +298,21 @@ struct SettingsView: View {
                 Text(AppPlan.pro.label).tag(AppPlan.pro)
             }
             .pickerStyle(.segmented)
+
+            Button {
+                Task { await library.runDebugRestoreCheck() }
+            } label: {
+                Label("Run Restore Check", systemImage: "arrow.clockwise.circle")
+                    .font(.caption.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(.secondary.opacity(0.12))
+                    )
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
             #endif
         }
         .frame(maxWidth: .infinity, alignment: .leading)
