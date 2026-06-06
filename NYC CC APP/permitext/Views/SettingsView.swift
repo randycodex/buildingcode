@@ -279,12 +279,12 @@ struct SettingsView: View {
             .foregroundStyle(.secondary)
             .disabled(library.isStoreKitBusy)
 
+            #if DEBUG
             Text(library.accountSyncDebugSummary)
                 .font(.caption2.monospaced())
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            #if DEBUG
             Text(storeKitDebugText)
                 .font(.caption2.monospaced())
                 .foregroundStyle(.secondary)

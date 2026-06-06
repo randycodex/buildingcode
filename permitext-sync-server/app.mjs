@@ -679,6 +679,35 @@ async function handleLifetimeGrantDelete(request, response) {
   sendJSON(response, 200, { userID, entitlement: null });
 }
 
+async function handleLegacyPasskeyAccountDelete(request, response) {
+  if (!requireAdmin(request, response)) {
+    return;
+  }
+
+  const store = await readStore();
+  const deletedUserIDs = Object.keys(store.users || {}).filter((userID) => userID.startsWith("passkey:"));
+  for (const userID of deletedUserIDs) {
+    delete store.users[userID];
+    delete store.sessions[userID];
+    delete store.entitlements[userID];
+    delete store.mutationsByUserID[userID];
+  }
+
+  const passkeyCredentials = store.passkeyCredentials || {};
+  for (const [credentialID, userID] of Object.entries(passkeyCredentials)) {
+    if (deletedUserIDs.includes(userID) || userID?.startsWith("passkey:")) {
+      delete passkeyCredentials[credentialID];
+    }
+  }
+  store.passkeyCredentials = passkeyCredentials;
+
+  await writeStore(store);
+  sendJSON(response, 200, {
+    deletedCount: deletedUserIDs.length,
+    deletedUserIDs
+  });
+}
+
 function handleAppleAppSiteAssociation(_request, response) {
   const teamID = process.env.APPLE_TEAM_ID || "TEAMID";
   const bundleID = process.env.APPLE_BUNDLE_ID || "com.randycodex.permitext";
@@ -701,7 +730,8 @@ const handlers = {
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,
-  "admin/lifetime-grants/revoke": handleLifetimeGrantDelete
+  "admin/lifetime-grants/revoke": handleLifetimeGrantDelete,
+  "admin/accounts/delete-legacy-passkey-users": handleLegacyPasskeyAccountDelete
 };
 
 export async function handleRequest(request, response) {

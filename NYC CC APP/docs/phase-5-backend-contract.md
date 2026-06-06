@@ -12,11 +12,11 @@ The iOS app defaults to the local development backend.
 
 When mode is `http`, the app posts JSON to the paths below under the configured base URL. Dates are ISO 8601.
 
-Local HTTP scaffold:
+Backend source:
 
-- Path: `NYC CC APP/Backend/permitext-sync-server`
-- Default URL: `http://localhost:8787`
-- Storage: local JSON file for integration testing only
+- Path: `permitext-sync-server`
+- Local default URL: `http://localhost:8787`
+- Local storage: JSON file for integration testing only
 
 Hosted production:
 
@@ -250,6 +250,7 @@ The local scaffold exposes internal admin routes when `PERMITEXT_SYNC_ADMIN_TOKE
 
 - `POST /admin/lifetime-grants/grant`
 - `POST /admin/lifetime-grants/revoke`
+- `POST /admin/accounts/delete-legacy-passkey-users`
 
 Request:
 
@@ -262,6 +263,8 @@ Required header:
 ```http
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
+
+Legacy passkey cleanup removes only users whose stored `appUserID` starts with `passkey:`. It is for records created before unlinked passkey sign-in was blocked.
 
 ## Ownership Rules
 

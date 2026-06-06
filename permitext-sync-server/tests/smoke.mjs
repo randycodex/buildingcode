@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -227,6 +227,73 @@ async function main() {
     assert(passkeySignIn.response.ok, "Linked passkey sign-in failed.");
     assert(passkeySignIn.json.account.appUserID === userID, "Passkey sign-in did not restore the linked account.");
     assert(passkeySignIn.json.entitlement?.source === "lifetimeGrant", "Passkey sign-in did not restore entitlement.");
+
+    const legacyStore = JSON.parse(await readFile(dataPath, "utf8"));
+    legacyStore.users["passkey:legacy-bad-account"] = {
+      appUserID: "passkey:legacy-bad-account",
+      authProvider: "passkey",
+      authProviderUserID: "legacy-bad-account",
+      displayName: "Legacy Bad Account"
+    };
+    legacyStore.sessions["passkey:legacy-bad-account"] = "legacy-session";
+    legacyStore.entitlements["passkey:legacy-bad-account"] = {
+      plan: "pro",
+      source: "subscription"
+    };
+    legacyStore.passkeyCredentials["legacy-bad-credential"] = "passkey:legacy-bad-account";
+    legacyStore.mutationsByUserID["passkey:legacy-bad-account"] = [{
+      savedItem: {
+        id: "legacy-bad-saved-item",
+        userID: "passkey:legacy-bad-account",
+        codeVersion: "nyc-2022",
+        sectionID: 202,
+        createdAt: "2026-06-05T00:00:00Z",
+        updatedAt: "2026-06-05T00:00:00Z"
+      }
+    }];
+    await writeFile(dataPath, JSON.stringify(legacyStore, null, 2) + "\n");
+
+    const unauthorizedLegacyCleanup = await request("/admin/accounts/delete-legacy-passkey-users", {
+      method: "POST"
+    });
+    assert(unauthorizedLegacyCleanup.response.status === 401, "Legacy passkey cleanup allowed an unauthenticated request.");
+
+    const legacyCleanup = await request("/admin/accounts/delete-legacy-passkey-users", {
+      method: "POST",
+      token: adminToken
+    });
+    assert(legacyCleanup.response.ok, "Legacy passkey cleanup failed.");
+    assert(legacyCleanup.json.deletedCount === 1, "Legacy passkey cleanup deleted the wrong number of users.");
+    assert(
+      legacyCleanup.json.deletedUserIDs.includes("passkey:legacy-bad-account"),
+      "Legacy passkey cleanup did not report the deleted user."
+    );
+
+    const linkedPasskeyAfterCleanup = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "passkey",
+          providerUserID: passkeyCredentialID
+        }
+      }
+    });
+    assert(linkedPasskeyAfterCleanup.response.ok, "Legacy cleanup broke the linked Apple passkey.");
+    assert(
+      linkedPasskeyAfterCleanup.json.account.appUserID === userID,
+      "Legacy cleanup changed the linked Apple passkey owner."
+    );
+
+    const legacyPasskeyAfterCleanup = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "passkey",
+          providerUserID: "legacy-bad-credential"
+        }
+      }
+    });
+    assert(legacyPasskeyAfterCleanup.response.status === 404, "Legacy passkey credential still signs in after cleanup.");
 
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",

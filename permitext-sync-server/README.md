@@ -67,12 +67,28 @@ The `permitext_sync_state` table is created automatically on first request. Loca
 - `POST /sync/pull`
 - `POST /admin/lifetime-grants/grant`
 - `POST /admin/lifetime-grants/revoke`
+- `POST /admin/accounts/delete-legacy-passkey-users`
 
 Admin routes require:
 
 ```http
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
+
+Legacy passkey cleanup removes only accounts whose stored user ID starts with `passkey:`. It exists to clean records created before unlinked passkey sign-in was blocked:
+
+```sh
+curl -X POST https://permitext-sync.vercel.app/admin/accounts/delete-legacy-passkey-users \
+  -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN"
+```
+
+Production identity restore can be tested with:
+
+```sh
+PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 npm run verify:production:identity
+```
+
+That test writes one stable synthetic smoke account to the configured production backend.
 
 This is intentionally simple and file-backed. It is for local integration testing before choosing production hosting, auth verification, and durable storage.
 
