@@ -2098,7 +2098,15 @@ final class CodeLibraryViewModel: ObservableObject {
         let planText = currentPlan == .pro ? "Pro active" : "Free active"
         let queueText = "\(pendingUserContentSyncCount) pending"
         let checkpointText = userContentSyncCheckpoint?.lastErrorMessage == nil ? "sync ok" : "sync has error"
-        statusMessage = "Restore check: \(accountText), \(planText), \(queueText), \(checkpointText)."
+        let backendText: String
+        do {
+            let health = try await accountBackendClient.health()
+            let storageText = health.storage.map { ", \($0)" } ?? ""
+            backendText = health.ok ? "backend ok\(storageText)" : "backend unavailable\(storageText)"
+        } catch {
+            backendText = "backend failed: \(error.localizedDescription)"
+        }
+        statusMessage = "Restore check: \(accountText), \(planText), \(queueText), \(checkpointText), \(backendText)."
     }
 
     func setDebugPlan(_ plan: AppPlan) {

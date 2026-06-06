@@ -947,8 +947,14 @@ struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let since: Date?
 }
 
+struct BackendHealthStatus: Codable, Hashable, Sendable {
+    let ok: Bool
+    let storage: String?
+}
+
 protocol PermitextBackendTransport {
     var name: String { get }
+    func health() async throws -> BackendHealthStatus
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
@@ -1053,17 +1059,20 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     let name: String
     private let baseURL: URL
     private let session: URLSession
+    private let requestTimeout: TimeInterval
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
 
     init(
         baseURL: URL,
         name: String = "http-backend",
-        session: URLSession = .shared
+        session: URLSession = .shared,
+        requestTimeout: TimeInterval = 20
     ) {
         self.name = name
         self.baseURL = baseURL
         self.session = session
+        self.requestTimeout = requestTimeout
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         self.encoder = encoder
@@ -1074,6 +1083,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord {
         try await post("account/sign-in", body: request)
+    }
+
+    func health() async throws -> BackendHealthStatus {
+        try await get("health")
     }
 
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
@@ -1096,6 +1109,14 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("sync/pull", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    private func get<ResponseBody: Decodable>(_ path: String) async throws -> ResponseBody {
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = "GET"
+        request.timeoutInterval = requestTimeout
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        return try await send(request)
+    }
+
     private func post<RequestBody: Encodable, ResponseBody: Decodable>(
         _ path: String,
         body: RequestBody,
@@ -1103,6 +1124,7 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     ) async throws -> ResponseBody {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if let bearerToken, !bearerToken.isEmpty {
@@ -1110,6 +1132,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         }
         request.httpBody = try encoder.encode(body)
 
+        return try await send(request)
+    }
+
+    private func send<ResponseBody: Decodable>(_ request: URLRequest) async throws -> ResponseBody {
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
             throw PermitextBackendHTTPError.invalidResponse
@@ -1127,6 +1153,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private var accountsByUserID: [String: SignedInAccount] = [:]
     private var userContentByUserID: [String: [ServerUserContentMutation]] = [:]
     private var passkeyCredentialUserIDs: [String: String] = [:]
+
+    func health() async throws -> BackendHealthStatus {
+        BackendHealthStatus(ok: true, storage: "memory")
+    }
 
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord {
         let credential = request.credential
@@ -1954,6 +1984,7 @@ struct BackendAccountRecord: Codable, Hashable, Sendable {
 
 protocol AccountBackendClient {
     var name: String { get }
+    func health() async throws -> BackendHealthStatus
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
@@ -1962,6 +1993,10 @@ protocol AccountBackendClient {
 
 struct LocalAccountBackendClient: AccountBackendClient {
     let name = "local"
+
+    func health() async throws -> BackendHealthStatus {
+        BackendHealthStatus(ok: true, storage: "memory")
+    }
 
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord {
         let account = SignedInAccount(

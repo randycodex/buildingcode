@@ -120,6 +120,10 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         try await transport.signIn(BackendSignInRequest(credential: credential))
     }
 
+    func health() async throws -> BackendHealthStatus {
+        try await transport.health()
+    }
+
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState {
         try await transport.attachLocalData(BackendAttachLocalDataRequest(account: account))
     }
