@@ -252,6 +252,7 @@ The local scaffold exposes internal admin routes when `PERMITEXT_SYNC_ADMIN_TOKE
 - `POST /admin/lifetime-grants/revoke`
 - `POST /admin/accounts/delete-legacy-passkey-users`
 - `POST /admin/accounts/restore-checklist`
+- `POST /admin/accounts/export`
 
 Request:
 
@@ -268,6 +269,8 @@ Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 Legacy passkey cleanup removes only users whose stored `appUserID` starts with `passkey:`. It is for records created before unlinked passkey sign-in was blocked.
 
 Restore checklist returns profile, entitlement, session, passkey, and synced mutation counts for one user. Use it to verify a reinstall/passkey restore path without querying storage directly.
+
+Account export returns the exact stored account, entitlement, passkey credential IDs, session presence, and mutation list for one user. Use it only for internal debugging when a restore appears incomplete and counts are not enough to identify the missing record.
 
 ## Ownership Rules
 
