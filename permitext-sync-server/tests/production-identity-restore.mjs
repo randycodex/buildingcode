@@ -2,6 +2,7 @@ const baseURL = process.env.PERMITEXT_PRODUCTION_BASE_URL || "https://permitext-
 const shouldRun = process.env.PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE === "1";
 const providerUserID = process.env.PERMITEXT_PRODUCTION_TEST_USER || "production-identity-restore-smoke";
 const passkeyCredentialID = process.env.PERMITEXT_PRODUCTION_TEST_PASSKEY || "production-identity-restore-passkey";
+const adminToken = process.env.PERMITEXT_SYNC_ADMIN_TOKEN || null;
 const userID = `apple:${providerUserID}`;
 
 function assert(condition, message) {
@@ -176,6 +177,23 @@ async function main() {
   assert(records.some((item) => item.kind === "annotation" && item.record.tags?.includes("ProductionSmoke")), "Tags were not restored.");
   assert(records.some((item) => item.kind === "project" && item.record.clientID === "production-restore-project-client"), "Project was not restored.");
   assert(records.some((item) => item.kind === "projectSection" && item.record.folderClientID === "production-restore-project-client"), "Project membership was not restored.");
+
+  if (adminToken) {
+    const checklist = await request("/admin/accounts/restore-checklist", {
+      method: "POST",
+      token: adminToken,
+      body: { userID }
+    });
+    assert(checklist.response.ok, "Admin restore checklist failed.");
+    assert(checklist.json.hasAccount === true, "Checklist did not report the account.");
+    assert(checklist.json.publicUsername === "production-restore-smoke", "Checklist did not report the profile.");
+    assert(checklist.json.hasSession === true, "Checklist did not report the session.");
+    assert(checklist.json.passkeyCredentialCount >= 1, "Checklist did not report the linked passkey.");
+    assert(checklist.json.mutationCounts.savedItem >= 1, "Checklist did not count saved items.");
+    assert(checklist.json.mutationCounts.annotation >= 1, "Checklist did not count annotations.");
+    assert(checklist.json.mutationCounts.project >= 1, "Checklist did not count projects.");
+    assert(checklist.json.mutationCounts.projectSection >= 1, "Checklist did not count project memberships.");
+  }
 }
 
 main().then(

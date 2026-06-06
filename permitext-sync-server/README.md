@@ -68,6 +68,7 @@ The `permitext_sync_state` table is created automatically on first request. Loca
 - `POST /admin/lifetime-grants/grant`
 - `POST /admin/lifetime-grants/revoke`
 - `POST /admin/accounts/delete-legacy-passkey-users`
+- `POST /admin/accounts/restore-checklist`
 
 Admin routes require:
 
@@ -80,6 +81,15 @@ Legacy passkey cleanup removes only accounts whose stored user ID starts with `p
 ```sh
 curl -X POST https://permitext-sync.vercel.app/admin/accounts/delete-legacy-passkey-users \
   -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN"
+```
+
+Restore checklist summarizes account restore readiness for one user:
+
+```sh
+curl -X POST https://permitext-sync.vercel.app/admin/accounts/restore-checklist \
+  -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"userID":"apple:YOUR_APPLE_USER_ID"}'
 ```
 
 Production identity restore can be tested with:

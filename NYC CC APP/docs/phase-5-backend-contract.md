@@ -251,6 +251,7 @@ The local scaffold exposes internal admin routes when `PERMITEXT_SYNC_ADMIN_TOKE
 - `POST /admin/lifetime-grants/grant`
 - `POST /admin/lifetime-grants/revoke`
 - `POST /admin/accounts/delete-legacy-passkey-users`
+- `POST /admin/accounts/restore-checklist`
 
 Request:
 
@@ -265,6 +266,8 @@ Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
 
 Legacy passkey cleanup removes only users whose stored `appUserID` starts with `passkey:`. It is for records created before unlinked passkey sign-in was blocked.
+
+Restore checklist returns profile, entitlement, session, passkey, and synced mutation counts for one user. Use it to verify a reinstall/passkey restore path without querying storage directly.
 
 ## Ownership Rules
 

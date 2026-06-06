@@ -220,11 +220,16 @@ function requireAdmin(request, response) {
 
 function requireUserSession(request, response, store, userID, requestAccount) {
   const sessionToken = store.sessions[userID];
+  const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
+  if (!suppliedToken) {
+    sendError(response, 401, "Missing session token.");
+    return false;
+  }
   if (!sessionToken) {
-    return true;
+    sendError(response, 401, "Session not found.");
+    return false;
   }
 
-  const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
   if (suppliedToken !== sessionToken) {
     sendError(response, 401, "Unauthorized.");
     return false;
@@ -708,6 +713,59 @@ async function handleLegacyPasskeyAccountDelete(request, response) {
   });
 }
 
+function mutationCounts(mutations) {
+  return mutations.reduce((counts, mutation) => {
+    const kind = Object.keys(mutation)[0];
+    if (kind) {
+      counts[kind] = (counts[kind] || 0) + 1;
+    }
+    return counts;
+  }, {});
+}
+
+async function handleRestoreChecklist(request, response) {
+  if (!requireAdmin(request, response)) {
+    return;
+  }
+
+  const body = await readJSON(request);
+  const userID = body.userID || body.appUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing userID.");
+    return;
+  }
+
+  const store = await readStore();
+  const account = store.users[userID] || null;
+  const mutations = store.mutationsByUserID[userID] || [];
+  const counts = mutationCounts(mutations);
+  const passkeyCredentialIDs = Object.entries(store.passkeyCredentials || {})
+    .filter(([, ownerUserID]) => ownerUserID === userID)
+    .map(([credentialID]) => credentialID);
+  const continuityMutations = mutations.filter((mutation) => Object.keys(mutation)[0] === "continuity");
+
+  sendJSON(response, 200, {
+    userID,
+    hasAccount: Boolean(account),
+    authProvider: account?.authProvider || null,
+    publicUsername: account?.publicUsername || null,
+    displayName: account?.displayName || null,
+    entitlement: store.entitlements[userID] || null,
+    hasSession: Boolean(store.sessions[userID]),
+    passkeyCredentialCount: passkeyCredentialIDs.length,
+    passkeyCredentialIDs,
+    mutationCounts: {
+      savedItem: counts.savedItem || 0,
+      annotation: counts.annotation || 0,
+      project: counts.project || 0,
+      projectSection: counts.projectSection || 0,
+      continuity: counts.continuity || 0,
+      codeVersionClear: counts.codeVersionClear || 0
+    },
+    latestContinuity: continuityMutations.at(-1) || null
+  });
+}
+
 function handleAppleAppSiteAssociation(_request, response) {
   const teamID = process.env.APPLE_TEAM_ID || "TEAMID";
   const bundleID = process.env.APPLE_BUNDLE_ID || "com.randycodex.permitext";
@@ -731,7 +789,8 @@ const handlers = {
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,
   "admin/lifetime-grants/revoke": handleLifetimeGrantDelete,
-  "admin/accounts/delete-legacy-passkey-users": handleLegacyPasskeyAccountDelete
+  "admin/accounts/delete-legacy-passkey-users": handleLegacyPasskeyAccountDelete,
+  "admin/accounts/restore-checklist": handleRestoreChecklist
 };
 
 export async function handleRequest(request, response) {

@@ -88,6 +88,18 @@ async function main() {
     });
     assert(unauthorizedGrant.response.status === 401, "Admin route allowed an unauthenticated grant.");
 
+    const unsignedPush = await request("/sync/push", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: "apple:unsigned-user" },
+        batch: {
+          user: { id: "apple:unsigned-user" },
+          mutations: []
+        }
+      }
+    });
+    assert(unsignedPush.response.status === 401, "Push allowed a user with no backend session.");
+
     const grant = await request("/admin/lifetime-grants/grant", {
       method: "POST",
       token: adminToken,
@@ -535,6 +547,29 @@ async function main() {
       reinstallRecords.some((item) => item.kind === "continuity" && item.record.values.activeProjectID === "42"),
       "Reinstall pull did not restore continuity."
     );
+
+    const unauthorizedChecklist = await request("/admin/accounts/restore-checklist", {
+      method: "POST",
+      body: { userID }
+    });
+    assert(unauthorizedChecklist.response.status === 401, "Restore checklist allowed an unauthenticated request.");
+
+    const restoreChecklist = await request("/admin/accounts/restore-checklist", {
+      method: "POST",
+      token: adminToken,
+      body: { userID }
+    });
+    assert(restoreChecklist.response.ok, "Restore checklist failed.");
+    assert(restoreChecklist.json.hasAccount === true, "Restore checklist did not report the account.");
+    assert(restoreChecklist.json.publicUsername === "smoke-pro", "Restore checklist did not report the profile.");
+    assert(restoreChecklist.json.entitlement?.plan === "pro", "Restore checklist did not report the entitlement.");
+    assert(restoreChecklist.json.hasSession === true, "Restore checklist did not report the session.");
+    assert(restoreChecklist.json.passkeyCredentialCount === 1, "Restore checklist did not report the linked passkey.");
+    assert(restoreChecklist.json.mutationCounts.savedItem === 1, "Restore checklist did not count saved items.");
+    assert(restoreChecklist.json.mutationCounts.annotation === 1, "Restore checklist did not count annotations.");
+    assert(restoreChecklist.json.mutationCounts.project === 1, "Restore checklist did not count projects.");
+    assert(restoreChecklist.json.mutationCounts.projectSection === 1, "Restore checklist did not count project memberships.");
+    assert(restoreChecklist.json.mutationCounts.continuity === 1, "Restore checklist did not count continuity.");
 
     const revoke = await request("/admin/lifetime-grants/revoke", {
       method: "POST",
