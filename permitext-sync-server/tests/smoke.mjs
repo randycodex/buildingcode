@@ -603,6 +603,31 @@ async function main() {
     assert(restoreChecklist.json.mutationCounts.projectSection === 1, "Restore checklist did not count project memberships.");
     assert(restoreChecklist.json.mutationCounts.continuity === 1, "Restore checklist did not count continuity.");
 
+    const unauthorizedExport = await request("/admin/accounts/export", {
+      method: "POST",
+      body: { userID }
+    });
+    assert(unauthorizedExport.response.status === 401, "Account export allowed an unauthenticated request.");
+
+    const accountExport = await request("/admin/accounts/export", {
+      method: "POST",
+      token: adminToken,
+      body: { userID }
+    });
+    assert(accountExport.response.ok, "Account export failed.");
+    assert(accountExport.json.account.appUserID === userID, "Account export did not include the account.");
+    assert(accountExport.json.entitlement?.plan === "pro", "Account export did not include the entitlement.");
+    assert(accountExport.json.hasSession === true, "Account export did not include session status.");
+    assert(accountExport.json.passkeyCredentialIDs.includes(passkeyCredentialID), "Account export did not include the linked passkey.");
+    assert(
+      accountExport.json.mutations.some((item) => item.annotation?.tags?.includes("Concrete")),
+      "Account export did not include tag mutations."
+    );
+    assert(
+      accountExport.json.mutations.some((item) => item.project?.clientID === "project-client-smoke"),
+      "Account export did not include project mutations."
+    );
+
     const revoke = await request("/admin/lifetime-grants/revoke", {
       method: "POST",
       token: adminToken,

@@ -766,6 +766,34 @@ async function handleRestoreChecklist(request, response) {
   });
 }
 
+async function handleAccountExport(request, response) {
+  if (!requireAdmin(request, response)) {
+    return;
+  }
+
+  const body = await readJSON(request);
+  const userID = body.userID || body.appUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing userID.");
+    return;
+  }
+
+  const store = await readStore();
+  const account = store.users[userID] || null;
+  const passkeyCredentialIDs = Object.entries(store.passkeyCredentials || {})
+    .filter(([, ownerUserID]) => ownerUserID === userID)
+    .map(([credentialID]) => credentialID);
+
+  sendJSON(response, 200, {
+    userID,
+    account,
+    entitlement: store.entitlements[userID] || null,
+    hasSession: Boolean(store.sessions[userID]),
+    passkeyCredentialIDs,
+    mutations: store.mutationsByUserID[userID] || []
+  });
+}
+
 function handleAppleAppSiteAssociation(_request, response) {
   const teamID = process.env.APPLE_TEAM_ID || "TEAMID";
   const bundleID = process.env.APPLE_BUNDLE_ID || "com.randycodex.permitext";
@@ -790,7 +818,8 @@ const handlers = {
   "admin/lifetime-grants/grant": handleLifetimeGrant,
   "admin/lifetime-grants/revoke": handleLifetimeGrantDelete,
   "admin/accounts/delete-legacy-passkey-users": handleLegacyPasskeyAccountDelete,
-  "admin/accounts/restore-checklist": handleRestoreChecklist
+  "admin/accounts/restore-checklist": handleRestoreChecklist,
+  "admin/accounts/export": handleAccountExport
 };
 
 export async function handleRequest(request, response) {
