@@ -1059,17 +1059,20 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     let name: String
     private let baseURL: URL
     private let session: URLSession
+    private let requestTimeout: TimeInterval
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
 
     init(
         baseURL: URL,
         name: String = "http-backend",
-        session: URLSession = .shared
+        session: URLSession = .shared,
+        requestTimeout: TimeInterval = 20
     ) {
         self.name = name
         self.baseURL = baseURL
         self.session = session
+        self.requestTimeout = requestTimeout
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         self.encoder = encoder
@@ -1109,6 +1112,7 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     private func get<ResponseBody: Decodable>(_ path: String) async throws -> ResponseBody {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "GET"
+        request.timeoutInterval = requestTimeout
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         return try await send(request)
     }
@@ -1120,6 +1124,7 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     ) async throws -> ResponseBody {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         if let bearerToken, !bearerToken.isEmpty {
