@@ -56,6 +56,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var pendingUserContentSyncCount = 0
     @Published private(set) var proProductDisplayPrice: String?
     @Published private(set) var storeKitLoadedProductIDs: [String] = []
+    @Published private(set) var storeKitDebugSummary: String = "not checked"
     @Published private(set) var isStoreKitBusy = false
     /// sectionID → ordered list of folderIDs containing that section. Cached
     /// up front so the Reader and Saved screens don't make per-section DB
@@ -2109,6 +2110,8 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshCurrentEntitlement()
         refreshUserContentSyncCheckpoint()
         refreshPendingUserContentSyncCount()
+        let storeKitSnapshot = await storeKitSubscriptionService.snapshot()
+        applyStoreKitSnapshot(storeKitSnapshot)
 
         let accountText = signedInAccount == nil ? "account missing" : "account ok"
         let planText = currentPlan == .pro ? "Pro active" : "Free active"
@@ -2122,7 +2125,7 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             backendText = "backend failed: \(error.localizedDescription)"
         }
-        statusMessage = "Restore check: \(accountText), \(planText), \(queueText), \(checkpointText), \(backendText)."
+        statusMessage = "Restore check: \(accountText), \(planText), \(queueText), \(checkpointText), \(backendText), StoreKit \(storeKitSnapshot.debugSummary)."
     }
 
     func setDebugPlan(_ plan: AppPlan) {
@@ -2166,6 +2169,7 @@ final class CodeLibraryViewModel: ObservableObject {
         currentEntitlementSource = resolvedEntitlement.source
         proProductDisplayPrice = snapshot.proDisplayPrice
         storeKitLoadedProductIDs = snapshot.loadedProductIDs
+        storeKitDebugSummary = snapshot.debugSummary
     }
 
     private static func isBackendAuthenticationFailure(_ error: Error) -> Bool {

@@ -584,10 +584,10 @@ struct SettingsView: View {
 
     #if DEBUG
     private var storeKitDebugText: String {
-        if library.storeKitLoadedProductIDs.isEmpty {
-            return "StoreKit: 0 products loaded"
-        }
-        return "StoreKit: \(library.storeKitLoadedProductIDs.joined(separator: ", "))"
+        let productsText = library.storeKitLoadedProductIDs.isEmpty
+            ? "0 products loaded"
+            : library.storeKitLoadedProductIDs.joined(separator: ", ")
+        return "StoreKit: \(productsText)\nTransactions: \(library.storeKitDebugSummary)"
     }
     #endif
 

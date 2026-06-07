@@ -2273,6 +2273,7 @@ struct StoreKitSubscriptionSnapshot: Sendable {
     let plan: AppPlan
     let proDisplayPrice: String?
     let loadedProductIDs: [String]
+    let debugSummary: String
 }
 
 enum StoreKitSubscriptionServiceError: LocalizedError {
@@ -2302,11 +2303,13 @@ actor StoreKitSubscriptionService {
     func snapshot() async -> StoreKitSubscriptionSnapshot {
         async let plan = verifiedPlan()
         async let products = proProducts()
+        async let debugSummary = transactionDebugSummary()
         let loadedProducts = await products
         return StoreKitSubscriptionSnapshot(
             plan: await plan,
             proDisplayPrice: loadedProducts.first { $0.id == proProductID }?.displayPrice,
-            loadedProductIDs: loadedProducts.map(\.id)
+            loadedProductIDs: loadedProducts.map(\.id),
+            debugSummary: await debugSummary
         )
     }
 
@@ -2393,6 +2396,37 @@ actor StoreKitSubscriptionService {
             return false
         }
         return true
+    }
+
+    private func transactionDebugSummary() async -> String {
+        var currentEntitlementDescriptions: [String] = []
+        for await entitlement in Transaction.currentEntitlements {
+            switch entitlement {
+            case .verified(let transaction):
+                let activeText = isActiveProTransaction(transaction) ? "active" : "inactive"
+                currentEntitlementDescriptions.append("\(transaction.productID) \(activeText)")
+            case .unverified(let transaction, _):
+                currentEntitlementDescriptions.append("\(transaction.productID) unverified")
+            }
+        }
+
+        let latestDescription: String
+        if let latest = await Transaction.latest(for: proProductID) {
+            switch latest {
+            case .verified(let transaction):
+                let activeText = isActiveProTransaction(transaction) ? "active" : "inactive"
+                latestDescription = "\(transaction.productID) \(activeText)"
+            case .unverified(let transaction, _):
+                latestDescription = "\(transaction.productID) unverified"
+            }
+        } else {
+            latestDescription = "none"
+        }
+
+        let currentText = currentEntitlementDescriptions.isEmpty
+            ? "none"
+            : currentEntitlementDescriptions.joined(separator: ", ")
+        return "current: \(currentText); latest: \(latestDescription)"
     }
 
     private func verifiedTransaction(from result: VerificationResult<Transaction>) throws -> Transaction {
