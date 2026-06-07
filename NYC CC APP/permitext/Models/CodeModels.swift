@@ -2381,6 +2381,10 @@ actor StoreKitSubscriptionService {
             LocalEntitlementService.setVerifiedPlan(.pro)
             return .pro
         }
+        if await subscriptionStatusIndicatesActivePro() {
+            LocalEntitlementService.setVerifiedPlan(.pro)
+            return .pro
+        }
         if LocalEntitlementService().currentEntitlement.source == .lifetimeGrant {
             return .pro
         }
@@ -2396,6 +2400,22 @@ actor StoreKitSubscriptionService {
             return false
         }
         return true
+    }
+
+    private func subscriptionStatusIndicatesActivePro() async -> Bool {
+        guard let subscription = await proProducts().first(where: { $0.id == proProductID })?.subscription,
+              let statuses = try? await subscription.status else {
+            return false
+        }
+        for status in statuses {
+            switch status.state {
+            case .subscribed, .inGracePeriod:
+                return true
+            default:
+                continue
+            }
+        }
+        return false
     }
 
     private func transactionDebugSummary() async -> String {
@@ -2426,7 +2446,21 @@ actor StoreKitSubscriptionService {
         let currentText = currentEntitlementDescriptions.isEmpty
             ? "none"
             : currentEntitlementDescriptions.joined(separator: ", ")
-        return "current: \(currentText); latest: \(latestDescription)"
+        let statusText = await subscriptionStatusDebugSummary()
+        return "current: \(currentText); latest: \(latestDescription); status: \(statusText)"
+    }
+
+    private func subscriptionStatusDebugSummary() async -> String {
+        guard let subscription = await proProducts().first(where: { $0.id == proProductID })?.subscription else {
+            return "none"
+        }
+        guard let statuses = try? await subscription.status else {
+            return "unavailable"
+        }
+        guard !statuses.isEmpty else {
+            return "none"
+        }
+        return statuses.map { String(describing: $0.state) }.joined(separator: ", ")
     }
 
     private func verifiedTransaction(from result: VerificationResult<Transaction>) throws -> Transaction {
