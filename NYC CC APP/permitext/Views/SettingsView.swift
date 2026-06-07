@@ -21,11 +21,13 @@ private enum SettingsControlMetrics {
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.openURL) private var openURL
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var publicUsernameDraft = ""
     @StateObject private var passkeyCoordinator = SettingsPasskeyAuthorizationCoordinator()
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
+    private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
 
     private var readerPreviewAccent: Color {
         Color(uiColor: library.accentColor())
@@ -268,16 +270,28 @@ struct SettingsView: View {
             .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
             .opacity(library.isStoreKitBusy || library.currentPlan == .pro ? 0.55 : 1)
 
-            Button {
-                Task { await library.restorePurchases() }
-            } label: {
-                Text(library.isStoreKitBusy ? "Checking purchases..." : "Restore Purchases")
-                    .font(.footnote.weight(.semibold))
-                    .frame(maxWidth: .infinity)
+            if library.currentPlan == .pro {
+                Button {
+                    openURL(subscriptionManagementURL)
+                } label: {
+                    Text("Manage Subscription")
+                        .font(.footnote.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+            } else {
+                Button {
+                    Task { await library.restorePurchases() }
+                } label: {
+                    Text(library.isStoreKitBusy ? "Checking purchases..." : "Restore Purchases")
+                        .font(.footnote.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
+                .disabled(library.isStoreKitBusy)
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .disabled(library.isStoreKitBusy)
 
             #if DEBUG
             Text(library.accountSyncDebugSummary)
