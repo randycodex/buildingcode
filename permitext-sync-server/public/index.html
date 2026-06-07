@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>permitext workspace</title>
+    <link rel="stylesheet" href="/web/styles.css">
+  </head>
+  <body>
+    <main class="workspace-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">New York City</p>
+          <h1>permitext</h1>
+        </div>
+        <button class="icon-button" id="add-reader" type="button" title="Add reader">+</button>
+      </header>
+
+      <section class="panel-track" id="panel-track" aria-label="permitext web workspace"></section>
+    </main>
+
+    <template id="reader-template">
+      <article class="workspace-panel reader-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">Reader</p>
+            <h2 class="panel-title">Reader</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-button reader-pick" type="button">Section</button>
+            <button class="icon-button reader-close" type="button" title="Close reader">x</button>
+          </div>
+        </header>
+        <div class="selector-stack" hidden>
+          <label>
+            Code Section
+            <select class="code-section-select">
+              <option>Building Code</option>
+              <option>General Administrative Provisions</option>
+              <option>Plumbing Code</option>
+              <option>Mechanical Code</option>
+              <option>Fuel Gas Code</option>
+            </select>
+          </label>
+          <label>
+            Chapter
+            <select class="chapter-select"></select>
+          </label>
+          <label>
+            Section
+            <select class="section-select"></select>
+          </label>
+        </div>
+        <section class="reader-content"></section>
+      </article>
+    </template>
+
+    <template id="search-template">
+      <article class="workspace-panel search-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">Search</p>
+            <h2 class="panel-title">Search</h2>
+          </div>
+        </header>
+        <label class="search-box">
+          <span>Search</span>
+          <input class="search-input" type="search" autocomplete="off" placeholder="Find a section">
+        </label>
+        <section class="search-results"></section>
+      </article>
+    </template>
+
+    <template id="saved-template">
+      <article class="workspace-panel utility-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">Saved</p>
+            <h2 class="panel-title">Saved</h2>
+          </div>
+        </header>
+        <section class="empty-panel">
+          <h3>Saved workspace</h3>
+          <p>Projects, bookmarks, tags, and notes will use the same backend data as the iOS app.</p>
+        </section>
+      </article>
+    </template>
+
+    <template id="settings-template">
+      <article class="workspace-panel utility-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">Settings</p>
+            <h2 class="panel-title">Settings</h2>
+          </div>
+        </header>
+        <section class="settings-list">
+          <div>
+            <span>Jurisdiction</span>
+            <strong>New York City</strong>
+          </div>
+          <div>
+            <span>Version</span>
+            <strong>2022 Construction Codes</strong>
+          </div>
+          <div>
+            <span>Code Section</span>
+            <strong>Building Code</strong>
+          </div>
+        </section>
+      </article>
+    </template>
+
+    <script src="/web/app.js" type="module"></script>
+  </body>
+</html>

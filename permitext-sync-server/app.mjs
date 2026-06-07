@@ -1,10 +1,37 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
+const webPublicPath = join(__dirname, "public");
+const chapterContentPath = join(
+  __dirname,
+  "..",
+  "NYC CC APP",
+  "permitext",
+  "Resources",
+  "CodeContent",
+  "authored",
+  "new-york-city",
+  "2022-construction-codes",
+  "prepared",
+  "chapters"
+);
+const sectionContentPath = join(
+  __dirname,
+  "..",
+  "NYC CC APP",
+  "NYCCCApp",
+  "Resources",
+  "CodeContent",
+  "authored",
+  "new-york-city",
+  "2022-construction-codes",
+  "prepared",
+  "sections"
+);
 const databaseURL =
   process.env.PERMITEXT_SYNC_DATABASE_URL ||
   process.env.DATABASE_URL ||
@@ -13,6 +40,8 @@ const databaseURL =
   process.env.NEON_DATABASE_URL;
 
 let cachedStoreAdapter = null;
+let cachedChapterIndex = null;
+let cachedSearchIndex = null;
 
 const emptyStore = () => ({
   users: {},
@@ -571,6 +600,39 @@ function sendError(response, status, message) {
   sendJSON(response, status, { error: message });
 }
 
+function sendHTML(response, html) {
+  response.writeHead(200, {
+    "content-type": "text/html; charset=utf-8",
+    "cache-control": "no-store"
+  });
+  response.end(html);
+}
+
+function sendStatic(response, contentType, body) {
+  response.writeHead(200, {
+    "content-type": contentType,
+    "cache-control": "public, max-age=60"
+  });
+  response.end(body);
+}
+
+function sendNotFound(response) {
+  sendError(response, 404, "Not found.");
+}
+
+function contentTypeForPath(path) {
+  if (path.endsWith(".css")) {
+    return "text/css; charset=utf-8";
+  }
+  if (path.endsWith(".js")) {
+    return "text/javascript; charset=utf-8";
+  }
+  if (path.endsWith(".svg")) {
+    return "image/svg+xml";
+  }
+  return "application/octet-stream";
+}
+
 function bearerToken(request) {
   const authorization = request.headers.authorization || "";
   const match = authorization.match(/^Bearer\s+(.+)$/i);
@@ -611,6 +673,223 @@ function requireUserSession(request, response, store, userID, requestAccount) {
 
 function normalizePath(url) {
   return new URL(url, "http://localhost").pathname.replace(/^\/+/, "");
+}
+
+function requestURL(request) {
+  return new URL(request.url, "http://localhost");
+}
+
+async function readJSONFile(path) {
+  return JSON.parse(await readFile(path, "utf8"));
+}
+
+function chapterSortValue(chapterNumber) {
+  const numeric = Number.parseFloat(chapterNumber);
+  return Number.isFinite(numeric) ? numeric : Number.MAX_SAFE_INTEGER;
+}
+
+async function chapterIndex() {
+  if (cachedChapterIndex) {
+    return cachedChapterIndex;
+  }
+  const files = await readdir(chapterContentPath);
+  const chapters = [];
+  for (const file of files.filter((name) => name.endsWith(".json"))) {
+    const chapter = await readJSONFile(join(chapterContentPath, file));
+    const firstGroup = chapter.groups?.[0] || {};
+    chapters.push({
+      id: chapter.chapterID,
+      chapterNumber: chapter.chapterNumber,
+      title: firstGroup.headingLine || `Chapter ${chapter.chapterNumber}`,
+      groupCount: chapter.groups?.length || 0,
+      sectionCount: (chapter.groups || []).reduce((count, group) => count + (group.sections?.length || 0), 0)
+    });
+  }
+  cachedChapterIndex = chapters.sort((left, right) =>
+    chapterSortValue(left.chapterNumber) - chapterSortValue(right.chapterNumber) ||
+    String(left.chapterNumber).localeCompare(String(right.chapterNumber))
+  );
+  return cachedChapterIndex;
+}
+
+function flattenChapterSections(chapter) {
+  return (chapter.groups || []).flatMap((group) =>
+    (group.sections || []).map((section) => ({
+      ...section,
+      groupID: group.id,
+      headerLine: group.headerLine,
+      headingLine: group.headingLine
+    }))
+  );
+}
+
+async function searchIndex() {
+  if (cachedSearchIndex) {
+    return cachedSearchIndex;
+  }
+  const chapters = await chapterIndex();
+  const sectionSummaries = [];
+  for (const chapterSummary of chapters) {
+    const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
+    for (const section of flattenChapterSections(chapter)) {
+      sectionSummaries.push({
+        id: section.id,
+        chapterID: chapterSummary.id,
+        chapterNumber: chapterSummary.chapterNumber,
+        sectionNumber: section.sectionNumber,
+        title: section.title,
+        headerLine: section.headerLine,
+        headingLine: section.headingLine
+      });
+    }
+  }
+
+  const index = [];
+  for (let start = 0; start < sectionSummaries.length; start += 150) {
+    const batch = sectionSummaries.slice(start, start + 150);
+    const entries = await Promise.all(
+      batch.map(async (section) => {
+        const body = await sectionBody(section.id, { allowMissing: true });
+        const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
+        return { ...section, plainText };
+      })
+    );
+    index.push(...entries);
+  }
+  cachedSearchIndex = index;
+  return cachedSearchIndex;
+}
+
+async function sectionBody(sectionID, options = {}) {
+  try {
+    return await readJSONFile(join(sectionContentPath, `${sectionID}.json`));
+  } catch (error) {
+    if (options.allowMissing && error.code === "ENOENT") {
+      return { blocks: [], sectionID };
+    }
+    throw error;
+  }
+}
+
+async function sectionSummaryByID(sectionID) {
+  const chapters = await chapterIndex();
+  for (const chapterSummary of chapters) {
+    const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
+    const section = flattenChapterSections(chapter).find((item) => String(item.id) === String(sectionID));
+    if (section) {
+      return {
+        ...section,
+        chapterID: chapterSummary.id,
+        chapterNumber: chapterSummary.chapterNumber
+      };
+    }
+  }
+  return null;
+}
+
+function searchSnippet(text, query) {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  const index = normalized.toLowerCase().indexOf(query.toLowerCase());
+  if (index === -1) {
+    return normalized.slice(0, 220);
+  }
+  const start = Math.max(0, index - 80);
+  const end = Math.min(normalized.length, index + query.length + 150);
+  return `${start > 0 ? "..." : ""}${normalized.slice(start, end)}${end < normalized.length ? "..." : ""}`;
+}
+
+async function handleWebIndex(_request, response) {
+  sendHTML(response, await readFile(join(webPublicPath, "index.html"), "utf8"));
+}
+
+async function handleWebStatic(path, response) {
+  const fileName = path.replace(/^web\//, "");
+  if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
+    sendNotFound(response);
+    return;
+  }
+  try {
+    const filePath = join(webPublicPath, fileName);
+    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath));
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      sendNotFound(response);
+      return;
+    }
+    throw error;
+  }
+}
+
+async function handleCodeChapters(_request, response) {
+  sendJSON(response, 200, { chapters: await chapterIndex() });
+}
+
+async function handleCodeChapter(path, response) {
+  const chapterID = path.split("/").at(-1);
+  if (!/^\d+$/.test(chapterID || "")) {
+    sendError(response, 400, "Invalid chapter ID.");
+    return;
+  }
+  const chapter = await readJSONFile(join(chapterContentPath, `${chapterID}.json`));
+  sendJSON(response, 200, {
+    chapter: {
+      id: chapter.chapterID,
+      chapterNumber: chapter.chapterNumber,
+      groups: chapter.groups || [],
+      sections: flattenChapterSections(chapter)
+    }
+  });
+}
+
+async function handleCodeSection(path, response) {
+  const sectionID = path.split("/").at(-1);
+  if (!/^\d+$/.test(sectionID || "")) {
+    sendError(response, 400, "Invalid section ID.");
+    return;
+  }
+  const body = await sectionBody(sectionID, { allowMissing: true });
+  if (!body.blocks?.length) {
+    const summary = await sectionSummaryByID(sectionID);
+    if (summary) {
+      sendJSON(response, 200, {
+        section: {
+          blocks: [{ id: `${sectionID}-title`, kind: "title", plainText: summary.title || "" }],
+          chapterNumber: summary.chapterNumber,
+          schemaVersion: 1,
+          sectionID: Number(sectionID)
+        }
+      });
+      return;
+    }
+  }
+  sendJSON(response, 200, { section: body });
+}
+
+async function handleCodeSearch(request, response) {
+  const query = requestURL(request).searchParams.get("q")?.trim() || "";
+  if (query.length < 2) {
+    sendJSON(response, 200, { query, results: [] });
+    return;
+  }
+  const normalizedQuery = query.toLowerCase();
+  const results = (await searchIndex())
+    .filter((section) =>
+      section.title?.toLowerCase().includes(normalizedQuery) ||
+      section.sectionNumber?.toLowerCase().includes(normalizedQuery) ||
+      section.plainText.toLowerCase().includes(normalizedQuery)
+    )
+    .slice(0, 80)
+    .map((section) => ({
+      id: section.id,
+      chapterID: section.chapterID,
+      chapterNumber: section.chapterNumber,
+      sectionNumber: section.sectionNumber,
+      title: section.title,
+      headerLine: section.headerLine,
+      headingLine: section.headingLine,
+      snippet: searchSnippet(section.plainText || section.title || "", query)
+    }));
+  sendJSON(response, 200, { query, results });
 }
 
 function accountFromCredential(credential) {
@@ -1198,6 +1477,30 @@ export async function handleRequest(request, response) {
   try {
     const path = normalizePath(request.url);
 
+    if (request.method === "GET" && (path === "" || path === "web")) {
+      await handleWebIndex(request, response);
+      return;
+    }
+    if (request.method === "GET" && path.startsWith("web/")) {
+      await handleWebStatic(path, response);
+      return;
+    }
+    if (request.method === "GET" && path === "code/chapters") {
+      await handleCodeChapters(request, response);
+      return;
+    }
+    if (request.method === "GET" && path.startsWith("code/chapters/")) {
+      await handleCodeChapter(path, response);
+      return;
+    }
+    if (request.method === "GET" && path.startsWith("code/sections/")) {
+      await handleCodeSection(path, response);
+      return;
+    }
+    if (request.method === "GET" && path === "code/search") {
+      await handleCodeSearch(request, response);
+      return;
+    }
     if (request.method === "GET" && path === "health") {
       await readStore();
       sendJSON(response, 200, { ok: true, storage: await storageKind(), schema: await storageSchema() });
