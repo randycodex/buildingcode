@@ -1597,7 +1597,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     var upgradeCallToActionTitle: String {
         if currentPlan == .pro { return "Pro Active" }
-        if let price = proProductDisplayPrice { return "Upgrade to Pro - \(price)/month" }
+        if proProductDisplayPrice != nil { return "Upgrade to Pro - $0.00/month" }
         return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
     }
 
