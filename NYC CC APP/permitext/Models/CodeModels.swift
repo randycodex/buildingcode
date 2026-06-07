@@ -2332,7 +2332,30 @@ actor StoreKitSubscriptionService {
 
     func restorePurchases() async -> StoreKitSubscriptionSnapshot {
         try? await AppStore.sync()
+        for _ in 0..<8 {
+            let currentSnapshot = await snapshot()
+            if currentSnapshot.plan == .pro {
+                return currentSnapshot
+            }
+            try? await Task.sleep(nanoseconds: 500_000_000)
+        }
         return await snapshot()
+    }
+
+    func transactionUpdates() -> AsyncStream<StoreKitSubscriptionSnapshot> {
+        AsyncStream { continuation in
+            let task = Task {
+                for await result in Transaction.updates {
+                    guard case .verified(let transaction) = result else { continue }
+                    if isActiveProTransaction(transaction) {
+                        LocalEntitlementService.setVerifiedPlan(.pro)
+                    }
+                    await transaction.finish()
+                    continuation.yield(await snapshot())
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
     }
 
     private func proProducts() async -> [Product] {
@@ -2362,8 +2385,8 @@ actor StoreKitSubscriptionService {
         return .free
     }
 
-    private func isActiveProTransaction(_ transaction: Transaction) -> Bool {
-        guard transaction.productID == proProductID, transaction.revocationDate == nil else {
+    private nonisolated func isActiveProTransaction(_ transaction: Transaction) -> Bool {
+        guard transaction.productID == StoreKitProductID.proMonthly, transaction.revocationDate == nil else {
             return false
         }
         if let expirationDate = transaction.expirationDate, expirationDate <= Date() {

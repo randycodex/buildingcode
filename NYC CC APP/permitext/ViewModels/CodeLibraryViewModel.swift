@@ -129,6 +129,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
     private var userContentAutoSyncTask: Task<Void, Never>?
+    private var storeKitUpdatesTask: Task<Void, Never>?
     private var didRunStartupAccountSync = false
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
@@ -183,6 +184,10 @@ final class CodeLibraryViewModel: ObservableObject {
         if loadsInitialContent {
             reload()
         }
+    }
+
+    deinit {
+        storeKitUpdatesTask?.cancel()
     }
 
     #if DEBUG
@@ -1623,6 +1628,17 @@ final class CodeLibraryViewModel: ObservableObject {
     func refreshStoreKitEntitlements() async {
         let snapshot = await storeKitSubscriptionService.snapshot()
         applyStoreKitSnapshot(snapshot)
+    }
+
+    func startStoreKitTransactionObservation() {
+        guard storeKitUpdatesTask == nil else { return }
+        let service = storeKitSubscriptionService
+        storeKitUpdatesTask = Task { [weak self] in
+            let updates = await service.transactionUpdates()
+            for await snapshot in updates {
+                await self?.applyStoreKitSnapshot(snapshot)
+            }
+        }
     }
 
     func purchasePro() async {

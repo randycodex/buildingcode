@@ -123,6 +123,7 @@ struct PermitextApp: App {
                 }
             }
             .onAppear {
+                library.startStoreKitTransactionObservation()
                 Task {
                     await library.refreshStoreKitEntitlements()
                 }
