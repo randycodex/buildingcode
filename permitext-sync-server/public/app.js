@@ -1,6 +1,9 @@
 const workspaceKey = "permitext:webWorkspace:v1";
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
+const toggleSearchButton = document.querySelector("#toggle-search");
+const toggleSavedButton = document.querySelector("#toggle-saved");
+const toggleSettingsButton = document.querySelector("#toggle-settings");
 const readerTemplate = document.querySelector("#reader-template");
 const searchTemplate = document.querySelector("#search-template");
 const savedTemplate = document.querySelector("#saved-template");
@@ -16,13 +19,21 @@ function loadWorkspaceState() {
     return {
       readers: Array.isArray(saved.readers) && saved.readers.length > 0 ? saved.readers : [newReaderState()],
       searchQuery: saved.searchQuery || "",
-      searchResultReader: saved.searchResultReader || null
+      searchResultReader: saved.searchResultReader || null,
+      utilities: {
+        search: Boolean(saved.utilities?.search),
+        saved: Boolean(saved.utilities?.saved),
+        settings: Boolean(saved.utilities?.settings)
+      },
+      paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {}
     };
   } catch {
     return {
       readers: [newReaderState()],
       searchQuery: "",
-      searchResultReader: null
+      searchResultReader: null,
+      utilities: { search: false, saved: false, settings: false },
+      paneWeights: {}
     };
   }
 }
@@ -41,6 +52,43 @@ function newReaderState(overrides = {}) {
     selectorOpen: true,
     ...overrides
   };
+}
+
+function paneIDForReader(reader, options = {}) {
+  return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
+}
+
+function activePaneIDs() {
+  const ids = state.readers.map((reader) => paneIDForReader(reader));
+  if (state.utilities.search) ids.push("utility:search");
+  if (state.searchResultReader) ids.push("reader:search-result");
+  if (state.utilities.saved) ids.push("utility:saved");
+  if (state.utilities.settings) ids.push("utility:settings");
+  return ids;
+}
+
+function normalizePaneWeights(ids) {
+  const current = state.paneWeights || {};
+  const existingWeights = ids.map((id) => Number(current[id])).filter((value) => Number.isFinite(value) && value > 0);
+  const fallbackWeight = existingWeights.length > 0
+    ? existingWeights.reduce((sum, value) => sum + value, 0) / existingWeights.length
+    : 1;
+  state.paneWeights = ids.reduce((weights, id) => {
+    const value = Number(current[id]);
+    weights[id] = Number.isFinite(value) && value > 0 ? value : fallbackWeight;
+    return weights;
+  }, {});
+}
+
+function applyPaneWeight(panel, paneID) {
+  panel.dataset.paneId = paneID;
+  panel.style.flex = `${state.paneWeights[paneID] || 1} 1 0`;
+}
+
+function setUtilityButtonStates() {
+  toggleSearchButton.setAttribute("aria-pressed", String(state.utilities.search));
+  toggleSavedButton.setAttribute("aria-pressed", String(state.utilities.saved));
+  toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
 }
 
 async function api(path) {
@@ -187,6 +235,7 @@ async function renderReader(reader, options = {}) {
   const sectionSelect = panel.querySelector(".section-select");
 
   panel.dataset.readerId = reader.id;
+  applyPaneWeight(panel, paneIDForReader(reader, options));
   selector.hidden = !reader.selectorOpen;
   setTitle(panel, reader);
 
@@ -269,6 +318,7 @@ function renderSearchPlaceholder(results, message) {
 async function renderSearch() {
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
   const input = panel.querySelector(".search-input");
+  applyPaneWeight(panel, "utility:search");
   input.value = state.searchQuery || "";
 
   input.addEventListener("input", () => {
@@ -346,17 +396,87 @@ function renderTemplate(template) {
   return template.content.firstElementChild.cloneNode(true);
 }
 
+function renderUtility(template, paneID) {
+  const panel = renderTemplate(template);
+  applyPaneWeight(panel, paneID);
+  return panel;
+}
+
+function createDivider(previousPaneID, nextPaneID) {
+  const divider = document.createElement("div");
+  divider.className = "pane-divider";
+  divider.role = "separator";
+  divider.tabIndex = 0;
+  divider.setAttribute("aria-orientation", "vertical");
+  divider.addEventListener("pointerdown", (event) => startPaneResize(event, previousPaneID, nextPaneID));
+  return divider;
+}
+
+function startPaneResize(event, previousPaneID, nextPaneID) {
+  const previousPane = track.querySelector(`[data-pane-id="${CSS.escape(previousPaneID)}"]`);
+  const nextPane = track.querySelector(`[data-pane-id="${CSS.escape(nextPaneID)}"]`);
+  if (!previousPane || !nextPane) return;
+
+  event.preventDefault();
+  const startX = event.clientX;
+  const previousRect = previousPane.getBoundingClientRect();
+  const nextRect = nextPane.getBoundingClientRect();
+  const totalWidth = previousRect.width + nextRect.width;
+  const minimumWidth = Math.min(220, Math.max(80, totalWidth * 0.25), totalWidth / 2 - 1);
+
+  const onMove = (moveEvent) => {
+    const delta = moveEvent.clientX - startX;
+    const nextPreviousWidth = Math.min(Math.max(previousRect.width + delta, minimumWidth), totalWidth - minimumWidth);
+    const nextNextWidth = totalWidth - nextPreviousWidth;
+    state.paneWeights[previousPaneID] = nextPreviousWidth;
+    state.paneWeights[nextPaneID] = nextNextWidth;
+    previousPane.style.flex = `${nextPreviousWidth} 1 0`;
+    nextPane.style.flex = `${nextNextWidth} 1 0`;
+  };
+
+  const onUp = () => {
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    saveWorkspaceState();
+  };
+
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp, { once: true });
+}
+
+function appendPaneSequence(panes) {
+  panes.forEach((pane, index) => {
+    if (index > 0) {
+      track.append(createDivider(panes[index - 1].dataset.paneId, pane.dataset.paneId));
+    }
+    track.append(pane);
+  });
+}
+
 async function renderWorkspace() {
   clear(track);
+  const paneIDs = activePaneIDs();
+  normalizePaneWeights(paneIDs);
+  setUtilityButtonStates();
+
+  const panes = [];
   for (const reader of state.readers) {
-    track.append(await renderReader(reader));
+    panes.push(await renderReader(reader));
   }
-  track.append(await renderSearch());
+  if (state.utilities.search) {
+    panes.push(await renderSearch());
+  }
   if (state.searchResultReader) {
-    track.append(await renderReader(state.searchResultReader, { isSearchResult: true }));
+    panes.push(await renderReader(state.searchResultReader, { isSearchResult: true }));
   }
-  track.append(renderTemplate(savedTemplate));
-  track.append(renderTemplate(settingsTemplate));
+  if (state.utilities.saved) {
+    panes.push(renderUtility(savedTemplate, "utility:saved"));
+  }
+  if (state.utilities.settings) {
+    panes.push(renderUtility(settingsTemplate, "utility:settings"));
+  }
+  appendPaneSequence(panes);
+  saveWorkspaceState();
 }
 
 async function start() {
@@ -366,13 +486,22 @@ async function start() {
     const reader = newReaderState();
     state.readers.push(reader);
     saveWorkspaceState();
-    renderWorkspace().then(() => {
-      document.querySelector(`[data-reader-id="${reader.id}"]`)?.scrollIntoView({
-        behavior: "smooth",
-        inline: "start",
-        block: "nearest"
-      });
-    });
+    renderWorkspace();
+  });
+  toggleSearchButton.addEventListener("click", () => {
+    state.utilities.search = !state.utilities.search;
+    saveWorkspaceState();
+    renderWorkspace();
+  });
+  toggleSavedButton.addEventListener("click", () => {
+    state.utilities.saved = !state.utilities.saved;
+    saveWorkspaceState();
+    renderWorkspace();
+  });
+  toggleSettingsButton.addEventListener("click", () => {
+    state.utilities.settings = !state.utilities.settings;
+    saveWorkspaceState();
+    renderWorkspace();
   });
   await renderWorkspace();
 }

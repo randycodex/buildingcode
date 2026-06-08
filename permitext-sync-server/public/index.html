@@ -13,7 +13,12 @@
           <p class="eyebrow">New York City</p>
           <h1>permitext</h1>
         </div>
-        <button class="icon-button" id="add-reader" type="button" title="Add reader">+</button>
+        <nav class="topbar-actions" aria-label="Workspace tools">
+          <button class="toolbar-button" id="add-reader" type="button">+ Reader</button>
+          <button class="toolbar-button" id="toggle-search" type="button" aria-pressed="false">Search</button>
+          <button class="toolbar-button" id="toggle-saved" type="button" aria-pressed="false">Saved</button>
+          <button class="icon-button" id="toggle-settings" type="button" title="Settings" aria-pressed="false">⚙</button>
+        </nav>
       </header>
 
       <section class="panel-track" id="panel-track" aria-label="permitext web workspace"></section>
@@ -79,9 +84,23 @@
             <h2 class="panel-title">Saved</h2>
           </div>
         </header>
-        <section class="empty-panel">
-          <h3>Saved workspace</h3>
-          <p>Projects, bookmarks, tags, and notes will use the same backend data as the iOS app.</p>
+        <section class="saved-content">
+          <p class="section-label">Projects</p>
+          <article class="project-card">
+            <div>
+              <h3>Project workspace</h3>
+              <p>Synced projects, bookmarks, tags, and notes will appear here after the web account layer is connected.</p>
+            </div>
+            <div class="project-meta">
+              <span>Private</span>
+              <span>Synced later</span>
+            </div>
+          </article>
+          <p class="section-label">Saved sections</p>
+          <article class="saved-row">
+            <strong>No synced saved sections yet</strong>
+            <span>This panel is a visual placeholder only. It will use the same saved data as the iOS app.</span>
+          </article>
         </section>
       </article>
     </template>
