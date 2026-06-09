@@ -3,15 +3,37 @@ const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
+const toggleAnalysisButton = document.querySelector("#toggle-analysis");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const readerTemplate = document.querySelector("#reader-template");
 const searchTemplate = document.querySelector("#search-template");
 const savedTemplate = document.querySelector("#saved-template");
+const analysisTemplate = document.querySelector("#analysis-template");
 const settingsTemplate = document.querySelector("#settings-template");
+
+const codeOptions = [
+  { prefix: "BC", label: "Building Code", theme: "building" },
+  { prefix: "AC", label: "Administrative Code", theme: "administrative" },
+  { prefix: "PC", label: "Plumbing Code", theme: "plumbing" },
+  { prefix: "MC", label: "Mechanical Code", theme: "mechanical" },
+  { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas" }
+];
+
+const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
+
+const defaultReaderSettings = {
+  fontSize: 12,
+  lineSpacing: 1,
+  fontFamily: "helvetica"
+};
 
 let chapters = [];
 let state = loadWorkspaceState();
 let searchTimer = null;
+let syncedContent = null;
+let syncLoadPromise = null;
+
+applyReaderSettings();
 
 function loadWorkspaceState() {
   try {
@@ -23,17 +45,22 @@ function loadWorkspaceState() {
       utilities: {
         search: Boolean(saved.utilities?.search),
         saved: Boolean(saved.utilities?.saved),
+        analysis: Boolean(saved.utilities?.analysis),
         settings: Boolean(saved.utilities?.settings)
       },
-      paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {}
+      account: saved.account && typeof saved.account === "object" ? saved.account : null,
+      paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
+      readerSettings: normalizeReaderSettings(saved.readerSettings)
     };
   } catch {
     return {
       readers: [newReaderState()],
       searchQuery: "",
       searchResultReader: null,
-      utilities: { search: false, saved: false, settings: false },
-      paneWeights: {}
+      utilities: { search: false, saved: false, analysis: false, settings: false },
+      account: null,
+      paneWeights: {},
+      readerSettings: { ...defaultReaderSettings }
     };
   }
 }
@@ -42,14 +69,43 @@ function saveWorkspaceState() {
   localStorage.setItem(workspaceKey, JSON.stringify(state));
 }
 
+function clampNumber(value, min, max, fallback) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, number));
+}
+
+function normalizeReaderSettings(settings = {}) {
+  return {
+    fontSize: clampNumber(settings.fontSize, 10, 18, defaultReaderSettings.fontSize),
+    lineSpacing: clampNumber(settings.lineSpacing, 0, 4, defaultReaderSettings.lineSpacing),
+    fontFamily: "helvetica"
+  };
+}
+
+function readerLineHeightValue(lineSpacing) {
+  return 1.2 + Number(lineSpacing) * 0.15;
+}
+
+function readerFontFamilyValue() {
+  return "Helvetica, Arial, sans-serif";
+}
+
+function applyReaderSettings() {
+  state.readerSettings = normalizeReaderSettings(state.readerSettings);
+  document.documentElement.style.setProperty("--reader-font-size", `${state.readerSettings.fontSize}pt`);
+  document.documentElement.style.setProperty("--reader-line-height", String(readerLineHeightValue(state.readerSettings.lineSpacing)));
+  document.documentElement.style.setProperty("--reader-font-family", readerFontFamilyValue());
+}
+
 function newReaderState(overrides = {}) {
   return {
     id: crypto.randomUUID(),
+    codePrefix: "BC",
     chapterID: "",
     sectionID: "",
     sectionNumber: "",
     title: "Reader",
-    selectorOpen: true,
     ...overrides
   };
 }
@@ -59,11 +115,13 @@ function paneIDForReader(reader, options = {}) {
 }
 
 function activePaneIDs() {
-  const ids = state.readers.map((reader) => paneIDForReader(reader));
+  const ids = [];
   if (state.utilities.search) ids.push("utility:search");
-  if (state.searchResultReader) ids.push("reader:search-result");
   if (state.utilities.saved) ids.push("utility:saved");
+  if (state.utilities.analysis) ids.push("utility:analysis");
   if (state.utilities.settings) ids.push("utility:settings");
+  if (state.searchResultReader) ids.push("reader:search-result");
+  state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
   return ids;
 }
 
@@ -88,6 +146,7 @@ function applyPaneWeight(panel, paneID) {
 function setUtilityButtonStates() {
   toggleSearchButton.setAttribute("aria-pressed", String(state.utilities.search));
   toggleSavedButton.setAttribute("aria-pressed", String(state.utilities.saved));
+  toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
 }
 
@@ -97,6 +156,23 @@ async function api(path) {
     throw new Error(`Request failed: ${response.status}`);
   }
   return response.json();
+}
+
+async function postJSON(path, body, options = {}) {
+  const headers = { "Content-Type": "application/json" };
+  if (options.token) {
+    headers.Authorization = `Bearer ${options.token}`;
+  }
+  const response = await fetch(path, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body)
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.error || `Request failed: ${response.status}`);
+  }
+  return payload;
 }
 
 function textNode(value) {
@@ -109,10 +185,32 @@ function clear(element) {
   }
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function sectionDisplayTitle(sectionNumber, title, fallback = "Section") {
+  const number = String(sectionNumber || "").trim();
+  const cleanTitle = String(title || "").trim();
+  if (!number) {
+    return cleanTitle || fallback;
+  }
+  if (cleanTitle) {
+    if (/^appendix\b/i.test(cleanTitle) || /^section\b/i.test(cleanTitle)) {
+      return cleanTitle;
+    }
+    const duplicatePattern = new RegExp(`^${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i");
+    if (duplicatePattern.test(cleanTitle)) {
+      return cleanTitle;
+    }
+  }
+  return `${number} ${cleanTitle || fallback}`.trim();
+}
+
 function setTitle(panel, reader) {
   const title = panel.querySelector(".panel-title");
   if (reader.sectionNumber) {
-    title.textContent = `${reader.sectionNumber} ${reader.title || ""}`.trim();
+    title.textContent = sectionDisplayTitle(reader.sectionNumber, reader.title, "Reader");
     return;
   }
   title.textContent = reader.title || "Reader";
@@ -144,7 +242,7 @@ function appendHighlighted(container, text, query) {
   }
 }
 
-function emptyReader(content, title = "Choose a section", message = "Use Section to pick a chapter and a code section.") {
+function emptyReader(content, title = "Choose a chapter", message = "Pick a chapter to load the full text. Section is optional and only jumps within the chapter.") {
   clear(content);
   const wrapper = document.createElement("section");
   wrapper.className = "reader-empty";
@@ -156,8 +254,159 @@ function emptyReader(content, title = "Choose a section", message = "Use Section
   content.append(wrapper);
 }
 
+function blankReader(content) {
+  clear(content);
+  const wrapper = document.createElement("section");
+  wrapper.className = "reader-empty reader-empty-blank";
+  wrapper.setAttribute("aria-hidden", "true");
+  content.append(wrapper);
+}
+
 function sectionTitleFromID(sectionID, chapter) {
   return chapter?.sections?.find((section) => section.id === sectionID) || null;
+}
+
+function codeLabel(prefix) {
+  return codeOptions.find((option) => option.prefix === prefix)?.label || "Building Code";
+}
+
+function codeTheme(prefix) {
+  return codeOptions.find((option) => option.prefix === prefix)?.theme || "building";
+}
+
+function resizeCodeSelect(codeSelect) {
+  if (!codeSelect) return;
+  const label = codeSelect.options[codeSelect.selectedIndex]?.textContent || codeLabel(codeSelect.value);
+  const styles = window.getComputedStyle(codeSelect);
+  const canvas = resizeCodeSelect.canvas || document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  resizeCodeSelect.canvas = canvas;
+  context.font = `${styles.fontWeight} ${styles.fontSize} ${styles.fontFamily}`;
+  const letterSpacing = Number.parseFloat(styles.letterSpacing) || 0;
+  const textWidth = context.measureText(label.toUpperCase()).width;
+  const spacedWidth = textWidth + Math.max(label.length - 1, 0) * letterSpacing;
+  codeSelect.style.setProperty("--code-select-width", `${Math.ceil(spacedWidth + 14)}px`);
+}
+
+function applyCodeTheme(panel, reader) {
+  panel.classList.remove(...codeThemeClasses);
+  panel.classList.add(`code-theme-${codeTheme(reader.codePrefix || "BC")}`);
+}
+
+function populateCodeSelect(panel, reader) {
+  const codeSelect = panel.querySelector(".code-select");
+  if (!codeSelect) return;
+  clear(codeSelect);
+  reader.codePrefix = reader.codePrefix || "BC";
+  codeOptions.forEach((code) => {
+    const option = document.createElement("option");
+    option.value = code.prefix;
+    option.textContent = code.label;
+    codeSelect.append(option);
+  });
+  codeSelect.value = reader.codePrefix;
+  codeSelect.setAttribute("aria-label", "Code section");
+  codeSelect.title = codeLabel(reader.codePrefix);
+  resizeCodeSelect(codeSelect);
+}
+
+function activeAccount() {
+  const userID = state.account?.userID?.trim();
+  const sessionToken = state.account?.sessionToken?.trim();
+  return userID && sessionToken ? { userID, sessionToken } : null;
+}
+
+function mutationKindAndRecord(mutation) {
+  const [kind, record] = Object.entries(mutation || {})[0] || [];
+  return { kind, record };
+}
+
+function mutationUpdatedAt(mutation) {
+  const record = Object.values(mutation || {})[0] || {};
+  const timestamp = Date.parse(record.updatedAt || 0);
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function summarizeMutations(mutations = []) {
+  const sorted = [...mutations].sort((left, right) => mutationUpdatedAt(right) - mutationUpdatedAt(left));
+  const projects = [];
+  const savedItems = [];
+  const annotations = [];
+  const projectSections = [];
+
+  sorted.forEach((mutation) => {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (!record || record.deletedAt) return;
+    if (kind === "project") projects.push(record);
+    if (kind === "savedItem") savedItems.push(record);
+    if (kind === "annotation") annotations.push(record);
+    if (kind === "projectSection") projectSections.push(record);
+  });
+
+  return { projects, savedItems, annotations, projectSections };
+}
+
+async function loadSyncedContent(options = {}) {
+  const account = activeAccount();
+  if (!account) {
+    syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
+    return syncedContent;
+  }
+  if (syncLoadPromise && !options.force) {
+    return syncLoadPromise;
+  }
+  syncLoadPromise = postJSON("/sync/pull", {
+    auth: { accountUserID: account.userID }
+  }, { token: account.sessionToken })
+    .then((payload) => {
+      syncedContent = {
+        status: "connected",
+        pulledAt: payload.pulledAt,
+        mutations: payload.mutations || [],
+        summary: summarizeMutations(payload.mutations || [])
+      };
+      return syncedContent;
+    })
+    .catch((error) => {
+      syncedContent = { status: "error", error: error.message, mutations: [], summary: summarizeMutations([]) };
+      return syncedContent;
+    })
+    .finally(() => {
+      syncLoadPromise = null;
+    });
+  return syncLoadPromise;
+}
+
+async function pushMutation(mutation) {
+  const account = activeAccount();
+  if (!account) {
+    throw new Error("Connect Web Sync in Settings before saving from the web.");
+  }
+  const payload = await postJSON("/sync/push", {
+    auth: { accountUserID: account.userID },
+    batch: {
+      user: { id: account.userID },
+      mutations: [mutation]
+    }
+  }, { token: account.sessionToken });
+  await loadSyncedContent({ force: true });
+  return payload;
+}
+
+function savedMutationForReader(reader) {
+  const account = activeAccount();
+  const now = new Date().toISOString();
+  return {
+    savedItem: {
+      id: `web-saved-${reader.sectionID}`,
+      userID: account.userID,
+      codeVersion: "nyc-2022",
+      sectionID: Number(reader.sectionID),
+      sectionNumber: reader.sectionNumber,
+      title: reader.title,
+      updatedAt: now
+    }
+  };
 }
 
 async function populateReaderSelectors(panel, reader) {
@@ -165,15 +414,18 @@ async function populateReaderSelectors(panel, reader) {
   const sectionSelect = panel.querySelector(".section-select");
   clear(chapterSelect);
   clear(sectionSelect);
+  reader.codePrefix = reader.codePrefix || "BC";
 
   const blankChapter = document.createElement("option");
   blankChapter.value = "";
   blankChapter.textContent = "Select a chapter";
   chapterSelect.append(blankChapter);
-  chapters.forEach((chapter) => {
+  const chapterPayload = await api(`/code/chapters?code=${encodeURIComponent(reader.codePrefix)}`);
+  const readerChapters = chapterPayload.chapters || [];
+  readerChapters.forEach((chapter) => {
     const option = document.createElement("option");
     option.value = chapter.id;
-    option.textContent = `Chapter ${chapter.chapterNumber}: ${chapter.title}`;
+    option.textContent = chapter.displayTitle || `Chapter ${chapter.chapterNumber}`;
     chapterSelect.append(option);
   });
   chapterSelect.value = reader.chapterID || "";
@@ -194,7 +446,7 @@ async function populateReaderSelectors(panel, reader) {
   chapter.sections.forEach((section) => {
     const option = document.createElement("option");
     option.value = section.id;
-    option.textContent = `${section.sectionNumber} ${section.title}`;
+    option.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
     sectionSelect.append(option);
   });
   sectionSelect.value = reader.sectionID || "";
@@ -202,27 +454,180 @@ async function populateReaderSelectors(panel, reader) {
 
 async function renderSectionContent(panel, reader) {
   const content = panel.querySelector(".reader-content");
-  if (!reader.sectionID) {
-    emptyReader(content);
+  if (!reader.chapterID) {
+    blankReader(content);
     return;
   }
 
   clear(content);
-  const { section } = await api(`/code/sections/${reader.sectionID}`);
-  const meta = document.createElement("section");
-  meta.className = "reader-meta";
-  const eyebrow = document.createElement("p");
-  eyebrow.textContent = `Chapter ${section.chapterNumber || ""}`;
-  const heading = document.createElement("h3");
-  heading.textContent = `${reader.sectionNumber || section.sectionID} ${reader.title || ""}`.trim();
-  meta.append(eyebrow, heading);
-  content.append(meta);
+  const { chapter } = await api(`/code/chapters/${reader.chapterID}?include=body`);
 
-  (section.blocks || []).forEach((block) => {
-    const paragraph = document.createElement("p");
-    paragraph.className = "section-block";
-    paragraph.textContent = block.plainText || "";
-    content.append(paragraph);
+  (chapter.sections || []).forEach((section) => {
+    const sectionWrapper = document.createElement("section");
+    sectionWrapper.className = "chapter-section";
+    sectionWrapper.dataset.sectionId = String(section.id);
+
+    const sectionHeading = document.createElement("h3");
+    sectionHeading.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
+    sectionWrapper.append(sectionHeading);
+
+    const blocks = section.blocks?.length ? section.blocks : [{ plainText: section.title || "" }];
+    blocks.forEach((block) => sectionWrapper.append(renderCodeBlock(block)));
+
+    content.append(sectionWrapper);
+  });
+
+  if (reader.sectionID) {
+    requestAnimationFrame(() => {
+      content.querySelector(`[data-section-id="${CSS.escape(String(reader.sectionID))}"]`)?.scrollIntoView({ block: "start" });
+    });
+  }
+}
+
+function rewriteCodeHTML(html) {
+  return String(html || "")
+    .replace(/src=(["'])(?:\.\.\/)+assets\/([^"']+)\1/gi, (_match, quote, fileName) => {
+      return `src=${quote}/code/assets/${encodeURIComponent(fileName)}${quote}`;
+    })
+    .replace(/<\s*\/?\s*(annotationdrawer|codeoptions)\b[^>]*>/gi, "");
+}
+
+function renderCodeBlock(block) {
+  if (block.kind === "image") {
+    const figure = document.createElement("figure");
+    figure.className = "code-media code-image";
+    if (block.html) {
+      figure.innerHTML = rewriteCodeHTML(block.html);
+    } else if (block.imageID) {
+      const image = document.createElement("img");
+      image.src = `/code/assets/${encodeURIComponent(block.imageID)}`;
+      figure.append(image);
+    }
+    decorateCodeHTML(figure);
+    return figure;
+  }
+
+  if (block.kind === "table" || /<table\b/i.test(block.html || "")) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-table";
+    wrapper.innerHTML = rewriteCodeHTML(block.html || "");
+    decorateCodeHTML(wrapper);
+    return wrapper;
+  }
+
+  if (block.kind === "html" && block.html) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "section-block section-html";
+    wrapper.innerHTML = rewriteCodeHTML(block.html);
+    decorateCodeHTML(wrapper);
+    if (!wrapper.textContent.trim() && !wrapper.querySelector("img, table")) {
+      wrapper.textContent = block.plainText || "";
+    }
+    return wrapper;
+  }
+
+  const paragraph = document.createElement("p");
+  paragraph.className = "section-block";
+  paragraph.textContent = block.plainText || "";
+  return paragraph;
+}
+
+function decorateCodeHTML(root) {
+  root.querySelectorAll("script, style, annotationdrawer, codeoptions").forEach((node) => node.remove());
+  normalizeCodeTables(root);
+  root.querySelectorAll("img").forEach((image) => {
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.alt = image.alt || "";
+  });
+  root.querySelectorAll("br").forEach((breakElement) => {
+    if (breakElement.textContent) {
+      breakElement.textContent = "";
+    }
+  });
+}
+
+function normalizeCodeTables(root) {
+  root.querySelectorAll("scrolltable").forEach((scrollTable) => {
+    const bodyTable =
+      scrollTable.querySelector(".xsl-table--body table") ||
+      scrollTable.querySelector(".xsl-table:not(.xsl-table--header) table") ||
+      Array.from(scrollTable.querySelectorAll("table")).at(-1);
+
+    if (bodyTable) {
+      scrollTable.replaceWith(bodyTable);
+    } else {
+      scrollTable.replaceWith(...Array.from(scrollTable.childNodes));
+    }
+  });
+
+  root.querySelectorAll(".xsl-table--header").forEach((headerTable) => headerTable.remove());
+  root.querySelectorAll(".xsl-table--body, .xsl-table").forEach((tableShell) => {
+    const nestedTable = tableShell.matches("table") ? tableShell : tableShell.querySelector(":scope > table");
+    if (nestedTable) {
+      tableShell.replaceWith(nestedTable);
+    } else if (!tableShell.textContent.trim()) {
+      tableShell.remove();
+    }
+  });
+
+  root.querySelectorAll("table").forEach((table) => {
+    removeEmptyTableFooters(table);
+    removeRepeatedLeadingRows(table);
+  });
+}
+
+function removeEmptyTableFooters(table) {
+  Array.from(table.tFoot?.rows || []).forEach((row) => {
+    const hasContent = Array.from(row.cells || []).some((cell) => normalizeTableCellText(cell.textContent));
+    if (!hasContent) {
+      row.remove();
+    }
+  });
+  if (table.tFoot && !table.tFoot.rows.length) {
+    table.tFoot.remove();
+  }
+}
+
+function removeRepeatedLeadingRows(table) {
+  const rows = Array.from(table.rows || []);
+  if (rows.length < 2) return;
+
+  for (let groupSize = Math.min(6, Math.floor(rows.length / 2)); groupSize >= 1; groupSize -= 1) {
+    const firstGroup = rows.slice(0, groupSize);
+    const secondGroup = rows.slice(groupSize, groupSize * 2);
+    if (!firstGroup.length || !secondGroup.length) continue;
+    if (!firstGroup.some(isHeaderLikeTableRow)) continue;
+
+    const firstSignature = firstGroup.map(tableRowSignature).join("||");
+    const secondSignature = secondGroup.map(tableRowSignature).join("||");
+    if (firstSignature !== secondSignature) continue;
+
+    firstGroup.forEach((row) => row.remove());
+    return;
+  }
+}
+
+function tableRowSignature(row) {
+  return Array.from(row.cells || [])
+    .map((cell) => {
+      const text = normalizeTableCellText(cell.textContent);
+      return `${cell.tagName}:${cell.colSpan || 1}:${cell.rowSpan || 1}:${text}`;
+    })
+    .join("|");
+}
+
+function normalizeTableCellText(text) {
+  return String(text || "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function isHeaderLikeTableRow(row) {
+  const cells = Array.from(row.cells || []);
+  if (!cells.length) return false;
+  if (cells.some((cell) => cell.tagName === "TH")) return true;
+  return cells.every((cell) => {
+    const text = normalizeTableCellText(cell.textContent);
+    return text && text.length <= 90 && !/^\d+(?:\.\d+)*\b/.test(text);
   });
 }
 
@@ -230,27 +635,57 @@ async function renderReader(reader, options = {}) {
   const panel = readerTemplate.content.firstElementChild.cloneNode(true);
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
-  const pickButton = panel.querySelector(".reader-pick");
+  const saveButton = panel.querySelector(".reader-save");
+  const codeSelect = panel.querySelector(".code-select");
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
 
   panel.dataset.readerId = reader.id;
+  reader.codePrefix = reader.codePrefix || "BC";
+  applyCodeTheme(panel, reader);
   applyPaneWeight(panel, paneIDForReader(reader, options));
-  selector.hidden = !reader.selectorOpen;
+  selector.hidden = false;
   setTitle(panel, reader);
 
   if (options.isSearchResult) {
-    panel.querySelector(".panel-kind").textContent = "Search Result";
-    pickButton.hidden = true;
     closeButton.hidden = false;
   } else {
     closeButton.hidden = state.readers.length <= 1;
   }
 
-  pickButton.addEventListener("click", () => {
-    reader.selectorOpen = !reader.selectorOpen;
+  populateCodeSelect(panel, reader);
+  codeSelect.addEventListener("change", async () => {
+    reader.codePrefix = codeSelect.value || "BC";
+    reader.chapterID = "";
+    reader.sectionID = "";
+    reader.sectionNumber = "";
+    reader.title = "Reader";
     saveWorkspaceState();
-    renderWorkspace();
+    await renderWorkspace();
+  });
+
+  saveButton.hidden = !reader.sectionID;
+  saveButton.disabled = !reader.sectionID;
+  saveButton.addEventListener("click", async () => {
+    if (!reader.sectionID) return;
+    saveButton.disabled = true;
+    const originalLabel = saveButton.textContent;
+    saveButton.textContent = "Saving";
+    try {
+      await pushMutation(savedMutationForReader(reader));
+      saveButton.textContent = "Saved";
+      if (state.utilities.saved) {
+        await renderWorkspace();
+      }
+    } catch (error) {
+      saveButton.textContent = "Connect sync";
+      saveButton.title = error.message;
+    } finally {
+      setTimeout(() => {
+        saveButton.disabled = !reader.sectionID;
+        saveButton.textContent = originalLabel;
+      }, 1600);
+    }
   });
 
   closeButton.addEventListener("click", () => {
@@ -271,7 +706,6 @@ async function renderReader(reader, options = {}) {
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
-    reader.selectorOpen = true;
     saveWorkspaceState();
     await renderWorkspace();
   });
@@ -283,18 +717,13 @@ async function renderReader(reader, options = {}) {
       const summary = sectionTitleFromID(reader.sectionID, chapter);
       reader.sectionNumber = summary?.sectionNumber || "";
       reader.title = summary?.title || "Reader";
-      reader.selectorOpen = false;
     }
     saveWorkspaceState();
     await renderWorkspace();
   });
 
   if (options.isSearchResult && !reader.sectionID) {
-    emptyReader(
-      panel.querySelector(".reader-content"),
-      "No active search result",
-      "Pick a search result to load it here. Clearing Search keeps this reader empty until you close it."
-    );
+    blankReader(panel.querySelector(".reader-content"));
   } else {
     await populateReaderSelectors(panel, reader);
     await renderSectionContent(panel, reader);
@@ -364,20 +793,21 @@ async function renderSearchResults(panel) {
   payload.results.forEach((result) => {
     const row = document.createElement("button");
     row.className = "result-row";
+    row.classList.add(`code-theme-${codeTheme(result.codePrefix || "BC")}`);
     row.type = "button";
     const heading = document.createElement("strong");
-    heading.textContent = `${result.sectionNumber} ${result.title}`.trim();
+    heading.textContent = sectionDisplayTitle(result.sectionNumber, result.title);
     const snippet = document.createElement("p");
     appendHighlighted(snippet, result.snippet, query);
     row.append(heading, snippet);
     row.addEventListener("click", () => {
       state.searchResultReader = {
         id: "search-result-reader",
+        codePrefix: result.codePrefix || "BC",
         chapterID: result.chapterID,
         sectionID: result.id,
         sectionNumber: result.sectionNumber,
-        title: result.title,
-        selectorOpen: false
+        title: result.title
       };
       saveWorkspaceState();
       renderWorkspace().then(() => {
@@ -400,6 +830,214 @@ function renderUtility(template, paneID) {
   const panel = renderTemplate(template);
   applyPaneWeight(panel, paneID);
   return panel;
+}
+
+async function renderSaved() {
+  const panel = renderTemplate(savedTemplate);
+  applyPaneWeight(panel, "utility:saved");
+  const content = panel.querySelector(".saved-content");
+  clear(content);
+  const data = await loadSyncedContent();
+
+  if (data.status === "disconnected") {
+    appendEmptySaved(content, "Connect Web Sync", "Open Settings and connect an account ID plus session token to show synced projects, bookmarks, tags, and notes.");
+    return panel;
+  }
+  if (data.status === "error") {
+    appendEmptySaved(content, "Sync error", data.error || "Could not load saved content.");
+    return panel;
+  }
+
+  const { projects, savedItems, annotations, projectSections } = data.summary;
+  appendSectionLabel(content, "Projects");
+  if (projects.length === 0) {
+    appendMutedRow(content, "No projects", "Projects synced from iOS will appear here.");
+  } else {
+    projects.slice(0, 12).forEach((project) => {
+      const count = projectSections.filter((item) =>
+        item.folderClientID === project.clientID ||
+        item.folderClientID === project.id ||
+        item.localFolderID === project.localFolderID
+      ).length;
+      const card = document.createElement("article");
+      card.className = "project-card";
+      const body = document.createElement("div");
+      const heading = document.createElement("h3");
+      heading.textContent = project.name || project.title || "Project";
+      const description = document.createElement("p");
+      description.textContent = project.description || "Private project workspace.";
+      body.append(heading, description);
+      const meta = document.createElement("div");
+      meta.className = "project-meta";
+      [count === 1 ? "1 saved" : `${count} saved`, project.sortMode || "Code order"].forEach((label) => {
+        const pill = document.createElement("span");
+        pill.textContent = label;
+        meta.append(pill);
+      });
+      card.append(body, meta);
+      content.append(card);
+    });
+  }
+
+  appendSectionLabel(content, "Saved sections");
+  if (savedItems.length === 0) {
+    appendMutedRow(content, "No saved sections", "Saved sections synced from iOS or saved in this web workspace will appear here.");
+  } else {
+    savedItems.slice(0, 24).forEach((item) => {
+      const row = document.createElement("button");
+      row.className = "saved-row saved-row-button";
+      row.type = "button";
+      const title = document.createElement("strong");
+      title.textContent = sectionDisplayTitle(item.sectionNumber || item.sectionID, item.title, "Saved section");
+      const subtitle = document.createElement("span");
+      subtitle.textContent = item.updatedAt ? `Updated ${new Date(item.updatedAt).toLocaleString()}` : "Synced saved section";
+      row.append(title, subtitle);
+      row.addEventListener("click", () => openSectionInReader(item));
+      content.append(row);
+    });
+  }
+
+  appendSectionLabel(content, "Tags and notes");
+  if (annotations.length === 0) {
+    appendMutedRow(content, "No tags or notes", "Annotations synced from iOS will appear here.");
+  } else {
+    annotations.slice(0, 12).forEach((annotation) => {
+      const row = document.createElement("article");
+      row.className = "saved-row";
+      const title = document.createElement("strong");
+      title.textContent = `${annotation.sectionNumber || annotation.sectionID || ""}`.trim() || "Annotation";
+      const detail = document.createElement("span");
+      const tags = Array.isArray(annotation.tags) && annotation.tags.length ? `Tags: ${annotation.tags.join(", ")}` : "";
+      const note = annotation.noteBody ? `Note: ${annotation.noteBody}` : "";
+      detail.textContent = [tags, note].filter(Boolean).join(" · ") || "Synced annotation";
+      row.append(title, detail);
+      content.append(row);
+    });
+  }
+  return panel;
+}
+
+function appendSectionLabel(container, label) {
+  const element = document.createElement("p");
+  element.className = "section-label";
+  element.textContent = label;
+  container.append(element);
+}
+
+function appendMutedRow(container, title, message) {
+  const row = document.createElement("article");
+  row.className = "saved-row";
+  const heading = document.createElement("strong");
+  heading.textContent = title;
+  const body = document.createElement("span");
+  body.textContent = message;
+  row.append(heading, body);
+  container.append(row);
+}
+
+function appendEmptySaved(container, title, message) {
+  const wrapper = document.createElement("section");
+  wrapper.className = "reader-empty";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const paragraph = document.createElement("p");
+  paragraph.textContent = message;
+  wrapper.append(heading, paragraph);
+  container.append(wrapper);
+}
+
+async function openSectionInReader(item) {
+  const sectionID = String(item.sectionID || item.id || "");
+  if (!sectionID) return;
+  let summary = null;
+  try {
+    const search = await api(`/code/search?q=${encodeURIComponent(item.sectionNumber || sectionID)}`);
+    summary = (search.results || []).find((result) => String(result.id) === sectionID) || null;
+  } catch {
+    summary = null;
+  }
+  state.readers.push(newReaderState({
+    chapterID: item.chapterID || summary?.chapterID || "",
+    sectionID,
+    sectionNumber: item.sectionNumber || summary?.sectionNumber || "",
+    title: item.title || summary?.title || "Saved section"
+  }));
+  saveWorkspaceState();
+  await renderWorkspace();
+}
+
+function renderSettings() {
+  const panel = renderTemplate(settingsTemplate);
+  applyPaneWeight(panel, "utility:settings");
+  wireReaderSettingsControls(panel);
+  const userInput = panel.querySelector(".account-user-id");
+  const tokenInput = panel.querySelector(".account-session-token");
+  const connectButton = panel.querySelector(".account-save");
+  const disconnectButton = panel.querySelector(".account-clear");
+  const status = panel.querySelector(".connector-status");
+  userInput.value = state.account?.userID || "";
+  tokenInput.value = state.account?.sessionToken || "";
+  status.textContent = activeAccount()
+    ? `Connected locally as ${state.account.userID}.`
+    : "Not connected in this browser.";
+  connectButton.addEventListener("click", async () => {
+    state.account = {
+      userID: userInput.value.trim(),
+      sessionToken: tokenInput.value.trim()
+    };
+    syncedContent = null;
+    saveWorkspaceState();
+    status.textContent = "Checking sync...";
+    await loadSyncedContent({ force: true });
+    renderWorkspace();
+  });
+  disconnectButton.addEventListener("click", () => {
+    state.account = null;
+    syncedContent = null;
+    saveWorkspaceState();
+    renderWorkspace();
+  });
+  return panel;
+}
+
+function wireReaderSettingsControls(panel) {
+  const fontSlider = panel.querySelector(".preview-font-slider");
+  const spacingSlider = panel.querySelector(".preview-spacing-slider");
+  const fontSelect = panel.querySelector(".preview-font-family-select");
+  const fontLabels = panel.querySelectorAll(".preview-font-value");
+  const spacingLabels = panel.querySelectorAll(".preview-spacing-value");
+
+  const syncControls = () => {
+    state.readerSettings = normalizeReaderSettings(state.readerSettings);
+    fontLabels.forEach((label) => {
+      label.textContent = `${state.readerSettings.fontSize} pt`;
+    });
+    spacingLabels.forEach((label) => {
+      label.textContent = String(state.readerSettings.lineSpacing);
+    });
+    if (fontSlider) fontSlider.value = String(state.readerSettings.fontSize);
+    if (spacingSlider) spacingSlider.value = String(state.readerSettings.lineSpacing);
+    if (fontSelect) fontSelect.value = state.readerSettings.fontFamily;
+    applyReaderSettings();
+  };
+
+  syncControls();
+
+  fontSlider?.addEventListener("input", () => {
+    state.readerSettings.fontSize = clampNumber(fontSlider.value, 10, 18, defaultReaderSettings.fontSize);
+    syncControls();
+    saveWorkspaceState();
+  });
+  spacingSlider?.addEventListener("input", () => {
+    state.readerSettings.lineSpacing = clampNumber(spacingSlider.value, 0, 4, defaultReaderSettings.lineSpacing);
+    syncControls();
+    saveWorkspaceState();
+  });
+  fontSelect?.addEventListener("change", () => {
+    state.readerSettings.fontFamily = "helvetica";
+    syncControls();
+    saveWorkspaceState();
+  });
 }
 
 function createDivider(previousPaneID, nextPaneID) {
@@ -460,20 +1098,23 @@ async function renderWorkspace() {
   setUtilityButtonStates();
 
   const panes = [];
-  for (const reader of state.readers) {
-    panes.push(await renderReader(reader));
-  }
   if (state.utilities.search) {
     panes.push(await renderSearch());
+  }
+  if (state.utilities.saved) {
+    panes.push(await renderSaved());
+  }
+  if (state.utilities.analysis) {
+    panes.push(renderUtility(analysisTemplate, "utility:analysis"));
+  }
+  if (state.utilities.settings) {
+    panes.push(renderSettings());
   }
   if (state.searchResultReader) {
     panes.push(await renderReader(state.searchResultReader, { isSearchResult: true }));
   }
-  if (state.utilities.saved) {
-    panes.push(renderUtility(savedTemplate, "utility:saved"));
-  }
-  if (state.utilities.settings) {
-    panes.push(renderUtility(settingsTemplate, "utility:settings"));
+  for (const reader of state.readers) {
+    panes.push(await renderReader(reader));
   }
   appendPaneSequence(panes);
   saveWorkspaceState();
@@ -495,6 +1136,11 @@ async function start() {
   });
   toggleSavedButton.addEventListener("click", () => {
     state.utilities.saved = !state.utilities.saved;
+    saveWorkspaceState();
+    renderWorkspace();
+  });
+  toggleAnalysisButton.addEventListener("click", () => {
+    state.utilities.analysis = !state.utilities.analysis;
     saveWorkspaceState();
     renderWorkspace();
   });

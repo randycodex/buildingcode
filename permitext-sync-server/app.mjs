@@ -19,6 +19,19 @@ const chapterContentPath = join(
   "prepared",
   "chapters"
 );
+const chapterManifestPath = join(
+  __dirname,
+  "..",
+  "NYC CC APP",
+  "permitext",
+  "Resources",
+  "CodeContent",
+  "authored",
+  "new-york-city",
+  "2022-construction-codes",
+  "prepared",
+  "manifest.json"
+);
 const sectionContentPath = join(
   __dirname,
   "..",
@@ -32,6 +45,18 @@ const sectionContentPath = join(
   "prepared",
   "sections"
 );
+const assetContentPath = join(
+  __dirname,
+  "..",
+  "NYC CC APP",
+  "permitext",
+  "Resources",
+  "CodeContent",
+  "authored",
+  "new-york-city",
+  "2022-construction-codes",
+  "assets"
+);
 const databaseURL =
   process.env.PERMITEXT_SYNC_DATABASE_URL ||
   process.env.DATABASE_URL ||
@@ -41,6 +66,7 @@ const databaseURL =
 
 let cachedStoreAdapter = null;
 let cachedChapterIndex = null;
+let cachedChapterManifest = null;
 let cachedSearchIndex = null;
 
 const emptyStore = () => ({
@@ -611,7 +637,7 @@ function sendHTML(response, html) {
 function sendStatic(response, contentType, body) {
   response.writeHead(200, {
     "content-type": contentType,
-    "cache-control": "public, max-age=60"
+    "cache-control": "no-store"
   });
   response.end(body);
 }
@@ -629,6 +655,18 @@ function contentTypeForPath(path) {
   }
   if (path.endsWith(".svg")) {
     return "image/svg+xml";
+  }
+  if (path.endsWith(".png")) {
+    return "image/png";
+  }
+  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+    return "image/jpeg";
+  }
+  if (path.endsWith(".gif")) {
+    return "image/gif";
+  }
+  if (path.endsWith(".webp")) {
+    return "image/webp";
   }
   return "application/octet-stream";
 }
@@ -683,9 +721,85 @@ async function readJSONFile(path) {
   return JSON.parse(await readFile(path, "utf8"));
 }
 
-function chapterSortValue(chapterNumber) {
-  const numeric = Number.parseFloat(chapterNumber);
-  return Number.isFinite(numeric) ? numeric : Number.MAX_SAFE_INTEGER;
+const codeSectionIDPrefixMap = new Map([
+  [1, "BC"],
+  [3, "AC"],
+  [4, "FGC"],
+  [5, "PC"],
+  [6, "MC"]
+]);
+
+function normalizeChapterNumber(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function compareChapterNumbers(left, right) {
+  const leftNumber = normalizeChapterNumber(left);
+  const rightNumber = normalizeChapterNumber(right);
+  const leftNumeric = /^\d+$/.test(leftNumber);
+  const rightNumeric = /^\d+$/.test(rightNumber);
+
+  if (leftNumeric !== rightNumeric) {
+    return leftNumeric ? -1 : 1;
+  }
+  if (leftNumeric && rightNumeric) {
+    return Number.parseInt(leftNumber, 10) - Number.parseInt(rightNumber, 10);
+  }
+  return leftNumber.localeCompare(rightNumber, undefined, { numeric: true, sensitivity: "base" });
+}
+
+async function chapterManifest() {
+  if (cachedChapterManifest) {
+    return cachedChapterManifest;
+  }
+
+  try {
+    const manifest = await readJSONFile(chapterManifestPath);
+    cachedChapterManifest = new Map(
+      (manifest.chapters || []).map((chapter) => [String(chapter.chapterID), chapter])
+    );
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+    cachedChapterManifest = new Map();
+  }
+  return cachedChapterManifest;
+}
+
+function codePrefixForChapter(chapter, manifestChapter = null) {
+  const manifestPrefix = codeSectionIDPrefixMap.get(Number(manifestChapter?.codeSectionID));
+  if (manifestPrefix) {
+    return manifestPrefix;
+  }
+
+  const headerLine = (chapter.groups || [])
+    .map((group) => group.headerLine || "")
+    .find((line) => /^SECTION\s+[A-Z]+/i.test(line)) || "";
+  if (/^SECTION\s+BC\s+28-/i.test(headerLine)) {
+    return "AC";
+  }
+  const prefix = headerLine.match(/^SECTION\s+([A-Z]+)/i)?.[1]?.toUpperCase();
+  if (prefix) {
+    return prefix;
+  }
+  const chapterID = Number.parseInt(chapter.chapterID, 10);
+  if (chapterID >= 1 && chapterID <= 35) {
+    return "BC";
+  }
+  if (chapterID >= 36 && chapterID <= 58) {
+    return "BC";
+  }
+  if (chapterID >= 59 && chapterID <= 65) {
+    return "FGC";
+  }
+  return "";
+}
+
+function displayTitleForChapter(chapter) {
+  const chapterNumber = String(chapter.chapterNumber || "").trim();
+  const isAppendix = chapterNumber && !/^\d+$/.test(chapterNumber);
+  return isAppendix ? `Appendix ${chapterNumber}` : `Chapter ${chapterNumber || chapter.chapterID}`;
 }
 
 async function chapterIndex() {
@@ -693,21 +807,39 @@ async function chapterIndex() {
     return cachedChapterIndex;
   }
   const files = await readdir(chapterContentPath);
-  const chapters = [];
+  const manifest = await chapterManifest();
+  const chaptersByKey = new Map();
   for (const file of files.filter((name) => name.endsWith(".json"))) {
     const chapter = await readJSONFile(join(chapterContentPath, file));
+    const manifestChapter = manifest.get(String(chapter.chapterID));
     const firstGroup = chapter.groups?.[0] || {};
-    chapters.push({
+    const codePrefix = codePrefixForChapter(chapter, manifestChapter);
+    const chapterNumber = manifestChapter?.chapterNumber || chapter.chapterNumber;
+    const chapterSummary = {
       id: chapter.chapterID,
-      chapterNumber: chapter.chapterNumber,
+      codePrefix,
+      codeSectionID: manifestChapter?.codeSectionID || null,
+      chapterNumber,
+      displayTitle: displayTitleForChapter({ ...chapter, chapterNumber }),
       title: firstGroup.headingLine || `Chapter ${chapter.chapterNumber}`,
       groupCount: chapter.groups?.length || 0,
-      sectionCount: (chapter.groups || []).reduce((count, group) => count + (group.sections?.length || 0), 0)
-    });
+      sectionCount: (chapter.groups || []).reduce((count, group) => count + (group.sections?.length || 0), 0),
+      manifestSectionCount: manifestChapter?.sectionCount || 0
+    };
+    const canonicalKey = `${codePrefix}:${normalizeChapterNumber(chapterNumber)}`;
+    const existing = chaptersByKey.get(canonicalKey);
+    if (
+      !existing ||
+      (chapterSummary.manifestSectionCount || chapterSummary.sectionCount) >
+        (existing.manifestSectionCount || existing.sectionCount)
+    ) {
+      chaptersByKey.set(canonicalKey, chapterSummary);
+    }
   }
-  cachedChapterIndex = chapters.sort((left, right) =>
-    chapterSortValue(left.chapterNumber) - chapterSortValue(right.chapterNumber) ||
-    String(left.chapterNumber).localeCompare(String(right.chapterNumber))
+  cachedChapterIndex = Array.from(chaptersByKey.values()).sort((left, right) =>
+    String(left.codePrefix).localeCompare(String(right.codePrefix)) ||
+    compareChapterNumbers(left.chapterNumber, right.chapterNumber) ||
+    Number(left.id) - Number(right.id)
   );
   return cachedChapterIndex;
 }
@@ -735,6 +867,7 @@ async function searchIndex() {
       sectionSummaries.push({
         id: section.id,
         chapterID: chapterSummary.id,
+        codePrefix: chapterSummary.codePrefix,
         chapterNumber: chapterSummary.chapterNumber,
         sectionNumber: section.sectionNumber,
         title: section.title,
@@ -820,23 +953,62 @@ async function handleWebStatic(path, response) {
   }
 }
 
-async function handleCodeChapters(_request, response) {
-  sendJSON(response, 200, { chapters: await chapterIndex() });
+async function handleCodeAsset(path, response) {
+  const fileName = decodeURIComponent(path.replace(/^code\/assets\//, ""));
+  if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
+    sendNotFound(response);
+    return;
+  }
+  try {
+    const filePath = join(assetContentPath, fileName);
+    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath));
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      sendNotFound(response);
+      return;
+    }
+    throw error;
+  }
 }
 
-async function handleCodeChapter(path, response) {
+async function handleCodeChapters(request, response) {
+  const codePrefix = requestURL(request).searchParams.get("code")?.trim().toUpperCase();
+  const chapters = await chapterIndex();
+  sendJSON(response, 200, {
+    chapters: codePrefix ? chapters.filter((chapter) => chapter.codePrefix === codePrefix) : chapters
+  });
+}
+
+async function handleCodeChapter(request, path, response) {
   const chapterID = path.split("/").at(-1);
-  if (!/^\d+$/.test(chapterID || "")) {
+  if (!/^[a-zA-Z0-9_-]+$/.test(chapterID || "")) {
     sendError(response, 400, "Invalid chapter ID.");
     return;
   }
   const chapter = await readJSONFile(join(chapterContentPath, `${chapterID}.json`));
+  const manifest = await chapterManifest();
+  const manifestChapter = manifest.get(String(chapter.chapterID));
+  const includeBody = requestURL(request).searchParams.get("include") === "body";
+  const sections = flattenChapterSections(chapter);
+  const sectionPayload = includeBody
+    ? await Promise.all(sections.map(async (section) => ({
+        ...section,
+        blocks: (await sectionBody(section.id, { allowMissing: true })).blocks || []
+      })))
+    : sections;
+
   sendJSON(response, 200, {
     chapter: {
       id: chapter.chapterID,
-      chapterNumber: chapter.chapterNumber,
+      codePrefix: codePrefixForChapter(chapter, manifestChapter),
+      codeSectionID: manifestChapter?.codeSectionID || null,
+      chapterNumber: manifestChapter?.chapterNumber || chapter.chapterNumber,
+      displayTitle: displayTitleForChapter({
+        ...chapter,
+        chapterNumber: manifestChapter?.chapterNumber || chapter.chapterNumber
+      }),
       groups: chapter.groups || [],
-      sections: flattenChapterSections(chapter)
+      sections: sectionPayload
     }
   });
 }
@@ -882,6 +1054,7 @@ async function handleCodeSearch(request, response) {
     .map((section) => ({
       id: section.id,
       chapterID: section.chapterID,
+      codePrefix: section.codePrefix,
       chapterNumber: section.chapterNumber,
       sectionNumber: section.sectionNumber,
       title: section.title,
@@ -1485,12 +1658,16 @@ export async function handleRequest(request, response) {
       await handleWebStatic(path, response);
       return;
     }
+    if (request.method === "GET" && path.startsWith("code/assets/")) {
+      await handleCodeAsset(path, response);
+      return;
+    }
     if (request.method === "GET" && path === "code/chapters") {
       await handleCodeChapters(request, response);
       return;
     }
     if (request.method === "GET" && path.startsWith("code/chapters/")) {
-      await handleCodeChapter(path, response);
+      await handleCodeChapter(request, path, response);
       return;
     }
     if (request.method === "GET" && path.startsWith("code/sections/")) {
