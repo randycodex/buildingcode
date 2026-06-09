@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>permitext workspace</title>
+    <link rel="stylesheet" href="/web/styles.css">
+  </head>
+  <body>
+    <main class="workspace-shell">
+      <header class="topbar">
+        <nav class="topbar-actions" aria-label="Workspace tools">
+          <button class="toolbar-button" id="add-reader" type="button">+ Reader</button>
+          <button class="toolbar-button" id="toggle-search" type="button" aria-pressed="false">Search</button>
+          <button class="toolbar-button" id="toggle-saved" type="button" aria-pressed="false">Saved</button>
+          <button class="toolbar-button" id="toggle-analysis" type="button" aria-pressed="false">Analysis</button>
+          <button class="toolbar-button" id="toggle-settings" type="button" aria-pressed="false">Settings</button>
+        </nav>
+        <div class="topbar-brand">
+          <h1>permitext</h1>
+        </div>
+        <div class="topbar-spacer" aria-hidden="true"></div>
+      </header>
+
+      <section class="panel-track" id="panel-track" aria-label="permitext web workspace"></section>
+    </main>
+
+    <template id="reader-template">
+      <article class="workspace-panel reader-panel">
+        <header class="panel-header">
+          <div>
+            <label class="reader-code-picker">
+              <span class="sr-only">Code section</span>
+              <select class="code-select"></select>
+            </label>
+            <h2 class="panel-title">Reader</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="ghost-button reader-save" type="button">Save</button>
+            <button class="icon-button reader-close" type="button" title="Close reader">x</button>
+          </div>
+        </header>
+        <div class="selector-stack">
+          <label>
+            Chapter
+            <select class="chapter-select"></select>
+          </label>
+          <label>
+            Section
+            <select class="section-select"></select>
+          </label>
+        </div>
+        <section class="reader-content"></section>
+      </article>
+    </template>
+
+    <template id="search-template">
+      <article class="workspace-panel search-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">Search</p>
+            <h2 class="panel-title">Search</h2>
+          </div>
+        </header>
+        <label class="search-box">
+          <span>Search</span>
+          <input class="search-input" type="search" autocomplete="off" placeholder="Find a section">
+        </label>
+        <section class="search-results"></section>
+      </article>
+    </template>
+
+    <template id="saved-template">
+      <article class="workspace-panel utility-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">Saved</p>
+            <h2 class="panel-title">Saved</h2>
+          </div>
+        </header>
+        <section class="saved-content">
+        </section>
+      </article>
+    </template>
+
+    <template id="analysis-template">
+      <article class="workspace-panel utility-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">AI</p>
+            <h2 class="panel-title">Analysis</h2>
+          </div>
+        </header>
+        <section class="analysis-content">
+          <article class="analysis-card">
+            <p class="section-label">Placeholder</p>
+            <h3>Bring your own AI account later</h3>
+            <p>This pane is reserved for chapter and section analysis. The planned setup will let users connect their own OpenAI, Claude, Gemini, or similar provider key so usage is billed to their account, not yours.</p>
+            <div class="project-meta">
+              <span>No API calls yet</span>
+              <span>Active reader aware later</span>
+              <span>Private by default</span>
+            </div>
+          </article>
+          <article class="saved-row">
+            <strong>Future behavior</strong>
+            <span>Select a reader, choose a section, then ask for summaries, conflicts, checklists, or design-review notes against that exact code text.</span>
+          </article>
+        </section>
+      </article>
+    </template>
+
+    <template id="settings-template">
+      <article class="workspace-panel utility-panel settings-panel">
+        <header class="panel-header">
+          <div>
+            <p class="eyebrow panel-kind">Settings</p>
+            <h2 class="panel-title">Settings</h2>
+          </div>
+        </header>
+        <section class="settings-list">
+          <div class="settings-row">
+            <span>Jurisdiction</span>
+            <strong>New York City</strong>
+          </div>
+          <div class="settings-row">
+            <span>Version</span>
+            <strong>2022 Construction Codes</strong>
+          </div>
+        </section>
+        <section class="reader-preview-card">
+          <p class="section-label">Reader Preview</p>
+          <p class="preview-code-title">Section BC 101: General</p>
+          <h3>101.2 Scope.</h3>
+          <p class="preview-copy">The provisions of this code shall apply to the construction, alteration, movement, addition, replacement, repair, equipment, use and occupancy of every building or structure.</p>
+          <div class="preview-pills">
+            <span><strong class="preview-font-value">12 pt</strong> type</span>
+            <span><strong class="preview-spacing-value">1</strong> spacing</span>
+          </div>
+          <label class="preview-setting-row preview-font-family-row">
+            <span>Font</span>
+            <select class="preview-font-family-select" aria-label="Reader font">
+              <option value="helvetica">Helvetica</option>
+            </select>
+          </label>
+          <div class="preview-setting-row">
+            <span>Font Size</span>
+            <strong class="preview-font-value">12 pt</strong>
+          </div>
+          <input class="preview-slider preview-font-slider" type="range" min="10" max="18" value="12" aria-label="Preview font size">
+          <div class="preview-setting-row">
+            <span>Line Spacing</span>
+            <strong class="preview-spacing-value">1</strong>
+          </div>
+          <input class="preview-slider preview-spacing-slider" type="range" min="0" max="4" value="1" aria-label="Preview line spacing">
+        </section>
+        <section class="account-connector">
+          <p class="section-label">Web Sync</p>
+          <p>Connect this browser to an existing backend account to show synced projects, saved sections, tags, and notes.</p>
+          <label>
+            Account ID
+            <input class="account-user-id" type="text" autocomplete="off" placeholder="apple:...">
+          </label>
+          <label>
+            Session token
+            <input class="account-session-token" type="password" autocomplete="off" placeholder="backend session token">
+          </label>
+          <div class="connector-actions">
+            <button class="ghost-button account-save" type="button">Connect</button>
+            <button class="ghost-button account-clear" type="button">Disconnect</button>
+          </div>
+          <p class="connector-status"></p>
+        </section>
+      </article>
+    </template>
+
+    <script src="/web/app.js" type="module"></script>
+  </body>
+</html>

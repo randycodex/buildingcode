@@ -16,4 +16,7 @@ Packages/
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
 
+# Local Permitext web sync smoke-test data.
+permitext-sync-server/data/
+
 NYC CC APP/IMG_*.PNG
