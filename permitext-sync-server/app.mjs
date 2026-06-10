@@ -802,6 +802,20 @@ function displayTitleForChapter(chapter) {
   return isAppendix ? `Appendix ${chapterNumber}` : `Chapter ${chapterNumber || chapter.chapterID}`;
 }
 
+function fullTitleForChapter(chapter, displayTitle, codePrefix = "") {
+  const lines = String(chapter.rawDraftText || "").split(/\r?\n/);
+  const heading = lines
+    .map((line) => line.match(/^#-\s*(.+?)\s*$/)?.[1])
+    .find(Boolean);
+  if (codePrefix === "AC" && heading) {
+    const article = lines
+      .map((line) => line.match(/^Article\s+\S+:\s*(.+?)\s*$/i)?.[0])
+      .find(Boolean);
+    return article ? `${heading} - ${article}` : heading;
+  }
+  return heading || displayTitle;
+}
+
 async function chapterIndex() {
   if (cachedChapterIndex) {
     return cachedChapterIndex;
@@ -815,12 +829,14 @@ async function chapterIndex() {
     const firstGroup = chapter.groups?.[0] || {};
     const codePrefix = codePrefixForChapter(chapter, manifestChapter);
     const chapterNumber = manifestChapter?.chapterNumber || chapter.chapterNumber;
+    const displayTitle = displayTitleForChapter({ ...chapter, chapterNumber });
     const chapterSummary = {
       id: chapter.chapterID,
       codePrefix,
       codeSectionID: manifestChapter?.codeSectionID || null,
       chapterNumber,
-      displayTitle: displayTitleForChapter({ ...chapter, chapterNumber }),
+      displayTitle,
+      fullTitle: fullTitleForChapter(chapter, displayTitle, codePrefix),
       title: firstGroup.headingLine || `Chapter ${chapter.chapterNumber}`,
       groupCount: chapter.groups?.length || 0,
       sectionCount: (chapter.groups || []).reduce((count, group) => count + (group.sections?.length || 0), 0),

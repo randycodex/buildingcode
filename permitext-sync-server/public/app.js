@@ -1,6 +1,7 @@
 const workspaceKey = "permitext:webWorkspace:v1";
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
+const collapseReadersButton = document.querySelector("#collapse-readers");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleAnalysisButton = document.querySelector("#toggle-analysis");
@@ -13,7 +14,7 @@ const settingsTemplate = document.querySelector("#settings-template");
 
 const codeOptions = [
   { prefix: "BC", label: "Building Code", theme: "building" },
-  { prefix: "AC", label: "Administrative Code", theme: "administrative" },
+  { prefix: "AC", label: "General Administrative Code", theme: "administrative" },
   { prefix: "PC", label: "Plumbing Code", theme: "plumbing" },
   { prefix: "MC", label: "Mechanical Code", theme: "mechanical" },
   { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas" }
@@ -50,6 +51,7 @@ function loadWorkspaceState() {
       },
       account: saved.account && typeof saved.account === "object" ? saved.account : null,
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
+      recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       readerSettings: normalizeReaderSettings(saved.readerSettings)
     };
   } catch {
@@ -60,6 +62,7 @@ function loadWorkspaceState() {
       utilities: { search: false, saved: false, analysis: false, settings: false },
       account: null,
       paneWeights: {},
+      recentChaptersByCode: {},
       readerSettings: { ...defaultReaderSettings }
     };
   }
@@ -99,13 +102,16 @@ function applyReaderSettings() {
 }
 
 function newReaderState(overrides = {}) {
+  const codePrefix = overrides.codePrefix || "BC";
   return {
     id: crypto.randomUUID(),
-    codePrefix: "BC",
-    chapterID: "",
+    codePrefix,
+    chapterID: overrides.chapterID || "",
     sectionID: "",
     sectionNumber: "",
     title: "Reader",
+    commentsOpen: false,
+    commentsWidth: 34,
     ...overrides
   };
 }
@@ -148,6 +154,10 @@ function setUtilityButtonStates() {
   toggleSavedButton.setAttribute("aria-pressed", String(state.utilities.saved));
   toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
+  if (collapseReadersButton) {
+    collapseReadersButton.disabled = state.readers.length <= 1;
+    collapseReadersButton.setAttribute("aria-disabled", String(state.readers.length <= 1));
+  }
 }
 
 async function api(path) {
@@ -285,7 +295,7 @@ function resizeCodeSelect(codeSelect) {
   const letterSpacing = Number.parseFloat(styles.letterSpacing) || 0;
   const textWidth = context.measureText(label.toUpperCase()).width;
   const spacedWidth = textWidth + Math.max(label.length - 1, 0) * letterSpacing;
-  codeSelect.style.setProperty("--code-select-width", `${Math.ceil(spacedWidth + 14)}px`);
+  codeSelect.style.setProperty("--code-select-width", `${Math.ceil(spacedWidth + 52)}px`);
 }
 
 function applyCodeTheme(panel, reader) {
@@ -308,6 +318,89 @@ function populateCodeSelect(panel, reader) {
   codeSelect.setAttribute("aria-label", "Code section");
   codeSelect.title = codeLabel(reader.codePrefix);
   resizeCodeSelect(codeSelect);
+}
+
+function enhanceSelect(select) {
+  if (!select || select.dataset.customized === "true") return;
+  select.dataset.customized = "true";
+  select.classList.add("native-select-hidden");
+
+  const custom = document.createElement("div");
+  custom.className = "custom-select";
+  const trigger = document.createElement("button");
+  trigger.className = "custom-select-trigger";
+  trigger.type = "button";
+  const menu = document.createElement("div");
+  menu.className = "custom-select-menu";
+  menu.hidden = true;
+
+  const syncTrigger = () => {
+    trigger.textContent = select.options[select.selectedIndex]?.textContent || "";
+  };
+
+  const closeMenu = () => {
+    menu.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+  };
+
+  const renderOptions = () => {
+    clear(menu);
+    Array.from(select.options).forEach((option) => {
+      const item = document.createElement("button");
+      item.className = "custom-select-option";
+      item.type = "button";
+      item.textContent = option.textContent;
+      item.dataset.value = option.value;
+      item.setAttribute("aria-selected", String(option.selected));
+      item.addEventListener("click", () => {
+        select.value = option.value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        syncTrigger();
+        closeMenu();
+      });
+      menu.append(item);
+    });
+  };
+
+  trigger.setAttribute("aria-haspopup", "listbox");
+  trigger.setAttribute("aria-expanded", "false");
+  trigger.addEventListener("click", () => {
+    const willOpen = menu.hidden;
+    document.querySelectorAll(".custom-select-menu").forEach((openMenu) => {
+      if (openMenu !== menu) openMenu.hidden = true;
+    });
+    renderOptions();
+    menu.hidden = !willOpen;
+    trigger.setAttribute("aria-expanded", String(willOpen));
+  });
+
+  select.addEventListener("change", () => {
+    syncTrigger();
+    renderOptions();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!custom.contains(event.target)) closeMenu();
+  });
+
+  syncTrigger();
+  renderOptions();
+  custom.append(trigger, menu);
+  select.insertAdjacentElement("afterend", custom);
+}
+
+function enhanceReaderSelects() {
+  track.querySelectorAll(".reader-panel select").forEach(enhanceSelect);
+}
+
+function resetEnhancedSelects(scope) {
+  scope.querySelectorAll("select.native-select-hidden").forEach((select) => {
+    if (select.nextElementSibling?.classList.contains("custom-select")) {
+      select.nextElementSibling.remove();
+    }
+    select.classList.remove("native-select-hidden");
+    delete select.dataset.customized;
+  });
 }
 
 function activeAccount() {
@@ -394,19 +487,49 @@ async function pushMutation(mutation) {
 }
 
 function savedMutationForReader(reader) {
+  return savedMutationForSection({
+    sectionID: reader.sectionID,
+    sectionNumber: reader.sectionNumber,
+    title: reader.title
+  });
+}
+
+function savedMutationForSection(section) {
   const account = activeAccount();
   const now = new Date().toISOString();
   return {
     savedItem: {
-      id: `web-saved-${reader.sectionID}`,
+      id: `web-saved-${section.sectionID}`,
       userID: account.userID,
       codeVersion: "nyc-2022",
-      sectionID: Number(reader.sectionID),
-      sectionNumber: reader.sectionNumber,
-      title: reader.title,
+      sectionID: Number(section.sectionID),
+      sectionNumber: section.sectionNumber,
+      title: section.title,
       updatedAt: now
     }
   };
+}
+
+function deletedSavedMutationForSection(section) {
+  const account = activeAccount();
+  const now = new Date().toISOString();
+  return {
+    savedItem: {
+      id: `web-saved-${section.sectionID}`,
+      userID: account.userID,
+      codeVersion: "nyc-2022",
+      sectionID: Number(section.sectionID),
+      sectionNumber: section.sectionNumber,
+      title: section.title,
+      updatedAt: now,
+      deletedAt: now
+    }
+  };
+}
+
+function isSectionSaved(sectionID) {
+  const savedItems = syncedContent?.summary?.savedItems || [];
+  return savedItems.some((item) => String(item.sectionID) === String(sectionID));
 }
 
 async function populateReaderSelectors(panel, reader) {
@@ -425,7 +548,8 @@ async function populateReaderSelectors(panel, reader) {
   readerChapters.forEach((chapter) => {
     const option = document.createElement("option");
     option.value = chapter.id;
-    option.textContent = chapter.displayTitle || `Chapter ${chapter.chapterNumber}`;
+    option.textContent = chapter.fullTitle || chapter.displayTitle || `Chapter ${chapter.chapterNumber}`;
+    option.title = option.textContent;
     chapterSelect.append(option);
   });
   chapterSelect.value = reader.chapterID || "";
@@ -454,18 +578,31 @@ async function populateReaderSelectors(panel, reader) {
 
 async function renderSectionContent(panel, reader) {
   const content = panel.querySelector(".reader-content");
+  const commentsList = panel.querySelector(".comments-list");
   if (!reader.chapterID) {
     blankReader(content);
+    renderSectionComments(commentsList, []);
     return;
   }
 
   clear(content);
   const { chapter } = await api(`/code/chapters/${reader.chapterID}?include=body`);
+  const sections = chapter.sections || [];
+  const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
 
-  (chapter.sections || []).forEach((section) => {
+  sections.forEach((section) => {
     const sectionWrapper = document.createElement("section");
     sectionWrapper.className = "chapter-section";
     sectionWrapper.dataset.sectionId = String(section.id);
+
+    const groupLabel = groupLabelsByFirstSection.get(String(section.id));
+    if (groupLabel) {
+      sectionWrapper.classList.add("starts-group");
+      const groupHeading = document.createElement("div");
+      groupHeading.className = "authored-section-label";
+      groupHeading.textContent = groupLabel;
+      sectionWrapper.append(groupHeading);
+    }
 
     const sectionHeading = document.createElement("h3");
     sectionHeading.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
@@ -473,15 +610,318 @@ async function renderSectionContent(panel, reader) {
 
     const blocks = section.blocks?.length ? section.blocks : [{ plainText: section.title || "" }];
     blocks.forEach((block) => sectionWrapper.append(renderCodeBlock(block)));
+    sectionWrapper.append(renderInlineCommentBox(section, reader));
 
     content.append(sectionWrapper);
   });
+  renderSectionComments(commentsList, []);
 
   if (reader.sectionID) {
     requestAnimationFrame(() => {
       content.querySelector(`[data-section-id="${CSS.escape(String(reader.sectionID))}"]`)?.scrollIntoView({ block: "start" });
     });
   }
+}
+
+function renderInlineCommentBox(section, reader) {
+  const wrapper = document.createElement("section");
+  wrapper.className = "inline-comment";
+  wrapper.dataset.commentSectionId = String(section.id);
+
+  const button = document.createElement("button");
+  button.className = "inline-comment-toggle";
+  button.type = "button";
+  button.innerHTML = `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+    </svg>
+    <span class="sr-only">Comments</span>
+  `;
+  button.setAttribute("aria-label", "Comments");
+  button.setAttribute("aria-expanded", "false");
+
+  const bookmarkButton = document.createElement("button");
+  bookmarkButton.className = "inline-bookmark-toggle";
+  bookmarkButton.type = "button";
+  bookmarkButton.innerHTML = `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+    </svg>
+    <span class="sr-only">Save subsection</span>
+  `;
+  bookmarkButton.setAttribute("aria-label", "Save subsection");
+  if (isSectionSaved(section.id)) {
+    bookmarkButton.classList.add("is-saved");
+    bookmarkButton.setAttribute("aria-pressed", "true");
+    bookmarkButton.title = "Saved";
+  } else {
+    bookmarkButton.setAttribute("aria-pressed", "false");
+  }
+
+  const editor = document.createElement("textarea");
+  editor.className = "inline-comment-input";
+  editor.setAttribute("aria-label", `Comment for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
+  editor.rows = 4;
+  editor.hidden = true;
+
+  const resizer = document.createElement("div");
+  resizer.className = "inline-comment-resizer";
+  resizer.setAttribute("role", "separator");
+  resizer.setAttribute("aria-orientation", "vertical");
+  resizer.setAttribute("aria-label", "Resize comment");
+
+  button.addEventListener("click", () => {
+    const willOpen = editor.hidden;
+    if (willOpen) {
+      editor.hidden = false;
+      requestAnimationFrame(() => {
+        sectionElementForInlineComment(wrapper)?.classList.add("has-inline-comment");
+        requestAnimationFrame(() => {
+          wrapper.classList.add("is-open");
+        });
+      });
+    } else {
+      wrapper.classList.remove("is-open");
+      sectionElementForInlineComment(wrapper)?.classList.remove("has-inline-comment");
+      window.setTimeout(() => {
+        if (!wrapper.classList.contains("is-open")) editor.hidden = true;
+      }, 680);
+    }
+    button.setAttribute("aria-expanded", String(willOpen));
+    if (willOpen) editor.focus();
+  });
+
+  bookmarkButton.addEventListener("click", async () => {
+    bookmarkButton.disabled = true;
+    bookmarkButton.classList.remove("has-error");
+    const shouldRemove = bookmarkButton.classList.contains("is-saved");
+    try {
+      const sectionPayload = {
+        sectionID: section.id,
+        sectionNumber: section.sectionNumber,
+        title: section.title
+      };
+      await pushMutation(shouldRemove ? deletedSavedMutationForSection(sectionPayload) : savedMutationForSection(sectionPayload));
+      bookmarkButton.classList.toggle("is-saved", !shouldRemove);
+      bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
+      bookmarkButton.title = shouldRemove ? "Save subsection" : "Saved";
+      if (state.utilities.saved) {
+        await renderWorkspace();
+      }
+    } catch (error) {
+      bookmarkButton.classList.add("has-error");
+      bookmarkButton.title = error.message;
+    } finally {
+      bookmarkButton.disabled = false;
+    }
+  });
+
+  bindInlineCommentResize(resizer, wrapper);
+  wrapper.append(button, bookmarkButton, resizer, editor);
+  return wrapper;
+}
+
+function sectionElementForInlineComment(commentWrapper) {
+  return commentWrapper.closest(".chapter-section");
+}
+
+function bindInlineCommentResize(resizer, wrapper) {
+  resizer.addEventListener("pointerdown", (event) => {
+    const section = sectionElementForInlineComment(wrapper);
+    if (!section?.classList.contains("has-inline-comment")) return;
+    event.preventDefault();
+    resizer.classList.add("is-dragging");
+    document.body.classList.add("is-resizing-comments");
+
+    const resize = (moveEvent) => {
+      const bounds = section.getBoundingClientRect();
+      if (!bounds.width) return;
+      const width = ((bounds.right - moveEvent.clientX) / bounds.width) * 100;
+      const clampedWidth = Math.min(60, Math.max(24, width));
+      section.style.setProperty("--inline-comment-width", `${clampedWidth}%`);
+    };
+
+    const stopResize = () => {
+      resizer.classList.remove("is-dragging");
+      document.body.classList.remove("is-resizing-comments");
+      window.removeEventListener("pointermove", resize);
+      window.removeEventListener("pointerup", stopResize);
+      window.removeEventListener("pointercancel", stopResize);
+    };
+
+    resize(event);
+    window.addEventListener("pointermove", resize);
+    window.addEventListener("pointerup", stopResize);
+    window.addEventListener("pointercancel", stopResize);
+  });
+}
+
+function syncCommentBoxHeights(content, commentsList) {
+  if (!content || !commentsList) return;
+  const sections = Array.from(content.querySelectorAll(".chapter-section"));
+  const boxes = Array.from(commentsList.querySelectorAll(".section-comment-box"));
+  sections.forEach((section, index) => {
+    const box = boxes[index];
+    if (!box) return;
+    box.style.minHeight = `${Math.ceil(section.getBoundingClientRect().height)}px`;
+  });
+}
+
+function syncAllCommentBoxHeights() {
+  requestAnimationFrame(() => {
+    track.querySelectorAll(".reader-panel").forEach((panel) => {
+      syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
+    });
+  });
+}
+
+function normalizeCommentsWidth(width) {
+  const numeric = Number(width);
+  if (!Number.isFinite(numeric)) return 34;
+  return Math.min(58, Math.max(22, numeric));
+}
+
+function applyCommentsWidth(panel, reader) {
+  const readerBody = panel.querySelector(".reader-body");
+  if (!readerBody) return;
+  reader.commentsWidth = normalizeCommentsWidth(reader.commentsWidth);
+  readerBody.style.setProperty("--comments-width", `${reader.commentsWidth}%`);
+}
+
+function setReaderCommentsOpen(panel, reader, open) {
+  const readerBody = panel.querySelector(".reader-body");
+  const commentsPanel = panel.querySelector(".reader-comments");
+  const commentsButton = panel.querySelector(".reader-comments-toggle");
+  if (!readerBody || !commentsPanel || !commentsButton) return;
+
+  reader.commentsOpen = Boolean(open);
+  commentsButton.setAttribute("aria-pressed", String(reader.commentsOpen));
+  commentsButton.title = reader.commentsOpen ? "Hide comments" : "Show comments";
+
+  if (reader.commentsOpen) {
+    commentsPanel.hidden = false;
+    requestAnimationFrame(() => {
+      readerBody.classList.add("comments-open");
+      syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
+    });
+    return;
+  }
+
+  readerBody.classList.remove("comments-open");
+  const hideComments = (event) => {
+    if (event && event.target !== readerBody) return;
+    if (!reader.commentsOpen) commentsPanel.hidden = true;
+    readerBody.removeEventListener("transitionend", hideComments);
+  };
+  readerBody.addEventListener("transitionend", hideComments);
+  window.setTimeout(hideComments, 500);
+}
+
+async function refreshReaderContent(panel, reader) {
+  const saveButton = panel.querySelector(".reader-save");
+  const commentsPanel = panel.querySelector(".reader-comments");
+  resetEnhancedSelects(panel);
+  await populateReaderSelectors(panel, reader);
+  await renderSectionContent(panel, reader);
+  applyCommentsWidth(panel, reader);
+  reader.commentsOpen = false;
+  panel.querySelector(".reader-body")?.classList.remove("comments-open");
+  panel.querySelector(".reader-comments-toggle")?.setAttribute("hidden", "");
+  panel.querySelectorAll("select").forEach(enhanceSelect);
+  if (saveButton) {
+    saveButton.hidden = !reader.sectionID;
+    saveButton.disabled = !reader.sectionID;
+  }
+  if (commentsPanel) commentsPanel.hidden = true;
+}
+
+function bindCommentDividerDrag(panel, reader) {
+  const readerBody = panel.querySelector(".reader-body");
+  const resizer = panel.querySelector(".reader-comments-resizer");
+  if (!readerBody || !resizer || panel.dataset.commentResizeBound === "true") return;
+  panel.dataset.commentResizeBound = "true";
+
+  function resize(event) {
+    const bounds = readerBody.getBoundingClientRect();
+    if (!bounds.width) return;
+    const width = ((bounds.right - event.clientX) / bounds.width) * 100;
+    reader.commentsWidth = normalizeCommentsWidth(width);
+    readerBody.style.setProperty("--comments-width", `${reader.commentsWidth}%`);
+    syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
+  }
+
+  const endDrag = () => {
+    resizer.classList.remove("is-dragging");
+    document.body.classList.remove("is-resizing-comments");
+    saveWorkspaceState();
+    window.removeEventListener("pointermove", resize);
+    window.removeEventListener("pointerup", endDrag);
+    window.removeEventListener("pointercancel", endDrag);
+  };
+
+  resizer.addEventListener("pointerdown", (event) => {
+    if (!reader.commentsOpen) return;
+    event.preventDefault();
+    resizer.classList.add("is-dragging");
+    document.body.classList.add("is-resizing-comments");
+    resize(event);
+    window.addEventListener("pointermove", resize);
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
+  });
+}
+
+function bindReaderCommentScroll(panel) {
+  const content = panel.querySelector(".reader-content");
+  const comments = panel.querySelector(".reader-comments");
+  if (!content || !comments || panel.dataset.commentScrollBound === "true") return;
+  panel.dataset.commentScrollBound = "true";
+  let syncing = false;
+
+  const syncScroll = (source, target) => {
+    if (syncing) return;
+    syncing = true;
+    target.scrollTop = source.scrollTop;
+    requestAnimationFrame(() => {
+      syncing = false;
+    });
+  };
+
+  content.addEventListener("scroll", () => syncScroll(content, comments), { passive: true });
+  comments.addEventListener("scroll", () => syncScroll(comments, content), { passive: true });
+}
+
+function bindAllReaderCommentScroll() {
+  track.querySelectorAll(".reader-panel").forEach(bindReaderCommentScroll);
+}
+
+function renderSectionComments(commentsList, sections) {
+  if (!commentsList) return;
+  clear(commentsList);
+  if (!sections.length) {
+    const empty = document.createElement("p");
+    empty.className = "comments-empty";
+    empty.textContent = "";
+    commentsList.append(empty);
+    return;
+  }
+
+  sections.forEach((section) => {
+    const item = document.createElement("article");
+    item.className = "section-comment-box";
+    item.dataset.sectionId = String(section.id);
+
+    const inputLabel = document.createElement("label");
+    inputLabel.className = "comment-composer";
+    const textarea = document.createElement("textarea");
+    textarea.className = "comment-input";
+    textarea.rows = 4;
+    textarea.setAttribute("aria-label", `Comment for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
+
+    inputLabel.append(textarea);
+    item.append(inputLabel);
+    commentsList.append(item);
+  });
 }
 
 function rewriteCodeHTML(html) {
@@ -529,12 +969,14 @@ function renderCodeBlock(block) {
   const paragraph = document.createElement("p");
   paragraph.className = "section-block";
   paragraph.textContent = block.plainText || "";
+  promoteAuthoredSectionLabels(paragraph);
   return paragraph;
 }
 
 function decorateCodeHTML(root) {
   root.querySelectorAll("script, style, annotationdrawer, codeoptions").forEach((node) => node.remove());
   normalizeCodeTables(root);
+  promoteAuthoredSectionLabels(root);
   root.querySelectorAll("img").forEach((image) => {
     image.loading = "lazy";
     image.decoding = "async";
@@ -544,6 +986,51 @@ function decorateCodeHTML(root) {
     if (breakElement.textContent) {
       breakElement.textContent = "";
     }
+  });
+}
+
+function groupLabelsForChapter(chapter) {
+  const labels = new Map();
+  (chapter.groups || []).forEach((group) => {
+    const firstSection = (group.sections || [])[0];
+    if (!firstSection?.id || !group.headerLine) return;
+    const label = [group.headerLine, group.headingLine].filter(Boolean).join(": ");
+    labels.set(String(firstSection.id), label.toUpperCase());
+  });
+  return labels;
+}
+
+function promoteAuthoredSectionLabels(root) {
+  const labelPattern = /(^|\n)\s*((?:section)\s+(?:BC|AC|PC|MC|FGC)\s+\d+[A-Z]?(?::\s*[^\n]+)?)/gi;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  let currentNode = walker.nextNode();
+  while (currentNode) {
+    if (labelPattern.test(currentNode.nodeValue || "")) {
+      textNodes.push(currentNode);
+    }
+    labelPattern.lastIndex = 0;
+    currentNode = walker.nextNode();
+  }
+
+  textNodes.forEach((textNode) => {
+    const text = textNode.nodeValue || "";
+    const fragment = document.createDocumentFragment();
+    let lastIndex = 0;
+    text.replace(labelPattern, (match, lineBreak, label, offset) => {
+      if (offset > lastIndex) {
+        fragment.append(document.createTextNode(text.slice(lastIndex, offset)));
+      }
+      if (lineBreak) {
+        fragment.append(document.createTextNode(lineBreak));
+      }
+      lastIndex = offset + match.length;
+      return match;
+    });
+    if (lastIndex < text.length) {
+      fragment.append(document.createTextNode(text.slice(lastIndex)));
+    }
+    textNode.replaceWith(fragment);
   });
 }
 
@@ -636,6 +1123,9 @@ async function renderReader(reader, options = {}) {
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const saveButton = panel.querySelector(".reader-save");
+  const commentsButton = panel.querySelector(".reader-comments-toggle");
+  const readerBody = panel.querySelector(".reader-body");
+  const commentsPanel = panel.querySelector(".reader-comments");
   const codeSelect = panel.querySelector(".code-select");
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
@@ -646,6 +1136,11 @@ async function renderReader(reader, options = {}) {
   applyPaneWeight(panel, paneIDForReader(reader, options));
   selector.hidden = false;
   setTitle(panel, reader);
+  reader.commentsOpen = false;
+  applyCommentsWidth(panel, reader);
+  readerBody.classList.remove("comments-open");
+  commentsPanel.hidden = true;
+  commentsButton.hidden = true;
 
   if (options.isSearchResult) {
     closeButton.hidden = false;
@@ -656,16 +1151,17 @@ async function renderReader(reader, options = {}) {
   populateCodeSelect(panel, reader);
   codeSelect.addEventListener("change", async () => {
     reader.codePrefix = codeSelect.value || "BC";
-    reader.chapterID = "";
+    reader.chapterID = state.recentChaptersByCode?.[reader.codePrefix] || "";
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
     saveWorkspaceState();
-    await renderWorkspace();
+    await refreshReaderContent(panel, reader);
   });
 
   saveButton.hidden = !reader.sectionID;
   saveButton.disabled = !reader.sectionID;
+
   saveButton.addEventListener("click", async () => {
     if (!reader.sectionID) return;
     saveButton.disabled = true;
@@ -703,11 +1199,15 @@ async function renderReader(reader, options = {}) {
 
   chapterSelect.addEventListener("change", async () => {
     reader.chapterID = chapterSelect.value;
+    state.recentChaptersByCode = state.recentChaptersByCode || {};
+    if (reader.chapterID) {
+      state.recentChaptersByCode[reader.codePrefix || "BC"] = reader.chapterID;
+    }
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
     saveWorkspaceState();
-    await renderWorkspace();
+    await refreshReaderContent(panel, reader);
   });
 
   sectionSelect.addEventListener("change", async () => {
@@ -1117,37 +1617,54 @@ async function renderWorkspace() {
     panes.push(await renderReader(reader));
   }
   appendPaneSequence(panes);
+  syncAllCommentBoxHeights();
+  bindAllReaderCommentScroll();
+  enhanceReaderSelects();
   saveWorkspaceState();
+}
+
+async function transitionWorkspace(mode = "default") {
+  await renderWorkspace();
 }
 
 async function start() {
   const payload = await api("/code/chapters");
   chapters = payload.chapters || [];
   addReaderButton.addEventListener("click", () => {
-    const reader = newReaderState();
+    const reader = newReaderState({ chapterID: state.recentChaptersByCode?.BC || "" });
     state.readers.push(reader);
     saveWorkspaceState();
-    renderWorkspace();
+    transitionWorkspace();
+  });
+  collapseReadersButton?.addEventListener("click", () => {
+    if (state.readers.length <= 1) return;
+    state.readers = [state.readers[0] || newReaderState({ chapterID: state.recentChaptersByCode?.BC || "" })];
+    saveWorkspaceState();
+    transitionWorkspace();
   });
   toggleSearchButton.addEventListener("click", () => {
-    state.utilities.search = !state.utilities.search;
+    const willOpen = !state.utilities.search;
+    state.utilities.search = willOpen;
     saveWorkspaceState();
-    renderWorkspace();
+    transitionWorkspace(willOpen ? "open" : "close");
   });
   toggleSavedButton.addEventListener("click", () => {
-    state.utilities.saved = !state.utilities.saved;
+    const willOpen = !state.utilities.saved;
+    state.utilities.saved = willOpen;
     saveWorkspaceState();
-    renderWorkspace();
+    transitionWorkspace(willOpen ? "open" : "close");
   });
   toggleAnalysisButton.addEventListener("click", () => {
-    state.utilities.analysis = !state.utilities.analysis;
+    const willOpen = !state.utilities.analysis;
+    state.utilities.analysis = willOpen;
     saveWorkspaceState();
-    renderWorkspace();
+    transitionWorkspace(willOpen ? "open" : "close");
   });
   toggleSettingsButton.addEventListener("click", () => {
-    state.utilities.settings = !state.utilities.settings;
+    const willOpen = !state.utilities.settings;
+    state.utilities.settings = willOpen;
     saveWorkspaceState();
-    renderWorkspace();
+    transitionWorkspace(willOpen ? "open" : "close");
   });
   await renderWorkspace();
 }
