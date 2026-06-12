@@ -18,6 +18,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Adding a reader should split the workspace proportionally.
 - Each reader should remain independently scrollable.
 - Search, saved, analysis, and settings should open as workspace tools, not permanent default reader panes.
+- Web layout changes must avoid full-screen blink/flicker: do not clear the whole workspace before rebuilding it; preserve existing panes or swap the next pane sequence in one operation.
 
 ## Top Menu
 
@@ -43,6 +44,8 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 ## Search
 
 - Search should behave like the iOS app.
+- When a behavior already exists in the iOS app, use it as the default reference for web Search/Saved/Projects behavior unless there is a clear desktop-specific reason not to.
+- Code-section filters should support every available code section, not only Building Code, and should be generated from the available code data where practical.
 - Search results should open or update a reader context.
 - Search text should be highlighted in results when practical.
 - Search should not replace the user's existing reader layout unless explicitly opened as a tool.
@@ -69,6 +72,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Keep contrast clear in light and dark themes.
 - Main panes should feel like workspace columns, not floating cards.
 - Internal controls can stay lightly rounded only when it helps usability.
+- Match the iOS radius set for shared surfaces: cards use a 14 px radius and compact tiles use a 10 px radius unless a desktop-specific control needs a different value.
 - Use spacing consistently; prefer tight, deliberate spacing over large mobile-style gaps.
 
 ## Mobile
@@ -86,3 +90,4 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Chapter text appears after choosing a chapter.
 - Section selection jumps within chapter text instead of controlling whether text exists.
 - Search, saved, analysis, and settings are accessible without disrupting existing readers.
+- Opening, closing, adding, removing, reordering, or resizing panes should not flash the workspace empty.

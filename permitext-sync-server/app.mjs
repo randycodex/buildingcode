@@ -1054,19 +1054,28 @@ async function handleCodeSection(path, response) {
 }
 
 async function handleCodeSearch(request, response) {
-  const query = requestURL(request).searchParams.get("q")?.trim() || "";
+  const url = requestURL(request);
+  const query = url.searchParams.get("q")?.trim() || "";
+  const codeFilter = new Set(
+    (url.searchParams.get("code") || url.searchParams.get("codes") || "")
+      .split(",")
+      .map((value) => value.trim().toUpperCase())
+      .filter(Boolean)
+  );
   if (query.length < 2) {
     sendJSON(response, 200, { query, results: [] });
     return;
   }
   const normalizedQuery = query.toLowerCase();
   const results = (await searchIndex())
-    .filter((section) =>
-      section.title?.toLowerCase().includes(normalizedQuery) ||
-      section.sectionNumber?.toLowerCase().includes(normalizedQuery) ||
-      section.plainText.toLowerCase().includes(normalizedQuery)
-    )
-    .slice(0, 80)
+    .filter((section) => {
+      const matchesCode = codeFilter.size === 0 || codeFilter.has(section.codePrefix);
+      const matchesQuery =
+        section.title?.toLowerCase().includes(normalizedQuery) ||
+        section.sectionNumber?.toLowerCase().includes(normalizedQuery) ||
+        section.plainText.toLowerCase().includes(normalizedQuery);
+      return matchesCode && matchesQuery;
+    })
     .map((section) => ({
       id: section.id,
       chapterID: section.chapterID,

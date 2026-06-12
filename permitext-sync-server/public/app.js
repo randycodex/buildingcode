@@ -1,12 +1,13 @@
 const workspaceKey = "permitext:webWorkspace:v1";
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
-const collapseReadersButton = document.querySelector("#collapse-readers");
+const toggleProjectsButton = document.querySelector("#toggle-projects");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleAnalysisButton = document.querySelector("#toggle-analysis");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const readerTemplate = document.querySelector("#reader-template");
+const projectsTemplate = document.querySelector("#projects-template");
 const searchTemplate = document.querySelector("#search-template");
 const savedTemplate = document.querySelector("#saved-template");
 const analysisTemplate = document.querySelector("#analysis-template");
@@ -23,8 +24,8 @@ const codeOptions = [
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
 
 const defaultReaderSettings = {
-  fontSize: 12,
-  lineSpacing: 1,
+  fontSize: 10,
+  lineSpacing: 0,
   fontFamily: "helvetica"
 };
 
@@ -33,6 +34,11 @@ let state = loadWorkspaceState();
 let searchTimer = null;
 let syncedContent = null;
 let syncLoadPromise = null;
+let draggedPaneID = "";
+let dragPreviewOrder = [];
+let activeCustomSelect = null;
+const chapterListCache = new Map();
+const chapterCache = new Map();
 
 applyReaderSettings();
 
@@ -42,8 +48,11 @@ function loadWorkspaceState() {
     return {
       readers: Array.isArray(saved.readers) && saved.readers.length > 0 ? saved.readers : [newReaderState()],
       searchQuery: saved.searchQuery || "",
+      searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
+      localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
       searchResultReader: saved.searchResultReader || null,
       utilities: {
+        projects: Boolean(saved.utilities?.projects),
         search: Boolean(saved.utilities?.search),
         saved: Boolean(saved.utilities?.saved),
         analysis: Boolean(saved.utilities?.analysis),
@@ -51,6 +60,7 @@ function loadWorkspaceState() {
       },
       account: saved.account && typeof saved.account === "object" ? saved.account : null,
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
+      paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       readerSettings: normalizeReaderSettings(saved.readerSettings)
     };
@@ -58,10 +68,13 @@ function loadWorkspaceState() {
     return {
       readers: [newReaderState()],
       searchQuery: "",
+      searchCodeFilters: [],
+      localProjects: [],
       searchResultReader: null,
-      utilities: { search: false, saved: false, analysis: false, settings: false },
+      utilities: { projects: false, search: false, saved: false, analysis: false, settings: false },
       account: null,
       paneWeights: {},
+      paneOrder: [],
       recentChaptersByCode: {},
       readerSettings: { ...defaultReaderSettings }
     };
@@ -84,6 +97,14 @@ function normalizeReaderSettings(settings = {}) {
     lineSpacing: clampNumber(settings.lineSpacing, 0, 4, defaultReaderSettings.lineSpacing),
     fontFamily: "helvetica"
   };
+}
+
+function normalizeSearchCodeFilters(value) {
+  if (Array.isArray(value)) {
+    return Array.from(new Set(value.map((item) => String(item).trim().toUpperCase()).filter(Boolean)));
+  }
+  const prefix = typeof value === "string" ? value.trim().toUpperCase() : "";
+  return prefix && prefix !== "ALL" ? [prefix] : [];
 }
 
 function readerLineHeightValue(lineSpacing) {
@@ -112,6 +133,8 @@ function newReaderState(overrides = {}) {
     title: "Reader",
     commentsOpen: false,
     commentsWidth: 34,
+    internalSearchQuery: "",
+    shouldSmoothScrollToSection: false,
     ...overrides
   };
 }
@@ -120,8 +143,9 @@ function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
 
-function activePaneIDs() {
+function defaultActivePaneIDs() {
   const ids = [];
+  if (state.utilities.projects) ids.push("utility:projects");
   if (state.utilities.search) ids.push("utility:search");
   if (state.utilities.saved) ids.push("utility:saved");
   if (state.utilities.analysis) ids.push("utility:analysis");
@@ -129,6 +153,32 @@ function activePaneIDs() {
   if (state.searchResultReader) ids.push("reader:search-result");
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
   return ids;
+}
+
+function activePaneIDs() {
+  const ids = defaultActivePaneIDs();
+  const active = new Set(ids);
+  const ordered = (state.paneOrder || []).filter((id) => active.has(id));
+  ids.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  state.paneOrder = ordered;
+  return ordered;
+}
+
+function orderPanes(panes) {
+  const orderedIDs = activePaneIDs();
+  const indexFor = (pane) => {
+    const index = orderedIDs.indexOf(pane.dataset.paneId);
+    return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+  };
+  return panes.slice().sort((a, b) => indexFor(a) - indexFor(b));
+}
+
+function movePaneToFront(paneID) {
+  if (!paneID) return;
+  const active = new Set(defaultActivePaneIDs());
+  state.paneOrder = [paneID, ...(state.paneOrder || []).filter((id) => id !== paneID && active.has(id))];
 }
 
 function normalizePaneWeights(ids) {
@@ -150,14 +200,34 @@ function applyPaneWeight(panel, paneID) {
 }
 
 function setUtilityButtonStates() {
+  toggleProjectsButton.setAttribute("aria-pressed", String(state.utilities.projects));
   toggleSearchButton.setAttribute("aria-pressed", String(state.utilities.search));
   toggleSavedButton.setAttribute("aria-pressed", String(state.utilities.saved));
   toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
-  if (collapseReadersButton) {
-    collapseReadersButton.disabled = state.readers.length <= 1;
-    collapseReadersButton.setAttribute("aria-disabled", String(state.readers.length <= 1));
-  }
+}
+
+function codeOptionFor(prefix = "BC") {
+  return codeOptions.find((option) => option.prefix === prefix) || codeOptions[0];
+}
+
+function codeDisplayLabel(prefix = "BC") {
+  return codeOptionFor(prefix).label;
+}
+
+function searchCodeFilterOptions() {
+  const dynamicPrefixes = new Set(chapters.map((chapter) => chapter.codePrefix).filter(Boolean));
+  const options = [{ prefix: "ALL", label: "All Sections" }];
+  codeOptions.forEach((option) => {
+    if (dynamicPrefixes.size === 0 || dynamicPrefixes.has(option.prefix)) {
+      options.push(option);
+      dynamicPrefixes.delete(option.prefix);
+    }
+  });
+  dynamicPrefixes.forEach((prefix) => {
+    options.push({ prefix, label: prefix });
+  });
+  return options;
 }
 
 async function api(path) {
@@ -166,6 +236,30 @@ async function api(path) {
     throw new Error(`Request failed: ${response.status}`);
   }
   return response.json();
+}
+
+async function fetchChapterList(codePrefix = "BC") {
+  const cacheKey = codePrefix || "BC";
+  if (!chapterListCache.has(cacheKey)) {
+    chapterListCache.set(
+      cacheKey,
+      api(`/code/chapters?code=${encodeURIComponent(cacheKey)}`).then((payload) => payload.chapters || [])
+    );
+  }
+  return chapterListCache.get(cacheKey);
+}
+
+async function fetchChapter(chapterID, options = {}) {
+  const cacheKey = `${chapterID}:${options.includeBody ? "body" : "summary"}`;
+  const bodyCacheKey = `${chapterID}:body`;
+  if (!options.includeBody && chapterCache.has(bodyCacheKey)) {
+    return chapterCache.get(bodyCacheKey);
+  }
+  if (!chapterCache.has(cacheKey)) {
+    const suffix = options.includeBody ? "?include=body" : "";
+    chapterCache.set(cacheKey, api(`/code/chapters/${chapterID}${suffix}`).then((payload) => payload.chapter));
+  }
+  return chapterCache.get(cacheKey);
 }
 
 async function postJSON(path, body, options = {}) {
@@ -320,6 +414,17 @@ function populateCodeSelect(panel, reader) {
   resizeCodeSelect(codeSelect);
 }
 
+function closeActiveCustomSelect() {
+  if (!activeCustomSelect) return;
+  activeCustomSelect.menu.hidden = true;
+  activeCustomSelect.trigger.setAttribute("aria-expanded", "false");
+  activeCustomSelect = null;
+}
+
+function repositionActiveCustomSelect() {
+  activeCustomSelect?.positionMenu();
+}
+
 function enhanceSelect(select) {
   if (!select || select.dataset.customized === "true") return;
   select.dataset.customized = "true";
@@ -332,7 +437,9 @@ function enhanceSelect(select) {
   trigger.type = "button";
   const menu = document.createElement("div");
   menu.className = "custom-select-menu";
+  menu.dataset.floatingSelect = "true";
   menu.hidden = true;
+  select._customSelectMenu = menu;
 
   const syncTrigger = () => {
     trigger.textContent = select.options[select.selectedIndex]?.textContent || "";
@@ -341,6 +448,7 @@ function enhanceSelect(select) {
   const closeMenu = () => {
     menu.hidden = true;
     trigger.setAttribute("aria-expanded", "false");
+    if (activeCustomSelect?.menu === menu) activeCustomSelect = null;
   };
 
   const renderOptions = () => {
@@ -362,16 +470,34 @@ function enhanceSelect(select) {
     });
   };
 
+  const positionMenu = () => {
+    const rect = trigger.getBoundingClientRect();
+    const viewportPadding = 8;
+    const optionWidths = Array.from(menu.children).map((item) => item.scrollWidth);
+    const naturalWidth = Math.max(rect.width, ...optionWidths);
+    const menuWidth = Math.min(naturalWidth, window.innerWidth - viewportPadding * 2);
+    const left = Math.max(viewportPadding, Math.min(rect.left, window.innerWidth - menuWidth - viewportPadding));
+    const availableBelow = Math.max(160, window.innerHeight - rect.bottom - viewportPadding);
+    menu.style.setProperty("--select-menu-top", `${rect.bottom + 2}px`);
+    menu.style.setProperty("--select-menu-left", `${left}px`);
+    menu.style.setProperty("--select-menu-width", `${menuWidth}px`);
+    menu.style.setProperty("--select-menu-max-height", `${availableBelow}px`);
+  };
+
   trigger.setAttribute("aria-haspopup", "listbox");
   trigger.setAttribute("aria-expanded", "false");
-  trigger.addEventListener("click", () => {
+  trigger.addEventListener("click", (event) => {
+    event.stopPropagation();
     const willOpen = menu.hidden;
-    document.querySelectorAll(".custom-select-menu").forEach((openMenu) => {
-      if (openMenu !== menu) openMenu.hidden = true;
-    });
+    closeActiveCustomSelect();
     renderOptions();
+    if (willOpen) {
+      activeCustomSelect = { custom, menu, trigger, positionMenu };
+    }
     menu.hidden = !willOpen;
+    if (willOpen) positionMenu();
     trigger.setAttribute("aria-expanded", String(willOpen));
+    if (willOpen) requestAnimationFrame(positionMenu);
   });
 
   select.addEventListener("change", () => {
@@ -379,14 +505,11 @@ function enhanceSelect(select) {
     renderOptions();
   });
 
-  document.addEventListener("click", (event) => {
-    if (!custom.contains(event.target)) closeMenu();
-  });
-
   syncTrigger();
   renderOptions();
-  custom.append(trigger, menu);
+  custom.append(trigger);
   select.insertAdjacentElement("afterend", custom);
+  document.body.append(menu);
 }
 
 function enhanceReaderSelects() {
@@ -395,6 +518,8 @@ function enhanceReaderSelects() {
 
 function resetEnhancedSelects(scope) {
   scope.querySelectorAll("select.native-select-hidden").forEach((select) => {
+    select._customSelectMenu?.remove();
+    delete select._customSelectMenu;
     if (select.nextElementSibling?.classList.contains("custom-select")) {
       select.nextElementSibling.remove();
     }
@@ -527,6 +652,93 @@ function deletedSavedMutationForSection(section) {
   };
 }
 
+const projectColorOptions = ["#6674c8", "#5aaea4", "#f27a4f", "#a14fc0", "#879a6d", "#9b7d6f"];
+
+function projectMutationForRecord(project, accountOverride = null) {
+  const account = accountOverride || activeAccount();
+  const now = project.updatedAt || new Date().toISOString();
+  return {
+    project: {
+      id: project.id,
+      clientID: project.clientID || project.id,
+      localFolderID: project.localFolderID || project.id,
+      userID: account?.userID || "local-web",
+      codeVersion: project.codeVersion || "nyc-2022",
+      name: project.name || "Project",
+      title: project.title || project.name || "Project",
+      description: project.description || "Project folder.",
+      color: project.color || project.tintColor || projectColorOptions[0],
+      sortMode: project.sortMode || "Code order",
+      createdAt: project.createdAt || now,
+      updatedAt: now
+    }
+  };
+}
+
+function projectRecordsFromMutations(mutations = []) {
+  return summarizeMutations(mutations).projects;
+}
+
+function visibleProjectRecords(syncedProjects = []) {
+  const byID = new Map();
+  syncedProjects.forEach((project) => {
+    const id = project.id || project.clientID || project.localFolderID;
+    if (id) byID.set(id, project);
+  });
+  (state.localProjects || []).forEach((project) => {
+    const id = project.id || project.clientID || project.localFolderID;
+    if (id && !byID.has(id)) byID.set(id, project);
+  });
+  return Array.from(byID.values()).sort((left, right) =>
+    String(left.name || left.title || "").localeCompare(String(right.name || right.title || ""), undefined, {
+      numeric: true,
+      sensitivity: "base"
+    })
+  );
+}
+
+function nextProjectName() {
+  const existing = visibleProjectRecords(projectRecordsFromMutations(syncedContent?.mutations || []));
+  const usedNumbers = new Set();
+  existing.forEach((project) => {
+    const match = String(project.name || project.title || "").trim().match(/^P(\d+)$/i);
+    if (match) usedNumbers.add(Number(match[1]));
+  });
+  let index = 1;
+  while (usedNumbers.has(index)) index += 1;
+  return `P${index}`;
+}
+
+async function createProjectFolder(details = {}) {
+  const now = new Date().toISOString();
+  const id = `web-project-${Date.now().toString(36)}`;
+  const fallbackName = nextProjectName();
+  const name = String(details.name || "").trim() || fallbackName;
+  const description = String(details.description || "").trim();
+  const project = {
+    id,
+    clientID: id,
+    localFolderID: id,
+    codeVersion: "nyc-2022",
+    name,
+    title: name,
+    description: description || "Project folder.",
+    color: details.color || projectColorOptions[0],
+    sortMode: "Code order",
+    createdAt: now,
+    updatedAt: now
+  };
+  state.localProjects = [...(state.localProjects || []), project];
+  saveWorkspaceState();
+
+  const account = activeAccount();
+  if (!account) return;
+
+  await pushMutation(projectMutationForRecord(project, account));
+  state.localProjects = (state.localProjects || []).filter((item) => item.id !== project.id);
+  saveWorkspaceState();
+}
+
 function isSectionSaved(sectionID) {
   const savedItems = syncedContent?.summary?.savedItems || [];
   return savedItems.some((item) => String(item.sectionID) === String(sectionID));
@@ -543,8 +755,7 @@ async function populateReaderSelectors(panel, reader) {
   blankChapter.value = "";
   blankChapter.textContent = "Select a chapter";
   chapterSelect.append(blankChapter);
-  const chapterPayload = await api(`/code/chapters?code=${encodeURIComponent(reader.codePrefix)}`);
-  const readerChapters = chapterPayload.chapters || [];
+  const readerChapters = await fetchChapterList(reader.codePrefix);
   readerChapters.forEach((chapter) => {
     const option = document.createElement("option");
     option.value = chapter.id;
@@ -562,7 +773,7 @@ async function populateReaderSelectors(panel, reader) {
     return;
   }
 
-  const { chapter } = await api(`/code/chapters/${reader.chapterID}`);
+  const chapter = await fetchChapter(reader.chapterID);
   const blankSection = document.createElement("option");
   blankSection.value = "";
   blankSection.textContent = "Select a section";
@@ -579,6 +790,7 @@ async function populateReaderSelectors(panel, reader) {
 async function renderSectionContent(panel, reader) {
   const content = panel.querySelector(".reader-content");
   const commentsList = panel.querySelector(".comments-list");
+  content?.classList.remove("is-searching-reader");
   if (!reader.chapterID) {
     blankReader(content);
     renderSectionComments(commentsList, []);
@@ -586,7 +798,7 @@ async function renderSectionContent(panel, reader) {
   }
 
   clear(content);
-  const { chapter } = await api(`/code/chapters/${reader.chapterID}?include=body`);
+  const chapter = await fetchChapter(reader.chapterID, { includeBody: true });
   const sections = chapter.sections || [];
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
 
@@ -618,7 +830,9 @@ async function renderSectionContent(panel, reader) {
 
   if (reader.sectionID) {
     requestAnimationFrame(() => {
-      content.querySelector(`[data-section-id="${CSS.escape(String(reader.sectionID))}"]`)?.scrollIntoView({ block: "start" });
+      const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
+      content.querySelector(`[data-section-id="${CSS.escape(String(reader.sectionID))}"]`)?.scrollIntoView({ behavior, block: "start" });
+      reader.shouldSmoothScrollToSection = false;
     });
   }
 }
@@ -663,6 +877,9 @@ function renderInlineCommentBox(section, reader) {
   editor.setAttribute("aria-label", `Comment for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
   editor.rows = 4;
   editor.hidden = true;
+  editor.addEventListener("input", () => {
+    button.classList.toggle("has-comment", Boolean(editor.value.trim()));
+  });
 
   const resizer = document.createElement("div");
   resizer.className = "inline-comment-resizer";
@@ -695,6 +912,9 @@ function renderInlineCommentBox(section, reader) {
     bookmarkButton.disabled = true;
     bookmarkButton.classList.remove("has-error");
     const shouldRemove = bookmarkButton.classList.contains("is-saved");
+    bookmarkButton.classList.toggle("is-saved", !shouldRemove);
+    bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
+    bookmarkButton.title = shouldRemove ? "Save subsection" : "Saved";
     try {
       const sectionPayload = {
         sectionID: section.id,
@@ -702,9 +922,6 @@ function renderInlineCommentBox(section, reader) {
         title: section.title
       };
       await pushMutation(shouldRemove ? deletedSavedMutationForSection(sectionPayload) : savedMutationForSection(sectionPayload));
-      bookmarkButton.classList.toggle("is-saved", !shouldRemove);
-      bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
-      bookmarkButton.title = shouldRemove ? "Save subsection" : "Saved";
       if (state.utilities.saved) {
         await renderWorkspace();
       }
@@ -820,6 +1037,8 @@ function setReaderCommentsOpen(panel, reader, open) {
 async function refreshReaderContent(panel, reader) {
   const saveButton = panel.querySelector(".reader-save");
   const commentsPanel = panel.querySelector(".reader-comments");
+  applyCodeTheme(panel, reader);
+  populateCodeSelect(panel, reader);
   resetEnhancedSelects(panel);
   await populateReaderSelectors(panel, reader);
   await renderSectionContent(panel, reader);
@@ -973,6 +1192,83 @@ function renderCodeBlock(block) {
   return paragraph;
 }
 
+function plainTextFromHTML(html) {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = rewriteCodeHTML(html || "");
+  return wrapper.textContent || "";
+}
+
+function plainTextForSearchBlock(block) {
+  if (block?.plainText) return block.plainText;
+  if (block?.html) return plainTextFromHTML(block.html);
+  return "";
+}
+
+function snippetForMatch(value, query) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  const needle = query.trim().toLowerCase();
+  const index = text.toLowerCase().indexOf(needle);
+  if (index === -1) return text.slice(0, 220);
+  const start = Math.max(0, index - 70);
+  const end = Math.min(text.length, index + needle.length + 150);
+  return `${start > 0 ? "..." : ""}${text.slice(start, end)}${end < text.length ? "..." : ""}`;
+}
+
+async function renderReaderInternalSearchResults(panel, reader, query) {
+  const content = panel.querySelector(".reader-content");
+  if (!content) return;
+  clear(content);
+  content.classList.add("is-searching-reader");
+
+  const needle = query.trim().toLowerCase();
+  const searchToken = `${Date.now()}:${query}`;
+  panel.dataset.readerSearchToken = searchToken;
+  if (needle.length < 2 || !reader.chapterID) return;
+
+  const chapter = await fetchChapter(reader.chapterID, { includeBody: true });
+  if (!panel.isConnected || panel.dataset.readerSearchToken !== searchToken) return;
+
+  const results = document.createElement("section");
+  results.className = "reader-internal-results";
+  const sections = (chapter.sections || []).filter((section) => {
+    const title = sectionDisplayTitle(section.sectionNumber, section.title);
+    const body = (section.blocks || []).map(plainTextForSearchBlock).join(" ");
+    return `${title} ${body}`.toLowerCase().includes(needle);
+  });
+
+  sections.forEach((section) => {
+    const row = document.createElement("button");
+    row.className = "reader-internal-result";
+    row.type = "button";
+
+    const heading = document.createElement("strong");
+    appendHighlighted(heading, sectionDisplayTitle(section.sectionNumber, section.title), query);
+
+    const snippet = document.createElement("p");
+    const body = (section.blocks || []).map(plainTextForSearchBlock).join(" ");
+    appendHighlighted(snippet, snippetForMatch(body || section.title, query), query);
+
+    row.append(heading, snippet);
+    row.addEventListener("click", async () => {
+      const searchBox = panel.querySelector(".reader-internal-search");
+      const searchInput = panel.querySelector(".reader-internal-search-input");
+      const searchButton = panel.querySelector(".reader-internal-search-toggle");
+      reader.sectionID = section.id;
+      reader.sectionNumber = section.sectionNumber || "";
+      reader.title = section.title || "Reader";
+      reader.internalSearchQuery = query;
+      reader.shouldSmoothScrollToSection = true;
+      if (searchBox) searchBox.hidden = true;
+      searchButton?.setAttribute("aria-pressed", "false");
+      saveWorkspaceState();
+      await renderSectionContent(panel, reader);
+    });
+    results.append(row);
+  });
+
+  content.append(results);
+}
+
 function decorateCodeHTML(root) {
   root.querySelectorAll("script, style, annotationdrawer, codeoptions").forEach((node) => node.remove());
   normalizeCodeTables(root);
@@ -1122,8 +1418,10 @@ async function renderReader(reader, options = {}) {
   const panel = readerTemplate.content.firstElementChild.cloneNode(true);
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
-  const saveButton = panel.querySelector(".reader-save");
   const commentsButton = panel.querySelector(".reader-comments-toggle");
+  const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
+  const internalSearchBox = panel.querySelector(".reader-internal-search");
+  const internalSearchInput = panel.querySelector(".reader-internal-search-input");
   const readerBody = panel.querySelector(".reader-body");
   const commentsPanel = panel.querySelector(".reader-comments");
   const codeSelect = panel.querySelector(".code-select");
@@ -1141,6 +1439,8 @@ async function renderReader(reader, options = {}) {
   readerBody.classList.remove("comments-open");
   commentsPanel.hidden = true;
   commentsButton.hidden = true;
+  internalSearchBox.hidden = true;
+  internalSearchInput.value = reader.internalSearchQuery || "";
 
   if (options.isSearchResult) {
     closeButton.hidden = false;
@@ -1151,6 +1451,7 @@ async function renderReader(reader, options = {}) {
   populateCodeSelect(panel, reader);
   codeSelect.addEventListener("change", async () => {
     reader.codePrefix = codeSelect.value || "BC";
+    applyCodeTheme(panel, reader);
     reader.chapterID = state.recentChaptersByCode?.[reader.codePrefix] || "";
     reader.sectionID = "";
     reader.sectionNumber = "";
@@ -1159,29 +1460,23 @@ async function renderReader(reader, options = {}) {
     await refreshReaderContent(panel, reader);
   });
 
-  saveButton.hidden = !reader.sectionID;
-  saveButton.disabled = !reader.sectionID;
-
-  saveButton.addEventListener("click", async () => {
-    if (!reader.sectionID) return;
-    saveButton.disabled = true;
-    const originalLabel = saveButton.textContent;
-    saveButton.textContent = "Saving";
-    try {
-      await pushMutation(savedMutationForReader(reader));
-      saveButton.textContent = "Saved";
-      if (state.utilities.saved) {
-        await renderWorkspace();
-      }
-    } catch (error) {
-      saveButton.textContent = "Connect sync";
-      saveButton.title = error.message;
-    } finally {
-      setTimeout(() => {
-        saveButton.disabled = !reader.sectionID;
-        saveButton.textContent = originalLabel;
-      }, 1600);
+  internalSearchButton.addEventListener("click", async () => {
+    const willOpen = internalSearchBox.hidden;
+    internalSearchBox.hidden = !willOpen;
+    internalSearchButton.setAttribute("aria-pressed", String(willOpen));
+    if (willOpen) {
+      internalSearchInput.value = reader.internalSearchQuery || "";
+      internalSearchInput.focus();
+      await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
+      return;
     }
+    await renderSectionContent(panel, reader);
+  });
+
+  internalSearchInput.addEventListener("input", () => {
+    reader.internalSearchQuery = internalSearchInput.value;
+    saveWorkspaceState();
+    renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
   });
 
   closeButton.addEventListener("click", () => {
@@ -1213,7 +1508,7 @@ async function renderReader(reader, options = {}) {
   sectionSelect.addEventListener("change", async () => {
     reader.sectionID = sectionSelect.value;
     if (reader.sectionID) {
-      const { chapter } = await api(`/code/chapters/${reader.chapterID}`);
+      const chapter = await fetchChapter(reader.chapterID);
       const summary = sectionTitleFromID(reader.sectionID, chapter);
       reader.sectionNumber = summary?.sectionNumber || "";
       reader.title = summary?.title || "Reader";
@@ -1244,11 +1539,36 @@ function renderSearchPlaceholder(results, message) {
   results.append(wrapper);
 }
 
+function bindHorizontalWheelScroll(element) {
+  if (!element || element.dataset.horizontalWheelBound === "true") return;
+  element.dataset.horizontalWheelBound = "true";
+  element.addEventListener(
+    "wheel",
+    (event) => {
+      const canScroll = element.scrollWidth > element.clientWidth;
+      if (!canScroll) return;
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      if (!delta) return;
+      const nextLeft = element.scrollLeft + delta;
+      const maxLeft = element.scrollWidth - element.clientWidth;
+      const isAtStart = element.scrollLeft <= 0;
+      const isAtEnd = element.scrollLeft >= maxLeft - 1;
+      if ((delta < 0 && isAtStart) || (delta > 0 && isAtEnd)) return;
+      event.preventDefault();
+      element.scrollLeft = Math.max(0, Math.min(maxLeft, nextLeft));
+    },
+    { passive: false }
+  );
+}
+
 async function renderSearch() {
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
   const input = panel.querySelector(".search-input");
+  const filterRail = panel.querySelector(".search-code-filter");
   applyPaneWeight(panel, "utility:search");
   input.value = state.searchQuery || "";
+  renderSearchCodeFilter(filterRail, panel);
+  bindHorizontalWheelScroll(filterRail);
 
   input.addEventListener("input", () => {
     state.searchQuery = input.value;
@@ -1270,9 +1590,68 @@ async function renderSearch() {
   return panel;
 }
 
+function renderSearchCodeFilter(filterRail, panel, renderOptions = {}) {
+  const previousLeft = renderOptions.preserveScroll ? filterRail.scrollLeft : 0;
+  clear(filterRail);
+  const options = searchCodeFilterOptions();
+  const validPrefixes = new Set(options.map((option) => option.prefix));
+  const normalizedFilters = normalizeSearchCodeFilters(state.searchCodeFilters);
+  state.searchCodeFilters = normalizedFilters.filter((prefix) => validPrefixes.has(prefix));
+  if (state.searchCodeFilters.length !== normalizedFilters.length) {
+    saveWorkspaceState();
+  }
+  options.forEach((option) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "search-filter-chip";
+    chip.textContent = option.label;
+    chip.dataset.prefix = option.prefix;
+    if (option.prefix !== "ALL") {
+      chip.classList.add(`code-theme-${codeTheme(option.prefix)}`);
+    }
+    const isAll = option.prefix === "ALL";
+    const isSelected = isAll ? state.searchCodeFilters.length === 0 : state.searchCodeFilters.includes(option.prefix);
+    chip.setAttribute("aria-pressed", String(isSelected));
+    chip.addEventListener("click", () => {
+      if (isAll) {
+        state.searchCodeFilters = [];
+      } else {
+        const selected = new Set(normalizeSearchCodeFilters(state.searchCodeFilters));
+        if (selected.has(option.prefix)) {
+          selected.delete(option.prefix);
+        } else {
+          selected.add(option.prefix);
+        }
+        state.searchCodeFilters = Array.from(selected);
+      }
+      saveWorkspaceState();
+      updateSearchCodeFilterStates(filterRail);
+      renderSearchResults(panel);
+    });
+    filterRail.append(chip);
+  });
+  if (renderOptions.preserveScroll) {
+    const restoredLeft = Math.min(previousLeft, filterRail.scrollWidth - filterRail.clientWidth);
+    filterRail.scrollLeft = restoredLeft;
+    requestAnimationFrame(() => {
+      filterRail.scrollLeft = restoredLeft;
+    });
+  }
+}
+
+function updateSearchCodeFilterStates(filterRail) {
+  const selectedFilters = normalizeSearchCodeFilters(state.searchCodeFilters);
+  filterRail.querySelectorAll(".search-filter-chip").forEach((chip) => {
+    const prefix = chip.dataset.prefix || "ALL";
+    const isSelected = prefix === "ALL" ? selectedFilters.length === 0 : selectedFilters.includes(prefix);
+    chip.setAttribute("aria-pressed", String(isSelected));
+  });
+}
+
 async function renderSearchResults(panel) {
   const results = panel.querySelector(".search-results");
   const query = state.searchQuery.trim();
+  const selectedPrefixes = normalizeSearchCodeFilters(state.searchCodeFilters);
   if (query.length < 2) {
     renderSearchPlaceholder(results, {
       title: "Search the code",
@@ -1282,24 +1661,60 @@ async function renderSearchResults(panel) {
   }
 
   renderSearchPlaceholder(results, { title: "Searching", body: "Checking section titles and code text." });
-  const payload = await api(`/code/search?q=${encodeURIComponent(query)}`);
+  const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
+  const payload = await api(`/code/search?q=${encodeURIComponent(query)}${codeQuery}`);
+  if (
+    !panel.isConnected ||
+    state.searchQuery.trim() !== query ||
+    normalizeSearchCodeFilters(state.searchCodeFilters).join(",") !== selectedPrefixes.join(",")
+  ) {
+    return;
+  }
   clear(results);
 
-  if (payload.results.length === 0) {
+  const filteredResults = (payload.results || []).filter((result) => {
+    return selectedPrefixes.length === 0 || selectedPrefixes.includes(result.codePrefix || "BC");
+  });
+
+  if (filteredResults.length === 0) {
     renderSearchPlaceholder(results, { title: "No results", body: "Try a shorter phrase or a section number." });
     return;
   }
 
-  payload.results.forEach((result) => {
+  const groups = new Map();
+  filteredResults.forEach((result) => {
+    const prefix = result.codePrefix || "BC";
+    if (!groups.has(prefix)) groups.set(prefix, []);
+    groups.get(prefix).push(result);
+  });
+
+  Array.from(groups.entries()).forEach(([prefix, groupResults]) => {
+    const group = document.createElement("section");
+    group.className = "search-result-group";
+    group.classList.add(`code-theme-${codeTheme(prefix)}`);
+    const label = document.createElement("p");
+    label.className = "section-label search-group-label";
+    label.textContent = codeDisplayLabel(prefix);
+    group.append(label);
+    groupResults.forEach((result) => {
     const row = document.createElement("button");
     row.className = "result-row";
-    row.classList.add(`code-theme-${codeTheme(result.codePrefix || "BC")}`);
     row.type = "button";
-    const heading = document.createElement("strong");
-    heading.textContent = sectionDisplayTitle(result.sectionNumber, result.title);
+      const heading = document.createElement("strong");
+      heading.className = "result-heading";
+      const number = document.createElement("span");
+      number.className = "result-number";
+      number.textContent = result.sectionNumber || "";
+      const chapter = document.createElement("span");
+      chapter.className = "result-chapter";
+      chapter.textContent = result.chapterNumber ? `Chapter ${result.chapterNumber}` : "";
+      heading.append(number, chapter);
+      const title = document.createElement("p");
+      title.className = "result-title";
+      appendHighlighted(title, result.title || result.headingLine || "", query);
     const snippet = document.createElement("p");
     appendHighlighted(snippet, result.snippet, query);
-    row.append(heading, snippet);
+      row.append(heading, title, snippet);
     row.addEventListener("click", () => {
       state.searchResultReader = {
         id: "search-result-reader",
@@ -1318,7 +1733,9 @@ async function renderSearchResults(panel) {
         });
       });
     });
-    results.append(row);
+      group.append(row);
+    });
+    results.append(group);
   });
 }
 
@@ -1330,6 +1747,183 @@ function renderUtility(template, paneID) {
   const panel = renderTemplate(template);
   applyPaneWeight(panel, paneID);
   return panel;
+}
+
+async function renderProjects() {
+  const panel = renderTemplate(projectsTemplate);
+  applyPaneWeight(panel, "utility:projects");
+  const content = panel.querySelector(".projects-content");
+  const addButton = panel.querySelector(".projects-add-button");
+  clear(content);
+  addButton?.addEventListener("click", () => showProjectCreateSheet(panel));
+  const data = await loadSyncedContent();
+
+  if (data.status === "disconnected") {
+    const projects = visibleProjectRecords([]);
+    appendSectionLabel(content, "Projects");
+    if (projects.length === 0) {
+      appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
+    } else {
+      renderProjectRows(content, projects, []);
+    }
+    return panel;
+  }
+  if (data.status === "error") {
+    appendSectionLabel(content, "Projects");
+    appendProjectEmptyCard(content, "Sync error", data.error || "Could not load projects.");
+    return panel;
+  }
+
+  const { projects, projectSections } = data.summary;
+  const visibleProjects = visibleProjectRecords(projects);
+  appendSectionLabel(content, "Projects");
+  if (visibleProjects.length === 0) {
+    appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
+  } else {
+    renderProjectRows(content, visibleProjects, projectSections);
+  }
+
+  return panel;
+}
+
+function showProjectCreateSheet(panel) {
+  panel.querySelector(".project-sheet-overlay")?.remove();
+  const overlay = document.createElement("section");
+  overlay.className = "project-sheet-overlay";
+  overlay.setAttribute("aria-label", "New project");
+
+  const sheet = document.createElement("form");
+  sheet.className = "project-create-sheet";
+
+  const grabber = document.createElement("div");
+  grabber.className = "sheet-grabber";
+  grabber.setAttribute("aria-hidden", "true");
+
+  const header = document.createElement("header");
+  header.className = "project-sheet-header";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.textContent = "Cancel";
+  const title = document.createElement("h3");
+  title.textContent = "New project";
+  const saveButton = document.createElement("button");
+  saveButton.type = "submit";
+  saveButton.textContent = "Save";
+  saveButton.disabled = true;
+  header.append(cancelButton, title, saveButton);
+
+  const nameLabel = document.createElement("label");
+  nameLabel.className = "project-sheet-field";
+  const nameText = document.createElement("span");
+  nameText.textContent = "Project name";
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.placeholder = "e.g. Bronx R-2 Passive House";
+  nameInput.autocomplete = "off";
+  nameLabel.append(nameText, nameInput);
+
+  const colorGroup = document.createElement("fieldset");
+  colorGroup.className = "project-sheet-colors";
+  const colorLegend = document.createElement("legend");
+  colorLegend.textContent = "Color";
+  const colorRail = document.createElement("div");
+  colorRail.className = "project-color-rail";
+  let selectedColor = projectColorOptions[0];
+  projectColorOptions.forEach((color, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "project-color-swatch";
+    button.style.setProperty("--project-swatch", color);
+    button.setAttribute("aria-label", `Project color ${index + 1}`);
+    button.setAttribute("aria-pressed", String(index === 0));
+    button.addEventListener("click", () => {
+      selectedColor = color;
+      colorRail.querySelectorAll(".project-color-swatch").forEach((swatch) => {
+        swatch.setAttribute("aria-pressed", String(swatch === button));
+      });
+    });
+    colorRail.append(button);
+  });
+  colorGroup.append(colorLegend, colorRail);
+
+  const descriptionLabel = document.createElement("label");
+  descriptionLabel.className = "project-sheet-field";
+  const descriptionText = document.createElement("span");
+  descriptionText.textContent = "Description (optional)";
+  const descriptionInput = document.createElement("input");
+  descriptionInput.type = "text";
+  descriptionInput.placeholder = "Short description";
+  descriptionInput.autocomplete = "off";
+  descriptionLabel.append(descriptionText, descriptionInput);
+
+  nameInput.addEventListener("input", () => {
+    saveButton.disabled = !nameInput.value.trim();
+  });
+  cancelButton.addEventListener("click", () => overlay.remove());
+  sheet.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!nameInput.value.trim()) return;
+    saveButton.disabled = true;
+    try {
+      await createProjectFolder({
+        name: nameInput.value,
+        color: selectedColor,
+        description: descriptionInput.value
+      });
+      overlay.remove();
+      await renderWorkspace();
+    } catch (error) {
+      saveButton.disabled = false;
+      const content = panel.querySelector(".projects-content");
+      appendMutedRow(content, "Project not synced", error.message || "Could not save the project folder.");
+    }
+  });
+
+  sheet.append(grabber, header, nameLabel, colorGroup, descriptionLabel);
+  overlay.append(sheet);
+  panel.append(overlay);
+  nameInput.focus();
+}
+
+function appendProjectEmptyCard(content, title, message) {
+  const card = document.createElement("article");
+  card.className = "project-card project-empty-card";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  const body = document.createElement("p");
+  body.textContent = message;
+  card.append(heading, body);
+  content.append(card);
+}
+
+function renderProjectRows(content, projects, projectSections) {
+  projects.slice(0, 24).forEach((project) => {
+    const count = projectSections.filter((item) =>
+      item.folderClientID === project.clientID ||
+      item.folderClientID === project.id ||
+      item.localFolderID === project.localFolderID
+    ).length;
+    const card = document.createElement("article");
+    card.className = "project-card project-row";
+    const body = document.createElement("div");
+    const heading = document.createElement("h3");
+    heading.textContent = project.name || project.title || "Project";
+    const description = document.createElement("p");
+    description.textContent = project.description || "Project folder.";
+    const dot = document.createElement("span");
+    dot.className = "project-color-dot";
+    dot.style.setProperty("--project-color", project.color || project.tintColor || projectColorOptions[0]);
+    body.append(heading, description);
+    const meta = document.createElement("div");
+    meta.className = "project-meta";
+    [count === 1 ? "1 saved" : `${count} saved`, project.sortMode || "Code order"].forEach((label) => {
+      const pill = document.createElement("span");
+      pill.textContent = label;
+      meta.append(pill);
+    });
+    card.append(dot, body, meta);
+    content.append(card);
+  });
 }
 
 async function renderSaved() {
@@ -1348,53 +1942,13 @@ async function renderSaved() {
     return panel;
   }
 
-  const { projects, savedItems, annotations, projectSections } = data.summary;
-  appendSectionLabel(content, "Projects");
-  if (projects.length === 0) {
-    appendMutedRow(content, "No projects", "Projects synced from iOS will appear here.");
-  } else {
-    projects.slice(0, 12).forEach((project) => {
-      const count = projectSections.filter((item) =>
-        item.folderClientID === project.clientID ||
-        item.folderClientID === project.id ||
-        item.localFolderID === project.localFolderID
-      ).length;
-      const card = document.createElement("article");
-      card.className = "project-card";
-      const body = document.createElement("div");
-      const heading = document.createElement("h3");
-      heading.textContent = project.name || project.title || "Project";
-      const description = document.createElement("p");
-      description.textContent = project.description || "Private project workspace.";
-      body.append(heading, description);
-      const meta = document.createElement("div");
-      meta.className = "project-meta";
-      [count === 1 ? "1 saved" : `${count} saved`, project.sortMode || "Code order"].forEach((label) => {
-        const pill = document.createElement("span");
-        pill.textContent = label;
-        meta.append(pill);
-      });
-      card.append(body, meta);
-      content.append(card);
-    });
-  }
+  const { savedItems, annotations } = data.summary;
 
   appendSectionLabel(content, "Saved sections");
   if (savedItems.length === 0) {
     appendMutedRow(content, "No saved sections", "Saved sections synced from iOS or saved in this web workspace will appear here.");
   } else {
-    savedItems.slice(0, 24).forEach((item) => {
-      const row = document.createElement("button");
-      row.className = "saved-row saved-row-button";
-      row.type = "button";
-      const title = document.createElement("strong");
-      title.textContent = sectionDisplayTitle(item.sectionNumber || item.sectionID, item.title, "Saved section");
-      const subtitle = document.createElement("span");
-      subtitle.textContent = item.updatedAt ? `Updated ${new Date(item.updatedAt).toLocaleString()}` : "Synced saved section";
-      row.append(title, subtitle);
-      row.addEventListener("click", () => openSectionInReader(item));
-      content.append(row);
-    });
+    renderSavedItemsByCode(content, savedItems.slice(0, 48));
   }
 
   appendSectionLabel(content, "Tags and notes");
@@ -1415,6 +1969,61 @@ async function renderSaved() {
     });
   }
   return panel;
+}
+
+function renderSavedItemsByCode(content, savedItems) {
+  const codeGroups = new Map();
+  savedItems.forEach((item) => {
+    const prefix = item.codePrefix || item.code || "BC";
+    if (!codeGroups.has(prefix)) codeGroups.set(prefix, []);
+    codeGroups.get(prefix).push(item);
+  });
+
+  Array.from(codeGroups.entries()).forEach(([prefix, items]) => {
+    const codeGroup = document.createElement("section");
+    codeGroup.className = "saved-code-group";
+    codeGroup.classList.add(`code-theme-${codeTheme(prefix)}`);
+    const codeLabel = document.createElement("p");
+    codeLabel.className = "section-label saved-code-label";
+    codeLabel.textContent = codeDisplayLabel(prefix);
+    codeGroup.append(codeLabel);
+
+    const chapterGroups = new Map();
+    items.forEach((item) => {
+      const chapterKey = item.chapterNumber || item.chapterTitle || item.chapterID || "Saved";
+      if (!chapterGroups.has(chapterKey)) chapterGroups.set(chapterKey, []);
+      chapterGroups.get(chapterKey).push(item);
+    });
+
+    Array.from(chapterGroups.entries()).forEach(([chapterKey, chapterItems]) => {
+      const chapterLabel = document.createElement("p");
+      chapterLabel.className = "saved-chapter-label";
+      chapterLabel.textContent = String(chapterKey).startsWith("Chapter") ? chapterKey : `Chapter ${chapterKey}`;
+      codeGroup.append(chapterLabel);
+      chapterItems.forEach((item) => {
+        const row = document.createElement("button");
+        row.className = "saved-row saved-row-button saved-section-row";
+        row.type = "button";
+        const title = document.createElement("strong");
+        title.textContent = item.sectionNumber || item.sectionID || "Saved";
+        const bookmark = document.createElement("span");
+        bookmark.className = "saved-bookmark-glyph";
+        bookmark.textContent = "▮";
+        const heading = document.createElement("span");
+        heading.className = "saved-section-heading";
+        heading.append(title, bookmark);
+        const subtitle = document.createElement("span");
+        subtitle.textContent = item.title || "Saved section";
+        const detail = document.createElement("span");
+        detail.textContent = item.subtitle || item.noteBody || item.title || "Synced saved section";
+        row.append(heading, subtitle, detail);
+        row.addEventListener("click", () => openSectionInReader(item));
+        codeGroup.append(row);
+      });
+    });
+
+    content.append(codeGroup);
+  });
 }
 
 function appendSectionLabel(container, label) {
@@ -1543,6 +2152,8 @@ function wireReaderSettingsControls(panel) {
 function createDivider(previousPaneID, nextPaneID) {
   const divider = document.createElement("div");
   divider.className = "pane-divider";
+  divider.dataset.previousPaneId = previousPaneID;
+  divider.dataset.nextPaneId = nextPaneID;
   divider.role = "separator";
   divider.tabIndex = 0;
   divider.setAttribute("aria-orientation", "vertical");
@@ -1550,31 +2161,182 @@ function createDivider(previousPaneID, nextPaneID) {
   return divider;
 }
 
+function orderWithPaneMoved(draggedPaneID, targetPaneID, position) {
+  if (!draggedPaneID || !targetPaneID || draggedPaneID === targetPaneID) return null;
+  const order = activePaneIDs().filter((id) => id !== draggedPaneID);
+  const targetIndex = order.indexOf(targetPaneID);
+  if (targetIndex === -1) return null;
+  order.splice(position === "after" ? targetIndex + 1 : targetIndex, 0, draggedPaneID);
+  return order;
+}
+
+function applyDragPreviewOrder(order) {
+  if (!Array.isArray(order) || !order.length) return;
+  const previousRects = new Map(
+    Array.from(track.querySelectorAll(".workspace-panel")).map((pane) => [pane.dataset.paneId, pane.getBoundingClientRect()])
+  );
+  dragPreviewOrder = order;
+  const paneIndex = new Map(order.map((id, index) => [id, index]));
+  track.querySelectorAll(".workspace-panel").forEach((pane) => {
+    const index = paneIndex.get(pane.dataset.paneId);
+    if (index !== undefined) pane.style.order = String(index * 2);
+  });
+  track.querySelectorAll(".pane-divider").forEach((divider) => {
+    const previousIndex = paneIndex.get(divider.dataset.previousPaneId);
+    const nextIndex = paneIndex.get(divider.dataset.nextPaneId);
+    const index = Math.min(previousIndex ?? Number.MAX_SAFE_INTEGER, nextIndex ?? Number.MAX_SAFE_INTEGER);
+    divider.style.order = String(index * 2 + 1);
+  });
+  track.querySelectorAll(".workspace-panel").forEach((pane) => {
+    const previousRect = previousRects.get(pane.dataset.paneId);
+    if (!previousRect) return;
+    const nextRect = pane.getBoundingClientRect();
+    const deltaX = previousRect.left - nextRect.left;
+    if (Math.abs(deltaX) < 1) return;
+    pane.style.transition = "none";
+    pane.style.transform = `translateX(${deltaX}px)`;
+    requestAnimationFrame(() => {
+      pane.style.transition = "";
+      pane.style.transform = "";
+    });
+  });
+}
+
+function clearDragPreviewOrder() {
+  dragPreviewOrder = [];
+  track.querySelectorAll(".workspace-panel, .pane-divider").forEach((node) => {
+    node.style.order = "";
+  });
+}
+
+function bindPaneDragging(panes) {
+  panes.forEach((pane) => {
+    const handle = pane.querySelector(".pane-drag-handle");
+    if (!handle || pane.dataset.dragBound === "true") return;
+    pane.dataset.dragBound = "true";
+    handle.draggable = true;
+
+    handle.addEventListener("dragstart", (event) => {
+      pane.classList.add("is-dragging");
+      draggedPaneID = pane.dataset.paneId || "";
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", draggedPaneID);
+    });
+
+    handle.addEventListener("dragend", () => {
+      const finalOrder = dragPreviewOrder.length ? dragPreviewOrder.slice() : null;
+      draggedPaneID = "";
+      pane.classList.remove("is-dragging");
+      track.querySelectorAll(".workspace-panel.is-drop-before, .workspace-panel.is-drop-after").forEach((panel) => {
+        panel.classList.remove("is-drop-before", "is-drop-after");
+      });
+      if (finalOrder?.length) {
+        state.paneOrder = finalOrder;
+        saveWorkspaceState();
+        renderWorkspace();
+      } else {
+        clearDragPreviewOrder();
+      }
+    });
+
+    pane.addEventListener("dragover", (event) => {
+      const activeDraggedPaneID = draggedPaneID || event.dataTransfer.getData("text/plain");
+      if (!activeDraggedPaneID || activeDraggedPaneID === pane.dataset.paneId) return;
+      event.preventDefault();
+      const rect = pane.getBoundingClientRect();
+      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
+      const previewOrder = orderWithPaneMoved(activeDraggedPaneID, pane.dataset.paneId, position);
+      if (previewOrder && previewOrder.join("|") !== dragPreviewOrder.join("|")) {
+        applyDragPreviewOrder(previewOrder);
+      }
+      pane.classList.toggle("is-drop-before", position === "before");
+      pane.classList.toggle("is-drop-after", position === "after");
+    });
+
+    pane.addEventListener("dragleave", () => {
+      pane.classList.remove("is-drop-before", "is-drop-after");
+    });
+
+    pane.addEventListener("drop", (event) => {
+      const activeDraggedPaneID = draggedPaneID || event.dataTransfer.getData("text/plain");
+      if (!activeDraggedPaneID || activeDraggedPaneID === pane.dataset.paneId) return;
+      event.preventDefault();
+      const rect = pane.getBoundingClientRect();
+      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
+      const nextOrder = dragPreviewOrder.length
+        ? dragPreviewOrder.slice()
+        : orderWithPaneMoved(activeDraggedPaneID, pane.dataset.paneId, position);
+      draggedPaneID = "";
+      if (nextOrder?.length) {
+        state.paneOrder = nextOrder;
+        saveWorkspaceState();
+        renderWorkspace();
+      } else {
+        clearDragPreviewOrder();
+      }
+    });
+  });
+}
+
 function startPaneResize(event, previousPaneID, nextPaneID) {
-  const previousPane = track.querySelector(`[data-pane-id="${CSS.escape(previousPaneID)}"]`);
-  const nextPane = track.querySelector(`[data-pane-id="${CSS.escape(nextPaneID)}"]`);
+  const panes = Array.from(track.querySelectorAll(".workspace-panel"));
+  const previousPane = panes.find((pane) => pane.dataset.paneId === previousPaneID);
+  const nextPane = panes.find((pane) => pane.dataset.paneId === nextPaneID);
   if (!previousPane || !nextPane) return;
 
   event.preventDefault();
+  event.currentTarget.setPointerCapture?.(event.pointerId);
+  track.classList.add("is-resizing");
   const startX = event.clientX;
-  const previousRect = previousPane.getBoundingClientRect();
-  const nextRect = nextPane.getBoundingClientRect();
-  const totalWidth = previousRect.width + nextRect.width;
-  const minimumWidth = Math.min(220, Math.max(80, totalWidth * 0.25), totalWidth / 2 - 1);
+  const minimumWidthFor = (pane) => {
+    const value = Number.parseFloat(getComputedStyle(pane).minWidth);
+    return Number.isFinite(value) ? value : 220;
+  };
+  const paneData = panes.map((pane) => ({
+    id: pane.dataset.paneId,
+    pane,
+    startWidth: pane.getBoundingClientRect().width,
+    minWidth: minimumWidthFor(pane)
+  }));
+  const previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
+  const nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
+  if (previousIndex === -1 || nextIndex === -1) return;
+
+  const shrinkFrom = (widths, indexes, requested) => {
+    let remaining = requested;
+    for (const index of indexes) {
+      if (remaining <= 0) break;
+      const available = Math.max(0, widths[index] - paneData[index].minWidth);
+      const taken = Math.min(available, remaining);
+      widths[index] -= taken;
+      remaining -= taken;
+    }
+    return requested - remaining;
+  };
 
   const onMove = (moveEvent) => {
     const delta = moveEvent.clientX - startX;
-    const nextPreviousWidth = Math.min(Math.max(previousRect.width + delta, minimumWidth), totalWidth - minimumWidth);
-    const nextNextWidth = totalWidth - nextPreviousWidth;
-    state.paneWeights[previousPaneID] = nextPreviousWidth;
-    state.paneWeights[nextPaneID] = nextNextWidth;
-    previousPane.style.flex = `${nextPreviousWidth} 1 0`;
-    nextPane.style.flex = `${nextNextWidth} 1 0`;
+    const widths = paneData.map((pane) => pane.startWidth);
+    if (delta > 0) {
+      const rightIndexes = paneData.map((_, index) => index).slice(nextIndex);
+      const applied = shrinkFrom(widths, rightIndexes, delta);
+      widths[previousIndex] += applied;
+    } else if (delta < 0) {
+      const leftIndexes = paneData.map((_, index) => index).slice(0, previousIndex + 1).reverse();
+      const applied = shrinkFrom(widths, leftIndexes, Math.abs(delta));
+      widths[nextIndex] += applied;
+    }
+    paneData.forEach((pane, index) => {
+      state.paneWeights[pane.id] = widths[index];
+      pane.pane.style.flex = `${widths[index]} 1 0`;
+    });
   };
 
-  const onUp = () => {
+  const onUp = (upEvent) => {
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
+    event.currentTarget.releasePointerCapture?.(upEvent.pointerId);
+    track.classList.remove("is-resizing");
     saveWorkspaceState();
   };
 
@@ -1583,21 +2345,31 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
 }
 
 function appendPaneSequence(panes) {
-  panes.forEach((pane, index) => {
+  closeActiveCustomSelect();
+  document.querySelectorAll(".custom-select-menu[data-floating-select='true']").forEach((menu) => menu.remove());
+  const orderedPanes = orderPanes(panes);
+  const previousScrollLeft = track.scrollLeft;
+  const nodes = [];
+  bindPaneDragging(orderedPanes);
+  orderedPanes.forEach((pane, index) => {
     if (index > 0) {
-      track.append(createDivider(panes[index - 1].dataset.paneId, pane.dataset.paneId));
+      nodes.push(createDivider(orderedPanes[index - 1].dataset.paneId, pane.dataset.paneId));
     }
-    track.append(pane);
+    nodes.push(pane);
   });
+  track.replaceChildren(...nodes);
+  track.scrollLeft = Math.min(previousScrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
 }
 
 async function renderWorkspace() {
-  clear(track);
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
   setUtilityButtonStates();
 
   const panes = [];
+  if (state.utilities.projects) {
+    panes.push(await renderProjects());
+  }
   if (state.utilities.search) {
     panes.push(await renderSearch());
   }
@@ -1623,48 +2395,100 @@ async function renderWorkspace() {
   saveWorkspaceState();
 }
 
+async function renderUtilityWorkspace() {
+  const existingContentPanes = Array.from(track.querySelectorAll(".workspace-panel"))
+    .filter((pane) => !String(pane.dataset.paneId || "").startsWith("utility:"));
+  const paneIDs = activePaneIDs();
+  normalizePaneWeights(paneIDs);
+  setUtilityButtonStates();
+
+  const panes = [];
+  if (state.utilities.projects) {
+    panes.push(await renderProjects());
+  }
+  if (state.utilities.search) {
+    panes.push(await renderSearch());
+  }
+  if (state.utilities.saved) {
+    panes.push(await renderSaved());
+  }
+  if (state.utilities.analysis) {
+    panes.push(renderUtility(analysisTemplate, "utility:analysis"));
+  }
+  if (state.utilities.settings) {
+    panes.push(renderSettings());
+  }
+
+  existingContentPanes.forEach((pane) => {
+    if (pane.dataset.paneId) {
+      applyPaneWeight(pane, pane.dataset.paneId);
+    }
+    panes.push(pane);
+  });
+
+  appendPaneSequence(panes);
+  syncAllCommentBoxHeights();
+  bindAllReaderCommentScroll();
+  saveWorkspaceState();
+}
+
 async function transitionWorkspace(mode = "default") {
+  if (mode === "utility") {
+    await renderUtilityWorkspace();
+    return;
+  }
   await renderWorkspace();
+}
+
+async function toggleUtilityPane(key) {
+  const paneID = `utility:${key}`;
+  const willOpen = !state.utilities[key];
+  state.utilities[key] = willOpen;
+  if (willOpen) {
+    movePaneToFront(paneID);
+  }
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  if (willOpen) {
+    track.scrollTo({ left: 0, behavior: "smooth" });
+  }
 }
 
 async function start() {
   const payload = await api("/code/chapters");
   chapters = payload.chapters || [];
-  addReaderButton.addEventListener("click", () => {
-    const reader = newReaderState({ chapterID: state.recentChaptersByCode?.BC || "" });
+  document.addEventListener("click", (event) => {
+    if (
+      activeCustomSelect &&
+      !activeCustomSelect.custom.contains(event.target) &&
+      !activeCustomSelect.menu.contains(event.target)
+    ) {
+      closeActiveCustomSelect();
+    }
+  });
+  window.addEventListener("resize", repositionActiveCustomSelect);
+  track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
+  addReaderButton.addEventListener("click", async () => {
+    const buildingChapters = await fetchChapterList("BC");
+    const reader = newReaderState({ chapterID: buildingChapters[0]?.id || "" });
     state.readers.push(reader);
     saveWorkspaceState();
     transitionWorkspace();
   });
-  collapseReadersButton?.addEventListener("click", () => {
-    if (state.readers.length <= 1) return;
-    state.readers = [state.readers[0] || newReaderState({ chapterID: state.recentChaptersByCode?.BC || "" })];
-    saveWorkspaceState();
-    transitionWorkspace();
+  toggleProjectsButton.addEventListener("click", () => {
+    toggleUtilityPane("projects");
   });
   toggleSearchButton.addEventListener("click", () => {
-    const willOpen = !state.utilities.search;
-    state.utilities.search = willOpen;
-    saveWorkspaceState();
-    transitionWorkspace(willOpen ? "open" : "close");
+    toggleUtilityPane("search");
   });
   toggleSavedButton.addEventListener("click", () => {
-    const willOpen = !state.utilities.saved;
-    state.utilities.saved = willOpen;
-    saveWorkspaceState();
-    transitionWorkspace(willOpen ? "open" : "close");
+    toggleUtilityPane("saved");
   });
   toggleAnalysisButton.addEventListener("click", () => {
-    const willOpen = !state.utilities.analysis;
-    state.utilities.analysis = willOpen;
-    saveWorkspaceState();
-    transitionWorkspace(willOpen ? "open" : "close");
+    toggleUtilityPane("analysis");
   });
   toggleSettingsButton.addEventListener("click", () => {
-    const willOpen = !state.utilities.settings;
-    state.utilities.settings = willOpen;
-    saveWorkspaceState();
-    transitionWorkspace(willOpen ? "open" : "close");
+    toggleUtilityPane("settings");
   });
   await renderWorkspace();
 }

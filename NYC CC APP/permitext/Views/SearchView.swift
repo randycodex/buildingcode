@@ -642,14 +642,12 @@ struct SearchView: View {
         let highlightedTitle = highlightedSearchText(
             displayTitle,
             query: query,
-            accent: resultAccent,
-            highlightedForeground: Color.appChrome
+            accent: resultAccent.opacity(0.24)
         )
         let highlightedSnippet = highlightedSearchText(
             snippet,
             query: query,
-            accent: resultAccent.opacity(0.22),
-            highlightedForeground: .primary
+            accent: resultAccent.opacity(0.24)
         )
         let showsSeparateTitle = !displayTitle.isEmpty
             && !snippet.isEmpty
@@ -706,8 +704,7 @@ struct SearchView: View {
     private func highlightedSearchText(
         _ text: String,
         query: String,
-        accent: Color,
-        highlightedForeground: Color
+        accent: Color
     ) -> AttributedString {
         var attributed = AttributedString(text)
         let tokens = query
@@ -722,7 +719,6 @@ struct SearchView: View {
             var searchRange = attributed.startIndex..<attributed.endIndex
             while let range = attributed[searchRange].range(of: token, options: [.caseInsensitive, .diacriticInsensitive]) {
                 attributed[range].backgroundColor = UIColor(accent)
-                attributed[range].foregroundColor = UIColor(highlightedForeground)
                 searchRange = range.upperBound..<attributed.endIndex
             }
         }
