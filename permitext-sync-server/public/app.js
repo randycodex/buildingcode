@@ -1814,18 +1814,14 @@ function showProjectCreateSheet(panel) {
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "project-sheet-field";
-  const nameText = document.createElement("span");
-  nameText.textContent = "Project name";
   const nameInput = document.createElement("input");
   nameInput.type = "text";
   nameInput.placeholder = "e.g. Bronx R-2 Passive House";
   nameInput.autocomplete = "off";
-  nameLabel.append(nameText, nameInput);
+  nameLabel.append(nameInput);
 
   const colorGroup = document.createElement("fieldset");
   colorGroup.className = "project-sheet-colors";
-  const colorLegend = document.createElement("legend");
-  colorLegend.textContent = "Color";
   const colorRail = document.createElement("div");
   colorRail.className = "project-color-rail";
   let selectedColor = projectColorOptions[0];
@@ -1844,17 +1840,15 @@ function showProjectCreateSheet(panel) {
     });
     colorRail.append(button);
   });
-  colorGroup.append(colorLegend, colorRail);
+  colorGroup.append(colorRail);
 
   const descriptionLabel = document.createElement("label");
   descriptionLabel.className = "project-sheet-field";
-  const descriptionText = document.createElement("span");
-  descriptionText.textContent = "Description (optional)";
   const descriptionInput = document.createElement("input");
   descriptionInput.type = "text";
   descriptionInput.placeholder = "Short description";
   descriptionInput.autocomplete = "off";
-  descriptionLabel.append(descriptionText, descriptionInput);
+  descriptionLabel.append(descriptionInput);
 
   nameInput.addEventListener("input", () => {
     saveButton.disabled = !nameInput.value.trim();
@@ -1905,23 +1899,21 @@ function renderProjectRows(content, projects, projectSections) {
     ).length;
     const card = document.createElement("article");
     card.className = "project-card project-row";
+    card.style.setProperty("--project-color", project.color || project.tintColor || projectColorOptions[0]);
     const body = document.createElement("div");
     const heading = document.createElement("h3");
     heading.textContent = project.name || project.title || "Project";
     const description = document.createElement("p");
     description.textContent = project.description || "Project folder.";
-    const dot = document.createElement("span");
-    dot.className = "project-color-dot";
-    dot.style.setProperty("--project-color", project.color || project.tintColor || projectColorOptions[0]);
     body.append(heading, description);
     const meta = document.createElement("div");
     meta.className = "project-meta";
-    [count === 1 ? "1 saved" : `${count} saved`, project.sortMode || "Code order"].forEach((label) => {
+    [count === 1 ? "1 saved" : `${count} saved`].forEach((label) => {
       const pill = document.createElement("span");
       pill.textContent = label;
       meta.append(pill);
     });
-    card.append(dot, body, meta);
+    card.append(body, meta);
     content.append(card);
   });
 }

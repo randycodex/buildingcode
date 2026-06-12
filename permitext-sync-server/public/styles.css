@@ -185,7 +185,7 @@ textarea:focus-visible {
 .eyebrow {
   margin: 0 0 var(--space-1);
   color: var(--text-secondary);
-  font-size: 0.72rem;
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1481,9 +1481,19 @@ select option:checked {
 .search-input {
   height: 50px;
   padding: 0 18px;
+  border: 0;
   border-radius: 18px;
+  background: var(--surface-muted);
   font-size: 1.05rem;
   font-weight: 500;
+  outline: 0;
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .search-input {
+    background: #111111;
+  }
 }
 
 .search-code-filter {
@@ -1701,7 +1711,7 @@ mark {
 .project-card,
 .analysis-card {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-2);
   padding: var(--space-4);
 }
 
@@ -1726,15 +1736,14 @@ mark {
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
-  grid-column: 2;
 }
 
-.project-meta span {
+.projects-content .project-meta span {
   padding: 6px 10px;
   border-radius: var(--radius-pill);
   background: var(--surface-muted);
   color: var(--text-secondary);
-  font-size: 0.82rem;
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
   font-weight: 500;
 }
 
@@ -1754,12 +1763,21 @@ mark {
 }
 
 .projects-content .project-card {
-  grid-template-columns: 12px minmax(0, 1fr);
-  min-height: 112px;
-  padding: var(--space-4) var(--space-5);
-  border: 1px solid var(--border);
+  min-height: 84px;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
   border-radius: var(--radius-card);
   background: transparent;
+}
+
+.projects-content .project-row {
+  background: color-mix(in srgb, var(--project-color) 16%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  .projects-content .project-row {
+    background: color-mix(in srgb, var(--project-color) 24%, transparent);
+  }
 }
 
 .projects-content .project-card h3 {
@@ -1790,20 +1808,13 @@ mark {
   color: var(--text-primary);
 }
 
-.project-color-dot {
-  width: 10px;
-  height: 10px;
-  margin-top: 0.3em;
-  border-radius: 999px;
-  background: var(--project-color, #6674c8);
-}
-
 .project-sheet-overlay {
   position: absolute;
   inset: 0;
   z-index: 90;
   display: grid;
   align-items: end;
+  justify-items: center;
   padding: var(--space-3);
   background: rgba(0, 0, 0, 0.54);
 }
@@ -1812,6 +1823,7 @@ mark {
   display: grid;
   gap: var(--space-4);
   width: 100%;
+  max-width: 28rem;
   max-height: min(82vh, 680px);
   overflow-y: auto;
   padding: 0 var(--space-3) var(--space-4);
