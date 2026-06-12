@@ -473,10 +473,14 @@ function enhanceSelect(select) {
   const positionMenu = () => {
     const rect = trigger.getBoundingClientRect();
     const viewportPadding = 8;
+    const panelRect = trigger.closest(".workspace-panel")?.getBoundingClientRect();
+    const boundaryLeft = Math.max(viewportPadding, panelRect?.left ?? viewportPadding);
+    const boundaryRight = Math.min(window.innerWidth - viewportPadding, panelRect?.right ?? window.innerWidth - viewportPadding);
+    const boundaryWidth = Math.max(rect.width, boundaryRight - boundaryLeft);
     const optionWidths = Array.from(menu.children).map((item) => item.scrollWidth);
     const naturalWidth = Math.max(rect.width, ...optionWidths);
-    const menuWidth = Math.min(naturalWidth, window.innerWidth - viewportPadding * 2);
-    const left = Math.max(viewportPadding, Math.min(rect.left, window.innerWidth - menuWidth - viewportPadding));
+    const menuWidth = Math.min(naturalWidth, boundaryWidth);
+    const left = Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
     const availableBelow = Math.max(160, window.innerHeight - rect.bottom - viewportPadding);
     menu.style.setProperty("--select-menu-top", `${rect.bottom + 2}px`);
     menu.style.setProperty("--select-menu-left", `${left}px`);
@@ -1760,7 +1764,6 @@ async function renderProjects() {
 
   if (data.status === "disconnected") {
     const projects = visibleProjectRecords([]);
-    appendSectionLabel(content, "Projects");
     if (projects.length === 0) {
       appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
     } else {
@@ -1769,14 +1772,12 @@ async function renderProjects() {
     return panel;
   }
   if (data.status === "error") {
-    appendSectionLabel(content, "Projects");
     appendProjectEmptyCard(content, "Sync error", data.error || "Could not load projects.");
     return panel;
   }
 
   const { projects, projectSections } = data.summary;
   const visibleProjects = visibleProjectRecords(projects);
-  appendSectionLabel(content, "Projects");
   if (visibleProjects.length === 0) {
     appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
   } else {
