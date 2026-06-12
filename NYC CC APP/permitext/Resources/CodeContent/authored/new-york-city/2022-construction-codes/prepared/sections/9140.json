@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156826\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156826\"></AnnotationDrawer><div>An approved agency shall test a representative sample of the material being labeled to the relevant standard or standards. The approved agency shall maintain a record of the tests performed. The record shall provide sufficient detail to verify compliance with the test standard.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9140-html-1",
+            "kind": "html",
+            "plainText": "An approved agency shall test a representative sample of the material being labeled to the relevant standard or standards. The approved agency shall maintain a record of the tests performed. The record shall provide sufficient detail to verify compliance with the test standard."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9140
+}

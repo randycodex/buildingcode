@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155614\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155614\"></AnnotationDrawer><div>The provisions of this code do not presumptively provide for matters that are contained in the charter, the New York state labor law, the New York state multiple dwelling law, the zoning resolution, or the New York state general city law. Where there is conflict or inconsistency between the requirements of this code and other applicable laws and rules, unless otherwise required, such conflict shall be resolved in favor of the more restrictive requirement.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155615\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155615\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155616\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155616\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8801-html-1",
+            "kind": "html",
+            "plainText": "The provisions of this code do not presumptively provide for matters that are contained in the charter, the New York state labor law, the New York state multiple dwelling law, the zoning resolution, or the New York state general city law. Where there is conflict or inconsistency between the requirements of this code and other applicable laws and rules, unless otherwise required, such conflict shall be resolved in favor of the more restrictive requirement.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8801
+}

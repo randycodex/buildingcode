@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156788\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156788\"></AnnotationDrawer><div>Materials shall be used, tested and approved for use in accordance with the specific provisions of this code and department rules, except that the commissioner shall have the power to limit or prohibit the use of any material to protect public safety. Materials shall be identified or described on construction documents and other related documents.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9122-html-1",
+            "kind": "html",
+            "plainText": "Materials shall be used, tested and approved for use in accordance with the specific provisions of this code and department rules, except that the commissioner shall have the power to limit or prohibit the use of any material to protect public safety. Materials shall be identified or described on construction documents and other related documents."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9122
+}

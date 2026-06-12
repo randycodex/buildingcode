@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156684\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156684\"></AnnotationDrawer><div>With respect to the rebates under section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156667', hash: '#JD_28-112.6' }}\">28-112.6</Link>, the commissioner may, at his or her discretion, issue a rebate of application fees as follows and as established by rule.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156685\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156685\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156686\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156686\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9092-html-1",
+            "kind": "html",
+            "plainText": "With respect to the rebates under section 28-112.6 , the commissioner may, at his or her discretion, issue a rebate of application fees as follows and as established by rule.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9092
+}

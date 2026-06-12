@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155411\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155411\"></AnnotationDrawer><div>The purpose of the New York city construction codes is to provide reasonable minimum requirements and standards, based upon current scientific and engineering knowledge, experience and techniques, and the utilization of modern machinery, equipment, materials, and forms and methods of construction, for the regulation of building construction in the city of New York in the interest of public safety, health, welfare and the environment, and with due regard for building construction and maintenance costs.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155412\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155412\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-205265', hash: '#JD_L.L.2010/049' }}\">L.L. 2010/049</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8780-html-1",
+            "kind": "html",
+            "plainText": "The purpose of the New York city construction codes is to provide reasonable minimum requirements and standards, based upon current scientific and engineering knowledge, experience and techniques, and the utilization of modern machinery, equipment, materials, and forms and methods of construction, for the regulation of building construction in the city of New York in the interest of public safety, health, welfare and the environment, and with due regard for building construction and maintenance costs.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2010/049 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8780
+}

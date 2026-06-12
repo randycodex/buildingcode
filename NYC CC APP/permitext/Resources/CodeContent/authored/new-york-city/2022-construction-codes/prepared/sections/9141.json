@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156828\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156828\"></AnnotationDrawer><div>The approved agency shall at regular intervals perform surveillance inspections, which shall be in-plant if necessary, of the material that is to be labeled. The inspection shall verify that the labeled material is representative of the material tested.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9141-html-1",
+            "kind": "html",
+            "plainText": "The approved agency shall at regular intervals perform surveillance inspections, which shall be in-plant if necessary, of the material that is to be labeled. The inspection shall verify that the labeled material is representative of the material tested."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9141
+}

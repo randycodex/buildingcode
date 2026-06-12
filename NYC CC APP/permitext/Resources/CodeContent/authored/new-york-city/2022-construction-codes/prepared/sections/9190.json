@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156971\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156971\"></AnnotationDrawer><div>The rebuttable presumption in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156962', hash: '#JD_28-117.4' }}\">28-117.4</Link>.1 shall not apply to an individual who is an owner of the establishment as described in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156962', hash: '#JD_28-117.4' }}\">28-117.4</Link> that has received a place of assembly certificate of operation.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156972\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156972\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-207427', hash: '#JD_L.L.2008/008' }}\">L.L. 2008/008</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9190-html-1",
+            "kind": "html",
+            "plainText": "The rebuttable presumption in section 28-117.4 .1 shall not apply to an individual who is an owner of the establishment as described in section 28-117.4 that has received a place of assembly certificate of operation.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9190
+}

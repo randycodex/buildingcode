@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-234225\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-234225\"></AnnotationDrawer><div>When an applicant seeks to demolish a residential building after the issuance of an order pursuant to section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-157507', hash: '#JD_28-207.4' }}\">28-207.4</Link> but before such order has been rescinded, the applicant shall submit documentation in support of the application to demolish such building showing any steps taken to correct any violations issued by the department in connection with such order that are unresolved as of the date of such application for demolition. Such documentation may include, but is not limited to, construction documents submitted to the department, permit applications, repair estimates, and invoices. Failure to submit such documentation shall result in denial of the application. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-234224\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-234224\"></AnnotationDrawer><div>(L.L. 2025/110, 8/13/2025, eff. 5/10/2026) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8963-html-1",
+            "kind": "html",
+            "plainText": "When an applicant seeks to demolish a residential building after the issuance of an order pursuant to section 28-207.4 but before such order has been rescinded, the applicant shall submit documentation in support of the application to demolish such building showing any steps taken to correct any violations issued by the department in connection with such order that are unresolved as of the date of such application for demolition. Such documentation may include, but is not limited to, construction documents submitted to the department, permit applications, repair estimates, and invoices. Failure to submit such documentation shall result in denial of the application. \n\n (L.L. 2025/110, 8/13/2025, eff. 5/10/2026)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8963
+}

@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156450\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156450\"></AnnotationDrawer><div>No permit for construction or demolition work for which training is required by section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-187944', hash: '#JD_BC3321' }}\">3321</Link> of the New York city building code shall be issued or renewed until the applicant has certified that all workers who will be working under such permit will have the requisite training throughout the duration of such permit. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156451\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156451\"></AnnotationDrawer><div>(L.L. 2017/196, 10/16/2017, eff. 10/16/2017) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9030-html-1",
+            "kind": "html",
+            "plainText": "No permit for construction or demolition work for which training is required by section 3321 of the New York city building code shall be issued or renewed until the applicant has certified that all workers who will be working under such permit will have the requisite training throughout the duration of such permit. \n\n (L.L. 2017/196, 10/16/2017, eff. 10/16/2017)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9030
+}

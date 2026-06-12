@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156929\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156929\"></AnnotationDrawer><div>The department may refuse to issue a letter of completion or certificate of occupancy pending payment of all outstanding fines or civil penalties imposed for violations of this code, the 1968 building code or other laws enforced by the department at the same building.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9177-html-1",
+            "kind": "html",
+            "plainText": "The department may refuse to issue a letter of completion or certificate of occupancy pending payment of all outstanding fines or civil penalties imposed for violations of this code, the 1968 building code or other laws enforced by the department at the same building."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9177
+}

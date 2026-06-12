@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155994\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155994\"></AnnotationDrawer><div>Completed construction documents complying with the provisions of this code and other applicable laws and rules shall be approved by the commissioner and written notice of approval shall be given the applicant promptly and no later than 40 calendar days after the submission of a complete application.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155995\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155995\"></AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;Exceptions:</span></div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155996\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155996\"></AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;1.&#160;&#160;&#160;On or before the fortieth day, the commissioner may, for good cause shown and upon notification to the applicant, extend such time for an additional 20 calendar days.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155997\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155997\"></AnnotationDrawer><div>&#160;&#160;&#160;&#160;&#160;&#160;2.&#160;&#160;&#160;Such time period for review shall commence in accordance with <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-206117', hash: '#JD_28-107' }}\">article 107</Link> for single room occupancy multiple dwellings.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8921-html-1",
+            "kind": "html",
+            "plainText": "Completed construction documents complying with the provisions of this code and other applicable laws and rules shall be approved by the commissioner and written notice of approval shall be given the applicant promptly and no later than 40 calendar days after the submission of a complete application.\n\n    Exceptions: \n\n       1.   On or before the fortieth day, the commissioner may, for good cause shown and upon notification to the applicant, extend such time for an additional 20 calendar days.\n\n       2.   Such time period for review shall commence in accordance with article 107 for single room occupancy multiple dwellings."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8921
+}

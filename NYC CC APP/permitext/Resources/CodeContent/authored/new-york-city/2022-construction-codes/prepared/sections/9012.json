@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156397\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156397\"></AnnotationDrawer><div>Every permit issued by the commissioner shall have his or her signature affixed thereto; but the commissioner may authorize any subordinate to affix such signature, including by the use of electronic means.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9012-html-1",
+            "kind": "html",
+            "plainText": "Every permit issued by the commissioner shall have his or her signature affixed thereto; but the commissioner may authorize any subordinate to affix such signature, including by the use of electronic means."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9012
+}

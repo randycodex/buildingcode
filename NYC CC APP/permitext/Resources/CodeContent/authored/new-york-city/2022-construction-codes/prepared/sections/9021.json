@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156426\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156426\"></AnnotationDrawer><div>All work shall conform to the approved construction and submittal documents, and any approved amendments thereto. Changes and revisions during the course of construction shall conform to the amendment requirements of this code.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9021-html-1",
+            "kind": "html",
+            "plainText": "All work shall conform to the approved construction and submittal documents, and any approved amendments thereto. Changes and revisions during the course of construction shall conform to the amendment requirements of this code."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9021
+}

@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156847\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156847\"></AnnotationDrawer><div>An approved agency shall maintain liability insurance as required by department rules.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9150-html-1",
+            "kind": "html",
+            "plainText": "An approved agency shall maintain liability insurance as required by department rules."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9150
+}

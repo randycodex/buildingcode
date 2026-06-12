@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156661\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156661\"></AnnotationDrawer><div>Any person who commences any work before obtaining the necessary permits shall be subject to a penalty as specified in this code that shall be in addition to the required permit fees.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156662\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156662\"></AnnotationDrawer><div>&#160;&#160;&#160;<span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Exception:</span> Emergency work performed pursuant to section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156304', hash: '#JD_28-105.4.1' }}\">28-105.4.1</Link>.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156663\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156663\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156664\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156664\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9087-html-1",
+            "kind": "html",
+            "plainText": "Any person who commences any work before obtaining the necessary permits shall be subject to a penalty as specified in this code that shall be in addition to the required permit fees.\n\n     Exception: Emergency work performed pursuant to section 28-105.4.1 .\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9087
+}

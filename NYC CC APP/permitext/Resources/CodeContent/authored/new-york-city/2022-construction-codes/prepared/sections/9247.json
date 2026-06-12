@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-235839\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-235839\"></AnnotationDrawer><div>The commissioner may authorize wires or appliances to be disconnected from the supply of electrical energy and to seal the wiring and appliances after due inspection or where in the commissioner&#8217;s judgment the continued use of such electric wiring or appliances in or on any building or structure is unsafe or dangerous to persons or property. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-235831\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-235831\"></AnnotationDrawer><div>(L.L. 2024/128, 12/21/2024, eff. 12/21/2025) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-235829\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-235829\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-229581', hash: '#JD_L.L.2024/128' }}\">L.L. 2024/128</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9247-html-1",
+            "kind": "html",
+            "plainText": "The commissioner may authorize wires or appliances to be disconnected from the supply of electrical energy and to seal the wiring and appliances after due inspection or where in the commissioner’s judgment the continued use of such electric wiring or appliances in or on any building or structure is unsafe or dangerous to persons or property. \n\n (L.L. 2024/128, 12/21/2024, eff. 12/21/2025) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2024/128 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9247
+}

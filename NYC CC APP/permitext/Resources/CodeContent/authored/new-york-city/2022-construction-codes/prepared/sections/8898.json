@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-217852\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-217852\"></AnnotationDrawer><div>No later than January 31, 2024, and annually for five years thereafter, the department shall conduct targeted outreach to educate building owners about the benefits of installing solar and green roof systems. Educational materials distributed pursuant to this section shall be in plain language and made available in all of the designated citywide languages, as defined in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-42850', hash: '#JD_23-1101' }}\">23-1101</Link> of this code. Such educational materials shall also be available on the department's website. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-217851\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-217851\"></AnnotationDrawer><div>(L.L. 2023/057, 5/12/2023, eff. 5/12/2023) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8898-html-1",
+            "kind": "html",
+            "plainText": "No later than January 31, 2024, and annually for five years thereafter, the department shall conduct targeted outreach to educate building owners about the benefits of installing solar and green roof systems. Educational materials distributed pursuant to this section shall be in plain language and made available in all of the designated citywide languages, as defined in section 23-1101 of this code. Such educational materials shall also be available on the department's website. \n\n (L.L. 2023/057, 5/12/2023, eff. 5/12/2023)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8898
+}

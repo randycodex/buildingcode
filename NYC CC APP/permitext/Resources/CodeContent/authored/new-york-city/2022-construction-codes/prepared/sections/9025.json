@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156437\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156437\"></AnnotationDrawer><div>All work shall be performed in compliance with the provisions of the New York city noise control code as set forth in <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-226524', hash: '#JD_T25C002' }}\">chapter 2 of title 24</Link> of the administrative code. Failure to comply with sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-128785', hash: '#JD_24-222' }}\">24-222</Link> and <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-209173', hash: '#JD_24-223' }}\">24-223</Link> of the administrative code shall be a violation of this code.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9025-html-1",
+            "kind": "html",
+            "plainText": "All work shall be performed in compliance with the provisions of the New York city noise control code as set forth in chapter 2 of title 24 of the administrative code. Failure to comply with sections 24-222 and 24-223 of the administrative code shall be a violation of this code."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9025
+}

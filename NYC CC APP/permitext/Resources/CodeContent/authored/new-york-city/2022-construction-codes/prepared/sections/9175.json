@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156916\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156916\"></AnnotationDrawer><div>Upon submission of a satisfactory report of final inspection and all required submittal documents, the department shall document the sign-off of the project and issue a letter of completion, or, if applicable, a certificate of occupancy for the work. The owner shall take all necessary steps required by the department for the issuance of such letter of completion or certificate of occupancy within one year following the expiration of the last permit.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156917\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156917\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156918\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156918\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9175-html-1",
+            "kind": "html",
+            "plainText": "Upon submission of a satisfactory report of final inspection and all required submittal documents, the department shall document the sign-off of the project and issue a letter of completion, or, if applicable, a certificate of occupancy for the work. The owner shall take all necessary steps required by the department for the issuance of such letter of completion or certificate of occupancy within one year following the expiration of the last permit.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9175
+}

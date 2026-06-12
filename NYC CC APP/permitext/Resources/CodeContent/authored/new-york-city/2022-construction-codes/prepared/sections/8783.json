@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155417\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155417\"></AnnotationDrawer><div>Except as otherwise provided in sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-155420', hash: '#JD_28-101.4.1' }}\">28-101.4.1</Link>, <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-155422', hash: '#JD_28-101.4.2' }}\">28-101.4.2</Link>, <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-155428', hash: '#JD_28-101.4.3' }}\">28-101.4.3</Link>, <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-230216', hash: '#JD_28-101.4.4' }}\">28-101.4.4</Link>, and <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-155462', hash: '#JD_28-101.4.5' }}\">28-101.4.5</Link>, on and after July 1, 2008, all work shall be performed in accordance with the provisions of this code.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155418\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155418\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155419\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155419\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8783-html-1",
+            "kind": "html",
+            "plainText": "Except as otherwise provided in sections 28-101.4.1 , 28-101.4.2 , 28-101.4.3 , 28-101.4.4 , and 28-101.4.5 , on and after July 1, 2008, all work shall be performed in accordance with the provisions of this code.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8783
+}

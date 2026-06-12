@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157084\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157084\"></AnnotationDrawer><div>The issuance of a certificate of occupancy shall not authorize the use of any space as a place of assembly unless and until the commissioner thereafter issues a place of assembly certificate of operation.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9219-html-1",
+            "kind": "html",
+            "plainText": "The issuance of a certificate of occupancy shall not authorize the use of any space as a place of assembly unless and until the commissioner thereafter issues a place of assembly certificate of operation."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9219
+}

@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155966\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155966\"></AnnotationDrawer><div>All construction documents, when approved, shall be stamped or endorsed \"approved\" under the official method of the department, followed by a notation of the date except that construction documents accepted with less than full examination by the department shall be stamped or endorsed \"accepted\" instead of \"approved\".</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155967\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155967\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155968\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155968\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8916-html-1",
+            "kind": "html",
+            "plainText": "All construction documents, when approved, shall be stamped or endorsed \"approved\" under the official method of the department, followed by a notation of the date except that construction documents accepted with less than full examination by the department shall be stamped or endorsed \"accepted\" instead of \"approved\".\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8916
+}

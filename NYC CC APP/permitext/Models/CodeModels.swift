@@ -1625,6 +1625,13 @@ enum CodeSectionHeaderFormatting {
         guard !trimmed.isEmpty else { return trimmed }
 
         let upper = trimmed.uppercased()
+        if upper.range(of: #"^SECTION\s+BC\s+28-"#, options: .regularExpression) != nil {
+            return trimmed.replacingOccurrences(
+                of: #"(?i)^SECTION\s+BC\s+"#,
+                with: "SECTION ",
+                options: .regularExpression
+            )
+        }
         if upper.hasPrefix("APPENDIX") {
             return trimmed
         }
@@ -2597,13 +2604,20 @@ struct ResolvedCodeReference: Identifiable, Hashable, Sendable {
 extension String {
     func displayTitle(for sectionNumber: String) -> String {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.hasPrefix(sectionNumber) else {
+        let normalized = trimmed
+            .replacingOccurrences(
+                of: #"^§\s*"#,
+                with: "",
+                options: .regularExpression
+            )
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard normalized.hasPrefix(sectionNumber) else {
             return trimmed.titleThroughFirstPeriod
         }
 
-        let suffix = trimmed.dropFirst(sectionNumber.count).trimmingCharacters(in: .whitespacesAndNewlines)
+        let suffix = normalized.dropFirst(sectionNumber.count).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !suffix.isEmpty else {
-            return trimmed.titleThroughFirstPeriod
+            return normalized.titleThroughFirstPeriod
         }
 
         return suffix.titleThroughFirstPeriod

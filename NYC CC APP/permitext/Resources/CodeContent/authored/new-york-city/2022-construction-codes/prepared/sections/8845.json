@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155761\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155761\"></AnnotationDrawer><div>As soon as practicable after the issuance of an immediately hazardous or major violation of <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-184649', hash: '#JD_BCCh.33' }}\">chapter 33</Link> of the New York city building code, the commissioner shall report such violation to the federal occupational safety and health administration.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155762\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155762\"></AnnotationDrawer><div>(L.L. 2017/068, 5/10/2017, eff. 9/7/2017; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155763\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155763\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8845-html-1",
+            "kind": "html",
+            "plainText": "As soon as practicable after the issuance of an immediately hazardous or major violation of chapter 33 of the New York city building code, the commissioner shall report such violation to the federal occupational safety and health administration.\n\n (L.L. 2017/068, 5/10/2017, eff. 9/7/2017; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8845
+}

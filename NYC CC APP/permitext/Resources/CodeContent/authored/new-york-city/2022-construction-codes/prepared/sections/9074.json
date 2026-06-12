@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156626\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156626\"></AnnotationDrawer><div>The erection of certain temporary structures and temporary uses may be authorized as set forth in sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156627', hash: '#JD_28-111.1.1' }}\">28-111.1.1</Link> and <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156632', hash: '#JD_28-111.1.2' }}\">28-111.1.2</Link>.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9074-html-1",
+            "kind": "html",
+            "plainText": "The erection of certain temporary structures and temporary uses may be authorized as set forth in sections 28-111.1.1 and 28-111.1.2 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9074
+}

@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156391\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156391\"></AnnotationDrawer><div>An application for a permit shall be deemed to have been abandoned 12 months after the date of its submission, unless such application has been diligently prosecuted after rejection in whole or in part, or a permit shall have been issued except that the commissioner may, for reasonable cause, and upon payment of all reinstatement fees as provided for in this code, grant extensions of time for additional 12-month periods.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9009-html-1",
+            "kind": "html",
+            "plainText": "An application for a permit shall be deemed to have been abandoned 12 months after the date of its submission, unless such application has been diligently prosecuted after rejection in whole or in part, or a permit shall have been issued except that the commissioner may, for reasonable cause, and upon payment of all reinstatement fees as provided for in this code, grant extensions of time for additional 12-month periods."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9009
+}

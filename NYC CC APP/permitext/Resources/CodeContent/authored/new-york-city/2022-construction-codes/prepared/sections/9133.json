@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156812\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156812\"></AnnotationDrawer><div>All materials tested and accepted for use shall be subject to periodic retesting as determined by the commissioner; and any material that upon retesting is found not to comply with the code requirements or the requirements set forth in the approval of such material shall cease to be acceptable for the use intended. During the period for such retesting, the commissioner may require the use of such material to be restricted or discontinued if necessary to secure safety.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9133-html-1",
+            "kind": "html",
+            "plainText": "All materials tested and accepted for use shall be subject to periodic retesting as determined by the commissioner; and any material that upon retesting is found not to comply with the code requirements or the requirements set forth in the approval of such material shall cease to be acceptable for the use intended. During the period for such retesting, the commissioner may require the use of such material to be restricted or discontinued if necessary to secure safety."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9133
+}

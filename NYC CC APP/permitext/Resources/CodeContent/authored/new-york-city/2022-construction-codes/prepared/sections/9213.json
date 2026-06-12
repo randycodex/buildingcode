@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157065\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157065\"></AnnotationDrawer><div>No certificate of occupancy shall be issued for any building or open lot requiring a pavement plan pursuant to <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156541', hash: '#JD_28-108' }}\">article 108</Link> unless and until an inspection has been made to show that all work necessary for compliance with the pavement plan has been completed.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9213-html-1",
+            "kind": "html",
+            "plainText": "No certificate of occupancy shall be issued for any building or open lot requiring a pavement plan pursuant to article 108 unless and until an inspection has been made to show that all work necessary for compliance with the pavement plan has been completed."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9213
+}

@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155668\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155668\"></AnnotationDrawer><div>The requirements and standards prescribed in this code shall be subject to variation in specific cases by the commissioner, or by the board of standards and appeals, under and pursuant to the provisions of paragraph two of subdivision (b) of section <InterCodeLink infobasePath=\"L:\\NY\\New York City\\Folio\\Working\\Charter.NFO\" destinationId=\"JD_645\" styleName=\"Jump\" linkPrefix=\"/codes/newyorkcity/latest/\" doc=\"{{ origDocIdx }}\">six hundred forty-five</InterCodeLink> and section <InterCodeLink infobasePath=\"L:\\NY\\New York City\\Folio\\Working\\Charter.NFO\" destinationId=\"JD_666\" styleName=\"Jump\" linkPrefix=\"/codes/newyorkcity/latest/\" doc=\"{{ origDocIdx }}\">six hundred sixty-six</InterCodeLink> of the New York city charter, as amended.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8818-html-1",
+            "kind": "html",
+            "plainText": "The requirements and standards prescribed in this code shall be subject to variation in specific cases by the commissioner, or by the board of standards and appeals, under and pursuant to the provisions of paragraph two of subdivision (b) of section six hundred forty-five and section six hundred sixty-six of the New York city charter, as amended."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8818
+}

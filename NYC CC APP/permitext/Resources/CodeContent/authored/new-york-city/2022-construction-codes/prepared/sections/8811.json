@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155639\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155639\"></AnnotationDrawer><div>References to provisions of the building code of the city of New York or to <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-48176', hash: '#JD_T27C001' }}\">chapter 1 of title 27</Link> of the administrative code in other laws shall be deemed to refer to equivalent provisions of the 1968 building code or the New York city construction codes as the context in which such references appear may require.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155640\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155640\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-207427', hash: '#JD_L.L.2008/008' }}\">L.L. 2008/008</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8811-html-1",
+            "kind": "html",
+            "plainText": "References to provisions of the building code of the city of New York or to chapter 1 of title 27 of the administrative code in other laws shall be deemed to refer to equivalent provisions of the 1968 building code or the New York city construction codes as the context in which such references appear may require.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8811
+}

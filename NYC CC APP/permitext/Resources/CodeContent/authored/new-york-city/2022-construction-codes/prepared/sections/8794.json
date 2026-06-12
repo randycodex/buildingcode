@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155471\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155471\"></AnnotationDrawer><div>As used in Section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-155462', hash: '#JD_28-101.4.5' }}\">28-101.4.5</Link>, the following term shall have the following meaning unless the context or subject matter requires otherwise.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155472\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155472\"></AnnotationDrawer><div><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">&#160;&#160;&#160;FLOOR SURFACE AREA.</span> Floor surface area is the gross square foot area of all horizontal floor and roof surfaces, including roofs of bulkheads and superstructures, of a building or structure at any level, including cellar, attic and roof.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8794-html-1",
+            "kind": "html",
+            "plainText": "As used in Section 28-101.4.5 , the following term shall have the following meaning unless the context or subject matter requires otherwise.\n\n    FLOOR SURFACE AREA. Floor surface area is the gross square foot area of all horizontal floor and roof surfaces, including roofs of bulkheads and superstructures, of a building or structure at any level, including cellar, attic and roof."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8794
+}

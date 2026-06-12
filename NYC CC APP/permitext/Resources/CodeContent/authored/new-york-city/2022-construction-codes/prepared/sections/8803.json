@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155620\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155620\"></AnnotationDrawer><div>The lawful use or occupancy of any existing building or structure, including the use of any service equipment therein, may be continued unless a retroactive change is specifically required by the provisions of this code or other applicable laws or rules.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8803-html-1",
+            "kind": "html",
+            "plainText": "The lawful use or occupancy of any existing building or structure, including the use of any service equipment therein, may be continued unless a retroactive change is specifically required by the provisions of this code or other applicable laws or rules."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8803
+}

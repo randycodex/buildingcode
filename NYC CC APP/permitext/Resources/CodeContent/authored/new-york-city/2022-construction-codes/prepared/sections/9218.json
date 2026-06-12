@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157076\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157076\"></AnnotationDrawer><div>No certificate of occupancy shall be issued until certificates of compliance are issued for the following types of service equipment:</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157077\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157077\"></AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Air conditioning and ventilation systems.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157078\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157078\"></AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Elevators, escalators, moving walkways and dumbwaiters.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157079\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157079\"></AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Fuel burning and fuel oil storage equipment.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157080\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157080\"></AnnotationDrawer><div>&#160;&#160;&#160;4.&#160;&#160;&#160;Refrigeration systems.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157081\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157081\"></AnnotationDrawer><div>&#160;&#160;&#160;5.&#160;&#160;&#160;Heating systems.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157082\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157082\"></AnnotationDrawer><div>&#160;&#160;&#160;6.&#160;&#160;&#160;Boilers. </div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9218-html-1",
+            "kind": "html",
+            "plainText": "No certificate of occupancy shall be issued until certificates of compliance are issued for the following types of service equipment:\n\n    1.   Air conditioning and ventilation systems.\n\n    2.   Elevators, escalators, moving walkways and dumbwaiters.\n\n    3.   Fuel burning and fuel oil storage equipment.\n\n    4.   Refrigeration systems.\n\n    5.   Heating systems.\n\n    6.   Boilers."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9218
+}

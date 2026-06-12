@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156830\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156830\"></AnnotationDrawer><div>The label shall contain the manufacturer's or distributor's identification, model number, serial number or definitive information describing the material's performance characteristics and the approved agency's identification.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9142-html-1",
+            "kind": "html",
+            "plainText": "The label shall contain the manufacturer's or distributor's identification, model number, serial number or definitive information describing the material's performance characteristics and the approved agency's identification."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9142
+}

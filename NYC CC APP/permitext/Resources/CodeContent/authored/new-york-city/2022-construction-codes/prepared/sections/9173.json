@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156912\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156912\"></AnnotationDrawer><div>It shall be the duty of the permit holder to notify the department or the person or entity designated to perform the inspection when work requiring inspection is ready to be inspected. It shall be the duty of the permit holder to provide access to and means for inspection of such work for any inspections that are required by this code.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9173-html-1",
+            "kind": "html",
+            "plainText": "It shall be the duty of the permit holder to notify the department or the person or entity designated to perform the inspection when work requiring inspection is ready to be inspected. It shall be the duty of the permit holder to provide access to and means for inspection of such work for any inspections that are required by this code."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9173
+}

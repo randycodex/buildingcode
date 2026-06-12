@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156802\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156802\"></AnnotationDrawer><div>The use of used material that meets the requirements of this code for new material is permitted unless otherwise provided in this code. Used equipment and devices shall not be reused without the prior approval of the commissioner and may be used only to the extent set forth in such approval.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9128-html-1",
+            "kind": "html",
+            "plainText": "The use of used material that meets the requirements of this code for new material is permitted unless otherwise provided in this code. Used equipment and devices shall not be reused without the prior approval of the commissioner and may be used only to the extent set forth in such approval."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9128
+}

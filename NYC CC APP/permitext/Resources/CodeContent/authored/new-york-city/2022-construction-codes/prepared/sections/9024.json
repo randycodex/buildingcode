@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156435\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156435\"></AnnotationDrawer><div>All work shall be conducted in accordance with and subject to the safety requirements of this code and other applicable laws or rules, including any order or requirement of the commissioner that the building or structure under construction or alteration be vacated, in whole or in part, during the progress of the work and until the issuance of a certificate of occupancy. Adjoining lots and properties shall be protected in accordance with this code.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9024-html-1",
+            "kind": "html",
+            "plainText": "All work shall be conducted in accordance with and subject to the safety requirements of this code and other applicable laws or rules, including any order or requirement of the commissioner that the building or structure under construction or alteration be vacated, in whole or in part, during the progress of the work and until the issuance of a certificate of occupancy. Adjoining lots and properties shall be protected in accordance with this code."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9024
+}

@@ -183,7 +183,7 @@ enum PreparedChapterContentBuilder {
     }
 
     private static func htmlHeadings(in html: String) -> [HTMLHeading] {
-        let pattern = #"<h6\b[^>]*>\s*([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*)\.?\s*.*?</h6>"#
+        let pattern = #"<h6\b[^>]*>\s*(?:<a\b[^>]*>\s*</a>\s*)?(?:§|&#167;)?\s*([A-Za-z0-9]+(?:[-.][A-Za-z0-9]+)*)\.?\s*.*?</h6>"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators]) else {
             return []
         }

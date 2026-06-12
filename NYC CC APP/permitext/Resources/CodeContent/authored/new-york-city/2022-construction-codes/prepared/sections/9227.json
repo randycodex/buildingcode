@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157118\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157118\"></AnnotationDrawer><div>The provisions of sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-157119', hash: '#JD_28-118.16.1' }}\">28-118.16.1</Link> through <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-157123', hash: '#JD_28-118.16.2' }}\">28-118.16.2</Link> shall apply to amended certificates of occupancy.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9227-html-1",
+            "kind": "html",
+            "plainText": "The provisions of sections 28-118.16.1 through 28-118.16.2 shall apply to amended certificates of occupancy."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9227
+}

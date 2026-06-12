@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155868\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155868\"></AnnotationDrawer><div>There is hereby established within the department an office of alternative energy. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155869\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155869\"></AnnotationDrawer><div>(L.L. 2017/233, 12/1/2017, eff. 12/1/2018; Am. L.L. 2019/093, 5/19/2019, eff. 9/16/2019) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8888-html-1",
+            "kind": "html",
+            "plainText": "There is hereby established within the department an office of alternative energy. \n\n (L.L. 2017/233, 12/1/2017, eff. 12/1/2018; Am. L.L. 2019/093, 5/19/2019, eff. 9/16/2019)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8888
+}

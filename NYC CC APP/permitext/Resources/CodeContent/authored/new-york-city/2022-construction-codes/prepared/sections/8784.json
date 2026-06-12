@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155421\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155421\"></AnnotationDrawer><div>If a permit for work was issued prior to July 1, 2008 or, if no permit was necessary, work was commenced prior to July 1, 2008, all of the provisions of <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-48176', hash: '#JD_T27C001' }}\">chapter 1 of title 27</Link> of the administrative code as heretofore in effect shall apply to such work.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8784-html-1",
+            "kind": "html",
+            "plainText": "If a permit for work was issued prior to July 1, 2008 or, if no permit was necessary, work was commenced prior to July 1, 2008, all of the provisions of chapter 1 of title 27 of the administrative code as heretofore in effect shall apply to such work."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8784
+}

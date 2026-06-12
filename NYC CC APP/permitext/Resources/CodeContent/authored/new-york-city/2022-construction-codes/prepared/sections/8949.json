@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156101\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156101\"></AnnotationDrawer><div>For amended certificates of occupancy subject to section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-157123', hash: '#JD_28-118.16.2' }}\">28-118.16.2</Link>, the term construction documents, as used in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-230255', hash: '#JD_28-116.2.4.1' }}\">28-116.2.4.1</Link>, means an accurate and complete final lot survey made by a land surveyor, and floor and roof plans showing, at a minimum, compliance with exit requirements in accordance with this code.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156102\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156102\"></AnnotationDrawer><div>(L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156103\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156103\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8949-html-1",
+            "kind": "html",
+            "plainText": "For amended certificates of occupancy subject to section 28-118.16.2 , the term construction documents, as used in section 28-116.2.4.1 , means an accurate and complete final lot survey made by a land surveyor, and floor and roof plans showing, at a minimum, compliance with exit requirements in accordance with this code.\n\n (L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8949
+}

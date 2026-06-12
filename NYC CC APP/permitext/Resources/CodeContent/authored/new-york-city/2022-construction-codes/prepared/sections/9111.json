@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156748\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156748\"></AnnotationDrawer><div>If such charge is not paid within 30 days from the date of entry, it shall be the duty of the department of finance to receive interest thereon at the rate of 15 percent per annum, to be calculated to the date of payment from the date of entry.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9111-html-1",
+            "kind": "html",
+            "plainText": "If such charge is not paid within 30 days from the date of entry, it shall be the duty of the department of finance to receive interest thereon at the rate of 15 percent per annum, to be calculated to the date of payment from the date of entry."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9111
+}

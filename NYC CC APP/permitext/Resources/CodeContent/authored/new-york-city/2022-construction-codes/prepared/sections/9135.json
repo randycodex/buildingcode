@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156816\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156816\"></AnnotationDrawer><div>Supporting data, where necessary to assist in the approval of materials not specifically provided for in this code, shall consist of valid research reports from approved sources or other equivalent approved supporting documentation.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9135-html-1",
+            "kind": "html",
+            "plainText": "Supporting data, where necessary to assist in the approval of materials not specifically provided for in this code, shall consist of valid research reports from approved sources or other equivalent approved supporting documentation."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9135
+}

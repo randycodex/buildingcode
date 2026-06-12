@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155914\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155914\"></AnnotationDrawer><div>Except as the New York city fire code may otherwise provide, the construction documents for facilities and systems for which the fire code provides design and installation requirements, including but not limited to fire alarm systems, flammable and combustible liquids, compressed gases, explosives and other hazardous materials; flammable spraying systems and facilities; automatic water sprinkler systems for hazardous material and combustible material storage, and non-water fire extinguishing systems, shall be subject to the review and approval of the fire commissioner in accordance with the New York city fire code. Approval by the department of construction documents for new or existing buildings containing such facilities and systems shall not be construed as approval of such systems and facilities.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8902-html-1",
+            "kind": "html",
+            "plainText": "Except as the New York city fire code may otherwise provide, the construction documents for facilities and systems for which the fire code provides design and installation requirements, including but not limited to fire alarm systems, flammable and combustible liquids, compressed gases, explosives and other hazardous materials; flammable spraying systems and facilities; automatic water sprinkler systems for hazardous material and combustible material storage, and non-water fire extinguishing systems, shall be subject to the review and approval of the fire commissioner in accordance with the New York city fire code. Approval by the department of construction documents for new or existing buildings containing such facilities and systems shall not be construed as approval of such systems and facilities."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8902
+}

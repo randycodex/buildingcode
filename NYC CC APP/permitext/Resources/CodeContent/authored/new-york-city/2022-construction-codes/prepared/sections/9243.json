@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157172\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157172\"></AnnotationDrawer><div>Within 24 hours after gas service to a building is shut off by a utility company or utility corporation because of a class A or class B condition, as described in part 261 of title 16 of the New York codes, rules and regulations, and within 24 hours after gas service is, after an inspection by such a company or corporation, not restored because of such a condition, such company or corporation and the owner of such building shall each provide notice to the department in a form and manner prescribed by the department. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157173\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157173\"></AnnotationDrawer><div>{'{'}L.L. 2016/154, 12/6/2016, eff. 3/6/2017) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9243-html-1",
+            "kind": "html",
+            "plainText": "Within 24 hours after gas service to a building is shut off by a utility company or utility corporation because of a class A or class B condition, as described in part 261 of title 16 of the New York codes, rules and regulations, and within 24 hours after gas service is, after an inspection by such a company or corporation, not restored because of such a condition, such company or corporation and the owner of such building shall each provide notice to the department in a form and manner prescribed by the department. \n\n {'{'}L.L. 2016/154, 12/6/2016, eff. 3/6/2017)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9243
+}

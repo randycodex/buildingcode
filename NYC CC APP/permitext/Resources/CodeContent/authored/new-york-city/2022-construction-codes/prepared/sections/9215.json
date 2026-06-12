@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157070\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157070\"></AnnotationDrawer><div>No certificate of occupancy shall be issued until the department confirms by inspection that all work relating to the installation of the part of the sanitary/storm water drainage system which lies outside of such property, if and as required by section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-45121', hash: '#JD_24-526' }}\">24-526</Link> of the administrative code, has been satisfactorily completed.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9215-html-1",
+            "kind": "html",
+            "plainText": "No certificate of occupancy shall be issued until the department confirms by inspection that all work relating to the installation of the part of the sanitary/storm water drainage system which lies outside of such property, if and as required by section 24-526 of the administrative code, has been satisfactorily completed."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9215
+}

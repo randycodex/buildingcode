@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155622\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155622\"></AnnotationDrawer><div>Prior code buildings must comply with the applicable retroactive requirements of the 1968 building code including those requiring the installation of fire safety and building safety systems and the filing of verifying reports with the department of such installations by the dates specified in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-48285', hash: '#JD_27-228.5' }}\">27-228.5</Link> of the administrative code or in other applicable provisions of such 1968 building code. A violation of such provisions shall be a violation of this code.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8804-html-1",
+            "kind": "html",
+            "plainText": "Prior code buildings must comply with the applicable retroactive requirements of the 1968 building code including those requiring the installation of fire safety and building safety systems and the filing of verifying reports with the department of such installations by the dates specified in section 27-228.5 of the administrative code or in other applicable provisions of such 1968 building code. A violation of such provisions shall be a violation of this code."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8804
+}

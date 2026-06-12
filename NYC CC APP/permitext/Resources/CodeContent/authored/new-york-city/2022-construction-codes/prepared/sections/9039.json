@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156482\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156482\"></AnnotationDrawer><div>The rules of the department of environmental protection relating to materials used in the construction of temporary structures for asbestos abatement activities shall contain a provision requiring such structures to be noncombustible or flame resistant in compliance with reference standard NFPA 255-06 or NFPA 701-99, as such standards may be modified by local law or by the Department of Buildings pursuant to applicable rules. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-224076\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-224076\"></AnnotationDrawer><div>(Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-206109\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-206109\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-206090', hash: '#JD_L.L.2009/037' }}\">L.L. 2009/037</Link> and <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-224061', hash: '#JD_L.L.2023/077' }}\">L.L. 2023/077</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9039-html-1",
+            "kind": "html",
+            "plainText": "The rules of the department of environmental protection relating to materials used in the construction of temporary structures for asbestos abatement activities shall contain a provision requiring such structures to be noncombustible or flame resistant in compliance with reference standard NFPA 255-06 or NFPA 701-99, as such standards may be modified by local law or by the Department of Buildings pursuant to applicable rules. \n\n (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/037 and L.L. 2023/077 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9039
+}

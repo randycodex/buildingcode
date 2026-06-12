@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156174\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156174\"></AnnotationDrawer><div>Where the department determines that work is located within a coastal zone or water-sensitive inland zone after construction documents have been approved for such work and/or that the documentation required by sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156160', hash: '#JD_28-104.9.2' }}\">28-104.9.2</Link> through <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-206247', hash: '#JD_28-104.9.4' }}\">28-104.9.4</Link> has not been submitted, the department shall revoke such approval and any associated work permits that may have been issued for such work in accordance with section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156010', hash: '#JD_28-104.2.10' }}\">28-104.2.10</Link>.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156175\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156175\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-206233', hash: '#JD_L.L.2009/021' }}\">L.L. 2009/021</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8970-html-1",
+            "kind": "html",
+            "plainText": "Where the department determines that work is located within a coastal zone or water-sensitive inland zone after construction documents have been approved for such work and/or that the documentation required by sections 28-104.9.2 through 28-104.9.4 has not been submitted, the department shall revoke such approval and any associated work permits that may have been issued for such work in accordance with section 28-104.2.10 .\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/021 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8970
+}

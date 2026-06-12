@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156076\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156076\"></AnnotationDrawer><div>Construction documents shall identify all materials proposed to be used, including identification of the test standard to which they conform, and where applicable, supporting information or test data from the manufacturer attesting to such conformance.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8940-html-1",
+            "kind": "html",
+            "plainText": "Construction documents shall identify all materials proposed to be used, including identification of the test standard to which they conform, and where applicable, supporting information or test data from the manufacturer attesting to such conformance."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8940
+}

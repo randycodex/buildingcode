@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156744\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156744\"></AnnotationDrawer><div>A notice, stating the amount due and the nature of the charge, shall be mailed by the department of finance to the last known address of the person whose name appears on the records in the office of the department of finance as being the owner or agent or as the person designated by the owner to receive tax bills or, where no name appears, to the premises addressed to either the owner or the agent.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156745\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156745\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156746\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156746\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9110-html-1",
+            "kind": "html",
+            "plainText": "A notice, stating the amount due and the nature of the charge, shall be mailed by the department of finance to the last known address of the person whose name appears on the records in the office of the department of finance as being the owner or agent or as the person designated by the owner to receive tax bills or, where no name appears, to the premises addressed to either the owner or the agent.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9110
+}

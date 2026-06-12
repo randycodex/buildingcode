@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155688\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155688\"></AnnotationDrawer><div>The department shall receive and review applications, construction documents, and other related documents and shall issue permits, in accordance with the provisions of this code. The department shall, on a weekly basis, send council members and community boards, by electronic mail, a copy of all completed applications for a new building or an alteration that will require a new certificate of occupancy for a building, received during the prior week, disaggregated by community board. In addition, the department shall post such information on its website on a weekly basis. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155689\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155689\"></AnnotationDrawer><div>(Am. L.L. 2016/010, 2/8/2016, eff. 5/8/2016) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8827-html-1",
+            "kind": "html",
+            "plainText": "The department shall receive and review applications, construction documents, and other related documents and shall issue permits, in accordance with the provisions of this code. The department shall, on a weekly basis, send council members and community boards, by electronic mail, a copy of all completed applications for a new building or an alteration that will require a new certificate of occupancy for a building, received during the prior week, disaggregated by community board. In addition, the department shall post such information on its website on a weekly basis. \n\n (Am. L.L. 2016/010, 2/8/2016, eff. 5/8/2016)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8827
+}

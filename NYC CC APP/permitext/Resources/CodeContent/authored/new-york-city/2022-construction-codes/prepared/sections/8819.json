@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155670\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155670\"></AnnotationDrawer><div>An appeal from any decision or interpretation of the commissioner may be taken to the board of standards and appeals pursuant to the procedures of the board, except as provided in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-219801', hash: '#JD_25-204' }}\">25-204</Link> of the administrative code or as otherwise provided in this code.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155671\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155671\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-207427', hash: '#JD_L.L.2008/008' }}\">L.L. 2008/008</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8819-html-1",
+            "kind": "html",
+            "plainText": "An appeal from any decision or interpretation of the commissioner may be taken to the board of standards and appeals pursuant to the procedures of the board, except as provided in section 25-204 of the administrative code or as otherwise provided in this code.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8819
+}

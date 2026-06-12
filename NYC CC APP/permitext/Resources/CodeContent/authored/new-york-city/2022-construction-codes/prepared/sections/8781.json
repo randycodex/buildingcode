@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155413\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155413\"></AnnotationDrawer><div>Any reference in this title to \"this code\" or \"the code\" shall be deemed to be a reference to this title and all of the codes comprising the New York city construction codes unless the context or subject matter requires otherwise. Whenever a section or subsection of this code is cited or referred to, subordinate consecutively numbered sections and subsections of the cited provision are deemed to be included in such reference unless the context or subject matter requires otherwise.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155414\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155414\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-207427', hash: '#JD_L.L.2008/008' }}\">L.L. 2008/008</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8781-html-1",
+            "kind": "html",
+            "plainText": "Any reference in this title to \"this code\" or \"the code\" shall be deemed to be a reference to this title and all of the codes comprising the New York city construction codes unless the context or subject matter requires otherwise. Whenever a section or subsection of this code is cited or referred to, subordinate consecutively numbered sections and subsections of the cited provision are deemed to be included in such reference unless the context or subject matter requires otherwise.\n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8781
+}

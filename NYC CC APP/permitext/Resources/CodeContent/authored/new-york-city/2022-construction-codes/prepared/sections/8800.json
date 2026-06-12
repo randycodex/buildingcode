@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155612\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155612\"></AnnotationDrawer><div>Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern. Where a general requirement conflicts with a specific requirement, the specific requirement shall govern. Where British and metric units of measurement conflict, the British units shall govern.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8800-html-1",
+            "kind": "html",
+            "plainText": "Where, in any specific case, different sections of this code specify different materials, methods of construction or other requirements, the most restrictive shall govern. Where a general requirement conflicts with a specific requirement, the specific requirement shall govern. Where British and metric units of measurement conflict, the British units shall govern."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8800
+}

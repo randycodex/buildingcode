@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156284\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156284\"></AnnotationDrawer><div>Prior to the issuance of any permit for work that includes foundations and/or earthwork, submittal documents clearly illustrating support of excavation design, including but not limited to stepping, sheeting, sloping, shoring, and bracing, and any protective railings or equipment required by <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-184649', hash: '#JD_BCCh.33' }}\">chapter 33</Link> of the New York city building code shall be required.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8987-html-1",
+            "kind": "html",
+            "plainText": "Prior to the issuance of any permit for work that includes foundations and/or earthwork, submittal documents clearly illustrating support of excavation design, including but not limited to stepping, sheeting, sloping, shoring, and bracing, and any protective railings or equipment required by chapter 33 of the New York city building code shall be required."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8987
+}

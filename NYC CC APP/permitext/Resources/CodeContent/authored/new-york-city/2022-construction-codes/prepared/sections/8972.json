@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156180\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156180\"></AnnotationDrawer><div>Construction documents for sites that are covered development projects as defined in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-132127', hash: '#JD_24-541' }}\">24-541</Link> of the administrative code shall comply with section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156183', hash: '#JD_28-104.11.1' }}\">28-104.11.1</Link> through <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156194', hash: '#JD_28-104.11.4' }}\">28-104.11.4</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156181\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156181\"></AnnotationDrawer><div>(L.L. 2017/097, 5/30/2017, eff. 6/1/2019; Am. L.L. 2020/091, 9/27/2020, eff. 3/26/2021) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156182\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156182\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-130645', hash: '#JD_L.L.2020/091' }}\">L.L. 2020/091</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8972-html-1",
+            "kind": "html",
+            "plainText": "Construction documents for sites that are covered development projects as defined in section 24-541 of the administrative code shall comply with section 28-104.11.1 through 28-104.11.4 . \n\n (L.L. 2017/097, 5/30/2017, eff. 6/1/2019; Am. L.L. 2020/091, 9/27/2020, eff. 3/26/2021) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2020/091 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8972
+}

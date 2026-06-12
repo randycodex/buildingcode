@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157195\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157195\"></AnnotationDrawer><div>The owner of a building undergoing work for which a tenant protection plan is required by section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-157175', hash: '#JD_28-120.1' }}\">28-120.1</Link> shall, upon request from an occupant of a dwelling unit within such building, provide such occupant with a paper copy of the tenant protection plan approved by the department. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157196\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157196\"></AnnotationDrawer><div>(L.L. 2017/154, 8/30/2017, eff. 12/28/2017; Am. L.L. 2019/106, 6/8/2019, eff. 3/8/2020) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157197\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157197\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-129355', hash: '#JD_L.L.2017/154' }}\">L.L. 2017/154</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9251-html-1",
+            "kind": "html",
+            "plainText": "The owner of a building undergoing work for which a tenant protection plan is required by section 28-120.1 shall, upon request from an occupant of a dwelling unit within such building, provide such occupant with a paper copy of the tenant protection plan approved by the department. \n\n (L.L. 2017/154, 8/30/2017, eff. 12/28/2017; Am. L.L. 2019/106, 6/8/2019, eff. 3/8/2020) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2017/154 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9251
+}

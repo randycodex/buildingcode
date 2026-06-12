@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156860\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156860\"></AnnotationDrawer><div>Special inspection agencies are approved agencies and shall be subject to the provisions of <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156835', hash: '#JD_28-114' }}\">article 114</Link> of this chapter. Special inspection agencies and special inspectors shall satisfy the provisions of this article and the rules of the department as to qualifications in order to perform special inspections required by <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-178144', hash: '#JD_BCCh.17' }}\">chapter 17</Link> of the New York city building code or elsewhere in this code or department rules.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9155-html-1",
+            "kind": "html",
+            "plainText": "Special inspection agencies are approved agencies and shall be subject to the provisions of article 114 of this chapter. Special inspection agencies and special inspectors shall satisfy the provisions of this article and the rules of the department as to qualifications in order to perform special inspections required by chapter 17 of the New York city building code or elsewhere in this code or department rules."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9155
+}

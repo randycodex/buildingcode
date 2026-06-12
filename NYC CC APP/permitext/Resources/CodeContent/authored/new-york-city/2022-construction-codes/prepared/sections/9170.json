@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-236889\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-236889\"></AnnotationDrawer><div>Final inspections for electrical work for which a permit is required shall be performed in accordance with the New York city electrical code. </div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156901\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156901\"></AnnotationDrawer><div><span style=\"font-weight: normal;font-style: normal;text-decoration:none;display: inline;\">(</span>L.L. 2026/042, 1/17/2026, eff. 1/17/2026) </div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9170-html-1",
+            "kind": "html",
+            "plainText": "Final inspections for electrical work for which a permit is required shall be performed in accordance with the New York city electrical code. \n\n ( L.L. 2026/042, 1/17/2026, eff. 1/17/2026)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9170
+}

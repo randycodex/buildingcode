@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156124\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156124\"></AnnotationDrawer><div>All applications shall comply with sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156126', hash: '#JD_28-104.8.1' }}\">28-104.8.1</Link> through <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156139', hash: '#JD_28-104.8.3' }}\">28-104.8.3</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156125\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156125\"></AnnotationDrawer><div>(Am. L.L. 2019/106, 6/8/2019, eff. 3/8/2020) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8959-html-1",
+            "kind": "html",
+            "plainText": "All applications shall comply with sections 28-104.8.1 through 28-104.8.3 . \n\n (Am. L.L. 2019/106, 6/8/2019, eff. 3/8/2020)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8959
+}

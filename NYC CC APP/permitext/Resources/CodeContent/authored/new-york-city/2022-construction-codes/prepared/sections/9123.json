@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156790\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156790\"></AnnotationDrawer><div>Except as set forth in sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156793', hash: '#JD_28-113.2.1' }}\">28-113.2.1</Link> through <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156803', hash: '#JD_28-113.2.6' }}\">28-113.2.6</Link> materials specifically prescribed by this code or department rules may be used as prescribed without the prior approval of the commissioner.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156791\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156791\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156792\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156792\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9123-html-1",
+            "kind": "html",
+            "plainText": "Except as set forth in sections 28-113.2.1 through 28-113.2.6 materials specifically prescribed by this code or department rules may be used as prescribed without the prior approval of the commissioner.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9123
+}

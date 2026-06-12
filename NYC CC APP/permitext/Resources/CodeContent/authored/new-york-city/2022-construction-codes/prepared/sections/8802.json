@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155618\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155618\"></AnnotationDrawer><div>If any clause, sentence, paragraph, section or part of this code shall be adjudged to be invalid, such judgment shall not affect, impair or invalidate the remainder thereof, but shall be confined in its operation to the clause, sentence, paragraph, or part thereof directly involved in the controversy in which such judgment shall have been rendered.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8802-html-1",
+            "kind": "html",
+            "plainText": "If any clause, sentence, paragraph, section or part of this code shall be adjudged to be invalid, such judgment shall not affect, impair or invalidate the remainder thereof, but shall be confined in its operation to the clause, sentence, paragraph, or part thereof directly involved in the controversy in which such judgment shall have been rendered."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8802
+}

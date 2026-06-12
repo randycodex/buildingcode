@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-157045\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-157045\"></AnnotationDrawer><div>All applications for certificates of occupancy and accompanying submittal documents shall be examined promptly after their submission. If the building is entitled to the certificate of occupancy applied for, the application shall be approved and the certificate of occupancy issued by the commissioner within 10 calendar days after submission of a complete application. Otherwise, the application shall be rejected and written notice of rejection, stating the grounds of rejection, shall be given to the applicant within 10 calendar days of the submission of the application. Wherever an application has been rejected and proof is thereafter submitted establishing that the grounds of rejection have been met and that the building is entitled to the certificate of occupancy applied for, the application shall be approved and the certificate of occupancy issued within 10 calendar days after submission of such proof.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9211-html-1",
+            "kind": "html",
+            "plainText": "All applications for certificates of occupancy and accompanying submittal documents shall be examined promptly after their submission. If the building is entitled to the certificate of occupancy applied for, the application shall be approved and the certificate of occupancy issued by the commissioner within 10 calendar days after submission of a complete application. Otherwise, the application shall be rejected and written notice of rejection, stating the grounds of rejection, shall be given to the applicant within 10 calendar days of the submission of the application. Wherever an application has been rejected and proof is thereafter submitted establishing that the grounds of rejection have been met and that the building is entitled to the certificate of occupancy applied for, the application shall be approved and the certificate of occupancy issued within 10 calendar days after submission of such proof."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9211
+}

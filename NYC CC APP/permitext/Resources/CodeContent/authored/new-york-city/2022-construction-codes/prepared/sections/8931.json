@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156035\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156035\"></AnnotationDrawer><div>The department shall not accept construction documents or other documents submitted in connection with applications for construction document approval or work permits under this code by any person representing that he or she is a registered design professional or landscape architect without verifying, by means of lists compiled and made available by the New York state department of education pursuant to paragraph e-1 of subdivision 4 of section 6507 of the New York state education law, that such person meets the qualifications established by law to practice as an architect or engineer in New York state.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156036\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156036\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156037\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156037\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-207427', hash: '#JD_L.L.2008/008' }}\">L.L. 2008/008</Link> and <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8931-html-1",
+            "kind": "html",
+            "plainText": "The department shall not accept construction documents or other documents submitted in connection with applications for construction document approval or work permits under this code by any person representing that he or she is a registered design professional or landscape architect without verifying, by means of lists compiled and made available by the New York state department of education pursuant to paragraph e-1 of subdivision 4 of section 6507 of the New York state education law, that such person meets the qualifications established by law to practice as an architect or engineer in New York state.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 and L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8931
+}

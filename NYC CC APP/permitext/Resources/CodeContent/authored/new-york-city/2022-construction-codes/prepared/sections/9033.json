@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156459\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156459\"></AnnotationDrawer><div>Where the work for which a permit is sought involves disturbance of lead-based paint, as defined in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-210581', hash: '#JD_27-2056.2' }}\">27-2056.2</Link>, or paint of unknown lead content, the application shall include a statement of compliance with section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-210590', hash: '#JD_27-2056.11' }}\">27-2056.11</Link> and, where applicable, subpart E or subpart L of part 745 of title 40 of the code of federal regulations. The application shall also include a statement that any firm performing proposed work holds the certification or certifications required to perform work pursuant to such section, such certification number(s) and, where applicable, that such firm has filed or will file a notice of commencement required pursuant to paragraph (2) of subdivision a of section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-210590', hash: '#JD_27-2056.11' }}\">27-2056.11</Link> with the department of health and mental hygiene. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156460\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156460\"></AnnotationDrawer><div>(L.L. 2021/040, 4/18/2021, eff. 4/18/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9033-html-1",
+            "kind": "html",
+            "plainText": "Where the work for which a permit is sought involves disturbance of lead-based paint, as defined in section 27-2056.2 , or paint of unknown lead content, the application shall include a statement of compliance with section 27-2056.11 and, where applicable, subpart E or subpart L of part 745 of title 40 of the code of federal regulations. The application shall also include a statement that any firm performing proposed work holds the certification or certifications required to perform work pursuant to such section, such certification number(s) and, where applicable, that such firm has filed or will file a notice of commencement required pursuant to paragraph (2) of subdivision a of section 27-2056.11 with the department of health and mental hygiene. \n\n (L.L. 2021/040, 4/18/2021, eff. 4/18/2022)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9033
+}

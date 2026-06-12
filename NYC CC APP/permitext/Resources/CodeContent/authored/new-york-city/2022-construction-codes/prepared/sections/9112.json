@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156750\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156750\"></AnnotationDrawer><div>Such charge and the interest thereon shall continue to be, until paid, a lien on the premises. Such lien shall be deemed a tax lien within the meaning of sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-8870', hash: '#JD_11-319' }}\">11-319</Link> and <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-9119', hash: '#JD_11-401' }}\">11-401</Link> of the administrative code and may be sold, enforced or foreclosed in the manner provided in <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-128692', hash: '#JD_T11C003' }}\">chapter 3</Link> or <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-240492', hash: '#JD_T11C004' }}\">4 of title 11</Link> of such code or may be satisfied in accordance with the provisions of section 1354 of the New York state real property actions and proceedings law.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156751\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156751\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156752\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156752\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9112-html-1",
+            "kind": "html",
+            "plainText": "Such charge and the interest thereon shall continue to be, until paid, a lien on the premises. Such lien shall be deemed a tax lien within the meaning of sections 11-319 and 11-401 of the administrative code and may be sold, enforced or foreclosed in the manner provided in chapter 3 or 4 of title 11 of such code or may be satisfied in accordance with the provisions of section 1354 of the New York state real property actions and proceedings law.\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9112
+}

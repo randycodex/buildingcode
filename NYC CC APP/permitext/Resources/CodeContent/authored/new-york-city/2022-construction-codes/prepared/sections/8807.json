@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155630\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155630\"></AnnotationDrawer><div>The continuation of the unlawful use or occupancy of a building or structure contrary to the provisions of this code, or contrary to the provisions of prior codes or other applicable law or rule, shall be a violation of this code.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8807-html-1",
+            "kind": "html",
+            "plainText": "The continuation of the unlawful use or occupancy of a building or structure contrary to the provisions of this code, or contrary to the provisions of prior codes or other applicable law or rule, shall be a violation of this code."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8807
+}

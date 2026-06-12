@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156834\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156834\"></AnnotationDrawer><div>On and after July 1, 2013 carpet and carpet cushion as defined in section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-29596', hash: '#JD_17-1401' }}\">17-1401</Link> of the administrative code shall comply with the limits on volatile organic compound emissions set forth in <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-201726', hash: '#JD_T17C014' }}\">chapter 14 of title 17</Link> of such code.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9144-html-1",
+            "kind": "html",
+            "plainText": "On and after July 1, 2013 carpet and carpet cushion as defined in section 17-1401 of the administrative code shall comply with the limits on volatile organic compound emissions set forth in chapter 14 of title 17 of such code."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9144
+}

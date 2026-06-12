@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156666\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156666\"></AnnotationDrawer><div>The payment of the fee for the construction, alteration, removal or demolition for work done in connection or concurrently with the work authorized by a building permit shall not relieve the applicant or holder of the permit from the payment of other fees that are prescribed by law.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9088-html-1",
+            "kind": "html",
+            "plainText": "The payment of the fee for the construction, alteration, removal or demolition for work done in connection or concurrently with the work authorized by a building permit shall not relieve the applicant or holder of the permit from the payment of other fees that are prescribed by law."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9088
+}

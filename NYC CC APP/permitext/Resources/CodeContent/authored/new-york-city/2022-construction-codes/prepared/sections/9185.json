@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156953\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156953\"></AnnotationDrawer><div>No change shall be made to a place of assembly that is inconsistent with the most recently issued place of assembly certificate of operation or renewal unless an amendment to such certificate is filed with and approved or accepted by the department. Changes that require an amendment include any of the following:</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156954\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156954\"></AnnotationDrawer><div>&#160;&#160;&#160;1.&#160;&#160;&#160;Any physical change requiring an alteration permit to be issued by the department.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156955\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156955\"></AnnotationDrawer><div>&#160;&#160;&#160;2.&#160;&#160;&#160;Any amendment to the plan for seating and other moveable furnishings, in accordance with section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156944', hash: '#JD_28-117.1' }}\">28-117.1</Link>.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156956\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156956\"></AnnotationDrawer><div>&#160;&#160;&#160;3.&#160;&#160;&#160;Any change to the name of the establishment.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9185-html-1",
+            "kind": "html",
+            "plainText": "No change shall be made to a place of assembly that is inconsistent with the most recently issued place of assembly certificate of operation or renewal unless an amendment to such certificate is filed with and approved or accepted by the department. Changes that require an amendment include any of the following:\n\n    1.   Any physical change requiring an alteration permit to be issued by the department.\n\n    2.   Any amendment to the plan for seating and other moveable furnishings, in accordance with section 28-117.1 .\n\n    3.   Any change to the name of the establishment."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9185
+}

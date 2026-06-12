@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156462\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156462\"></AnnotationDrawer><div>The department shall maintain an electronic record of all permits issued that indicate that section <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156458', hash: '#JD_28-105.12.12' }}\">28-105.12.12</Link> applies to the building subject to such permit. The department shall make such permit information available to the department of health and mental hygiene. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156463\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156463\"></AnnotationDrawer><div>(L.L. 2021/040, 4/18/2021, eff. 4/18/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9034-html-1",
+            "kind": "html",
+            "plainText": "The department shall maintain an electronic record of all permits issued that indicate that section 28-105.12.12 applies to the building subject to such permit. The department shall make such permit information available to the department of health and mental hygiene. \n\n (L.L. 2021/040, 4/18/2021, eff. 4/18/2022)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9034
+}

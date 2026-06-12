@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156768\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156768\"></AnnotationDrawer><div>The commissioner shall waive the fees that would otherwise be required to be paid by this code, the electrical code or the rules of the department for applications, permits and inspections for certain work arising out of the storm that occurred on October 29 and 30, 2012 as provided in sections <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156771', hash: '#JD_28-112.10.1' }}\">28-112.10.1</Link> and <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-156773', hash: '#JD_28-112.10.2' }}\">28-112.10.2</Link>.</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156769\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156769\"></AnnotationDrawer><div>(Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156770\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156770\"></AnnotationDrawer><div class=\"EdNoteSm\"><span style=\"font-weight: bold;font-style: normal;text-decoration:none;display: inline;\">Editor's note:</span> For related unconsolidated provisions, see Appendix A at <Link class=\"Jump\" to=\"{{ pathname: '/codes/newyorkcity/latest/NYCadmin/0-0-0-135195', hash: '#JD_L.L.2021/126' }}\">L.L. 2021/126</Link>. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9116-html-1",
+            "kind": "html",
+            "plainText": "The commissioner shall waive the fees that would otherwise be required to be paid by this code, the electrical code or the rules of the department for applications, permits and inspections for certain work arising out of the storm that occurred on October 29 and 30, 2012 as provided in sections 28-112.10.1 and 28-112.10.2 .\n\n (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) \n\n Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9116
+}

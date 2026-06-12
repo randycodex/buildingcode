@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155826\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155826\"></AnnotationDrawer><div>The real time enforcement unit shall receive and track all complaints related to work without a permit in occupied multiple dwellings. The unit shall retain records of such complaints. \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-155827\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-155827\"></AnnotationDrawer><div>(L.L. 2017/188, 10/16/2017, eff. 2/13/2018; Am. L.L. 2017/233, 12/1/2017, eff. 12/1/2018) \n\t\t\t\t\t\t\t\t\t\t\t</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "8880-html-1",
+            "kind": "html",
+            "plainText": "The real time enforcement unit shall receive and track all complaints related to work without a permit in occupied multiple dwellings. The unit shall retain records of such complaints. \n\n (L.L. 2017/188, 10/16/2017, eff. 2/13/2018; Am. L.L. 2017/233, 12/1/2017, eff. 12/1/2018)"
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 8880
+}

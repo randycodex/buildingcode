@@ -1,0 +1,13 @@
+{
+    "blocks": [
+        {
+            "html": "</div><div class=\"clearfix\"></div><div id=\"rid-0-0-0-156984\" class=\"rbox Normal-Level\"><AnnotationDrawer recordId=\"0-0-0-156984\"></AnnotationDrawer><div>No building or open lot shall be used or occupied without a certificate of occupancy issued by the commissioner. Issuance of a certificate of occupancy shall not be construed as an approval of a violation of the provisions of this code or of other applicable laws and rules.</div></div><div class=\"clearfix\"></div><div class=\"clearfix\"></div></div>",
+            "id": "9195-html-1",
+            "kind": "html",
+            "plainText": "No building or open lot shall be used or occupied without a certificate of occupancy issued by the commissioner. Issuance of a certificate of occupancy shall not be construed as an approval of a violation of the provisions of this code or of other applicable laws and rules."
+        }
+    ],
+    "chapterNumber": "1",
+    "schemaVersion": 1,
+    "sectionID": 9195
+}
