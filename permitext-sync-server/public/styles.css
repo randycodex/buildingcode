@@ -2083,23 +2083,21 @@ mark {
 }
 
 .project-color-rail {
-  display: flex;
-  gap: var(--space-3);
-  overflow-x: auto;
-  padding: var(--space-3);
+  --project-swatch-size: clamp(24px, 7.2vw, 30px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--project-swatch-size), 1fr));
+  justify-items: center;
+  align-items: center;
+  gap: clamp(7px, 2vw, var(--space-3));
+  overflow: visible;
+  padding: clamp(9px, 2.6vw, var(--space-3));
   border-radius: var(--radius-panel);
   background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-  scrollbar-width: none;
-}
-
-.project-color-rail::-webkit-scrollbar {
-  display: none;
 }
 
 .project-color-swatch {
-  flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
+  width: var(--project-swatch-size);
+  height: var(--project-swatch-size);
   padding: 0;
   border: 0;
   border-radius: 999px;

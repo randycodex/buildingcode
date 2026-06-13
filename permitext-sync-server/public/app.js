@@ -725,7 +725,20 @@ function deletedSavedMutationForSection(section) {
   };
 }
 
-const projectColorOptions = ["#6674c8", "#5aaea4", "#f27a4f", "#a14fc0", "#879a6d", "#9b7d6f"];
+const projectColorOptions = [
+  "#6674c8",
+  "#5aaea4",
+  "#f27a4f",
+  "#a14fc0",
+  "#879a6d",
+  "#9b7d6f",
+  "#d75f7a",
+  "#2f8f4e",
+  "#0891b2",
+  "#c96410",
+  "#3f6f9f",
+  "#b58b2a"
+];
 
 function projectMutationForRecord(project, accountOverride = null) {
   const account = accountOverride || activeAccount();
