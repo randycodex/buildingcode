@@ -1866,10 +1866,7 @@ async function renderSearchResults(panel, instance) {
   const query = searchInstance.query.trim();
   const selectedPrefixes = normalizeSearchCodeFilters(searchInstance.codeFilters);
   if (query.length < 2) {
-    renderSearchPlaceholder(results, {
-      title: "Search the code",
-      body: "Type at least two characters to search section numbers, titles, and body text."
-    });
+    clear(results);
     return;
   }
 
