@@ -2014,11 +2014,12 @@ function backIconSVG() {
   `;
 }
 
-function arrowLeftIconSVG() {
+function circleXIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M19 12H5"></path>
-      <path d="m12 19-7-7 7-7"></path>
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="m15 9-6 6"></path>
+      <path d="m9 9 6 6"></path>
     </svg>
   `;
 }
@@ -2331,7 +2332,7 @@ async function renderProjectDetail(detail) {
     title: "Back",
     label: "Back to projects",
     className: "project-detail-back",
-    svg: arrowLeftIconSVG()
+    svg: circleXIconSVG()
   });
   const title = document.createElement("h2");
   title.textContent = identity.name;
