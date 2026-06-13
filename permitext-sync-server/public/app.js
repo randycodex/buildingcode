@@ -774,7 +774,10 @@ const projectColorOptions = [
   "#0891b2",
   "#c96410",
   "#3f6f9f",
-  "#b58b2a"
+  "#b58b2a",
+  "#6f58c9",
+  "#c84b7a",
+  "#4f8f8b"
 ];
 
 function projectMutationForRecord(project, accountOverride = null) {
