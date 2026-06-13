@@ -6,6 +6,8 @@ const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleAnalysisButton = document.querySelector("#toggle-analysis");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
+const fitColumnsButton = document.querySelector("#fit-columns");
+const collapseReadersButton = document.querySelector("#collapse-readers");
 const readerTemplate = document.querySelector("#reader-template");
 const projectsTemplate = document.querySelector("#projects-template");
 const searchTemplate = document.querySelector("#search-template");
@@ -22,6 +24,8 @@ const codeOptions = [
 ];
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
+const defaultUtilityPaneWidth = 320;
+const repeatableUtilityKeys = new Set(["search", "saved", "analysis"]);
 
 const defaultReaderSettings = {
   fontSize: 10,
@@ -31,7 +35,7 @@ const defaultReaderSettings = {
 
 let chapters = [];
 let state = loadWorkspaceState();
-let searchTimer = null;
+const searchTimers = new Map();
 let syncedContent = null;
 let syncLoadPromise = null;
 let draggedPaneID = "";
@@ -45,17 +49,19 @@ applyReaderSettings();
 function loadWorkspaceState() {
   try {
     const saved = JSON.parse(localStorage.getItem(workspaceKey) || "{}");
+    const utilityInstances = normalizeUtilityInstances(saved);
     return {
       readers: Array.isArray(saved.readers) && saved.readers.length > 0 ? saved.readers : [newReaderState()],
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
       searchResultReader: saved.searchResultReader || null,
+      utilityInstances,
       utilities: {
         projects: Boolean(saved.utilities?.projects),
-        search: Boolean(saved.utilities?.search),
-        saved: Boolean(saved.utilities?.saved),
-        analysis: Boolean(saved.utilities?.analysis),
+        search: false,
+        saved: false,
+        analysis: false,
         settings: Boolean(saved.utilities?.settings)
       },
       account: saved.account && typeof saved.account === "object" ? saved.account : null,
@@ -71,6 +77,7 @@ function loadWorkspaceState() {
       searchCodeFilters: [],
       localProjects: [],
       searchResultReader: null,
+      utilityInstances: [],
       utilities: { projects: false, search: false, saved: false, analysis: false, settings: false },
       account: null,
       paneWeights: {},
@@ -79,6 +86,37 @@ function loadWorkspaceState() {
       readerSettings: { ...defaultReaderSettings }
     };
   }
+}
+
+function newUtilityInstance(key, overrides = {}) {
+  const instance = {
+    id: overrides.id || crypto.randomUUID(),
+    key
+  };
+  if (key === "search") {
+    instance.query = typeof overrides.query === "string" ? overrides.query : "";
+    instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
+  }
+  return instance;
+}
+
+function normalizeUtilityInstances(saved = {}) {
+  const source = Array.isArray(saved.utilityInstances) ? saved.utilityInstances : [];
+  const instances = source
+    .map((pane) => newUtilityInstance(String(pane?.key || "").trim().toLowerCase(), {
+      id: String(pane?.id || crypto.randomUUID()),
+      query: typeof pane?.query === "string" ? pane.query : "",
+      codeFilters: pane?.codeFilters
+    }))
+    .filter((pane) => repeatableUtilityKeys.has(pane.key));
+
+  if (source.length === 0) {
+    repeatableUtilityKeys.forEach((key) => {
+      if (saved.utilities?.[key]) instances.push(newUtilityInstance(key));
+    });
+  }
+
+  return instances;
 }
 
 function saveWorkspaceState() {
@@ -105,6 +143,13 @@ function normalizeSearchCodeFilters(value) {
   }
   const prefix = typeof value === "string" ? value.trim().toUpperCase() : "";
   return prefix && prefix !== "ALL" ? [prefix] : [];
+}
+
+function normalizeSearchInstance(instance) {
+  if (!instance || typeof instance !== "object") return { query: "", codeFilters: [] };
+  instance.query = typeof instance.query === "string" ? instance.query : "";
+  instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
+  return instance;
 }
 
 function readerLineHeightValue(lineSpacing) {
@@ -143,12 +188,16 @@ function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
 
+function paneIDForUtilityInstance(instance) {
+  return `utility:${instance.key}:${instance.id}`;
+}
+
 function defaultActivePaneIDs() {
   const ids = [];
   if (state.utilities.projects) ids.push("utility:projects");
-  if (state.utilities.search) ids.push("utility:search");
-  if (state.utilities.saved) ids.push("utility:saved");
-  if (state.utilities.analysis) ids.push("utility:analysis");
+  (state.utilityInstances || []).forEach((instance) => {
+    ids.push(paneIDForUtilityInstance(instance));
+  });
   if (state.utilities.settings) ids.push("utility:settings");
   if (state.searchResultReader) ids.push("reader:search-result");
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
@@ -189,21 +238,36 @@ function normalizePaneWeights(ids) {
     : 1;
   state.paneWeights = ids.reduce((weights, id) => {
     const value = Number(current[id]);
-    weights[id] = Number.isFinite(value) && value > 0 ? value : fallbackWeight;
+    weights[id] = Number.isFinite(value) && value > 0
+      ? value
+      : id.startsWith("utility:")
+        ? defaultUtilityPaneWidth
+        : fallbackWeight;
     return weights;
   }, {});
 }
 
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
-  panel.style.flex = `${state.paneWeights[paneID] || 1} 1 0`;
+  const value = Number(state.paneWeights[paneID]);
+  if (paneID.startsWith("utility:")) {
+    const utilityWidth = Number.isFinite(value) && value > 40 ? value : defaultUtilityPaneWidth;
+    panel.style.flex = `0 0 ${utilityWidth}px`;
+    return;
+  }
+  if (Number.isFinite(value) && value > 40) {
+    panel.style.flex = `1 1 ${value}px`;
+    return;
+  }
+  panel.style.flex = `${value || 1} 1 0`;
 }
 
 function setUtilityButtonStates() {
+  const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   toggleProjectsButton.setAttribute("aria-pressed", String(state.utilities.projects));
-  toggleSearchButton.setAttribute("aria-pressed", String(state.utilities.search));
-  toggleSavedButton.setAttribute("aria-pressed", String(state.utilities.saved));
-  toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
+  toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
+  toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
+  toggleAnalysisButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("analysis")));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
 }
 
@@ -247,6 +311,11 @@ async function fetchChapterList(codePrefix = "BC") {
     );
   }
   return chapterListCache.get(cacheKey);
+}
+
+async function firstChapterIDForCode(codePrefix = "BC") {
+  const chapterList = await fetchChapterList(codePrefix || "BC");
+  return chapterList[0]?.id || "";
 }
 
 async function fetchChapter(chapterID, options = {}) {
@@ -670,7 +739,7 @@ function projectMutationForRecord(project, accountOverride = null) {
       codeVersion: project.codeVersion || "nyc-2022",
       name: project.name || "Project",
       title: project.title || project.name || "Project",
-      description: project.description || "Project folder.",
+      description: project.description || "",
       color: project.color || project.tintColor || projectColorOptions[0],
       sortMode: project.sortMode || "Code order",
       createdAt: project.createdAt || now,
@@ -726,7 +795,7 @@ async function createProjectFolder(details = {}) {
     codeVersion: "nyc-2022",
     name,
     title: name,
-    description: description || "Project folder.",
+    description,
     color: details.color || projectColorOptions[0],
     sortMode: "Code order",
     createdAt: now,
@@ -760,6 +829,9 @@ async function populateReaderSelectors(panel, reader) {
   blankChapter.textContent = "Select a chapter";
   chapterSelect.append(blankChapter);
   const readerChapters = await fetchChapterList(reader.codePrefix);
+  if (!reader.chapterID) {
+    reader.chapterID = readerChapters[0]?.id || "";
+  }
   readerChapters.forEach((chapter) => {
     const option = document.createElement("option");
     option.value = chapter.id;
@@ -835,10 +907,22 @@ async function renderSectionContent(panel, reader) {
   if (reader.sectionID) {
     requestAnimationFrame(() => {
       const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
-      content.querySelector(`[data-section-id="${CSS.escape(String(reader.sectionID))}"]`)?.scrollIntoView({ behavior, block: "start" });
+      scrollReaderContentToSection(content, reader.sectionID, behavior);
       reader.shouldSmoothScrollToSection = false;
     });
   }
+}
+
+function scrollReaderContentToSection(content, sectionID, behavior = "auto") {
+  const target = content?.querySelector(`[data-section-id="${CSS.escape(String(sectionID))}"]`);
+  if (!content || !target) return;
+  const contentRect = content.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const targetTop = content.scrollTop + targetRect.top - contentRect.top;
+  content.scrollTo({
+    top: Math.max(0, targetTop),
+    behavior
+  });
 }
 
 function renderInlineCommentBox(section, reader) {
@@ -938,8 +1022,11 @@ function renderInlineCommentBox(section, reader) {
   });
 
   bindInlineCommentResize(resizer, wrapper);
-  wrapper.append(button, bookmarkButton, resizer, editor);
-  return wrapper;
+  wrapper.append(button, bookmarkButton, resizer);
+
+  const fragment = document.createDocumentFragment();
+  fragment.append(wrapper, editor);
+  return fragment;
 }
 
 function sectionElementForInlineComment(commentWrapper) {
@@ -1456,7 +1543,7 @@ async function renderReader(reader, options = {}) {
   codeSelect.addEventListener("change", async () => {
     reader.codePrefix = codeSelect.value || "BC";
     applyCodeTheme(panel, reader);
-    reader.chapterID = state.recentChaptersByCode?.[reader.codePrefix] || "";
+    reader.chapterID = await firstChapterIDForCode(reader.codePrefix);
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
@@ -1565,43 +1652,46 @@ function bindHorizontalWheelScroll(element) {
   );
 }
 
-async function renderSearch() {
+async function renderSearch(instance) {
+  const searchInstance = normalizeSearchInstance(instance);
+  const paneID = paneIDForUtilityInstance(searchInstance);
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
   const input = panel.querySelector(".search-input");
   const filterRail = panel.querySelector(".search-code-filter");
-  applyPaneWeight(panel, "utility:search");
-  input.value = state.searchQuery || "";
-  renderSearchCodeFilter(filterRail, panel);
+  applyPaneWeight(panel, paneID);
+  input.value = searchInstance.query || "";
+  renderSearchCodeFilter(filterRail, panel, searchInstance);
   bindHorizontalWheelScroll(filterRail);
 
   input.addEventListener("input", () => {
-    state.searchQuery = input.value;
-    if (!state.searchQuery.trim() && state.searchResultReader) {
+    searchInstance.query = input.value;
+    if (!searchInstance.query.trim() && state.searchResultReader) {
       state.searchResultReader = { ...state.searchResultReader, sectionID: "", sectionNumber: "", title: "Search Result" };
     }
     saveWorkspaceState();
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-      if (!state.searchQuery.trim() && state.searchResultReader) {
+    clearTimeout(searchTimers.get(paneID));
+    searchTimers.set(paneID, setTimeout(() => {
+      if (!searchInstance.query.trim() && state.searchResultReader) {
         renderWorkspace();
         return;
       }
-      renderSearchResults(panel);
-    }, 250);
+      renderSearchResults(panel, searchInstance);
+    }, 250));
   });
 
-  await renderSearchResults(panel);
+  await renderSearchResults(panel, searchInstance);
   return panel;
 }
 
-function renderSearchCodeFilter(filterRail, panel, renderOptions = {}) {
+function renderSearchCodeFilter(filterRail, panel, instance, renderOptions = {}) {
+  const searchInstance = normalizeSearchInstance(instance);
   const previousLeft = renderOptions.preserveScroll ? filterRail.scrollLeft : 0;
   clear(filterRail);
   const options = searchCodeFilterOptions();
   const validPrefixes = new Set(options.map((option) => option.prefix));
-  const normalizedFilters = normalizeSearchCodeFilters(state.searchCodeFilters);
-  state.searchCodeFilters = normalizedFilters.filter((prefix) => validPrefixes.has(prefix));
-  if (state.searchCodeFilters.length !== normalizedFilters.length) {
+  const normalizedFilters = normalizeSearchCodeFilters(searchInstance.codeFilters);
+  searchInstance.codeFilters = normalizedFilters.filter((prefix) => validPrefixes.has(prefix));
+  if (searchInstance.codeFilters.length !== normalizedFilters.length) {
     saveWorkspaceState();
   }
   options.forEach((option) => {
@@ -1614,23 +1704,23 @@ function renderSearchCodeFilter(filterRail, panel, renderOptions = {}) {
       chip.classList.add(`code-theme-${codeTheme(option.prefix)}`);
     }
     const isAll = option.prefix === "ALL";
-    const isSelected = isAll ? state.searchCodeFilters.length === 0 : state.searchCodeFilters.includes(option.prefix);
+    const isSelected = isAll ? searchInstance.codeFilters.length === 0 : searchInstance.codeFilters.includes(option.prefix);
     chip.setAttribute("aria-pressed", String(isSelected));
     chip.addEventListener("click", () => {
       if (isAll) {
-        state.searchCodeFilters = [];
+        searchInstance.codeFilters = [];
       } else {
-        const selected = new Set(normalizeSearchCodeFilters(state.searchCodeFilters));
+        const selected = new Set(normalizeSearchCodeFilters(searchInstance.codeFilters));
         if (selected.has(option.prefix)) {
           selected.delete(option.prefix);
         } else {
           selected.add(option.prefix);
         }
-        state.searchCodeFilters = Array.from(selected);
+        searchInstance.codeFilters = Array.from(selected);
       }
       saveWorkspaceState();
-      updateSearchCodeFilterStates(filterRail);
-      renderSearchResults(panel);
+      updateSearchCodeFilterStates(filterRail, searchInstance);
+      renderSearchResults(panel, searchInstance);
     });
     filterRail.append(chip);
   });
@@ -1643,8 +1733,8 @@ function renderSearchCodeFilter(filterRail, panel, renderOptions = {}) {
   }
 }
 
-function updateSearchCodeFilterStates(filterRail) {
-  const selectedFilters = normalizeSearchCodeFilters(state.searchCodeFilters);
+function updateSearchCodeFilterStates(filterRail, instance) {
+  const selectedFilters = normalizeSearchCodeFilters(instance?.codeFilters);
   filterRail.querySelectorAll(".search-filter-chip").forEach((chip) => {
     const prefix = chip.dataset.prefix || "ALL";
     const isSelected = prefix === "ALL" ? selectedFilters.length === 0 : selectedFilters.includes(prefix);
@@ -1652,10 +1742,11 @@ function updateSearchCodeFilterStates(filterRail) {
   });
 }
 
-async function renderSearchResults(panel) {
+async function renderSearchResults(panel, instance) {
+  const searchInstance = normalizeSearchInstance(instance);
   const results = panel.querySelector(".search-results");
-  const query = state.searchQuery.trim();
-  const selectedPrefixes = normalizeSearchCodeFilters(state.searchCodeFilters);
+  const query = searchInstance.query.trim();
+  const selectedPrefixes = normalizeSearchCodeFilters(searchInstance.codeFilters);
   if (query.length < 2) {
     renderSearchPlaceholder(results, {
       title: "Search the code",
@@ -1668,9 +1759,8 @@ async function renderSearchResults(panel) {
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   const payload = await api(`/code/search?q=${encodeURIComponent(query)}${codeQuery}`);
   if (
-    !panel.isConnected ||
-    state.searchQuery.trim() !== query ||
-    normalizeSearchCodeFilters(state.searchCodeFilters).join(",") !== selectedPrefixes.join(",")
+    searchInstance.query.trim() !== query ||
+    normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")
   ) {
     return;
   }
@@ -1753,6 +1843,36 @@ function renderUtility(template, paneID) {
   return panel;
 }
 
+function closeUtilityInstance(instance) {
+  const paneID = paneIDForUtilityInstance(instance);
+  state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
+  delete state.paneWeights[paneID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
+  saveWorkspaceState();
+  transitionWorkspace("utility");
+}
+
+function wireUtilityInstanceActions(panel, instance) {
+  const closeButton = panel?.querySelector(".utility-close");
+  if (!closeButton || closeButton.dataset.utilityCloseBound === instance.id) return;
+  closeButton.dataset.utilityCloseBound = instance.id;
+  closeButton.addEventListener("click", () => closeUtilityInstance(instance));
+}
+
+async function renderUtilityInstance(instance) {
+  const paneID = paneIDForUtilityInstance(instance);
+  let panel = null;
+  if (instance.key === "search") {
+    panel = await renderSearch(instance);
+  } else if (instance.key === "saved") {
+    panel = await renderSaved(paneID);
+  } else if (instance.key === "analysis") {
+    panel = renderUtility(analysisTemplate, paneID);
+  }
+  wireUtilityInstanceActions(panel, instance);
+  return panel;
+}
+
 async function renderProjects() {
   const panel = renderTemplate(projectsTemplate);
   applyPaneWeight(panel, "utility:projects");
@@ -1796,22 +1916,16 @@ function showProjectCreateSheet(panel) {
   const sheet = document.createElement("form");
   sheet.className = "project-create-sheet";
 
-  const grabber = document.createElement("div");
-  grabber.className = "sheet-grabber";
-  grabber.setAttribute("aria-hidden", "true");
-
   const header = document.createElement("header");
-  header.className = "project-sheet-header";
+  header.className = "project-sheet-header project-sheet-header-compact";
   const cancelButton = document.createElement("button");
   cancelButton.type = "button";
   cancelButton.textContent = "Cancel";
-  const title = document.createElement("h3");
-  title.textContent = "New project";
   const saveButton = document.createElement("button");
   saveButton.type = "submit";
   saveButton.textContent = "Save";
   saveButton.disabled = true;
-  header.append(cancelButton, title, saveButton);
+  header.append(cancelButton, saveButton);
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "project-sheet-field";
@@ -1874,7 +1988,7 @@ function showProjectCreateSheet(panel) {
     }
   });
 
-  sheet.append(grabber, header, nameLabel, colorGroup, descriptionLabel);
+  sheet.append(header, nameLabel, colorGroup, descriptionLabel);
   overlay.append(sheet);
   panel.append(overlay);
   nameInput.focus();
@@ -1904,9 +2018,13 @@ function renderProjectRows(content, projects, projectSections) {
     const body = document.createElement("div");
     const heading = document.createElement("h3");
     heading.textContent = project.name || project.title || "Project";
-    const description = document.createElement("p");
-    description.textContent = project.description || "Project folder.";
-    body.append(heading, description);
+    body.append(heading);
+    const descriptionText = String(project.description || "").trim();
+    if (descriptionText) {
+      const description = document.createElement("p");
+      description.textContent = descriptionText;
+      body.append(description);
+    }
     const meta = document.createElement("div");
     meta.className = "project-meta";
     [count === 1 ? "1 saved" : `${count} saved`].forEach((label) => {
@@ -1919,9 +2037,9 @@ function renderProjectRows(content, projects, projectSections) {
   });
 }
 
-async function renderSaved() {
+async function renderSaved(paneID = "utility:saved") {
   const panel = renderTemplate(savedTemplate);
-  applyPaneWeight(panel, "utility:saved");
+  applyPaneWeight(panel, paneID);
   const content = panel.querySelector(".saved-content");
   clear(content);
   const data = await loadSyncedContent();
@@ -2291,9 +2409,13 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     startWidth: pane.getBoundingClientRect().width,
     minWidth: minimumWidthFor(pane)
   }));
+  const startScrollLeft = track.scrollLeft;
+  const trackStartRect = track.getBoundingClientRect();
   const previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
   const nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
   if (previousIndex === -1 || nextIndex === -1) return;
+  const rightEdgePane = paneData[paneData.length - 1]?.pane;
+  const rightEdgeStartRect = rightEdgePane?.getBoundingClientRect();
 
   const shrinkFrom = (widths, indexes, requested) => {
     let remaining = requested;
@@ -2311,17 +2433,25 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     const delta = moveEvent.clientX - startX;
     const widths = paneData.map((pane) => pane.startWidth);
     if (delta > 0) {
-      const rightIndexes = paneData.map((_, index) => index).slice(nextIndex);
-      const applied = shrinkFrom(widths, rightIndexes, delta);
-      widths[previousIndex] += applied;
+      const applied = shrinkFrom(widths, [nextIndex], delta);
+      widths[previousIndex] += delta;
+      if (delta > applied) {
+        track.scrollLeft = startScrollLeft;
+      }
     } else if (delta < 0) {
-      const leftIndexes = paneData.map((_, index) => index).slice(0, previousIndex + 1).reverse();
-      const applied = shrinkFrom(widths, leftIndexes, Math.abs(delta));
-      widths[nextIndex] += applied;
+      const requested = Math.abs(delta);
+      const applied = shrinkFrom(widths, [previousIndex], requested);
+      if (Math.abs(delta) > applied) {
+        track.scrollLeft = Math.max(0, startScrollLeft - (requested - applied));
+      }
+      const rightGroupEdgeWithoutFill = (rightEdgeStartRect?.right ?? trackStartRect.right) - applied;
+      if (rightGroupEdgeWithoutFill < trackStartRect.right) {
+        widths[nextIndex] += trackStartRect.right - rightGroupEdgeWithoutFill;
+      }
     }
     paneData.forEach((pane, index) => {
       state.paneWeights[pane.id] = widths[index];
-      pane.pane.style.flex = `${widths[index]} 1 0`;
+      pane.pane.style.flex = `0 0 ${widths[index]}px`;
     });
   };
 
@@ -2363,14 +2493,9 @@ async function renderWorkspace() {
   if (state.utilities.projects) {
     panes.push(await renderProjects());
   }
-  if (state.utilities.search) {
-    panes.push(await renderSearch());
-  }
-  if (state.utilities.saved) {
-    panes.push(await renderSaved());
-  }
-  if (state.utilities.analysis) {
-    panes.push(renderUtility(analysisTemplate, "utility:analysis"));
+  for (const instance of state.utilityInstances || []) {
+    const pane = await renderUtilityInstance(instance);
+    if (pane) panes.push(pane);
   }
   if (state.utilities.settings) {
     panes.push(renderSettings());
@@ -2389,7 +2514,12 @@ async function renderWorkspace() {
 }
 
 async function renderUtilityWorkspace() {
-  const existingContentPanes = Array.from(track.querySelectorAll(".workspace-panel"))
+  const existingPanesByID = new Map(
+    Array.from(track.querySelectorAll(".workspace-panel"))
+      .filter((pane) => pane.dataset.paneId)
+      .map((pane) => [pane.dataset.paneId, pane])
+  );
+  const existingContentPanes = Array.from(existingPanesByID.values())
     .filter((pane) => !String(pane.dataset.paneId || "").startsWith("utility:"));
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
@@ -2399,20 +2529,21 @@ async function renderUtilityWorkspace() {
   if (state.utilities.projects) {
     panes.push(await renderProjects());
   }
-  if (state.utilities.search) {
-    panes.push(await renderSearch());
-  }
-  if (state.utilities.saved) {
-    panes.push(await renderSaved());
-  }
-  if (state.utilities.analysis) {
-    panes.push(renderUtility(analysisTemplate, "utility:analysis"));
+  for (const instance of state.utilityInstances || []) {
+    const paneID = paneIDForUtilityInstance(instance);
+    const pane = existingPanesByID.get(paneID) || await renderUtilityInstance(instance);
+    wireUtilityInstanceActions(pane, instance);
+    if (pane?.dataset.paneId) {
+      applyPaneWeight(pane, pane.dataset.paneId);
+    }
+    if (pane) panes.push(pane);
   }
   if (state.utilities.settings) {
     panes.push(renderSettings());
   }
 
   existingContentPanes.forEach((pane) => {
+    resetEnhancedSelects(pane);
     if (pane.dataset.paneId) {
       applyPaneWeight(pane, pane.dataset.paneId);
     }
@@ -2422,6 +2553,7 @@ async function renderUtilityWorkspace() {
   appendPaneSequence(panes);
   syncAllCommentBoxHeights();
   bindAllReaderCommentScroll();
+  enhanceReaderSelects();
   saveWorkspaceState();
 }
 
@@ -2434,10 +2566,24 @@ async function transitionWorkspace(mode = "default") {
 }
 
 async function toggleUtilityPane(key) {
+  if (repeatableUtilityKeys.has(key)) {
+    const instance = newUtilityInstance(key);
+    const paneID = paneIDForUtilityInstance(instance);
+    state.utilityInstances = [...(state.utilityInstances || []), instance];
+    state.utilities[key] = false;
+    state.paneWeights[paneID] = defaultUtilityPaneWidth;
+    movePaneToFront(paneID);
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+    track.scrollTo({ left: 0, behavior: "smooth" });
+    return;
+  }
+
   const paneID = `utility:${key}`;
   const willOpen = !state.utilities[key];
   state.utilities[key] = willOpen;
   if (willOpen) {
+    state.paneWeights[paneID] = defaultUtilityPaneWidth;
     movePaneToFront(paneID);
   }
   saveWorkspaceState();
@@ -2445,6 +2591,37 @@ async function toggleUtilityPane(key) {
   if (willOpen) {
     track.scrollTo({ left: 0, behavior: "smooth" });
   }
+}
+
+async function fitVisibleColumns() {
+  const paneIDs = activePaneIDs();
+  state.paneWeights = paneIDs.reduce((weights, paneID) => {
+    weights[paneID] = 1;
+    return weights;
+  }, {});
+  saveWorkspaceState();
+  track.querySelectorAll(".workspace-panel").forEach((pane) => {
+    if (pane.dataset.paneId) {
+      applyPaneWeight(pane, pane.dataset.paneId);
+    }
+  });
+  track.scrollTo({ left: 0, behavior: "smooth" });
+}
+
+async function collapseToOneReader() {
+  const reader = state.readers[0] || newReaderState();
+  state.readers = [reader];
+  state.searchResultReader = null;
+  Object.keys(state.utilities).forEach((key) => {
+    state.utilities[key] = false;
+  });
+  state.utilityInstances = [];
+  const readerPaneID = paneIDForReader(reader);
+  state.paneOrder = [readerPaneID];
+  state.paneWeights = { [readerPaneID]: 1 };
+  saveWorkspaceState();
+  await transitionWorkspace();
+  track.scrollTo({ left: 0, behavior: "smooth" });
 }
 
 async function start() {
@@ -2462,8 +2639,7 @@ async function start() {
   window.addEventListener("resize", repositionActiveCustomSelect);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   addReaderButton.addEventListener("click", async () => {
-    const buildingChapters = await fetchChapterList("BC");
-    const reader = newReaderState({ chapterID: buildingChapters[0]?.id || "" });
+    const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
     state.readers.push(reader);
     saveWorkspaceState();
     transitionWorkspace();
@@ -2482,6 +2658,12 @@ async function start() {
   });
   toggleSettingsButton.addEventListener("click", () => {
     toggleUtilityPane("settings");
+  });
+  fitColumnsButton.addEventListener("click", () => {
+    fitVisibleColumns();
+  });
+  collapseReadersButton.addEventListener("click", () => {
+    collapseToOneReader();
   });
   await renderWorkspace();
 }
