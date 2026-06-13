@@ -2347,29 +2347,18 @@ async function renderProjectDetail(detail) {
   savedTitle.textContent = "Saved sections";
   savedSection.append(savedTitle);
 
-  if (linkedSavedItems.length === 0) {
-    const empty = document.createElement("article");
-    empty.className = "saved-row";
-    const emptyTitle = document.createElement("strong");
-    emptyTitle.textContent = "No saved sections";
-    const emptyBody = document.createElement("span");
-    emptyBody.textContent = "Sections added to this project will appear here.";
-    empty.append(emptyTitle, emptyBody);
-    savedSection.append(empty);
-  } else {
-    linkedSavedItems.forEach((item) => {
-      const row = document.createElement("button");
-      row.className = "saved-row project-detail-saved-row";
-      row.type = "button";
-      const rowTitle = document.createElement("strong");
-      rowTitle.textContent = item.sectionNumber || item.sectionID || "Saved";
-      const rowBody = document.createElement("span");
-      rowBody.textContent = item.title || item.subtitle || "Saved section";
-      row.append(rowTitle, rowBody);
-      row.addEventListener("click", () => openSectionDetailForExistingSearch(item));
-      savedSection.append(row);
-    });
-  }
+  linkedSavedItems.forEach((item) => {
+    const row = document.createElement("button");
+    row.className = "saved-row project-detail-saved-row";
+    row.type = "button";
+    const rowTitle = document.createElement("strong");
+    rowTitle.textContent = item.sectionNumber || item.sectionID || "Saved";
+    const rowBody = document.createElement("span");
+    rowBody.textContent = item.title || item.subtitle || "Saved section";
+    row.append(rowTitle, rowBody);
+    row.addEventListener("click", () => openSectionDetailForExistingSearch(item));
+    savedSection.append(row);
+  });
 
   backButton.addEventListener("click", () => {
     state.projectDetail = null;
