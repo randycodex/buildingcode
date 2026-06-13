@@ -2228,9 +2228,9 @@ mark {
   min-width: 0;
   margin: 0;
   color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 1.25) !important;
-  font-weight: 750;
-  line-height: 1.1;
+  font-size: 1rem !important;
+  font-weight: 650;
+  line-height: normal;
 }
 
 .project-detail-content {
