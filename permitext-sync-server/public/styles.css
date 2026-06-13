@@ -1521,11 +1521,16 @@ select option:checked {
   gap: 0;
   --comments-width: 34%;
   min-height: 0;
+  overflow-x: hidden;
   transition: grid-template-columns 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .reader-panel .reader-body {
   grid-row: 1;
+}
+
+.reader-content {
+  overflow-x: hidden;
 }
 
 .reader-body.comments-open {
