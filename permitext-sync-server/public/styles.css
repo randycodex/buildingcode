@@ -2095,6 +2095,11 @@ mark {
   position: relative;
 }
 
+.project-card-body {
+  display: grid;
+  gap: var(--space-1);
+}
+
 .project-card h3,
 .analysis-card h3,
 .saved-row strong {
