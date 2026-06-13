@@ -3321,6 +3321,26 @@ function appendPaneSequence(panes) {
   track.scrollLeft = Math.min(previousScrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
 }
 
+function scrollPaneIntoView(paneID, behavior = "smooth") {
+  const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (!pane) return;
+  const paneRect = pane.getBoundingClientRect();
+  const trackRect = track.getBoundingClientRect();
+  const paneRight = paneRect.right - trackRect.right;
+  const paneLeft = paneRect.left - trackRect.left;
+  if (paneRight > 0) {
+    track.scrollTo({
+      left: Math.min(track.scrollLeft + paneRight, Math.max(0, track.scrollWidth - track.clientWidth)),
+      behavior
+    });
+  } else if (paneLeft < 0) {
+    track.scrollTo({
+      left: Math.max(0, track.scrollLeft + paneLeft),
+      behavior
+    });
+  }
+}
+
 async function renderWorkspace() {
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
@@ -3510,7 +3530,8 @@ async function start() {
     const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
     state.readers.push(reader);
     saveWorkspaceState();
-    transitionWorkspace();
+    await transitionWorkspace();
+    scrollPaneIntoView(paneIDForReader(reader));
   });
   toggleProjectsButton.addEventListener("click", () => {
     toggleUtilityPane("projects");
