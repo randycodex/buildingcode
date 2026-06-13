@@ -2148,16 +2148,21 @@ mark {
 
 .projects-content .project-card {
   min-height: 84px;
-  padding: var(--space-3) calc(var(--space-4) + var(--panel-title-control-size) + var(--space-2)) var(--space-3) var(--space-4);
+  padding: var(--space-3) calc(var(--space-4) + (var(--panel-title-control-size) * 2) + (var(--space-2) * 2)) var(--space-3) var(--space-4);
   border: 0;
   border-radius: var(--radius-card);
   background: transparent;
 }
 
-.project-card-action {
+.project-card-actions {
   position: absolute;
   top: var(--space-3);
   right: var(--space-3);
+  display: flex;
+  gap: var(--space-1);
+}
+
+.project-card-action {
   display: grid;
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);

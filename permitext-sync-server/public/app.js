@@ -1065,6 +1065,47 @@ async function createProjectFolder(details = {}) {
   saveWorkspaceState();
 }
 
+async function updateProjectFolder(project, details = {}) {
+  const id = projectRecordID(project);
+  if (!id) return;
+  const now = new Date().toISOString();
+  const name = String(details.name || "").trim() || project.name || project.title || "Project";
+  const color = details.color || projectColor(project);
+  const updated = {
+    ...project,
+    id: project.id || id,
+    clientID: project.clientID || id,
+    localFolderID: project.localFolderID || id,
+    codeVersion: project.codeVersion || "nyc-2022",
+    name,
+    title: name,
+    description: String(details.description || "").trim(),
+    color,
+    colorHex: project.colorHex || color,
+    tintColor: color,
+    updatedAt: now
+  };
+  const localProjects = state.localProjects || [];
+  const localIndex = localProjects.findIndex((item) => projectRecordID(item) === id);
+  const account = activeAccount();
+
+  if (account) {
+    await pushMutation(projectMutationForRecord(updated, account));
+    state.localProjects = localProjects.filter((item) => projectRecordID(item) !== id);
+  } else {
+    const nextProjects = [...localProjects];
+    if (localIndex >= 0) {
+      nextProjects[localIndex] = { ...nextProjects[localIndex], ...updated };
+    } else {
+      nextProjects.push(updated);
+    }
+    state.localProjects = nextProjects;
+  }
+
+  if (projectDetailMatches(project, state.projectDetail)) state.projectDetail = projectIdentity(updated);
+  saveWorkspaceState();
+}
+
 function isSectionSaved(sectionID) {
   const savedItems = syncedContent?.summary?.savedItems || [];
   return savedItems.some((item) => String(item.sectionID) === String(sectionID));
@@ -2203,6 +2244,15 @@ function trashIconSVG() {
   `;
 }
 
+function pencilIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.2 6.8 17.2 2.8a2 2 0 0 0-2.8 0L3 14.2V21h6.8L21.2 9.6a2 2 0 0 0 0-2.8z"></path>
+      <path d="m14 5 5 5"></path>
+    </svg>
+  `;
+}
+
 function makeSectionPayloadFromDetail(detail, section) {
   return {
     sectionID: detail.sectionID,
@@ -2595,11 +2645,13 @@ async function renderProjectDetail(detail) {
   return panel;
 }
 
-function showProjectCreateSheet(panel) {
+function showProjectCreateSheet(panel, project = null) {
   panel.querySelector(".project-sheet-overlay")?.remove();
+  const isEditing = Boolean(project);
+  const identity = isEditing ? projectIdentity(project) : null;
   const overlay = document.createElement("section");
   overlay.className = "project-sheet-overlay";
-  overlay.setAttribute("aria-label", "New project");
+  overlay.setAttribute("aria-label", isEditing ? "Edit project" : "New project");
 
   const sheet = document.createElement("form");
   sheet.className = "project-create-sheet";
@@ -2612,7 +2664,7 @@ function showProjectCreateSheet(panel) {
   const saveButton = document.createElement("button");
   saveButton.type = "submit";
   saveButton.textContent = "Save";
-  saveButton.disabled = true;
+  saveButton.disabled = !isEditing;
   header.append(cancelButton, saveButton);
 
   const nameLabel = document.createElement("label");
@@ -2621,20 +2673,21 @@ function showProjectCreateSheet(panel) {
   nameInput.type = "text";
   nameInput.placeholder = "e.g. Bronx R-2 Passive House";
   nameInput.autocomplete = "off";
+  if (identity) nameInput.value = identity.name;
   nameLabel.append(nameInput);
 
   const colorGroup = document.createElement("fieldset");
   colorGroup.className = "project-sheet-colors";
   const colorRail = document.createElement("div");
   colorRail.className = "project-color-rail";
-  let selectedColor = projectColorOptions[0];
+  let selectedColor = identity?.color && projectColorOptions.includes(identity.color) ? identity.color : projectColorOptions[0];
   projectColorOptions.forEach((color, index) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "project-color-swatch";
     button.style.setProperty("--project-swatch", color);
     button.setAttribute("aria-label", `Project color ${index + 1}`);
-    button.setAttribute("aria-pressed", String(index === 0));
+    button.setAttribute("aria-pressed", String(color === selectedColor || (!identity && index === 0)));
     button.addEventListener("click", () => {
       selectedColor = color;
       colorRail.querySelectorAll(".project-color-swatch").forEach((swatch) => {
@@ -2651,6 +2704,7 @@ function showProjectCreateSheet(panel) {
   descriptionInput.type = "text";
   descriptionInput.placeholder = "Short description";
   descriptionInput.autocomplete = "off";
+  if (identity) descriptionInput.value = identity.description;
   descriptionLabel.append(descriptionInput);
 
   nameInput.addEventListener("input", () => {
@@ -2662,11 +2716,16 @@ function showProjectCreateSheet(panel) {
     if (!nameInput.value.trim()) return;
     saveButton.disabled = true;
     try {
-      await createProjectFolder({
+      const details = {
         name: nameInput.value,
         color: selectedColor,
         description: descriptionInput.value
-      });
+      };
+      if (isEditing) {
+        await updateProjectFolder(project, details);
+      } else {
+        await createProjectFolder(details);
+      }
       overlay.remove();
       await renderWorkspace();
     } catch (error) {
@@ -2712,13 +2771,27 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
     card.style.setProperty("--project-color", projectColor(project));
-    const actionButton = document.createElement("button");
-    actionButton.className = `project-card-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
-    actionButton.type = "button";
-    actionButton.title = mode === "archive" ? "Delete project" : "Archive project";
-    actionButton.setAttribute("aria-label", `${actionButton.title}: ${project.name || project.title || "project"}`);
-    actionButton.innerHTML = mode === "archive" ? trashIconSVG() : archiveIconSVG();
-    actionButton.addEventListener("click", (event) => {
+    const actionGroup = document.createElement("div");
+    actionGroup.className = "project-card-actions";
+    const editButton = document.createElement("button");
+    editButton.className = "project-card-action is-edit";
+    editButton.type = "button";
+    editButton.title = "Edit project";
+    editButton.setAttribute("aria-label", `Edit project: ${project.name || project.title || "project"}`);
+    editButton.innerHTML = pencilIconSVG();
+    editButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showProjectCreateSheet(content.closest(".workspace-panel"), project);
+    });
+    editButton.addEventListener("keydown", (event) => event.stopPropagation());
+
+    const lifecycleButton = document.createElement("button");
+    lifecycleButton.className = `project-card-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
+    lifecycleButton.type = "button";
+    lifecycleButton.title = mode === "archive" ? "Delete project" : "Archive project";
+    lifecycleButton.setAttribute("aria-label", `${lifecycleButton.title}: ${project.name || project.title || "project"}`);
+    lifecycleButton.innerHTML = mode === "archive" ? trashIconSVG() : archiveIconSVG();
+    lifecycleButton.addEventListener("click", (event) => {
       event.stopPropagation();
       if (mode === "archive") {
         deleteArchivedProject(project);
@@ -2726,7 +2799,8 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
         archiveProject(project);
       }
     });
-    actionButton.addEventListener("keydown", (event) => event.stopPropagation());
+    lifecycleButton.addEventListener("keydown", (event) => event.stopPropagation());
+    actionGroup.append(editButton, lifecycleButton);
     const body = document.createElement("div");
     body.className = "project-card-body";
     const heading = document.createElement("h3");
@@ -2745,7 +2819,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
       pill.textContent = label;
       meta.append(pill);
     });
-    card.append(actionButton, body, meta);
+    card.append(actionGroup, body, meta);
     card.addEventListener("click", () => openProjectDetail(project));
     card.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
