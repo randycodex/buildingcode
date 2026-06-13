@@ -58,6 +58,7 @@ function loadWorkspaceState() {
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
       sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
+      searchLinkedReaders: saved.searchLinkedReaders && typeof saved.searchLinkedReaders === "object" ? saved.searchLinkedReaders : {},
       projectDetail: saved.projectDetail && typeof saved.projectDetail === "object" ? saved.projectDetail : null,
       sectionNotes: saved.sectionNotes && typeof saved.sectionNotes === "object" ? saved.sectionNotes : {},
       utilityInstances,
@@ -83,6 +84,7 @@ function loadWorkspaceState() {
       searchResultReader: null,
       sectionDetail: null,
       sectionDetails: {},
+      searchLinkedReaders: {},
       projectDetail: null,
       sectionNotes: {},
       utilityInstances: [],
@@ -224,6 +226,30 @@ function sectionDetailsBySearch() {
   return state.sectionDetails;
 }
 
+function searchLinkedReadersBySearch() {
+  state.searchLinkedReaders = state.searchLinkedReaders && typeof state.searchLinkedReaders === "object" ? state.searchLinkedReaders : {};
+  const activeSearchIDs = new Set((state.utilityInstances || []).filter((instance) => instance.key === "search").map((instance) => instance.id));
+  const activeReaderIDs = new Set((state.readers || []).map((reader) => reader.id));
+  Object.keys(state.searchLinkedReaders).forEach((searchID) => {
+    if (!activeSearchIDs.has(searchID) || !activeReaderIDs.has(state.searchLinkedReaders[searchID])) {
+      delete state.searchLinkedReaders[searchID];
+    }
+  });
+  return state.searchLinkedReaders;
+}
+
+function readerFieldsForSectionDetail(detail, overrides = {}) {
+  return {
+    codePrefix: detail.codePrefix || "BC",
+    chapterID: detail.chapterID || "",
+    sectionID: detail.sectionID,
+    sectionNumber: detail.sectionNumber || "",
+    title: detail.title || "Section",
+    shouldSmoothScrollToSection: true,
+    ...overrides
+  };
+}
+
 function defaultActivePaneIDs() {
   const ids = [];
   if (state.utilities.projects) ids.push("utility:projects");
@@ -298,6 +324,40 @@ function placeSectionDetailAfterSearch(searchID) {
   const insertIndex = searchIndex === -1 ? 0 : searchIndex + 1;
   ordered.splice(insertIndex, 0, detailID);
   state.paneOrder = ordered;
+}
+
+function placeLinkedReaderAfterSectionDetail(searchID, readerID) {
+  const readerPaneID = `reader:${readerID}`;
+  const detailID = paneIDForSectionDetail(searchID);
+  const activeIDs = defaultActivePaneIDs().filter((id) => id !== readerPaneID);
+  const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== readerPaneID);
+  activeIDs.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  const detailIndex = ordered.indexOf(detailID);
+  const insertIndex = detailIndex === -1 ? ordered.length : detailIndex + 1;
+  ordered.splice(insertIndex, 0, readerPaneID);
+  state.paneOrder = ordered;
+}
+
+function updateLinkedReaderForSearch(searchID, detail, overrides = {}) {
+  const linkedReaders = searchLinkedReadersBySearch();
+  const readerID = linkedReaders[searchID];
+  const reader = (state.readers || []).find((item) => item.id === readerID);
+  if (!reader) return null;
+  Object.assign(reader, readerFieldsForSectionDetail(detail, overrides));
+  placeLinkedReaderAfterSectionDetail(searchID, reader.id);
+  return reader;
+}
+
+function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
+  const existing = updateLinkedReaderForSearch(searchID, detail, overrides);
+  if (existing) return existing;
+  const reader = newReaderState(readerFieldsForSectionDetail(detail, overrides));
+  state.readers.push(reader);
+  searchLinkedReadersBySearch()[searchID] = reader.id;
+  placeLinkedReaderAfterSectionDetail(searchID, reader.id);
+  return reader;
 }
 
 function placeProjectDetailAfterProjects() {
@@ -1704,6 +1764,9 @@ async function renderReader(reader, options = {}) {
       state.sectionDetails = {};
     } else {
       state.readers = state.readers.filter((item) => item.id !== reader.id);
+      Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
+        if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
+      });
       if (state.readers.length === 0) {
         state.readers = [newReaderState()];
       }
@@ -1972,6 +2035,7 @@ async function openSectionDetail(searchID, section) {
   };
   state.searchResultReader = null;
   placeSectionDetailAfterSearch(searchID);
+  updateLinkedReaderForSearch(searchID, details[searchID]);
   saveWorkspaceState();
   await renderWorkspace();
 }
@@ -2173,14 +2237,11 @@ async function renderSectionDetail(searchID, detail) {
   });
 
   heading.addEventListener("click", async () => {
-    state.readers.push(newReaderState({
-      codePrefix: detail.codePrefix || "BC",
+    openOrUpdateLinkedReaderForSearch(searchID, detail, {
       chapterID: detail.chapterID || chapter?.id || "",
-      sectionID: detail.sectionID,
       sectionNumber: sectionPayload.sectionNumber,
-      title: sectionPayload.title,
-      shouldSmoothScrollToSection: true
-    }));
+      title: sectionPayload.title
+    });
     saveWorkspaceState();
     await renderWorkspace();
   });
@@ -2218,6 +2279,7 @@ function closeUtilityInstance(instance) {
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
   if (instance.key === "search") {
     delete sectionDetailsBySearch()[instance.id];
+    delete searchLinkedReadersBySearch()[instance.id];
   }
   delete state.paneWeights[paneID];
   if (detailID) delete state.paneWeights[detailID];
@@ -3130,6 +3192,7 @@ async function collapseToOneReader() {
   state.searchResultReader = null;
   state.sectionDetail = null;
   state.sectionDetails = {};
+  state.searchLinkedReaders = {};
   state.projectDetail = null;
   Object.keys(state.utilities).forEach((key) => {
     state.utilities[key] = false;
