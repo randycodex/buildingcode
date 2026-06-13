@@ -1054,9 +1054,7 @@ select option:checked {
 .section-detail-panel {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  background:
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--code-accent) 7%, transparent), transparent 38%),
-    var(--background);
+  background: var(--background);
 }
 
 .section-detail-chrome {
@@ -2172,9 +2170,7 @@ mark {
 .project-detail-panel {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  background:
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--project-color) 13%, transparent), transparent 42%),
-    var(--background);
+  background: var(--background);
 }
 
 .project-detail-chrome {
