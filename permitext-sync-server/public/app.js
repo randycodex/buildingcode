@@ -2065,7 +2065,7 @@ async function renderSectionDetail(searchID, detail) {
   const backButton = appendDetailIconButton(chrome, {
     title: "Back",
     label: "Back to search",
-    svg: backIconSVG()
+    svg: circleXIconSVG()
   });
   const title = document.createElement("h2");
   title.textContent = section?.sectionNumber || detail.sectionNumber || "Section";
