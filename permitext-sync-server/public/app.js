@@ -2,6 +2,7 @@ const workspaceKey = "permitext:webWorkspace:v1";
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
 const toggleProjectsButton = document.querySelector("#toggle-projects");
+const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleAnalysisButton = document.querySelector("#toggle-analysis");
@@ -55,6 +56,7 @@ function loadWorkspaceState() {
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
+      archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
       sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
@@ -64,6 +66,7 @@ function loadWorkspaceState() {
       utilityInstances,
       utilities: {
         projects: Boolean(saved.utilities?.projects),
+        archive: Boolean(saved.utilities?.archive),
         search: false,
         saved: false,
         analysis: false,
@@ -81,6 +84,7 @@ function loadWorkspaceState() {
       searchQuery: "",
       searchCodeFilters: [],
       localProjects: [],
+      archivedProjectIDs: [],
       searchResultReader: null,
       sectionDetail: null,
       sectionDetails: {},
@@ -88,7 +92,7 @@ function loadWorkspaceState() {
       projectDetail: null,
       sectionNotes: {},
       utilityInstances: [],
-      utilities: { projects: false, search: false, saved: false, analysis: false, settings: false },
+      utilities: { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false },
       account: null,
       paneWeights: {},
       paneOrder: [],
@@ -254,6 +258,7 @@ function defaultActivePaneIDs() {
   const ids = [];
   if (state.utilities.projects) ids.push("utility:projects");
   if (state.utilities.projects && state.projectDetail) ids.push(paneIDForProjectDetail());
+  if (state.utilities.archive) ids.push("utility:archive");
   (state.utilityInstances || []).forEach((instance) => {
     ids.push(paneIDForUtilityInstance(instance));
     if (instance.key === "search" && sectionDetailsBySearch()[instance.id]) {
@@ -408,6 +413,7 @@ function applyPaneWeight(panel, paneID) {
 function setUtilityButtonStates() {
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   toggleProjectsButton.setAttribute("aria-pressed", String(state.utilities.projects));
+  toggleArchiveButton.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("analysis")));
@@ -935,18 +941,39 @@ function projectMutationForRecord(project, accountOverride = null) {
   };
 }
 
+function deletedProjectMutationForRecord(project, accountOverride = null) {
+  const account = accountOverride || activeAccount();
+  const now = new Date().toISOString();
+  return {
+    project: {
+      ...projectMutationForRecord(project, account).project,
+      updatedAt: now,
+      deletedAt: now
+    }
+  };
+}
+
 function projectRecordsFromMutations(mutations = []) {
   return summarizeMutations(mutations).projects;
+}
+
+function projectRecordID(project) {
+  return String(project?.id || project?.clientID || project?.localFolderID || "");
+}
+
+function archivedProjectIDSet() {
+  state.archivedProjectIDs = Array.isArray(state.archivedProjectIDs) ? state.archivedProjectIDs.map(String) : [];
+  return new Set(state.archivedProjectIDs);
 }
 
 function visibleProjectRecords(syncedProjects = []) {
   const byID = new Map();
   syncedProjects.forEach((project) => {
-    const id = project.id || project.clientID || project.localFolderID;
+    const id = projectRecordID(project);
     if (id) byID.set(id, project);
   });
   (state.localProjects || []).forEach((project) => {
-    const id = project.id || project.clientID || project.localFolderID;
+    const id = projectRecordID(project);
     if (id && !byID.has(id)) byID.set(id, project);
   });
   return Array.from(byID.values()).sort((left, right) =>
@@ -955,6 +982,16 @@ function visibleProjectRecords(syncedProjects = []) {
       sensitivity: "base"
     })
   );
+}
+
+function activeProjectRecords(syncedProjects = []) {
+  const archived = archivedProjectIDSet();
+  return visibleProjectRecords(syncedProjects).filter((project) => !archived.has(projectRecordID(project)));
+}
+
+function archivedProjectRecords(syncedProjects = []) {
+  const archived = archivedProjectIDSet();
+  return visibleProjectRecords(syncedProjects).filter((project) => archived.has(projectRecordID(project)));
 }
 
 function nextProjectName() {
@@ -2115,6 +2152,28 @@ function jumpIconSVG() {
   `;
 }
 
+function archiveIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="20" height="5" x="2" y="3" rx="1"></rect>
+      <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path>
+      <path d="M10 12h4"></path>
+    </svg>
+  `;
+}
+
+function trashIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18"></path>
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+      <path d="M10 11v6"></path>
+      <path d="M14 11v6"></path>
+    </svg>
+  `;
+}
+
 function makeSectionPayloadFromDetail(detail, section) {
   return {
     sectionID: detail.sectionID,
@@ -2319,11 +2378,11 @@ async function renderProjects() {
   const data = await loadSyncedContent();
 
   if (data.status === "disconnected") {
-    const projects = visibleProjectRecords([]);
+    const projects = activeProjectRecords([]);
     if (projects.length === 0) {
       appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
     } else {
-      renderProjectRows(content, projects, []);
+      renderProjectRows(content, projects, [], { mode: "projects" });
     }
     return panel;
   }
@@ -2333,13 +2392,42 @@ async function renderProjects() {
   }
 
   const { projects, projectSections } = data.summary;
-  const visibleProjects = visibleProjectRecords(projects);
+  const visibleProjects = activeProjectRecords(projects);
   if (visibleProjects.length === 0) {
     appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
   } else {
-    renderProjectRows(content, visibleProjects, projectSections);
+    renderProjectRows(content, visibleProjects, projectSections, { mode: "projects" });
   }
 
+  return panel;
+}
+
+async function renderArchive() {
+  const panel = renderTemplate(projectsTemplate);
+  panel.classList.remove("projects-panel");
+  panel.classList.add("archive-panel");
+  panel.dataset.paneId = "utility:archive";
+  applyPaneWeight(panel, "utility:archive");
+  const kind = panel.querySelector(".panel-kind");
+  const title = panel.querySelector(".panel-title");
+  const addButton = panel.querySelector(".projects-add-button");
+  const content = panel.querySelector(".projects-content");
+  if (kind) kind.textContent = "Archive";
+  if (title) title.textContent = "Archive";
+  addButton?.remove();
+  clear(content);
+  const data = await loadSyncedContent();
+  const sourceProjects = data.status === "connected" ? data.summary.projects : [];
+  const projects = archivedProjectRecords(sourceProjects);
+  if (data.status === "error") {
+    appendProjectEmptyCard(content, "Sync error", data.error || "Could not load archived projects.");
+    return panel;
+  }
+  if (projects.length === 0) {
+    appendProjectEmptyCard(content, "No archived projects", "Archived project folders will appear here.");
+  } else {
+    renderProjectRows(content, projects, data.summary?.projectSections || [], { mode: "archive" });
+  }
   return panel;
 }
 
@@ -2376,6 +2464,43 @@ function projectDetailMatches(project, detail) {
   if (!project || !detail) return false;
   const ids = [project.id, project.clientID, project.localFolderID].filter(Boolean).map(String);
   return [detail.id, detail.clientID, detail.localFolderID].filter(Boolean).some((id) => ids.includes(String(id)));
+}
+
+async function archiveProject(project) {
+  const id = projectRecordID(project);
+  if (!id) return;
+  const name = project.name || project.title || "this project";
+  if (!window.confirm(`Archive ${name}?`)) return;
+  const archived = archivedProjectIDSet();
+  archived.add(id);
+  state.archivedProjectIDs = Array.from(archived);
+  if (projectDetailMatches(project, state.projectDetail)) state.projectDetail = null;
+  state.utilities.archive = true;
+  state.paneWeights["utility:archive"] = state.paneWeights["utility:archive"] || defaultUtilityPaneWidth;
+  movePaneToFront("utility:archive");
+  saveWorkspaceState();
+  await renderWorkspace();
+}
+
+async function deleteArchivedProject(project) {
+  const id = projectRecordID(project);
+  if (!id) return;
+  const name = project.name || project.title || "this project";
+  if (!window.confirm(`Delete ${name} permanently?`)) return;
+  const isLocal = (state.localProjects || []).some((item) => projectRecordID(item) === id);
+  if (!isLocal && activeAccount()) {
+    try {
+      await pushMutation(deletedProjectMutationForRecord(project));
+    } catch (error) {
+      window.alert(error.message || "Could not delete the project.");
+      return;
+    }
+  }
+  state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
+  state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
+  if (projectDetailMatches(project, state.projectDetail)) state.projectDetail = null;
+  saveWorkspaceState();
+  await renderWorkspace();
 }
 
 async function renderProjectDetail(detail) {
@@ -2537,7 +2662,8 @@ function appendProjectEmptyCard(content, title, message) {
   content.append(card);
 }
 
-function renderProjectRows(content, projects, projectSections) {
+function renderProjectRows(content, projects, projectSections, options = {}) {
+  const mode = options.mode || "projects";
   projects.slice(0, 24).forEach((project) => {
     const count = projectSections.filter((item) =>
       item.folderClientID === project.clientID ||
@@ -2555,7 +2681,23 @@ function renderProjectRows(content, projects, projectSections) {
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
     card.style.setProperty("--project-color", project.color || project.tintColor || projectColorOptions[0]);
+    const actionButton = document.createElement("button");
+    actionButton.className = `project-card-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
+    actionButton.type = "button";
+    actionButton.title = mode === "archive" ? "Delete project" : "Archive project";
+    actionButton.setAttribute("aria-label", `${actionButton.title}: ${project.name || project.title || "project"}`);
+    actionButton.innerHTML = mode === "archive" ? trashIconSVG() : archiveIconSVG();
+    actionButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (mode === "archive") {
+        deleteArchivedProject(project);
+      } else {
+        archiveProject(project);
+      }
+    });
+    actionButton.addEventListener("keydown", (event) => event.stopPropagation());
     const body = document.createElement("div");
+    body.className = "project-card-body";
     const heading = document.createElement("h3");
     heading.textContent = project.name || project.title || "Project";
     body.append(heading);
@@ -2572,7 +2714,7 @@ function renderProjectRows(content, projects, projectSections) {
       pill.textContent = label;
       meta.append(pill);
     });
-    card.append(body, meta);
+    card.append(actionButton, body, meta);
     card.addEventListener("click", () => openProjectDetail(project));
     card.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
@@ -3053,6 +3195,9 @@ async function renderWorkspace() {
     panes.push(await renderProjects());
     if (state.projectDetail) panes.push(await renderProjectDetail(state.projectDetail));
   }
+  if (state.utilities.archive) {
+    panes.push(await renderArchive());
+  }
   for (const instance of state.utilityInstances || []) {
     const pane = await renderUtilityInstance(instance);
     if (pane) panes.push(pane);
@@ -3093,6 +3238,9 @@ async function renderUtilityWorkspace() {
   if (state.utilities.projects) {
     panes.push(await renderProjects());
     if (state.projectDetail) panes.push(await renderProjectDetail(state.projectDetail));
+  }
+  if (state.utilities.archive) {
+    panes.push(await renderArchive());
   }
   for (const instance of state.utilityInstances || []) {
     const paneID = paneIDForUtilityInstance(instance);
@@ -3163,6 +3311,8 @@ async function toggleUtilityPane(key) {
     state.projectDetail = null;
     delete state.paneWeights[paneIDForProjectDetail()];
     state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneIDForProjectDetail());
+  } else if (key === "archive") {
+    state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:archive");
   }
   saveWorkspaceState();
   await transitionWorkspace("utility");
@@ -3228,6 +3378,9 @@ async function start() {
   });
   toggleProjectsButton.addEventListener("click", () => {
     toggleUtilityPane("projects");
+  });
+  toggleArchiveButton.addEventListener("click", () => {
+    toggleUtilityPane("archive");
   });
   toggleSearchButton.addEventListener("click", () => {
     toggleUtilityPane("search");
