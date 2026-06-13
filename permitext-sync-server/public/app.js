@@ -2479,6 +2479,11 @@ function renderProjectRows(content, projects, projectSections) {
     ).length;
     const card = document.createElement("article");
     card.className = "project-card project-row";
+    const isOpenProject = projectDetailMatches(project, state.projectDetail);
+    if (isOpenProject) {
+      card.classList.add("is-open");
+      card.setAttribute("aria-current", "true");
+    }
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);

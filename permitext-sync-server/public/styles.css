@@ -2129,9 +2129,17 @@ mark {
   background: color-mix(in srgb, var(--project-color) 16%, transparent);
 }
 
+.projects-content .project-row.is-open {
+  background: color-mix(in srgb, var(--project-color) 32%, transparent);
+}
+
 @media (prefers-color-scheme: dark) {
   .projects-content .project-row {
     background: color-mix(in srgb, var(--project-color) 24%, transparent);
+  }
+
+  .projects-content .project-row.is-open {
+    background: color-mix(in srgb, var(--project-color) 42%, transparent);
   }
 }
 
