@@ -498,6 +498,18 @@ function appendHighlighted(container, text, query) {
   }
 }
 
+function snippetWithoutDuplicateTitle(result) {
+  let snippet = String(result?.snippet || "").trim();
+  if (!snippet) return "";
+  const title = String(result?.title || result?.headingLine || "").trim();
+  const displayedTitle = sectionDisplayTitle(result?.sectionNumber, title, "").trim();
+  [displayedTitle, title].filter(Boolean).forEach((candidate) => {
+    const pattern = new RegExp(`^(?:\\.\\.\\.\\s*)?${escapeRegExp(candidate)}(?:\\s+|$)`, "i");
+    snippet = snippet.replace(pattern, (match) => match.startsWith("...") ? "..." : "").trim();
+  });
+  return snippet;
+}
+
 function emptyReader(content, title = "Choose a chapter", message = "Pick a chapter to load the full text. Section is optional and only jumps within the chapter.") {
   clear(content);
   const wrapper = document.createElement("section");
@@ -1921,9 +1933,11 @@ async function renderSearchResults(panel, instance) {
       const title = document.createElement("p");
       title.className = "result-title";
       appendHighlighted(title, result.title || result.headingLine || "", query);
-    const snippet = document.createElement("p");
-    appendHighlighted(snippet, result.snippet, query);
-      row.append(heading, title, snippet);
+      const snippetText = snippetWithoutDuplicateTitle(result);
+      const snippet = document.createElement("p");
+      appendHighlighted(snippet, snippetText, query);
+      row.append(heading, title);
+      if (snippetText) row.append(snippet);
     row.addEventListener("click", () => {
       openSectionDetail(searchInstance.id, {
         codePrefix: result.codePrefix || "BC",
