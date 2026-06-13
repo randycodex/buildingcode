@@ -963,15 +963,7 @@ struct ProjectView: View {
                 CodeHairline()
                     .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
-                if projectBookmarks.isEmpty {
-                    CodeEmptyStateCard(
-                        title: "No Saved Sections",
-                        systemImage: "folder",
-                        description: "Add saved sections to this project from any section reader.",
-                        accent: accentColor
-                    )
-                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-                } else {
+                if !projectBookmarks.isEmpty {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(projectBookmarks) { bookmark in
                             projectBookmarkRow(bookmark)
@@ -1082,13 +1074,6 @@ struct ProjectView: View {
                 action: toggleSelectionMode
             )
 
-            if projectBookmarks.isEmpty {
-                projectHeaderActionButton(
-                    title: "Back to Saved",
-                    systemImage: "bookmark",
-                    action: { dismiss() }
-                )
-            }
         }
     }
 
