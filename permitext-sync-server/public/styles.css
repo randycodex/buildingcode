@@ -1931,6 +1931,9 @@ select option:checked {
 .search-results {
   overflow-y: auto;
   padding-right: var(--space-3);
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
+  line-height: var(--reader-line-height);
   scrollbar-gutter: stable;
   scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
   scrollbar-width: thin;
@@ -1957,11 +1960,15 @@ select option:checked {
   gap: 0;
 }
 
-.search-group-label,
-.saved-code-label {
+.section-label.search-group-label,
+.section-label.saved-code-label {
   margin: var(--space-5) 0 var(--space-2);
   color: var(--code-accent) !important;
   -webkit-text-fill-color: var(--code-accent);
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * var(--section-label-scale)) !important;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .search-result-group mark,
@@ -1991,21 +1998,22 @@ select option:checked {
 
 .result-number {
   color: var(--code-accent);
-  font-size: 1.08rem;
-  font-weight: 600;
+  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
+  font-weight: 700;
 }
 
 .result-chapter {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   font-weight: 500;
 }
 
 .result-title {
   margin: 0 0 var(--space-1);
   color: var(--text-primary);
-  font-size: 1.02rem;
-  line-height: 1.22;
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
+  line-height: var(--reader-line-height);
 }
 
 .result-row p {
@@ -2013,7 +2021,9 @@ select option:checked {
   margin: 0;
   overflow: hidden;
   color: var(--text-secondary);
-  line-height: 1.36;
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
+  line-height: var(--reader-line-height);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
