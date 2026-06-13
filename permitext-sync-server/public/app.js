@@ -317,6 +317,17 @@ function movePaneToFront(paneID) {
   state.paneOrder = [paneID, ...(state.paneOrder || []).filter((id) => id !== paneID && active.has(id))];
 }
 
+function appendPaneIfMissing(paneID) {
+  if (!paneID) return;
+  const active = new Set(defaultActivePaneIDs());
+  const ordered = (state.paneOrder || []).filter((id) => active.has(id));
+  active.forEach((id) => {
+    if (!ordered.includes(id) && id !== paneID) ordered.push(id);
+  });
+  if (!ordered.includes(paneID)) ordered.push(paneID);
+  state.paneOrder = ordered;
+}
+
 function placeSectionDetailAfterSearch(searchID) {
   const searchPaneID = paneIDForUtilityInstance({ key: "search", id: searchID });
   const detailID = paneIDForSectionDetail(searchID);
@@ -2477,9 +2488,11 @@ async function archiveProject(project) {
   if (projectDetailMatches(project, state.projectDetail)) state.projectDetail = null;
   state.utilities.archive = true;
   state.paneWeights["utility:archive"] = state.paneWeights["utility:archive"] || defaultUtilityPaneWidth;
-  movePaneToFront("utility:archive");
+  appendPaneIfMissing("utility:archive");
+  const currentLeft = track.scrollLeft;
   saveWorkspaceState();
   await renderWorkspace();
+  track.scrollLeft = currentLeft;
 }
 
 async function deleteArchivedProject(project) {
