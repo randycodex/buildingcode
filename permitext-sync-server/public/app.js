@@ -2030,8 +2030,9 @@ function bookmarkIconSVG(saved) {
 function jumpIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M7 17 17 7"></path>
-      <path d="M7 7h10v10"></path>
+      <path d="M15 3h6v6"></path>
+      <path d="M10 14 21 3"></path>
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
     </svg>
   `;
 }
