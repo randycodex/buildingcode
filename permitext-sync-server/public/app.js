@@ -2330,22 +2330,6 @@ async function renderProjectDetail(detail) {
   const content = document.createElement("section");
   content.className = "project-detail-content";
 
-  const hero = document.createElement("section");
-  hero.className = "project-detail-hero";
-  const marker = document.createElement("span");
-  marker.className = "project-detail-marker";
-  const heading = document.createElement("h3");
-  heading.textContent = identity.name;
-  const description = document.createElement("p");
-  description.textContent = identity.description || "Project folder.";
-  const meta = document.createElement("div");
-  meta.className = "project-meta";
-  const savedCount = linkedSavedItems.length;
-  const savedPill = document.createElement("span");
-  savedPill.textContent = savedCount === 1 ? "1 saved" : `${savedCount} saved`;
-  meta.append(savedPill);
-  hero.append(marker, heading, description, meta);
-
   const savedSection = document.createElement("section");
   savedSection.className = "project-detail-section";
   const savedTitle = document.createElement("p");
@@ -2383,7 +2367,7 @@ async function renderProjectDetail(detail) {
     renderWorkspace();
   });
 
-  content.append(hero, savedSection);
+  content.append(savedSection);
   panel.append(chrome, content);
   return panel;
 }
