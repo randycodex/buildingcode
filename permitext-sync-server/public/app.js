@@ -58,6 +58,7 @@ function loadWorkspaceState() {
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
       sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
+      projectDetail: saved.projectDetail && typeof saved.projectDetail === "object" ? saved.projectDetail : null,
       sectionNotes: saved.sectionNotes && typeof saved.sectionNotes === "object" ? saved.sectionNotes : {},
       utilityInstances,
       utilities: {
@@ -82,6 +83,7 @@ function loadWorkspaceState() {
       searchResultReader: null,
       sectionDetail: null,
       sectionDetails: {},
+      projectDetail: null,
       sectionNotes: {},
       utilityInstances: [],
       utilities: { projects: false, search: false, saved: false, analysis: false, settings: false },
@@ -202,6 +204,10 @@ function paneIDForSectionDetail(searchID = "legacy") {
   return `section:detail:${searchID}`;
 }
 
+function paneIDForProjectDetail() {
+  return "project:detail";
+}
+
 function sectionDetailsBySearch() {
   state.sectionDetails = state.sectionDetails && typeof state.sectionDetails === "object" ? state.sectionDetails : {};
   if (state.sectionDetail) {
@@ -221,6 +227,7 @@ function sectionDetailsBySearch() {
 function defaultActivePaneIDs() {
   const ids = [];
   if (state.utilities.projects) ids.push("utility:projects");
+  if (state.utilities.projects && state.projectDetail) ids.push(paneIDForProjectDetail());
   (state.utilityInstances || []).forEach((instance) => {
     ids.push(paneIDForUtilityInstance(instance));
     if (instance.key === "search" && sectionDetailsBySearch()[instance.id]) {
@@ -239,7 +246,16 @@ function activePaneIDs() {
   ids.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  const paired = ordered.filter((id) => !id.startsWith("section:detail:"));
+  const paired = ordered.filter((id) => !id.startsWith("section:detail:") && id !== paneIDForProjectDetail());
+  if (state.utilities.projects && state.projectDetail) {
+    const projectsIndex = paired.indexOf("utility:projects");
+    const detailID = paneIDForProjectDetail();
+    if (projectsIndex === -1) {
+      paired.push(detailID);
+    } else {
+      paired.splice(projectsIndex + 1, 0, detailID);
+    }
+  }
   (state.utilityInstances || []).forEach((instance) => {
     if (instance.key !== "search" || !sectionDetailsBySearch()[instance.id]) return;
     const searchID = paneIDForUtilityInstance(instance);
@@ -280,6 +296,19 @@ function placeSectionDetailAfterSearch(searchID) {
   });
   const searchIndex = ordered.indexOf(searchPaneID);
   const insertIndex = searchIndex === -1 ? 0 : searchIndex + 1;
+  ordered.splice(insertIndex, 0, detailID);
+  state.paneOrder = ordered;
+}
+
+function placeProjectDetailAfterProjects() {
+  const detailID = paneIDForProjectDetail();
+  const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
+  const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== detailID);
+  activeIDs.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  const projectIndex = ordered.indexOf("utility:projects");
+  const insertIndex = projectIndex === -1 ? 0 : projectIndex + 1;
   ordered.splice(insertIndex, 0, detailID);
   state.paneOrder = ordered;
 }
@@ -2238,6 +2267,137 @@ async function renderProjects() {
   return panel;
 }
 
+function projectIdentity(project) {
+  return {
+    id: project.id || "",
+    clientID: project.clientID || "",
+    localFolderID: project.localFolderID || "",
+    name: project.name || project.title || "Project",
+    title: project.title || project.name || "Project",
+    description: project.description || "",
+    color: project.color || project.tintColor || projectColorOptions[0]
+  };
+}
+
+function projectSectionBelongsToProject(item, project) {
+  return (
+    item.folderClientID === project.clientID ||
+    item.folderClientID === project.id ||
+    item.localFolderID === project.localFolderID ||
+    item.folderID === project.id ||
+    item.folderID === project.clientID
+  );
+}
+
+async function openProjectDetail(project) {
+  state.projectDetail = projectIdentity(project);
+  placeProjectDetailAfterProjects();
+  saveWorkspaceState();
+  await renderWorkspace();
+  document.querySelector(`[data-pane-id="${CSS.escape(paneIDForProjectDetail())}"]`)?.scrollIntoView({
+    behavior: "smooth",
+    inline: "start",
+    block: "nearest"
+  });
+}
+
+function projectDetailMatches(project, detail) {
+  if (!project || !detail) return false;
+  const ids = [project.id, project.clientID, project.localFolderID].filter(Boolean).map(String);
+  return [detail.id, detail.clientID, detail.localFolderID].filter(Boolean).some((id) => ids.includes(String(id)));
+}
+
+async function renderProjectDetail(detail) {
+  const data = await loadSyncedContent();
+  const projects = visibleProjectRecords(data.summary?.projects || []);
+  const project = projects.find((item) => projectDetailMatches(item, detail)) || detail;
+  const identity = projectIdentity(project);
+  const projectSections = data.summary?.projectSections || [];
+  const savedItems = data.summary?.savedItems || [];
+  const sectionLinks = projectSections.filter((item) => projectSectionBelongsToProject(item, identity));
+  const savedBySectionID = new Map(savedItems.map((item) => [String(item.sectionID || item.id || ""), item]));
+  const linkedSavedItems = sectionLinks
+    .map((link) => savedBySectionID.get(String(link.sectionID || link.savedSectionID || link.itemID || "")) || link)
+    .filter(Boolean);
+
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel project-detail-panel";
+  panel.dataset.paneId = paneIDForProjectDetail();
+  panel.style.setProperty("--project-color", identity.color);
+  applyPaneWeight(panel, paneIDForProjectDetail());
+
+  const chrome = document.createElement("header");
+  chrome.className = "project-detail-chrome";
+  const backButton = appendDetailIconButton(chrome, {
+    title: "Back",
+    label: "Back to projects",
+    svg: backIconSVG()
+  });
+  const title = document.createElement("h2");
+  title.textContent = identity.name;
+  chrome.append(title);
+
+  const content = document.createElement("section");
+  content.className = "project-detail-content";
+
+  const hero = document.createElement("section");
+  hero.className = "project-detail-hero";
+  const marker = document.createElement("span");
+  marker.className = "project-detail-marker";
+  const heading = document.createElement("h3");
+  heading.textContent = identity.name;
+  const description = document.createElement("p");
+  description.textContent = identity.description || "Project folder.";
+  const meta = document.createElement("div");
+  meta.className = "project-meta";
+  const savedCount = linkedSavedItems.length;
+  const savedPill = document.createElement("span");
+  savedPill.textContent = savedCount === 1 ? "1 saved" : `${savedCount} saved`;
+  meta.append(savedPill);
+  hero.append(marker, heading, description, meta);
+
+  const savedSection = document.createElement("section");
+  savedSection.className = "project-detail-section";
+  const savedTitle = document.createElement("p");
+  savedTitle.className = "section-label";
+  savedTitle.textContent = "Saved sections";
+  savedSection.append(savedTitle);
+
+  if (linkedSavedItems.length === 0) {
+    const empty = document.createElement("article");
+    empty.className = "saved-row";
+    const emptyTitle = document.createElement("strong");
+    emptyTitle.textContent = "No saved sections";
+    const emptyBody = document.createElement("span");
+    emptyBody.textContent = "Sections added to this project will appear here.";
+    empty.append(emptyTitle, emptyBody);
+    savedSection.append(empty);
+  } else {
+    linkedSavedItems.forEach((item) => {
+      const row = document.createElement("button");
+      row.className = "saved-row project-detail-saved-row";
+      row.type = "button";
+      const rowTitle = document.createElement("strong");
+      rowTitle.textContent = item.sectionNumber || item.sectionID || "Saved";
+      const rowBody = document.createElement("span");
+      rowBody.textContent = item.title || item.subtitle || "Saved section";
+      row.append(rowTitle, rowBody);
+      row.addEventListener("click", () => openSectionDetailForExistingSearch(item));
+      savedSection.append(row);
+    });
+  }
+
+  backButton.addEventListener("click", () => {
+    state.projectDetail = null;
+    saveWorkspaceState();
+    renderWorkspace();
+  });
+
+  content.append(hero, savedSection);
+  panel.append(chrome, content);
+  return panel;
+}
+
 function showProjectCreateSheet(panel) {
   panel.querySelector(".project-sheet-overlay")?.remove();
   const overlay = document.createElement("section");
@@ -2345,6 +2505,9 @@ function renderProjectRows(content, projects, projectSections) {
     ).length;
     const card = document.createElement("article");
     card.className = "project-card project-row";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
     card.style.setProperty("--project-color", project.color || project.tintColor || projectColorOptions[0]);
     const body = document.createElement("div");
     const heading = document.createElement("h3");
@@ -2364,6 +2527,12 @@ function renderProjectRows(content, projects, projectSections) {
       meta.append(pill);
     });
     card.append(body, meta);
+    card.addEventListener("click", () => openProjectDetail(project));
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      openProjectDetail(project);
+    });
     content.append(card);
   });
 }
@@ -2812,6 +2981,7 @@ async function renderWorkspace() {
   const panes = [];
   if (state.utilities.projects) {
     panes.push(await renderProjects());
+    if (state.projectDetail) panes.push(await renderProjectDetail(state.projectDetail));
   }
   for (const instance of state.utilityInstances || []) {
     const pane = await renderUtilityInstance(instance);
@@ -2841,7 +3011,10 @@ async function renderUtilityWorkspace() {
       .map((pane) => [pane.dataset.paneId, pane])
   );
   const existingContentPanes = Array.from(existingPanesByID.values())
-    .filter((pane) => !String(pane.dataset.paneId || "").startsWith("utility:"));
+    .filter((pane) => {
+      const paneID = String(pane.dataset.paneId || "");
+      return !paneID.startsWith("utility:") && paneID !== paneIDForProjectDetail();
+    });
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
   setUtilityButtonStates();
@@ -2849,6 +3022,7 @@ async function renderUtilityWorkspace() {
   const panes = [];
   if (state.utilities.projects) {
     panes.push(await renderProjects());
+    if (state.projectDetail) panes.push(await renderProjectDetail(state.projectDetail));
   }
   for (const instance of state.utilityInstances || []) {
     const paneID = paneIDForUtilityInstance(instance);
@@ -2915,6 +3089,10 @@ async function toggleUtilityPane(key) {
   if (willOpen) {
     state.paneWeights[paneID] = defaultUtilityPaneWidth;
     movePaneToFront(paneID);
+  } else if (key === "projects") {
+    state.projectDetail = null;
+    delete state.paneWeights[paneIDForProjectDetail()];
+    state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneIDForProjectDetail());
   }
   saveWorkspaceState();
   await transitionWorkspace("utility");
@@ -2944,6 +3122,7 @@ async function collapseToOneReader() {
   state.searchResultReader = null;
   state.sectionDetail = null;
   state.sectionDetails = {};
+  state.projectDetail = null;
   Object.keys(state.utilities).forEach((key) => {
     state.utilities[key] = false;
   });
