@@ -2343,10 +2343,6 @@ async function renderProjectDetail(detail) {
 
   const savedSection = document.createElement("section");
   savedSection.className = "project-detail-section";
-  const savedTitle = document.createElement("p");
-  savedTitle.className = "section-label";
-  savedTitle.textContent = "Saved sections";
-  savedSection.append(savedTitle);
 
   linkedSavedItems.forEach((item) => {
     const row = document.createElement("button");
