@@ -1069,18 +1069,9 @@ select option:checked {
 
 .section-detail-chrome {
   display: grid;
-  grid-template-columns: var(--panel-title-control-size) minmax(0, 1fr) var(--panel-title-control-size);
+  grid-template-columns: var(--panel-title-control-size) var(--panel-title-control-size);
+  justify-content: space-between;
   gap: var(--space-3);
-}
-
-.section-detail-chrome h2 {
-  min-width: 0;
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 1rem !important;
-  font-weight: 650;
-  line-height: normal;
-  text-align: center;
 }
 
 .section-detail-icon {

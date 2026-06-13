@@ -2081,8 +2081,6 @@ async function renderSectionDetail(searchID, detail) {
     label: "Back to search",
     svg: circleXIconSVG()
   });
-  const title = document.createElement("h2");
-  title.textContent = section?.sectionNumber || detail.sectionNumber || "Section";
   const saveButton = appendDetailIconButton(chrome, {
     title: saved ? "Remove bookmark" : "Save bookmark",
     label: saved ? "Remove bookmark" : "Save bookmark",
@@ -2090,7 +2088,6 @@ async function renderSectionDetail(searchID, detail) {
     svg: bookmarkIconSVG(saved)
   });
   saveButton.setAttribute("aria-pressed", String(saved));
-  chrome.insertBefore(title, saveButton);
 
   const content = document.createElement("section");
   content.className = "section-detail-content";
