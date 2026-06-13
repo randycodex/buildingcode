@@ -2232,6 +2232,19 @@ function archiveIconSVG() {
   `;
 }
 
+function archiveRestoreIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <rect width="20" height="5" x="2" y="3" rx="1"></rect>
+      <path d="M4 8v11a2 2 0 0 0 2 2h2"></path>
+      <path d="M20 8v5"></path>
+      <path d="m9 15 3-3 3 3"></path>
+      <path d="M12 12v9"></path>
+      <path d="M10 12h4"></path>
+    </svg>
+  `;
+}
+
 function trashIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
@@ -2563,6 +2576,16 @@ async function archiveProject(project) {
   track.scrollLeft = currentLeft;
 }
 
+async function restoreArchivedProject(project) {
+  const id = projectRecordID(project);
+  if (!id) return;
+  state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
+  const currentLeft = track.scrollLeft;
+  saveWorkspaceState();
+  await renderWorkspace();
+  track.scrollLeft = currentLeft;
+}
+
 async function deleteArchivedProject(project) {
   const id = projectRecordID(project);
   if (!id) return;
@@ -2773,17 +2796,21 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     card.style.setProperty("--project-color", projectColor(project));
     const actionGroup = document.createElement("div");
     actionGroup.className = "project-card-actions";
-    const editButton = document.createElement("button");
-    editButton.className = "project-card-action is-edit";
-    editButton.type = "button";
-    editButton.title = "Edit project";
-    editButton.setAttribute("aria-label", `Edit project: ${project.name || project.title || "project"}`);
-    editButton.innerHTML = pencilIconSVG();
-    editButton.addEventListener("click", (event) => {
+    const primaryActionButton = document.createElement("button");
+    primaryActionButton.className = `project-card-action ${mode === "archive" ? "is-restore" : "is-edit"}`;
+    primaryActionButton.type = "button";
+    primaryActionButton.title = mode === "archive" ? "Restore project" : "Edit project";
+    primaryActionButton.setAttribute("aria-label", `${primaryActionButton.title}: ${project.name || project.title || "project"}`);
+    primaryActionButton.innerHTML = mode === "archive" ? archiveRestoreIconSVG() : pencilIconSVG();
+    primaryActionButton.addEventListener("click", (event) => {
       event.stopPropagation();
-      showProjectCreateSheet(content.closest(".workspace-panel"), project);
+      if (mode === "archive") {
+        restoreArchivedProject(project);
+      } else {
+        showProjectCreateSheet(content.closest(".workspace-panel"), project);
+      }
     });
-    editButton.addEventListener("keydown", (event) => event.stopPropagation());
+    primaryActionButton.addEventListener("keydown", (event) => event.stopPropagation());
 
     const lifecycleButton = document.createElement("button");
     lifecycleButton.className = `project-card-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
@@ -2800,7 +2827,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
       }
     });
     lifecycleButton.addEventListener("keydown", (event) => event.stopPropagation());
-    actionGroup.append(editButton, lifecycleButton);
+    actionGroup.append(primaryActionButton, lifecycleButton);
     const body = document.createElement("div");
     body.className = "project-card-body";
     const heading = document.createElement("h3");
