@@ -1963,11 +1963,6 @@ async function openSectionDetail(searchID, section) {
   placeSectionDetailAfterSearch(searchID);
   saveWorkspaceState();
   await renderWorkspace();
-  document.querySelector(`[data-pane-id="${CSS.escape(paneIDForSectionDetail(searchID))}"]`)?.scrollIntoView({
-    behavior: "smooth",
-    inline: "start",
-    block: "nearest"
-  });
 }
 
 function annotationForSection(sectionID) {
@@ -2294,11 +2289,6 @@ async function openProjectDetail(project) {
   placeProjectDetailAfterProjects();
   saveWorkspaceState();
   await renderWorkspace();
-  document.querySelector(`[data-pane-id="${CSS.escape(paneIDForProjectDetail())}"]`)?.scrollIntoView({
-    behavior: "smooth",
-    inline: "start",
-    block: "nearest"
-  });
 }
 
 function projectDetailMatches(project, detail) {
@@ -2761,12 +2751,36 @@ function createDivider(previousPaneID, nextPaneID) {
   return divider;
 }
 
+function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
+  if (!paneID) return [];
+  const active = new Set(orderedIDs);
+  if (paneID === "utility:projects" || paneID === paneIDForProjectDetail()) {
+    return ["utility:projects", paneIDForProjectDetail()].filter((id) => active.has(id));
+  }
+  if (paneID.startsWith("utility:search:")) {
+    const searchID = paneID.replace("utility:search:", "");
+    return [paneID, paneIDForSectionDetail(searchID)].filter((id) => active.has(id));
+  }
+  if (paneID.startsWith("section:detail:")) {
+    const searchID = paneID.replace("section:detail:", "");
+    return [paneIDForUtilityInstance({ key: "search", id: searchID }), paneID].filter((id) => active.has(id));
+  }
+  return active.has(paneID) ? [paneID] : [];
+}
+
 function orderWithPaneMoved(draggedPaneID, targetPaneID, position) {
   if (!draggedPaneID || !targetPaneID || draggedPaneID === targetPaneID) return null;
-  const order = activePaneIDs().filter((id) => id !== draggedPaneID);
-  const targetIndex = order.indexOf(targetPaneID);
+  const currentOrder = activePaneIDs();
+  const draggedGroup = paneGroupForMove(draggedPaneID, currentOrder);
+  const targetGroup = paneGroupForMove(targetPaneID, currentOrder);
+  if (!draggedGroup.length || !targetGroup.length) return null;
+  if (draggedGroup.some((id) => targetGroup.includes(id))) return null;
+  const order = currentOrder.filter((id) => !draggedGroup.includes(id));
+  const targetIndexes = targetGroup.map((id) => order.indexOf(id)).filter((index) => index !== -1);
+  if (!targetIndexes.length) return null;
+  const targetIndex = position === "after" ? Math.max(...targetIndexes) + 1 : Math.min(...targetIndexes);
   if (targetIndex === -1) return null;
-  order.splice(position === "after" ? targetIndex + 1 : targetIndex, 0, draggedPaneID);
+  order.splice(targetIndex, 0, ...draggedGroup);
   return order;
 }
 
