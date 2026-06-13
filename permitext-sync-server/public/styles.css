@@ -2179,11 +2179,35 @@ mark {
 
 .project-detail-chrome {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   gap: var(--space-3);
-  min-height: 88px;
-  padding: var(--space-5) clamp(18px, 4vw, 34px) var(--space-3);
+  min-height: var(--header-height);
+  padding: 0 clamp(22px, 3vw, 46px);
+}
+
+.project-detail-back {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+  line-height: 1;
+}
+
+.project-detail-back:hover,
+.project-detail-back:focus-visible {
+  color: var(--text-primary);
+}
+
+.project-detail-back svg {
+  width: 17px;
+  height: 17px;
 }
 
 .project-detail-chrome h2 {

@@ -2014,6 +2014,15 @@ function backIconSVG() {
   `;
 }
 
+function arrowLeftIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"></path>
+      <path d="m12 19-7-7 7-7"></path>
+    </svg>
+  `;
+}
+
 function bookmarkIconSVG(saved) {
   return saved
     ? `<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"></path></svg>`
@@ -2321,7 +2330,8 @@ async function renderProjectDetail(detail) {
   const backButton = appendDetailIconButton(chrome, {
     title: "Back",
     label: "Back to projects",
-    svg: backIconSVG()
+    className: "project-detail-back",
+    svg: arrowLeftIconSVG()
   });
   const title = document.createElement("h2");
   title.textContent = identity.name;
