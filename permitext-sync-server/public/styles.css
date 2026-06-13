@@ -1115,7 +1115,7 @@ select option:checked {
 }
 
 .section-detail-content {
-  padding: var(--space-4) clamp(20px, 5vw, 46px) 108px;
+  padding: var(--space-4) 0 108px;
   font-family: var(--reader-font-family);
   font-size: var(--reader-font-size) !important;
   line-height: var(--reader-line-height);
@@ -2251,7 +2251,7 @@ mark {
 .project-detail-content {
   min-height: 0;
   overflow-y: auto;
-  padding: var(--space-4) clamp(20px, 5vw, 46px) 108px;
+  padding: var(--space-4) 0 108px;
 }
 
 .project-detail-section {
