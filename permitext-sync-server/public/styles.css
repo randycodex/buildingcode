@@ -550,6 +550,9 @@ textarea:focus-visible {
 }
 
 .topbar .toolbar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   min-height: 0;
   padding: 0;
   border-color: transparent;
@@ -558,6 +561,11 @@ textarea:focus-visible {
   font-size: var(--chrome-font-size) !important;
   font-weight: 400;
   box-shadow: none;
+}
+
+.topbar .toolbar-icon-label svg {
+  width: 17px;
+  height: 17px;
 }
 
 .toolbar-button[aria-pressed="true"],
