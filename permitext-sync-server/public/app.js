@@ -57,6 +57,7 @@ function loadWorkspaceState() {
       localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
+      sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
       sectionNotes: saved.sectionNotes && typeof saved.sectionNotes === "object" ? saved.sectionNotes : {},
       utilityInstances,
       utilities: {
@@ -80,6 +81,7 @@ function loadWorkspaceState() {
       localProjects: [],
       searchResultReader: null,
       sectionDetail: null,
+      sectionDetails: {},
       sectionNotes: {},
       utilityInstances: [],
       utilities: { projects: false, search: false, saved: false, analysis: false, settings: false },
@@ -196,8 +198,24 @@ function paneIDForUtilityInstance(instance) {
   return `utility:${instance.key}:${instance.id}`;
 }
 
-function paneIDForSectionDetail() {
-  return "section:detail";
+function paneIDForSectionDetail(searchID = "legacy") {
+  return `section:detail:${searchID}`;
+}
+
+function sectionDetailsBySearch() {
+  state.sectionDetails = state.sectionDetails && typeof state.sectionDetails === "object" ? state.sectionDetails : {};
+  if (state.sectionDetail) {
+    const firstSearch = (state.utilityInstances || []).find((instance) => instance.key === "search");
+    if (firstSearch && !state.sectionDetails[firstSearch.id]) {
+      state.sectionDetails[firstSearch.id] = state.sectionDetail;
+    }
+    state.sectionDetail = null;
+  }
+  const activeSearchIDs = new Set((state.utilityInstances || []).filter((instance) => instance.key === "search").map((instance) => instance.id));
+  Object.keys(state.sectionDetails).forEach((searchID) => {
+    if (!activeSearchIDs.has(searchID)) delete state.sectionDetails[searchID];
+  });
+  return state.sectionDetails;
 }
 
 function defaultActivePaneIDs() {
@@ -205,9 +223,11 @@ function defaultActivePaneIDs() {
   if (state.utilities.projects) ids.push("utility:projects");
   (state.utilityInstances || []).forEach((instance) => {
     ids.push(paneIDForUtilityInstance(instance));
+    if (instance.key === "search" && sectionDetailsBySearch()[instance.id]) {
+      ids.push(paneIDForSectionDetail(instance.id));
+    }
   });
   if (state.utilities.settings) ids.push("utility:settings");
-  if (state.sectionDetail) ids.push(paneIDForSectionDetail());
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
   return ids;
 }
@@ -219,8 +239,20 @@ function activePaneIDs() {
   ids.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  state.paneOrder = ordered;
-  return ordered;
+  const paired = ordered.filter((id) => !id.startsWith("section:detail:"));
+  (state.utilityInstances || []).forEach((instance) => {
+    if (instance.key !== "search" || !sectionDetailsBySearch()[instance.id]) return;
+    const searchID = paneIDForUtilityInstance(instance);
+    const detailID = paneIDForSectionDetail(instance.id);
+    const searchIndex = paired.indexOf(searchID);
+    if (searchIndex === -1) {
+      paired.push(detailID);
+    } else if (!paired.includes(detailID)) {
+      paired.splice(searchIndex + 1, 0, detailID);
+    }
+  });
+  state.paneOrder = paired;
+  return paired;
 }
 
 function orderPanes(panes) {
@@ -238,14 +270,15 @@ function movePaneToFront(paneID) {
   state.paneOrder = [paneID, ...(state.paneOrder || []).filter((id) => id !== paneID && active.has(id))];
 }
 
-function placeSectionDetailAfterSearch() {
-  const detailID = paneIDForSectionDetail();
+function placeSectionDetailAfterSearch(searchID) {
+  const searchPaneID = paneIDForUtilityInstance({ key: "search", id: searchID });
+  const detailID = paneIDForSectionDetail(searchID);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== detailID);
   activeIDs.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  const searchIndex = ordered.findIndex((id) => id.startsWith("utility:search:"));
+  const searchIndex = ordered.indexOf(searchPaneID);
   const insertIndex = searchIndex === -1 ? 0 : searchIndex + 1;
   ordered.splice(insertIndex, 0, detailID);
   state.paneOrder = ordered;
@@ -1627,6 +1660,7 @@ async function renderReader(reader, options = {}) {
     if (options.isSearchResult) {
       state.searchResultReader = null;
       state.sectionDetail = null;
+      state.sectionDetails = {};
     } else {
       state.readers = state.readers.filter((item) => item.id !== reader.id);
       if (state.readers.length === 0) {
@@ -1719,13 +1753,14 @@ async function renderSearch(instance) {
 
   input.addEventListener("input", () => {
     searchInstance.query = input.value;
-    if (!searchInstance.query.trim() && state.sectionDetail) {
-      state.sectionDetail = null;
+    const details = sectionDetailsBySearch();
+    if (!searchInstance.query.trim() && details[searchInstance.id]) {
+      delete details[searchInstance.id];
     }
     saveWorkspaceState();
     clearTimeout(searchTimers.get(paneID));
     searchTimers.set(paneID, setTimeout(() => {
-      if (!searchInstance.query.trim() && state.sectionDetail) {
+      if (!searchInstance.query.trim() && sectionDetailsBySearch()[searchInstance.id]) {
         renderWorkspace();
         return;
       }
@@ -1864,7 +1899,7 @@ async function renderSearchResults(panel, instance) {
     appendHighlighted(snippet, result.snippet, query);
       row.append(heading, title, snippet);
     row.addEventListener("click", () => {
-      openSectionDetail({
+      openSectionDetail(searchInstance.id, {
         codePrefix: result.codePrefix || "BC",
         chapterID: result.chapterID,
         chapterNumber: result.chapterNumber || "",
@@ -1881,10 +1916,11 @@ async function renderSearchResults(panel, instance) {
   });
 }
 
-async function openSectionDetail(section) {
+async function openSectionDetail(searchID, section) {
   const sectionID = String(section.sectionID || section.id || "");
   if (!sectionID) return;
-  state.sectionDetail = {
+  const details = sectionDetailsBySearch();
+  details[searchID] = {
     codePrefix: section.codePrefix || "BC",
     chapterID: section.chapterID || "",
     chapterNumber: section.chapterNumber || "",
@@ -1895,10 +1931,10 @@ async function openSectionDetail(section) {
     headingLine: section.headingLine || ""
   };
   state.searchResultReader = null;
-  placeSectionDetailAfterSearch();
+  placeSectionDetailAfterSearch(searchID);
   saveWorkspaceState();
   await renderWorkspace();
-  document.querySelector('[data-pane-id="section:detail"]')?.scrollIntoView({
+  document.querySelector(`[data-pane-id="${CSS.escape(paneIDForSectionDetail(searchID))}"]`)?.scrollIntoView({
     behavior: "smooth",
     inline: "start",
     block: "nearest"
@@ -1977,12 +2013,12 @@ function makeSectionPayloadFromDetail(detail, section) {
   };
 }
 
-async function renderSectionDetail(detail) {
+async function renderSectionDetail(searchID, detail) {
   const panel = document.createElement("article");
   panel.className = "workspace-panel section-detail-panel";
-  panel.dataset.paneId = paneIDForSectionDetail();
+  panel.dataset.paneId = paneIDForSectionDetail(searchID);
   panel.classList.add(`code-theme-${codeTheme(detail.codePrefix || "BC")}`);
-  applyPaneWeight(panel, paneIDForSectionDetail());
+  applyPaneWeight(panel, paneIDForSectionDetail(searchID));
 
   const { chapter, section } = await resolveSectionDetail(detail);
   const sectionPayload = makeSectionPayloadFromDetail(detail, section);
@@ -2067,7 +2103,7 @@ async function renderSectionDetail(detail) {
   notes.append(notesHeader, textareaWrap);
 
   backButton.addEventListener("click", () => {
-    state.sectionDetail = null;
+    delete sectionDetailsBySearch()[searchID];
     saveWorkspaceState();
     renderWorkspace();
   });
@@ -2135,9 +2171,14 @@ function renderUtility(template, paneID) {
 
 function closeUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
+  const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
+  if (instance.key === "search") {
+    delete sectionDetailsBySearch()[instance.id];
+  }
   delete state.paneWeights[paneID];
-  state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
+  if (detailID) delete state.paneWeights[detailID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID && id !== detailID);
   saveWorkspaceState();
   transitionWorkspace("utility");
 }
@@ -2418,7 +2459,7 @@ function renderSavedItemsByCode(content, savedItems) {
         const detail = document.createElement("span");
         detail.textContent = item.subtitle || item.noteBody || item.title || "Synced saved section";
         row.append(heading, subtitle, detail);
-        row.addEventListener("click", () => openSectionDetail(item));
+        row.addEventListener("click", () => openSectionDetailForExistingSearch(item));
         codeGroup.append(row);
       });
     });
@@ -2454,6 +2495,15 @@ function appendEmptySaved(container, title, message) {
   paragraph.textContent = message;
   wrapper.append(heading, paragraph);
   container.append(wrapper);
+}
+
+async function openSectionDetailForExistingSearch(item) {
+  let searchInstance = (state.utilityInstances || []).find((instance) => instance.key === "search");
+  if (!searchInstance) {
+    searchInstance = newUtilityInstance("search");
+    state.utilityInstances = [...(state.utilityInstances || []), searchInstance];
+  }
+  await openSectionDetail(searchInstance.id, item);
 }
 
 function renderSettings() {
@@ -2766,12 +2816,13 @@ async function renderWorkspace() {
   for (const instance of state.utilityInstances || []) {
     const pane = await renderUtilityInstance(instance);
     if (pane) panes.push(pane);
+    if (instance.key === "search") {
+      const detail = sectionDetailsBySearch()[instance.id];
+      if (detail) panes.push(await renderSectionDetail(instance.id, detail));
+    }
   }
   if (state.utilities.settings) {
     panes.push(renderSettings());
-  }
-  if (state.sectionDetail) {
-    panes.push(await renderSectionDetail(state.sectionDetail));
   }
   for (const reader of state.readers) {
     panes.push(await renderReader(reader));
@@ -2807,6 +2858,15 @@ async function renderUtilityWorkspace() {
       applyPaneWeight(pane, pane.dataset.paneId);
     }
     if (pane) panes.push(pane);
+    if (instance.key === "search") {
+      const detailID = paneIDForSectionDetail(instance.id);
+      const detailState = sectionDetailsBySearch()[instance.id];
+      if (detailState) {
+        const detailPane = existingPanesByID.get(detailID) || await renderSectionDetail(instance.id, detailState);
+        applyPaneWeight(detailPane, detailID);
+        panes.push(detailPane);
+      }
+    }
   }
   if (state.utilities.settings) {
     panes.push(renderSettings());
@@ -2883,6 +2943,7 @@ async function collapseToOneReader() {
   state.readers = [reader];
   state.searchResultReader = null;
   state.sectionDetail = null;
+  state.sectionDetails = {};
   Object.keys(state.utilities).forEach((key) => {
     state.utilities[key] = false;
   });
