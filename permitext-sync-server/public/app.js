@@ -214,6 +214,17 @@ function paneIDForProjectDetail() {
   return "project:detail";
 }
 
+function linkedReaderPaneIDForSearch(searchID) {
+  const readerID = searchLinkedReadersBySearch()[searchID];
+  return readerID ? `reader:${readerID}` : "";
+}
+
+function searchIDForLinkedReaderPane(paneID) {
+  if (!paneID?.startsWith("reader:")) return "";
+  const readerID = paneID.replace("reader:", "");
+  return Object.entries(searchLinkedReadersBySearch()).find(([, linkedReaderID]) => linkedReaderID === readerID)?.[0] || "";
+}
+
 function sectionDetailsBySearch() {
   state.sectionDetails = state.sectionDetails && typeof state.sectionDetails === "object" ? state.sectionDetails : {};
   if (state.sectionDetail) {
@@ -931,9 +942,14 @@ const projectColorOptions = [
   "#4f8f8b"
 ];
 
+function projectColor(project) {
+  return project?.color || project?.tintColor || project?.colorHex || projectColorOptions[0];
+}
+
 function projectMutationForRecord(project, accountOverride = null) {
   const account = accountOverride || activeAccount();
   const now = project.updatedAt || new Date().toISOString();
+  const color = projectColor(project);
   return {
     project: {
       id: project.id,
@@ -944,7 +960,9 @@ function projectMutationForRecord(project, accountOverride = null) {
       name: project.name || "Project",
       title: project.title || project.name || "Project",
       description: project.description || "",
-      color: project.color || project.tintColor || projectColorOptions[0],
+      color,
+      colorHex: project.colorHex || color,
+      sortOrder: Number.isFinite(Number(project.sortOrder)) ? Number(project.sortOrder) : 0,
       sortMode: project.sortMode || "Code order",
       createdAt: project.createdAt || now,
       updatedAt: now
@@ -2450,7 +2468,7 @@ function projectIdentity(project) {
     name: project.name || project.title || "Project",
     title: project.title || project.name || "Project",
     description: project.description || "",
-    color: project.color || project.tintColor || projectColorOptions[0]
+    color: projectColor(project)
   };
 }
 
@@ -2693,7 +2711,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
-    card.style.setProperty("--project-color", project.color || project.tintColor || projectColorOptions[0]);
+    card.style.setProperty("--project-color", projectColor(project));
     const actionButton = document.createElement("button");
     actionButton.className = `project-card-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
     actionButton.type = "button";
@@ -2970,11 +2988,15 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   }
   if (paneID.startsWith("utility:search:")) {
     const searchID = paneID.replace("utility:search:", "");
-    return [paneID, paneIDForSectionDetail(searchID)].filter((id) => active.has(id));
+    return [paneID, paneIDForSectionDetail(searchID), linkedReaderPaneIDForSearch(searchID)].filter((id) => active.has(id));
   }
   if (paneID.startsWith("section:detail:")) {
     const searchID = paneID.replace("section:detail:", "");
-    return [paneIDForUtilityInstance({ key: "search", id: searchID }), paneID].filter((id) => active.has(id));
+    return [paneIDForUtilityInstance({ key: "search", id: searchID }), paneID, linkedReaderPaneIDForSearch(searchID)].filter((id) => active.has(id));
+  }
+  const linkedSearchID = searchIDForLinkedReaderPane(paneID);
+  if (linkedSearchID) {
+    return [paneIDForUtilityInstance({ key: "search", id: linkedSearchID }), paneIDForSectionDetail(linkedSearchID), paneID].filter((id) => active.has(id));
   }
   return active.has(paneID) ? [paneID] : [];
 }
@@ -3241,7 +3263,7 @@ async function renderUtilityWorkspace() {
   const existingContentPanes = Array.from(existingPanesByID.values())
     .filter((pane) => {
       const paneID = String(pane.dataset.paneId || "");
-      return !paneID.startsWith("utility:") && paneID !== paneIDForProjectDetail();
+      return !paneID.startsWith("utility:") && !paneID.startsWith("section:detail:") && paneID !== paneIDForProjectDetail();
     });
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
