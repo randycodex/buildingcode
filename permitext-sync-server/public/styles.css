@@ -197,11 +197,11 @@ textarea:focus-visible {
 
 .reader-code-picker {
   position: relative;
-  display: inline-block;
+  display: block;
   width: var(--code-select-width, max-content);
   min-width: 420px;
   max-width: 100%;
-  margin: 0 0 var(--space-1);
+  margin: 0;
   font-size: calc(var(--chrome-font-size) * var(--code-title-scale)) !important;
 }
 
@@ -277,7 +277,9 @@ textarea:focus-visible {
   --code-accent-soft: rgba(201, 100, 16, 0.105);
   --pane-min-width: clamp(260px, 22vw, 420px);
   --panel-padding: clamp(16px, 1.8vw, 24px);
-  --panel-title-row-height: 32px;
+  --panel-title-row-height: calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2);
+  --panel-title-control-size: var(--panel-title-row-height);
+  --panel-title-icon-size: calc(var(--panel-title-row-height) - 2px);
   --panel-control-row-top: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-2));
   container-type: inline-size;
   display: grid;
@@ -466,7 +468,7 @@ textarea:focus-visible {
   z-index: 8;
   min-height: var(--panel-title-row-height);
   margin-bottom: 0;
-  padding-bottom: var(--space-2);
+  padding-bottom: 0;
   overflow: hidden;
   background: transparent;
 }
@@ -500,11 +502,11 @@ textarea:focus-visible {
 
 .panel-actions {
   display: flex;
-  align-items: center;
+  align-items: start;
   flex: 0 0 auto;
   gap: var(--space-2);
   min-width: 0;
-  transform: translateY(-3px);
+  transform: none;
 }
 
 .reader-panel .panel-actions {
@@ -604,8 +606,8 @@ textarea:focus-visible {
 .utility-close,
 .pane-drag-handle {
   display: grid;
-  width: 24px;
-  height: 24px;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
   place-items: center;
   padding: 0;
   border-color: transparent;
@@ -633,21 +635,21 @@ textarea:focus-visible {
 }
 
 .reader-internal-search-toggle svg {
-  width: 17px;
-  height: 17px;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
 }
 
 .reader-close svg,
 .utility-close svg,
 .pane-drag-handle svg {
-  width: 17px;
-  height: 17px;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
 }
 
 .projects-add-button {
   display: grid;
-  width: 26px;
-  height: 26px;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
   place-items: center;
   padding: 0;
   border-color: transparent;
@@ -664,8 +666,8 @@ textarea:focus-visible {
 }
 
 .projects-add-button svg {
-  width: 20px;
-  height: 20px;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
 }
 
 .projects-add-button:disabled {
@@ -675,8 +677,8 @@ textarea:focus-visible {
 
 .pane-drag-handle {
   display: grid;
-  width: 24px;
-  height: 24px;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
   place-items: center;
   padding: 0;
   border-color: transparent;
@@ -692,8 +694,8 @@ textarea:focus-visible {
 }
 
 .pane-drag-handle svg {
-  width: 15px;
-  height: 15px;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
 }
 
 .selector-stack {
@@ -1067,7 +1069,7 @@ select option:checked {
 
 .section-detail-chrome {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr) 58px;
+  grid-template-columns: var(--panel-title-control-size) minmax(0, 1fr) var(--panel-title-control-size);
   gap: var(--space-3);
 }
 
@@ -1075,28 +1077,33 @@ select option:checked {
   min-width: 0;
   margin: 0;
   color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 1.45) !important;
-  font-weight: 750;
-  line-height: 1;
+  font-size: 1rem !important;
+  font-weight: 650;
+  line-height: normal;
   text-align: center;
 }
 
 .section-detail-icon {
   display: grid;
   place-items: center;
-  width: clamp(42px, 9vw, 58px);
-  height: clamp(42px, 9vw, 58px);
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
   padding: 0;
   border: 0;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  color: var(--text-primary);
-  box-shadow: 0 10px 26px rgba(27, 29, 34, 0.08);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
 }
 
 .section-detail-icon svg {
-  width: 52%;
-  height: 52%;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
+}
+
+.section-detail-icon:hover,
+.section-detail-icon:focus-visible {
+  color: var(--text-primary);
 }
 
 .section-detail-save.is-saved {
@@ -2202,8 +2209,8 @@ mark {
 
 .project-detail-back {
   display: grid;
-  width: 24px;
-  height: 24px;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
   place-items: center;
   padding: 0;
   border: 0;
@@ -2220,8 +2227,8 @@ mark {
 }
 
 .project-detail-back svg {
-  width: 17px;
-  height: 17px;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
 }
 
 .project-detail-chrome h2 {
