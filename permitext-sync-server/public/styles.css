@@ -11,6 +11,8 @@
   --toolbar-active: rgba(20, 20, 24, 0.08);
   --toolbar-active-text: #111111;
   --select-highlight: rgba(20, 20, 24, 0.08);
+  --search-detail-background: color-mix(in srgb, #8fc7ff 16%, var(--background));
+  --project-detail-background: color-mix(in srgb, #8fd8a8 16%, var(--background));
   --ios-accent-building: #c96410;
   --ios-accent-fuel-gas: #c62828;
   --ios-accent-administrative: #7c3aed;
@@ -59,6 +61,8 @@
     --toolbar-active: rgba(255, 255, 255, 0.12);
     --toolbar-active-text: #ffffff;
     --select-highlight: rgba(255, 255, 255, 0.16);
+    --search-detail-background: color-mix(in srgb, #67b7ff 18%, var(--background));
+    --project-detail-background: color-mix(in srgb, #6edc8c 18%, var(--background));
     --ios-accent-building: #ffb067;
     --ios-accent-fuel-gas: #ff7b7b;
     --ios-accent-administrative: #c4a1ff;
@@ -1069,7 +1073,7 @@ select option:checked {
 .section-detail-panel {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  background: var(--background);
+  background: var(--search-detail-background);
 }
 
 .section-detail-chrome {
@@ -1111,13 +1115,16 @@ select option:checked {
 }
 
 .section-detail-content {
+  min-width: 0;
   padding: var(--space-4) 0 108px;
   font-family: var(--reader-font-family);
   font-size: var(--reader-font-size) !important;
   line-height: var(--reader-line-height);
+  overflow-wrap: anywhere;
 }
 
 .section-detail-code-label {
+  min-width: 0;
   margin: 0 0 var(--space-4);
   color: var(--code-accent);
   font-family: var(--reader-font-family);
@@ -1131,6 +1138,7 @@ select option:checked {
 .section-detail-heading {
   position: relative;
   display: block;
+  min-width: 0;
   width: 100%;
   margin: var(--space-6) 0 var(--space-3);
   padding: 0 34px 0 0;
@@ -1138,13 +1146,16 @@ select option:checked {
   background: transparent;
   color: var(--text-primary);
   text-align: left;
+  overflow-wrap: anywhere;
 }
 
 .section-detail-heading span {
+  min-width: 0;
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--subsection-title-scale)) !important;
   font-weight: 700;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .section-detail-heading .section-detail-number {
@@ -1170,6 +1181,7 @@ select option:checked {
 }
 
 .section-detail-chapter {
+  min-width: 0;
   margin: 0 0 var(--space-5);
   color: var(--text-secondary);
   font-family: var(--reader-font-family);
@@ -1180,6 +1192,7 @@ select option:checked {
 .section-detail-body {
   display: grid;
   gap: var(--space-3);
+  min-width: 0;
   margin: 0 0 var(--space-6);
   color: var(--text-primary);
   font-family: var(--reader-font-family);
@@ -1193,9 +1206,11 @@ select option:checked {
 .section-detail-body li,
 .section-detail-body td,
 .section-detail-body th {
+  min-width: 0;
   font-family: inherit !important;
   font-size: inherit !important;
   line-height: var(--reader-line-height);
+  overflow-wrap: anywhere;
 }
 
 .section-detail-notes {
@@ -1701,8 +1716,8 @@ select option:checked {
 
 .chapter-section {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 28px;
-  column-gap: 0;
+  grid-template-columns: minmax(0, 1fr) 58px;
+  column-gap: var(--space-2);
   position: relative;
   padding: 0 0 var(--space-3);
   border-bottom: 0;
@@ -1716,11 +1731,14 @@ select option:checked {
 
 .chapter-section h3 {
   grid-column: 1;
+  min-width: 0;
   margin: 0 0 var(--space-2);
   color: var(--text-primary);
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--subsection-title-scale)) !important;
   line-height: 1.25;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .section-block {
@@ -2219,7 +2237,7 @@ mark {
 }
 
 .projects-content .project-card h3 {
-  font-size: calc(var(--chrome-font-size) * 1.08);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
   font-weight: 650;
 }
 
@@ -2258,7 +2276,7 @@ mark {
 .project-detail-panel {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  background: var(--background);
+  background: var(--project-detail-background);
 }
 
 .project-detail-chrome {

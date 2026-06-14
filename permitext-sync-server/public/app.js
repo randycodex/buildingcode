@@ -1182,6 +1182,7 @@ async function renderSectionContent(panel, reader) {
     const sectionWrapper = document.createElement("section");
     sectionWrapper.className = "chapter-section";
     sectionWrapper.dataset.sectionId = String(section.id);
+    sectionWrapper.dataset.sectionNumber = String(section.sectionNumber || "");
 
     const groupLabel = groupLabelsByFirstSection.get(String(section.id));
     if (groupLabel) {
@@ -1207,18 +1208,22 @@ async function renderSectionContent(panel, reader) {
   if (reader.sectionID) {
     requestAnimationFrame(() => {
       const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
-      scrollReaderContentToSection(content, reader.sectionID, behavior);
+      scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
       reader.shouldSmoothScrollToSection = false;
     });
   }
 }
 
-function scrollReaderContentToSection(content, sectionID, behavior = "auto") {
-  const target = content?.querySelector(`[data-section-id="${CSS.escape(String(sectionID))}"]`);
+function scrollReaderContentToSection(content, sectionID, behavior = "auto", sectionNumber = "") {
+  const idSelector = sectionID ? `[data-section-id="${CSS.escape(String(sectionID))}"]` : "";
+  const numberSelector = sectionNumber ? `[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
+  const target = (idSelector ? content?.querySelector(idSelector) : null) || (numberSelector ? content?.querySelector(numberSelector) : null);
   if (!content || !target) return;
   const contentRect = content.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
-  const targetTop = content.scrollTop + targetRect.top - contentRect.top;
+  const panel = content.closest(".reader-panel");
+  const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
+  const targetTop = content.scrollTop + targetRect.top - contentRect.top - (Number.isFinite(headerOffset) ? headerOffset : 0);
   content.scrollTo({
     top: Math.max(0, targetTop),
     behavior
@@ -2574,9 +2579,6 @@ async function archiveProject(project) {
   archived.add(id);
   state.archivedProjectIDs = Array.from(archived);
   if (projectDetailMatches(project, state.projectDetail)) state.projectDetail = null;
-  state.utilities.archive = true;
-  state.paneWeights["utility:archive"] = state.paneWeights["utility:archive"] || defaultPaneWidthForID("utility:archive");
-  appendPaneIfMissing("utility:archive");
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
   await renderWorkspace();
