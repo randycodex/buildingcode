@@ -2733,7 +2733,8 @@ function showProjectCreateSheet(panel, project = null) {
   descriptionLabel.className = "project-sheet-field";
   const descriptionInput = document.createElement("input");
   descriptionInput.type = "text";
-  descriptionInput.placeholder = "Short description";
+  descriptionInput.className = "project-description-input";
+  descriptionInput.placeholder = "Description";
   descriptionInput.autocomplete = "off";
   if (identity) descriptionInput.value = identity.description;
   descriptionLabel.append(descriptionInput);

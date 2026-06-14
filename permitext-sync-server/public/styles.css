@@ -2431,7 +2431,8 @@ mark {
   color: var(--text-tertiary);
 }
 
-.project-sheet-field .project-name-input {
+.project-sheet-field .project-name-input,
+.project-sheet-field .project-description-input {
   text-align: center;
 }
 
