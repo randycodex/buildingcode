@@ -2701,7 +2701,8 @@ function showProjectCreateSheet(panel, project = null) {
   nameLabel.className = "project-sheet-field";
   const nameInput = document.createElement("input");
   nameInput.type = "text";
-  nameInput.placeholder = "e.g. Bronx R-2 Passive House";
+  nameInput.className = "project-name-input";
+  nameInput.placeholder = "Project Name";
   nameInput.autocomplete = "off";
   if (identity) nameInput.value = identity.name;
   nameLabel.append(nameInput);
