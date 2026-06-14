@@ -575,11 +575,6 @@ textarea:focus-visible {
   box-shadow: none;
 }
 
-.topbar .toolbar-icon-label svg {
-  width: 17px;
-  height: 17px;
-}
-
 .toolbar-button[aria-pressed="true"],
 .topbar .icon-button[aria-pressed="true"] {
   border-color: transparent;
