@@ -25,7 +25,10 @@ const codeOptions = [
 ];
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
+const defaultReaderPaneWidth = 520;
 const defaultUtilityPaneWidth = 320;
+const defaultDetailPaneWidth = 320;
+const defaultSettingsPaneWidth = 340;
 const repeatableUtilityKeys = new Set(["search", "saved", "analysis"]);
 
 const defaultReaderSettings = {
@@ -212,6 +215,19 @@ function paneIDForSectionDetail(searchID = "legacy") {
 
 function paneIDForProjectDetail() {
   return "project:detail";
+}
+
+function defaultPaneWidthForID(paneID) {
+  if (!paneID) return defaultReaderPaneWidth;
+  if (paneID === paneIDForProjectDetail() || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
+  if (paneID === "utility:settings" || paneID.startsWith("utility:analysis:")) return defaultSettingsPaneWidth;
+  if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
+  if (paneID.startsWith("reader:")) return defaultReaderPaneWidth;
+  return defaultReaderPaneWidth;
+}
+
+function isFixedWidthPaneID(paneID) {
+  return paneID?.startsWith("utility:") || paneID === paneIDForProjectDetail() || paneID?.startsWith("section:detail:");
 }
 
 function linkedReaderPaneIDForSearch(searchID) {
@@ -402,17 +418,11 @@ function placeProjectDetailAfterProjects() {
 
 function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
-  const existingWeights = ids.map((id) => Number(current[id])).filter((value) => Number.isFinite(value) && value > 0);
-  const fallbackWeight = existingWeights.length > 0
-    ? existingWeights.reduce((sum, value) => sum + value, 0) / existingWeights.length
-    : 1;
   state.paneWeights = ids.reduce((weights, id) => {
     const value = Number(current[id]);
-    weights[id] = Number.isFinite(value) && value > 0
+    weights[id] = Number.isFinite(value) && value > 40
       ? value
-      : id.startsWith("utility:")
-        ? defaultUtilityPaneWidth
-        : fallbackWeight;
+      : defaultPaneWidthForID(id);
     return weights;
   }, {});
 }
@@ -420,16 +430,12 @@ function normalizePaneWeights(ids) {
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
   const value = Number(state.paneWeights[paneID]);
-  if (paneID.startsWith("utility:")) {
-    const utilityWidth = Number.isFinite(value) && value > 40 ? value : defaultUtilityPaneWidth;
-    panel.style.flex = `0 0 ${utilityWidth}px`;
+  const width = Number.isFinite(value) && value > 40 ? value : defaultPaneWidthForID(paneID);
+  if (isFixedWidthPaneID(paneID)) {
+    panel.style.flex = `0 0 ${width}px`;
     return;
   }
-  if (Number.isFinite(value) && value > 40) {
-    panel.style.flex = `1 1 ${value}px`;
-    return;
-  }
-  panel.style.flex = `${value || 1} 1 0`;
+  panel.style.flex = `1 1 ${width}px`;
 }
 
 function setUtilityButtonStates() {
@@ -2455,6 +2461,7 @@ async function renderUtilityInstance(instance) {
     panel = await renderSaved(paneID);
   } else if (instance.key === "analysis") {
     panel = renderUtility(analysisTemplate, paneID);
+    panel.classList.add("analysis-panel");
   }
   wireUtilityInstanceActions(panel, instance);
   return panel;
@@ -2568,7 +2575,7 @@ async function archiveProject(project) {
   state.archivedProjectIDs = Array.from(archived);
   if (projectDetailMatches(project, state.projectDetail)) state.projectDetail = null;
   state.utilities.archive = true;
-  state.paneWeights["utility:archive"] = state.paneWeights["utility:archive"] || defaultUtilityPaneWidth;
+  state.paneWeights["utility:archive"] = state.paneWeights["utility:archive"] || defaultPaneWidthForID("utility:archive");
   appendPaneIfMissing("utility:archive");
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
@@ -3078,7 +3085,22 @@ function createDivider(previousPaneID, nextPaneID) {
   divider.tabIndex = 0;
   divider.setAttribute("aria-orientation", "vertical");
   divider.addEventListener("pointerdown", (event) => startPaneResize(event, previousPaneID, nextPaneID));
+  divider.addEventListener("dblclick", () => resetDividerPanes(previousPaneID, nextPaneID));
   return divider;
+}
+
+function resetDividerPanes(previousPaneID, nextPaneID) {
+  const currentLeft = track.scrollLeft;
+  [previousPaneID, nextPaneID].forEach((paneID) => {
+    if (!paneID) return;
+    state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
+    const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    if (pane) applyPaneWeight(pane, paneID);
+  });
+  saveWorkspaceState();
+  requestAnimationFrame(() => {
+    track.scrollLeft = Math.min(currentLeft, Math.max(0, track.scrollWidth - track.clientWidth));
+  });
 }
 
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
@@ -3233,7 +3255,8 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   if (!previousPane || !nextPane) return;
 
   event.preventDefault();
-  event.currentTarget.setPointerCapture?.(event.pointerId);
+  const resizeHandle = event.currentTarget;
+  resizeHandle?.setPointerCapture?.(event.pointerId);
   track.classList.add("is-resizing");
   const startX = event.clientX;
   const minimumWidthFor = (pane) => {
@@ -3288,14 +3311,14 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     }
     paneData.forEach((pane, index) => {
       state.paneWeights[pane.id] = widths[index];
-      pane.pane.style.flex = `0 0 ${widths[index]}px`;
+      applyPaneWeight(pane.pane, pane.id);
     });
   };
 
   const onUp = (upEvent) => {
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
-    event.currentTarget.releasePointerCapture?.(upEvent.pointerId);
+    resizeHandle?.releasePointerCapture?.(upEvent.pointerId);
     track.classList.remove("is-resizing");
     saveWorkspaceState();
   };
@@ -3449,7 +3472,7 @@ async function toggleUtilityPane(key) {
     const paneID = paneIDForUtilityInstance(instance);
     state.utilityInstances = [...(state.utilityInstances || []), instance];
     state.utilities[key] = false;
-    state.paneWeights[paneID] = defaultUtilityPaneWidth;
+    state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
     movePaneToFront(paneID);
     saveWorkspaceState();
     await transitionWorkspace("utility");
@@ -3461,7 +3484,7 @@ async function toggleUtilityPane(key) {
   const willOpen = !state.utilities[key];
   state.utilities[key] = willOpen;
   if (willOpen) {
-    state.paneWeights[paneID] = defaultUtilityPaneWidth;
+    state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
     movePaneToFront(paneID);
   } else if (key === "projects") {
     state.projectDetail = null;
@@ -3480,7 +3503,7 @@ async function toggleUtilityPane(key) {
 async function fitVisibleColumns() {
   const paneIDs = activePaneIDs();
   state.paneWeights = paneIDs.reduce((weights, paneID) => {
-    weights[paneID] = 1;
+    weights[paneID] = defaultPaneWidthForID(paneID);
     return weights;
   }, {});
   saveWorkspaceState();
@@ -3506,7 +3529,7 @@ async function collapseToOneReader() {
   state.utilityInstances = [];
   const readerPaneID = paneIDForReader(reader);
   state.paneOrder = [readerPaneID];
-  state.paneWeights = { [readerPaneID]: 1 };
+  state.paneWeights = { [readerPaneID]: defaultPaneWidthForID(readerPaneID) };
   saveWorkspaceState();
   await transitionWorkspace();
   track.scrollTo({ left: 0, behavior: "smooth" });

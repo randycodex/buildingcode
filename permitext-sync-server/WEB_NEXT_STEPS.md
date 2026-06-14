@@ -5,10 +5,10 @@ Reference list for the current web workspace direction.
 ## Priority Order
 
 1. Column behavior
-   - Smooth and predictable resizing with many panels open.
-   - Better minimum widths per panel type.
-   - Utility panels should stay smaller by default than reader panels.
-   - Consider double-click on divider to reset width.
+   - Done: Smooth and predictable resizing with many panels open is supported by persisted pane widths, role-based defaults, and resize limits.
+   - Done: Better minimum widths per panel type are defined for readers, utilities, settings/analysis, and detail side screens.
+   - Done: Utility panels stay smaller by default than reader panels.
+   - Done: Double-clicking a divider resets the two adjacent panes to their default widths.
 
 2. Panel visibility
    - Search, Saved, Analysis, Settings, and Projects should open in useful positions.

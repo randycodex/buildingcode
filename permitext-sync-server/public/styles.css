@@ -383,7 +383,7 @@ textarea:focus-visible {
 }
 
 .reader-panel {
-  --pane-min-width: clamp(340px, 28vw, 520px);
+  --pane-min-width: clamp(380px, 30vw, 560px);
   --reader-header-overlay-height: clamp(104px, 9vh, 132px);
   position: relative;
   grid-template-rows: minmax(0, 1fr);
@@ -406,7 +406,17 @@ textarea:focus-visible {
 .search-panel,
 .utility-panel,
 .settings-panel {
-  --pane-min-width: clamp(260px, 22vw, 360px);
+  --pane-min-width: clamp(280px, 22vw, 360px);
+}
+
+.settings-panel,
+.analysis-panel {
+  --pane-min-width: clamp(300px, 24vw, 380px);
+}
+
+.section-detail-panel,
+.project-detail-panel {
+  --pane-min-width: clamp(300px, 24vw, 380px);
 }
 
 .pane-divider {
