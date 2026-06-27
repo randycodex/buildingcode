@@ -37,6 +37,16 @@ Configure passkey web credentials metadata with:
 APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mjs
 ```
 
+Apple sign-in requests may include the identity token issued by Sign in with Apple. When a token is present, the server verifies the Apple signature, issuer, expiration, subject, and configured audience. Set `PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1` after production Apple client IDs are configured to reject tokenless Apple sign-ins:
+
+```sh
+APPLE_BUNDLE_ID=com.randycodex.permitext \
+APPLE_SERVICE_ID=com.example.permitext.web \
+APPLE_ALLOWED_CLIENT_IDS=com.example.extra.client \
+PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1 \
+node server.mjs
+```
+
 ## Deploy To Vercel
 
 This folder is Vercel-ready.
@@ -115,9 +125,12 @@ PERMITEXT_SYNC_DATABASE_URL="$DATABASE_URL" npm run verify:postgres
   "rejectedMutationIDs": [],
   "latestEventID": 123,
   "syncRevision": 123,
+  "entitlement": null,
   "serverTime": "2026-06-27T00:00:00.000Z"
 }
 ```
+
+Entitlements are server-owned. Sync batches can include local user content mutations, but any client-provided `batch.entitlement` value is ignored; paid access should be written only by verified Apple/web payment handlers or admin grant routes.
 
 `POST /sync/pull` still accepts the original timestamp `since` field, but hosted Postgres deployments can also use the event cursor:
 

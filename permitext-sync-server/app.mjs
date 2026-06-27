@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createPublicKey, randomUUID, verify as verifySignature } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -68,6 +68,8 @@ let cachedStoreAdapter = null;
 let cachedChapterIndex = null;
 let cachedChapterManifest = null;
 let cachedSearchIndex = null;
+let cachedAppleJWKS = null;
+let cachedAppleJWKSExpiresAt = 0;
 
 const emptyStore = () => ({
   users: {},
@@ -1618,9 +1620,130 @@ async function handleCodeSearch(request, response) {
   sendJSON(response, 200, { query, results });
 }
 
-function accountFromCredential(credential) {
+class ClientAuthError extends Error {
+  constructor(statusCode, message) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
+function decodeBase64URL(value) {
+  const normalized = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  return Buffer.from(padded, "base64");
+}
+
+function parseJWTPart(value) {
+  try {
+    return JSON.parse(decodeBase64URL(value).toString("utf8"));
+  } catch {
+    throw new ClientAuthError(401, "Invalid Apple identity token.");
+  }
+}
+
+function appleAllowedClientIDs() {
+  return [
+    process.env.APPLE_BUNDLE_ID,
+    process.env.APPLE_SERVICE_ID,
+    ...(process.env.APPLE_ALLOWED_CLIENT_IDS || "").split(",")
+  ]
+    .map((value) => value?.trim())
+    .filter(Boolean);
+}
+
+async function appleJWKS() {
+  const now = Date.now();
+  if (cachedAppleJWKS && cachedAppleJWKSExpiresAt > now) {
+    return cachedAppleJWKS;
+  }
+  const response = await fetch("https://appleid.apple.com/auth/keys");
+  if (!response.ok) {
+    throw new ClientAuthError(503, "Apple identity verification is temporarily unavailable.");
+  }
+  cachedAppleJWKS = await response.json();
+  cachedAppleJWKSExpiresAt = now + 60 * 60 * 1000;
+  return cachedAppleJWKS;
+}
+
+async function verifyAppleIdentityToken(identityToken) {
+  const parts = String(identityToken || "").split(".");
+  if (parts.length !== 3) {
+    throw new ClientAuthError(401, "Invalid Apple identity token.");
+  }
+
+  const [encodedHeader, encodedPayload, encodedSignature] = parts;
+  const header = parseJWTPart(encodedHeader);
+  const payload = parseJWTPart(encodedPayload);
+  if (header.alg !== "RS256" || !header.kid) {
+    throw new ClientAuthError(401, "Unsupported Apple identity token.");
+  }
+
+  const jwks = await appleJWKS();
+  const jwk = jwks.keys?.find((candidate) => candidate.kid === header.kid);
+  if (!jwk) {
+    throw new ClientAuthError(401, "Unknown Apple identity token key.");
+  }
+
+  const publicKey = createPublicKey({ key: jwk, format: "jwk" });
+  const signatureOK = verifySignature(
+    "RSA-SHA256",
+    Buffer.from(`${encodedHeader}.${encodedPayload}`),
+    publicKey,
+    decodeBase64URL(encodedSignature)
+  );
+  if (!signatureOK) {
+    throw new ClientAuthError(401, "Apple identity token signature is invalid.");
+  }
+
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (payload.iss !== "https://appleid.apple.com") {
+    throw new ClientAuthError(401, "Apple identity token issuer is invalid.");
+  }
+  if (!payload.sub) {
+    throw new ClientAuthError(401, "Apple identity token is missing a subject.");
+  }
+  if (Number(payload.exp || 0) <= nowSeconds) {
+    throw new ClientAuthError(401, "Apple identity token has expired.");
+  }
+
+  const allowedClientIDs = appleAllowedClientIDs();
+  if (process.env.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1" && allowedClientIDs.length === 0) {
+    throw new ClientAuthError(500, "Apple client IDs are not configured.");
+  }
+  if (allowedClientIDs.length > 0) {
+    const audiences = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+    if (!audiences.some((audience) => allowedClientIDs.includes(audience))) {
+      throw new ClientAuthError(401, "Apple identity token audience is invalid.");
+    }
+  }
+
+  return payload;
+}
+
+async function verifiedProviderUserID(credential) {
   const provider = credential?.provider || "guest";
-  const providerUserID = credential?.providerUserID || "local-guest";
+  if (provider !== "apple") {
+    return credential?.providerUserID || "local-guest";
+  }
+
+  const identityToken = typeof credential?.identityToken === "string" ? credential.identityToken.trim() : "";
+  if (!identityToken) {
+    if (process.env.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1") {
+      throw new ClientAuthError(401, "Missing Apple identity token.");
+    }
+    return credential?.providerUserID || "local-guest";
+  }
+
+  const payload = await verifyAppleIdentityToken(identityToken);
+  if (credential.providerUserID && credential.providerUserID !== payload.sub) {
+    throw new ClientAuthError(401, "Apple identity token subject does not match the credential.");
+  }
+  return payload.sub;
+}
+
+async function accountFromCredential(credential) {
+  const provider = credential?.provider || "guest";
+  const providerUserID = await verifiedProviderUserID(credential);
   return {
     appUserID: `${provider}:${providerUserID}`,
     authProvider: provider,
@@ -1836,9 +1959,18 @@ async function handleSignIn(request, response) {
     sendError(response, 404, "Linked passkey account was not found.");
     return;
   }
-  const account = passkeyUserID
-    ? { ...store.users[passkeyUserID], signedInAt: credential.signedInAt || new Date().toISOString() }
-    : accountFromCredential(credential);
+  let account;
+  try {
+    account = passkeyUserID
+      ? { ...store.users[passkeyUserID], signedInAt: credential.signedInAt || new Date().toISOString() }
+      : await accountFromCredential(credential);
+  } catch (error) {
+    if (error instanceof ClientAuthError) {
+      sendError(response, error.statusCode, error.message);
+      return;
+    }
+    throw error;
+  }
   if (!account?.appUserID) {
     sendError(response, 400, "Missing account.");
     return;
@@ -1977,9 +2109,6 @@ async function handlePush(request, response) {
     return;
   }
   store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
-  if (body.batch?.entitlement) {
-    store.entitlements[userID] = body.batch.entitlement;
-  }
 
   if (body.batch?.mutations !== undefined && !Array.isArray(body.batch.mutations)) {
     sendError(response, 400, "Mutations must be an array.");
@@ -2003,6 +2132,7 @@ async function handlePush(request, response) {
     rejectedMutationIDs: merge.rejectedMutationIDs,
     latestEventID,
     syncRevision: latestEventID,
+    entitlement: store.entitlements[userID] || null,
     serverTime: new Date().toISOString()
   });
 }

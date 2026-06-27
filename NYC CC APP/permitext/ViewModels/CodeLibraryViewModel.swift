@@ -1692,13 +1692,17 @@ final class CodeLibraryViewModel: ObservableObject {
             let displayName = [credential.fullName?.givenName, credential.fullName?.familyName]
                 .compactMap { $0 }
                 .joined(separator: " ")
+            let identityToken = credential.identityToken.flatMap { String(data: $0, encoding: .utf8) }
+            let authorizationCode = credential.authorizationCode.flatMap { String(data: $0, encoding: .utf8) }
             do {
                 let backendRecord = try await accountBackendClient.signIn(
                     credential: AccountSignInCredential(
                         provider: .apple,
                         providerUserID: credential.user,
                         displayName: displayName.isEmpty ? nil : displayName,
-                        signedInAt: Date()
+                        signedInAt: Date(),
+                        identityToken: identityToken,
+                        authorizationCode: authorizationCode
                     )
                 )
                 await completeBackendSignIn(backendRecord)
@@ -2172,7 +2176,7 @@ final class CodeLibraryViewModel: ObservableObject {
         if entitlement.plan == .pro {
             resolvedEntitlement = entitlement
         } else if snapshot.plan == .pro {
-            resolvedEntitlement = .subscriptionPro
+            resolvedEntitlement = .appleSubscriptionPro
         } else {
             resolvedEntitlement = entitlement
         }

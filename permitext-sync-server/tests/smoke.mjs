@@ -134,6 +134,18 @@ async function main() {
     assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
 
+    const invalidAppleTokenSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "bad-token-user",
+          identityToken: "not-a-jwt"
+        }
+      }
+    });
+    assert(invalidAppleTokenSignIn.response.status === 401, "Invalid Apple identity token was accepted.");
+
     const attach = await request("/account/attach-local-data", {
       method: "POST",
       body: { account: signIn.json.account }
@@ -195,6 +207,40 @@ async function main() {
       }
     });
     assert(secondSignIn.response.ok, "Second account sign-in failed.");
+
+    const clientEntitlementPush = await request("/sync/push", {
+      method: "POST",
+      token: secondSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: "apple:second-smoke-user" },
+        batch: {
+          user: { id: "apple:second-smoke-user" },
+          entitlement: {
+            plan: "pro",
+            source: "webSubscription",
+            grantedUserID: "apple:second-smoke-user"
+          },
+          mutations: []
+        }
+      }
+    });
+    assert(clientEntitlementPush.response.ok, "Push with client entitlement failed.");
+    assert(clientEntitlementPush.json.entitlement === null, "Push accepted a client-provided entitlement.");
+
+    const secondSignInAfterClientEntitlement = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "second-smoke-user",
+          displayName: "Second Smoke User"
+        }
+      }
+    });
+    assert(
+      secondSignInAfterClientEntitlement.json.entitlement === null,
+      "Client-provided entitlement persisted after sign-in."
+    );
 
     const crossAccountProfile = await request("/account/profile", {
       method: "POST",

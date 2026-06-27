@@ -1941,16 +1941,24 @@ enum AppPlan: String, Codable, Hashable, Sendable {
 enum EntitlementSource: String, Codable, Hashable, Sendable {
     case none
     case subscription
+    case appleSubscription
+    case webSubscription
     case lifetimeGrant
     case debugOverride
 
     var label: String {
         switch self {
         case .none: return "None"
-        case .subscription: return "Subscription"
+        case .subscription: return "Pro Subscription"
+        case .appleSubscription: return "Apple Billing"
+        case .webSubscription: return "Web Billing"
         case .lifetimeGrant: return "Lifetime Grant"
         case .debugOverride: return "Debug Override"
         }
+    }
+
+    var isAppleManagedSubscription: Bool {
+        self == .appleSubscription || self == .subscription
     }
 }
 
@@ -1960,7 +1968,9 @@ struct AppEntitlement: Codable, Hashable, Sendable {
     let grantedUserID: String?
 
     static let free = AppEntitlement(plan: .free, source: .none, grantedUserID: nil)
-    static let subscriptionPro = AppEntitlement(plan: .pro, source: .subscription, grantedUserID: nil)
+    static let appleSubscriptionPro = AppEntitlement(plan: .pro, source: .appleSubscription, grantedUserID: nil)
+    static let webSubscriptionPro = AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: nil)
+    static let subscriptionPro = appleSubscriptionPro
 
     static func lifetimeGrant(userID: String) -> AppEntitlement {
         AppEntitlement(plan: .pro, source: .lifetimeGrant, grantedUserID: userID)
@@ -1990,6 +2000,24 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
     let providerUserID: String
     let displayName: String?
     let signedInAt: Date
+    let identityToken: String?
+    let authorizationCode: String?
+
+    init(
+        provider: AccountAuthProvider,
+        providerUserID: String,
+        displayName: String?,
+        signedInAt: Date,
+        identityToken: String? = nil,
+        authorizationCode: String? = nil
+    ) {
+        self.provider = provider
+        self.providerUserID = providerUserID
+        self.displayName = displayName
+        self.signedInAt = signedInAt
+        self.identityToken = identityToken
+        self.authorizationCode = authorizationCode
+    }
 }
 
 struct SignedInAccount: Codable, Hashable, Sendable {
@@ -2237,7 +2265,7 @@ struct LocalEntitlementService: EntitlementService {
             return .lifetimeGrant(userID: lifetimeGrantUserID)
         }
         if defaults.string(forKey: Self.verifiedPlanDefaultsKey).flatMap(AppPlan.init(rawValue:)) == .pro {
-            return .subscriptionPro
+            return .appleSubscriptionPro
         }
         #if DEBUG
         if let debugPlan = defaults.string(forKey: Self.planDefaultsKey).flatMap(AppPlan.init(rawValue:)) {
@@ -2310,8 +2338,8 @@ struct LocalEntitlementService: EntitlementService {
     static func setVerifiedPlan(_ plan: AppPlan, defaults: UserDefaults = .standard) {
         defaults.set(plan.rawValue, forKey: verifiedPlanDefaultsKey)
         if plan == .pro {
-            setEntitlement(.subscriptionPro, defaults: defaults)
-        } else if currentStoredEntitlement(defaults: defaults).source == .subscription {
+            setEntitlement(.appleSubscriptionPro, defaults: defaults)
+        } else if currentStoredEntitlement(defaults: defaults).source.isAppleManagedSubscription {
             setEntitlement(.free, defaults: defaults)
         }
     }
@@ -2463,7 +2491,8 @@ actor StoreKitSubscriptionService {
             LocalEntitlementService.setVerifiedPlan(.pro)
             return .pro
         }
-        if LocalEntitlementService().currentEntitlement.source == .lifetimeGrant {
+        let currentEntitlement = LocalEntitlementService().currentEntitlement
+        if currentEntitlement.plan == .pro && !currentEntitlement.source.isAppleManagedSubscription {
             return .pro
         }
         LocalEntitlementService.setVerifiedPlan(.free)
