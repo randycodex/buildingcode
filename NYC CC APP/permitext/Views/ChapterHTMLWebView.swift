@@ -100,6 +100,15 @@ enum PreparedChapterHTMLCache {
 struct ChapterHTMLSectionTarget: Hashable {
     let anchorID: String
     let sectionNumber: String?
+    let blockID: String?
+    let blockLabel: String?
+
+    init(anchorID: String, sectionNumber: String?, blockID: String? = nil, blockLabel: String? = nil) {
+        self.anchorID = anchorID
+        self.sectionNumber = sectionNumber
+        self.blockID = blockID
+        self.blockLabel = blockLabel
+    }
 }
 
 struct ChapterHTMLWebView: UIViewRepresentable {
@@ -114,6 +123,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
     let bookmarkedAnchorIDs: Set<String>
     let bookmarkedSectionNumbers: Set<String>
     let notedSectionNumbers: Set<String>
+    let notedBlockIDs: Set<String>
     let expandAllTrigger: Int
     let collapseAllTrigger: Int
     let scrollToTopTrigger: Int
@@ -188,7 +198,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
         if context.coordinator.appliedBookmarkedAnchorIDs != bookmarkedAnchorIDs ||
             context.coordinator.appliedBookmarkedSectionNumbers != bookmarkedSectionNumbers ||
-            context.coordinator.appliedNotedSectionNumbers != notedSectionNumbers {
+            context.coordinator.appliedNotedSectionNumbers != notedSectionNumbers ||
+            context.coordinator.appliedNotedBlockIDs != notedBlockIDs {
             context.coordinator.applyBookmarkDecorations(to: webView)
         }
         if context.coordinator.appliedExpandAllTrigger != expandAllTrigger {
@@ -230,6 +241,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedBookmarkedAnchorIDs: Set<String> = []
         var appliedBookmarkedSectionNumbers: Set<String> = []
         var appliedNotedSectionNumbers: Set<String> = []
+        var appliedNotedBlockIDs: Set<String> = []
         var appliedExpandAllTrigger = 0
         var appliedCollapseAllTrigger = 0
         var appliedScrollToTopTrigger = 0
@@ -437,6 +449,23 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   window.webkit.messageHandlers.\(Coordinator.openSectionMessageName).postMessage({
                     anchorID: anchorID,
                     sectionNumber: sectionNumber
+                  });
+                } catch (error) {}
+              }
+
+              function openNoteForBlock(heading, block) {
+                if (!heading || !block) { return; }
+                var anchorID = heading.id || '';
+                var sectionNumber = sectionNumberForHeading(heading);
+                var blockID = block.id || '';
+                if (!blockID) { return; }
+                var label = (block.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 96);
+                try {
+                  window.webkit.messageHandlers.\(Coordinator.openSectionMessageName).postMessage({
+                    anchorID: anchorID,
+                    sectionNumber: sectionNumber,
+                    blockID: blockID,
+                    blockLabel: label
                   });
                 } catch (error) {}
               }
@@ -659,12 +688,33 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     if (node.dataset.nycccSectionTapReady === 'true') { return; }
                     node.dataset.nycccSectionTapReady = 'true';
                     node.classList.add('nyccc-section-open-target');
+                    var blockID = node.id || '';
+                    if (blockID && node.classList && node.classList.contains('Normal-Level')) {
+                      node.classList.add('nyccc-note-block');
+                      if (!node.querySelector(':scope > .nyccc-block-note-button')) {
+                        var noteButton = document.createElement('button');
+                        noteButton.type = 'button';
+                        noteButton.className = 'nyccc-block-note-button';
+                        noteButton.setAttribute('aria-label', 'Open paragraph note');
+                        noteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>';
+                        noteButton.addEventListener('click', function(event) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          openNoteForBlock(heading, node);
+                        });
+                        node.appendChild(noteButton);
+                      }
+                    }
                     node.addEventListener('click', function(event) {
-                      if (event.target.closest('a')) { return; }
+                      if (event.target.closest('a, button')) { return; }
                       if (window.getSelection && String(window.getSelection()).trim().length > 0) { return; }
                       event.preventDefault();
                       event.stopPropagation();
-                      openSectionForHeading(heading);
+                      if (node.id) {
+                        openNoteForBlock(heading, node);
+                      } else {
+                        openSectionForHeading(heading);
+                      }
                     });
                   });
                 }
@@ -702,14 +752,17 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             appliedBookmarkedAnchorIDs = parent.bookmarkedAnchorIDs
             appliedBookmarkedSectionNumbers = parent.bookmarkedSectionNumbers
             appliedNotedSectionNumbers = parent.notedSectionNumbers
+            appliedNotedBlockIDs = parent.notedBlockIDs
             let anchorIDs = Array(parent.bookmarkedAnchorIDs).sorted()
             let sectionNumbers = Array(parent.bookmarkedSectionNumbers).sorted()
             let notedSectionNumbers = Array(parent.notedSectionNumbers).sorted()
+            let notedBlockIDs = Array(parent.notedBlockIDs).sorted()
             let javascript = """
             (function() {
               var bookmarkedAnchors = new Set(\(Self.javascriptStringArray(anchorIDs)));
               var bookmarkedSections = new Set(\(Self.javascriptStringArray(sectionNumbers)));
               var notedSections = new Set(\(Self.javascriptStringArray(notedSectionNumbers)));
+              var notedBlocks = new Set(\(Self.javascriptStringArray(notedBlockIDs)));
 
               function normalizeSectionNumber(value) {
                 return String(value || '')
@@ -765,6 +818,16 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     badges.appendChild(bookmark);
                   }
                   h6.appendChild(badges);
+                }
+              });
+
+              document.querySelectorAll('.nyccc-note-block').forEach(function(block) {
+                var hasBlockNote = notedBlocks.has(block.id || '');
+                block.classList.toggle('nyccc-noted-block', hasBlockNote);
+                var button = block.querySelector(':scope > .nyccc-block-note-button');
+                if (button) {
+                  button.classList.toggle('nyccc-has-note', hasBlockNote);
+                  button.setAttribute('aria-label', hasBlockNote ? 'Open paragraph note' : 'Add paragraph note');
                 }
               });
             })();
@@ -1026,10 +1089,16 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             let sectionNumber = (payload["sectionNumber"] as? String)?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
+            let blockID = (payload["blockID"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let blockLabel = (payload["blockLabel"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !anchorID.isEmpty || !(sectionNumber?.isEmpty ?? true) else { return nil }
             return ChapterHTMLSectionTarget(
                 anchorID: anchorID,
-                sectionNumber: sectionNumber?.isEmpty == false ? sectionNumber : nil
+                sectionNumber: sectionNumber?.isEmpty == false ? sectionNumber : nil,
+                blockID: blockID?.isEmpty == false ? blockID : nil,
+                blockLabel: blockLabel?.isEmpty == false ? blockLabel : nil
             )
         }
 
@@ -1300,6 +1369,51 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-section-open-target {
               cursor: pointer;
+            }
+            .nyccc-note-block {
+              position: relative !important;
+              padding-right: 1.9rem !important;
+            }
+            .nyccc-block-note-button {
+              position: absolute !important;
+              top: 0.15rem !important;
+              right: 0 !important;
+              display: inline-flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              width: 1.28rem !important;
+              height: 1.28rem !important;
+              padding: 0 !important;
+              border: 0 !important;
+              border-radius: 999px !important;
+              background: transparent !important;
+              color: \(secondaryColor) !important;
+              opacity: 0.38 !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+            .nyccc-block-note-button svg {
+              width: 0.95rem !important;
+              height: 0.95rem !important;
+              display: block !important;
+              fill: none !important;
+              stroke: currentColor !important;
+              stroke-width: 2.2 !important;
+              stroke-linecap: round !important;
+              stroke-linejoin: round !important;
+            }
+            .nyccc-note-block:hover .nyccc-block-note-button,
+            .nyccc-block-note-button:focus,
+            .nyccc-block-note-button.nyccc-has-note {
+              opacity: 1 !important;
+              color: \(accentHex) !important;
+            }
+            .nyccc-block-note-button.nyccc-has-note svg {
+              fill: currentColor !important;
+              stroke: currentColor !important;
+            }
+            .nyccc-noted-block {
+              background: color-mix(in srgb, \(accentHex) 8%, transparent) !important;
             }
             .Section.nyccc-collapsible-heading h6::before {
               content: "" !important;

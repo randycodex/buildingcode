@@ -2392,11 +2392,26 @@ final class CodeLibraryViewModel: ObservableObject {
         return (try? userContentRepository.noteBody(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? ""
     }
 
+    func noteBody(sectionID: Int64, blockID: String) -> String {
+        guard let selectedVersion, let userContentRepository else { return "" }
+        return (try? userContentRepository.noteBody(sectionID: sectionID, blockID: blockID, codeVersion: selectedVersion.codeVersion)) ?? ""
+    }
+
+    func noteBlockIDs(sectionID: Int64) -> [String] {
+        guard let selectedVersion, let userContentRepository else { return [] }
+        return (try? userContentRepository.noteBlockIDs(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
+    }
+
     func saveNote(sectionID: Int64, body: String) {
+        saveNote(sectionID: sectionID, blockID: "", body: body)
+    }
+
+    func saveNote(sectionID: Int64, blockID: String, body: String) {
         guard let selectedVersion, let userContentRepository else { return }
         do {
+            let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
             let trimmedBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
-            let existingBody = try userContentRepository.noteBody(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            let existingBody = try userContentRepository.noteBody(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion)
             if !trimmedBody.isEmpty && existingBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 let noteCount = try noteCountForEntitlements(codeVersion: selectedVersion.codeVersion)
                 guard !denyIfNeeded(entitlementService.canCreateNote(currentCount: noteCount)) else {
@@ -2407,7 +2422,10 @@ final class CodeLibraryViewModel: ObservableObject {
             // `refreshBookmarks` pass that previously fired on every keystroke.
             // BookmarksView re-reads notes from disk on appear, and the note
             // editor re-reads via `noteBody(sectionID:)` when it opens.
-            try userContentRepository.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
+            try userContentRepository.saveNote(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion, body: body)
+            if !normalizedBlockID.isEmpty {
+                bookmarkRevision &+= 1
+            }
             scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription

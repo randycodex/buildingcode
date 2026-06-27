@@ -758,6 +758,7 @@ struct ChapterReaderView: View {
 
 struct ChapterNoteSheet: View {
     let detail: ReaderSectionDetail
+    let titleOverride: String?
     @Binding var noteBody: String
     let accentColor: Color
     let projects: [CodeFolder]
@@ -774,6 +775,7 @@ struct ChapterNoteSheet: View {
 
     init(
         detail: ReaderSectionDetail,
+        titleOverride: String? = nil,
         noteBody: Binding<String>,
         accentColor: Color,
         projects: [CodeFolder],
@@ -784,6 +786,7 @@ struct ChapterNoteSheet: View {
         onSave: @escaping (String) -> Void
     ) {
         self.detail = detail
+        self.titleOverride = titleOverride
         _noteBody = noteBody
         self.accentColor = accentColor
         self.projects = projects
@@ -795,10 +798,15 @@ struct ChapterNoteSheet: View {
         self.onSave = onSave
     }
 
+    private var displayTitle: String {
+        let trimmedOverride = titleOverride?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmedOverride.isEmpty ? detail.displayLabel : trimmedOverride
+    }
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 10) {
-                Text(detail.displayLabel)
+                Text(displayTitle)
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -840,7 +848,7 @@ struct ChapterNoteSheet: View {
                 dismissKeyboard()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle(detail.displayLabel)
+            .navigationTitle(displayTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

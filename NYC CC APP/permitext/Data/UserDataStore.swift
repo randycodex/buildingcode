@@ -8,9 +8,12 @@ protocol UserContentRepository {
     func isBookmarked(sectionID: Int64, codeVersion: String) throws -> Bool
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws
     func noteBody(sectionID: Int64, codeVersion: String) throws -> String
+    func noteBody(sectionID: Int64, blockID: String, codeVersion: String) throws -> String
+    func noteBlockIDs(sectionID: Int64, codeVersion: String) throws -> [String]
     func noteCount(codeVersion: String) throws -> Int
     func noteEntries(codeVersion: String) throws -> [Int64: String]
     func saveNote(sectionID: Int64, codeVersion: String, body: String) throws
+    func saveNote(sectionID: Int64, blockID: String, codeVersion: String, body: String) throws
     func tags(sectionID: Int64, codeVersion: String) throws -> [String]
     func tagsBySectionID(codeVersion: String) throws -> [Int64: [String]]
     func setTags(_ tags: [String], sectionID: Int64, codeVersion: String) throws
@@ -224,22 +227,51 @@ final class UserDataStore: UserContentRepository {
     }
 
     func noteBody(sectionID: Int64, codeVersion: String) throws -> String {
+        try noteBody(sectionID: sectionID, blockID: "", codeVersion: codeVersion)
+    }
+
+    func noteBody(sectionID: Int64, blockID: String, codeVersion: String) throws -> String {
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
         let statement = try connection.prepare(
             """
             SELECT body
             FROM notes
-            WHERE section_id = ? AND code_version = ? AND block_id = ''
+            WHERE section_id = ? AND code_version = ? AND block_id = ?
             LIMIT 1;
             """
         )
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, sectionID)
         try connection.bind(text: codeVersion, index: 2, to: statement)
+        try connection.bind(text: normalizedBlockID, index: 3, to: statement)
 
         guard try connection.step(statement) == SQLITE_ROW else {
             return ""
         }
         return connection.string(at: 0, in: statement)
+    }
+
+    func noteBlockIDs(sectionID: Int64, codeVersion: String) throws -> [String] {
+        let statement = try connection.prepare(
+            """
+            SELECT block_id
+            FROM notes
+            WHERE section_id = ? AND code_version = ? AND block_id <> '' AND TRIM(body) <> ''
+            ORDER BY updated_at DESC;
+            """
+        )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, sectionID)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+
+        var blockIDs: [String] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            let blockID = connection.string(at: 0, in: statement)
+            if !blockID.isEmpty {
+                blockIDs.append(blockID)
+            }
+        }
+        return blockIDs
     }
 
     func noteCount(codeVersion: String) throws -> Int {
@@ -273,21 +305,31 @@ final class UserDataStore: UserContentRepository {
     }
 
     func saveNote(sectionID: Int64, codeVersion: String, body: String) throws {
+        try saveNote(sectionID: sectionID, blockID: "", codeVersion: codeVersion, body: body)
+    }
+
+    func saveNote(sectionID: Int64, blockID: String, codeVersion: String, body: String) throws {
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
         if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             let statement = try connection.prepare(
                 """
                 DELETE FROM notes
-                WHERE section_id = ? AND code_version = ? AND block_id = '';
+                WHERE section_id = ? AND code_version = ? AND block_id = ?;
                 """
             )
             defer { connection.finalize(statement) }
             sqlite3_bind_int64(statement, 1, sectionID)
             try connection.bind(text: codeVersion, index: 2, to: statement)
+            try connection.bind(text: normalizedBlockID, index: 3, to: statement)
             _ = try connection.step(statement)
+            var values: [String: String] = [:]
+            if !normalizedBlockID.isEmpty {
+                values["blockID"] = normalizedBlockID
+            }
             enqueueSyncOperationIfPossible(
                 entityType: .note,
                 operationType: .delete,
-                payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
+                payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID, values: values)
             )
             return
         }
@@ -298,7 +340,7 @@ final class UserDataStore: UserContentRepository {
                 code_version, section_id, block_id, body, created_at, updated_at, client_id,
                 owner_id, visibility, sync_state
             )
-            VALUES (?, ?, '', ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(code_version, section_id, block_id) DO UPDATE SET
                 body = excluded.body,
                 updated_at = excluded.updated_at,
@@ -308,22 +350,27 @@ final class UserDataStore: UserContentRepository {
         defer { connection.finalize(statement) }
         try connection.bind(text: codeVersion, index: 1, to: statement)
         sqlite3_bind_int64(statement, 2, sectionID)
-        try connection.bind(text: body, index: 3, to: statement)
+        try connection.bind(text: normalizedBlockID, index: 3, to: statement)
+        try connection.bind(text: body, index: 4, to: statement)
         let now = isoFormatter.string(from: Date())
-        try connection.bind(text: now, index: 4, to: statement)
         try connection.bind(text: now, index: 5, to: statement)
-        try connection.bind(text: UUID().uuidString, index: 6, to: statement)
-        try connection.bind(text: localOwnerID, index: 7, to: statement)
-        try connection.bind(text: personalVisibility, index: 8, to: statement)
-        try connection.bind(text: pendingSyncState, index: 9, to: statement)
+        try connection.bind(text: now, index: 6, to: statement)
+        try connection.bind(text: UUID().uuidString, index: 7, to: statement)
+        try connection.bind(text: localOwnerID, index: 8, to: statement)
+        try connection.bind(text: personalVisibility, index: 9, to: statement)
+        try connection.bind(text: pendingSyncState, index: 10, to: statement)
         _ = try connection.step(statement)
+        var values = ["body": body]
+        if !normalizedBlockID.isEmpty {
+            values["blockID"] = normalizedBlockID
+        }
         enqueueSyncOperationIfPossible(
             entityType: .note,
             operationType: .upsert,
             payload: SyncQueuePayload(
                 codeVersion: codeVersion,
                 sectionID: sectionID,
-                values: ["body": body]
+                values: values
             )
         )
     }
