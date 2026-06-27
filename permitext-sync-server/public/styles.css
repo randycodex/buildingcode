@@ -2602,12 +2602,13 @@ mark {
 
 .project-section-reader {
   display: grid;
-  gap: var(--space-3);
+  gap: calc(var(--space-3) / 2);
   padding: 0 var(--space-4) var(--space-6);
 }
 
 .project-section-reader > .section-label {
   color: var(--code-accent);
+  font-weight: 700;
 }
 
 .project-section-reader h3 {
