@@ -2625,12 +2625,14 @@ mark {
 
 .project-section-body {
   color: var(--text-primary);
+  font-size: 12px !important;
 }
 
 .project-section-body > :first-child {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+  font-size: 12px !important;
   overflow: hidden;
 }
 
