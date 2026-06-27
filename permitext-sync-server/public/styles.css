@@ -2689,6 +2689,10 @@ mark {
   overflow-wrap: anywhere;
 }
 
+.project-sheet-field .project-description-input {
+  text-align: center;
+}
+
 .project-sheet-field input::placeholder,
 .project-sheet-field textarea::placeholder {
   color: var(--text-tertiary);
