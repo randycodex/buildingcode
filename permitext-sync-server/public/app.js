@@ -1636,6 +1636,7 @@ function toggleReaderNotesSheet(panel, section, reader) {
 function openReaderNotesSheet(panel, section, reader, options = {}) {
   if (!panel || !section) return;
   const sheet = ensureReaderNotesSheet(panel, reader);
+  const wasOpen = sheet.classList.contains("is-open") && !sheet.hidden;
   const sectionID = sectionNoteKey(section.id);
   if (reader) {
     reader.activeNotesSectionID = sectionID;
@@ -1688,7 +1689,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const title = sheet.querySelector(".reader-notes-title");
   const input = sheet.querySelector(".reader-notes-input");
   sheet.dataset.sectionId = sectionID;
-  sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
+  if (!wasOpen) sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
   title.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
   input.value = noteValueForSection(section.id);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
