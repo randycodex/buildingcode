@@ -2683,6 +2683,8 @@ mark {
 
 .project-sheet-field textarea {
   min-height: 86px;
+  padding-right: var(--space-4);
+  padding-left: var(--space-4);
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
   resize: vertical;
@@ -2690,7 +2692,7 @@ mark {
 }
 
 .project-sheet-field .project-description-input {
-  text-align: center;
+  text-align: left;
 }
 
 .project-sheet-field input::placeholder,
