@@ -264,9 +264,11 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
         bookmarkedSectionIDs: Set<Int64>,
         notesBySectionID: [Int64: String],
         tagsBySectionID: [Int64: [String]] = [:],
+        annotationEntries: [UserAnnotationEntry] = [],
         bookmarkCreatedAtBySectionID: [Int64: Date] = [:]
     ) throws -> [BookmarkedSection] {
         guard !ids.isEmpty else { return [] }
+        let annotationsBySectionID = Dictionary(grouping: annotationEntries, by: \.sectionID)
         let placeholders = ids.map { _ in "?" }.joined(separator: ",")
         let statement = try connection.prepare(
             """
@@ -284,21 +286,52 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
 
         var items: [BookmarkedSection] = []
         while try connection.step(statement) == SQLITE_ROW {
-            items.append(
-                BookmarkedSection(
-                    id: connection.int64(at: 0, in: statement),
-                    codeVersion: codeVersion,
-                    chapterNumber: connection.string(at: 1, in: statement),
-                    chapterTitle: connection.string(at: 2, in: statement),
-                    sectionNumber: connection.string(at: 3, in: statement),
-                    title: connection.string(at: 4, in: statement),
-                    previewText: connection.string(at: 5, in: statement).titleThroughFirstPeriod,
-                    isBookmarked: bookmarkedSectionIDs.contains(connection.int64(at: 0, in: statement)),
-                    noteBody: notesBySectionID[connection.int64(at: 0, in: statement)] ?? "",
-                    tags: tagsBySectionID[connection.int64(at: 0, in: statement)] ?? [],
-                    bookmarkedAt: bookmarkCreatedAtBySectionID[connection.int64(at: 0, in: statement)]
+            let sectionID = connection.int64(at: 0, in: statement)
+            let sectionNumber = connection.string(at: 3, in: statement)
+            let title = connection.string(at: 4, in: statement)
+            let sectionAnnotations = annotationsBySectionID[sectionID] ?? []
+            let sectionLevelAnnotation = sectionAnnotations.first { $0.blockID.isEmpty }
+            let sectionTags = sectionLevelAnnotation?.tags ?? tagsBySectionID[sectionID] ?? []
+            let sectionNote = sectionLevelAnnotation?.noteBody ?? notesBySectionID[sectionID] ?? ""
+            if bookmarkedSectionIDs.contains(sectionID) ||
+                !sectionNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                !sectionTags.isEmpty {
+                items.append(
+                    BookmarkedSection(
+                        id: sectionID,
+                        codeVersion: codeVersion,
+                        chapterNumber: connection.string(at: 1, in: statement),
+                        chapterTitle: connection.string(at: 2, in: statement),
+                        sectionNumber: sectionNumber,
+                        title: title,
+                        previewText: connection.string(at: 5, in: statement).titleThroughFirstPeriod,
+                        isBookmarked: bookmarkedSectionIDs.contains(sectionID),
+                        noteBody: sectionNote,
+                        tags: sectionTags,
+                        bookmarkedAt: bookmarkCreatedAtBySectionID[sectionID]
+                    )
                 )
-            )
+            }
+
+            items.append(contentsOf: sectionAnnotations
+                .filter { !$0.blockID.isEmpty }
+                .map { annotation in
+                    BookmarkedSection(
+                        id: sectionID,
+                        annotationBlockID: annotation.blockID,
+                        annotationLabel: "Paragraph annotation",
+                        codeVersion: codeVersion,
+                        chapterNumber: connection.string(at: 1, in: statement),
+                        chapterTitle: connection.string(at: 2, in: statement),
+                        sectionNumber: sectionNumber,
+                        title: title,
+                        previewText: "\(sectionNumber) \(title.displayTitle(for: sectionNumber))",
+                        isBookmarked: bookmarkedSectionIDs.contains(sectionID),
+                        noteBody: annotation.noteBody,
+                        tags: annotation.tags,
+                        bookmarkedAt: bookmarkCreatedAtBySectionID[sectionID]
+                    )
+                })
         }
         return items
     }

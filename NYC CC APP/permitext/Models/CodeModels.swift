@@ -435,10 +435,15 @@ struct ServerAnnotationRecord: Codable, Hashable, Sendable {
     let userID: String
     let codeVersion: String
     let sectionID: Int64
+    let blockID: String?
     let noteBody: String?
     let tags: [String]?
     let updatedAt: Date
     let deletedAt: Date?
+
+    var normalizedBlockID: String {
+        blockID?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
 }
 
 struct ServerProjectRecord: Codable, Hashable, Sendable {
@@ -571,10 +576,17 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             }
             self = .annotation(
                 ServerAnnotationRecord(
-                    id: Self.recordID(account: account, type: "note", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    id: Self.recordID(
+                        account: account,
+                        type: "note",
+                        codeVersion: payload.codeVersion,
+                        sectionID: sectionID,
+                        blockID: payload.values["blockID"]
+                    ),
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
+                    blockID: payload.values["blockID"],
                     noteBody: item.operationType == .delete ? nil : payload.values["body"],
                     tags: nil,
                     updatedAt: item.updatedAt,
@@ -587,10 +599,17 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             }
             self = .annotation(
                 ServerAnnotationRecord(
-                    id: Self.recordID(account: account, type: "tags", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    id: Self.recordID(
+                        account: account,
+                        type: "tags",
+                        codeVersion: payload.codeVersion,
+                        sectionID: sectionID,
+                        blockID: payload.values["blockID"]
+                    ),
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
+                    blockID: payload.values["blockID"],
                     noteBody: nil,
                     tags: item.operationType == .delete ? nil : Self.tags(from: payload.values["tags"]),
                     updatedAt: item.updatedAt,
@@ -686,6 +705,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         clientID: String? = nil,
         folderID: Int64? = nil,
         sectionID: Int64? = nil,
+        blockID: String? = nil,
         scope: String? = nil
     ) -> String {
         [
@@ -695,6 +715,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             clientID,
             folderID.map(String.init),
             sectionID.map(String.init),
+            blockID?.trimmingCharacters(in: .whitespacesAndNewlines),
             scope
         ]
         .compactMap { $0 }
@@ -802,6 +823,8 @@ struct ServerUserContentBatch: Codable, Hashable, Sendable {
 struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     let userID: String
     let pulledAt: Date
+    var latestEventID: Int64? = nil
+    var syncRevision: Int64? = nil
     let mutations: [ServerUserContentMutation]
 }
 
@@ -812,6 +835,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
     let lastSuccessfulPullAt: Date?
     let lastAttemptedSyncAt: Date?
     let lastErrorMessage: String?
+    let latestEventID: Int64?
 
     init(
         accountUserID: String,
@@ -819,7 +843,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         lastSuccessfulPushAt: Date? = nil,
         lastSuccessfulPullAt: Date? = nil,
         lastAttemptedSyncAt: Date? = nil,
-        lastErrorMessage: String? = nil
+        lastErrorMessage: String? = nil,
+        latestEventID: Int64? = nil
     ) {
         self.accountUserID = accountUserID
         self.backendName = backendName
@@ -827,27 +852,30 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         self.lastSuccessfulPullAt = lastSuccessfulPullAt
         self.lastAttemptedSyncAt = lastAttemptedSyncAt
         self.lastErrorMessage = lastErrorMessage
+        self.latestEventID = latestEventID
     }
 
-    func markingPushSucceeded(at date: Date) -> UserContentSyncCheckpoint {
+    func markingPushSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
         UserContentSyncCheckpoint(
             accountUserID: accountUserID,
             backendName: backendName,
             lastSuccessfulPushAt: date,
             lastSuccessfulPullAt: lastSuccessfulPullAt,
             lastAttemptedSyncAt: date,
-            lastErrorMessage: nil
+            lastErrorMessage: nil,
+            latestEventID: latestEventID ?? self.latestEventID
         )
     }
 
-    func markingPullSucceeded(at date: Date) -> UserContentSyncCheckpoint {
+    func markingPullSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
         UserContentSyncCheckpoint(
             accountUserID: accountUserID,
             backendName: backendName,
             lastSuccessfulPushAt: lastSuccessfulPushAt,
             lastSuccessfulPullAt: date,
             lastAttemptedSyncAt: date,
-            lastErrorMessage: nil
+            lastErrorMessage: nil,
+            latestEventID: latestEventID ?? self.latestEventID
         )
     }
 
@@ -858,7 +886,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastSuccessfulPushAt: lastSuccessfulPushAt,
             lastSuccessfulPullAt: lastSuccessfulPullAt,
             lastAttemptedSyncAt: date,
-            lastErrorMessage: error.localizedDescription
+            lastErrorMessage: error.localizedDescription,
+            latestEventID: latestEventID
         )
     }
 }
@@ -941,12 +970,15 @@ struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
 struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
     let acceptedMutationIDs: [String]
     let rejectedMutationIDs: [String]?
+    var latestEventID: Int64? = nil
+    var syncRevision: Int64? = nil
     let serverTime: Date
 }
 
 struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let since: Date?
+    var sinceEventID: Int64? = nil
 }
 
 struct BackendHealthStatus: Codable, Hashable, Sendable {
@@ -1784,6 +1816,8 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
 
 struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let id: Int64
+    let annotationBlockID: String
+    let annotationLabel: String?
     let codeVersion: String
     let codeSectionID: Int64?
     let clientID: String?
@@ -1805,6 +1839,8 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
 
     init(
         id: Int64,
+        annotationBlockID: String = "",
+        annotationLabel: String? = nil,
         codeVersion: String,
         codeSectionID: Int64? = nil,
         clientID: String? = nil,
@@ -1825,6 +1861,8 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         bookmarkedAt: Date? = nil
     ) {
         self.id = id
+        self.annotationBlockID = annotationBlockID.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.annotationLabel = annotationLabel
         self.codeVersion = codeVersion
         self.codeSectionID = codeSectionID
         self.clientID = clientID
@@ -1846,11 +1884,41 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     }
 
     var displayTitle: String {
-        kind == .textBlock ? title : title.displayTitle(for: sectionNumber)
+        if isBlockAnnotation {
+            let trimmedLabel = annotationLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return trimmedLabel.isEmpty ? "Paragraph annotation" : trimmedLabel
+        }
+        return kind == .textBlock ? title : title.displayTitle(for: sectionNumber)
     }
 
     var hasNote: Bool {
         !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var rowID: String {
+        annotationBlockID.isEmpty ? "section:\(id)" : "section:\(id):block:\(annotationBlockID)"
+    }
+
+    var isBlockAnnotation: Bool {
+        !annotationBlockID.isEmpty
+    }
+}
+
+struct UserAnnotationEntry: Hashable, Sendable {
+    let sectionID: Int64
+    let blockID: String
+    let noteBody: String
+    let tags: [String]
+
+    init(sectionID: Int64, blockID: String = "", noteBody: String = "", tags: [String] = []) {
+        self.sectionID = sectionID
+        self.blockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.noteBody = noteBody
+        self.tags = tags
+    }
+
+    var hasContent: Bool {
+        !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !tags.isEmpty
     }
 }
 
@@ -2565,7 +2633,14 @@ enum BookmarkSorter {
         if lhs.chapterNumber != rhs.chapterNumber {
             return lhs.chapterNumber.compare(rhs.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
         }
-        return lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+        let sectionOrder = lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive])
+        if sectionOrder != .orderedSame {
+            return sectionOrder == .orderedAscending
+        }
+        if lhs.annotationBlockID.isEmpty != rhs.annotationBlockID.isEmpty {
+            return lhs.annotationBlockID.isEmpty
+        }
+        return lhs.rowID.localizedStandardCompare(rhs.rowID) == .orderedAscending
     }
 }
 

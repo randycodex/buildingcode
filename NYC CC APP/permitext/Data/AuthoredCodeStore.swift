@@ -1055,32 +1055,93 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         bookmarkedSectionIDs: Set<Int64>,
         notesBySectionID: [Int64: String],
         tagsBySectionID: [Int64: [String]] = [:],
+        annotationEntries: [UserAnnotationEntry] = [],
         bookmarkCreatedAtBySectionID: [Int64: Date] = [:]
     ) -> [BookmarkedSection] {
-        ids.compactMap { id in
-            guard let indexed = sectionIndex[id] else { return nil }
-            return BookmarkedSection(
-                id: indexed.section.id,
-                codeVersion: codeVersion,
-                codeSectionID: indexed.chapter.codeSectionID,
-                chapterNumber: indexed.chapter.chapterNumber,
-                chapterTitle: indexed.chapter.title,
-                sectionNumber: indexed.section.sectionNumber,
-                title: indexed.section.title,
-                previewText: previewText(for: indexed.section.id, fallbackOfficialText: indexed.section.officialText),
-                kind: indexed.section.kind,
-                isBookmarked: bookmarkedSectionIDs.contains(id),
-                noteBody: notesBySectionID[id] ?? "",
-                tags: tagsBySectionID[id] ?? [],
-                bookmarkedAt: bookmarkCreatedAtBySectionID[id]
-            )
+        let annotationsBySectionID = Dictionary(grouping: annotationEntries, by: \.sectionID)
+        return ids.flatMap { id -> [BookmarkedSection] in
+            guard let indexed = sectionIndex[id] else { return [] }
+            let sectionAnnotations = annotationsBySectionID[id] ?? []
+            let sectionLevelAnnotation = sectionAnnotations.first { $0.blockID.isEmpty }
+            let sectionTags = sectionLevelAnnotation?.tags ?? tagsBySectionID[id] ?? []
+            let sectionNote = sectionLevelAnnotation?.noteBody ?? notesBySectionID[id] ?? ""
+            var rows: [BookmarkedSection] = []
+
+            if bookmarkedSectionIDs.contains(id) || !sectionNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !sectionTags.isEmpty {
+                rows.append(BookmarkedSection(
+                    id: indexed.section.id,
+                    codeVersion: codeVersion,
+                    codeSectionID: indexed.chapter.codeSectionID,
+                    chapterNumber: indexed.chapter.chapterNumber,
+                    chapterTitle: indexed.chapter.title,
+                    sectionNumber: indexed.section.sectionNumber,
+                    title: indexed.section.title,
+                    previewText: previewText(for: indexed.section.id, fallbackOfficialText: indexed.section.officialText),
+                    kind: indexed.section.kind,
+                    isBookmarked: bookmarkedSectionIDs.contains(id),
+                    noteBody: sectionNote,
+                    tags: sectionTags,
+                    bookmarkedAt: bookmarkCreatedAtBySectionID[id]
+                ))
+            }
+
+            rows.append(contentsOf: sectionAnnotations
+                .filter { !$0.blockID.isEmpty }
+                .map { annotation in
+                    BookmarkedSection(
+                        id: indexed.section.id,
+                        annotationBlockID: annotation.blockID,
+                        annotationLabel: annotationLabel(for: annotation.blockID, in: indexed.section),
+                        codeVersion: codeVersion,
+                        codeSectionID: indexed.chapter.codeSectionID,
+                        chapterNumber: indexed.chapter.chapterNumber,
+                        chapterTitle: indexed.chapter.title,
+                        sectionNumber: indexed.section.sectionNumber,
+                        title: indexed.section.title,
+                        previewText: sectionLabel(for: indexed.section),
+                        kind: indexed.section.kind,
+                        isBookmarked: bookmarkedSectionIDs.contains(id),
+                        noteBody: annotation.noteBody,
+                        tags: annotation.tags,
+                        bookmarkedAt: bookmarkCreatedAtBySectionID[id]
+                    )
+                })
+
+            return rows
         }
         .sorted {
             if $0.chapterNumber == $1.chapterNumber {
-                return $0.sectionNumber.compare($1.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+                let sectionOrder = $0.sectionNumber.compare($1.sectionNumber, options: [.numeric, .caseInsensitive])
+                if sectionOrder != .orderedSame { return sectionOrder == .orderedAscending }
+                if $0.annotationBlockID.isEmpty != $1.annotationBlockID.isEmpty {
+                    return $0.annotationBlockID.isEmpty
+                }
+                return $0.rowID.localizedStandardCompare($1.rowID) == .orderedAscending
             }
             return $0.chapterNumber.compare($1.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
         }
+    }
+
+    private func annotationLabel(for blockID: String, in section: Section) -> String {
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let contentBlock = section.contentBlocks.first(where: {
+            $0.id == normalizedBlockID || $0.tableID == normalizedBlockID || $0.imageID == normalizedBlockID
+        }) {
+            if let caption = contentBlock.caption?.trimmingCharacters(in: .whitespacesAndNewlines), !caption.isEmpty {
+                return caption
+            }
+            if let plainText = contentBlock.plainText?.trimmingCharacters(in: .whitespacesAndNewlines), !plainText.isEmpty {
+                return String(plainText.prefix(90))
+            }
+        }
+        return "Paragraph annotation"
+    }
+
+    private func sectionLabel(for section: Section) -> String {
+        if section.kind == .textBlock {
+            return section.title
+        }
+        return "\(section.sectionNumber) \(section.title.displayTitle(for: section.sectionNumber))"
     }
 
     func chapter(chapterNumber: String) throws -> CodeChapter? {

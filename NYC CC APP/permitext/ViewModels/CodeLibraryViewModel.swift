@@ -1395,9 +1395,15 @@ final class CodeLibraryViewModel: ObservableObject {
             let ids = try userContentRepository.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
             let noteEntries = try userContentRepository.noteEntries(codeVersion: selectedVersion.codeVersion)
             let tagEntries = (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            let annotationEntries = (try? userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)) ?? []
             let bookmarkDates = (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
-            let savedSectionIDs = Array(Set(ids).union(noteEntries.keys)).sorted()
+            let savedSectionIDs = Array(
+                Set(ids)
+                    .union(noteEntries.keys)
+                    .union(tagEntries.keys)
+                    .union(annotationEntries.map(\.sectionID))
+            ).sorted()
             if let authoredCodeStore {
                 bookmarks = authoredCodeStore.savedSections(
                     ids: savedSectionIDs,
@@ -1405,6 +1411,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
                     notesBySectionID: noteEntries,
                     tagsBySectionID: tagEntries,
+                    annotationEntries: annotationEntries,
                     bookmarkCreatedAtBySectionID: bookmarkDates
                 )
             } else {
@@ -1414,6 +1421,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
                     notesBySectionID: noteEntries,
                     tagsBySectionID: tagEntries,
+                    annotationEntries: annotationEntries,
                     bookmarkCreatedAtBySectionID: bookmarkDates
                 ) ?? []
             }
@@ -2392,11 +2400,26 @@ final class CodeLibraryViewModel: ObservableObject {
         return (try? userContentRepository.noteBody(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? ""
     }
 
+    func noteBody(sectionID: Int64, blockID: String) -> String {
+        guard let selectedVersion, let userContentRepository else { return "" }
+        return (try? userContentRepository.noteBody(sectionID: sectionID, blockID: blockID, codeVersion: selectedVersion.codeVersion)) ?? ""
+    }
+
+    func noteBlockIDs(sectionID: Int64) -> [String] {
+        guard let selectedVersion, let userContentRepository else { return [] }
+        return (try? userContentRepository.noteBlockIDs(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
+    }
+
     func saveNote(sectionID: Int64, body: String) {
+        saveNote(sectionID: sectionID, blockID: "", body: body)
+    }
+
+    func saveNote(sectionID: Int64, blockID: String, body: String) {
         guard let selectedVersion, let userContentRepository else { return }
         do {
+            let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
             let trimmedBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
-            let existingBody = try userContentRepository.noteBody(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            let existingBody = try userContentRepository.noteBody(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion)
             if !trimmedBody.isEmpty && existingBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 let noteCount = try noteCountForEntitlements(codeVersion: selectedVersion.codeVersion)
                 guard !denyIfNeeded(entitlementService.canCreateNote(currentCount: noteCount)) else {
@@ -2407,7 +2430,10 @@ final class CodeLibraryViewModel: ObservableObject {
             // `refreshBookmarks` pass that previously fired on every keystroke.
             // BookmarksView re-reads notes from disk on appear, and the note
             // editor re-reads via `noteBody(sectionID:)` when it opens.
-            try userContentRepository.saveNote(sectionID: sectionID, codeVersion: selectedVersion.codeVersion, body: body)
+            try userContentRepository.saveNote(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion, body: body)
+            if !normalizedBlockID.isEmpty {
+                bookmarkRevision &+= 1
+            }
             scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
@@ -2443,9 +2469,19 @@ final class CodeLibraryViewModel: ObservableObject {
         return (try? userContentRepository.tags(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
     }
 
+    func tags(sectionID: Int64, blockID: String) -> [String] {
+        guard let selectedVersion, let userContentRepository else { return [] }
+        return (try? userContentRepository.tags(sectionID: sectionID, blockID: blockID, codeVersion: selectedVersion.codeVersion)) ?? []
+    }
+
     /// Replaces a section's tag set. Empty array clears all tags for it.
     @discardableResult
     func setTags(_ tags: [String], sectionID: Int64) -> Bool {
+        setTags(tags, sectionID: sectionID, blockID: "")
+    }
+
+    @discardableResult
+    func setTags(_ tags: [String], sectionID: Int64, blockID: String) -> Bool {
         guard let selectedVersion, let userContentRepository else { return false }
         do {
             if !tags.isEmpty {
@@ -2453,8 +2489,16 @@ final class CodeLibraryViewModel: ObservableObject {
                     return false
                 }
             }
-            try userContentRepository.setTags(tags, sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.setTags(
+                tags,
+                sectionID: sectionID,
+                blockID: blockID.trimmingCharacters(in: .whitespacesAndNewlines),
+                codeVersion: selectedVersion.codeVersion
+            )
             refreshBookmarks()
+            if !blockID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                bookmarkRevision &+= 1
+            }
             scheduleUserContentAutoSync()
             return true
         } catch {

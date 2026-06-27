@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check tests/smoke.mjs",
+    "check": "node --check server.mjs && node --check tests/smoke.mjs && node --check tests/postgres-integration.mjs",
     "smoke": "node tests/smoke.mjs",
+    "verify:postgres": "node tests/postgres-integration.mjs",
     "verify:production": "node tests/production-health.mjs",
     "verify:production:aasa": "node tests/production-aasa.mjs",
     "verify:production:identity": "node tests/production-identity-restore.mjs"

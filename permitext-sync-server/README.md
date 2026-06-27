@@ -54,7 +54,22 @@ When a Neon database is connected through Vercel, the server uses the first avai
 - `POSTGRES_URL`
 - `NEON_DATABASE_URL`
 
-The `permitext_sync_state` table is created automatically on first request. Local development still falls back to the JSON file store if no database URL is present.
+The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v2`:
+
+- `permitext_users`
+- `permitext_entitlements`
+- `permitext_sessions`
+- `permitext_passkey_credentials`
+- `permitext_saved_items`
+- `permitext_annotations`
+- `permitext_projects`
+- `permitext_project_items`
+- `permitext_comments`
+- `permitext_sync_events`
+- `permitext_user_content_records`
+- `permitext_sync_state`
+
+`permitext_user_content_records` and `permitext_sync_state` remain as compatibility mirrors for the existing iOS/web mutation contract. New saved sections, paragraph notes/tags, projects, and project membership are also written into first-class relational tables so the backend can scale past the prototype JSON shape. Local development still falls back to the JSON file store if no database URL is present.
 
 ## Endpoints
 
@@ -69,12 +84,51 @@ The `permitext_sync_state` table is created automatically on first request. Loca
 - `POST /admin/lifetime-grants/revoke`
 - `POST /admin/accounts/delete-legacy-passkey-users`
 - `POST /admin/accounts/restore-checklist`
+- `GET /admin/storage/summary`
 
 Admin routes require:
 
 ```http
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
+
+Storage summary verifies which persistence layer is live and returns table counts plus the latest sync event cursor:
+
+```sh
+curl https://permitext-sync.vercel.app/admin/storage/summary \
+  -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN"
+```
+
+Postgres integration verification runs only when a database URL is configured. It starts a local server against that database, writes a synthetic account, checks normalized tables and event-cursor pull behavior, then cleans up the synthetic rows:
+
+```sh
+PERMITEXT_SYNC_DATABASE_URL="$DATABASE_URL" npm run verify:postgres
+```
+
+## Sync Cursor
+
+`POST /sync/push` returns both the accepted/rejected mutation IDs and the latest server event cursor:
+
+```json
+{
+  "acceptedMutationIDs": [],
+  "rejectedMutationIDs": [],
+  "latestEventID": 123,
+  "syncRevision": 123,
+  "serverTime": "2026-06-27T00:00:00.000Z"
+}
+```
+
+`POST /sync/pull` still accepts the original timestamp `since` field, but hosted Postgres deployments can also use the event cursor:
+
+```json
+{
+  "auth": { "accountUserID": "apple:USER" },
+  "sinceEventID": 123
+}
+```
+
+The response includes `latestEventID`/`syncRevision` and the mutations after that cursor. File-backed local development returns `0` for the cursor and keeps the timestamp-compatible behavior.
 
 Legacy passkey cleanup removes only accounts whose stored user ID starts with `passkey:`. It exists to clean records created before unlinked passkey sign-in was blocked:
 
@@ -100,7 +154,7 @@ PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 npm run verify:production:identity
 
 That test writes one stable synthetic smoke account to the configured production backend.
 
-This is intentionally simple and file-backed. It is for local integration testing before choosing production hosting, auth verification, and durable storage.
+Local mode remains intentionally simple and file-backed for integration testing. Hosted mode is intended to run on Vercel with Neon Postgres for durable storage.
 
 ## iOS Local HTTP Mode
 

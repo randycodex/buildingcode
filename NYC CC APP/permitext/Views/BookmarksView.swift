@@ -237,7 +237,7 @@ private var savedBookmarkList: some View {
             ForEach(codeGroup.chapterGroups) { group in
                 chapterHeader(group)
 
-                ForEach(group.items) { bookmark in
+                ForEach(group.items, id: \.rowID) { bookmark in
                     NavigationLink {
                         bookmarkDestination(for: bookmark)
                     } label: {
@@ -659,7 +659,7 @@ private var savedBookmarkList: some View {
             mode: savedSortMode,
             codeSectionName: { library.codeSectionName(id: $0) }
         )
-        let order = Dictionary(uniqueKeysWithValues: sortedBookmarks.enumerated().map { ($0.element.id, $0.offset) })
+        let order = Dictionary(uniqueKeysWithValues: sortedBookmarks.enumerated().map { ($0.element.rowID, $0.offset) })
         let groupedByCodeSection = Dictionary(grouping: sortedBookmarks) { bookmark in
             BookmarkCodeGroupKey(codeSectionID: bookmark.codeSectionID)
         }
@@ -673,13 +673,13 @@ private var savedBookmarkList: some View {
                     chapterNumber: chapterKey.chapterNumber,
                     chapterTitle: chapterItems.first?.chapterTitle ?? "",
                     items: chapterItems.sorted {
-                        (order[$0.id] ?? 0) < (order[$1.id] ?? 0)
+                        (order[$0.rowID] ?? 0) < (order[$1.rowID] ?? 0)
                     }
                 )
             }
             .sorted {
-                let lhsOrder = $0.items.first.map { order[$0.id] ?? 0 } ?? 0
-                let rhsOrder = $1.items.first.map { order[$0.id] ?? 0 } ?? 0
+                let lhsOrder = $0.items.first.map { order[$0.rowID] ?? 0 } ?? 0
+                let rhsOrder = $1.items.first.map { order[$0.rowID] ?? 0 } ?? 0
                 return lhsOrder < rhsOrder
             }
 
@@ -690,8 +690,8 @@ private var savedBookmarkList: some View {
             )
         }
         .sorted {
-            let lhsOrder = $0.chapterGroups.first?.items.first.map { order[$0.id] ?? 0 } ?? 0
-            let rhsOrder = $1.chapterGroups.first?.items.first.map { order[$0.id] ?? 0 } ?? 0
+            let lhsOrder = $0.chapterGroups.first?.items.first.map { order[$0.rowID] ?? 0 } ?? 0
+            let rhsOrder = $1.chapterGroups.first?.items.first.map { order[$0.rowID] ?? 0 } ?? 0
             return lhsOrder < rhsOrder
         }
     }
@@ -767,7 +767,9 @@ private var savedBookmarkList: some View {
         return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    if bookmark.kind == .textBlock {
+                    if bookmark.isBlockAnnotation {
+                        CodeMetaBadge(text: "Paragraph", accent: bookmarkAccent)
+                    } else if bookmark.kind == .textBlock {
                         CodeMetaBadge(text: "Text Block", accent: bookmarkAccent)
                     } else {
                         Text(bookmark.sectionNumber)
@@ -934,7 +936,7 @@ struct ProjectView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var sortMode: BookmarkSortMode = .codeOrder
     @State private var isSelecting = false
-    @State private var selectedSectionIDs: Set<Int64> = []
+    @State private var selectedBookmarkRowIDs: Set<String> = []
     @State private var folderEditorTarget: ProjectFolderEditorTarget?
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
@@ -965,7 +967,7 @@ struct ProjectView: View {
 
                 if !projectBookmarks.isEmpty {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(projectBookmarks) { bookmark in
+                        ForEach(projectBookmarks, id: \.rowID) { bookmark in
                             projectBookmarkRow(bookmark)
                             CodeHairline()
                         }
@@ -1010,8 +1012,8 @@ struct ProjectView: View {
             library.noteProjectOpened(folderID)
         }
         .onChange(of: projectBookmarks) { _, _ in
-            selectedSectionIDs = selectedSectionIDs.intersection(Set(projectBookmarks.map(\.id)))
-            if selectedSectionIDs.isEmpty {
+            selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(projectBookmarks.map(\.rowID)))
+            if selectedBookmarkRowIDs.isEmpty {
                 isSelecting = false
             }
         }
@@ -1025,7 +1027,7 @@ struct ProjectView: View {
     }
 
     private var selectedBookmarks: [BookmarkedSection] {
-        projectBookmarks.filter { selectedSectionIDs.contains($0.id) }
+        projectBookmarks.filter { selectedBookmarkRowIDs.contains($0.rowID) }
     }
 
     private var projectHeader: some View {
@@ -1185,13 +1187,13 @@ struct ProjectView: View {
 
     @ViewBuilder
     private var projectExportMenuContent: some View {
-        if isSelecting && !selectedSectionIDs.isEmpty {
-            Button("Export selected (\(selectedSectionIDs.count))") {
+        if isSelecting && !selectedBookmarkRowIDs.isEmpty {
+            Button("Export selected (\(selectedBookmarkRowIDs.count))") {
                 library.startBookmarkExport(bookmarks: selectedBookmarks, contextLabel: folder?.name)
             }
             Button("Remove selected from project", role: .destructive) {
-                library.removeSections(selectedSectionIDs, fromFolder: folderID)
-                selectedSectionIDs.removeAll()
+                library.removeSections(Set(selectedBookmarks.map(\.id)), fromFolder: folderID)
+                selectedBookmarkRowIDs.removeAll()
                 isSelecting = false
             }
         }
@@ -1205,19 +1207,19 @@ struct ProjectView: View {
         withAnimation(.easeInOut(duration: 0.18)) {
             isSelecting.toggle()
             if !isSelecting {
-                selectedSectionIDs.removeAll()
+                selectedBookmarkRowIDs.removeAll()
             }
         }
     }
 
     private func projectBookmarkRow(_ bookmark: BookmarkedSection) -> some View {
         let bookmarkAccent = Color(uiColor: library.accentColor(for: bookmark.codeSectionID))
-        let isSelected = selectedSectionIDs.contains(bookmark.id)
+        let isSelected = selectedBookmarkRowIDs.contains(bookmark.rowID)
 
         return HStack(alignment: .top, spacing: 12) {
             if isSelecting {
                 Button {
-                    toggleSelection(bookmark.id)
+                    toggleSelection(bookmark.rowID)
                 } label: {
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .font(.title3.weight(.semibold))
@@ -1233,9 +1235,13 @@ struct ProjectView: View {
             } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Text(bookmark.sectionNumber)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(bookmarkAccent)
+                        if bookmark.isBlockAnnotation {
+                            CodeMetaBadge(text: "Paragraph", accent: bookmarkAccent)
+                        } else {
+                            Text(bookmark.sectionNumber)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(bookmarkAccent)
+                        }
 
                         if bookmark.hasNote {
                             Image(systemName: "note.text")
@@ -1294,7 +1300,7 @@ struct ProjectView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             if isSelecting {
-                toggleSelection(bookmark.id)
+                toggleSelection(bookmark.rowID)
             }
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -1306,11 +1312,11 @@ struct ProjectView: View {
         }
     }
 
-    private func toggleSelection(_ sectionID: Int64) {
-        if selectedSectionIDs.contains(sectionID) {
-            selectedSectionIDs.remove(sectionID)
+    private func toggleSelection(_ rowID: String) {
+        if selectedBookmarkRowIDs.contains(rowID) {
+            selectedBookmarkRowIDs.remove(rowID)
         } else {
-            selectedSectionIDs.insert(sectionID)
+            selectedBookmarkRowIDs.insert(rowID)
         }
     }
 }

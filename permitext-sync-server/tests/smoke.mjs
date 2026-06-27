@@ -82,6 +82,17 @@ async function main() {
       "AASA payload did not include the configured app identifier."
     );
 
+    const unauthorizedStorageSummary = await request("/admin/storage/summary");
+    assert(unauthorizedStorageSummary.response.status === 401, "Storage summary allowed an unauthenticated request.");
+
+    const storageSummary = await request("/admin/storage/summary", {
+      token: adminToken
+    });
+    assert(storageSummary.response.ok, "Storage summary failed.");
+    assert(storageSummary.json.storage === "file", "Local storage summary did not report file storage.");
+    assert(storageSummary.json.schema === "json-file", "Local storage summary did not report the file schema.");
+    assert(storageSummary.json.latestEventID === 0, "Local storage summary should report event cursor 0.");
+
     const unauthorizedGrant = await request("/admin/lifetime-grants/grant", {
       method: "POST",
       body: { userID }
@@ -400,6 +411,8 @@ async function main() {
     });
     assert(push.response.ok, "Sync push failed.");
     assert(push.json.acceptedMutationIDs.includes("saved-smoke"), "Push did not accept the saved item mutation.");
+    assert(Number.isInteger(push.json.latestEventID), "Push did not return a latest event ID.");
+    assert(push.json.syncRevision === push.json.latestEventID, "Push sync revision did not match latest event ID.");
 
     const stalePush = await request("/sync/push", {
       method: "POST",
@@ -427,7 +440,17 @@ async function main() {
       body: { auth: { accountUserID: userID } }
     });
     assert(pull.response.ok, "Sync pull failed.");
+    assert(Number.isInteger(pull.json.latestEventID), "Pull did not return a latest event ID.");
+    assert(pull.json.syncRevision === pull.json.latestEventID, "Pull sync revision did not match latest event ID.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
+
+    const cursorPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, sinceEventID: pull.json.latestEventID }
+    });
+    assert(cursorPull.response.ok, "Event cursor sync pull failed.");
+    assert(Number.isInteger(cursorPull.json.latestEventID), "Cursor pull did not return a latest event ID.");
 
     const projectMutation = {
       project: {
