@@ -2613,7 +2613,7 @@ mark {
 .project-section-reader h3 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 14px !important;
+  font-size: 12px !important;
   font-weight: 650;
 }
 
