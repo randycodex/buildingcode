@@ -2290,6 +2290,15 @@ mark {
   gap: 0;
 }
 
+.projects-content {
+  scrollbar-width: none;
+}
+
+.projects-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .projects-panel .panel-header {
   align-items: start;
   min-height: var(--panel-title-row-height);
