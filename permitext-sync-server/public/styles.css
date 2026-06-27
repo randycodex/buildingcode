@@ -1527,7 +1527,7 @@ select option:checked {
   padding: var(--space-4);
   flex-direction: column;
   gap: var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--border) 72%, var(--reader-notes-surface));
+  border: 0;
   border-radius: 0;
   background: var(--reader-notes-surface);
   box-shadow: 0 22px 64px rgba(0, 0, 0, 0.18);
