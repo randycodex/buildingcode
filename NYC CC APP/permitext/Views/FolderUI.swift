@@ -197,6 +197,9 @@ struct FolderEditorSheet: View {
     private var isEditing: Bool { existing != nil }
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var canSave: Bool { !trimmedName.isEmpty }
+    private var detents: Set<PresentationDetent> {
+        isEditing ? [.large] : [.medium, .large]
+    }
 
     var body: some View {
         NavigationStack {
@@ -277,7 +280,7 @@ struct FolderEditorSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents(detents)
     }
 
     private func colorSwatch(_ hex: String) -> some View {
