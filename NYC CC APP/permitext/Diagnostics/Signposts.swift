@@ -24,6 +24,7 @@ struct UserContentSyncPushReport: Hashable, Sendable {
     let sampledItemIDs: [Int64]
     let acceptedMutationIDs: [String]
     let rejectedMutationIDs: [String]
+    let latestEventID: Int64?
 }
 
 struct UserContentSyncPullReport: Hashable, Sendable {
@@ -55,7 +56,7 @@ protocol UserContentSyncBackend {
     var name: String { get }
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport
     func push(batch: UserContentSyncBatch, account: SignedInAccount) async throws -> UserContentSyncPushReport
-    func pull(account: SignedInAccount, since: Date?) async throws -> ServerUserContentPullResult
+    func pull(account: SignedInAccount, since: Date?, sinceEventID: Int64?) async throws -> ServerUserContentPullResult
     func previewMerge(incoming: ServerUserContentPullResult, localCandidates: [String: UserContentMergeCandidate]) throws -> UserContentMergePlan
 }
 
@@ -80,11 +81,12 @@ struct NoOpUserContentSyncBackend: UserContentSyncBackend {
             skippedReason: nil,
             sampledItemIDs: batch.items.map(\.id),
             acceptedMutationIDs: serverBatch.mutations.map(\.recordID),
-            rejectedMutationIDs: []
+            rejectedMutationIDs: [],
+            latestEventID: nil
         )
     }
 
-    func pull(account: SignedInAccount, since: Date?) async throws -> ServerUserContentPullResult {
+    func pull(account: SignedInAccount, since: Date?, sinceEventID: Int64?) async throws -> ServerUserContentPullResult {
         ServerUserContentPullResult(
             userID: account.appUserID,
             pulledAt: Date(),
@@ -174,15 +176,17 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             skippedReason: nil,
             sampledItemIDs: batch.items.map(\.id),
             acceptedMutationIDs: response.acceptedMutationIDs,
-            rejectedMutationIDs: response.rejectedMutationIDs ?? []
+            rejectedMutationIDs: response.rejectedMutationIDs ?? [],
+            latestEventID: response.latestEventID ?? response.syncRevision
         )
     }
 
-    func pull(account: SignedInAccount, since: Date?) async throws -> ServerUserContentPullResult {
+    func pull(account: SignedInAccount, since: Date?, sinceEventID: Int64?) async throws -> ServerUserContentPullResult {
         try await transport.pullUserContent(
             BackendUserContentPullRequest(
                 auth: authContext(for: account),
-                since: since
+                since: since,
+                sinceEventID: sinceEventID
             )
         )
     }
@@ -281,7 +285,11 @@ struct UserContentSyncEngine {
 
         let checkpoint = checkpoint(for: account)
         do {
-            let incoming = try await backend.pull(account: account, since: since ?? checkpoint.lastSuccessfulPullAt)
+            let incoming = try await backend.pull(
+                account: account,
+                since: checkpoint.latestEventID == nil ? since ?? checkpoint.lastSuccessfulPullAt : nil,
+                sinceEventID: checkpoint.latestEventID
+            )
             let resolvedLocalCandidates = try localCandidates.isEmpty
                 ? repository?.localMergeCandidates(for: incoming.mutations) ?? [:]
                 : localCandidates
@@ -293,7 +301,12 @@ struct UserContentSyncEngine {
             let unresolvedCount = mergePlan.keepLocalCount + mergePlan.uploadLocalCount + mergePlan.conflictCount
             let skippedCount = max(mergePlan.decisions.count - appliedCount - safeNoOpCount, 0)
             if applySafeChanges && unresolvedCount == 0 {
-                checkpointStore.save(checkpoint.markingPullSucceeded(at: incoming.pulledAt))
+                checkpointStore.save(
+                    checkpoint.markingPullSucceeded(
+                        at: incoming.pulledAt,
+                        latestEventID: incoming.latestEventID ?? incoming.syncRevision
+                    )
+                )
             }
             return UserContentSyncPullReport(
                 pulledCount: incoming.mutations.count,
@@ -321,7 +334,8 @@ struct UserContentSyncEngine {
                 skippedReason: "No signed-in account.",
                 sampledItemIDs: [],
                 acceptedMutationIDs: [],
-                rejectedMutationIDs: []
+                rejectedMutationIDs: [],
+                latestEventID: nil
             )
         }
 
@@ -331,6 +345,7 @@ struct UserContentSyncEngine {
         var sampledItemIDs: [Int64] = []
         var acceptedMutationIDs: [String] = []
         var rejectedMutationIDs: [String] = []
+        var latestEventID = checkpoint.latestEventID
         var processedBatchCount = 0
 
         while processedBatchCount < maxBatches {
@@ -347,6 +362,7 @@ struct UserContentSyncEngine {
                 sampledItemIDs.append(contentsOf: report.sampledItemIDs)
                 acceptedMutationIDs.append(contentsOf: report.acceptedMutationIDs)
                 rejectedMutationIDs.append(contentsOf: report.rejectedMutationIDs)
+                latestEventID = report.latestEventID ?? latestEventID
                 let acceptedIDs = Set(report.acceptedMutationIDs)
                 let rejectedIDs = Set(report.rejectedMutationIDs)
                 for item in batch.items {
@@ -380,11 +396,12 @@ struct UserContentSyncEngine {
                 skippedReason: nil,
                 sampledItemIDs: [],
                 acceptedMutationIDs: [],
-                rejectedMutationIDs: []
+                rejectedMutationIDs: [],
+                latestEventID: latestEventID
             )
         }
 
-        checkpointStore.save(checkpoint.markingPushSucceeded(at: Date()))
+        checkpointStore.save(checkpoint.markingPushSucceeded(at: Date(), latestEventID: latestEventID))
         return UserContentSyncPushReport(
             attemptedCount: attemptedCount,
             completedCount: completedCount,
@@ -393,7 +410,8 @@ struct UserContentSyncEngine {
             skippedReason: nil,
             sampledItemIDs: Array(sampledItemIDs.prefix(100)),
             acceptedMutationIDs: acceptedMutationIDs,
-            rejectedMutationIDs: rejectedMutationIDs
+            rejectedMutationIDs: rejectedMutationIDs,
+            latestEventID: latestEventID
         )
     }
 

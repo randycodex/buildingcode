@@ -697,6 +697,26 @@ async function createPostgresStoreAdapter() {
     `;
   }
 
+  async function latestEventID(userID) {
+    const rows = await sql`
+      SELECT COALESCE(MAX(event_id), 0)::bigint AS latest_event_id
+      FROM permitext_sync_events
+      WHERE user_id = ${userID}
+    `;
+    return Number(rows[0]?.latest_event_id || 0);
+  }
+
+  async function mutationsAfterEventID(userID, sinceEventID) {
+    const rows = await sql`
+      SELECT mutation
+      FROM permitext_sync_events
+      WHERE user_id = ${userID}
+        AND event_id > ${sinceEventID}
+      ORDER BY event_id ASC
+    `;
+    return rows.map((row) => safeJSON(row.mutation, {}));
+  }
+
   async function writeNormalizedStore(store, { backupLegacy = true } = {}) {
     const users = store.users || {};
     const desiredUserIDs = new Set(Object.keys(users));
@@ -969,6 +989,16 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       await writeNormalizedStore(store);
+    },
+    async latestEventID(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return latestEventID(userID);
+    },
+    async mutationsAfterEventID(userID, sinceEventID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return mutationsAfterEventID(userID, sinceEventID);
     }
   };
 }
@@ -1000,6 +1030,22 @@ async function storageKind() {
 async function storageSchema() {
   const adapter = await storeAdapter();
   return adapter.schema;
+}
+
+async function latestSyncEventID(userID) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.latestEventID !== "function") {
+    return 0;
+  }
+  return adapter.latestEventID(userID);
+}
+
+async function mutationsAfterSyncEventID(userID, sinceEventID) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.mutationsAfterEventID !== "function") {
+    return null;
+  }
+  return adapter.mutationsAfterEventID(userID, sinceEventID);
 }
 
 async function readJSON(request) {
@@ -1689,6 +1735,15 @@ function expandPullMutationsWithDependencies(filteredMutations, allMutations) {
   });
 }
 
+function normalizedSinceEventID(body) {
+  const rawValue = body.sinceEventID ?? body.sinceRevision ?? body.afterEventID;
+  if (rawValue === null || rawValue === undefined || rawValue === "") {
+    return null;
+  }
+  const value = Number(rawValue);
+  return Number.isSafeInteger(value) && value >= 0 ? value : null;
+}
+
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
   const store = await readStore();
@@ -1865,9 +1920,12 @@ async function handlePush(request, response) {
   const merge = mergeMutations(existing, incoming);
   store.mutationsByUserID[userID] = merge.mutations;
   await writeStore(store);
+  const latestEventID = await latestSyncEventID(userID);
   sendJSON(response, 200, {
     acceptedMutationIDs: merge.acceptedMutationIDs,
     rejectedMutationIDs: merge.rejectedMutationIDs,
+    latestEventID,
+    syncRevision: latestEventID,
     serverTime: new Date().toISOString()
   });
 }
@@ -1886,13 +1944,19 @@ async function handlePull(request, response) {
   }
   const since = body.since ? Date.parse(body.since) : null;
   const allMutations = store.mutationsByUserID[userID] || [];
-  const filteredMutations = Number.isFinite(since)
-    ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since)
-    : allMutations;
+  const sinceEventID = normalizedSinceEventID(body);
+  const eventMutations = sinceEventID === null ? null : await mutationsAfterSyncEventID(userID, sinceEventID);
+  const filteredMutations = eventMutations ??
+    (Number.isFinite(since)
+      ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since)
+      : allMutations);
   const mutations = expandPullMutationsWithDependencies(filteredMutations, allMutations);
+  const latestEventID = await latestSyncEventID(userID);
   sendJSON(response, 200, {
     userID,
     pulledAt: new Date().toISOString(),
+    latestEventID,
+    syncRevision: latestEventID,
     mutations
   });
 }

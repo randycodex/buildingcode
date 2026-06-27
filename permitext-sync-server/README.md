@@ -91,6 +91,31 @@ Admin routes require:
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
 
+## Sync Cursor
+
+`POST /sync/push` returns both the accepted/rejected mutation IDs and the latest server event cursor:
+
+```json
+{
+  "acceptedMutationIDs": [],
+  "rejectedMutationIDs": [],
+  "latestEventID": 123,
+  "syncRevision": 123,
+  "serverTime": "2026-06-27T00:00:00.000Z"
+}
+```
+
+`POST /sync/pull` still accepts the original timestamp `since` field, but hosted Postgres deployments can also use the event cursor:
+
+```json
+{
+  "auth": { "accountUserID": "apple:USER" },
+  "sinceEventID": 123
+}
+```
+
+The response includes `latestEventID`/`syncRevision` and the mutations after that cursor. File-backed local development returns `0` for the cursor and keeps the timestamp-compatible behavior.
+
 Legacy passkey cleanup removes only accounts whose stored user ID starts with `passkey:`. It exists to clean records created before unlinked passkey sign-in was blocked:
 
 ```sh

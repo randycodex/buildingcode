@@ -823,6 +823,8 @@ struct ServerUserContentBatch: Codable, Hashable, Sendable {
 struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     let userID: String
     let pulledAt: Date
+    var latestEventID: Int64? = nil
+    var syncRevision: Int64? = nil
     let mutations: [ServerUserContentMutation]
 }
 
@@ -833,6 +835,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
     let lastSuccessfulPullAt: Date?
     let lastAttemptedSyncAt: Date?
     let lastErrorMessage: String?
+    let latestEventID: Int64?
 
     init(
         accountUserID: String,
@@ -840,7 +843,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         lastSuccessfulPushAt: Date? = nil,
         lastSuccessfulPullAt: Date? = nil,
         lastAttemptedSyncAt: Date? = nil,
-        lastErrorMessage: String? = nil
+        lastErrorMessage: String? = nil,
+        latestEventID: Int64? = nil
     ) {
         self.accountUserID = accountUserID
         self.backendName = backendName
@@ -848,27 +852,30 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         self.lastSuccessfulPullAt = lastSuccessfulPullAt
         self.lastAttemptedSyncAt = lastAttemptedSyncAt
         self.lastErrorMessage = lastErrorMessage
+        self.latestEventID = latestEventID
     }
 
-    func markingPushSucceeded(at date: Date) -> UserContentSyncCheckpoint {
+    func markingPushSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
         UserContentSyncCheckpoint(
             accountUserID: accountUserID,
             backendName: backendName,
             lastSuccessfulPushAt: date,
             lastSuccessfulPullAt: lastSuccessfulPullAt,
             lastAttemptedSyncAt: date,
-            lastErrorMessage: nil
+            lastErrorMessage: nil,
+            latestEventID: latestEventID ?? self.latestEventID
         )
     }
 
-    func markingPullSucceeded(at date: Date) -> UserContentSyncCheckpoint {
+    func markingPullSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
         UserContentSyncCheckpoint(
             accountUserID: accountUserID,
             backendName: backendName,
             lastSuccessfulPushAt: lastSuccessfulPushAt,
             lastSuccessfulPullAt: date,
             lastAttemptedSyncAt: date,
-            lastErrorMessage: nil
+            lastErrorMessage: nil,
+            latestEventID: latestEventID ?? self.latestEventID
         )
     }
 
@@ -879,7 +886,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastSuccessfulPushAt: lastSuccessfulPushAt,
             lastSuccessfulPullAt: lastSuccessfulPullAt,
             lastAttemptedSyncAt: date,
-            lastErrorMessage: error.localizedDescription
+            lastErrorMessage: error.localizedDescription,
+            latestEventID: latestEventID
         )
     }
 }
@@ -962,12 +970,15 @@ struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
 struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
     let acceptedMutationIDs: [String]
     let rejectedMutationIDs: [String]?
+    var latestEventID: Int64? = nil
+    var syncRevision: Int64? = nil
     let serverTime: Date
 }
 
 struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let since: Date?
+    var sinceEventID: Int64? = nil
 }
 
 struct BackendHealthStatus: Codable, Hashable, Sendable {

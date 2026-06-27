@@ -400,6 +400,8 @@ async function main() {
     });
     assert(push.response.ok, "Sync push failed.");
     assert(push.json.acceptedMutationIDs.includes("saved-smoke"), "Push did not accept the saved item mutation.");
+    assert(Number.isInteger(push.json.latestEventID), "Push did not return a latest event ID.");
+    assert(push.json.syncRevision === push.json.latestEventID, "Push sync revision did not match latest event ID.");
 
     const stalePush = await request("/sync/push", {
       method: "POST",
@@ -427,7 +429,17 @@ async function main() {
       body: { auth: { accountUserID: userID } }
     });
     assert(pull.response.ok, "Sync pull failed.");
+    assert(Number.isInteger(pull.json.latestEventID), "Pull did not return a latest event ID.");
+    assert(pull.json.syncRevision === pull.json.latestEventID, "Pull sync revision did not match latest event ID.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
+
+    const cursorPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, sinceEventID: pull.json.latestEventID }
+    });
+    assert(cursorPull.response.ok, "Event cursor sync pull failed.");
+    assert(Number.isInteger(cursorPull.json.latestEventID), "Cursor pull did not return a latest event ID.");
 
     const projectMutation = {
       project: {
