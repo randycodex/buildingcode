@@ -2666,7 +2666,8 @@ mark {
   font-weight: 650;
 }
 
-.project-sheet-field input {
+.project-sheet-field input,
+.project-sheet-field textarea {
   width: 100%;
   min-height: 42px;
   padding: 0 var(--space-3);
@@ -2674,17 +2675,27 @@ mark {
   border-radius: var(--radius-panel);
   background: color-mix(in srgb, var(--text-primary) 10%, transparent);
   color: var(--text-primary);
+  font-family: inherit;
   font-size: calc(var(--chrome-font-size) * 0.92) !important;
+  line-height: 1.25;
   outline: 0;
 }
 
-.project-sheet-field input::placeholder {
+.project-sheet-field textarea {
+  min-height: 86px;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+
+.project-sheet-field input::placeholder,
+.project-sheet-field textarea::placeholder {
   color: var(--text-tertiary);
 }
 
 .project-sheet-field .project-name-input,
-.project-sheet-field .project-address-input,
-.project-sheet-field .project-description-input {
+.project-sheet-field .project-address-input {
   text-align: center;
 }
 

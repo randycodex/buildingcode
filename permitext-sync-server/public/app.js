@@ -3231,11 +3231,11 @@ function showProjectCreateSheet(panel, project = null) {
 
   const descriptionLabel = document.createElement("label");
   descriptionLabel.className = "project-sheet-field";
-  const descriptionInput = document.createElement("input");
-  descriptionInput.type = "text";
+  const descriptionInput = document.createElement("textarea");
   descriptionInput.className = "project-description-input";
   descriptionInput.placeholder = "Description";
   descriptionInput.autocomplete = "off";
+  descriptionInput.rows = 3;
   if (identity) descriptionInput.value = identity.description;
   descriptionLabel.append(descriptionInput);
 
