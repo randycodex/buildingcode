@@ -82,6 +82,17 @@ async function main() {
       "AASA payload did not include the configured app identifier."
     );
 
+    const unauthorizedStorageSummary = await request("/admin/storage/summary");
+    assert(unauthorizedStorageSummary.response.status === 401, "Storage summary allowed an unauthenticated request.");
+
+    const storageSummary = await request("/admin/storage/summary", {
+      token: adminToken
+    });
+    assert(storageSummary.response.ok, "Storage summary failed.");
+    assert(storageSummary.json.storage === "file", "Local storage summary did not report file storage.");
+    assert(storageSummary.json.schema === "json-file", "Local storage summary did not report the file schema.");
+    assert(storageSummary.json.latestEventID === 0, "Local storage summary should report event cursor 0.");
+
     const unauthorizedGrant = await request("/admin/lifetime-grants/grant", {
       method: "POST",
       body: { userID }

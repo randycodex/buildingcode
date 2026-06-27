@@ -84,11 +84,25 @@ The Neon schema is created automatically on first request. The current Postgres 
 - `POST /admin/lifetime-grants/revoke`
 - `POST /admin/accounts/delete-legacy-passkey-users`
 - `POST /admin/accounts/restore-checklist`
+- `GET /admin/storage/summary`
 
 Admin routes require:
 
 ```http
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
+```
+
+Storage summary verifies which persistence layer is live and returns table counts plus the latest sync event cursor:
+
+```sh
+curl https://permitext-sync.vercel.app/admin/storage/summary \
+  -H "Authorization: Bearer $PERMITEXT_SYNC_ADMIN_TOKEN"
+```
+
+Postgres integration verification runs only when a database URL is configured. It starts a local server against that database, writes a synthetic account, checks normalized tables and event-cursor pull behavior, then cleans up the synthetic rows:
+
+```sh
+PERMITEXT_SYNC_DATABASE_URL="$DATABASE_URL" npm run verify:postgres
 ```
 
 ## Sync Cursor

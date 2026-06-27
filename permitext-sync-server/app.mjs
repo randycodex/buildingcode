@@ -114,6 +114,28 @@ function createFileStoreAdapter() {
     async write(store) {
       await mkdir(dirname(dataPath), { recursive: true });
       await writeFile(dataPath, JSON.stringify(store, null, 2) + "\n");
+    },
+    async summary() {
+      const store = await this.read();
+      const mutationCountsByKind = mutationCounts(
+        Object.values(store.mutationsByUserID || {}).flatMap((mutations) => mutations || [])
+      );
+      return {
+        storage: "file",
+        schema: "json-file",
+        latestEventID: 0,
+        tables: {
+          users: Object.keys(store.users || {}).length,
+          entitlements: Object.keys(store.entitlements || {}).length,
+          sessions: Object.keys(store.sessions || {}).length,
+          passkeyCredentials: Object.keys(store.passkeyCredentials || {}).length,
+          mutations: Object.values(store.mutationsByUserID || {}).reduce(
+            (count, mutations) => count + (mutations?.length || 0),
+            0
+          )
+        },
+        mutationCounts: mutationCountsByKind
+      };
     }
   };
 }
@@ -717,6 +739,43 @@ async function createPostgresStoreAdapter() {
     return rows.map((row) => safeJSON(row.mutation, {}));
   }
 
+  async function storageSummary() {
+    const rows = await sql`
+      SELECT
+        (SELECT count(*) FROM permitext_users)::int AS users,
+        (SELECT count(*) FROM permitext_entitlements)::int AS entitlements,
+        (SELECT count(*) FROM permitext_sessions)::int AS sessions,
+        (SELECT count(*) FROM permitext_passkey_credentials)::int AS passkey_credentials,
+        (SELECT count(*) FROM permitext_saved_items)::int AS saved_items,
+        (SELECT count(*) FROM permitext_annotations)::int AS annotations,
+        (SELECT count(*) FROM permitext_projects)::int AS projects,
+        (SELECT count(*) FROM permitext_project_items)::int AS project_items,
+        (SELECT count(*) FROM permitext_comments)::int AS comments,
+        (SELECT count(*) FROM permitext_user_content_records)::int AS user_content_records,
+        (SELECT count(*) FROM permitext_sync_events)::int AS sync_events,
+        COALESCE((SELECT max(event_id) FROM permitext_sync_events), 0)::bigint AS latest_event_id
+    `;
+    const row = rows[0] || {};
+    return {
+      storage: "postgres",
+      schema: "normalized-v2",
+      latestEventID: Number(row.latest_event_id || 0),
+      tables: {
+        users: Number(row.users || 0),
+        entitlements: Number(row.entitlements || 0),
+        sessions: Number(row.sessions || 0),
+        passkeyCredentials: Number(row.passkey_credentials || 0),
+        savedItems: Number(row.saved_items || 0),
+        annotations: Number(row.annotations || 0),
+        projects: Number(row.projects || 0),
+        projectItems: Number(row.project_items || 0),
+        comments: Number(row.comments || 0),
+        userContentRecords: Number(row.user_content_records || 0),
+        syncEvents: Number(row.sync_events || 0)
+      }
+    };
+  }
+
   async function writeNormalizedStore(store, { backupLegacy = true } = {}) {
     const users = store.users || {};
     const desiredUserIDs = new Set(Object.keys(users));
@@ -999,6 +1058,11 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       return mutationsAfterEventID(userID, sinceEventID);
+    },
+    async summary() {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return storageSummary();
     }
   };
 }
@@ -1046,6 +1110,19 @@ async function mutationsAfterSyncEventID(userID, sinceEventID) {
     return null;
   }
   return adapter.mutationsAfterEventID(userID, sinceEventID);
+}
+
+async function storageSummary() {
+  const adapter = await storeAdapter();
+  if (typeof adapter.summary === "function") {
+    return adapter.summary();
+  }
+  return {
+    storage: adapter.kind,
+    schema: adapter.schema,
+    latestEventID: 0,
+    tables: {}
+  };
 }
 
 async function readJSON(request) {
@@ -2112,6 +2189,13 @@ async function handleAccountExport(request, response) {
   });
 }
 
+async function handleStorageSummary(request, response) {
+  if (!requireAdmin(request, response)) {
+    return;
+  }
+  sendJSON(response, 200, await storageSummary());
+}
+
 function handleAppleAppSiteAssociation(_request, response) {
   const teamID = process.env.APPLE_TEAM_ID || "TEAMID";
   const bundleID = process.env.APPLE_BUNDLE_ID || "com.randycodex.permitext";
@@ -2137,7 +2221,8 @@ const handlers = {
   "admin/lifetime-grants/revoke": handleLifetimeGrantDelete,
   "admin/accounts/delete-legacy-passkey-users": handleLegacyPasskeyAccountDelete,
   "admin/accounts/restore-checklist": handleRestoreChecklist,
-  "admin/accounts/export": handleAccountExport
+  "admin/accounts/export": handleAccountExport,
+  "admin/storage/summary": handleStorageSummary
 };
 
 export async function handleRequest(request, response) {
@@ -2175,6 +2260,10 @@ export async function handleRequest(request, response) {
     if (request.method === "GET" && path === "health") {
       await readStore();
       sendJSON(response, 200, { ok: true, storage: await storageKind(), schema: await storageSchema() });
+      return;
+    }
+    if (request.method === "GET" && path === "admin/storage/summary") {
+      await handleStorageSummary(request, response);
       return;
     }
     if (request.method === "GET" && path === ".well-known/apple-app-site-association") {
