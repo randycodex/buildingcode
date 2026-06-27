@@ -152,6 +152,16 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         return response.account
     }
 
+    func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement? {
+        let response = try await transport.verifyAppleTransaction(
+            BackendAppleTransactionVerifyRequest(
+                auth: authContext(for: account),
+                signedTransactionInfo: signedTransactionInfo
+            )
+        )
+        return response.entitlement
+    }
+
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
         UserContentSyncPreviewReport(
             pendingCount: items.count,

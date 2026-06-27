@@ -1,4 +1,12 @@
-import { createPublicKey, randomUUID, verify as verifySignature } from "node:crypto";
+import {
+  X509Certificate,
+  createHash,
+  createHmac,
+  createPublicKey,
+  randomUUID,
+  timingSafeEqual,
+  verify as verifySignature
+} from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -1136,6 +1144,14 @@ async function readJSON(request) {
   return raw.length ? JSON.parse(raw) : {};
 }
 
+async function readRawBody(request) {
+  const chunks = [];
+  for await (const chunk of request) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
 function sendJSON(response, status, body) {
   response.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
@@ -1756,6 +1772,278 @@ async function accountFromCredential(credential) {
   };
 }
 
+function entitlementForSource(userID, source, details = {}) {
+  const entitlement = {
+    plan: "pro",
+    source,
+    grantedUserID: userID,
+    updatedAt: new Date().toISOString()
+  };
+  if (details.expiresAt) {
+    entitlement.expiresAt = details.expiresAt;
+  }
+  if (details.provider) {
+    entitlement.provider = details.provider;
+  }
+  return entitlement;
+}
+
+function grantServerEntitlement(store, userID, source, details = {}) {
+  const entitlement = entitlementForSource(userID, source, details);
+  store.entitlements[userID] = entitlement;
+  return entitlement;
+}
+
+function revokeServerEntitlement(store, userID, predicate = () => true) {
+  const entitlement = store.entitlements[userID];
+  if (!entitlement || !predicate(entitlement)) {
+    return false;
+  }
+  delete store.entitlements[userID];
+  return true;
+}
+
+function stripeConfigured() {
+  return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRO_PRICE_ID);
+}
+
+function configuredPublicBaseURL(request) {
+  const explicitURL =
+    process.env.PERMITEXT_PUBLIC_BASE_URL ||
+    process.env.PERMITEXT_SYNC_PUBLIC_URL ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` ||
+    process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`;
+  if (explicitURL) {
+    return explicitURL.replace(/\/+$/, "");
+  }
+  const host = request.headers.host || "localhost:8787";
+  const protocol = host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https";
+  return `${protocol}://${host}`;
+}
+
+function formURLEncode(value, prefix = null, pairs = []) {
+  if (value === null || value === undefined) {
+    return pairs;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => formURLEncode(item, `${prefix}[${index}]`, pairs));
+    return pairs;
+  }
+  if (typeof value === "object") {
+    for (const [key, child] of Object.entries(value)) {
+      formURLEncode(child, prefix ? `${prefix}[${key}]` : key, pairs);
+    }
+    return pairs;
+  }
+  pairs.push([prefix, String(value)]);
+  return pairs;
+}
+
+function encodedFormBody(value) {
+  return formURLEncode(value)
+    .map(([key, child]) => `${encodeURIComponent(key)}=${encodeURIComponent(child)}`)
+    .join("&");
+}
+
+function stripeSignatureTimestamp(header) {
+  const timestampPart = String(header || "").split(",").find((part) => part.startsWith("t="));
+  const timestamp = Number(timestampPart?.slice(2));
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function verifyStripeSignature(rawBody, signatureHeader, webhookSecret) {
+  const timestamp = stripeSignatureTimestamp(signatureHeader);
+  if (!timestamp) {
+    return false;
+  }
+  const toleranceSeconds = Number(process.env.STRIPE_WEBHOOK_TOLERANCE_SECONDS || 300);
+  if (Math.abs(Math.floor(Date.now() / 1000) - timestamp) > toleranceSeconds) {
+    return false;
+  }
+  const expected = createHmac("sha256", webhookSecret)
+    .update(`${timestamp}.${rawBody.toString("utf8")}`)
+    .digest("hex");
+  const expectedBuffer = Buffer.from(expected, "hex");
+  return String(signatureHeader || "")
+    .split(",")
+    .filter((part) => part.startsWith("v1="))
+    .some((part) => {
+      const supplied = Buffer.from(part.slice(3), "hex");
+      return supplied.length === expectedBuffer.length && timingSafeEqual(supplied, expectedBuffer);
+    });
+}
+
+function stripeSubscriptionID(value) {
+  if (!value) {
+    return null;
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  return value.id || null;
+}
+
+function stripeSubscriptionIDFromObject(object) {
+  return stripeSubscriptionID(object?.subscription) ||
+    stripeSubscriptionID(object?.parent?.subscription_details?.subscription) ||
+    stripeSubscriptionID(object?.lines?.data?.[0]?.subscription);
+}
+
+function stripeUserIDFromObject(object) {
+  return object?.metadata?.accountUserID ||
+    object?.subscription_details?.metadata?.accountUserID ||
+    object?.parent?.subscription_details?.metadata?.accountUserID ||
+    object?.client_reference_id ||
+    null;
+}
+
+function entitlementMatchesStripeSubscription(subscriptionID) {
+  return (entitlement) => entitlement?.source === "webSubscription" &&
+    entitlement?.provider?.stripeSubscriptionID === subscriptionID;
+}
+
+function findUserIDForStripeSubscription(store, subscriptionID) {
+  if (!subscriptionID) {
+    return null;
+  }
+  return Object.entries(store.entitlements || {}).find(([, entitlement]) =>
+    entitlementMatchesStripeSubscription(subscriptionID)(entitlement)
+  )?.[0] || null;
+}
+
+function stripeSubscriptionExpiresAt(object) {
+  const timestamp =
+    object?.current_period_end ||
+    object?.lines?.data?.[0]?.period?.end ||
+    object?.period_end ||
+    null;
+  return Number.isFinite(Number(timestamp)) ? new Date(Number(timestamp) * 1000).toISOString() : null;
+}
+
+function appleStoreKitProductID() {
+  return process.env.STOREKIT_PRO_PRODUCT_ID || "com.randycodex.permitext.pro.monthly";
+}
+
+function x509CertificateFromX5C(certificate) {
+  return new X509Certificate(Buffer.from(certificate, "base64"));
+}
+
+function configuredAppleRootFingerprints() {
+  return (process.env.APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS || "")
+    .split(",")
+    .map((value) => value.replace(/[^a-fA-F0-9]/g, "").toUpperCase())
+    .filter(Boolean);
+}
+
+function certificateFingerprint(certificate) {
+  return createHash("sha256").update(certificate.raw).digest("hex").toUpperCase();
+}
+
+function verifyAppleTransactionCertificateChain(x5c) {
+  if (!Array.isArray(x5c) || x5c.length < 2) {
+    throw new ClientAuthError(401, "Apple transaction certificate chain is missing.");
+  }
+
+  const certificates = x5c.map(x509CertificateFromX5C);
+  const now = Date.now();
+  for (const certificate of certificates) {
+    if (Date.parse(certificate.validFrom) > now || Date.parse(certificate.validTo) < now) {
+      throw new ClientAuthError(401, "Apple transaction certificate is not currently valid.");
+    }
+  }
+
+  for (let index = 0; index < certificates.length - 1; index += 1) {
+    const certificate = certificates[index];
+    const issuer = certificates[index + 1];
+    if (!certificate.checkIssued(issuer) || !certificate.verify(issuer.publicKey)) {
+      throw new ClientAuthError(401, "Apple transaction certificate chain is invalid.");
+    }
+  }
+
+  const root = certificates[certificates.length - 1];
+  const allowedFingerprints = configuredAppleRootFingerprints();
+  if (process.env.PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN === "1" && allowedFingerprints.length === 0) {
+    throw new ClientAuthError(500, "Apple transaction root fingerprints are not configured.");
+  }
+  if (allowedFingerprints.length > 0 && !allowedFingerprints.includes(certificateFingerprint(root))) {
+    throw new ClientAuthError(401, "Apple transaction root certificate is not trusted.");
+  }
+  if (allowedFingerprints.length === 0 && !/Apple/.test(root.subject)) {
+    throw new ClientAuthError(401, "Apple transaction root certificate is not recognized.");
+  }
+
+  return certificates[0].publicKey;
+}
+
+function ecdsaJoseToDER(signature) {
+  if (signature.length % 2 !== 0) {
+    throw new ClientAuthError(401, "Invalid Apple transaction signature.");
+  }
+  const half = signature.length / 2;
+  const encodeInteger = (value) => {
+    let bytes = Buffer.from(value);
+    while (bytes.length > 1 && bytes[0] === 0) {
+      bytes = bytes.subarray(1);
+    }
+    if (bytes[0] & 0x80) {
+      bytes = Buffer.concat([Buffer.from([0]), bytes]);
+    }
+    return Buffer.concat([Buffer.from([0x02, bytes.length]), bytes]);
+  };
+  const r = encodeInteger(signature.subarray(0, half));
+  const s = encodeInteger(signature.subarray(half));
+  const body = Buffer.concat([r, s]);
+  return Buffer.concat([Buffer.from([0x30, body.length]), body]);
+}
+
+function verifyAppleTransactionJWS(signedTransactionInfo) {
+  const parts = String(signedTransactionInfo || "").split(".");
+  if (parts.length !== 3) {
+    throw new ClientAuthError(401, "Invalid Apple transaction.");
+  }
+
+  const [encodedHeader, encodedPayload, encodedSignature] = parts;
+  const header = parseJWTPart(encodedHeader);
+  const payload = parseJWTPart(encodedPayload);
+  if (header.alg !== "ES256" || !Array.isArray(header.x5c) || !header.x5c[0]) {
+    throw new ClientAuthError(401, "Unsupported Apple transaction.");
+  }
+
+  const publicKey = verifyAppleTransactionCertificateChain(header.x5c);
+  const signatureOK = verifySignature(
+    "sha256",
+    Buffer.from(`${encodedHeader}.${encodedPayload}`),
+    publicKey,
+    ecdsaJoseToDER(decodeBase64URL(encodedSignature))
+  );
+  if (!signatureOK) {
+    throw new ClientAuthError(401, "Apple transaction signature is invalid.");
+  }
+
+  const bundleID = process.env.APPLE_BUNDLE_ID;
+  if (bundleID && payload.bundleId !== bundleID) {
+    throw new ClientAuthError(401, "Apple transaction bundle is invalid.");
+  }
+  if (payload.productId !== appleStoreKitProductID()) {
+    throw new ClientAuthError(401, "Apple transaction product is invalid.");
+  }
+
+  return payload;
+}
+
+function appleTransactionExpiration(payload) {
+  const expiresDate = Number(payload?.expiresDate || 0);
+  return Number.isFinite(expiresDate) && expiresDate > 0 ? new Date(expiresDate).toISOString() : null;
+}
+
+function appleTransactionActive(payload) {
+  if (payload?.revocationDate) {
+    return false;
+  }
+  const expiresDate = Number(payload?.expiresDate || 0);
+  return !Number.isFinite(expiresDate) || expiresDate === 0 || expiresDate > Date.now();
+}
+
 function mutationRecordID(mutation) {
   const [kind, record] = Object.entries(mutation)[0] || [];
   if (!kind || !record) {
@@ -2168,6 +2456,200 @@ async function handlePull(request, response) {
   });
 }
 
+async function handleWebCheckout(request, response) {
+  if (!stripeConfigured()) {
+    sendError(response, 503, "Stripe checkout is not configured.");
+    return;
+  }
+
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, userID)) {
+    return;
+  }
+
+  const baseURL = configuredPublicBaseURL(request);
+  const successURL = body.successURL || `${baseURL}/web/?checkout=success`;
+  const cancelURL = body.cancelURL || `${baseURL}/web/?checkout=cancel`;
+  const formBody = encodedFormBody({
+    mode: "subscription",
+    client_reference_id: userID,
+    success_url: successURL,
+    cancel_url: cancelURL,
+    allow_promotion_codes: true,
+    line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID, quantity: 1 }],
+    metadata: { accountUserID: userID },
+    subscription_data: {
+      metadata: { accountUserID: userID }
+    }
+  });
+
+  const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      authorization: `Basic ${Buffer.from(`${process.env.STRIPE_SECRET_KEY}:`).toString("base64")}`,
+      "content-type": "application/x-www-form-urlencoded"
+    },
+    body: formBody
+  });
+  const text = await stripeResponse.text();
+  const json = text ? JSON.parse(text) : {};
+  if (!stripeResponse.ok) {
+    sendError(response, stripeResponse.status, json.error?.message || "Stripe checkout failed.");
+    return;
+  }
+
+  sendJSON(response, 200, {
+    checkoutSessionID: json.id,
+    url: json.url
+  });
+}
+
+async function handleStripeWebhook(request, response) {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    sendError(response, 503, "Stripe webhook is not configured.");
+    return;
+  }
+
+  const rawBody = await readRawBody(request);
+  const signatureHeader = request.headers["stripe-signature"];
+  if (!verifyStripeSignature(rawBody, signatureHeader, webhookSecret)) {
+    sendError(response, 400, "Invalid Stripe signature.");
+    return;
+  }
+
+  const event = JSON.parse(rawBody.toString("utf8"));
+  const object = event?.data?.object || {};
+  const store = await readStore();
+  let changed = false;
+
+  switch (event.type) {
+  case "checkout.session.completed": {
+    const userID = stripeUserIDFromObject(object);
+    if (userID && (object.mode === "subscription" || object.payment_status === "paid")) {
+      grantServerEntitlement(store, userID, "webSubscription", {
+        provider: {
+          stripeCustomerID: stripeSubscriptionID(object.customer),
+          stripeSubscriptionID: stripeSubscriptionID(object.subscription),
+          stripeCheckoutSessionID: object.id
+        }
+      });
+      changed = true;
+    }
+    break;
+  }
+  case "customer.subscription.created":
+  case "customer.subscription.updated": {
+    const userID = stripeUserIDFromObject(object);
+    const subscriptionID = stripeSubscriptionID(object);
+    if (userID && ["active", "trialing"].includes(object.status)) {
+      grantServerEntitlement(store, userID, "webSubscription", {
+        expiresAt: stripeSubscriptionExpiresAt(object),
+        provider: {
+          stripeCustomerID: stripeSubscriptionID(object.customer),
+          stripeSubscriptionID: subscriptionID
+        }
+      });
+      changed = true;
+    } else if (subscriptionID && ["canceled", "incomplete_expired", "unpaid", "paused"].includes(object.status)) {
+      const ownerUserID = findUserIDForStripeSubscription(store, subscriptionID);
+      changed = ownerUserID ? revokeServerEntitlement(store, ownerUserID, entitlementMatchesStripeSubscription(subscriptionID)) : false;
+    }
+    break;
+  }
+  case "customer.subscription.deleted": {
+    const subscriptionID = stripeSubscriptionID(object);
+    const ownerUserID = findUserIDForStripeSubscription(store, subscriptionID);
+    changed = ownerUserID ? revokeServerEntitlement(store, ownerUserID, entitlementMatchesStripeSubscription(subscriptionID)) : false;
+    break;
+  }
+  case "invoice.payment_succeeded": {
+    const userID = stripeUserIDFromObject(object);
+    const subscriptionID = stripeSubscriptionIDFromObject(object);
+    if (userID && subscriptionID) {
+      grantServerEntitlement(store, userID, "webSubscription", {
+        expiresAt: stripeSubscriptionExpiresAt(object),
+        provider: {
+          stripeCustomerID: stripeSubscriptionID(object.customer),
+          stripeSubscriptionID: subscriptionID
+        }
+      });
+      changed = true;
+    }
+    break;
+  }
+  default:
+    break;
+  }
+
+  if (changed) {
+    await writeStore(store);
+  }
+  sendJSON(response, 200, { received: true, changed });
+}
+
+async function handleAppleTransactionVerify(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  if (!body.signedTransactionInfo) {
+    sendError(response, 400, "Missing signed transaction.");
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, userID)) {
+    return;
+  }
+
+  let payload;
+  try {
+    payload = verifyAppleTransactionJWS(body.signedTransactionInfo);
+  } catch (error) {
+    if (error instanceof ClientAuthError) {
+      sendError(response, error.statusCode, error.message);
+      return;
+    }
+    throw error;
+  }
+
+  const transactionID = String(payload.transactionId || "");
+  const originalTransactionID = String(payload.originalTransactionId || transactionID);
+  const provider = {
+    appleTransactionID: transactionID,
+    appleOriginalTransactionID: originalTransactionID,
+    appleWebOrderLineItemID: payload.webOrderLineItemId || null,
+    appleEnvironment: payload.environment || null
+  };
+
+  if (!appleTransactionActive(payload)) {
+    revokeServerEntitlement(store, userID, (entitlement) =>
+      entitlement?.source === "appleSubscription" &&
+      entitlement?.provider?.appleOriginalTransactionID === originalTransactionID
+    );
+    await writeStore(store);
+    sendJSON(response, 200, { entitlement: store.entitlements[userID] || null, transaction: { active: false } });
+    return;
+  }
+
+  const entitlement = grantServerEntitlement(store, userID, "appleSubscription", {
+    expiresAt: appleTransactionExpiration(payload),
+    provider
+  });
+  await writeStore(store);
+  sendJSON(response, 200, { entitlement, transaction: { active: true, productID: payload.productId } });
+}
+
 async function handleLifetimeGrant(request, response) {
   if (!requireAdmin(request, response)) {
     return;
@@ -2181,12 +2663,7 @@ async function handleLifetimeGrant(request, response) {
   }
 
   const store = await readStore();
-  const entitlement = {
-    plan: "pro",
-    source: "lifetimeGrant",
-    grantedUserID: userID
-  };
-  store.entitlements[userID] = entitlement;
+  const entitlement = grantServerEntitlement(store, userID, "lifetimeGrant");
   await writeStore(store);
   sendJSON(response, 200, { userID, entitlement });
 }
@@ -2345,6 +2822,9 @@ const handlers = {
   "account/attach-local-data": handleAttachLocalData,
   "account/profile": handleProfileUpdate,
   "account/passkeys/link": handlePasskeyLink,
+  "billing/web/checkout": handleWebCheckout,
+  "billing/stripe/webhook": handleStripeWebhook,
+  "billing/apple/transactions/verify": handleAppleTransactionVerify,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,

@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createHmac } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,6 +8,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 const port = 8794;
 const baseURL = `http://127.0.0.1:${port}`;
 const adminToken = "smoke-admin-token";
+const stripeWebhookSecret = "whsec_smoke";
 const userID = "apple:smoke-user";
 
 function assert(condition, message) {
@@ -23,14 +25,22 @@ function mutationRecord(mutation) {
   return Object.values(mutation)[0];
 }
 
-async function request(path, { method = "GET", body, token } = {}) {
+function stripeSignature(rawBody, secret, timestamp = Math.floor(Date.now() / 1000)) {
+  const signature = createHmac("sha256", secret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest("hex");
+  return `t=${timestamp},v1=${signature}`;
+}
+
+async function request(path, { method = "GET", body, token, headers = {}, rawBody } = {}) {
   const response = await fetch(`${baseURL}${path}`, {
     method,
     headers: {
       ...(body ? { "content-type": "application/json" } : {}),
+      ...headers,
       ...(token ? { authorization: `Bearer ${token}` } : {})
     },
-    body: body ? JSON.stringify(body) : undefined
+    body: rawBody ?? (body ? JSON.stringify(body) : undefined)
   });
   const text = await response.text();
   const json = text ? JSON.parse(text) : null;
@@ -67,7 +77,8 @@ async function main() {
       NEON_DATABASE_URL: "",
       PERMITEXT_SYNC_ADMIN_TOKEN: adminToken,
       APPLE_TEAM_ID: "ABCDE12345",
-      APPLE_BUNDLE_ID: "com.randycodex.permitext"
+      APPLE_BUNDLE_ID: "com.randycodex.permitext",
+      STRIPE_WEBHOOK_SECRET: stripeWebhookSecret
     },
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -240,6 +251,93 @@ async function main() {
     assert(
       secondSignInAfterClientEntitlement.json.entitlement === null,
       "Client-provided entitlement persisted after sign-in."
+    );
+
+    const stripeCheckoutEvent = JSON.stringify({
+      id: "evt_smoke_checkout",
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          id: "cs_smoke",
+          mode: "subscription",
+          client_reference_id: "apple:second-smoke-user",
+          customer: "cus_smoke",
+          subscription: "sub_smoke",
+          metadata: { accountUserID: "apple:second-smoke-user" }
+        }
+      }
+    });
+    const invalidStripeWebhook = await request("/billing/stripe/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "stripe-signature": "t=1,v1=bad"
+      },
+      rawBody: stripeCheckoutEvent
+    });
+    assert(invalidStripeWebhook.response.status === 400, "Stripe webhook accepted an invalid signature.");
+
+    const stripeCheckoutWebhook = await request("/billing/stripe/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "stripe-signature": stripeSignature(stripeCheckoutEvent, stripeWebhookSecret)
+      },
+      rawBody: stripeCheckoutEvent
+    });
+    assert(stripeCheckoutWebhook.response.ok, "Stripe checkout webhook failed.");
+    assert(stripeCheckoutWebhook.json.changed === true, "Stripe checkout webhook did not update entitlement.");
+
+    const secondSignInAfterStripeWebhook = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "second-smoke-user",
+          displayName: "Second Smoke User"
+        }
+      }
+    });
+    assert(
+      secondSignInAfterStripeWebhook.json.entitlement?.source === "webSubscription",
+      "Stripe checkout webhook did not grant web subscription entitlement."
+    );
+
+    const stripeDeletedEvent = JSON.stringify({
+      id: "evt_smoke_deleted",
+      type: "customer.subscription.deleted",
+      data: {
+        object: {
+          id: "sub_smoke",
+          status: "canceled",
+          customer: "cus_smoke"
+        }
+      }
+    });
+    const stripeDeletedWebhook = await request("/billing/stripe/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "stripe-signature": stripeSignature(stripeDeletedEvent, stripeWebhookSecret)
+      },
+      rawBody: stripeDeletedEvent
+    });
+    assert(stripeDeletedWebhook.response.ok, "Stripe subscription delete webhook failed.");
+    assert(stripeDeletedWebhook.json.changed === true, "Stripe subscription delete did not update entitlement.");
+
+    const secondSignInAfterStripeDelete = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "second-smoke-user",
+          displayName: "Second Smoke User"
+        }
+      }
+    });
+    assert(
+      secondSignInAfterStripeDelete.json.entitlement === null,
+      "Stripe subscription delete did not revoke web subscription entitlement."
     );
 
     const crossAccountProfile = await request("/account/profile", {
