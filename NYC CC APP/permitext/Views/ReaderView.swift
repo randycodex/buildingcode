@@ -174,14 +174,14 @@ struct ReaderView: View {
         .sheet(item: $folderEditorTarget) { target in
             FolderEditorSheet(
                 existing: target.folder,
-                onSave: { name, description, colorHex in
+                onSave: { name, address, description, colorHex in
                     if let existing = target.folder {
-                        library.updateFolder(existing, name: name, description: description, colorHex: colorHex)
+                        library.updateFolder(existing, name: name, address: address, description: description, colorHex: colorHex)
                     } else {
                         // After creating a new folder from inside the Reader,
                         // assign the current section to it so the user
                         // doesn't have to reopen the picker.
-                        if let newFolder = library.createFolder(name: name, description: description, colorHex: colorHex) {
+                        if let newFolder = library.createFolder(name: name, address: address, description: description, colorHex: colorHex) {
                             library.addSection(sectionID, toFolder: newFolder.id)
                         }
                     }

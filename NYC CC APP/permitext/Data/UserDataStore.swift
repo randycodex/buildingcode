@@ -23,8 +23,8 @@ protocol UserContentRepository {
     func folderCount(codeVersion: String) throws -> Int
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]]
     func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64]
-    func createFolder(name: String, description: String, colorHex: String, codeVersion: String) throws -> Int64
-    func updateFolder(id: Int64, name: String, description: String, colorHex: String, codeVersion: String) throws
+    func createFolder(name: String, address: String, description: String, colorHex: String, codeVersion: String) throws -> Int64
+    func updateFolder(id: Int64, name: String, address: String, description: String, colorHex: String, codeVersion: String) throws
     func deleteFolder(id: Int64, codeVersion: String) throws
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws
@@ -388,6 +388,7 @@ final class UserDataStore: UserContentRepository {
                 sync_state TEXT NOT NULL DEFAULT 'localOnly',
                 code_version TEXT NOT NULL,
                 name TEXT NOT NULL,
+                address TEXT NOT NULL DEFAULT '',
                 description TEXT NOT NULL DEFAULT '',
                 color_hex TEXT NOT NULL,
                 sort_order INTEGER NOT NULL DEFAULT 0,
@@ -468,6 +469,7 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "bookmark_tags", column: "sync_state", definition: "TEXT NOT NULL DEFAULT 'localOnly'")
         try addColumnIfMissing(table: "bookmark_tags", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "bookmark_tags", column: "deleted_at", definition: "TEXT")
+        try addColumnIfMissing(table: "folders", column: "address", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folders", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folders", column: "owner_id", definition: "TEXT NOT NULL DEFAULT 'local'")
         try addColumnIfMissing(table: "folders", column: "visibility", definition: "TEXT NOT NULL DEFAULT 'personal'")
@@ -516,7 +518,7 @@ final class UserDataStore: UserContentRepository {
             ],
             "folders": [
                 "id", "client_id", "owner_id", "visibility", "sync_state",
-                "code_version", "name", "description", "color_hex", "sort_order",
+                "code_version", "name", "address", "description", "color_hex", "sort_order",
                 "created_at", "updated_at", "deleted_at"
             ],
             "folder_sections": [
@@ -1109,7 +1111,7 @@ final class UserDataStore: UserContentRepository {
     func folders(codeVersion: String) throws -> [FolderRecord] {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, name, description, color_hex, sort_order, created_at, updated_at
+            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, name, address, description, color_hex, sort_order, created_at, updated_at
             FROM folders
             WHERE code_version = ?
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
@@ -1129,11 +1131,12 @@ final class UserDataStore: UserContentRepository {
                     syncState: connection.string(at: 4, in: statement),
                     deletedAt: connection.stringOrNil(at: 5, in: statement),
                     name: connection.string(at: 6, in: statement),
-                    description: connection.string(at: 7, in: statement),
-                    colorHex: connection.string(at: 8, in: statement),
-                    sortOrder: Int(connection.int64(at: 9, in: statement)),
-                    createdAt: connection.string(at: 10, in: statement),
-                    updatedAt: connection.string(at: 11, in: statement)
+                    address: connection.string(at: 7, in: statement),
+                    description: connection.string(at: 8, in: statement),
+                    colorHex: connection.string(at: 9, in: statement),
+                    sortOrder: Int(connection.int64(at: 10, in: statement)),
+                    createdAt: connection.string(at: 11, in: statement),
+                    updatedAt: connection.string(at: 12, in: statement)
                 )
             )
         }
@@ -1195,6 +1198,7 @@ final class UserDataStore: UserContentRepository {
     @discardableResult
     func createFolder(
         name: String,
+        address: String,
         description: String,
         colorHex: String,
         codeVersion: String
@@ -1226,9 +1230,9 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT INTO folders (
                 client_id, owner_id, visibility, sync_state, code_version, name,
-                description, color_hex, sort_order, created_at, updated_at
+                address, description, color_hex, sort_order, created_at, updated_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """
         )
         defer { connection.finalize(statement) }
@@ -1239,11 +1243,12 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: pendingSyncState, index: 4, to: statement)
         try connection.bind(text: codeVersion, index: 5, to: statement)
         try connection.bind(text: trimmedName, index: 6, to: statement)
-        try connection.bind(text: description, index: 7, to: statement)
-        try connection.bind(text: colorHex, index: 8, to: statement)
-        sqlite3_bind_int64(statement, 9, Int64(nextSortOrder))
-        try connection.bind(text: now, index: 10, to: statement)
+        try connection.bind(text: address, index: 7, to: statement)
+        try connection.bind(text: description, index: 8, to: statement)
+        try connection.bind(text: colorHex, index: 9, to: statement)
+        sqlite3_bind_int64(statement, 10, Int64(nextSortOrder))
         try connection.bind(text: now, index: 11, to: statement)
+        try connection.bind(text: now, index: 12, to: statement)
         _ = try connection.step(statement)
 
         let folderID = connection.lastInsertedRowID()
@@ -1256,6 +1261,7 @@ final class UserDataStore: UserContentRepository {
                 clientID: clientID,
                 values: [
                     "name": trimmedName,
+                    "address": address,
                     "description": description,
                     "colorHex": colorHex,
                     "sortOrder": String(nextSortOrder)
@@ -1268,6 +1274,7 @@ final class UserDataStore: UserContentRepository {
     func updateFolder(
         id: Int64,
         name: String,
+        address: String,
         description: String,
         colorHex: String,
         codeVersion: String
@@ -1285,18 +1292,19 @@ final class UserDataStore: UserContentRepository {
         let statement = try connection.prepare(
             """
             UPDATE folders
-            SET name = ?, description = ?, color_hex = ?, updated_at = ?, sync_state = ?
+            SET name = ?, address = ?, description = ?, color_hex = ?, updated_at = ?, sync_state = ?
             WHERE id = ? AND code_version = ?;
             """
         )
         defer { connection.finalize(statement) }
         try connection.bind(text: trimmedName, index: 1, to: statement)
-        try connection.bind(text: description, index: 2, to: statement)
-        try connection.bind(text: colorHex, index: 3, to: statement)
-        try connection.bind(text: isoFormatter.string(from: Date()), index: 4, to: statement)
-        try connection.bind(text: pendingSyncState, index: 5, to: statement)
-        sqlite3_bind_int64(statement, 6, id)
-        try connection.bind(text: codeVersion, index: 7, to: statement)
+        try connection.bind(text: address, index: 2, to: statement)
+        try connection.bind(text: description, index: 3, to: statement)
+        try connection.bind(text: colorHex, index: 4, to: statement)
+        try connection.bind(text: isoFormatter.string(from: Date()), index: 5, to: statement)
+        try connection.bind(text: pendingSyncState, index: 6, to: statement)
+        sqlite3_bind_int64(statement, 7, id)
+        try connection.bind(text: codeVersion, index: 8, to: statement)
         _ = try connection.step(statement)
         enqueueSyncOperationIfPossible(
             entityType: .folder,
@@ -1307,6 +1315,7 @@ final class UserDataStore: UserContentRepository {
                 clientID: clientID,
                 values: [
                     "name": trimmedName,
+                    "address": address,
                     "description": description,
                     "colorHex": colorHex
                 ]
@@ -1778,9 +1787,9 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT INTO folders (
                 client_id, owner_id, visibility, sync_state, code_version, name,
-                description, color_hex, sort_order, created_at, updated_at, deleted_at
+                address, description, color_hex, sort_order, created_at, updated_at, deleted_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
             """
         )
         defer { connection.finalize(statement) }
@@ -1790,11 +1799,12 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: syncedContentState, index: 4, to: statement)
         try connection.bind(text: record.codeVersion, index: 5, to: statement)
         try connection.bind(text: record.name ?? "Project", index: 6, to: statement)
-        try connection.bind(text: record.description ?? "", index: 7, to: statement)
-        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 8, to: statement)
-        sqlite3_bind_int64(statement, 9, Int64(record.sortOrder ?? 0))
-        try connection.bind(text: timestamp, index: 10, to: statement)
+        try connection.bind(text: record.address ?? "", index: 7, to: statement)
+        try connection.bind(text: record.description ?? "", index: 8, to: statement)
+        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 9, to: statement)
+        sqlite3_bind_int64(statement, 10, Int64(record.sortOrder ?? 0))
         try connection.bind(text: timestamp, index: 11, to: statement)
+        try connection.bind(text: timestamp, index: 12, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -1809,6 +1819,7 @@ final class UserDataStore: UserContentRepository {
                 visibility = ?,
                 sync_state = ?,
                 name = ?,
+                address = ?,
                 description = ?,
                 color_hex = ?,
                 sort_order = ?,
@@ -1823,12 +1834,13 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: personalVisibility, index: 3, to: statement)
         try connection.bind(text: syncedContentState, index: 4, to: statement)
         try connection.bind(text: record.name ?? "Project", index: 5, to: statement)
-        try connection.bind(text: record.description ?? "", index: 6, to: statement)
-        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 7, to: statement)
-        sqlite3_bind_int64(statement, 8, Int64(record.sortOrder ?? 0))
-        try connection.bind(text: timestamp, index: 9, to: statement)
-        sqlite3_bind_int64(statement, 10, localFolderID)
-        try connection.bind(text: record.codeVersion, index: 11, to: statement)
+        try connection.bind(text: record.address ?? "", index: 6, to: statement)
+        try connection.bind(text: record.description ?? "", index: 7, to: statement)
+        try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 8, to: statement)
+        sqlite3_bind_int64(statement, 9, Int64(record.sortOrder ?? 0))
+        try connection.bind(text: timestamp, index: 10, to: statement)
+        sqlite3_bind_int64(statement, 11, localFolderID)
+        try connection.bind(text: record.codeVersion, index: 12, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -1962,6 +1974,7 @@ struct FolderRecord: Sendable {
     let syncState: String
     let deletedAt: String?
     let name: String
+    let address: String
     let description: String
     let colorHex: String
     let sortOrder: Int

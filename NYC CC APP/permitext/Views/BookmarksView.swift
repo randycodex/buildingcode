@@ -180,11 +180,11 @@ struct BookmarksView: View {
             .sheet(item: $folderEditorTarget) { target in
                 FolderEditorSheet(
                     existing: target.folder,
-                    onSave: { name, description, colorHex in
+                    onSave: { name, address, description, colorHex in
                         if let existing = target.folder {
-                            library.updateFolder(existing, name: name, description: description, colorHex: colorHex)
+                            library.updateFolder(existing, name: name, address: address, description: description, colorHex: colorHex)
                         } else {
-                            _ = library.createFolder(name: name, description: description, colorHex: colorHex)
+                            _ = library.createFolder(name: name, address: address, description: description, colorHex: colorHex)
                         }
                     },
                     onDelete: {
@@ -991,9 +991,9 @@ struct ProjectView: View {
         .sheet(item: $folderEditorTarget) { target in
             FolderEditorSheet(
                 existing: target.folder,
-                onSave: { name, description, colorHex in
+                onSave: { name, address, description, colorHex in
                     if let existing = target.folder {
-                        library.updateFolder(existing, name: name, description: description, colorHex: colorHex)
+                        library.updateFolder(existing, name: name, address: address, description: description, colorHex: colorHex)
                     }
                 },
                 onDelete: {

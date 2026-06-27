@@ -183,12 +183,13 @@ struct FolderEditorSheet: View {
     /// Existing folder when editing; nil when creating new.
     let existing: CodeFolder?
     /// Called on Save tap. Validation (non-empty name) is handled inside.
-    let onSave: (_ name: String, _ description: String, _ colorHex: String) -> Void
+    let onSave: (_ name: String, _ address: String, _ description: String, _ colorHex: String) -> Void
     /// Called on Delete tap. Only invoked when `existing != nil`.
     let onDelete: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var name: String = ""
+    @State private var address: String = ""
     @State private var description: String = ""
     @State private var colorHex: String = CodeFolder.defaultColorHex
     @State private var showsDeleteConfirm = false
@@ -206,6 +207,17 @@ struct FolderEditorSheet: View {
                         .autocorrectionDisabled()
                 }
 
+                Section("Project address") {
+                    TextField("Address", text: $address, axis: .vertical)
+                        .textInputAutocapitalization(.words)
+                        .lineLimit(1...3)
+                }
+
+                Section("Description (optional)") {
+                    TextField("Short description", text: $description, axis: .vertical)
+                        .lineLimit(2...4)
+                }
+
                 Section("Color") {
                     HStack(spacing: 12) {
                         ForEach(CodeFolder.presetColorHexes, id: \.self) { hex in
@@ -214,11 +226,6 @@ struct FolderEditorSheet: View {
                         Spacer(minLength: 0)
                     }
                     .padding(.vertical, 4)
-                }
-
-                Section("Description (optional)") {
-                    TextField("Short description", text: $description, axis: .vertical)
-                        .lineLimit(2...4)
                 }
 
                 if isEditing {
@@ -241,7 +248,7 @@ struct FolderEditorSheet: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
-                        onSave(trimmedName, description, colorHex)
+                        onSave(trimmedName, address, description, colorHex)
                         dismiss()
                     }
                     .disabled(!canSave)
@@ -264,6 +271,7 @@ struct FolderEditorSheet: View {
             .onAppear {
                 if let existing {
                     name = existing.name
+                    address = existing.address
                     description = existing.description
                     colorHex = existing.colorHex
                 }

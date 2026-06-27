@@ -1454,6 +1454,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     syncState: UserContentSyncState(rawValue: record.syncState) ?? .localOnly,
                     deletedAt: record.deletedAt.flatMap { ISO8601DateFormatter().date(from: $0) },
                     name: record.name,
+                    address: record.address,
                     description: record.description,
                     colorHex: record.colorHex,
                     sortOrder: record.sortOrder,
@@ -1474,7 +1475,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     @discardableResult
-    func createFolder(name: String, description: String = "", colorHex: String = CodeFolder.defaultColorHex) -> CodeFolder? {
+    func createFolder(name: String, address: String = "", description: String = "", colorHex: String = CodeFolder.defaultColorHex) -> CodeFolder? {
         guard let selectedVersion, let userContentRepository else { return nil }
         do {
             let folderCount = try folderCountForEntitlements(codeVersion: selectedVersion.codeVersion)
@@ -1483,6 +1484,7 @@ final class CodeLibraryViewModel: ObservableObject {
             }
             let id = try userContentRepository.createFolder(
                 name: name,
+                address: address,
                 description: description,
                 colorHex: colorHex,
                 codeVersion: selectedVersion.codeVersion
@@ -1496,12 +1498,13 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func updateFolder(_ folder: CodeFolder, name: String, description: String, colorHex: String) {
+    func updateFolder(_ folder: CodeFolder, name: String, address: String, description: String, colorHex: String) {
         guard let selectedVersion, let userContentRepository else { return }
         do {
             try userContentRepository.updateFolder(
                 id: folder.id,
                 name: name,
+                address: address,
                 description: description,
                 colorHex: colorHex,
                 codeVersion: selectedVersion.codeVersion

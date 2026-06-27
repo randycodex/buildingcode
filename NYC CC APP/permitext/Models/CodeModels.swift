@@ -448,6 +448,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     let clientID: String?
     let localFolderID: Int64
     let name: String?
+    let address: String?
     let description: String?
     let colorHex: String?
     let sortOrder: Int?
@@ -615,6 +616,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     clientID: projectClientID,
                     localFolderID: folderID,
                     name: item.operationType == .delete ? nil : payload.values["name"],
+                    address: item.operationType == .delete ? nil : payload.values["address"],
                     description: item.operationType == .delete ? nil : payload.values["description"],
                     colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
                     sortOrder: payload.values["sortOrder"].flatMap(Int.init),
@@ -1441,6 +1443,7 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     let syncState: UserContentSyncState
     let deletedAt: Date?
     let name: String
+    let address: String
     let description: String
     let colorHex: String
     let sortOrder: Int
