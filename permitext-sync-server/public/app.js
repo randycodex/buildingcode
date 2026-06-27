@@ -285,6 +285,7 @@ function searchIDForLinkedReaderPane(paneID) {
 
 function sectionDetailsBySearch() {
   state.sectionDetails = state.sectionDetails && typeof state.sectionDetails === "object" ? state.sectionDetails : {};
+  state.sectionDetailAnchors = state.sectionDetailAnchors && typeof state.sectionDetailAnchors === "object" ? state.sectionDetailAnchors : {};
   if (state.sectionDetail) {
     const firstSearch = (state.utilityInstances || []).find((instance) => instance.key === "search");
     if (firstSearch && !state.sectionDetails[firstSearch.id]) {
@@ -296,7 +297,16 @@ function sectionDetailsBySearch() {
   Object.keys(state.sectionDetails).forEach((searchID) => {
     if (!activeSearchIDs.has(searchID)) delete state.sectionDetails[searchID];
   });
+  Object.keys(state.sectionDetailAnchors).forEach((searchID) => {
+    if (!activeSearchIDs.has(searchID) || !state.sectionDetails[searchID]) delete state.sectionDetailAnchors[searchID];
+  });
   return state.sectionDetails;
+}
+
+function sectionDetailAnchorsBySearch() {
+  sectionDetailsBySearch();
+  state.sectionDetailAnchors = state.sectionDetailAnchors && typeof state.sectionDetailAnchors === "object" ? state.sectionDetailAnchors : {};
+  return state.sectionDetailAnchors;
 }
 
 function searchLinkedReadersBySearch() {
@@ -360,11 +370,12 @@ function activePaneIDs() {
     if (instance.key !== "search" || !sectionDetailsBySearch()[instance.id]) return;
     const searchID = paneIDForUtilityInstance(instance);
     const detailID = paneIDForSectionDetail(instance.id);
-    const searchIndex = paired.indexOf(searchID);
-    if (searchIndex === -1) {
+    const anchorPaneID = sectionDetailAnchorsBySearch()[instance.id] || searchID;
+    const anchorIndex = paired.indexOf(anchorPaneID);
+    if (anchorIndex === -1) {
       paired.push(detailID);
     } else if (!paired.includes(detailID)) {
-      paired.splice(searchIndex + 1, 0, detailID);
+      paired.splice(anchorIndex + 1, 0, detailID);
     }
   });
   state.paneOrder = paired;
@@ -399,14 +410,18 @@ function appendPaneIfMissing(paneID) {
 
 function placeSectionDetailAfterSearch(searchID) {
   const searchPaneID = paneIDForUtilityInstance({ key: "search", id: searchID });
+  placeSectionDetailAfterPane(searchID, searchPaneID);
+}
+
+function placeSectionDetailAfterPane(searchID, anchorPaneID) {
   const detailID = paneIDForSectionDetail(searchID);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== detailID);
   activeIDs.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  const searchIndex = ordered.indexOf(searchPaneID);
-  const insertIndex = searchIndex === -1 ? 0 : searchIndex + 1;
+  const anchorIndex = ordered.indexOf(anchorPaneID);
+  const insertIndex = anchorIndex === -1 ? 0 : anchorIndex + 1;
   ordered.splice(insertIndex, 0, detailID);
   state.paneOrder = ordered;
 }
@@ -2734,10 +2749,11 @@ async function renderSearchResults(panel, instance) {
   });
 }
 
-async function openSectionDetail(searchID, section) {
+async function openSectionDetail(searchID, section, options = {}) {
   const sectionID = String(section.sectionID || section.id || "");
   if (!sectionID) return;
   const details = sectionDetailsBySearch();
+  const anchors = sectionDetailAnchorsBySearch();
   details[searchID] = {
     codePrefix: section.codePrefix || "BC",
     chapterID: section.chapterID || "",
@@ -2748,8 +2764,13 @@ async function openSectionDetail(searchID, section) {
     headerLine: section.headerLine || "",
     headingLine: section.headingLine || ""
   };
+  if (options.anchorPaneID) {
+    anchors[searchID] = options.anchorPaneID;
+  } else {
+    delete anchors[searchID];
+  }
   state.searchResultReader = null;
-  placeSectionDetailAfterSearch(searchID);
+  placeSectionDetailAfterPane(searchID, anchors[searchID] || paneIDForUtilityInstance({ key: "search", id: searchID }));
   updateLinkedReaderForSearch(searchID, details[searchID]);
   saveWorkspaceState();
   await renderWorkspace();
@@ -2969,6 +2990,7 @@ async function renderSectionDetail(searchID, detail) {
 
   backButton.addEventListener("click", () => {
     delete sectionDetailsBySearch()[searchID];
+    delete sectionDetailAnchorsBySearch()[searchID];
     saveWorkspaceState();
     renderWorkspace();
   });
@@ -3039,6 +3061,7 @@ function closeUtilityInstance(instance) {
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
   if (instance.key === "search") {
     delete sectionDetailsBySearch()[instance.id];
+    delete sectionDetailAnchorsBySearch()[instance.id];
     delete searchLinkedReadersBySearch()[instance.id];
   }
   delete state.paneWeights[paneID];
@@ -3635,13 +3658,13 @@ async function renderSaved(paneID = "utility:saved") {
   if (savedItems.length === 0) {
     appendMutedRow(content, "No saved sections", "Saved sections synced from iOS or saved in this web workspace will appear here.");
   } else {
-    renderSavedItemsByCode(content, savedItems.slice(0, 48));
+    renderSavedItemsByCode(content, savedItems.slice(0, 48), paneID);
   }
 
   return panel;
 }
 
-function renderSavedItemsByCode(content, savedItems) {
+function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved") {
   const codeGroups = new Map();
   savedItems.forEach((item) => {
     const prefix = item.codePrefix || item.code || "BC";
@@ -3680,7 +3703,7 @@ function renderSavedItemsByCode(content, savedItems) {
         heading.className = "saved-section-heading";
         heading.append(title);
         row.append(heading);
-        row.addEventListener("click", () => openSectionDetailForExistingSearch(item));
+        row.addEventListener("click", () => openSectionDetailForExistingSearch(item, { anchorPaneID: paneID }));
         codeGroup.append(row);
       });
     });
@@ -3718,13 +3741,13 @@ function appendEmptySaved(container, title, message) {
   container.append(wrapper);
 }
 
-async function openSectionDetailForExistingSearch(item) {
+async function openSectionDetailForExistingSearch(item, options = {}) {
   let searchInstance = (state.utilityInstances || []).find((instance) => instance.key === "search");
   if (!searchInstance) {
     searchInstance = newUtilityInstance("search");
     state.utilityInstances = [...(state.utilityInstances || []), searchInstance];
   }
-  await openSectionDetail(searchInstance.id, item);
+  await openSectionDetail(searchInstance.id, item, options);
 }
 
 function renderSettings() {
