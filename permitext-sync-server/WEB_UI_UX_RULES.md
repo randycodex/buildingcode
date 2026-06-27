@@ -73,6 +73,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Main panes should feel like workspace columns, not floating cards.
 - Internal controls can stay lightly rounded only when it helps usability.
 - Match the iOS radius set for shared surfaces: cards use a 14 px radius and compact tiles use a 10 px radius unless a desktop-specific control needs a different value.
+- Notes, comments, and other annotation cards should not use thin border outlines; rely on surface color, spacing, and hierarchy instead.
 - Use spacing consistently; prefer tight, deliberate spacing over large mobile-style gaps.
 
 ## Mobile
