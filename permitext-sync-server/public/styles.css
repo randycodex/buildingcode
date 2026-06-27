@@ -4,6 +4,7 @@
   --surface: #ffffff;
   --surface-muted: #f7f7fa;
   --surface-raised: rgba(255, 255, 255, 0.92);
+  --comment-surface: color-mix(in srgb, #fff2c2 24%, var(--surface));
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
   --text-tertiary: #b7b7bf;
@@ -54,6 +55,7 @@
     --surface: #000000;
     --surface-muted: #000000;
     --surface-raised: #000000;
+    --comment-surface: #22190a;
     --text-primary: #f6f4f1;
     --text-secondary: #a09fa7;
     --text-tertiary: #6f6f78;
@@ -1498,7 +1500,7 @@ select option:checked {
   resize: none;
   border: 0;
   border-radius: var(--radius-card);
-  background: var(--surface);
+  background: var(--comment-surface);
   color: var(--text-primary);
   font-size: 12pt !important;
   font-weight: 400;
@@ -1735,7 +1737,7 @@ select option:checked {
   min-height: 0;
   padding: 0;
   border: 0;
-  background: transparent;
+  background: var(--comment-surface);
   border-radius: 0;
   font-size: 12pt !important;
   font-weight: 400;
