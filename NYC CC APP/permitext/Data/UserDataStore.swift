@@ -15,9 +15,12 @@ protocol UserContentRepository {
     func saveNote(sectionID: Int64, codeVersion: String, body: String) throws
     func saveNote(sectionID: Int64, blockID: String, codeVersion: String, body: String) throws
     func tags(sectionID: Int64, codeVersion: String) throws -> [String]
+    func tags(sectionID: Int64, blockID: String, codeVersion: String) throws -> [String]
     func tagsBySectionID(codeVersion: String) throws -> [Int64: [String]]
     func setTags(_ tags: [String], sectionID: Int64, codeVersion: String) throws
+    func setTags(_ tags: [String], sectionID: Int64, blockID: String, codeVersion: String) throws
     func tagUsageCounts(codeVersion: String) throws -> [(tag: String, count: Int)]
+    func clearTags(sectionID: Int64, codeVersion: String) throws
     func clearBookmarks(codeVersion: String) throws
     func clearNotes(codeVersion: String) throws
     func clearAllTags(codeVersion: String) throws
@@ -155,17 +158,6 @@ final class UserDataStore: UserContentRepository {
                 try connection.bind(text: codeVersion, index: 2, to: statement)
                 _ = try connection.step(statement)
 
-                let tags = try connection.prepare(
-                    """
-                    DELETE FROM bookmark_tags
-                    WHERE code_version = ? AND section_id = ?;
-                    """
-                )
-                defer { connection.finalize(tags) }
-                try connection.bind(text: codeVersion, index: 1, to: tags)
-                sqlite3_bind_int64(tags, 2, sectionID)
-                _ = try connection.step(tags)
-
                 let folders = try connection.prepare(
                     """
                     DELETE FROM folder_sections
@@ -179,11 +171,6 @@ final class UserDataStore: UserContentRepository {
             }
             enqueueSyncOperationIfPossible(
                 entityType: .bookmark,
-                operationType: .delete,
-                payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
-            )
-            enqueueSyncOperationIfPossible(
-                entityType: .tagSet,
                 operationType: .delete,
                 payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
             )
@@ -418,11 +405,12 @@ final class UserDataStore: UserContentRepository {
                 sync_state TEXT NOT NULL DEFAULT 'localOnly',
                 code_version TEXT NOT NULL,
                 section_id INTEGER NOT NULL,
+                block_id TEXT NOT NULL DEFAULT '',
                 tag TEXT NOT NULL,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL DEFAULT '',
                 deleted_at TEXT,
-                PRIMARY KEY(code_version, section_id, tag)
+                PRIMARY KEY(code_version, section_id, block_id, tag)
             );
 
             CREATE INDEX IF NOT EXISTS idx_bookmark_tags_lookup
@@ -519,6 +507,8 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "bookmark_tags", column: "sync_state", definition: "TEXT NOT NULL DEFAULT 'localOnly'")
         try addColumnIfMissing(table: "bookmark_tags", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "bookmark_tags", column: "deleted_at", definition: "TEXT")
+        try addColumnIfMissing(table: "bookmark_tags", column: "block_id", definition: "TEXT NOT NULL DEFAULT ''")
+        try migrateBookmarkTagsBlockIDConstraintIfNeeded()
         try addColumnIfMissing(table: "folders", column: "address", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folders", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folders", column: "owner_id", definition: "TEXT NOT NULL DEFAULT 'local'")
@@ -583,6 +573,53 @@ final class UserDataStore: UserContentRepository {
         }
     }
 
+    private func migrateBookmarkTagsBlockIDConstraintIfNeeded() throws {
+        guard try !hasPrimaryKey(table: "bookmark_tags", columns: ["code_version", "section_id", "block_id", "tag"]) else {
+            return
+        }
+
+        try performTransaction {
+            try connection.execute("ALTER TABLE bookmark_tags RENAME TO bookmark_tags_legacy;")
+            try connection.execute(
+                """
+                CREATE TABLE bookmark_tags (
+                    client_id TEXT NOT NULL DEFAULT '',
+                    owner_id TEXT NOT NULL DEFAULT 'local',
+                    visibility TEXT NOT NULL DEFAULT 'personal',
+                    sync_state TEXT NOT NULL DEFAULT 'localOnly',
+                    code_version TEXT NOT NULL,
+                    section_id INTEGER NOT NULL,
+                    block_id TEXT NOT NULL DEFAULT '',
+                    tag TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL DEFAULT '',
+                    deleted_at TEXT,
+                    PRIMARY KEY(code_version, section_id, block_id, tag)
+                );
+                """
+            )
+            try connection.execute(
+                """
+                INSERT INTO bookmark_tags (
+                    client_id, owner_id, visibility, sync_state, code_version,
+                    section_id, block_id, tag, created_at, updated_at, deleted_at
+                )
+                SELECT
+                    client_id, owner_id, visibility, sync_state, code_version,
+                    section_id, COALESCE(block_id, ''), tag, created_at, updated_at, deleted_at
+                FROM bookmark_tags_legacy;
+                """
+            )
+            try connection.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_bookmark_tags_lookup
+                    ON bookmark_tags(code_version, tag);
+                """
+            )
+            try connection.execute("DROP TABLE bookmark_tags_legacy;")
+        }
+    }
+
     private func hasUniqueIndex(table: String, columns expectedColumns: [String]) throws -> Bool {
         let indexList = try connection.prepare("PRAGMA index_list(\(table));")
         defer { connection.finalize(indexList) }
@@ -600,6 +637,23 @@ final class UserDataStore: UserContentRepository {
             }
         }
         return false
+    }
+
+    private func hasPrimaryKey(table: String, columns expectedColumns: [String]) throws -> Bool {
+        let statement = try connection.prepare("PRAGMA table_info(\(table));")
+        defer { connection.finalize(statement) }
+
+        var columnsByPosition: [Int: String] = [:]
+        while try connection.step(statement) == SQLITE_ROW {
+            let columnName = connection.string(at: 1, in: statement)
+            let position = connection.int(at: 5, in: statement)
+            if position > 0 {
+                columnsByPosition[position] = columnName
+            }
+        }
+
+        let actualColumns = columnsByPosition.keys.sorted().compactMap { columnsByPosition[$0] }
+        return actualColumns.map { $0.lowercased() } == expectedColumns.map { $0.lowercased() }
     }
 
     private func columnNames(in table: String) throws -> Set<String> {
@@ -625,7 +679,7 @@ final class UserDataStore: UserContentRepository {
             ],
             "bookmark_tags": [
                 "client_id", "owner_id", "visibility", "sync_state",
-                "code_version", "section_id", "tag", "created_at", "updated_at", "deleted_at"
+                "code_version", "section_id", "block_id", "tag", "created_at", "updated_at", "deleted_at"
             ],
             "folders": [
                 "id", "client_id", "owner_id", "visibility", "sync_state",
@@ -671,6 +725,7 @@ final class UserDataStore: UserContentRepository {
         try connection.execute("UPDATE bookmark_tags SET visibility = '\(personalVisibility)' WHERE visibility = '';")
         try connection.execute("UPDATE bookmark_tags SET sync_state = '\(localOnlySyncState)' WHERE sync_state = '';")
         try connection.execute("UPDATE bookmark_tags SET updated_at = CASE WHEN updated_at = '' THEN created_at ELSE updated_at END;")
+        try connection.execute("UPDATE bookmark_tags SET block_id = '' WHERE block_id IS NULL;")
         try connection.execute("UPDATE folders SET client_id = lower(hex(randomblob(16))) WHERE client_id = '';")
         try connection.execute("UPDATE folders SET owner_id = '\(localOwnerID)' WHERE owner_id = '';")
         try connection.execute("UPDATE folders SET visibility = '\(personalVisibility)' WHERE visibility = '';")
@@ -969,20 +1024,26 @@ final class UserDataStore: UserContentRepository {
 
     // MARK: - Tags
 
-    /// Returns the tags associated with a single bookmarked section, in the
+    /// Returns the tags associated with a single annotation target, in the
     /// order they were added (oldest first).
     func tags(sectionID: Int64, codeVersion: String) throws -> [String] {
+        try tags(sectionID: sectionID, blockID: "", codeVersion: codeVersion)
+    }
+
+    func tags(sectionID: Int64, blockID: String, codeVersion: String) throws -> [String] {
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
         let statement = try connection.prepare(
             """
             SELECT tag
             FROM bookmark_tags
-            WHERE code_version = ? AND section_id = ?
+            WHERE code_version = ? AND section_id = ? AND block_id = ?
             ORDER BY created_at ASC;
             """
         )
         defer { connection.finalize(statement) }
         try connection.bind(text: codeVersion, index: 1, to: statement)
         sqlite3_bind_int64(statement, 2, sectionID)
+        try connection.bind(text: normalizedBlockID, index: 3, to: statement)
 
         var tags: [String] = []
         while try connection.step(statement) == SQLITE_ROW {
@@ -997,10 +1058,11 @@ final class UserDataStore: UserContentRepository {
     func tagsBySectionID(codeVersion: String) throws -> [Int64: [String]] {
         let statement = try connection.prepare(
             """
-            SELECT section_id, tag
+            SELECT section_id, tag, MIN(created_at) AS first_created
             FROM bookmark_tags
             WHERE code_version = ?
-            ORDER BY section_id ASC, created_at ASC;
+            GROUP BY section_id, tag
+            ORDER BY section_id ASC, first_created ASC;
             """
         )
         defer { connection.finalize(statement) }
@@ -1015,8 +1077,13 @@ final class UserDataStore: UserContentRepository {
         return entries
     }
 
-    /// Replaces the tag set for one section. Empty `tags` clears the row.
+    /// Replaces the tag set for one annotation target. Empty `tags` clears the row.
     func setTags(_ tags: [String], sectionID: Int64, codeVersion: String) throws {
+        try setTags(tags, sectionID: sectionID, blockID: "", codeVersion: codeVersion)
+    }
+
+    func setTags(_ tags: [String], sectionID: Int64, blockID: String, codeVersion: String) throws {
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
         // Normalize: trim, drop empty, de-dupe case-insensitively while
         // preserving the user's preferred casing (first occurrence wins).
         var seen = Set<String>()
@@ -1030,12 +1097,13 @@ final class UserDataStore: UserContentRepository {
             let delete = try connection.prepare(
                 """
                 DELETE FROM bookmark_tags
-                WHERE code_version = ? AND section_id = ?;
+                WHERE code_version = ? AND section_id = ? AND block_id = ?;
                 """
             )
             defer { connection.finalize(delete) }
             try connection.bind(text: codeVersion, index: 1, to: delete)
             sqlite3_bind_int64(delete, 2, sectionID)
+            try connection.bind(text: normalizedBlockID, index: 3, to: delete)
             _ = try connection.step(delete)
 
             if !cleaned.isEmpty {
@@ -1043,10 +1111,10 @@ final class UserDataStore: UserContentRepository {
                 let insert = try connection.prepare(
                     """
                     INSERT INTO bookmark_tags (
-                        code_version, section_id, tag, created_at, updated_at, client_id,
+                        code_version, section_id, block_id, tag, created_at, updated_at, client_id,
                         owner_id, visibility, sync_state
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
                     """
                 )
                 defer { connection.finalize(insert) }
@@ -1056,25 +1124,30 @@ final class UserDataStore: UserContentRepository {
                     sqlite3_clear_bindings(insert)
                     try connection.bind(text: codeVersion, index: 1, to: insert)
                     sqlite3_bind_int64(insert, 2, sectionID)
-                    try connection.bind(text: tag, index: 3, to: insert)
-                    try connection.bind(text: timestamp, index: 4, to: insert)
+                    try connection.bind(text: normalizedBlockID, index: 3, to: insert)
+                    try connection.bind(text: tag, index: 4, to: insert)
                     try connection.bind(text: timestamp, index: 5, to: insert)
-                    try connection.bind(text: UUID().uuidString, index: 6, to: insert)
-                    try connection.bind(text: localOwnerID, index: 7, to: insert)
-                    try connection.bind(text: personalVisibility, index: 8, to: insert)
-                    try connection.bind(text: pendingSyncState, index: 9, to: insert)
+                    try connection.bind(text: timestamp, index: 6, to: insert)
+                    try connection.bind(text: UUID().uuidString, index: 7, to: insert)
+                    try connection.bind(text: localOwnerID, index: 8, to: insert)
+                    try connection.bind(text: personalVisibility, index: 9, to: insert)
+                    try connection.bind(text: pendingSyncState, index: 10, to: insert)
                     _ = try connection.step(insert)
                 }
             }
 
             try connection.execute("COMMIT;")
+            var values = ["tags": cleaned.joined(separator: "\n")]
+            if !normalizedBlockID.isEmpty {
+                values["blockID"] = normalizedBlockID
+            }
             enqueueSyncOperationIfPossible(
                 entityType: .tagSet,
                 operationType: .replace,
                 payload: SyncQueuePayload(
                     codeVersion: codeVersion,
                     sectionID: sectionID,
-                    values: ["tags": cleaned.joined(separator: "\n")]
+                    values: values
                 )
             )
         } catch {
@@ -1108,23 +1181,32 @@ final class UserDataStore: UserContentRepository {
         return rows
     }
 
-    /// Removes all tags belonging to a section; called when a bookmark is
-    /// removed entirely so we don't leave orphaned tag rows behind.
+    /// Removes all tags belonging to a section. Empty blockID targets section-level tags.
     func clearTags(sectionID: Int64, codeVersion: String) throws {
+        try clearTags(sectionID: sectionID, blockID: "", codeVersion: codeVersion)
+    }
+
+    func clearTags(sectionID: Int64, blockID: String, codeVersion: String) throws {
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
         let statement = try connection.prepare(
             """
             DELETE FROM bookmark_tags
-            WHERE code_version = ? AND section_id = ?;
+            WHERE code_version = ? AND section_id = ? AND block_id = ?;
             """
         )
         defer { connection.finalize(statement) }
         try connection.bind(text: codeVersion, index: 1, to: statement)
         sqlite3_bind_int64(statement, 2, sectionID)
+        try connection.bind(text: normalizedBlockID, index: 3, to: statement)
         _ = try connection.step(statement)
+        var values: [String: String] = [:]
+        if !normalizedBlockID.isEmpty {
+            values["blockID"] = normalizedBlockID
+        }
         enqueueSyncOperationIfPossible(
             entityType: .tagSet,
             operationType: .delete,
-            payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
+            payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID, values: values)
         )
     }
 
@@ -1139,18 +1221,6 @@ final class UserDataStore: UserContentRepository {
             defer { connection.finalize(statement) }
             try connection.bind(text: codeVersion, index: 1, to: statement)
             _ = try connection.step(statement)
-
-            // Tags belong to bookmarks; remove them as well so the tag filter
-            // doesn't keep showing stale chips.
-            let tagWipe = try connection.prepare(
-                """
-                DELETE FROM bookmark_tags
-                WHERE code_version = ?;
-                """
-            )
-            defer { connection.finalize(tagWipe) }
-            try connection.bind(text: codeVersion, index: 1, to: tagWipe)
-            _ = try connection.step(tagWipe)
 
             // Folder membership references bookmarks. Wipe the junction so
             // folders don't keep ghost section IDs after Clear Bookmarks.
@@ -1647,11 +1717,31 @@ final class UserDataStore: UserContentRepository {
             )
         case .annotation(let record):
             if record.tags != nil {
-                return try localMergeCandidate(
-                    mutation: mutation,
-                    sql: "SELECT sync_state, MAX(updated_at), MAX(deleted_at) FROM bookmark_tags WHERE code_version = ? AND section_id = ?;",
-                    codeVersion: record.codeVersion,
-                    firstID: record.sectionID
+                let statement = try connection.prepare(
+                    """
+                    SELECT MIN(sync_state), MAX(updated_at), MAX(deleted_at)
+                    FROM bookmark_tags
+                    WHERE code_version = ? AND section_id = ? AND block_id = ?;
+                    """
+                )
+                defer { connection.finalize(statement) }
+                try connection.bind(text: record.codeVersion, index: 1, to: statement)
+                sqlite3_bind_int64(statement, 2, record.sectionID)
+                try connection.bind(text: record.normalizedBlockID, index: 3, to: statement)
+
+                guard try connection.step(statement) == SQLITE_ROW else { return nil }
+                let syncStateRaw = connection.stringOrNil(at: 0, in: statement) ?? syncedContentState
+                let updatedAt = connection.stringOrNil(at: 1, in: statement).flatMap { isoFormatter.date(from: $0) }
+                guard updatedAt != nil || connection.stringOrNil(at: 0, in: statement) != nil else { return nil }
+                let deletedAt = connection.stringOrNil(at: 2, in: statement).flatMap { isoFormatter.date(from: $0) }
+                return UserContentMergeCandidate(
+                    recordID: mutation.recordID,
+                    entityKind: mutation.entityKind,
+                    localUpdatedAt: updatedAt,
+                    serverUpdatedAt: mutation.updatedAt,
+                    localDeletedAt: deletedAt,
+                    serverDeletedAt: mutation.deletedAt,
+                    localSyncState: UserContentSyncState(rawValue: syncStateRaw) ?? .synced
                 )
             }
             return try localMergeCandidate(
@@ -1822,7 +1912,6 @@ final class UserDataStore: UserContentRepository {
     private func deleteServerBookmark(sectionID: Int64, codeVersion: String) throws {
         try performTransaction {
             try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
-            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
             try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
         }
     }
@@ -1832,7 +1921,14 @@ final class UserDataStore: UserContentRepository {
             try upsertServerNote(record, body: noteBody)
         }
         if let tags = record.tags {
-            try setServerTags(tags, sectionID: record.sectionID, codeVersion: record.codeVersion, userID: record.userID, updatedAt: record.updatedAt)
+            try setServerTags(
+                tags,
+                sectionID: record.sectionID,
+                blockID: record.normalizedBlockID,
+                codeVersion: record.codeVersion,
+                userID: record.userID,
+                updatedAt: record.updatedAt
+            )
         }
     }
 
@@ -1876,23 +1972,24 @@ final class UserDataStore: UserContentRepository {
         _ = try connection.step(statement)
     }
 
-    private func setServerTags(_ tags: [String], sectionID: Int64, codeVersion: String, userID: String, updatedAt: Date) throws {
+    private func setServerTags(_ tags: [String], sectionID: Int64, blockID: String = "", codeVersion: String, userID: String, updatedAt: Date) throws {
         let cleaned = tags
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
         let timestamp = isoFormatter.string(from: updatedAt)
 
         try performTransaction {
-            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: codeVersion, sectionID: sectionID)
+            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ? AND block_id = ?;", codeVersion: codeVersion, sectionID: sectionID, text: normalizedBlockID)
             guard !cleaned.isEmpty else { return }
 
             let insert = try connection.prepare(
                 """
                 INSERT INTO bookmark_tags (
-                    code_version, section_id, tag, created_at, updated_at, client_id,
+                    code_version, section_id, block_id, tag, created_at, updated_at, client_id,
                     owner_id, visibility, sync_state, deleted_at
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
                 """
             )
             defer { connection.finalize(insert) }
@@ -1901,13 +1998,14 @@ final class UserDataStore: UserContentRepository {
                 sqlite3_clear_bindings(insert)
                 try connection.bind(text: codeVersion, index: 1, to: insert)
                 sqlite3_bind_int64(insert, 2, sectionID)
-                try connection.bind(text: tag, index: 3, to: insert)
-                try connection.bind(text: timestamp, index: 4, to: insert)
+                try connection.bind(text: normalizedBlockID, index: 3, to: insert)
+                try connection.bind(text: tag, index: 4, to: insert)
                 try connection.bind(text: timestamp, index: 5, to: insert)
-                try connection.bind(text: "\(userID):tags:\(codeVersion):\(sectionID):\(tag)", index: 6, to: insert)
-                try connection.bind(text: userID, index: 7, to: insert)
-                try connection.bind(text: personalVisibility, index: 8, to: insert)
-                try connection.bind(text: syncedContentState, index: 9, to: insert)
+                try connection.bind(text: timestamp, index: 6, to: insert)
+                try connection.bind(text: "\(userID):tags:\(codeVersion):\(sectionID):\(normalizedBlockID):\(tag)", index: 7, to: insert)
+                try connection.bind(text: userID, index: 8, to: insert)
+                try connection.bind(text: personalVisibility, index: 9, to: insert)
+                try connection.bind(text: syncedContentState, index: 10, to: insert)
                 _ = try connection.step(insert)
             }
         }
@@ -1926,8 +2024,13 @@ final class UserDataStore: UserContentRepository {
                     text: record.normalizedBlockID
                 )
             }
-            if deletesTags && record.normalizedBlockID.isEmpty {
-                try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+            if deletesTags {
+                try deleteRows(
+                    sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ? AND block_id = ?;",
+                    codeVersion: record.codeVersion,
+                    sectionID: record.sectionID,
+                    text: record.normalizedBlockID
+                )
             }
         }
     }
@@ -2063,7 +2166,6 @@ final class UserDataStore: UserContentRepository {
         switch record.values["scope"] {
         case "bookmarks":
             try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ?;", codeVersion: record.codeVersion)
-            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ?;", codeVersion: record.codeVersion)
             try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: record.codeVersion)
         case "notes":
             try deleteRows(sql: "DELETE FROM notes WHERE code_version = ?;", codeVersion: record.codeVersion)

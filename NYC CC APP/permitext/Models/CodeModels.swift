@@ -576,7 +576,13 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             }
             self = .annotation(
                 ServerAnnotationRecord(
-                    id: Self.recordID(account: account, type: "note", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    id: Self.recordID(
+                        account: account,
+                        type: "note",
+                        codeVersion: payload.codeVersion,
+                        sectionID: sectionID,
+                        blockID: payload.values["blockID"]
+                    ),
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
@@ -593,7 +599,13 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             }
             self = .annotation(
                 ServerAnnotationRecord(
-                    id: Self.recordID(account: account, type: "tags", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    id: Self.recordID(
+                        account: account,
+                        type: "tags",
+                        codeVersion: payload.codeVersion,
+                        sectionID: sectionID,
+                        blockID: payload.values["blockID"]
+                    ),
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
@@ -693,6 +705,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         clientID: String? = nil,
         folderID: Int64? = nil,
         sectionID: Int64? = nil,
+        blockID: String? = nil,
         scope: String? = nil
     ) -> String {
         [
@@ -702,6 +715,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             clientID,
             folderID.map(String.init),
             sectionID.map(String.init),
+            blockID?.trimmingCharacters(in: .whitespacesAndNewlines),
             scope
         ]
         .compactMap { $0 }

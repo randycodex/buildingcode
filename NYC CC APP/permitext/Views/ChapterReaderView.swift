@@ -184,6 +184,7 @@ struct ChapterReaderView: View {
                 accentColor: accentColor,
                 projects: library.folders,
                 projectMemberIDs: Set(library.folderMembership[detail.id] ?? []),
+                initialTags: library.tags(sectionID: detail.id),
                 isBookmarked: library.isBookmarked(sectionID: detail.id),
                 onToggleBookmark: {
                     let isBookmarked = library.toggleBookmark(sectionID: detail.id)
@@ -196,6 +197,11 @@ struct ChapterReaderView: View {
                     } else {
                         library.removeSection(detail.id, fromFolder: project.id)
                     }
+                },
+                onSetTags: { tags in
+                    _ = library.setTags(tags, sectionID: detail.id)
+                    syncVisibleSavedState()
+                    return library.tags(sectionID: detail.id)
                 },
                 onSave: { body in
                     library.saveNote(sectionID: detail.id, body: body)
@@ -763,8 +769,11 @@ struct ChapterNoteSheet: View {
     let accentColor: Color
     let projects: [CodeFolder]
     let projectMemberIDs: Set<Int64>
+    let onSetTags: ([String]) -> [String]
     @State private var isBookmarked: Bool
     @State private var selectedProjectIDs: Set<Int64>
+    @State private var annotationTags: [String]
+    @State private var pendingTag = ""
     let onToggleBookmark: () -> Bool
     let onToggleProject: (CodeFolder, Bool) -> Void
     let onSave: (String) -> Void
@@ -772,6 +781,7 @@ struct ChapterNoteSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isProjectPickerPresented = false
     @FocusState private var isNotesFieldFocused: Bool
+    @FocusState private var isTagFieldFocused: Bool
 
     init(
         detail: ReaderSectionDetail,
@@ -780,9 +790,11 @@ struct ChapterNoteSheet: View {
         accentColor: Color,
         projects: [CodeFolder],
         projectMemberIDs: Set<Int64>,
+        initialTags: [String] = [],
         isBookmarked: Bool,
         onToggleBookmark: @escaping () -> Bool,
         onToggleProject: @escaping (CodeFolder, Bool) -> Void,
+        onSetTags: @escaping ([String]) -> [String] = { $0 },
         onSave: @escaping (String) -> Void
     ) {
         self.detail = detail
@@ -791,8 +803,10 @@ struct ChapterNoteSheet: View {
         self.accentColor = accentColor
         self.projects = projects
         self.projectMemberIDs = projectMemberIDs
+        self.onSetTags = onSetTags
         _isBookmarked = State(initialValue: isBookmarked)
         _selectedProjectIDs = State(initialValue: projectMemberIDs)
+        _annotationTags = State(initialValue: initialTags)
         self.onToggleBookmark = onToggleBookmark
         self.onToggleProject = onToggleProject
         self.onSave = onSave
@@ -838,6 +852,8 @@ struct ChapterNoteSheet: View {
                             .allowsHitTesting(false)
                     }
                 }
+
+                tagsEditor
 
                 Spacer(minLength: 0)
             }
@@ -894,7 +910,88 @@ struct ChapterNoteSheet: View {
 
     private func dismissKeyboard() {
         isNotesFieldFocused = false
+        isTagFieldFocused = false
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    private var tagsEditor: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Tags")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+
+            if annotationTags.isEmpty {
+                Text("No tags")
+                    .font(.footnote)
+                    .foregroundStyle(.tertiary)
+            } else {
+                FlowLayout(spacing: 6) {
+                    ForEach(annotationTags, id: \.self) { tag in
+                        HStack(spacing: 4) {
+                            Text(tag)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(accentColor)
+                            Button {
+                                removeTag(tag)
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(accentColor.opacity(0.75))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(accentColor.opacity(0.12))
+                        )
+                    }
+                }
+            }
+
+            HStack(spacing: 8) {
+                Image(systemName: "tag")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                TextField("Add tag", text: $pendingTag)
+                    .focused($isTagFieldFocused)
+                    .textInputAutocapitalization(.words)
+                    .autocorrectionDisabled()
+                    .submitLabel(.done)
+                    .onSubmit { commitPendingTag() }
+                if !pendingTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Button("Add") {
+                        commitPendingTag()
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(accentColor)
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
+                    .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
+            )
+        }
+    }
+
+    private func commitPendingTag() {
+        let trimmed = pendingTag.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        let updatedTags = annotationTags + [trimmed]
+        annotationTags = onSetTags(updatedTags)
+        pendingTag = ""
+    }
+
+    private func removeTag(_ tag: String) {
+        let updatedTags = annotationTags.filter { $0.caseInsensitiveCompare(tag) != .orderedSame }
+        annotationTags = onSetTags(updatedTags)
     }
 
 }

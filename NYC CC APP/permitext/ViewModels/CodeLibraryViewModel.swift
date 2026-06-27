@@ -1397,7 +1397,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let tagEntries = (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             let bookmarkDates = (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
-            let savedSectionIDs = Array(Set(ids).union(noteEntries.keys)).sorted()
+            let savedSectionIDs = Array(Set(ids).union(noteEntries.keys).union(tagEntries.keys)).sorted()
             if let authoredCodeStore {
                 bookmarks = authoredCodeStore.savedSections(
                     ids: savedSectionIDs,
@@ -2461,9 +2461,19 @@ final class CodeLibraryViewModel: ObservableObject {
         return (try? userContentRepository.tags(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
     }
 
+    func tags(sectionID: Int64, blockID: String) -> [String] {
+        guard let selectedVersion, let userContentRepository else { return [] }
+        return (try? userContentRepository.tags(sectionID: sectionID, blockID: blockID, codeVersion: selectedVersion.codeVersion)) ?? []
+    }
+
     /// Replaces a section's tag set. Empty array clears all tags for it.
     @discardableResult
     func setTags(_ tags: [String], sectionID: Int64) -> Bool {
+        setTags(tags, sectionID: sectionID, blockID: "")
+    }
+
+    @discardableResult
+    func setTags(_ tags: [String], sectionID: Int64, blockID: String) -> Bool {
         guard let selectedVersion, let userContentRepository else { return false }
         do {
             if !tags.isEmpty {
@@ -2471,8 +2481,16 @@ final class CodeLibraryViewModel: ObservableObject {
                     return false
                 }
             }
-            try userContentRepository.setTags(tags, sectionID: sectionID, codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.setTags(
+                tags,
+                sectionID: sectionID,
+                blockID: blockID.trimmingCharacters(in: .whitespacesAndNewlines),
+                codeVersion: selectedVersion.codeVersion
+            )
             refreshBookmarks()
+            if !blockID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                bookmarkRevision &+= 1
+            }
             scheduleUserContentAutoSync()
             return true
         } catch {
