@@ -2607,6 +2607,7 @@ mark {
 
 .project-section-reader > .section-label {
   color: var(--code-accent);
+  font-size: 12px !important;
   font-weight: 700;
 }
 
