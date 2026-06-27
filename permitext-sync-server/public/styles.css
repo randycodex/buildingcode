@@ -2606,6 +2606,10 @@ mark {
   padding: 0 var(--space-4) var(--space-6);
 }
 
+.project-section-reader > .section-label {
+  color: var(--code-accent);
+}
+
 .project-section-reader h3 {
   margin: 0;
   color: var(--text-primary);
@@ -2621,6 +2625,13 @@ mark {
 
 .project-section-body {
   color: var(--text-primary);
+}
+
+.project-section-body > :first-child {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .project-sheet-overlay {
@@ -2815,20 +2826,6 @@ mark {
 
 .saved-section-heading strong {
   color: var(--code-accent);
-}
-
-.saved-bookmark-glyph {
-  display: inline-grid;
-  place-items: center;
-  width: 13px;
-  height: 13px;
-  color: var(--code-accent);
-}
-
-.saved-bookmark-glyph svg {
-  width: 100%;
-  height: 100%;
-  display: block;
 }
 
 .saved-row-button {

@@ -3367,6 +3367,7 @@ async function renderProjectSectionText(content, project, item) {
   const { section } = await resolveSectionDetail(detail);
   const wrapper = document.createElement("section");
   wrapper.className = "project-section-reader";
+  wrapper.classList.add(`code-theme-${codeTheme(detail.codePrefix)}`);
 
   const codeLabel = document.createElement("p");
   codeLabel.className = "section-label";
@@ -3691,18 +3692,11 @@ function renderSavedItemsByCode(content, savedItems) {
         row.className = "saved-row saved-row-button saved-section-row";
         row.type = "button";
         const title = document.createElement("strong");
-        title.textContent = item.sectionNumber || item.sectionID || "Saved";
-        const bookmark = document.createElement("span");
-        bookmark.className = "saved-bookmark-glyph";
-        bookmark.innerHTML = bookmarkIconSVG(true);
+        title.textContent = sectionDisplayTitle(item.sectionNumber || item.sectionID || "", item.title || "");
         const heading = document.createElement("span");
         heading.className = "saved-section-heading";
-        heading.append(title, bookmark);
-        const subtitle = document.createElement("span");
-        subtitle.textContent = item.title || "Saved section";
-        const detail = document.createElement("span");
-        detail.textContent = item.subtitle || item.noteBody || item.title || "Synced saved section";
-        row.append(heading, subtitle, detail);
+        heading.append(title);
+        row.append(heading);
         row.addEventListener("click", () => openSectionDetailForExistingSearch(item));
         codeGroup.append(row);
       });
