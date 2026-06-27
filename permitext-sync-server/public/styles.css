@@ -5,8 +5,8 @@
   --surface-muted: #f7f7fa;
   --surface-raised: rgba(255, 255, 255, 0.92);
   --comment-surface: color-mix(in srgb, #fff2c2 24%, var(--surface));
-  --reader-notes-surface: #cccdce;
-  --reader-notes-input-surface: #eeeeee;
+  --reader-notes-surface: #eeeeee;
+  --reader-notes-input-surface: #ffffff;
   --reader-notes-default-height: 250px;
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
