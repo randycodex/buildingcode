@@ -182,9 +182,21 @@ struct ChapterReaderView: View {
                 detail: detail,
                 noteBody: $noteBody,
                 accentColor: accentColor,
+                projects: library.folders,
+                projectMemberIDs: Set(library.folderMembership[detail.id] ?? []),
                 isBookmarked: library.isBookmarked(sectionID: detail.id),
                 onToggleBookmark: {
-                    library.toggleBookmark(sectionID: detail.id)
+                    let isBookmarked = library.toggleBookmark(sectionID: detail.id)
+                    syncVisibleSavedState()
+                    return isBookmarked
+                },
+                onToggleProject: { project, shouldAdd in
+                    if shouldAdd {
+                        library.addSection(detail.id, toFolder: project.id)
+                    } else {
+                        library.removeSection(detail.id, fromFolder: project.id)
+                    }
+                    syncVisibleSavedState()
                 },
                 onSave: { body in
                     library.saveNote(sectionID: detail.id, body: body)
@@ -749,26 +761,38 @@ struct ChapterNoteSheet: View {
     let detail: ReaderSectionDetail
     @Binding var noteBody: String
     let accentColor: Color
+    let projects: [CodeFolder]
+    let projectMemberIDs: Set<Int64>
     @State private var isBookmarked: Bool
+    @State private var selectedProjectIDs: Set<Int64>
     let onToggleBookmark: () -> Bool
+    let onToggleProject: (CodeFolder, Bool) -> Void
     let onSave: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @State private var isProjectPickerPresented = false
     @FocusState private var isNotesFieldFocused: Bool
 
     init(
         detail: ReaderSectionDetail,
         noteBody: Binding<String>,
         accentColor: Color,
+        projects: [CodeFolder],
+        projectMemberIDs: Set<Int64>,
         isBookmarked: Bool,
         onToggleBookmark: @escaping () -> Bool,
+        onToggleProject: @escaping (CodeFolder, Bool) -> Void,
         onSave: @escaping (String) -> Void
     ) {
         self.detail = detail
         _noteBody = noteBody
         self.accentColor = accentColor
+        self.projects = projects
+        self.projectMemberIDs = projectMemberIDs
         _isBookmarked = State(initialValue: isBookmarked)
+        _selectedProjectIDs = State(initialValue: projectMemberIDs)
         self.onToggleBookmark = onToggleBookmark
+        self.onToggleProject = onToggleProject
         self.onSave = onSave
     }
 
@@ -823,6 +847,11 @@ struct ChapterNoteSheet: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         isBookmarked = onToggleBookmark()
+                        if isBookmarked {
+                            isProjectPickerPresented = true
+                        } else {
+                            selectedProjectIDs.removeAll()
+                        }
                     } label: {
                         Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                             .foregroundStyle(isBookmarked ? accentColor : .secondary)
@@ -837,11 +866,95 @@ struct ChapterNoteSheet: View {
         }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .sheet(isPresented: $isProjectPickerPresented) {
+            ChapterNoteProjectPickerSheet(
+                projects: projects,
+                selectedProjectIDs: selectedProjectIDs,
+                accentColor: accentColor,
+                onToggle: { project in
+                    let shouldAdd = !selectedProjectIDs.contains(project.id)
+                    if shouldAdd {
+                        selectedProjectIDs.insert(project.id)
+                    } else {
+                        selectedProjectIDs.remove(project.id)
+                    }
+                    onToggleProject(project, shouldAdd)
+                }
+            )
+        }
     }
 
     private func dismissKeyboard() {
         isNotesFieldFocused = false
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+
+private struct ChapterNoteProjectPickerSheet: View {
+    let projects: [CodeFolder]
+    let selectedProjectIDs: Set<Int64>
+    let accentColor: Color
+    let onToggle: (CodeFolder) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Save to project") {
+                    if projects.isEmpty {
+                        Text("No projects yet.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(projects) { project in
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                onToggle(project)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Circle()
+                                        .fill(project.color)
+                                        .frame(width: 12, height: 12)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(project.name)
+                                            .foregroundStyle(.primary)
+                                        if !project.address.isEmpty {
+                                            Text(project.address)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(1)
+                                        } else if !project.description.isEmpty {
+                                            Text(project.description)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(1)
+                                        }
+                                    }
+                                    Spacer()
+                                    Image(systemName: selectedProjectIDs.contains(project.id) ? "checkmark.circle.fill" : "circle")
+                                        .font(.title3)
+                                        .foregroundStyle(selectedProjectIDs.contains(project.id) ? project.color : Color.secondary.opacity(0.5))
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Add to project")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .tint(accentColor)
     }
 }
 

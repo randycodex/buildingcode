@@ -360,11 +360,21 @@ struct ChapterHTMLReaderView: View {
                 detail: detail,
                 noteBody: $noteBody,
                 accentColor: accentColor,
+                projects: library.folders,
+                projectMemberIDs: Set(library.folderMembership[detail.id] ?? []),
                 isBookmarked: library.isBookmarked(sectionID: detail.id),
                 onToggleBookmark: {
                     let isBookmarked = library.toggleBookmark(sectionID: detail.id)
                     recomputeSavedDecorations()
                     return isBookmarked
+                },
+                onToggleProject: { project, shouldAdd in
+                    if shouldAdd {
+                        library.addSection(detail.id, toFolder: project.id)
+                    } else {
+                        library.removeSection(detail.id, fromFolder: project.id)
+                    }
+                    recomputeSavedDecorations()
                 },
                 onSave: { body in
                     library.saveNote(sectionID: detail.id, body: body)
