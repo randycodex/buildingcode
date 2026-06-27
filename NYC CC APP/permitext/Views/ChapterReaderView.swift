@@ -774,17 +774,11 @@ struct ChapterNoteSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(detail.displayLabel)
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(detail.chapterTitle)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
+            VStack(alignment: .leading, spacing: 10) {
+                Text(detail.displayLabel)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 ZStack(alignment: .topLeading) {
                     TextEditor(text: $noteBody)
@@ -823,7 +817,7 @@ struct ChapterNoteSheet: View {
                 dismissKeyboard()
             }
             .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
-            .navigationTitle("Notes")
+            .navigationTitle(detail.displayLabel)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
