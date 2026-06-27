@@ -770,7 +770,7 @@ struct ChapterNoteSheet: View {
     let onSave: (String) -> Void
 
     @Environment(\.dismiss) private var dismiss
-    @State private var isProjectPickerPresented = false
+    @State private var isProjectPickerVisible = false
     @FocusState private var isNotesFieldFocused: Bool
 
     init(
@@ -832,6 +832,10 @@ struct ChapterNoteSheet: View {
                     }
                 }
 
+                if isProjectPickerVisible {
+                    projectPicker
+                }
+
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 20)
@@ -848,9 +852,14 @@ struct ChapterNoteSheet: View {
                     Button {
                         isBookmarked = onToggleBookmark()
                         if isBookmarked {
-                            isProjectPickerPresented = true
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                isProjectPickerVisible = true
+                            }
                         } else {
-                            selectedProjectIDs.removeAll()
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                selectedProjectIDs.removeAll()
+                                isProjectPickerVisible = false
+                            }
                         }
                     } label: {
                         Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
@@ -864,97 +873,90 @@ struct ChapterNoteSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents(isProjectPickerVisible ? [.large] : [.medium, .large])
         .presentationDragIndicator(.visible)
-        .sheet(isPresented: $isProjectPickerPresented) {
-            ChapterNoteProjectPickerSheet(
-                projects: projects,
-                selectedProjectIDs: selectedProjectIDs,
-                accentColor: accentColor,
-                onToggle: { project in
-                    let shouldAdd = !selectedProjectIDs.contains(project.id)
-                    if shouldAdd {
-                        selectedProjectIDs.insert(project.id)
-                    } else {
-                        selectedProjectIDs.remove(project.id)
-                    }
-                    onToggleProject(project, shouldAdd)
-                }
-            )
-        }
     }
 
     private func dismissKeyboard() {
         isNotesFieldFocused = false
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
-}
 
-private struct ChapterNoteProjectPickerSheet: View {
-    let projects: [CodeFolder]
-    let selectedProjectIDs: Set<Int64>
-    let accentColor: Color
-    let onToggle: (CodeFolder) -> Void
+    private var projectPicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Save to project")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
 
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("Save to project") {
-                    if projects.isEmpty {
-                        Text("No projects yet.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    } else {
+            if projects.isEmpty {
+                Text("No projects yet.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .background(Color(uiColor: .secondarySystemGroupedBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            } else {
+                ScrollView {
+                    VStack(spacing: 8) {
                         ForEach(projects) { project in
-                            Button {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                onToggle(project)
-                            } label: {
-                                HStack(spacing: 12) {
-                                    Circle()
-                                        .fill(project.color)
-                                        .frame(width: 12, height: 12)
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(project.name)
-                                            .foregroundStyle(.primary)
-                                        if !project.address.isEmpty {
-                                            Text(project.address)
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                                .lineLimit(1)
-                                        } else if !project.description.isEmpty {
-                                            Text(project.description)
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                                .lineLimit(1)
-                                        }
-                                    }
-                                    Spacer()
-                                    Image(systemName: selectedProjectIDs.contains(project.id) ? "checkmark.circle.fill" : "circle")
-                                        .font(.title3)
-                                        .foregroundStyle(selectedProjectIDs.contains(project.id) ? project.color : Color.secondary.opacity(0.5))
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
+                            projectRow(project)
                         }
                     }
                 }
-            }
-            .navigationTitle("Add to project")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .fontWeight(.semibold)
-                }
+                .frame(maxHeight: 190)
             }
         }
-        .presentationDetents([.medium, .large])
-        .tint(accentColor)
+        .transition(.move(edge: .top).combined(with: .opacity))
+    }
+
+    private func projectRow(_ project: CodeFolder) -> some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            let shouldAdd = !selectedProjectIDs.contains(project.id)
+            if shouldAdd {
+                selectedProjectIDs.insert(project.id)
+            } else {
+                selectedProjectIDs.remove(project.id)
+            }
+            onToggleProject(project, shouldAdd)
+        } label: {
+            HStack(spacing: 12) {
+                Circle()
+                    .fill(project.color)
+                    .frame(width: 12, height: 12)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(project.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                    if !project.address.isEmpty {
+                        Text(project.address)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    } else if !project.description.isEmpty {
+                        Text(project.description)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                }
+
+                Spacer()
+
+                Image(systemName: selectedProjectIDs.contains(project.id) ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(selectedProjectIDs.contains(project.id) ? project.color : Color.secondary.opacity(0.5))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color(uiColor: .secondarySystemGroupedBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 }
 
