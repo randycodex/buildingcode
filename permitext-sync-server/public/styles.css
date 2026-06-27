@@ -2398,7 +2398,6 @@ mark {
 .saved-code-group .saved-row {
   padding: var(--space-4) 0;
   border: 0;
-  border-top: 1px solid var(--border);
   border-radius: 0;
   background: transparent;
 }
@@ -2481,7 +2480,7 @@ mark {
 .projects-content > .section-label,
 .saved-content > .section-label {
   padding-top: var(--space-4);
-  border-top: 1px solid var(--border);
+  border-top: 0;
 }
 
 .projects-content > .section-label {
