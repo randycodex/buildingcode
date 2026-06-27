@@ -1596,11 +1596,13 @@ function bindReaderNotesResize(resizer, sheet, panel) {
     sheet.classList.add("is-resizing");
 
     const panelBounds = panel.getBoundingClientRect();
-    const maxHeight = Math.max(220, panelBounds.height - (parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0));
+    const sheetStyles = getComputedStyle(sheet);
+    const minHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-default-height")) || 250;
+    const maxHeight = Math.max(minHeight, panelBounds.height - (parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0));
 
     const resize = (moveEvent) => {
       const height = panelBounds.bottom - moveEvent.clientY;
-      const clampedHeight = Math.min(maxHeight, Math.max(220, height));
+      const clampedHeight = Math.min(maxHeight, Math.max(minHeight, height));
       sheet.style.setProperty("--reader-notes-height", `${clampedHeight}px`);
     };
 
