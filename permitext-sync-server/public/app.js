@@ -63,6 +63,8 @@ function loadWorkspaceState() {
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
+      localSavedItems: Array.isArray(saved.localSavedItems) ? saved.localSavedItems.filter((item) => item && typeof item === "object") : [],
+      localProjectSections: Array.isArray(saved.localProjectSections) ? saved.localProjectSections.filter((item) => item && typeof item === "object") : [],
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
@@ -93,6 +95,8 @@ function loadWorkspaceState() {
       searchQuery: "",
       searchCodeFilters: [],
       localProjects: [],
+      localSavedItems: [],
+      localProjectSections: [],
       archivedProjectIDs: [],
       searchResultReader: null,
       sectionDetail: null,
@@ -1019,6 +1023,40 @@ function summarizeMutations(mutations = []) {
   return { projects, savedItems, annotations, projectSections };
 }
 
+function currentContentSummary() {
+  const summary = syncedContent?.summary || summarizeMutations([]);
+  const summarySavedItems = summary.savedItems || [];
+  const localProjectSavedItems = (state.localProjectSections || [])
+    .filter((item) => item && item.sectionID)
+    .map((item) => ({
+      id: `web-saved-${item.sectionID}`,
+      userID: item.userID || "local-web",
+      codeVersion: item.codeVersion || "nyc-2022",
+      codePrefix: item.codePrefix || "BC",
+      chapterID: item.chapterID || "",
+      chapterNumber: item.chapterNumber || "",
+      sectionID: Number(item.sectionID),
+      sectionNumber: item.sectionNumber || "",
+      title: item.title || "Section",
+      updatedAt: item.updatedAt || new Date().toISOString()
+    }));
+  const localSavedItems = [...(state.localSavedItems || []), ...localProjectSavedItems];
+  return {
+    ...summary,
+    savedItems: [
+      ...summarySavedItems,
+      ...localSavedItems.filter((localItem, index, items) =>
+        items.findIndex((item) => String(item.sectionID) === String(localItem.sectionID)) === index &&
+        !summarySavedItems.some((item) => String(item.sectionID) === String(localItem.sectionID))
+      )
+    ],
+    projectSections: [
+      ...(summary.projectSections || []),
+      ...(state.localProjectSections || [])
+    ]
+  };
+}
+
 async function loadSyncedContent(options = {}) {
   const account = activeAccount();
   if (!account) {
@@ -1078,14 +1116,59 @@ function savedMutationForSection(section) {
   const account = activeAccount();
   const now = new Date().toISOString();
   return {
-    savedItem: {
-      id: `web-saved-${section.sectionID}`,
-      userID: account.userID,
-      codeVersion: "nyc-2022",
-      sectionID: Number(section.sectionID),
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      updatedAt: now
+    savedItem: savedRecordForSection(section, account?.userID || "local-web", now)
+  };
+}
+
+function savedRecordForSection(section, userID = "local-web", updatedAt = new Date().toISOString()) {
+  return {
+    id: `web-saved-${section.sectionID}`,
+    userID,
+    codeVersion: "nyc-2022",
+    codePrefix: section.codePrefix || "BC",
+    chapterID: section.chapterID || "",
+    chapterNumber: section.chapterNumber || "",
+    sectionID: Number(section.sectionID),
+    sectionNumber: section.sectionNumber,
+    title: section.title,
+    updatedAt
+  };
+}
+
+function projectSectionRecordForSection(project, sectionPayload) {
+  const account = activeAccount();
+  const now = new Date().toISOString();
+  const sectionID = String(sectionPayload.sectionID || "");
+  const folderClientID = project.clientID || project.id || project.localFolderID || "";
+  return {
+    id: `web-project-section-${folderClientID}-${sectionID}`,
+    userID: account?.userID || "local-web",
+    codeVersion: "nyc-2022",
+    codePrefix: sectionPayload.codePrefix || "BC",
+    chapterID: sectionPayload.chapterID || "",
+    chapterNumber: sectionPayload.chapterNumber || "",
+    folderClientID,
+    localFolderID: numericLocalFolderID(project) || null,
+    sectionID: Number(sectionID),
+    sectionNumber: sectionPayload.sectionNumber || "",
+    title: sectionPayload.title || "Section",
+    scope: "manual",
+    updatedAt: now
+  };
+}
+
+function projectSectionMutationForSection(project, sectionPayload) {
+  const record = projectSectionRecordForSection(project, sectionPayload);
+  return {
+    projectSection: {
+      id: record.id,
+      userID: record.userID,
+      codeVersion: record.codeVersion,
+      folderClientID: record.folderClientID,
+      localFolderID: record.localFolderID,
+      sectionID: record.sectionID,
+      scope: record.scope,
+      updatedAt: record.updatedAt
     }
   };
 }
@@ -1129,6 +1212,11 @@ function projectColor(project) {
   return project?.color || project?.tintColor || project?.colorHex || projectColorOptions[0];
 }
 
+function numericLocalFolderID(project) {
+  const value = Number(project?.localFolderID);
+  return Number.isInteger(value) && value > 0 ? value : 0;
+}
+
 function projectMutationForRecord(project, accountOverride = null) {
   const account = accountOverride || activeAccount();
   const now = project.updatedAt || new Date().toISOString();
@@ -1137,7 +1225,7 @@ function projectMutationForRecord(project, accountOverride = null) {
     project: {
       id: project.id,
       clientID: project.clientID || project.id,
-      localFolderID: project.localFolderID || project.id,
+      localFolderID: numericLocalFolderID(project),
       userID: account?.userID || "local-web",
       codeVersion: project.codeVersion || "nyc-2022",
       name: project.name || "Project",
@@ -1221,7 +1309,8 @@ function nextProjectName() {
 
 async function createProjectFolder(details = {}) {
   const now = new Date().toISOString();
-  const id = `web-project-${Date.now().toString(36)}`;
+  const localFolderID = Date.now();
+  const id = `web-project-${localFolderID.toString(36)}`;
   const fallbackName = nextProjectName();
   const name = String(details.name || "").trim() || fallbackName;
   const description = String(details.description || "").trim();
@@ -1229,7 +1318,7 @@ async function createProjectFolder(details = {}) {
   const project = {
     id,
     clientID: id,
-    localFolderID: id,
+    localFolderID,
     codeVersion: "nyc-2022",
     name,
     title: name,
@@ -1313,8 +1402,34 @@ function setLocalSectionSaved(sectionID, saved) {
 
 async function persistSectionBookmark(sectionPayload, saved) {
   setLocalSectionSaved(sectionPayload.sectionID, saved);
+  const sectionKey = String(sectionPayload.sectionID || "");
+  if (saved) {
+    const record = savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web");
+    state.localSavedItems = [
+      ...(state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey),
+      record
+    ];
+  } else {
+    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
+  }
+  saveWorkspaceState();
   if (!activeAccount()) return;
   await pushMutation(saved ? savedMutationForSection(sectionPayload) : deletedSavedMutationForSection(sectionPayload));
+  if (saved) {
+    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
+    saveWorkspaceState();
+  }
+}
+
+async function persistSectionInProject(project, sectionPayload) {
+  const record = projectSectionRecordForSection(project, sectionPayload);
+  const current = (state.localProjectSections || []).filter((item) => item.id !== record.id);
+  state.localProjectSections = [...current, record];
+  saveWorkspaceState();
+  if (!activeAccount()) return;
+  await pushMutation(projectSectionMutationForSection(project, sectionPayload));
+  state.localProjectSections = (state.localProjectSections || []).filter((item) => item.id !== record.id);
+  saveWorkspaceState();
 }
 
 async function populateReaderSelectors(panel, reader) {
@@ -1592,6 +1707,47 @@ function ensureReaderNotesSheet(panel, reader) {
   return sheet;
 }
 
+function removeReaderNotesProjectPicker(sheet) {
+  sheet?.querySelector(".reader-notes-project-picker")?.remove();
+}
+
+function showReaderNotesProjectPicker(sheet, sectionPayload) {
+  removeReaderNotesProjectPicker(sheet);
+  const projects = activeProjectRecords(projectRecordsFromMutations(syncedContent?.mutations || []));
+  const picker = document.createElement("section");
+  picker.className = "reader-notes-project-picker";
+  picker.setAttribute("aria-label", "Choose project folder");
+
+  if (!projects.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "Create a project folder first.";
+    picker.append(empty);
+  } else {
+    projects.forEach((project) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = project.name || project.title || "Project";
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        try {
+          await persistSectionBookmark(sectionPayload, true);
+          await persistSectionInProject(project, sectionPayload);
+          syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+          removeReaderNotesProjectPicker(sheet);
+          await renderWorkspace();
+        } catch (error) {
+          button.disabled = false;
+          button.title = error.message || "Could not save to project.";
+        }
+      });
+      picker.append(button);
+    });
+  }
+
+  const header = sheet.querySelector(".reader-notes-header");
+  header?.insertAdjacentElement("afterend", picker);
+}
+
 function bindReaderNotesResize(resizer, sheet, panel) {
   resizer.addEventListener("pointerdown", (event) => {
     if (!sheet.classList.contains("is-open")) return;
@@ -1657,7 +1813,10 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const sectionPayload = {
     sectionID: section.id,
     sectionNumber: section.sectionNumber,
-    title: section.title
+    title: section.title,
+    codePrefix: reader?.codePrefix || "BC",
+    chapterID: reader?.chapterID || "",
+    chapterNumber: section.chapterNumber || ""
   };
   if (bookmarkButton) {
     bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Remove bookmark" : "Save bookmark"}</span>`;
@@ -1668,6 +1827,11 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
       bookmarkButton.disabled = true;
       bookmarkButton.classList.remove("has-error");
       const shouldRemove = bookmarkButton.classList.contains("is-saved");
+      if (!shouldRemove && visibleProjectRecords(projectRecordsFromMutations(syncedContent?.mutations || [])).length) {
+        bookmarkButton.disabled = false;
+        showReaderNotesProjectPicker(sheet, sectionPayload);
+        return;
+      }
       bookmarkButton.classList.toggle("is-saved", !shouldRemove);
       bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
       bookmarkButton.setAttribute("aria-label", shouldRemove ? "Save bookmark" : "Remove bookmark");
@@ -1695,6 +1859,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const input = sheet.querySelector(".reader-notes-input");
   sheet.dataset.sectionId = sectionID;
   if (!wasOpen) sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
+  removeReaderNotesProjectPicker(sheet);
   title.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
   input.value = noteValueForSection(section.id);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
@@ -2922,7 +3087,7 @@ async function renderProjects() {
     if (projects.length === 0) {
       appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
     } else {
-      renderProjectRows(content, projects, [], { mode: "projects" });
+      renderProjectRows(content, projects, currentContentSummary().projectSections, { mode: "projects" });
     }
     return panel;
   }
@@ -2931,7 +3096,7 @@ async function renderProjects() {
     return panel;
   }
 
-  const { projects, projectSections } = data.summary;
+  const { projects, projectSections } = currentContentSummary();
   const visibleProjects = activeProjectRecords(projects);
   if (visibleProjects.length === 0) {
     appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
@@ -2977,7 +3142,7 @@ async function renderArchive() {
   if (projects.length === 0) {
     appendProjectEmptyCard(content, "No archived projects", "Archived project folders will appear here.");
   } else {
-    renderProjectRows(content, projects, data.summary?.projectSections || [], { mode: "archive" });
+    renderProjectRows(content, projects, currentContentSummary().projectSections || [], { mode: "archive" });
   }
   return panel;
 }
@@ -3091,12 +3256,16 @@ async function renderProjectDetail(detail) {
   const projects = visibleProjectRecords(data.summary?.projects || []);
   const project = projects.find((item) => projectDetailMatches(item, detail)) || detail;
   const identity = projectIdentity(project);
-  const projectSections = data.summary?.projectSections || [];
-  const savedItems = data.summary?.savedItems || [];
+  const summary = currentContentSummary();
+  const projectSections = summary.projectSections || [];
+  const savedItems = summary.savedItems || [];
   const sectionLinks = projectSections.filter((item) => projectSectionBelongsToProject(item, identity));
   const savedBySectionID = new Map(savedItems.map((item) => [String(item.sectionID || item.id || ""), item]));
   const linkedSavedItems = sectionLinks
-    .map((link) => savedBySectionID.get(String(link.sectionID || link.savedSectionID || link.itemID || "")) || link)
+    .map((link) => ({
+      ...link,
+      ...(savedBySectionID.get(String(link.sectionID || link.savedSectionID || link.itemID || "")) || {})
+    }))
     .filter(Boolean);
 
   const panel = document.createElement("article");
@@ -3135,6 +3304,20 @@ async function renderProjectDetail(detail) {
   const content = document.createElement("section");
   content.className = "project-detail-content";
 
+  if (detail.selectedSection) {
+    await renderProjectSectionText(content, identity, detail.selectedSection);
+    backButton.addEventListener("click", () => {
+      setOpenProjectDetails(openProjectDetails().map((item) =>
+        projectDetailMatches(identity, item) ? { ...item, selectedSection: null } : item
+      ));
+      state.paneOrder = state.paneOrder || [];
+      saveWorkspaceState();
+      renderWorkspace();
+    });
+    panel.append(chrome, content);
+    return panel;
+  }
+
   const savedSection = document.createElement("section");
   savedSection.className = "project-detail-section";
 
@@ -3145,9 +3328,14 @@ async function renderProjectDetail(detail) {
     const rowTitle = document.createElement("strong");
     rowTitle.textContent = item.sectionNumber || item.sectionID || "Saved";
     const rowBody = document.createElement("span");
-    rowBody.textContent = item.title || item.subtitle || "Saved section";
+    rowBody.textContent = [
+      codeDisplayLabel(item.codePrefix || "BC"),
+      item.chapterNumber ? `Chapter ${item.chapterNumber}` : "",
+      item.sectionNumber || item.sectionID || "",
+      item.title || item.subtitle || "Saved section"
+    ].filter(Boolean).join(" · ");
     row.append(rowTitle, rowBody);
-    row.addEventListener("click", () => openSectionDetailForExistingSearch(item));
+    row.addEventListener("click", () => openProjectSavedSection(identity, item));
     savedSection.append(row);
   });
 
@@ -3163,6 +3351,56 @@ async function renderProjectDetail(detail) {
   content.append(savedSection);
   panel.append(chrome, content);
   return panel;
+}
+
+async function renderProjectSectionText(content, project, item) {
+  const detail = {
+    codePrefix: item.codePrefix || "BC",
+    chapterID: item.chapterID || "",
+    chapterNumber: item.chapterNumber || "",
+    sectionID: String(item.sectionID || item.savedSectionID || item.itemID || ""),
+    sectionNumber: item.sectionNumber || "",
+    title: item.title || "Section",
+    headerLine: item.headerLine || "",
+    headingLine: item.headingLine || ""
+  };
+  const { section } = await resolveSectionDetail(detail);
+  const wrapper = document.createElement("section");
+  wrapper.className = "project-section-reader";
+
+  const codeLabel = document.createElement("p");
+  codeLabel.className = "section-label";
+  codeLabel.textContent = codeDisplayLabel(detail.codePrefix);
+
+  const chapterLabel = document.createElement("p");
+  chapterLabel.className = "project-section-chapter";
+  chapterLabel.textContent = detail.chapterNumber ? `Chapter ${detail.chapterNumber}` : "";
+
+  const title = document.createElement("h3");
+  title.textContent = sectionDisplayTitle(section?.sectionNumber || detail.sectionNumber, section?.title || detail.title);
+
+  const body = document.createElement("section");
+  body.className = "project-section-body";
+  if (section?.blocks?.length) {
+    section.blocks.forEach((block) => body.append(renderCodeBlock(block)));
+  } else {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = sectionPlainText(section) || detail.title;
+    body.append(paragraph);
+  }
+
+  wrapper.append(codeLabel);
+  if (chapterLabel.textContent) wrapper.append(chapterLabel);
+  wrapper.append(title, body);
+  content.append(wrapper);
+}
+
+function openProjectSavedSection(project, item) {
+  setOpenProjectDetails(openProjectDetails().map((detail) =>
+    projectDetailMatches(project, detail) ? { ...detail, selectedSection: item } : detail
+  ));
+  saveWorkspaceState();
+  renderWorkspace();
 }
 
 function showProjectCreateSheet(panel, project = null) {
@@ -3379,17 +3617,18 @@ async function renderSaved(paneID = "utility:saved") {
   const content = panel.querySelector(".saved-content");
   clear(content);
   const data = await loadSyncedContent();
+  const summary = currentContentSummary();
 
-  if (data.status === "disconnected") {
+  if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Connect Web Sync", "Open Settings and connect an account ID plus session token to show synced projects, bookmarks, tags, and notes.");
     return panel;
   }
-  if (data.status === "error") {
+  if (data.status === "error" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Sync error", data.error || "Could not load saved content.");
     return panel;
   }
 
-  const { savedItems, annotations } = data.summary;
+  const { savedItems, annotations } = summary;
 
   appendSectionLabel(content, "Saved sections");
   if (savedItems.length === 0) {
@@ -3455,7 +3694,7 @@ function renderSavedItemsByCode(content, savedItems) {
         title.textContent = item.sectionNumber || item.sectionID || "Saved";
         const bookmark = document.createElement("span");
         bookmark.className = "saved-bookmark-glyph";
-        bookmark.textContent = "▮";
+        bookmark.innerHTML = bookmarkIconSVG(true);
         const heading = document.createElement("span");
         heading.className = "saved-section-heading";
         heading.append(title, bookmark);
