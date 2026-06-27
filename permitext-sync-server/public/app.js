@@ -4169,12 +4169,17 @@ function renderSettings() {
   const tokenInput = panel.querySelector(".account-session-token");
   const connectButton = panel.querySelector(".account-save");
   const disconnectButton = panel.querySelector(".account-clear");
+  const checkoutButton = panel.querySelector(".account-checkout");
   const status = panel.querySelector(".connector-status");
+  const syncCheckoutState = () => {
+    checkoutButton.disabled = !activeAccount();
+  };
   userInput.value = state.account?.userID || "";
   tokenInput.value = state.account?.sessionToken || "";
   status.textContent = activeAccount()
     ? `Connected locally as ${state.account.userID}.`
     : "Not connected in this browser.";
+  syncCheckoutState();
   connectButton.addEventListener("click", async () => {
     state.account = {
       userID: userInput.value.trim(),
@@ -4184,6 +4189,7 @@ function renderSettings() {
     saveWorkspaceState();
     status.textContent = "Checking sync...";
     await loadSyncedContent({ force: true });
+    syncCheckoutState();
     renderWorkspace();
   });
   disconnectButton.addEventListener("click", () => {
@@ -4191,6 +4197,26 @@ function renderSettings() {
     syncedContent = null;
     saveWorkspaceState();
     renderWorkspace();
+  });
+  checkoutButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account) {
+      status.textContent = "Connect Web Sync before opening checkout.";
+      syncCheckoutState();
+      return;
+    }
+    checkoutButton.disabled = true;
+    status.textContent = "Opening checkout...";
+    try {
+      const payload = await postJSON("/billing/web/checkout", {
+        auth: { accountUserID: account.userID }
+      }, { token: account.sessionToken });
+      if (!payload.url) throw new Error("Checkout did not return a URL.");
+      window.location.href = payload.url;
+    } catch (error) {
+      status.textContent = error.message || "Could not open checkout.";
+      syncCheckoutState();
+    }
   });
   return panel;
 }
