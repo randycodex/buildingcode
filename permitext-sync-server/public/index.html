@@ -305,17 +305,13 @@
         </section>
         <section class="account-connector">
           <p class="section-label">Web Sync</p>
-          <p>Connect this browser to an existing backend account to show synced projects, saved sections, tags, and notes.</p>
-          <label>
-            Account ID
-            <input class="account-user-id" type="text" autocomplete="off" placeholder="apple:...">
-          </label>
-          <label>
-            Session token
-            <input class="account-session-token" type="password" autocomplete="off" placeholder="backend session token">
-          </label>
+          <p>Sign in to sync projects, saved sections, tags, and notes on this browser.</p>
+          <div class="account-summary" hidden>
+            <span>Signed in as</span>
+            <strong class="account-display-name"></strong>
+          </div>
           <div class="connector-actions">
-            <button class="ghost-button account-save" type="button">Connect</button>
+            <button class="ghost-button account-sign-in" type="button">Sign in</button>
             <button class="ghost-button account-clear" type="button">Disconnect</button>
             <button class="ghost-button account-checkout" type="button">Upgrade to Pro</button>
           </div>

@@ -1011,6 +1011,43 @@ function activeAccount() {
   return userID && sessionToken ? { userID, sessionToken } : null;
 }
 
+function browserCredentialID() {
+  const existing = typeof state.browserCredentialID === "string" ? state.browserCredentialID.trim() : "";
+  if (existing) return existing;
+  state.browserCredentialID = crypto.randomUUID();
+  saveWorkspaceState();
+  return state.browserCredentialID;
+}
+
+function accountDisplayName(account = state.account) {
+  return account?.displayName || account?.userID || "this browser";
+}
+
+async function signInCurrentBrowser() {
+  const payload = await postJSON("/account/sign-in", {
+    credential: {
+      provider: "web",
+      providerUserID: browserCredentialID(),
+      displayName: "Web browser",
+      signedInAt: new Date().toISOString()
+    }
+  });
+  const account = payload.account;
+  if (!account?.appUserID || !account?.backendSessionToken) {
+    throw new Error("Sign in did not return a backend session.");
+  }
+  state.account = {
+    userID: account.appUserID,
+    sessionToken: account.backendSessionToken,
+    authProvider: account.authProvider || "web",
+    displayName: account.displayName || "Web browser"
+  };
+  syncedContent = null;
+  saveWorkspaceState();
+  await loadSyncedContent({ force: true });
+  return state.account;
+}
+
 function mutationKindAndRecord(mutation) {
   const [kind, record] = Object.entries(mutation || {})[0] || [];
   return { kind, record };
@@ -1117,7 +1154,7 @@ async function loadSyncedContent(options = {}) {
 async function pushMutation(mutation) {
   const account = activeAccount();
   if (!account) {
-    throw new Error("Connect Web Sync in Settings before saving from the web.");
+    throw new Error("Sign in from Settings before saving from the web.");
   }
   const payload = await postJSON("/sync/push", {
     auth: { accountUserID: account.userID },
@@ -1495,7 +1532,7 @@ async function removeSectionFromProject(project, item) {
   if (!wasLocal && activeAccount()) {
     await pushMutation(deletedProjectSectionMutationForItem(project, item));
   } else if (!activeAccount() && !wasLocal) {
-    window.alert("Connect Web Sync before removing a synced project section.");
+    window.alert("Sign in from Settings before removing a synced project section.");
   }
 }
 
@@ -4032,7 +4069,7 @@ async function renderSaved(paneID = "utility:saved") {
   const summary = currentContentSummary();
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
-    appendEmptySaved(content, "Connect Web Sync", "Open Settings and connect an account ID plus session token to show synced projects, bookmarks, tags, and notes.");
+    appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced projects, bookmarks, tags, and notes.");
     return panel;
   }
   if (data.status === "error" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
@@ -4165,32 +4202,36 @@ function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
   wireReaderSettingsControls(panel);
-  const userInput = panel.querySelector(".account-user-id");
-  const tokenInput = panel.querySelector(".account-session-token");
-  const connectButton = panel.querySelector(".account-save");
+  const summary = panel.querySelector(".account-summary");
+  const displayName = panel.querySelector(".account-display-name");
+  const signInButton = panel.querySelector(".account-sign-in");
   const disconnectButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
   const status = panel.querySelector(".connector-status");
-  const syncCheckoutState = () => {
-    checkoutButton.disabled = !activeAccount();
+  const syncAccountState = () => {
+    const account = activeAccount();
+    checkoutButton.disabled = !account;
+    disconnectButton.disabled = !account;
+    signInButton.hidden = Boolean(account);
+    disconnectButton.hidden = !account;
+    summary.hidden = !account;
+    displayName.textContent = account ? accountDisplayName() : "";
   };
-  userInput.value = state.account?.userID || "";
-  tokenInput.value = state.account?.sessionToken || "";
   status.textContent = activeAccount()
-    ? `Connected locally as ${state.account.userID}.`
-    : "Not connected in this browser.";
-  syncCheckoutState();
-  connectButton.addEventListener("click", async () => {
-    state.account = {
-      userID: userInput.value.trim(),
-      sessionToken: tokenInput.value.trim()
-    };
-    syncedContent = null;
-    saveWorkspaceState();
-    status.textContent = "Checking sync...";
-    await loadSyncedContent({ force: true });
-    syncCheckoutState();
-    renderWorkspace();
+    ? "Connected. Sync and checkout are ready for this browser."
+    : "Not signed in on this browser.";
+  syncAccountState();
+  signInButton.addEventListener("click", async () => {
+    signInButton.disabled = true;
+    status.textContent = "Signing in...";
+    try {
+      await signInCurrentBrowser();
+      renderWorkspace();
+    } catch (error) {
+      status.textContent = error.message || "Could not sign in.";
+      signInButton.disabled = false;
+      syncAccountState();
+    }
   });
   disconnectButton.addEventListener("click", () => {
     state.account = null;
@@ -4201,8 +4242,8 @@ function renderSettings() {
   checkoutButton.addEventListener("click", async () => {
     const account = activeAccount();
     if (!account) {
-      status.textContent = "Connect Web Sync before opening checkout.";
-      syncCheckoutState();
+      status.textContent = "Sign in before opening checkout.";
+      syncAccountState();
       return;
     }
     checkoutButton.disabled = true;
@@ -4215,7 +4256,7 @@ function renderSettings() {
       window.location.href = payload.url;
     } catch (error) {
       status.textContent = error.message || "Could not open checkout.";
-      syncCheckoutState();
+      syncAccountState();
     }
   });
   return panel;
