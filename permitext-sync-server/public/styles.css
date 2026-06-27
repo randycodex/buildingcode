@@ -137,10 +137,23 @@ button {
 
 body.is-resizing-comments,
 body.is-resizing-comments *,
+body.is-resizing-notes,
+body.is-resizing-notes *,
+.panel-track.is-resizing,
+.panel-track.is-resizing * {
+  user-select: none;
+}
+
+body.is-resizing-comments,
+body.is-resizing-comments *,
 .panel-track.is-resizing,
 .panel-track.is-resizing * {
   cursor: col-resize !important;
-  user-select: none;
+}
+
+body.is-resizing-notes,
+body.is-resizing-notes * {
+  cursor: ns-resize !important;
 }
 
 button:focus-visible,
@@ -1505,9 +1518,9 @@ select option:checked {
   left: 0;
   z-index: 18;
   display: flex;
-  height: calc((100% - var(--reader-scrollbar-track-top)) / 3);
+  height: var(--reader-notes-height, calc((100% - var(--reader-scrollbar-track-top)) / 3));
   min-height: 220px;
-  max-height: 34%;
+  max-height: calc(100% - var(--reader-scrollbar-track-top));
   padding: var(--space-4);
   flex-direction: column;
   gap: var(--space-4);
@@ -1518,11 +1531,6 @@ select option:checked {
   opacity: 0;
   transform: translateY(18px);
   transition: opacity 220ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.reader-notes-sheet.is-expanded {
-  height: min(68%, calc(100% - var(--reader-scrollbar-track-top)));
-  max-height: calc(100% - var(--reader-scrollbar-track-top));
 }
 
 .reader-notes-sheet[hidden] {
@@ -1536,6 +1544,35 @@ select option:checked {
 
 .reader-notes-sheet.is-restoring {
   transition: none;
+}
+
+.reader-notes-sheet.is-resizing {
+  transition: none;
+}
+
+.reader-notes-resizer {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  left: 0;
+  height: 12px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.reader-notes-resizer::before {
+  position: absolute;
+  top: 5px;
+  right: 0;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: transparent;
+}
+
+.reader-notes-resizer:hover::before,
+.reader-notes-resizer.is-dragging::before {
+  background: color-mix(in srgb, var(--text-primary) 22%, transparent);
 }
 
 .reader-notes-header {
@@ -1559,7 +1596,6 @@ select option:checked {
 }
 
 .reader-notes-bookmark,
-.reader-notes-expand,
 .reader-notes-done {
   display: grid;
   place-items: center;
@@ -1580,7 +1616,6 @@ select option:checked {
   gap: var(--space-1);
 }
 
-.reader-notes-expand svg,
 .reader-notes-bookmark svg {
   width: 18px;
   height: 18px;
@@ -1633,7 +1668,7 @@ select option:checked {
     right: var(--space-2);
     bottom: 0;
     left: var(--space-2);
-    height: 34%;
+    height: var(--reader-notes-height, 34%);
     min-height: 220px;
     padding: var(--space-4) var(--space-3);
   }

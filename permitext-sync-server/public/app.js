@@ -1544,6 +1544,12 @@ function ensureReaderNotesSheet(panel, reader) {
   sheet.className = "reader-notes-sheet";
   sheet.hidden = true;
 
+  const resizer = document.createElement("div");
+  resizer.className = "reader-notes-resizer";
+  resizer.setAttribute("role", "separator");
+  resizer.setAttribute("aria-orientation", "horizontal");
+  resizer.setAttribute("aria-label", "Resize note card");
+
   const header = document.createElement("header");
   header.className = "reader-notes-header";
 
@@ -1554,28 +1560,6 @@ function ensureReaderNotesSheet(panel, reader) {
   const title = document.createElement("h2");
   title.className = "reader-notes-title";
 
-  const expandButton = document.createElement("button");
-  expandButton.className = "reader-notes-expand";
-  expandButton.type = "button";
-  expandButton.setAttribute("aria-label", "Expand note card");
-  expandButton.setAttribute("aria-pressed", "false");
-  expandButton.title = "Expand note card";
-  expandButton.innerHTML = `
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M8 3H5a2 2 0 0 0-2 2v3"></path>
-      <path d="M16 3h3a2 2 0 0 1 2 2v3"></path>
-      <path d="M8 21H5a2 2 0 0 1-2-2v-3"></path>
-      <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
-    </svg>
-  `;
-  expandButton.addEventListener("click", () => {
-    const expanded = !sheet.classList.contains("is-expanded");
-    sheet.classList.toggle("is-expanded", expanded);
-    expandButton.setAttribute("aria-pressed", String(expanded));
-    expandButton.setAttribute("aria-label", expanded ? "Collapse note card" : "Expand note card");
-    expandButton.title = expanded ? "Collapse note card" : "Expand note card";
-  });
-
   const doneButton = document.createElement("button");
   doneButton.className = "reader-notes-done";
   doneButton.type = "button";
@@ -1584,7 +1568,7 @@ function ensureReaderNotesSheet(panel, reader) {
 
   const actions = document.createElement("div");
   actions.className = "reader-notes-actions";
-  actions.append(expandButton, doneButton);
+  actions.append(doneButton);
 
   header.append(bookmarkButton, title, actions);
 
@@ -1597,9 +1581,43 @@ function ensureReaderNotesSheet(panel, reader) {
     syncReaderNoteControls(sectionID, input.value, { source: input });
   });
 
-  sheet.append(header, input);
+  bindReaderNotesResize(resizer, sheet, panel);
+  sheet.append(resizer, header, input);
   panel.append(sheet);
   return sheet;
+}
+
+function bindReaderNotesResize(resizer, sheet, panel) {
+  resizer.addEventListener("pointerdown", (event) => {
+    if (!sheet.classList.contains("is-open")) return;
+    event.preventDefault();
+    resizer.classList.add("is-dragging");
+    document.body.classList.add("is-resizing-notes");
+    sheet.classList.add("is-resizing");
+
+    const panelBounds = panel.getBoundingClientRect();
+    const maxHeight = Math.max(220, panelBounds.height - (parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0));
+
+    const resize = (moveEvent) => {
+      const height = panelBounds.bottom - moveEvent.clientY;
+      const clampedHeight = Math.min(maxHeight, Math.max(220, height));
+      sheet.style.setProperty("--reader-notes-height", `${clampedHeight}px`);
+    };
+
+    const stopResize = () => {
+      resizer.classList.remove("is-dragging");
+      document.body.classList.remove("is-resizing-notes");
+      sheet.classList.remove("is-resizing");
+      window.removeEventListener("pointermove", resize);
+      window.removeEventListener("pointerup", stopResize);
+      window.removeEventListener("pointercancel", stopResize);
+    };
+
+    resize(event);
+    window.addEventListener("pointermove", resize);
+    window.addEventListener("pointerup", stopResize);
+    window.addEventListener("pointercancel", stopResize);
+  });
 }
 
 function toggleReaderNotesSheet(panel, section, reader) {
@@ -1668,13 +1686,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const title = sheet.querySelector(".reader-notes-title");
   const input = sheet.querySelector(".reader-notes-input");
   sheet.dataset.sectionId = sectionID;
-  sheet.classList.remove("is-expanded");
-  const expandButton = sheet.querySelector(".reader-notes-expand");
-  if (expandButton) {
-    expandButton.setAttribute("aria-pressed", "false");
-    expandButton.setAttribute("aria-label", "Expand note card");
-    expandButton.title = "Expand note card";
-  }
+  sheet.style.removeProperty("--reader-notes-height");
   title.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
   input.value = noteValueForSection(section.id);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
