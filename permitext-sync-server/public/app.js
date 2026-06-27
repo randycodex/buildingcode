@@ -29,6 +29,7 @@ const defaultReaderPaneWidth = 520;
 const defaultUtilityPaneWidth = 320;
 const defaultDetailPaneWidth = 320;
 const defaultSettingsPaneWidth = 340;
+const readerSearchFlashDurationMS = 2000;
 const repeatableUtilityKeys = new Set(["search", "saved", "analysis"]);
 
 const defaultReaderSettings = {
@@ -227,7 +228,17 @@ function defaultPaneWidthForID(paneID) {
 }
 
 function isFixedWidthPaneID(paneID) {
-  return paneID?.startsWith("utility:") || paneID === paneIDForProjectDetail() || paneID?.startsWith("section:detail:");
+  return paneID?.startsWith("utility:") ||
+    paneID === paneIDForProjectDetail() ||
+    paneID?.startsWith("section:detail:");
+}
+
+function isFixedWidthReaderPaneID(paneID) {
+  if (!paneID?.startsWith("reader:")) return false;
+  const readerCount = (state.readers || []).length;
+  if (readerCount > 3) return true;
+  const hasSideColumns = activePaneIDs().some((id) => !id.startsWith("reader:"));
+  return readerCount >= 2 && hasSideColumns;
 }
 
 function linkedReaderPaneIDForSearch(searchID) {
@@ -416,6 +427,44 @@ function placeProjectDetailAfterProjects() {
   state.paneOrder = ordered;
 }
 
+function placeArchiveAfterProjectsStack() {
+  const archiveID = "utility:archive";
+  const activeIDs = defaultActivePaneIDs().filter((id) => id !== archiveID);
+  const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== archiveID);
+  activeIDs.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  const projectIndex = ordered.indexOf("utility:projects");
+  const insertIndex = projectIndex === -1 ? 0 : projectIndex + 1;
+  ordered.splice(insertIndex, 0, archiveID);
+  state.paneOrder = ordered;
+}
+
+async function openArchiveAfterProjectsStack() {
+  state.utilities.archive = true;
+  state.paneWeights["utility:archive"] = defaultPaneWidthForID("utility:archive");
+  placeArchiveAfterProjectsStack();
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  scrollPaneIntoView("utility:archive");
+}
+
+async function toggleArchiveAfterProjectsStack() {
+  if (state.utilities.archive) {
+    await closeArchiveColumn();
+    return;
+  }
+  await openArchiveAfterProjectsStack();
+}
+
+async function closeArchiveColumn() {
+  state.utilities.archive = false;
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:archive");
+  delete state.paneWeights["utility:archive"];
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+}
+
 function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
   state.paneWeights = ids.reduce((weights, id) => {
@@ -431,8 +480,12 @@ function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
   const value = Number(state.paneWeights[paneID]);
   const width = Number.isFinite(value) && value > 40 ? value : defaultPaneWidthForID(paneID);
-  if (isFixedWidthPaneID(paneID)) {
+  if (isFixedWidthPaneID(paneID) || isFixedWidthReaderPaneID(paneID)) {
     panel.style.flex = `0 0 ${width}px`;
+    return;
+  }
+  if (paneID?.startsWith("reader:")) {
+    panel.style.flex = `${Math.max(1, width)} 1 0`;
     return;
   }
   panel.style.flex = `1 1 ${width}px`;
@@ -441,7 +494,7 @@ function applyPaneWeight(panel, paneID) {
 function setUtilityButtonStates() {
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   toggleProjectsButton.setAttribute("aria-pressed", String(state.utilities.projects));
-  toggleArchiveButton.setAttribute("aria-pressed", String(state.utilities.archive));
+  toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("analysis")));
@@ -592,9 +645,81 @@ function appendHighlighted(container, text, query) {
   }
 }
 
+function shouldSkipSearchHighlightNode(node) {
+  const parent = node?.parentElement;
+  if (!parent) return true;
+  return Boolean(parent.closest("button, input, textarea, select, mark, .inline-comment"));
+}
+
+function scrollReaderContentToNode(content, target, behavior = "auto") {
+  if (!content || !target) return;
+  const contentRect = content.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const panel = content.closest(".reader-panel");
+  const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
+  const offset = Number.isFinite(headerOffset) ? headerOffset : 0;
+  const targetTop = content.scrollTop + targetRect.top - contentRect.top - offset;
+  content.scrollTo({
+    top: Math.max(0, targetTop),
+    behavior
+  });
+}
+
+function flashSearchMatchInSection(content, sectionID, sectionNumber, query) {
+  const needle = String(query || "").trim();
+  if (!content || needle.length < 2) return;
+  const idSelector = sectionID ? `[data-section-id="${CSS.escape(String(sectionID))}"]` : "";
+  const numberSelector = sectionNumber ? `[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
+  const section = (idSelector ? content.querySelector(idSelector) : null) ||
+    (numberSelector ? content.querySelector(numberSelector) : null);
+  if (!section) return;
+
+  const lowerNeedle = needle.toLowerCase();
+  const walker = document.createTreeWalker(section, window.NodeFilter?.SHOW_TEXT || 4);
+  let node = walker.nextNode();
+  while (node) {
+    const value = node.nodeValue || "";
+    const index = value.toLowerCase().indexOf(lowerNeedle);
+    if (index >= 0 && !shouldSkipSearchHighlightNode(node)) {
+      const range = document.createRange();
+      range.setStart(node, index);
+      range.setEnd(node, index + needle.length);
+      const mark = document.createElement("mark");
+      mark.className = "reader-search-match reader-search-flash";
+      mark.dataset.flashCreatedAt = String(Date.now());
+      range.surroundContents(mark);
+
+      const contentRect = content.getBoundingClientRect();
+      const markRect = mark.getBoundingClientRect();
+      const panel = content.closest(".reader-panel");
+      const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
+      const visibleTop = contentRect.top + (Number.isFinite(headerOffset) ? headerOffset : 0);
+      if (markRect.top < visibleTop || markRect.bottom > contentRect.bottom) {
+        scrollReaderContentToNode(content, mark, "smooth");
+      }
+
+      window.setTimeout(() => {
+        mark.replaceWith(textNode(mark.textContent || ""));
+        section.normalize();
+      }, readerSearchFlashDurationMS);
+      return;
+    }
+    node = walker.nextNode();
+  }
+}
+
+function stripLeadingSectionNumber(value, sectionNumber) {
+  let text = String(value || "").trim();
+  const number = String(sectionNumber || "").trim();
+  if (!text || !number) return text;
+  const numberPattern = new RegExp(`^(?:\\.\\.\\.\\s*)?(?:§\\s*)?${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i");
+  return text.replace(numberPattern, (match) => match.startsWith("...") ? "..." : "").trim();
+}
+
 function snippetWithoutDuplicateTitle(result) {
   let snippet = String(result?.snippet || "").trim();
   if (!snippet) return "";
+  snippet = stripLeadingSectionNumber(snippet, result?.sectionNumber);
   const title = String(result?.title || result?.headingLine || "").trim();
   const displayedTitle = sectionDisplayTitle(result?.sectionNumber, title, "").trim();
   [displayedTitle, title].filter(Boolean).forEach((candidate) => {
@@ -1209,6 +1334,14 @@ async function renderSectionContent(panel, reader) {
     requestAnimationFrame(() => {
       const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
       scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
+      const highlightQuery = reader.pendingSearchHighlightQuery || panel.dataset.pendingSearchHighlightQuery || "";
+      if (highlightQuery) {
+        reader.pendingSearchHighlightQuery = "";
+        delete panel.dataset.pendingSearchHighlightQuery;
+        window.setTimeout(() => {
+          flashSearchMatchInSection(content, reader.sectionID, reader.sectionNumber, highlightQuery);
+        }, behavior === "smooth" ? 520 : 0);
+      }
       reader.shouldSmoothScrollToSection = false;
     });
   }
@@ -1219,15 +1352,7 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
   const numberSelector = sectionNumber ? `[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
   const target = (idSelector ? content?.querySelector(idSelector) : null) || (numberSelector ? content?.querySelector(numberSelector) : null);
   if (!content || !target) return;
-  const contentRect = content.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
-  const panel = content.closest(".reader-panel");
-  const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
-  const targetTop = content.scrollTop + targetRect.top - contentRect.top - (Number.isFinite(headerOffset) ? headerOffset : 0);
-  content.scrollTo({
-    top: Math.max(0, targetTop),
-    behavior
-  });
+  scrollReaderContentToNode(content, target, behavior);
 }
 
 function renderInlineCommentBox(section, reader) {
@@ -1506,8 +1631,49 @@ function bindReaderCommentScroll(panel) {
   comments.addEventListener("scroll", () => syncScroll(comments, content), { passive: true });
 }
 
+function updateReaderScrollIndicator(panel) {
+  const content = panel.querySelector(".reader-content");
+  const indicator = panel.querySelector(".reader-scroll-indicator");
+  const thumb = panel.querySelector(".reader-scroll-thumb");
+  if (!content || !indicator || !thumb) return;
+  const scrollable = Math.max(0, content.scrollHeight - content.clientHeight);
+  const trackHeight = indicator.clientHeight;
+  if (scrollable <= 1 || trackHeight <= 0) {
+    thumb.hidden = true;
+    panel.classList.remove("is-scrolling");
+    return;
+  }
+  thumb.hidden = false;
+  const thumbHeight = Math.max(24, Math.round((content.clientHeight / content.scrollHeight) * trackHeight));
+  const maxTop = Math.max(0, trackHeight - thumbHeight);
+  const top = Math.round((content.scrollTop / scrollable) * maxTop);
+  thumb.style.height = `${thumbHeight}px`;
+  thumb.style.setProperty("--reader-scroll-thumb-top", `${top}px`);
+}
+
+function bindReaderScrollIndicator(panel) {
+  const content = panel.querySelector(".reader-content");
+  if (!content || panel.dataset.scrollIndicatorBound === "true") return;
+  panel.dataset.scrollIndicatorBound = "true";
+  let hideTimer = null;
+  const update = () => updateReaderScrollIndicator(panel);
+  const reveal = () => {
+    panel.classList.add("is-scrolling");
+    update();
+    if (hideTimer) window.clearTimeout(hideTimer);
+    hideTimer = window.setTimeout(() => panel.classList.remove("is-scrolling"), 700);
+  };
+  content.addEventListener("scroll", reveal, { passive: true });
+  window.addEventListener("resize", update, { passive: true });
+  requestAnimationFrame(update);
+}
+
 function bindAllReaderCommentScroll() {
-  track.querySelectorAll(".reader-panel").forEach(bindReaderCommentScroll);
+  track.querySelectorAll(".reader-panel").forEach((panel) => {
+    bindReaderCommentScroll(panel);
+    bindReaderScrollIndicator(panel);
+    updateReaderScrollIndicator(panel);
+  });
 }
 
 function renderSectionComments(commentsList, sections) {
@@ -1615,6 +1781,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
   if (!content) return;
   clear(content);
   content.classList.add("is-searching-reader");
+  content.scrollTop = 0;
 
   const needle = query.trim().toLowerCase();
   const searchToken = `${Date.now()}:${query}`;
@@ -1649,10 +1816,13 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       const searchBox = panel.querySelector(".reader-internal-search");
       const searchInput = panel.querySelector(".reader-internal-search-input");
       const searchButton = panel.querySelector(".reader-internal-search-toggle");
+      panel.dataset.readerSearchToken = `selected:${Date.now()}`;
       reader.sectionID = section.id;
       reader.sectionNumber = section.sectionNumber || "";
       reader.title = section.title || "Reader";
       reader.internalSearchQuery = query;
+      reader.pendingSearchHighlightQuery = query;
+      panel.dataset.pendingSearchHighlightQuery = query;
       reader.shouldSmoothScrollToSection = true;
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
@@ -2107,17 +2277,14 @@ async function renderSearchResults(panel, instance) {
       const number = document.createElement("span");
       number.className = "result-number";
       number.textContent = result.sectionNumber || "";
-      const chapter = document.createElement("span");
-      chapter.className = "result-chapter";
-      chapter.textContent = result.chapterNumber ? `Chapter ${result.chapterNumber}` : "";
-      heading.append(number, chapter);
-      const title = document.createElement("p");
+      const title = document.createElement("span");
       title.className = "result-title";
-      appendHighlighted(title, result.title || result.headingLine || "", query);
+      appendHighlighted(title, stripLeadingSectionNumber(result.title || result.headingLine || "", result.sectionNumber), query);
+      heading.append(number, title);
       const snippetText = snippetWithoutDuplicateTitle(result);
       const snippet = document.createElement("p");
       appendHighlighted(snippet, snippetText, query);
-      row.append(heading, title);
+      row.append(heading);
       if (snippetText) row.append(snippet);
     row.addEventListener("click", () => {
       openSectionDetail(searchInstance.id, {
@@ -2477,8 +2644,11 @@ async function renderProjects() {
   applyPaneWeight(panel, "utility:projects");
   const content = panel.querySelector(".projects-content");
   const addButton = panel.querySelector(".projects-add-button");
+  const archiveButton = panel.querySelector(".projects-archive-button");
   clear(content);
   addButton?.addEventListener("click", () => showProjectCreateSheet(panel));
+  archiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
+  archiveButton?.addEventListener("click", toggleArchiveAfterProjectsStack);
   const data = await loadSyncedContent();
 
   if (data.status === "disconnected") {
@@ -2515,10 +2685,21 @@ async function renderArchive() {
   const kind = panel.querySelector(".panel-kind");
   const title = panel.querySelector(".panel-title");
   const addButton = panel.querySelector(".projects-add-button");
+  const archiveButton = panel.querySelector(".projects-archive-button");
+  const actions = panel.querySelector(".panel-actions");
   const content = panel.querySelector(".projects-content");
   if (kind) kind.textContent = "Archive";
   if (title) title.textContent = "Archive";
   addButton?.remove();
+  archiveButton?.remove();
+  const closeButton = document.createElement("button");
+  closeButton.className = "icon-button archive-close-button";
+  closeButton.type = "button";
+  closeButton.title = "Close archive";
+  closeButton.setAttribute("aria-label", "Close archive");
+  closeButton.innerHTML = circleXIconSVG();
+  closeButton.addEventListener("click", closeArchiveColumn);
+  actions?.prepend(closeButton);
   clear(content);
   const data = await loadSyncedContent();
   const sourceProjects = data.status === "connected" ? data.summary.projects : [];
@@ -2643,9 +2824,18 @@ async function renderProjectDetail(detail) {
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
+  const headingGroup = document.createElement("div");
+  headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
   title.textContent = identity.name;
-  chrome.append(title);
+  headingGroup.append(title);
+  const descriptionText = String(project.description || identity.description || "").trim();
+  if (descriptionText) {
+    const description = document.createElement("p");
+    description.textContent = descriptionText;
+    headingGroup.append(description);
+  }
+  chrome.append(headingGroup);
 
   const content = document.createElement("section");
   content.className = "project-detail-content";
@@ -3563,7 +3753,7 @@ async function start() {
   toggleProjectsButton.addEventListener("click", () => {
     toggleUtilityPane("projects");
   });
-  toggleArchiveButton.addEventListener("click", () => {
+  toggleArchiveButton?.addEventListener("click", () => {
     toggleUtilityPane("archive");
   });
   toggleSearchButton.addEventListener("click", () => {
