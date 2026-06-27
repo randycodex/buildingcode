@@ -2470,7 +2470,7 @@ mark {
 
 .projects-content .project-card {
   min-height: 84px;
-  padding: var(--space-3) calc(var(--space-4) + (var(--panel-title-control-size) * 2) + (var(--space-2) * 2)) var(--space-3) var(--space-4);
+  padding: var(--space-3) calc(var(--space-4) + (var(--panel-title-control-size) * 3) + (var(--space-2) * 3)) var(--space-3) var(--space-4);
   border: 0;
   border-radius: var(--radius-card);
   background: transparent;
@@ -2482,6 +2482,19 @@ mark {
   right: var(--space-3);
   display: flex;
   gap: var(--space-1);
+}
+
+.project-count-badge {
+  display: grid;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  font-weight: 650;
+  line-height: 1;
 }
 
 .project-card-action {

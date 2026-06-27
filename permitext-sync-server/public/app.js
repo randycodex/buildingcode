@@ -3568,6 +3568,10 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     card.style.setProperty("--project-color", projectColor(project));
     const actionGroup = document.createElement("div");
     actionGroup.className = "project-card-actions";
+    const countBadge = document.createElement("span");
+    countBadge.className = "project-count-badge";
+    countBadge.textContent = String(count);
+    countBadge.setAttribute("aria-label", count === 1 ? "1 saved" : `${count} saved`);
     const primaryActionButton = document.createElement("button");
     primaryActionButton.className = `project-card-action ${mode === "archive" ? "is-restore" : "is-edit"}`;
     primaryActionButton.type = "button";
@@ -3599,7 +3603,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
       }
     });
     lifecycleButton.addEventListener("keydown", (event) => event.stopPropagation());
-    actionGroup.append(primaryActionButton, lifecycleButton);
+    actionGroup.append(countBadge, primaryActionButton, lifecycleButton);
     const body = document.createElement("div");
     body.className = "project-card-body";
     const heading = document.createElement("h3");
@@ -3617,14 +3621,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
       description.textContent = descriptionText;
       body.append(description);
     }
-    const meta = document.createElement("div");
-    meta.className = "project-meta";
-    [count === 1 ? "1 saved" : `${count} saved`].forEach((label) => {
-      const pill = document.createElement("span");
-      pill.textContent = label;
-      meta.append(pill);
-    });
-    card.append(actionGroup, body, meta);
+    card.append(actionGroup, body);
     card.addEventListener("click", () => openProjectDetail(project));
     card.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
