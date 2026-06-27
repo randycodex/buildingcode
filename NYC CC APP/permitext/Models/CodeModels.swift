@@ -1805,6 +1805,8 @@ struct ReaderSectionDetail: Identifiable, Hashable, Sendable {
 
 struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let id: Int64
+    let annotationBlockID: String
+    let annotationLabel: String?
     let codeVersion: String
     let codeSectionID: Int64?
     let clientID: String?
@@ -1826,6 +1828,8 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
 
     init(
         id: Int64,
+        annotationBlockID: String = "",
+        annotationLabel: String? = nil,
         codeVersion: String,
         codeSectionID: Int64? = nil,
         clientID: String? = nil,
@@ -1846,6 +1850,8 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         bookmarkedAt: Date? = nil
     ) {
         self.id = id
+        self.annotationBlockID = annotationBlockID.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.annotationLabel = annotationLabel
         self.codeVersion = codeVersion
         self.codeSectionID = codeSectionID
         self.clientID = clientID
@@ -1867,11 +1873,41 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     }
 
     var displayTitle: String {
-        kind == .textBlock ? title : title.displayTitle(for: sectionNumber)
+        if isBlockAnnotation {
+            let trimmedLabel = annotationLabel?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return trimmedLabel.isEmpty ? "Paragraph annotation" : trimmedLabel
+        }
+        return kind == .textBlock ? title : title.displayTitle(for: sectionNumber)
     }
 
     var hasNote: Bool {
         !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var rowID: String {
+        annotationBlockID.isEmpty ? "section:\(id)" : "section:\(id):block:\(annotationBlockID)"
+    }
+
+    var isBlockAnnotation: Bool {
+        !annotationBlockID.isEmpty
+    }
+}
+
+struct UserAnnotationEntry: Hashable, Sendable {
+    let sectionID: Int64
+    let blockID: String
+    let noteBody: String
+    let tags: [String]
+
+    init(sectionID: Int64, blockID: String = "", noteBody: String = "", tags: [String] = []) {
+        self.sectionID = sectionID
+        self.blockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.noteBody = noteBody
+        self.tags = tags
+    }
+
+    var hasContent: Bool {
+        !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !tags.isEmpty
     }
 }
 
@@ -2586,7 +2622,14 @@ enum BookmarkSorter {
         if lhs.chapterNumber != rhs.chapterNumber {
             return lhs.chapterNumber.compare(rhs.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
         }
-        return lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+        let sectionOrder = lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive])
+        if sectionOrder != .orderedSame {
+            return sectionOrder == .orderedAscending
+        }
+        if lhs.annotationBlockID.isEmpty != rhs.annotationBlockID.isEmpty {
+            return lhs.annotationBlockID.isEmpty
+        }
+        return lhs.rowID.localizedStandardCompare(rhs.rowID) == .orderedAscending
     }
 }
 

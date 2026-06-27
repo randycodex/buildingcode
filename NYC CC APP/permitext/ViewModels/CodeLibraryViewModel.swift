@@ -1395,9 +1395,15 @@ final class CodeLibraryViewModel: ObservableObject {
             let ids = try userContentRepository.bookmarkedSectionIDs(codeVersion: selectedVersion.codeVersion)
             let noteEntries = try userContentRepository.noteEntries(codeVersion: selectedVersion.codeVersion)
             let tagEntries = (try? userContentRepository.tagsBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            let annotationEntries = (try? userContentRepository.annotationEntries(codeVersion: selectedVersion.codeVersion)) ?? []
             let bookmarkDates = (try? userContentRepository.bookmarkCreatedAtBySectionID(codeVersion: selectedVersion.codeVersion)) ?? [:]
             bookmarkedSectionIDs = Set(ids)
-            let savedSectionIDs = Array(Set(ids).union(noteEntries.keys).union(tagEntries.keys)).sorted()
+            let savedSectionIDs = Array(
+                Set(ids)
+                    .union(noteEntries.keys)
+                    .union(tagEntries.keys)
+                    .union(annotationEntries.map(\.sectionID))
+            ).sorted()
             if let authoredCodeStore {
                 bookmarks = authoredCodeStore.savedSections(
                     ids: savedSectionIDs,
@@ -1405,6 +1411,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
                     notesBySectionID: noteEntries,
                     tagsBySectionID: tagEntries,
+                    annotationEntries: annotationEntries,
                     bookmarkCreatedAtBySectionID: bookmarkDates
                 )
             } else {
@@ -1414,6 +1421,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     bookmarkedSectionIDs: bookmarkedSectionIDs,
                     notesBySectionID: noteEntries,
                     tagsBySectionID: tagEntries,
+                    annotationEntries: annotationEntries,
                     bookmarkCreatedAtBySectionID: bookmarkDates
                 ) ?? []
             }

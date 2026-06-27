@@ -12,6 +12,7 @@ protocol UserContentRepository {
     func noteBlockIDs(sectionID: Int64, codeVersion: String) throws -> [String]
     func noteCount(codeVersion: String) throws -> Int
     func noteEntries(codeVersion: String) throws -> [Int64: String]
+    func annotationEntries(codeVersion: String) throws -> [UserAnnotationEntry]
     func saveNote(sectionID: Int64, codeVersion: String, body: String) throws
     func saveNote(sectionID: Int64, blockID: String, codeVersion: String, body: String) throws
     func tags(sectionID: Int64, codeVersion: String) throws -> [String]
@@ -277,7 +278,7 @@ final class UserDataStore: UserContentRepository {
             """
             SELECT section_id, body
             FROM notes
-            WHERE code_version = ?
+            WHERE code_version = ? AND block_id = ''
             ORDER BY updated_at DESC;
             """
         )
@@ -289,6 +290,66 @@ final class UserDataStore: UserContentRepository {
             entries[connection.int64(at: 0, in: statement)] = connection.string(at: 1, in: statement)
         }
         return entries
+    }
+
+    func annotationEntries(codeVersion: String) throws -> [UserAnnotationEntry] {
+        struct Key: Hashable {
+            let sectionID: Int64
+            let blockID: String
+        }
+
+        var notesByKey: [Key: String] = [:]
+        let notesStatement = try connection.prepare(
+            """
+            SELECT section_id, block_id, body
+            FROM notes
+            WHERE code_version = ? AND TRIM(body) <> ''
+            ORDER BY updated_at DESC;
+            """
+        )
+        defer { connection.finalize(notesStatement) }
+        try connection.bind(text: codeVersion, index: 1, to: notesStatement)
+        while try connection.step(notesStatement) == SQLITE_ROW {
+            let key = Key(
+                sectionID: connection.int64(at: 0, in: notesStatement),
+                blockID: connection.string(at: 1, in: notesStatement)
+            )
+            notesByKey[key] = connection.string(at: 2, in: notesStatement)
+        }
+
+        var tagsByKey: [Key: [String]] = [:]
+        let tagsStatement = try connection.prepare(
+            """
+            SELECT section_id, block_id, tag
+            FROM bookmark_tags
+            WHERE code_version = ?
+            ORDER BY created_at ASC;
+            """
+        )
+        defer { connection.finalize(tagsStatement) }
+        try connection.bind(text: codeVersion, index: 1, to: tagsStatement)
+        while try connection.step(tagsStatement) == SQLITE_ROW {
+            let key = Key(
+                sectionID: connection.int64(at: 0, in: tagsStatement),
+                blockID: connection.string(at: 1, in: tagsStatement)
+            )
+            tagsByKey[key, default: []].append(connection.string(at: 2, in: tagsStatement))
+        }
+
+        return Array(Set(notesByKey.keys).union(tagsByKey.keys))
+            .map { key in
+                UserAnnotationEntry(
+                    sectionID: key.sectionID,
+                    blockID: key.blockID,
+                    noteBody: notesByKey[key] ?? "",
+                    tags: tagsByKey[key] ?? []
+                )
+            }
+            .filter(\.hasContent)
+            .sorted {
+                if $0.sectionID != $1.sectionID { return $0.sectionID < $1.sectionID }
+                return $0.blockID.localizedStandardCompare($1.blockID) == .orderedAscending
+            }
     }
 
     func saveNote(sectionID: Int64, codeVersion: String, body: String) throws {
