@@ -2300,11 +2300,17 @@ mark {
 }
 
 .projects-panel .panel-header {
+  position: absolute;
+  top: var(--panel-padding);
+  right: var(--panel-padding);
+  left: var(--panel-padding);
+  z-index: 8;
   align-items: start;
   min-height: var(--panel-title-row-height);
-  margin-bottom: var(--space-3);
+  margin-bottom: 0;
   padding-bottom: 0;
   border-bottom: 0;
+  background: transparent;
 }
 
 .projects-panel .panel-actions {
@@ -2312,8 +2318,23 @@ mark {
 }
 
 .projects-panel {
+  --reader-header-overlay-height: clamp(76px, 7vh, 96px);
   position: relative;
   overflow: hidden;
+}
+
+.projects-panel::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 6;
+  height: calc(var(--reader-header-overlay-height) + var(--panel-padding));
+  content: "";
+  pointer-events: none;
+  background: color-mix(in srgb, var(--surface) 68%, transparent);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
 }
 
 .archive-panel {
@@ -2322,6 +2343,7 @@ mark {
 
 .projects-content {
   gap: var(--card-stack-gap);
+  padding-top: var(--reader-header-overlay-height);
 }
 
 .section-label {
