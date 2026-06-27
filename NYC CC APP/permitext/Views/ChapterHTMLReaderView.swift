@@ -374,7 +374,6 @@ struct ChapterHTMLReaderView: View {
                     } else {
                         library.removeSection(detail.id, fromFolder: project.id)
                     }
-                    recomputeSavedDecorations()
                 },
                 onSave: { body in
                     library.saveNote(sectionID: detail.id, body: body)
