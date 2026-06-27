@@ -1649,7 +1649,7 @@ select option:checked {
   flex: 1 1 auto;
   padding: var(--space-3);
   resize: none;
-  border: 1px solid color-mix(in srgb, var(--border) 72%, var(--text-tertiary));
+  border: 0;
   border-radius: var(--radius-card);
   background: var(--reader-notes-input-surface);
   color: var(--text-primary);
