@@ -3629,7 +3629,7 @@ async function renderSaved(paneID = "utility:saved") {
     return panel;
   }
 
-  const { savedItems, annotations } = summary;
+  const { savedItems } = summary;
 
   appendSectionLabel(content, "Saved sections");
   if (savedItems.length === 0) {
@@ -3638,23 +3638,6 @@ async function renderSaved(paneID = "utility:saved") {
     renderSavedItemsByCode(content, savedItems.slice(0, 48));
   }
 
-  appendSectionLabel(content, "Tags and notes");
-  if (annotations.length === 0) {
-    appendMutedRow(content, "No tags or notes", "Annotations synced from iOS will appear here.");
-  } else {
-    annotations.slice(0, 12).forEach((annotation) => {
-      const row = document.createElement("article");
-      row.className = "saved-row";
-      const title = document.createElement("strong");
-      title.textContent = `${annotation.sectionNumber || annotation.sectionID || ""}`.trim() || "Annotation";
-      const detail = document.createElement("span");
-      const tags = Array.isArray(annotation.tags) && annotation.tags.length ? `Tags: ${annotation.tags.join(", ")}` : "";
-      const note = annotation.noteBody ? `Note: ${annotation.noteBody}` : "";
-      detail.textContent = [tags, note].filter(Boolean).join(" · ") || "Synced annotation";
-      row.append(title, detail);
-      content.append(row);
-    });
-  }
   return panel;
 }
 
