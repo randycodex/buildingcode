@@ -5,7 +5,8 @@
   --surface-muted: #f7f7fa;
   --surface-raised: rgba(255, 255, 255, 0.92);
   --comment-surface: color-mix(in srgb, #fff2c2 24%, var(--surface));
-  --reader-notes-surface: #878472;
+  --reader-notes-surface: #cccdce;
+  --reader-notes-input-surface: #eeeeee;
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
   --text-tertiary: #b7b7bf;
@@ -57,7 +58,8 @@
     --surface-muted: #000000;
     --surface-raised: #000000;
     --comment-surface: #22190a;
-    --reader-notes-surface: #686963;
+    --reader-notes-surface: #cccdce;
+    --reader-notes-input-surface: #eeeeee;
     --text-primary: #f6f4f1;
     --text-secondary: #a09fa7;
     --text-tertiary: #6f6f78;
@@ -1648,7 +1650,7 @@ select option:checked {
   resize: none;
   border: 1px solid color-mix(in srgb, var(--border) 72%, var(--text-tertiary));
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--surface) 54%, var(--comment-surface));
+  background: var(--reader-notes-input-surface);
   color: var(--text-primary);
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
