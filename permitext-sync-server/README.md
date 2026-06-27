@@ -54,7 +54,22 @@ When a Neon database is connected through Vercel, the server uses the first avai
 - `POSTGRES_URL`
 - `NEON_DATABASE_URL`
 
-The `permitext_sync_state` table is created automatically on first request. Local development still falls back to the JSON file store if no database URL is present.
+The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v2`:
+
+- `permitext_users`
+- `permitext_entitlements`
+- `permitext_sessions`
+- `permitext_passkey_credentials`
+- `permitext_saved_items`
+- `permitext_annotations`
+- `permitext_projects`
+- `permitext_project_items`
+- `permitext_comments`
+- `permitext_sync_events`
+- `permitext_user_content_records`
+- `permitext_sync_state`
+
+`permitext_user_content_records` and `permitext_sync_state` remain as compatibility mirrors for the existing iOS/web mutation contract. New saved sections, paragraph notes/tags, projects, and project membership are also written into first-class relational tables so the backend can scale past the prototype JSON shape. Local development still falls back to the JSON file store if no database URL is present.
 
 ## Endpoints
 
@@ -100,7 +115,7 @@ PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 npm run verify:production:identity
 
 That test writes one stable synthetic smoke account to the configured production backend.
 
-This is intentionally simple and file-backed. It is for local integration testing before choosing production hosting, auth verification, and durable storage.
+Local mode remains intentionally simple and file-backed for integration testing. Hosted mode is intended to run on Vercel with Neon Postgres for durable storage.
 
 ## iOS Local HTTP Mode
 

@@ -158,6 +158,18 @@ function normalizedMutationRecordID(mutation) {
   return record.id || null;
 }
 
+function normalizedBlockID(value) {
+  return String(value || "").trim();
+}
+
+function mutationRecordUpdatedAt(record) {
+  return dateToISO(record?.updatedAt, new Date().toISOString());
+}
+
+function mutationRecordDeletedAt(record) {
+  return dateToISO(record?.deletedAt);
+}
+
 async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
@@ -260,6 +272,148 @@ async function createPostgresStoreAdapter() {
       ON permitext_user_content_records (user_id, code_version, entity_kind)
     `;
     await sql`
+      CREATE TABLE IF NOT EXISTS permitext_saved_items (
+        record_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        code_version TEXT NOT NULL,
+        section_id BIGINT NOT NULL,
+        mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ,
+        server_version BIGINT NOT NULL DEFAULT 1
+      )
+    `;
+    await sql`
+      DROP INDEX IF EXISTS permitext_saved_items_user_locator_idx
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_saved_items_user_locator_idx
+      ON permitext_saved_items (user_id, code_version, section_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_saved_items_user_updated_idx
+      ON permitext_saved_items (user_id, updated_at)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_annotations (
+        record_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        code_version TEXT NOT NULL,
+        section_id BIGINT NOT NULL,
+        block_id TEXT NOT NULL DEFAULT '',
+        note_body TEXT,
+        tags JSONB,
+        mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ,
+        server_version BIGINT NOT NULL DEFAULT 1
+      )
+    `;
+    await sql`
+      DROP INDEX IF EXISTS permitext_annotations_user_locator_idx
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_annotations_user_locator_idx
+      ON permitext_annotations (user_id, code_version, section_id, block_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_annotations_user_updated_idx
+      ON permitext_annotations (user_id, updated_at)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_projects (
+        record_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        code_version TEXT NOT NULL,
+        client_id TEXT,
+        local_folder_id BIGINT,
+        name TEXT,
+        address TEXT,
+        description TEXT,
+        color_hex TEXT,
+        sort_order INTEGER,
+        mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ,
+        server_version BIGINT NOT NULL DEFAULT 1
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_projects_user_version_idx
+      ON permitext_projects (user_id, code_version)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_projects_user_updated_idx
+      ON permitext_projects (user_id, updated_at)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_project_items (
+        record_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        code_version TEXT NOT NULL,
+        project_client_id TEXT,
+        local_folder_id BIGINT,
+        section_id BIGINT NOT NULL,
+        block_id TEXT NOT NULL DEFAULT '',
+        scope TEXT,
+        mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ,
+        server_version BIGINT NOT NULL DEFAULT 1
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_project_items_project_idx
+      ON permitext_project_items (user_id, code_version, project_client_id, local_folder_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_project_items_user_updated_idx
+      ON permitext_project_items (user_id, updated_at)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_comments (
+        record_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        code_version TEXT NOT NULL,
+        section_id BIGINT NOT NULL,
+        block_id TEXT NOT NULL DEFAULT '',
+        body TEXT,
+        visibility TEXT NOT NULL DEFAULT 'private',
+        mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ,
+        server_version BIGINT NOT NULL DEFAULT 1
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_comments_user_locator_idx
+      ON permitext_comments (user_id, code_version, section_id, block_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_sync_events (
+        event_id BIGSERIAL PRIMARY KEY,
+        record_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        entity_kind TEXT NOT NULL,
+        code_version TEXT,
+        mutation_updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      ALTER TABLE permitext_sync_events
+      ADD COLUMN IF NOT EXISTS mutation_updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_sync_events_user_event_idx
+      ON permitext_sync_events (user_id, event_id)
+    `;
+    await sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS permitext_sync_events_record_update_idx
+      ON permitext_sync_events (record_id, mutation_updated_at)
+    `;
+    await sql`
       INSERT INTO permitext_sync_state (id)
       VALUES ('default')
       ON CONFLICT (id) DO NOTHING
@@ -311,6 +465,235 @@ async function createPostgresStoreAdapter() {
         passkey_credentials = EXCLUDED.passkey_credentials,
         mutations_by_user_id = EXCLUDED.mutations_by_user_id,
         updated_at = EXCLUDED.updated_at
+      `;
+  }
+
+  async function writeNormalizedUserContentMutation(userID, mutation) {
+    const recordID = normalizedMutationRecordID(mutation);
+    const { kind, record } = normalizedMutationKindAndRecord(mutation);
+    if (!recordID || !kind || !record) {
+      return;
+    }
+
+    const ownerUserID = record.userID || userID;
+    const codeVersion = record.codeVersion || null;
+    const updatedAt = mutationRecordUpdatedAt(record);
+    const deletedAt = mutationRecordDeletedAt(record);
+    const mutationJSON = JSON.stringify(mutation);
+
+    if (kind === "savedItem") {
+      await sql`
+        INSERT INTO permitext_saved_items (
+          record_id,
+          user_id,
+          code_version,
+          section_id,
+          mutation,
+          updated_at,
+          deleted_at,
+          server_version
+        )
+        VALUES (
+          ${recordID},
+          ${ownerUserID},
+          ${codeVersion},
+          ${record.sectionID},
+          ${mutationJSON}::jsonb,
+          ${updatedAt}::timestamptz,
+          ${deletedAt}::timestamptz,
+          1
+        )
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          section_id = EXCLUDED.section_id,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = permitext_saved_items.server_version + 1
+      `;
+      return;
+    }
+
+    if (kind === "annotation") {
+      await sql`
+        INSERT INTO permitext_annotations (
+          record_id,
+          user_id,
+          code_version,
+          section_id,
+          block_id,
+          note_body,
+          tags,
+          mutation,
+          updated_at,
+          deleted_at,
+          server_version
+        )
+        VALUES (
+          ${recordID},
+          ${ownerUserID},
+          ${codeVersion},
+          ${record.sectionID},
+          ${normalizedBlockID(record.blockID)},
+          ${record.noteBody ?? null},
+          ${record.tags === undefined || record.tags === null ? null : JSON.stringify(record.tags)}::jsonb,
+          ${mutationJSON}::jsonb,
+          ${updatedAt}::timestamptz,
+          ${deletedAt}::timestamptz,
+          1
+        )
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          section_id = EXCLUDED.section_id,
+          block_id = EXCLUDED.block_id,
+          note_body = EXCLUDED.note_body,
+          tags = EXCLUDED.tags,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = permitext_annotations.server_version + 1
+      `;
+      return;
+    }
+
+    if (kind === "project") {
+      await sql`
+        INSERT INTO permitext_projects (
+          record_id,
+          user_id,
+          code_version,
+          client_id,
+          local_folder_id,
+          name,
+          address,
+          description,
+          color_hex,
+          sort_order,
+          mutation,
+          updated_at,
+          deleted_at,
+          server_version
+        )
+        VALUES (
+          ${recordID},
+          ${ownerUserID},
+          ${codeVersion},
+          ${record.clientID || null},
+          ${record.localFolderID || null},
+          ${record.name ?? null},
+          ${record.address ?? null},
+          ${record.description ?? null},
+          ${record.colorHex ?? null},
+          ${record.sortOrder ?? null},
+          ${mutationJSON}::jsonb,
+          ${updatedAt}::timestamptz,
+          ${deletedAt}::timestamptz,
+          1
+        )
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          client_id = EXCLUDED.client_id,
+          local_folder_id = EXCLUDED.local_folder_id,
+          name = EXCLUDED.name,
+          address = EXCLUDED.address,
+          description = EXCLUDED.description,
+          color_hex = EXCLUDED.color_hex,
+          sort_order = EXCLUDED.sort_order,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = permitext_projects.server_version + 1
+      `;
+      return;
+    }
+
+    if (kind === "projectSection") {
+      await sql`
+        INSERT INTO permitext_project_items (
+          record_id,
+          user_id,
+          code_version,
+          project_client_id,
+          local_folder_id,
+          section_id,
+          block_id,
+          scope,
+          mutation,
+          updated_at,
+          deleted_at,
+          server_version
+        )
+        VALUES (
+          ${recordID},
+          ${ownerUserID},
+          ${codeVersion},
+          ${record.folderClientID || null},
+          ${record.localFolderID || null},
+          ${record.sectionID},
+          ${normalizedBlockID(record.blockID)},
+          ${record.scope || null},
+          ${mutationJSON}::jsonb,
+          ${updatedAt}::timestamptz,
+          ${deletedAt}::timestamptz,
+          1
+        )
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          project_client_id = EXCLUDED.project_client_id,
+          local_folder_id = EXCLUDED.local_folder_id,
+          section_id = EXCLUDED.section_id,
+          block_id = EXCLUDED.block_id,
+          scope = EXCLUDED.scope,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = permitext_project_items.server_version + 1
+      `;
+    }
+  }
+
+  async function deleteNormalizedUserContentRecord(recordID, kind) {
+    if (kind === "savedItem") {
+      await sql`DELETE FROM permitext_saved_items WHERE record_id = ${recordID}`;
+    } else if (kind === "annotation") {
+      await sql`DELETE FROM permitext_annotations WHERE record_id = ${recordID}`;
+    } else if (kind === "project") {
+      await sql`DELETE FROM permitext_projects WHERE record_id = ${recordID}`;
+    } else if (kind === "projectSection") {
+      await sql`DELETE FROM permitext_project_items WHERE record_id = ${recordID}`;
+    } else if (kind === "comment") {
+      await sql`DELETE FROM permitext_comments WHERE record_id = ${recordID}`;
+    }
+  }
+
+  async function writeSyncEvent(userID, mutation) {
+    const recordID = normalizedMutationRecordID(mutation);
+    const { kind, record } = normalizedMutationKindAndRecord(mutation);
+    if (!recordID || !kind || !record) {
+      return;
+    }
+    await sql`
+      INSERT INTO permitext_sync_events (
+        record_id,
+        user_id,
+        entity_kind,
+        code_version,
+        mutation_updated_at,
+        mutation
+      )
+      VALUES (
+        ${recordID},
+        ${record.userID || userID},
+        ${kind},
+        ${record.codeVersion || null},
+        ${mutationRecordUpdatedAt(record)}::timestamptz,
+        ${JSON.stringify(mutation)}::jsonb
+      )
+      ON CONFLICT (record_id, mutation_updated_at) DO NOTHING
     `;
   }
 
@@ -447,9 +830,10 @@ async function createPostgresStoreAdapter() {
         }
       }
     }
-    const existingMutations = await sql`SELECT record_id FROM permitext_user_content_records`;
+    const existingMutations = await sql`SELECT record_id, entity_kind FROM permitext_user_content_records`;
     for (const row of existingMutations) {
       if (!desiredMutationIDs.has(row.record_id)) {
+        await deleteNormalizedUserContentRecord(row.record_id, row.entity_kind);
         await sql`DELETE FROM permitext_user_content_records WHERE record_id = ${row.record_id}`;
       }
     }
@@ -490,6 +874,8 @@ async function createPostgresStoreAdapter() {
             deleted_at = EXCLUDED.deleted_at,
             server_version = permitext_user_content_records.server_version + 1
         `;
+        await writeNormalizedUserContentMutation(userID, mutation);
+        await writeSyncEvent(userID, mutation);
       }
     }
 
@@ -505,7 +891,22 @@ async function createPostgresStoreAdapter() {
       sql`SELECT user_id, entitlement FROM permitext_entitlements ORDER BY user_id`,
       sql`SELECT user_id, session_token FROM permitext_sessions ORDER BY user_id`,
       sql`SELECT credential_id, user_id FROM permitext_passkey_credentials ORDER BY credential_id`,
-      sql`SELECT user_id, mutation FROM permitext_user_content_records ORDER BY user_id, record_id`
+      sql`
+        SELECT user_id, mutation
+        FROM (
+          SELECT user_id, mutation, record_id FROM permitext_saved_items
+          UNION ALL
+          SELECT user_id, mutation, record_id FROM permitext_annotations
+          UNION ALL
+          SELECT user_id, mutation, record_id FROM permitext_projects
+          UNION ALL
+          SELECT user_id, mutation, record_id FROM permitext_project_items
+          UNION ALL
+          SELECT user_id, mutation, record_id FROM permitext_user_content_records
+          WHERE entity_kind IN ('continuity', 'codeVersionClear')
+        ) AS user_content
+        ORDER BY user_id, record_id
+      `
     ]);
 
     for (const row of users) {
@@ -540,7 +941,11 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_entitlements) +
         (SELECT count(*) FROM permitext_sessions) +
         (SELECT count(*) FROM permitext_passkey_credentials) +
-        (SELECT count(*) FROM permitext_user_content_records)
+        (SELECT count(*) FROM permitext_user_content_records) +
+        (SELECT count(*) FROM permitext_saved_items) +
+        (SELECT count(*) FROM permitext_annotations) +
+        (SELECT count(*) FROM permitext_projects) +
+        (SELECT count(*) FROM permitext_project_items)
       )::int AS count
     `;
     if (Number(count) === 0) {
@@ -554,7 +959,7 @@ async function createPostgresStoreAdapter() {
 
   return {
     kind: "postgres",
-    schema: "normalized-v1",
+    schema: "normalized-v2",
     async read() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
