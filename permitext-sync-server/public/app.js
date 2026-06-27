@@ -1688,7 +1688,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const title = sheet.querySelector(".reader-notes-title");
   const input = sheet.querySelector(".reader-notes-input");
   sheet.dataset.sectionId = sectionID;
-  sheet.style.removeProperty("--reader-notes-height");
+  sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
   title.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
   input.value = noteValueForSection(section.id);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
