@@ -1142,6 +1142,7 @@ function projectMutationForRecord(project, accountOverride = null) {
       codeVersion: project.codeVersion || "nyc-2022",
       name: project.name || "Project",
       title: project.title || project.name || "Project",
+      address: project.address || "",
       description: project.description || "",
       color,
       colorHex: project.colorHex || color,
@@ -1224,6 +1225,7 @@ async function createProjectFolder(details = {}) {
   const fallbackName = nextProjectName();
   const name = String(details.name || "").trim() || fallbackName;
   const description = String(details.description || "").trim();
+  const address = String(details.address || "").trim();
   const project = {
     id,
     clientID: id,
@@ -1231,6 +1233,7 @@ async function createProjectFolder(details = {}) {
     codeVersion: "nyc-2022",
     name,
     title: name,
+    address,
     description,
     color: details.color || projectColorOptions[0],
     sortMode: "Code order",
@@ -1254,6 +1257,7 @@ async function updateProjectFolder(project, details = {}) {
   const now = new Date().toISOString();
   const name = String(details.name || "").trim() || project.name || project.title || "Project";
   const color = details.color || projectColor(project);
+  const address = String(details.address || "").trim();
   const updated = {
     ...project,
     id: project.id || id,
@@ -1262,6 +1266,7 @@ async function updateProjectFolder(project, details = {}) {
     codeVersion: project.codeVersion || "nyc-2022",
     name,
     title: name,
+    address,
     description: String(details.description || "").trim(),
     color,
     colorHex: project.colorHex || color,
@@ -2984,6 +2989,7 @@ function projectIdentity(project) {
     localFolderID: project.localFolderID || "",
     name: project.name || project.title || "Project",
     title: project.title || project.name || "Project",
+    address: project.address || "",
     description: project.description || "",
     color: projectColor(project)
   };
@@ -3112,6 +3118,12 @@ async function renderProjectDetail(detail) {
   const title = document.createElement("h2");
   title.textContent = identity.name;
   headingGroup.append(title);
+  const addressText = String(project.address || identity.address || "").trim();
+  if (addressText) {
+    const address = document.createElement("p");
+    address.textContent = addressText;
+    headingGroup.append(address);
+  }
   const descriptionText = String(project.description || identity.description || "").trim();
   if (descriptionText) {
     const description = document.createElement("p");
@@ -3185,6 +3197,16 @@ function showProjectCreateSheet(panel, project = null) {
   if (identity) nameInput.value = identity.name;
   nameLabel.append(nameInput);
 
+  const addressLabel = document.createElement("label");
+  addressLabel.className = "project-sheet-field";
+  const addressInput = document.createElement("input");
+  addressInput.type = "text";
+  addressInput.className = "project-address-input";
+  addressInput.placeholder = "Project Address";
+  addressInput.autocomplete = "street-address";
+  if (identity) addressInput.value = identity.address;
+  addressLabel.append(addressInput);
+
   const colorGroup = document.createElement("fieldset");
   colorGroup.className = "project-sheet-colors";
   const colorRail = document.createElement("div");
@@ -3228,6 +3250,7 @@ function showProjectCreateSheet(panel, project = null) {
     try {
       const details = {
         name: nameInput.value,
+        address: addressInput.value,
         color: selectedColor,
         description: descriptionInput.value
       };
@@ -3245,7 +3268,7 @@ function showProjectCreateSheet(panel, project = null) {
     }
   });
 
-  sheet.append(header, nameLabel, colorGroup, descriptionLabel);
+  sheet.append(header, nameLabel, addressLabel, descriptionLabel, colorGroup);
   overlay.append(sheet);
   panel.append(overlay);
   nameInput.focus();
@@ -3320,6 +3343,12 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     const heading = document.createElement("h3");
     heading.textContent = project.name || project.title || "Project";
     body.append(heading);
+    const addressText = String(project.address || "").trim();
+    if (addressText) {
+      const address = document.createElement("p");
+      address.textContent = addressText;
+      body.append(address);
+    }
     const descriptionText = String(project.description || "").trim();
     if (descriptionText) {
       const description = document.createElement("p");

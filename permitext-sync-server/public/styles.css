@@ -2683,6 +2683,7 @@ mark {
 }
 
 .project-sheet-field .project-name-input,
+.project-sheet-field .project-address-input,
 .project-sheet-field .project-description-input {
   text-align: center;
 }
