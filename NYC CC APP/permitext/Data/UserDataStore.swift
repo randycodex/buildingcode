@@ -228,7 +228,7 @@ final class UserDataStore: UserContentRepository {
             """
             SELECT body
             FROM notes
-            WHERE section_id = ? AND code_version = ?
+            WHERE section_id = ? AND code_version = ? AND block_id = ''
             LIMIT 1;
             """
         )
@@ -277,7 +277,7 @@ final class UserDataStore: UserContentRepository {
             let statement = try connection.prepare(
                 """
                 DELETE FROM notes
-                WHERE section_id = ? AND code_version = ?;
+                WHERE section_id = ? AND code_version = ? AND block_id = '';
                 """
             )
             defer { connection.finalize(statement) }
@@ -295,11 +295,11 @@ final class UserDataStore: UserContentRepository {
         let statement = try connection.prepare(
             """
             INSERT INTO notes (
-                code_version, section_id, body, created_at, updated_at, client_id,
+                code_version, section_id, block_id, body, created_at, updated_at, client_id,
                 owner_id, visibility, sync_state
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(code_version, section_id) DO UPDATE SET
+            VALUES (?, ?, '', ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(code_version, section_id, block_id) DO UPDATE SET
                 body = excluded.body,
                 updated_at = excluded.updated_at,
                 sync_state = excluded.sync_state;
@@ -356,11 +356,12 @@ final class UserDataStore: UserContentRepository {
                 sync_state TEXT NOT NULL DEFAULT 'localOnly',
                 code_version TEXT NOT NULL,
                 section_id INTEGER NOT NULL,
+                block_id TEXT NOT NULL DEFAULT '',
                 body TEXT NOT NULL,
                 created_at TEXT NOT NULL DEFAULT '',
                 updated_at TEXT NOT NULL,
                 deleted_at TEXT,
-                UNIQUE(code_version, section_id)
+                UNIQUE(code_version, section_id, block_id)
             );
 
             CREATE TABLE IF NOT EXISTS bookmark_tags (
@@ -463,6 +464,8 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "notes", column: "sync_state", definition: "TEXT NOT NULL DEFAULT 'localOnly'")
         try addColumnIfMissing(table: "notes", column: "created_at", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "notes", column: "deleted_at", definition: "TEXT")
+        try addColumnIfMissing(table: "notes", column: "block_id", definition: "TEXT NOT NULL DEFAULT ''")
+        try migrateNotesBlockIDConstraintIfNeeded()
         try addColumnIfMissing(table: "bookmark_tags", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "bookmark_tags", column: "owner_id", definition: "TEXT NOT NULL DEFAULT 'local'")
         try addColumnIfMissing(table: "bookmark_tags", column: "visibility", definition: "TEXT NOT NULL DEFAULT 'personal'")
@@ -491,6 +494,67 @@ final class UserDataStore: UserContentRepository {
         }
     }
 
+    private func migrateNotesBlockIDConstraintIfNeeded() throws {
+        guard try !hasUniqueIndex(table: "notes", columns: ["code_version", "section_id", "block_id"]) else {
+            return
+        }
+
+        try performTransaction {
+            try connection.execute("ALTER TABLE notes RENAME TO notes_legacy;")
+            try connection.execute(
+                """
+                CREATE TABLE notes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    client_id TEXT NOT NULL DEFAULT '',
+                    owner_id TEXT NOT NULL DEFAULT 'local',
+                    visibility TEXT NOT NULL DEFAULT 'personal',
+                    sync_state TEXT NOT NULL DEFAULT 'localOnly',
+                    code_version TEXT NOT NULL,
+                    section_id INTEGER NOT NULL,
+                    block_id TEXT NOT NULL DEFAULT '',
+                    body TEXT NOT NULL,
+                    created_at TEXT NOT NULL DEFAULT '',
+                    updated_at TEXT NOT NULL,
+                    deleted_at TEXT,
+                    UNIQUE(code_version, section_id, block_id)
+                );
+                """
+            )
+            try connection.execute(
+                """
+                INSERT INTO notes (
+                    id, client_id, owner_id, visibility, sync_state, code_version,
+                    section_id, block_id, body, created_at, updated_at, deleted_at
+                )
+                SELECT
+                    id, client_id, owner_id, visibility, sync_state, code_version,
+                    section_id, COALESCE(block_id, ''), body, created_at, updated_at, deleted_at
+                FROM notes_legacy;
+                """
+            )
+            try connection.execute("DROP TABLE notes_legacy;")
+        }
+    }
+
+    private func hasUniqueIndex(table: String, columns expectedColumns: [String]) throws -> Bool {
+        let indexList = try connection.prepare("PRAGMA index_list(\(table));")
+        defer { connection.finalize(indexList) }
+        while try connection.step(indexList) == SQLITE_ROW {
+            guard connection.int(at: 2, in: indexList) == 1 else { continue }
+            let indexName = connection.string(at: 1, in: indexList)
+            let indexInfo = try connection.prepare("PRAGMA index_info(\(indexName));")
+            defer { connection.finalize(indexInfo) }
+            var columns: [String] = []
+            while try connection.step(indexInfo) == SQLITE_ROW {
+                columns.append(connection.string(at: 2, in: indexInfo))
+            }
+            if columns == expectedColumns {
+                return true
+            }
+        }
+        return false
+    }
+
     private func columnNames(in table: String) throws -> Set<String> {
         let statement = try connection.prepare("PRAGMA table_info(\(table));")
         defer { connection.finalize(statement) }
@@ -510,7 +574,7 @@ final class UserDataStore: UserContentRepository {
             ],
             "notes": [
                 "id", "client_id", "owner_id", "visibility", "sync_state",
-                "code_version", "section_id", "body", "created_at", "updated_at", "deleted_at"
+                "code_version", "section_id", "block_id", "body", "created_at", "updated_at", "deleted_at"
             ],
             "bookmark_tags": [
                 "client_id", "owner_id", "visibility", "sync_state",
@@ -1545,9 +1609,7 @@ final class UserDataStore: UserContentRepository {
             }
             return try localMergeCandidate(
                 mutation: mutation,
-                sql: "SELECT sync_state, updated_at, deleted_at FROM notes WHERE code_version = ? AND section_id = ? LIMIT 1;",
-                codeVersion: record.codeVersion,
-                firstID: record.sectionID
+                record: record
             )
         case .project(let record):
             if let localFolderID = try localFolderID(clientID: record.clientID ?? record.id, codeVersion: record.codeVersion) {
@@ -1600,6 +1662,39 @@ final class UserDataStore: UserContentRepository {
         if let secondID {
             sqlite3_bind_int64(statement, 3, secondID)
         }
+
+        guard try connection.step(statement) == SQLITE_ROW else { return nil }
+        let syncStateRaw = connection.stringOrNil(at: 0, in: statement) ?? syncedContentState
+        let updatedAt = connection.stringOrNil(at: 1, in: statement).flatMap { isoFormatter.date(from: $0) }
+        guard updatedAt != nil || connection.stringOrNil(at: 0, in: statement) != nil else { return nil }
+        let deletedAt = connection.stringOrNil(at: 2, in: statement).flatMap { isoFormatter.date(from: $0) }
+        return UserContentMergeCandidate(
+            recordID: mutation.recordID,
+            entityKind: mutation.entityKind,
+            localUpdatedAt: updatedAt,
+            serverUpdatedAt: mutation.updatedAt,
+            localDeletedAt: deletedAt,
+            serverDeletedAt: mutation.deletedAt,
+            localSyncState: UserContentSyncState(rawValue: syncStateRaw) ?? .synced
+        )
+    }
+
+    private func localMergeCandidate(
+        mutation: ServerUserContentMutation,
+        record: ServerAnnotationRecord
+    ) throws -> UserContentMergeCandidate? {
+        let statement = try connection.prepare(
+            """
+            SELECT sync_state, updated_at, deleted_at
+            FROM notes
+            WHERE code_version = ? AND section_id = ? AND block_id = ?
+            LIMIT 1;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: record.codeVersion, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, record.sectionID)
+        try connection.bind(text: record.normalizedBlockID, index: 3, to: statement)
 
         guard try connection.step(statement) == SQLITE_ROW else { return nil }
         let syncStateRaw = connection.stringOrNil(at: 0, in: statement) ?? syncedContentState
@@ -1697,18 +1792,23 @@ final class UserDataStore: UserContentRepository {
     private func upsertServerNote(_ record: ServerAnnotationRecord, body: String) throws {
         let timestamp = isoFormatter.string(from: record.updatedAt)
         if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            try deleteRows(sql: "DELETE FROM notes WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+            try deleteRows(
+                sql: "DELETE FROM notes WHERE code_version = ? AND section_id = ? AND block_id = ?;",
+                codeVersion: record.codeVersion,
+                sectionID: record.sectionID,
+                text: record.normalizedBlockID
+            )
             return
         }
 
         let statement = try connection.prepare(
             """
             INSERT INTO notes (
-                code_version, section_id, body, created_at, updated_at, client_id,
+                code_version, section_id, block_id, body, created_at, updated_at, client_id,
                 owner_id, visibility, sync_state, deleted_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
-            ON CONFLICT(code_version, section_id) DO UPDATE SET
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
+            ON CONFLICT(code_version, section_id, block_id) DO UPDATE SET
                 body = excluded.body,
                 updated_at = excluded.updated_at,
                 sync_state = excluded.sync_state,
@@ -1718,13 +1818,14 @@ final class UserDataStore: UserContentRepository {
         defer { connection.finalize(statement) }
         try connection.bind(text: record.codeVersion, index: 1, to: statement)
         sqlite3_bind_int64(statement, 2, record.sectionID)
-        try connection.bind(text: body, index: 3, to: statement)
-        try connection.bind(text: timestamp, index: 4, to: statement)
+        try connection.bind(text: record.normalizedBlockID, index: 3, to: statement)
+        try connection.bind(text: body, index: 4, to: statement)
         try connection.bind(text: timestamp, index: 5, to: statement)
-        try connection.bind(text: record.id, index: 6, to: statement)
-        try connection.bind(text: record.userID, index: 7, to: statement)
-        try connection.bind(text: personalVisibility, index: 8, to: statement)
-        try connection.bind(text: syncedContentState, index: 9, to: statement)
+        try connection.bind(text: timestamp, index: 6, to: statement)
+        try connection.bind(text: record.id, index: 7, to: statement)
+        try connection.bind(text: record.userID, index: 8, to: statement)
+        try connection.bind(text: personalVisibility, index: 9, to: statement)
+        try connection.bind(text: syncedContentState, index: 10, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -1766,9 +1867,21 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func deleteServerAnnotation(_ record: ServerAnnotationRecord) throws {
+        let recordID = record.id.lowercased()
+        let deletesTags = recordID.contains(":tags:") || recordID.contains("-tags-")
+        let deletesNote = !deletesTags
         try performTransaction {
-            try deleteRows(sql: "DELETE FROM notes WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
-            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+            if deletesNote {
+                try deleteRows(
+                    sql: "DELETE FROM notes WHERE code_version = ? AND section_id = ? AND block_id = ?;",
+                    codeVersion: record.codeVersion,
+                    sectionID: record.sectionID,
+                    text: record.normalizedBlockID
+                )
+            }
+            if deletesTags && record.normalizedBlockID.isEmpty {
+                try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ? AND section_id = ?;", codeVersion: record.codeVersion, sectionID: record.sectionID)
+            }
         }
     }
 
@@ -1942,6 +2055,15 @@ final class UserDataStore: UserContentRepository {
         defer { connection.finalize(statement) }
         try connection.bind(text: codeVersion, index: 1, to: statement)
         sqlite3_bind_int64(statement, 2, sectionID)
+        _ = try connection.step(statement)
+    }
+
+    private func deleteRows(sql: String, codeVersion: String, sectionID: Int64, text: String) throws {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+        sqlite3_bind_int64(statement, 2, sectionID)
+        try connection.bind(text: text, index: 3, to: statement)
         _ = try connection.step(statement)
     }
 

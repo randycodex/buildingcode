@@ -48,6 +48,7 @@ let dragPreviewOrder = [];
 let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = new Map();
+const annotationPushTimers = new Map();
 
 applyReaderSettings();
 
@@ -65,6 +66,7 @@ function loadWorkspaceState() {
       localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
       localSavedItems: Array.isArray(saved.localSavedItems) ? saved.localSavedItems.filter((item) => item && typeof item === "object") : [],
       localProjectSections: Array.isArray(saved.localProjectSections) ? saved.localProjectSections.filter((item) => item && typeof item === "object") : [],
+      localAnnotations: Array.isArray(saved.localAnnotations) ? saved.localAnnotations.filter((item) => item && typeof item === "object") : [],
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
@@ -97,6 +99,7 @@ function loadWorkspaceState() {
       localProjects: [],
       localSavedItems: [],
       localProjectSections: [],
+      localAnnotations: [],
       archivedProjectIDs: [],
       searchResultReader: null,
       sectionDetail: null,
@@ -1041,6 +1044,7 @@ function summarizeMutations(mutations = []) {
 function currentContentSummary() {
   const summary = syncedContent?.summary || summarizeMutations([]);
   const summarySavedItems = summary.savedItems || [];
+  const summaryAnnotations = summary.annotations || [];
   const localProjectSavedItems = (state.localProjectSections || [])
     .filter((item) => item && item.sectionID)
     .map((item) => ({
@@ -1056,6 +1060,7 @@ function currentContentSummary() {
       updatedAt: item.updatedAt || new Date().toISOString()
     }));
   const localSavedItems = [...(state.localSavedItems || []), ...localProjectSavedItems];
+  const localAnnotations = (state.localAnnotations || []).filter((item) => item && !item.deletedAt);
   return {
     ...summary,
     savedItems: [
@@ -1063,6 +1068,12 @@ function currentContentSummary() {
       ...localSavedItems.filter((localItem, index, items) =>
         items.findIndex((item) => String(item.sectionID) === String(localItem.sectionID)) === index &&
         !summarySavedItems.some((item) => String(item.sectionID) === String(localItem.sectionID))
+      )
+    ],
+    annotations: [
+      ...summaryAnnotations,
+      ...localAnnotations.filter((localAnnotation) =>
+        !summaryAnnotations.some((annotation) => String(annotation.id || "") === String(localAnnotation.id || ""))
       )
     ],
     projectSections: [
@@ -1184,6 +1195,24 @@ function projectSectionMutationForSection(project, sectionPayload) {
       sectionID: record.sectionID,
       scope: record.scope,
       updatedAt: record.updatedAt
+    }
+  };
+}
+
+function deletedProjectSectionMutationForItem(project, item) {
+  const now = new Date().toISOString();
+  const record = projectSectionRecordForSection(project, item);
+  return {
+    projectSection: {
+      id: item.id || record.id,
+      userID: activeAccount()?.userID || item.userID || "local-web",
+      codeVersion: item.codeVersion || "nyc-2022",
+      folderClientID: item.folderClientID || record.folderClientID,
+      localFolderID: item.localFolderID || record.localFolderID,
+      sectionID: Number(item.sectionID || item.savedSectionID || item.itemID),
+      scope: item.scope || record.scope,
+      updatedAt: now,
+      deletedAt: now
     }
   };
 }
@@ -1447,6 +1476,285 @@ async function persistSectionInProject(project, sectionPayload) {
   saveWorkspaceState();
 }
 
+async function removeSectionFromProject(project, item) {
+  const sectionID = String(item.sectionID || item.savedSectionID || item.itemID || "");
+  const projectID = projectRecordID(project);
+  if (!sectionID || !projectID) return;
+
+  const matches = (candidate) =>
+    String(candidate.id || "") === String(item.id || "") ||
+    (
+      String(candidate.sectionID || candidate.savedSectionID || candidate.itemID || "") === sectionID &&
+      projectSectionBelongsToProject(candidate, project)
+    );
+
+  const wasLocal = (state.localProjectSections || []).some(matches);
+  state.localProjectSections = (state.localProjectSections || []).filter((candidate) => !matches(candidate));
+  saveWorkspaceState();
+
+  if (!wasLocal && activeAccount()) {
+    await pushMutation(deletedProjectSectionMutationForItem(project, item));
+  } else if (!activeAccount() && !wasLocal) {
+    window.alert("Connect Web Sync before removing a synced project section.");
+  }
+}
+
+function normalizeAnnotationBlockID(value) {
+  return String(value || "").trim();
+}
+
+function safeAnnotationIDPart(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[^a-z0-9_-]+/gi, "-")
+    .replace(/^-+|-+$/g, "") || "section";
+}
+
+function annotationRecordID(target) {
+  const codeVersion = target.codeVersion || "nyc-2022";
+  const sectionID = String(target.sectionID || "");
+  const blockID = normalizeAnnotationBlockID(target.blockID);
+  return `web-annotation-${codeVersion}-${sectionID}-${safeAnnotationIDPart(blockID)}`;
+}
+
+function normalizeAnnotationTags(tags = []) {
+  const seen = new Set();
+  return tags
+    .map((tag) => String(tag || "").trim())
+    .filter(Boolean)
+    .filter((tag) => {
+      const key = tag.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function annotationRecordsForTarget(sectionID, blockID = "") {
+  const sectionKey = String(sectionID || "");
+  const blockKey = normalizeAnnotationBlockID(blockID);
+  const allAnnotations = [
+    ...(syncedContent?.summary?.annotations || []),
+    ...(state.localAnnotations || [])
+  ];
+  return allAnnotations
+    .filter((annotation) =>
+      String(annotation?.sectionID || "") === sectionKey &&
+      normalizeAnnotationBlockID(annotation?.blockID || annotation?.anchorID || annotation?.contentBlockID) === blockKey
+    )
+    .sort((left, right) => Date.parse(right.updatedAt || 0) - Date.parse(left.updatedAt || 0));
+}
+
+function annotationForTarget(sectionID, blockID = "") {
+  const records = annotationRecordsForTarget(sectionID, blockID);
+  let noteBody = "";
+  let tags = [];
+  let noteResolved = false;
+  let tagsResolved = false;
+
+  for (const record of records) {
+    if (record.deletedAt && !noteResolved) {
+      noteBody = "";
+      noteResolved = true;
+    }
+    if (!record.deletedAt && record.noteBody !== undefined && record.noteBody !== null && !noteResolved) {
+      noteBody = String(record.noteBody);
+      noteResolved = true;
+    }
+    if (!record.deletedAt && Array.isArray(record.tags) && !tagsResolved) {
+      tags = normalizeAnnotationTags(record.tags);
+      tagsResolved = true;
+    }
+  }
+
+  return { noteBody, tags };
+}
+
+function noteValueForTarget(sectionID, blockID = "") {
+  const blockKey = normalizeAnnotationBlockID(blockID);
+  if (!blockKey) {
+    const legacyNote = state.sectionNotes?.[sectionNoteKey(sectionID)];
+    if (legacyNote !== undefined) return legacyNote;
+  }
+  return annotationForTarget(sectionID, blockKey).noteBody;
+}
+
+function tagsForTarget(sectionID, blockID = "") {
+  return annotationForTarget(sectionID, blockID).tags;
+}
+
+function annotationRecordForTarget(target, values = {}) {
+  const existing = annotationForTarget(target.sectionID, target.blockID);
+  const now = values.updatedAt || new Date().toISOString();
+  const blockID = normalizeAnnotationBlockID(target.blockID);
+  const noteBody = values.noteBody !== undefined ? values.noteBody : existing.noteBody;
+  const tags = values.tags !== undefined ? normalizeAnnotationTags(values.tags) : existing.tags;
+  return {
+    id: annotationRecordID(target),
+    userID: activeAccount()?.userID || "local-web",
+    codeVersion: target.codeVersion || "nyc-2022",
+    codePrefix: target.codePrefix || "BC",
+    chapterID: target.chapterID || "",
+    chapterNumber: target.chapterNumber || "",
+    sectionID: Number(target.sectionID),
+    sectionNumber: target.sectionNumber || "",
+    title: target.title || "Section",
+    blockID,
+    blockLabel: target.blockLabel || "",
+    noteBody,
+    tags,
+    syncFields: values.syncFields || ["noteBody", "tags"],
+    updatedAt: now,
+    deletedAt: values.deletedAt || null
+  };
+}
+
+function upsertLocalAnnotation(record) {
+  const annotations = (state.localAnnotations || []).filter((item) => String(item.id || "") !== String(record.id || ""));
+  state.localAnnotations = [...annotations, record];
+  if (!record.blockID) {
+    state.sectionNotes = state.sectionNotes && typeof state.sectionNotes === "object" ? state.sectionNotes : {};
+    delete state.sectionNotes[sectionNoteKey(record.sectionID)];
+  }
+  saveWorkspaceState();
+}
+
+function annotationMutationForRecord(record) {
+  const account = activeAccount();
+  const fields = new Set(Array.isArray(record.syncFields) ? record.syncFields : ["noteBody", "tags"]);
+  const annotation = {
+    id: record.id,
+    userID: account?.userID || record.userID || "local-web",
+    codeVersion: record.codeVersion || "nyc-2022",
+    sectionID: Number(record.sectionID),
+    blockID: normalizeAnnotationBlockID(record.blockID) || null,
+    updatedAt: record.updatedAt || new Date().toISOString(),
+    deletedAt: record.deletedAt || null
+  };
+  if (fields.has("noteBody")) annotation.noteBody = record.deletedAt ? null : record.noteBody ?? "";
+  if (fields.has("tags")) annotation.tags = record.deletedAt ? null : normalizeAnnotationTags(record.tags || []);
+  return {
+    annotation
+  };
+}
+
+function scheduleAnnotationPush(record) {
+  if (!activeAccount()) return;
+  const timerKey = String(record.id || "");
+  clearTimeout(annotationPushTimers.get(timerKey));
+  annotationPushTimers.set(timerKey, window.setTimeout(async () => {
+    try {
+      await pushMutation(annotationMutationForRecord(record));
+      state.localAnnotations = (state.localAnnotations || []).filter((item) =>
+        String(item.id || "") !== timerKey || String(item.updatedAt || "") !== String(record.updatedAt || "")
+      );
+      saveWorkspaceState();
+      if (state.utilities.saved) await renderWorkspace();
+    } catch {
+      // Keep the local annotation queued in workspace state; the next edit can retry.
+    } finally {
+      annotationPushTimers.delete(timerKey);
+    }
+  }, 650));
+}
+
+function setAnnotationNoteValue(target, value) {
+  if (!target?.sectionID) return;
+  const existingTags = tagsForTarget(target.sectionID, target.blockID);
+  const record = annotationRecordForTarget(target, {
+    noteBody: String(value || ""),
+    tags: existingTags,
+    syncFields: ["noteBody"]
+  });
+  upsertLocalAnnotation(record);
+  scheduleAnnotationPush(record);
+}
+
+function setAnnotationTags(target, tags) {
+  if (!target?.sectionID) return;
+  const nextTags = normalizeAnnotationTags(tags);
+  const noteBody = noteValueForTarget(target.sectionID, target.blockID);
+  const record = annotationRecordForTarget(target, {
+    noteBody,
+    tags: nextTags,
+    syncFields: ["tags"]
+  });
+  upsertLocalAnnotation(record);
+  scheduleAnnotationPush(record);
+}
+
+function renderAnnotationTagEditor(container, target, options = {}) {
+  if (!container || !target?.sectionID) return;
+  clear(container);
+  const tags = tagsForTarget(target.sectionID, target.blockID);
+  const label = document.createElement("p");
+  label.className = "annotation-tags-label";
+  label.textContent = "Tags";
+
+  const chips = document.createElement("div");
+  chips.className = "annotation-tag-chips";
+  if (tags.length) {
+    tags.forEach((tag) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "annotation-tag-chip";
+      chip.textContent = tag;
+      chip.title = `Remove ${tag}`;
+      chip.addEventListener("click", () => {
+        setAnnotationTags(target, tags.filter((item) => item.toLowerCase() !== tag.toLowerCase()));
+        renderAnnotationTagEditor(container, target, options);
+        options.onChange?.();
+      });
+      chips.append(chip);
+    });
+  } else {
+    const empty = document.createElement("span");
+    empty.className = "annotation-tags-empty";
+    empty.textContent = "No tags";
+    chips.append(empty);
+  }
+
+  const input = document.createElement("input");
+  input.className = "annotation-tag-input";
+  input.type = "text";
+  input.placeholder = "Add tag";
+  input.setAttribute("aria-label", "Add tag");
+  input.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const value = input.value.trim();
+    if (!value) return;
+    setAnnotationTags(target, [...tags, value]);
+    input.value = "";
+    renderAnnotationTagEditor(container, target, options);
+    options.onChange?.();
+  });
+
+  container.append(label, chips, input);
+}
+
+function annotationTargetForSection(section, reader = null, overrides = {}) {
+  return {
+    codeVersion: "nyc-2022",
+    codePrefix: reader?.codePrefix || section.codePrefix || "BC",
+    chapterID: reader?.chapterID || section.chapterID || "",
+    chapterNumber: reader?.chapterNumber || section.chapterNumber || "",
+    sectionID: section.id || section.sectionID,
+    sectionNumber: section.sectionNumber || "",
+    title: section.title || "Section",
+    blockID: normalizeAnnotationBlockID(overrides.blockID),
+    blockLabel: overrides.blockLabel || ""
+  };
+}
+
+function annotationTargetForBlock(section, block, reader = null, index = 0) {
+  const blockID = normalizeAnnotationBlockID(block?.id || block?.tableID || block?.imageID || `block-${index + 1}`);
+  return annotationTargetForSection(section, reader, {
+    blockID,
+    blockLabel: block?.caption || block?.plainText?.slice(0, 80) || `Paragraph ${index + 1}`
+  });
+}
+
 async function populateReaderSelectors(panel, reader) {
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
@@ -1537,13 +1845,24 @@ async function renderSectionContent(panel, reader) {
     });
     sectionWrapper.append(sectionHeading);
 
-    const blocks = section.blocks?.length ? section.blocks : [{ plainText: section.title || "" }];
-    blocks.forEach((block) => sectionWrapper.append(renderCodeBlock(block)));
-    sectionWrapper.append(renderInlineCommentBox(section, reader));
+    const blocks = section.blocks?.length ? section.blocks : [{ id: `section-${section.id}`, plainText: section.title || "" }];
+    blocks.forEach((block, index) => {
+      const target = annotationTargetForBlock(section, block, reader, index);
+      sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target));
+    });
 
     content.append(sectionWrapper);
   });
-  renderSectionComments(commentsList, []);
+  renderSectionComments(commentsList, Array.from(content.querySelectorAll(".annotated-code-block")).map((node) => ({
+    sectionID: node.dataset.sectionId,
+    sectionNumber: node.dataset.sectionNumber,
+    title: node.dataset.sectionTitle,
+    blockID: node.dataset.blockId,
+    blockLabel: node.dataset.blockLabel,
+    codePrefix: reader.codePrefix || "BC",
+    chapterID: reader.chapterID || "",
+    chapterNumber: reader.chapterNumber || ""
+  })));
   restoreReaderNotesSheet(panel, reader, sections);
 
   if (reader.sectionID) {
@@ -1571,14 +1890,27 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
   scrollReaderContentToNode(content, target, behavior);
 }
 
-function renderInlineCommentBox(section, reader) {
-  const noteBody = noteValueForSection(section.id);
+function renderAnnotatedCodeBlock(block, section, reader, target) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "annotated-code-block";
+  wrapper.dataset.sectionId = String(target.sectionID || "");
+  wrapper.dataset.sectionNumber = target.sectionNumber || "";
+  wrapper.dataset.sectionTitle = target.title || "";
+  wrapper.dataset.blockId = target.blockID || "";
+  wrapper.dataset.blockLabel = target.blockLabel || "";
+  wrapper.append(renderCodeBlock(block), renderInlineCommentBox(section, reader, target));
+  return wrapper;
+}
+
+function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader)) {
+  const noteBody = noteValueForTarget(target.sectionID, target.blockID);
   const saved = isSectionSaved(section.id);
   const wrapper = document.createElement("section");
   wrapper.className = "inline-comment";
   wrapper.classList.toggle("has-note", Boolean(noteBody.trim()));
   wrapper.classList.toggle("has-saved-section", saved);
   wrapper.dataset.commentSectionId = String(section.id);
+  wrapper.dataset.commentBlockId = target.blockID || "";
 
   const button = document.createElement("button");
   button.className = "inline-comment-toggle";
@@ -1592,7 +1924,7 @@ function renderInlineCommentBox(section, reader) {
   button.setAttribute("aria-label", "Comments");
   button.title = "Open notes";
   button.classList.toggle("has-comment", Boolean(noteBody.trim()));
-  button.addEventListener("click", () => openReaderNotesSheet(sectionElementForInlineComment(wrapper)?.closest(".reader-panel"), section, reader));
+  button.addEventListener("click", () => openReaderNotesSheet(sectionElementForInlineComment(wrapper)?.closest(".reader-panel"), section, reader, { target }));
 
   const bookmarkButton = document.createElement("button");
   bookmarkButton.className = "inline-bookmark-toggle";
@@ -1643,29 +1975,25 @@ function sectionNoteKey(sectionID) {
 }
 
 function noteValueForSection(sectionID) {
-  const noteKey = sectionNoteKey(sectionID);
-  if (!noteKey) return "";
-  return state.sectionNotes?.[noteKey] ?? annotationForSection(sectionID)?.noteBody ?? "";
+  return noteValueForTarget(sectionID, "");
 }
 
 function setSectionNoteValue(sectionID, value) {
-  const noteKey = sectionNoteKey(sectionID);
-  if (!noteKey) return;
-  state.sectionNotes = state.sectionNotes && typeof state.sectionNotes === "object" ? state.sectionNotes : {};
-  state.sectionNotes[noteKey] = value;
-  saveWorkspaceState();
+  setAnnotationNoteValue({ sectionID, codeVersion: "nyc-2022", blockID: "" }, value);
 }
 
-function syncReaderNoteControls(sectionID, value, options = {}) {
+function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
+  const blockKey = normalizeAnnotationBlockID(blockID);
   const hasNote = Boolean(value.trim());
-  track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`).forEach((wrapper) => {
+  const selector = `.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"][data-comment-block-id="${CSS.escape(blockKey)}"]`;
+  track.querySelectorAll(selector).forEach((wrapper) => {
     const button = wrapper.querySelector(".inline-comment-toggle");
     wrapper.classList.toggle("has-note", hasNote);
     button?.classList.toggle("has-comment", hasNote);
   });
-  track.querySelectorAll(`.reader-notes-sheet[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((sheet) => {
+  track.querySelectorAll(`.reader-notes-sheet[data-section-id="${CSS.escape(sectionKey)}"][data-block-id="${CSS.escape(blockKey)}"]`).forEach((sheet) => {
     const input = sheet.querySelector(".reader-notes-input");
     if (input && input !== options.source) input.value = value;
   });
@@ -1712,12 +2040,17 @@ function ensureReaderNotesSheet(panel, reader) {
   input.placeholder = "Add a note";
   input.addEventListener("input", () => {
     const sectionID = sheet.dataset.sectionId || "";
-    setSectionNoteValue(sectionID, input.value);
-    syncReaderNoteControls(sectionID, input.value, { source: input });
+    const blockID = sheet.dataset.blockId || "";
+    const target = sheet.__annotationTarget || { sectionID, blockID, codeVersion: "nyc-2022" };
+    setAnnotationNoteValue(target, input.value);
+    syncReaderNoteControls(sectionID, blockID, input.value, { source: input });
   });
 
+  const tagsHost = document.createElement("section");
+  tagsHost.className = "reader-notes-tags";
+
   bindReaderNotesResize(resizer, sheet, panel);
-  sheet.append(resizer, header, input);
+  sheet.append(resizer, header, input, tagsHost);
   panel.append(sheet);
   return sheet;
 }
@@ -1802,7 +2135,7 @@ function toggleReaderNotesSheet(panel, section, reader) {
   if (!panel || !section) return;
   const sheet = panel.querySelector(".reader-notes-sheet.is-open");
   const sectionID = sectionNoteKey(section.id);
-  if (sheet?.dataset.sectionId === sectionID) {
+  if (sheet?.dataset.sectionId === sectionID && !sheet?.dataset.blockId) {
     closeReaderNotesSheet(panel, reader);
     return;
   }
@@ -1814,8 +2147,11 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const sheet = ensureReaderNotesSheet(panel, reader);
   const wasOpen = sheet.classList.contains("is-open") && !sheet.hidden;
   const sectionID = sectionNoteKey(section.id);
+  const target = options.target || annotationTargetForSection(section, reader);
+  const blockID = normalizeAnnotationBlockID(target.blockID);
   if (reader) {
     reader.activeNotesSectionID = sectionID;
+    reader.activeNotesBlockID = blockID;
     saveWorkspaceState();
   }
   panel.querySelectorAll(".chapter-section.is-notes-active").forEach((activeSection) => {
@@ -1872,12 +2208,20 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
 
   const title = sheet.querySelector(".reader-notes-title");
   const input = sheet.querySelector(".reader-notes-input");
+  const tagsHost = sheet.querySelector(".reader-notes-tags");
   sheet.dataset.sectionId = sectionID;
+  sheet.dataset.blockId = blockID;
+  sheet.__annotationTarget = target;
   if (!wasOpen) sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
   removeReaderNotesProjectPicker(sheet);
-  title.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
-  input.value = noteValueForSection(section.id);
+  title.textContent = blockID && target.blockLabel ? target.blockLabel : sectionDisplayTitle(section.sectionNumber, section.title);
+  input.value = noteValueForTarget(section.id, blockID);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
+  renderAnnotationTagEditor(tagsHost, target, {
+    onChange: () => {
+      if (state.utilities.saved) renderWorkspace();
+    }
+  });
   sheet.hidden = false;
   if (options.instant) {
     sheet.classList.add("is-restoring", "is-open");
@@ -1901,7 +2245,14 @@ function restoreReaderNotesSheet(panel, reader, sections) {
     saveWorkspaceState();
     return;
   }
-  openReaderNotesSheet(panel, section, reader, { instant: true });
+  const blockID = normalizeAnnotationBlockID(reader?.activeNotesBlockID);
+  const block = blockID ? (section.blocks || []).find((item) =>
+    normalizeAnnotationBlockID(item?.id || item?.tableID || item?.imageID) === blockID
+  ) : null;
+  const target = block
+    ? annotationTargetForBlock(section, block, reader, Math.max(0, (section.blocks || []).indexOf(block)))
+    : annotationTargetForSection(section, reader);
+  openReaderNotesSheet(panel, section, reader, { instant: true, target });
 }
 
 function closeReaderNotesSheet(panel, reader = null) {
@@ -1909,6 +2260,7 @@ function closeReaderNotesSheet(panel, reader = null) {
   if (!sheet) return;
   if (reader) {
     reader.activeNotesSectionID = "";
+    reader.activeNotesBlockID = "";
     saveWorkspaceState();
   }
   sheet.classList.remove("is-open");
@@ -2121,10 +2473,10 @@ function bindAllReaderCommentScroll() {
   });
 }
 
-function renderSectionComments(commentsList, sections) {
+function renderSectionComments(commentsList, targets) {
   if (!commentsList) return;
   clear(commentsList);
-  if (!sections.length) {
+  if (!targets.length) {
     const empty = document.createElement("p");
     empty.className = "comments-empty";
     empty.textContent = "";
@@ -2132,17 +2484,24 @@ function renderSectionComments(commentsList, sections) {
     return;
   }
 
-  sections.forEach((section) => {
+  targets.forEach((target) => {
     const item = document.createElement("article");
     item.className = "section-comment-box";
-    item.dataset.sectionId = String(section.id);
+    item.dataset.sectionId = String(target.sectionID);
+    item.dataset.blockId = target.blockID || "";
 
     const inputLabel = document.createElement("label");
     inputLabel.className = "comment-composer";
     const textarea = document.createElement("textarea");
     textarea.className = "comment-input";
     textarea.rows = 4;
-    textarea.setAttribute("aria-label", `Comment for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
+    textarea.value = noteValueForTarget(target.sectionID, target.blockID);
+    textarea.placeholder = "Add a note";
+    textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(target.sectionNumber, target.title)}`);
+    textarea.addEventListener("input", () => {
+      setAnnotationNoteValue(target, textarea.value);
+      syncReaderNoteControls(target.sectionID, target.blockID, textarea.value, { source: textarea });
+    });
 
     inputLabel.append(textarea);
     item.append(inputLabel);
@@ -2777,8 +3136,7 @@ async function openSectionDetail(searchID, section, options = {}) {
 }
 
 function annotationForSection(sectionID) {
-  const annotations = syncedContent?.summary?.annotations || [];
-  return annotations.find((annotation) => String(annotation.sectionID) === String(sectionID)) || null;
+  return annotationForTarget(sectionID, "");
 }
 
 async function resolveSectionDetail(detail) {
@@ -2912,9 +3270,16 @@ async function renderSectionDetail(searchID, detail) {
 
   const { chapter, section } = await resolveSectionDetail(detail);
   const sectionPayload = makeSectionPayloadFromDetail(detail, section);
+  sectionPayload.codePrefix = detail.codePrefix || "BC";
+  sectionPayload.chapterID = detail.chapterID || chapter?.id || "";
+  sectionPayload.chapterNumber = detail.chapterNumber || chapter?.chapterNumber || "";
+  const sectionTarget = {
+    ...sectionPayload,
+    codeVersion: "nyc-2022",
+    blockID: ""
+  };
   const saved = isSectionSaved(detail.sectionID);
-  const noteKey = String(detail.sectionID);
-  const noteBody = noteValueForSection(detail.sectionID);
+  const noteBody = noteValueForTarget(sectionTarget.sectionID, "");
   const bodyText = sectionPlainText(section);
 
   const chrome = document.createElement("header");
@@ -2986,7 +3351,14 @@ async function renderSectionDetail(searchID, detail) {
   textarea.placeholder = "Add a note";
   textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
   textareaWrap.append(textarea);
-  notes.append(notesHeader, textareaWrap);
+  const tagsHost = document.createElement("section");
+  tagsHost.className = "section-detail-tags";
+  renderAnnotationTagEditor(tagsHost, sectionTarget, {
+    onChange: () => {
+      saveState.textContent = "Saved locally";
+    }
+  });
+  notes.append(notesHeader, textareaWrap, tagsHost);
 
   backButton.addEventListener("click", () => {
     delete sectionDetailsBySearch()[searchID];
@@ -3031,8 +3403,8 @@ async function renderSectionDetail(searchID, detail) {
 
   let noteTimer = null;
   textarea.addEventListener("input", () => {
-    setSectionNoteValue(noteKey, textarea.value);
-    syncReaderNoteControls(noteKey, textarea.value, { source: textarea });
+    setAnnotationNoteValue(sectionTarget, textarea.value);
+    syncReaderNoteControls(sectionTarget.sectionID, "", textarea.value, { source: textarea });
     saveState.textContent = "Saving...";
     window.clearTimeout(noteTimer);
     noteTimer = window.setTimeout(() => {
@@ -3345,9 +3717,11 @@ async function renderProjectDetail(detail) {
   savedSection.className = "project-detail-section";
 
   linkedSavedItems.forEach((item) => {
-    const row = document.createElement("button");
+    const row = document.createElement("article");
     row.className = "saved-row project-detail-saved-row";
-    row.type = "button";
+    const openButton = document.createElement("button");
+    openButton.className = "project-detail-section-open";
+    openButton.type = "button";
     const rowTitle = document.createElement("strong");
     rowTitle.textContent = item.sectionNumber || item.sectionID || "Saved";
     const rowBody = document.createElement("span");
@@ -3357,8 +3731,25 @@ async function renderProjectDetail(detail) {
       item.sectionNumber || item.sectionID || "",
       item.title || item.subtitle || "Saved section"
     ].filter(Boolean).join(" · ");
-    row.append(rowTitle, rowBody);
-    row.addEventListener("click", () => openProjectSavedSection(identity, item));
+    openButton.append(rowTitle, rowBody);
+    openButton.addEventListener("click", () => openProjectSavedSection(identity, item));
+    const removeButton = document.createElement("button");
+    removeButton.className = "project-detail-section-remove";
+    removeButton.type = "button";
+    removeButton.title = "Remove from project";
+    removeButton.setAttribute("aria-label", `Remove ${rowTitle.textContent} from ${identity.name}`);
+    removeButton.innerHTML = trashIconSVG();
+    removeButton.addEventListener("click", async () => {
+      removeButton.disabled = true;
+      try {
+        await removeSectionFromProject(identity, item);
+        await renderWorkspace();
+      } catch (error) {
+        removeButton.disabled = false;
+        window.alert(error.message || "Could not remove the section.");
+      }
+    });
+    row.append(openButton, removeButton);
     savedSection.append(row);
   });
 
@@ -3649,13 +4040,24 @@ async function renderSaved(paneID = "utility:saved") {
     return panel;
   }
 
-  const { savedItems } = summary;
+  const { savedItems, annotations } = summary;
+  const annotatedItems = (annotations || []).filter((annotation) =>
+    !annotation.deletedAt &&
+    (String(annotation.noteBody || "").trim() || normalizeAnnotationTags(annotation.tags || []).length)
+  );
 
   appendSectionLabel(content, "Saved sections");
   if (savedItems.length === 0) {
     appendMutedRow(content, "No saved sections", "Saved sections synced from iOS or saved in this web workspace will appear here.");
   } else {
     renderSavedItemsByCode(content, savedItems.slice(0, 48), paneID);
+  }
+
+  appendSectionLabel(content, "Notes and tags");
+  if (annotatedItems.length === 0) {
+    appendMutedRow(content, "No notes or tags", "Paragraph notes and tags from this web workspace will appear here.");
+  } else {
+    renderSavedItemsByCode(content, annotatedItems.slice(0, 48), paneID);
   }
 
   return panel;
@@ -3700,6 +4102,18 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved") {
         heading.className = "saved-section-heading";
         heading.append(title);
         row.append(heading);
+        const annotation = annotationForTarget(item.sectionID, item.blockID || "");
+        if (annotation.tags.length) {
+          const tags = document.createElement("span");
+          tags.className = "saved-row-tags";
+          annotation.tags.forEach((tag) => {
+            const chip = document.createElement("span");
+            chip.className = "saved-row-tag";
+            chip.textContent = tag;
+            tags.append(chip);
+          });
+          row.append(tags);
+        }
         row.addEventListener("click", () => openSectionDetailForExistingSearch(item, { anchorPaneID: paneID }));
         codeGroup.append(row);
       });

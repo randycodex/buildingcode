@@ -435,10 +435,15 @@ struct ServerAnnotationRecord: Codable, Hashable, Sendable {
     let userID: String
     let codeVersion: String
     let sectionID: Int64
+    let blockID: String?
     let noteBody: String?
     let tags: [String]?
     let updatedAt: Date
     let deletedAt: Date?
+
+    var normalizedBlockID: String {
+        blockID?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
 }
 
 struct ServerProjectRecord: Codable, Hashable, Sendable {
@@ -575,6 +580,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
+                    blockID: payload.values["blockID"],
                     noteBody: item.operationType == .delete ? nil : payload.values["body"],
                     tags: nil,
                     updatedAt: item.updatedAt,
@@ -591,6 +597,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
+                    blockID: payload.values["blockID"],
                     noteBody: nil,
                     tags: item.operationType == .delete ? nil : Self.tags(from: payload.values["tags"]),
                     updatedAt: item.updatedAt,
