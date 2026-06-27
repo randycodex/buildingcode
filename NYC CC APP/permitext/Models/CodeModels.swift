@@ -958,6 +958,15 @@ struct BackendPasskeyLinkResponse: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
 
+struct BackendAppleTransactionVerifyRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let signedTransactionInfo: String
+}
+
+struct BackendAppleTransactionVerifyResponse: Codable, Hashable, Sendable {
+    let entitlement: AppEntitlement?
+}
+
 private struct BackendErrorResponse: Codable, Hashable, Sendable {
     let error: String?
 }
@@ -972,6 +981,7 @@ struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
     let rejectedMutationIDs: [String]?
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
+    var entitlement: AppEntitlement? = nil
     let serverTime: Date
 }
 
@@ -993,6 +1003,7 @@ protocol PermitextBackendTransport {
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
     func linkPasskey(_ request: BackendPasskeyLinkRequest) async throws -> BackendPasskeyLinkResponse
+    func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
 }
@@ -1135,6 +1146,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("account/passkeys/link", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse {
+        try await post("billing/apple/transactions/verify", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
         try await post("sync/push", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -1248,6 +1263,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             )
         accountsByUserID[request.auth.accountUserID] = account
         return BackendPasskeyLinkResponse(account: account)
+    }
+
+    func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse {
+        BackendAppleTransactionVerifyResponse(entitlement: .appleSubscriptionPro)
     }
 
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
@@ -1941,16 +1960,24 @@ enum AppPlan: String, Codable, Hashable, Sendable {
 enum EntitlementSource: String, Codable, Hashable, Sendable {
     case none
     case subscription
+    case appleSubscription
+    case webSubscription
     case lifetimeGrant
     case debugOverride
 
     var label: String {
         switch self {
         case .none: return "None"
-        case .subscription: return "Subscription"
+        case .subscription: return "Pro Subscription"
+        case .appleSubscription: return "Apple Billing"
+        case .webSubscription: return "Web Billing"
         case .lifetimeGrant: return "Lifetime Grant"
         case .debugOverride: return "Debug Override"
         }
+    }
+
+    var isAppleManagedSubscription: Bool {
+        self == .appleSubscription || self == .subscription
     }
 }
 
@@ -1960,7 +1987,9 @@ struct AppEntitlement: Codable, Hashable, Sendable {
     let grantedUserID: String?
 
     static let free = AppEntitlement(plan: .free, source: .none, grantedUserID: nil)
-    static let subscriptionPro = AppEntitlement(plan: .pro, source: .subscription, grantedUserID: nil)
+    static let appleSubscriptionPro = AppEntitlement(plan: .pro, source: .appleSubscription, grantedUserID: nil)
+    static let webSubscriptionPro = AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: nil)
+    static let subscriptionPro = appleSubscriptionPro
 
     static func lifetimeGrant(userID: String) -> AppEntitlement {
         AppEntitlement(plan: .pro, source: .lifetimeGrant, grantedUserID: userID)
@@ -1990,6 +2019,24 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
     let providerUserID: String
     let displayName: String?
     let signedInAt: Date
+    let identityToken: String?
+    let authorizationCode: String?
+
+    init(
+        provider: AccountAuthProvider,
+        providerUserID: String,
+        displayName: String?,
+        signedInAt: Date,
+        identityToken: String? = nil,
+        authorizationCode: String? = nil
+    ) {
+        self.provider = provider
+        self.providerUserID = providerUserID
+        self.displayName = displayName
+        self.signedInAt = signedInAt
+        self.identityToken = identityToken
+        self.authorizationCode = authorizationCode
+    }
 }
 
 struct SignedInAccount: Codable, Hashable, Sendable {
@@ -2067,6 +2114,7 @@ protocol AccountBackendClient {
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount
+    func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
 }
 
 struct LocalAccountBackendClient: AccountBackendClient {
@@ -2108,6 +2156,10 @@ struct LocalAccountBackendClient: AccountBackendClient {
 
     func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount {
         account
+    }
+
+    func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement? {
+        .appleSubscriptionPro
     }
 }
 
@@ -2237,7 +2289,7 @@ struct LocalEntitlementService: EntitlementService {
             return .lifetimeGrant(userID: lifetimeGrantUserID)
         }
         if defaults.string(forKey: Self.verifiedPlanDefaultsKey).flatMap(AppPlan.init(rawValue:)) == .pro {
-            return .subscriptionPro
+            return .appleSubscriptionPro
         }
         #if DEBUG
         if let debugPlan = defaults.string(forKey: Self.planDefaultsKey).flatMap(AppPlan.init(rawValue:)) {
@@ -2310,8 +2362,8 @@ struct LocalEntitlementService: EntitlementService {
     static func setVerifiedPlan(_ plan: AppPlan, defaults: UserDefaults = .standard) {
         defaults.set(plan.rawValue, forKey: verifiedPlanDefaultsKey)
         if plan == .pro {
-            setEntitlement(.subscriptionPro, defaults: defaults)
-        } else if currentStoredEntitlement(defaults: defaults).source == .subscription {
+            setEntitlement(.appleSubscriptionPro, defaults: defaults)
+        } else if currentStoredEntitlement(defaults: defaults).source.isAppleManagedSubscription {
             setEntitlement(.free, defaults: defaults)
         }
     }
@@ -2352,6 +2404,7 @@ struct StoreKitSubscriptionSnapshot: Sendable {
     let proDisplayPrice: String?
     let loadedProductIDs: [String]
     let debugSummary: String
+    let signedTransactionInfo: String?
 }
 
 enum StoreKitSubscriptionServiceError: LocalizedError {
@@ -2378,16 +2431,18 @@ actor StoreKitSubscriptionService {
     private let proProductID = StoreKitProductID.proMonthly
     private var cachedProProduct: Product?
 
-    func snapshot() async -> StoreKitSubscriptionSnapshot {
-        async let plan = verifiedPlan()
+    func snapshot(signedTransactionInfo: String? = nil) async -> StoreKitSubscriptionSnapshot {
+        async let planResult = verifiedPlanAndSignedTransactionInfo()
         async let products = proProducts()
         async let debugSummary = transactionDebugSummary()
         let loadedProducts = await products
+        let resolvedPlanResult = await planResult
         return StoreKitSubscriptionSnapshot(
-            plan: await plan,
+            plan: resolvedPlanResult.plan,
             proDisplayPrice: loadedProducts.first { $0.id == proProductID }?.displayPrice,
             loadedProductIDs: loadedProducts.map(\.id),
-            debugSummary: await debugSummary
+            debugSummary: await debugSummary,
+            signedTransactionInfo: signedTransactionInfo ?? resolvedPlanResult.signedTransactionInfo
         )
     }
 
@@ -2401,7 +2456,7 @@ actor StoreKitSubscriptionService {
         case .success(let verification):
             let transaction = try verifiedTransaction(from: verification)
             await transaction.finish()
-            return await snapshot()
+            return await snapshot(signedTransactionInfo: verification.jwsRepresentation)
         case .userCancelled:
             return await snapshot()
         case .pending:
@@ -2432,7 +2487,7 @@ actor StoreKitSubscriptionService {
                         LocalEntitlementService.setVerifiedPlan(.pro)
                     }
                     await transaction.finish()
-                    continuation.yield(await snapshot())
+                    continuation.yield(await snapshot(signedTransactionInfo: result.jwsRepresentation))
                 }
             }
             continuation.onTermination = { _ in task.cancel() }
@@ -2446,28 +2501,29 @@ actor StoreKitSubscriptionService {
         return products
     }
 
-    private func verifiedPlan() async -> AppPlan {
-        for await entitlement in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = entitlement else { continue }
+    private func verifiedPlanAndSignedTransactionInfo() async -> (plan: AppPlan, signedTransactionInfo: String?) {
+        for await verification in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = verification else { continue }
             guard isActiveProTransaction(transaction) else { continue }
             LocalEntitlementService.setVerifiedPlan(.pro)
-            return .pro
+            return (.pro, verification.jwsRepresentation)
         }
-        if let latest = await Transaction.latest(for: proProductID),
-           case .verified(let transaction) = latest,
+        if let verification = await Transaction.latest(for: proProductID),
+           case .verified(let transaction) = verification,
            isActiveProTransaction(transaction) {
             LocalEntitlementService.setVerifiedPlan(.pro)
-            return .pro
+            return (.pro, verification.jwsRepresentation)
         }
         if await subscriptionStatusIndicatesActivePro() {
             LocalEntitlementService.setVerifiedPlan(.pro)
-            return .pro
+            return (.pro, nil)
         }
-        if LocalEntitlementService().currentEntitlement.source == .lifetimeGrant {
-            return .pro
+        let currentEntitlement = LocalEntitlementService().currentEntitlement
+        if currentEntitlement.plan == .pro && !currentEntitlement.source.isAppleManagedSubscription {
+            return (.pro, nil)
         }
         LocalEntitlementService.setVerifiedPlan(.free)
-        return .free
+        return (.free, nil)
     }
 
     private nonisolated func isActiveProTransaction(_ transaction: Transaction) -> Bool {

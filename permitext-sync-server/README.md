@@ -37,6 +37,32 @@ Configure passkey web credentials metadata with:
 APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mjs
 ```
 
+Apple sign-in requests may include the identity token issued by Sign in with Apple. When a token is present, the server verifies the Apple signature, issuer, expiration, subject, and configured audience. Set `PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1` after production Apple client IDs are configured to reject tokenless Apple sign-ins:
+
+```sh
+APPLE_BUNDLE_ID=com.randycodex.permitext \
+APPLE_SERVICE_ID=com.example.permitext.web \
+APPLE_ALLOWED_CLIENT_IDS=com.example.extra.client \
+PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1 \
+node server.mjs
+```
+
+Configure paid entitlement sources with:
+
+```sh
+STRIPE_SECRET_KEY=sk_live_... \
+STRIPE_PRO_PRICE_ID=price_... \
+STRIPE_WEBHOOK_SECRET=whsec_... \
+STOREKIT_PRO_PRODUCT_ID=com.randycodex.permitext.pro.monthly \
+APPLE_BUNDLE_ID=com.randycodex.permitext \
+APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS=... \
+PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN=1 \
+PERMITEXT_PUBLIC_BASE_URL=https://permitext-sync.vercel.app \
+node server.mjs
+```
+
+Stripe Checkout only creates the web checkout session. Web Pro access is granted or revoked by signed Stripe webhook events. Apple Pro access is granted only after the iOS app sends Apple's signed StoreKit transaction JWS to the backend.
+
 ## Deploy To Vercel
 
 This folder is Vercel-ready.
@@ -80,6 +106,9 @@ The Neon schema is created automatically on first request. The current Postgres 
 - `POST /account/profile`
 - `POST /sync/push`
 - `POST /sync/pull`
+- `POST /billing/web/checkout`
+- `POST /billing/stripe/webhook`
+- `POST /billing/apple/transactions/verify`
 - `POST /admin/lifetime-grants/grant`
 - `POST /admin/lifetime-grants/revoke`
 - `POST /admin/accounts/delete-legacy-passkey-users`
@@ -115,9 +144,12 @@ PERMITEXT_SYNC_DATABASE_URL="$DATABASE_URL" npm run verify:postgres
   "rejectedMutationIDs": [],
   "latestEventID": 123,
   "syncRevision": 123,
+  "entitlement": null,
   "serverTime": "2026-06-27T00:00:00.000Z"
 }
 ```
+
+Entitlements are server-owned. Sync batches can include local user content mutations, but any client-provided `batch.entitlement` value is ignored; paid access should be written only by verified Apple/web payment handlers or admin grant routes.
 
 `POST /sync/pull` still accepts the original timestamp `since` field, but hosted Postgres deployments can also use the event cursor:
 

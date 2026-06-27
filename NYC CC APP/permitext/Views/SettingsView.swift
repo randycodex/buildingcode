@@ -244,7 +244,7 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("Source: \(library.currentEntitlementSource.label)")
+            Text("Billing: \(library.currentEntitlementSource.label)")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
 
@@ -535,7 +535,7 @@ struct SettingsView: View {
             if library.currentEntitlementSource == .lifetimeGrant {
                 return "Lifetime Pro is active. This account has gifted access and does not need an App Store subscription."
             }
-            return "Pro is active. Unlimited saved work, PDF export, tags, continuity, and future cross-device sync are unlocked."
+            return "Pro is active. The same saved work, PDF export, tags, continuity, and future cross-device sync are unlocked across iOS and web."
         }
         return "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity."
     }

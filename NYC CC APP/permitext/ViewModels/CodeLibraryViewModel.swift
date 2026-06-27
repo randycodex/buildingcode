@@ -1640,6 +1640,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func refreshStoreKitEntitlements() async {
         let snapshot = await storeKitSubscriptionService.snapshot()
         applyStoreKitSnapshot(snapshot)
+        await syncAppleTransactionIfPossible(snapshot)
     }
 
     func startStoreKitTransactionObservation() {
@@ -1649,6 +1650,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let updates = await service.transactionUpdates()
             for await snapshot in updates {
                 await self?.applyStoreKitSnapshot(snapshot)
+                await self?.syncAppleTransactionIfPossible(snapshot)
             }
         }
     }
@@ -1661,6 +1663,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             let snapshot = try await storeKitSubscriptionService.purchasePro()
             applyStoreKitSnapshot(snapshot)
+            await syncAppleTransactionIfPossible(snapshot)
             statusMessage = currentPlan == .pro ? "Pro is active." : "Purchase cancelled."
         } catch {
             statusMessage = error.localizedDescription
@@ -1679,6 +1682,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         let snapshot = await storeKitSubscriptionService.restorePurchases()
         applyStoreKitSnapshot(snapshot)
+        await syncAppleTransactionIfPossible(snapshot)
         statusMessage = currentPlan == .pro ? "Pro purchase restored." : "No active Pro subscription found."
     }
 
@@ -1692,13 +1696,17 @@ final class CodeLibraryViewModel: ObservableObject {
             let displayName = [credential.fullName?.givenName, credential.fullName?.familyName]
                 .compactMap { $0 }
                 .joined(separator: " ")
+            let identityToken = credential.identityToken.flatMap { String(data: $0, encoding: .utf8) }
+            let authorizationCode = credential.authorizationCode.flatMap { String(data: $0, encoding: .utf8) }
             do {
                 let backendRecord = try await accountBackendClient.signIn(
                     credential: AccountSignInCredential(
                         provider: .apple,
                         providerUserID: credential.user,
                         displayName: displayName.isEmpty ? nil : displayName,
-                        signedInAt: Date()
+                        signedInAt: Date(),
+                        identityToken: identityToken,
+                        authorizationCode: authorizationCode
                     )
                 )
                 await completeBackendSignIn(backendRecord)
@@ -2172,7 +2180,7 @@ final class CodeLibraryViewModel: ObservableObject {
         if entitlement.plan == .pro {
             resolvedEntitlement = entitlement
         } else if snapshot.plan == .pro {
-            resolvedEntitlement = .subscriptionPro
+            resolvedEntitlement = .appleSubscriptionPro
         } else {
             resolvedEntitlement = entitlement
         }
@@ -2181,6 +2189,27 @@ final class CodeLibraryViewModel: ObservableObject {
         proProductDisplayPrice = snapshot.proDisplayPrice
         storeKitLoadedProductIDs = snapshot.loadedProductIDs
         storeKitDebugSummary = snapshot.debugSummary
+    }
+
+    private func syncAppleTransactionIfPossible(_ snapshot: StoreKitSubscriptionSnapshot) async {
+        guard let signedInAccount,
+              let signedTransactionInfo = snapshot.signedTransactionInfo,
+              !signedTransactionInfo.isEmpty
+        else {
+            return
+        }
+        do {
+            if let entitlement = try await accountBackendClient.verifyAppleTransaction(
+                account: signedInAccount,
+                signedTransactionInfo: signedTransactionInfo
+            ) {
+                LocalEntitlementService.setEntitlement(entitlement)
+                refreshCurrentEntitlement()
+            }
+        } catch {
+            if handleBackendSessionFailureIfNeeded(error) { return }
+            statusMessage = "Pro is active on this device. Backend billing sync failed: \(error.localizedDescription)"
+        }
     }
 
     private static func isBackendAuthenticationFailure(_ error: Error) -> Bool {
