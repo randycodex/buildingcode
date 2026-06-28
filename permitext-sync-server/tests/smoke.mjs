@@ -124,6 +124,14 @@ async function main() {
       appleWebStart.response.headers.get("set-cookie")?.includes("permitext_apple_oauth="),
       "Apple web sign-in start did not set the OAuth state cookie."
     );
+    const productionAppleWebStart = await request("/account/apple/start", {
+      method: "POST",
+      body: { successURL: "/" },
+      headers: { "x-forwarded-host": "permitext-sync.vercel.app" }
+    });
+    const productionAppleCookie = productionAppleWebStart.response.headers.get("set-cookie") || "";
+    assert(productionAppleCookie.includes("SameSite=None"), "Production Apple OAuth cookie must allow cross-site form POST.");
+    assert(productionAppleCookie.includes("Secure"), "Production Apple OAuth cookie must be Secure.");
 
     const appleWebCallback = await request("/account/apple/callback");
     assert(appleWebCallback.response.ok, "Apple web sign-in callback did not load.");

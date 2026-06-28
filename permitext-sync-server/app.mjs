@@ -1723,13 +1723,14 @@ function cookieValue(request, name) {
 }
 
 function appleOAuthCookie(request, value = "", maxAge = 600) {
-  const secure = !((request.headers.host || "").startsWith("localhost") || (request.headers.host || "").startsWith("127.0.0.1"));
+  const host = request.headers["x-forwarded-host"] || request.headers.host || "";
+  const secure = !String(host).startsWith("localhost") && !String(host).startsWith("127.0.0.1");
   return [
     `permitext_apple_oauth=${encodeURIComponent(value)}`,
     `Max-Age=${maxAge}`,
     "Path=/account/apple",
     "HttpOnly",
-    "SameSite=Lax",
+    secure ? "SameSite=None" : "SameSite=Lax",
     secure ? "Secure" : null
   ].filter(Boolean).join("; ");
 }
