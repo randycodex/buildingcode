@@ -1886,10 +1886,15 @@ async function verifyAppleIdentityToken(identityToken) {
   return payload;
 }
 
-async function verifiedProviderUserID(credential) {
+function normalizedAccountEmail(value) {
+  const email = String(value || "").trim().toLowerCase();
+  return email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : "";
+}
+
+async function verifiedCredentialIdentity(credential) {
   const provider = credential?.provider || "guest";
   if (provider !== "apple") {
-    return credential?.providerUserID || "local-guest";
+    return { providerUserID: credential?.providerUserID || "local-guest", email: "" };
   }
 
   const identityToken = typeof credential?.identityToken === "string" ? credential.identityToken.trim() : "";
@@ -1897,29 +1902,107 @@ async function verifiedProviderUserID(credential) {
     if (process.env.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1") {
       throw new ClientAuthError(401, "Missing Apple identity token.");
     }
-    return credential?.providerUserID || "local-guest";
+    return {
+      providerUserID: credential?.providerUserID || "local-guest",
+      email: normalizedAccountEmail(credential?.email)
+    };
   }
 
   const payload = await verifyAppleIdentityToken(identityToken);
   if (credential.providerUserID && credential.providerUserID !== payload.sub) {
     throw new ClientAuthError(401, "Apple identity token subject does not match the credential.");
   }
-  return payload.sub;
+  return {
+    providerUserID: payload.sub,
+    email: normalizedAccountEmail(payload.email || credential?.email)
+  };
 }
 
 async function accountFromCredential(credential) {
   const provider = credential?.provider || "guest";
-  const providerUserID = await verifiedProviderUserID(credential);
+  const identity = await verifiedCredentialIdentity(credential);
+  const providerUserID = identity.providerUserID;
   return {
     appUserID: `${provider}:${providerUserID}`,
     authProvider: provider,
     authProviderUserID: providerUserID,
     appleUserID: provider === "apple" ? providerUserID : "",
+    email: provider === "apple" ? identity.email : "",
     publicUsername: null,
     displayName: credential?.displayName ?? null,
     signedInAt: credential?.signedInAt || new Date().toISOString(),
     migrationState: "notStarted"
   };
+}
+
+function accountEmail(account) {
+  return normalizedAccountEmail(account?.email || account?.emailAddress || account?.privateRelayEmail);
+}
+
+function appleSubjectIDs(account) {
+  return new Set([
+    account?.authProviderUserID,
+    account?.appleUserID,
+    ...(Array.isArray(account?.linkedAppleUserIDs) ? account.linkedAppleUserIDs : [])
+  ].map((value) => String(value || "").trim()).filter(Boolean));
+}
+
+function appleAccountMergeCandidates(store, account) {
+  if (account?.authProvider !== "apple") return [];
+  const email = accountEmail(account);
+  const subjectIDs = appleSubjectIDs(account);
+  return Object.values(store.users || {})
+    .filter((candidate) => candidate?.authProvider === "apple")
+    .filter((candidate) => {
+      if (candidate.appUserID === account.appUserID) return false;
+      if (email && accountEmail(candidate) === email) return true;
+      const candidateSubjects = appleSubjectIDs(candidate);
+      return Array.from(subjectIDs).some((subjectID) => candidateSubjects.has(subjectID));
+    });
+}
+
+function userMutationCount(store, userID) {
+  return (store.mutationsByUserID?.[userID] || []).length;
+}
+
+function preferredAppleAccountTarget(store, account) {
+  const candidates = appleAccountMergeCandidates(store, account);
+  if (!candidates.length) return null;
+  return candidates.sort((left, right) => {
+    const mutationDelta = userMutationCount(store, right.appUserID) - userMutationCount(store, left.appUserID);
+    if (mutationDelta !== 0) return mutationDelta;
+    const rightEntitled = store.entitlements?.[right.appUserID] ? 1 : 0;
+    const leftEntitled = store.entitlements?.[left.appUserID] ? 1 : 0;
+    if (rightEntitled !== leftEntitled) return rightEntitled - leftEntitled;
+    return String(left.signedInAt || "").localeCompare(String(right.signedInAt || ""));
+  })[0];
+}
+
+async function canonicalizeAppleAccountForSignIn(store, account) {
+  if (account?.authProvider !== "apple") return account;
+  const target = preferredAppleAccountTarget(store, account);
+  if (!target?.appUserID) return account;
+  const email = accountEmail(account) || accountEmail(target);
+  const linkedAppleUserIDs = Array.from(new Set([
+    ...Array.from(appleSubjectIDs(target)),
+    ...Array.from(appleSubjectIDs(account))
+  ]));
+  store.users[target.appUserID] = {
+    ...account,
+    ...target,
+    appUserID: target.appUserID,
+    authProvider: "apple",
+    authProviderUserID: target.authProviderUserID || target.appleUserID || account.authProviderUserID,
+    appleUserID: target.appleUserID || account.appleUserID,
+    email,
+    linkedAppleUserIDs,
+    signedInAt: account.signedInAt || new Date().toISOString(),
+    migrationState: "localDataAttached"
+  };
+  if (store.users[account.appUserID]) {
+    await mergeAccountInto(store, account.appUserID, target.appUserID);
+  }
+  return store.users[target.appUserID];
 }
 
 function entitlementForSource(userID, source, details = {}) {
@@ -2613,6 +2696,7 @@ async function handleSignIn(request, response) {
     account = passkeyUserID
       ? { ...store.users[passkeyUserID], signedInAt: credential.signedInAt || new Date().toISOString() }
       : await accountFromCredential(credential);
+    account = await canonicalizeAppleAccountForSignIn(store, account);
   } catch (error) {
     if (error instanceof ClientAuthError) {
       sendError(response, error.statusCode, error.message);
@@ -3477,13 +3561,14 @@ async function handleAppleWebCallback(request, response) {
       .filter(Boolean)
       .join(" ");
     const store = await readStore();
-    const account = await accountFromCredential({
+    let account = await accountFromCredential({
       provider: "apple",
       displayName: displayName || null,
       signedInAt: new Date().toISOString(),
       identityToken,
       authorizationCode: form.get("code") || undefined
     });
+    account = await canonicalizeAppleAccountForSignIn(store, account);
     const sessionToken = store.sessions[account.appUserID] || randomUUID();
     store.sessions[account.appUserID] = sessionToken;
     const existing = store.users[account.appUserID];

@@ -410,6 +410,71 @@ async function main() {
     });
     assert(mergeSourcePull.response.status === 401, "Merged source account session still worked.");
 
+    const nativeAppleSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "native-apple-subject",
+          email: "shared-apple@example.com",
+          displayName: "Native Apple"
+        }
+      }
+    });
+    assert(nativeAppleSignIn.response.ok, "Native Apple sign-in failed.");
+    const nativeAppleUserID = nativeAppleSignIn.json.account.appUserID;
+    const nativeAppleToken = nativeAppleSignIn.json.account.backendSessionToken;
+    const nativeAnnotationID = `${nativeAppleUserID}:note:${defaultSyncCodeVersion}:545:rid-0-0-0-164259`;
+    const nativeAnnotationPush = await request("/sync/push", {
+      method: "POST",
+      token: nativeAppleToken,
+      body: {
+        auth: { accountUserID: nativeAppleUserID },
+        batch: {
+          user: { id: nativeAppleUserID },
+          mutations: [{
+            annotation: {
+              id: nativeAnnotationID,
+              userID: nativeAppleUserID,
+              codeVersion: defaultSyncCodeVersion,
+              sectionID: 545,
+              blockID: "rid-0-0-0-164259",
+              noteBody: "Native note",
+              updatedAt: new Date().toISOString()
+            }
+          }]
+        }
+      }
+    });
+    assert(nativeAnnotationPush.response.ok, "Native Apple annotation push failed.");
+    const webAppleSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "web-apple-subject",
+          email: "shared-apple@example.com",
+          displayName: "Web Apple"
+        }
+      }
+    });
+    assert(webAppleSignIn.response.ok, "Web Apple sign-in failed.");
+    assert(webAppleSignIn.json.account.appUserID === nativeAppleUserID, "Web Apple sign-in did not reuse the native Apple account.");
+    assert(
+      webAppleSignIn.json.account.linkedAppleUserIDs?.includes("web-apple-subject"),
+      "Web Apple subject was not linked to the native account."
+    );
+    const webApplePull = await request("/sync/pull", {
+      method: "POST",
+      token: webAppleSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: nativeAppleUserID } }
+    });
+    assert(webApplePull.response.ok, "Web Apple pull failed.");
+    assert(
+      webApplePull.json.mutations.some((mutation) => mutation.annotation?.noteBody === "Native note"),
+      "Web Apple account did not pull the native Apple annotation."
+    );
+
     const clientEntitlementPush = await request("/sync/push", {
       method: "POST",
       token: secondSignIn.json.account.backendSessionToken,
