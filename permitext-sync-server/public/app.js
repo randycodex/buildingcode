@@ -1067,6 +1067,21 @@ function browserCredentialID() {
   return state.browserCredentialID;
 }
 
+async function repairAppleBrowserAccountLink(account, entitlement) {
+  const browserID = typeof state.browserCredentialID === "string" ? state.browserCredentialID.trim() : "";
+  if (!account || account.authProvider !== "apple" || entitlement || !browserID) {
+    return null;
+  }
+  const payload = await postJSON("/account/link-browser", {
+    auth: { accountUserID: account.userID },
+    browserCredentialID: browserID
+  }, { token: account.sessionToken });
+  if (payload.account || payload.entitlement) {
+    storeAccountEntitlement(payload.entitlement || null);
+  }
+  return payload;
+}
+
 function decodeJWTPart(value) {
   try {
     const normalized = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
@@ -1255,15 +1270,20 @@ async function loadSyncedContent(options = {}) {
   syncLoadPromise = postJSON("/sync/pull", {
     auth: { accountUserID: account.userID }
   }, { token: account.sessionToken })
-    .then((payload) => {
+    .then(async (payload) => {
+      let entitlement = payload.entitlement || null;
+      const repaired = await repairAppleBrowserAccountLink(account, entitlement);
+      if (repaired?.entitlement) {
+        entitlement = repaired.entitlement;
+      }
       syncedContent = {
         status: "connected",
         pulledAt: payload.pulledAt,
-        entitlement: payload.entitlement || null,
+        entitlement,
         mutations: payload.mutations || [],
         summary: summarizeMutations(payload.mutations || [])
       };
-      storeAccountEntitlement(payload.entitlement || null);
+      storeAccountEntitlement(entitlement);
       return syncedContent;
     })
     .catch((error) => {

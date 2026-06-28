@@ -199,6 +199,47 @@ async function main() {
     assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
 
+    const browserCredentialID = "smoke-browser";
+    const browserSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "web",
+          providerUserID: browserCredentialID,
+          displayName: "Smoke Browser"
+        }
+      }
+    });
+    assert(browserSignIn.response.ok, "Browser sign-in failed.");
+    const browserGrant = await request("/admin/lifetime-grants/grant", {
+      method: "POST",
+      token: adminToken,
+      body: { userID: browserSignIn.json.account.appUserID }
+    });
+    assert(browserGrant.response.ok, "Browser entitlement grant failed.");
+    const appleRepairSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "repair-target",
+          displayName: "Repair Target"
+        }
+      }
+    });
+    assert(appleRepairSignIn.response.ok, "Apple repair target sign-in failed.");
+    const browserLink = await request("/account/link-browser", {
+      method: "POST",
+      token: appleRepairSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: appleRepairSignIn.json.account.appUserID },
+        browserCredentialID
+      }
+    });
+    assert(browserLink.response.ok, "Browser account link failed.");
+    assert(browserLink.json.entitlement?.grantedUserID === appleRepairSignIn.json.account.appUserID, "Browser entitlement was not transferred to Apple.");
+    assert(browserLink.json.mergedAccount?.sourceUserID === browserSignIn.json.account.appUserID, "Browser account link did not report the merged source.");
+
     const invalidAppleTokenSignIn = await request("/account/sign-in", {
       method: "POST",
       body: {

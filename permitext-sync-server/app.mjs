@@ -2470,6 +2470,52 @@ async function handlePasskeyLink(request, response) {
   sendJSON(response, 200, { account: existingAccount });
 }
 
+async function handleBrowserAccountLink(request, response) {
+  const body = await readJSON(request);
+  const targetUserID = body.auth?.accountUserID;
+  const browserCredentialID = typeof body.browserCredentialID === "string" ? body.browserCredentialID.trim() : "";
+  if (!targetUserID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  if (!browserCredentialID) {
+    sendError(response, 400, "Missing browser credential ID.");
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, targetUserID)) {
+    return;
+  }
+  const targetAccount = store.users[targetUserID];
+  if (!targetAccount) {
+    sendError(response, 404, "Target account was not found.");
+    return;
+  }
+  if (targetAccount.authProvider !== "apple") {
+    sendError(response, 400, "Browser account repair requires an Apple account.");
+    return;
+  }
+
+  const sourceUserID = `web:${browserCredentialID}`;
+  const mergedAccount = mergeAccountInto(store, sourceUserID, targetUserID);
+  if (!mergedAccount) {
+    sendJSON(response, 200, {
+      account: store.users[targetUserID],
+      entitlement: store.entitlements[targetUserID] || null,
+      mergedAccount: null
+    });
+    return;
+  }
+
+  await writeStore(store);
+  sendJSON(response, 200, {
+    account: store.users[targetUserID],
+    entitlement: store.entitlements[targetUserID] || null,
+    mergedAccount
+  });
+}
+
 async function handleAttachLocalData(request, response) {
   const body = await readJSON(request);
   const account = body.account;
@@ -3180,6 +3226,7 @@ const handlers = {
   "account/sign-in": handleSignIn,
   "account/apple/start": handleAppleWebStart,
   "account/attach-local-data": handleAttachLocalData,
+  "account/link-browser": handleBrowserAccountLink,
   "account/profile": handleProfileUpdate,
   "account/passkeys/link": handlePasskeyLink,
   "billing/web/checkout": handleWebCheckout,
