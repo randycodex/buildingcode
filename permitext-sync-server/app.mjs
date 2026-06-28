@@ -2740,7 +2740,7 @@ async function handleWebCheckout(request, response) {
   }
 
   const baseURL = configuredPublicBaseURL(request);
-  const successURL = body.successURL || `${baseURL}/?checkout=success`;
+  const successURL = body.successURL || `${baseURL}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`;
   const cancelURL = body.cancelURL || `${baseURL}/?checkout=cancel`;
   const formBody = encodedFormBody({
     mode: "subscription",

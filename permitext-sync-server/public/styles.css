@@ -3259,29 +3259,7 @@ mark {
   gap: var(--space-2);
 }
 
-.account-restore {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.account-restore[hidden] {
-  display: none;
-}
-
-.account-restore-button {
-  justify-self: start;
-}
-
 .account-connector .connector-actions .ghost-button {
-  min-height: 34px;
-  padding: 0 13px;
-  border: 1px solid color-mix(in srgb, var(--text-secondary) 42%, transparent);
-  background: transparent;
-  box-shadow: none;
-  color: var(--text-primary);
-}
-
-.account-connector .account-restore .ghost-button {
   min-height: 34px;
   padding: 0 13px;
   border: 1px solid color-mix(in srgb, var(--text-secondary) 42%, transparent);

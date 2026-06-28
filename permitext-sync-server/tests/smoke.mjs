@@ -147,6 +147,13 @@ async function main() {
       "Legacy checkout return URL did not return HTML."
     );
 
+    const checkoutReturn = await request("/?checkout=success&session_id=cs_smoke");
+    assert(checkoutReturn.response.ok, "Checkout return URL with session ID did not load.");
+    assert(
+      checkoutReturn.response.headers.get("content-type")?.includes("text/html"),
+      "Checkout return URL with session ID did not return HTML."
+    );
+
     const unauthorizedStorageSummary = await request("/admin/storage/summary");
     assert(unauthorizedStorageSummary.response.status === 401, "Storage summary allowed an unauthenticated request.");
 
