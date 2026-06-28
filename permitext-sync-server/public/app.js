@@ -1985,6 +1985,26 @@ function annotationTargetForBlock(section, block, reader = null, index = 0) {
   });
 }
 
+function annotatedBlocksForSection(section) {
+  const sourceBlocks = section.blocks?.length ? section.blocks : [{ id: `section-${section.id}`, plainText: section.title || "" }];
+  return sourceBlocks.flatMap((block, blockIndex) => splitAnnotatedCodeBlock(block, blockIndex));
+}
+
+function splitAnnotatedCodeBlock(block, blockIndex = 0) {
+  if (block?.kind !== "html" || !block.html || typeof document === "undefined") return [block];
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = rewriteCodeHTML(block.html);
+  const noteBlocks = Array.from(wrapper.querySelectorAll(".Normal-Level[id], .rbox[id]"))
+    .filter((node) => String(node.textContent || "").trim());
+  if (noteBlocks.length <= 1) return [block];
+  return noteBlocks.map((node, nodeIndex) => ({
+    ...block,
+    id: node.id || `${block.id || `block-${blockIndex + 1}`}-${nodeIndex + 1}`,
+    html: node.outerHTML,
+    plainText: String(node.textContent || "").replace(/\s+/g, " ").trim()
+  }));
+}
+
 async function populateReaderSelectors(panel, reader) {
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
@@ -2064,18 +2084,9 @@ async function renderSectionContent(panel, reader) {
     const sectionHeading = document.createElement("h3");
     sectionHeading.className = "reader-section-title";
     sectionHeading.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
-    sectionHeading.tabIndex = 0;
-    sectionHeading.setAttribute("role", "button");
-    sectionHeading.setAttribute("aria-label", `Open notes for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
-    sectionHeading.addEventListener("click", () => toggleReaderNotesSheet(panel, section, reader));
-    sectionHeading.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      event.preventDefault();
-      toggleReaderNotesSheet(panel, section, reader);
-    });
     sectionWrapper.append(sectionHeading);
 
-    const blocks = section.blocks?.length ? section.blocks : [{ id: `section-${section.id}`, plainText: section.title || "" }];
+    const blocks = annotatedBlocksForSection(section);
     blocks.forEach((block, index) => {
       const target = annotationTargetForBlock(section, block, reader, index);
       sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target));
