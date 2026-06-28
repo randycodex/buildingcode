@@ -117,9 +117,17 @@ struct PermitextApp: App {
                 }
             }
             .onChange(of: scenePhase) { _, phase in
-                guard phase == .inactive || phase == .background else { return }
-                Task {
-                    await library.syncPendingUserContentIfPossible()
+                switch phase {
+                case .active:
+                    Task {
+                        await library.performForegroundAccountSyncIfNeeded()
+                    }
+                case .inactive, .background:
+                    Task {
+                        await library.syncPendingUserContentIfPossible()
+                    }
+                @unknown default:
+                    break
                 }
             }
             .onAppear {

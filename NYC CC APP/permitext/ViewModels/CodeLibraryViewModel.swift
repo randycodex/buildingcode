@@ -132,6 +132,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private var userContentAutoSyncTask: Task<Void, Never>?
     private var storeKitUpdatesTask: Task<Void, Never>?
     private var didRunStartupAccountSync = false
+    private var lastForegroundAccountSyncAt: Date?
+    private let foregroundAccountSyncInterval: TimeInterval = 45
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
     private var pendingTabAssertionToken: Int = 0
@@ -188,6 +190,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     deinit {
+        userContentAutoSyncTask?.cancel()
         storeKitUpdatesTask?.cancel()
     }
 
@@ -426,6 +429,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 codeVersion: context.selectedVersionFileName,
                 values: continuitySyncValues(from: context)
             )
+            scheduleUserContentAutoSync()
         } catch {
             #if DEBUG
             print("permitext diagnostics: continuity sync queue failed: \(error.localizedDescription)")
@@ -1862,12 +1866,19 @@ final class CodeLibraryViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 guard let self else { return }
                 if !self.isAccountBusy {
-                    await self.syncPendingUserContentIfPossible()
+                    await self.performAutomaticUserContentSync()
                     return
                 }
                 try? await Task.sleep(nanoseconds: 600_000_000)
             }
         }
+    }
+
+    private func performAutomaticUserContentSync() async {
+        guard signedInAccount != nil else { return }
+        await pullRemoteUserContentIfPossible()
+        await syncPendingUserContentIfPossible()
+        await pullRemoteUserContentIfPossible()
     }
 
     private static func syncDurationText(_ interval: TimeInterval) -> String {
@@ -1931,9 +1942,20 @@ final class CodeLibraryViewModel: ObservableObject {
         guard signedInAccount != nil else { return }
         guard !didRunStartupAccountSync else { return }
         didRunStartupAccountSync = true
-        await pullRemoteUserContentIfPossible()
-        await syncPendingUserContentIfPossible()
-        await pullRemoteUserContentIfPossible()
+        lastForegroundAccountSyncAt = Date()
+        await performAutomaticUserContentSync()
+    }
+
+    func performForegroundAccountSyncIfNeeded() async {
+        guard isInitialContentLoaded else { return }
+        guard signedInAccount != nil else { return }
+        let now = Date()
+        if let lastForegroundAccountSyncAt,
+           now.timeIntervalSince(lastForegroundAccountSyncAt) < foregroundAccountSyncInterval {
+            return
+        }
+        lastForegroundAccountSyncAt = now
+        await performAutomaticUserContentSync()
     }
 
     func syncNow() async {
@@ -1946,9 +1968,7 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             statusMessage = "Could not prepare failed sync items for retry. \(error.localizedDescription)"
         }
-        await pullRemoteUserContentIfPossible()
-        await syncPendingUserContentIfPossible()
-        await pullRemoteUserContentIfPossible()
+        await performAutomaticUserContentSync()
         refreshPendingUserContentSyncCount()
     }
 
