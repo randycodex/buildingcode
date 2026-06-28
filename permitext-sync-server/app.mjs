@@ -2452,6 +2452,7 @@ async function handlePull(request, response) {
     pulledAt: new Date().toISOString(),
     latestEventID,
     syncRevision: latestEventID,
+    entitlement: store.entitlements[userID] || null,
     mutations
   });
 }

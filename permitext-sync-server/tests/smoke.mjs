@@ -313,6 +313,15 @@ async function main() {
       secondSignInAfterStripeWebhook.json.entitlement?.source === "webSubscription",
       "Stripe checkout webhook did not grant web subscription entitlement."
     );
+    const secondPullAfterStripeWebhook = await request("/sync/pull", {
+      method: "POST",
+      token: secondSignInAfterStripeWebhook.json.account.backendSessionToken,
+      body: { auth: { accountUserID: "apple:second-smoke-user" } }
+    });
+    assert(
+      secondPullAfterStripeWebhook.json.entitlement?.source === "webSubscription",
+      "Sync pull did not return the web subscription entitlement."
+    );
 
     const stripeDeletedEvent = JSON.stringify({
       id: "evt_smoke_deleted",
