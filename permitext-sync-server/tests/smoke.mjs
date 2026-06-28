@@ -78,6 +78,8 @@ async function main() {
       PERMITEXT_SYNC_ADMIN_TOKEN: adminToken,
       APPLE_TEAM_ID: "ABCDE12345",
       APPLE_BUNDLE_ID: "com.randycodex.permitext",
+      APPLE_SERVICE_ID: "com.randycodex.permitext.web",
+      PERMITEXT_PUBLIC_BASE_URL: baseURL,
       STRIPE_WEBHOOK_SECRET: stripeWebhookSecret
     },
     stdio: ["ignore", "pipe", "pipe"]
@@ -96,6 +98,25 @@ async function main() {
     const webRoot = await request("/");
     assert(webRoot.response.ok, "Web root did not load.");
     assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
+
+    const appleWebConfig = await request("/account/apple-web-config");
+    assert(appleWebConfig.response.ok, "Apple web sign-in config failed.");
+    assert(appleWebConfig.json.available === true, "Apple web sign-in config did not report availability.");
+    assert(
+      appleWebConfig.json.clientID === "com.randycodex.permitext.web",
+      "Apple web sign-in config returned the wrong client ID."
+    );
+    assert(
+      appleWebConfig.json.redirectURI === `${baseURL}/account/apple/callback`,
+      "Apple web sign-in config returned the wrong redirect URI."
+    );
+
+    const appleWebCallback = await request("/account/apple/callback");
+    assert(appleWebCallback.response.ok, "Apple web sign-in callback did not load.");
+    assert(
+      appleWebCallback.response.headers.get("content-type")?.includes("text/html"),
+      "Apple web sign-in callback did not return HTML."
+    );
 
     const webCheckoutFallback = await request("/web/?checkout=success");
     assert(webCheckoutFallback.response.ok, "Legacy checkout return URL did not load.");

@@ -47,6 +47,15 @@ PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1 \
 node server.mjs
 ```
 
+The web app uses Sign in with Apple JS when `APPLE_SERVICE_ID` is configured. In Apple Developer, the Service ID must allow the production domain and return URL:
+
+```text
+Domain: permitext-sync.vercel.app
+Return URL: https://permitext-sync.vercel.app/account/apple/callback
+```
+
+Without `APPLE_SERVICE_ID`, production web sign-in is disabled instead of creating a browser-only account that cannot match iOS. Localhost can still use the browser-local fallback for development, or set `PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN=1` to allow it explicitly.
+
 Configure paid entitlement sources with:
 
 ```sh

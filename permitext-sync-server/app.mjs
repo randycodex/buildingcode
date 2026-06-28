@@ -1667,6 +1667,18 @@ function appleAllowedClientIDs() {
     .filter(Boolean);
 }
 
+function appleWebSignInConfigured() {
+  return Boolean(process.env.APPLE_SERVICE_ID?.trim());
+}
+
+function browserFallbackSignInAllowed(request) {
+  if (process.env.PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN === "1") {
+    return true;
+  }
+  const host = request.headers.host || "";
+  return host.startsWith("localhost") || host.startsWith("127.0.0.1");
+}
+
 async function appleJWKS() {
   const now = Date.now();
   if (cachedAppleJWKS && cachedAppleJWKSExpiresAt > now) {
@@ -2818,6 +2830,36 @@ function handleAppleAppSiteAssociation(_request, response) {
   });
 }
 
+function appleWebRedirectURI(request) {
+  return `${configuredPublicBaseURL(request)}/account/apple/callback`;
+}
+
+function handleAppleWebConfig(request, response) {
+  const serviceID = process.env.APPLE_SERVICE_ID?.trim() || "";
+  sendJSON(response, 200, {
+    available: appleWebSignInConfigured(),
+    clientID: serviceID || null,
+    redirectURI: serviceID ? appleWebRedirectURI(request) : null,
+    scope: "name email",
+    browserFallbackAllowed: browserFallbackSignInAllowed(request)
+  });
+}
+
+function handleAppleWebCallback(_request, response) {
+  sendHTML(response, `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>permitext sign in</title>
+  </head>
+  <body>
+    <script>window.close();</script>
+    <p>Sign in completed. You can close this window and return to permitext.</p>
+  </body>
+</html>`);
+}
+
 const handlers = {
   "account/sign-in": handleSignIn,
   "account/attach-local-data": handleAttachLocalData,
@@ -2875,6 +2917,14 @@ export async function handleRequest(request, response) {
     }
     if (request.method === "GET" && path === "admin/storage/summary") {
       await handleStorageSummary(request, response);
+      return;
+    }
+    if (request.method === "GET" && path === "account/apple-web-config") {
+      handleAppleWebConfig(request, response);
+      return;
+    }
+    if ((request.method === "GET" || request.method === "POST") && path === "account/apple/callback") {
+      handleAppleWebCallback(request, response);
       return;
     }
     if (request.method === "GET" && path === ".well-known/apple-app-site-association") {

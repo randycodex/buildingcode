@@ -49,6 +49,8 @@ let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = new Map();
 const annotationPushTimers = new Map();
+let appleWebConfigPromise = null;
+let appleIDScriptPromise = null;
 
 applyReaderSettings();
 
@@ -1065,19 +1067,54 @@ function browserCredentialID() {
   return state.browserCredentialID;
 }
 
+function decodeJWTPart(value) {
+  try {
+    const normalized = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    return JSON.parse(atob(padded));
+  } catch {
+    return {};
+  }
+}
+
+function appleDisplayName(user = {}) {
+  const name = user.name || {};
+  const parts = [name.firstName, name.lastName].map((part) => String(part || "").trim()).filter(Boolean);
+  return parts.join(" ");
+}
+
+async function appleWebSignInConfig() {
+  if (!appleWebConfigPromise) {
+    appleWebConfigPromise = api("/account/apple-web-config").catch((error) => {
+      appleWebConfigPromise = null;
+      throw error;
+    });
+  }
+  return appleWebConfigPromise;
+}
+
+function loadAppleIDScript() {
+  if (window.AppleID?.auth) return Promise.resolve();
+  if (appleIDScriptPromise) return appleIDScriptPromise;
+  appleIDScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => {
+      appleIDScriptPromise = null;
+      reject(new Error("Could not load Sign in with Apple."));
+    };
+    document.head.append(script);
+  });
+  return appleIDScriptPromise;
+}
+
 function accountDisplayName(account = state.account) {
   return account?.displayName || account?.userID || "this browser";
 }
 
-async function signInCurrentBrowser() {
-  const payload = await postJSON("/account/sign-in", {
-    credential: {
-      provider: "web",
-      providerUserID: browserCredentialID(),
-      displayName: "Web browser",
-      signedInAt: new Date().toISOString()
-    }
-  });
+function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   const account = payload.account;
   if (!account?.appUserID || !account?.backendSessionToken) {
     throw new Error("Sign in did not return a backend session.");
@@ -1086,13 +1123,74 @@ async function signInCurrentBrowser() {
     userID: account.appUserID,
     sessionToken: account.backendSessionToken,
     authProvider: account.authProvider || "web",
-    displayName: account.displayName || "Web browser",
+    displayName: account.displayName || fallbackDisplayName,
     entitlement: payload.entitlement || null
   };
   syncedContent = null;
   saveWorkspaceState();
   loadSyncedContent({ force: true }).then(() => renderWorkspace());
   return state.account;
+}
+
+async function signInWithAppleWeb(config) {
+  await loadAppleIDScript();
+  if (!window.AppleID?.auth) {
+    throw new Error("Sign in with Apple is unavailable in this browser.");
+  }
+  const stateToken = crypto.randomUUID();
+  const nonce = crypto.randomUUID();
+  window.AppleID.auth.init({
+    clientId: config.clientID,
+    scope: config.scope || "name email",
+    redirectURI: config.redirectURI,
+    state: stateToken,
+    nonce,
+    usePopup: true
+  });
+  const result = await window.AppleID.auth.signIn();
+  if (result.authorization?.state && result.authorization.state !== stateToken) {
+    throw new Error("Apple sign-in state did not match.");
+  }
+  const identityToken = result.authorization?.id_token;
+  if (!identityToken) {
+    throw new Error("Apple sign-in did not return an identity token.");
+  }
+  const tokenPayload = decodeJWTPart(identityToken.split(".")[1]);
+  const displayName = appleDisplayName(result.user) || tokenPayload.email || "Apple account";
+  const payload = await postJSON("/account/sign-in", {
+    credential: {
+      provider: "apple",
+      providerUserID: tokenPayload.sub || undefined,
+      displayName,
+      signedInAt: new Date().toISOString(),
+      identityToken,
+      authorizationCode: result.authorization?.code || undefined
+    }
+  });
+  return storeSignedInAccount(payload, displayName);
+}
+
+async function signInWithBrowserFallback() {
+  const payload = await postJSON("/account/sign-in", {
+    credential: {
+      provider: "web",
+      providerUserID: browserCredentialID(),
+      displayName: "Web browser",
+      signedInAt: new Date().toISOString()
+    }
+  });
+  return storeSignedInAccount(payload, "Web browser");
+}
+
+async function signInCurrentBrowser() {
+  const config = await appleWebSignInConfig();
+  if (config.available) {
+    return signInWithAppleWeb(config);
+  }
+  if (config.browserFallbackAllowed) {
+    return signInWithBrowserFallback();
+  }
+  throw new Error("Apple web sign-in is not configured yet.");
 }
 
 function mutationKindAndRecord(mutation) {
@@ -4281,6 +4379,18 @@ function renderSettings() {
     ? (isProAccount() ? "Connected. Pro is active for this browser." : "Connected. Sync and checkout are ready for this browser.")
     : "Not signed in on this browser.";
   syncAccountState();
+  appleWebSignInConfig().then((config) => {
+    if (activeAccount()) return;
+    signInButton.textContent = config.available ? "Sign in with Apple" : "Sign in";
+    signInButton.disabled = !config.available && !config.browserFallbackAllowed;
+    if (!config.available && !config.browserFallbackAllowed) {
+      status.textContent = "Apple web sign-in is not configured yet.";
+    }
+  }).catch(() => {
+    if (!activeAccount()) {
+      status.textContent = "Could not check sign-in configuration.";
+    }
+  });
   signInButton.addEventListener("click", async () => {
     signInButton.disabled = true;
     status.textContent = "Signing in...";
