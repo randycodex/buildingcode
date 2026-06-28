@@ -1157,6 +1157,10 @@ async function signInWithAppleWeb(config) {
   }
   const tokenPayload = decodeJWTPart(identityToken.split(".")[1]);
   const displayName = appleDisplayName(result.user) || tokenPayload.email || "Apple account";
+  const existingAccount = activeAccount();
+  const linkFrom = existingAccount && state.account?.authProvider === "web"
+    ? { accountUserID: existingAccount.userID, sessionToken: existingAccount.sessionToken }
+    : undefined;
   const payload = await postJSON("/account/sign-in", {
     credential: {
       provider: "apple",
@@ -1165,7 +1169,8 @@ async function signInWithAppleWeb(config) {
       signedInAt: new Date().toISOString(),
       identityToken,
       authorizationCode: result.authorization?.code || undefined
-    }
+    },
+    linkFrom
   });
   return storeSignedInAccount(payload, displayName);
 }
@@ -4362,10 +4367,14 @@ function renderSettings() {
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
+    const canLinkApple = Boolean(account && state.account?.authProvider === "web");
     checkoutButton.disabled = !account || pro;
     checkoutButton.textContent = pro ? "Pro active" : "Upgrade to Pro";
     disconnectButton.disabled = !account;
-    signInButton.hidden = Boolean(account);
+    signInButton.hidden = Boolean(account) && !canLinkApple;
+    if (canLinkApple) {
+      signInButton.textContent = "Link Apple";
+    }
     disconnectButton.hidden = !account;
     summary.hidden = !account;
     planSummary.hidden = !account;
@@ -4380,7 +4389,19 @@ function renderSettings() {
     : "Not signed in on this browser.";
   syncAccountState();
   appleWebSignInConfig().then((config) => {
-    if (activeAccount()) return;
+    const account = activeAccount();
+    if (account && state.account?.authProvider === "web") {
+      signInButton.hidden = !config.available;
+      signInButton.disabled = !config.available;
+      signInButton.textContent = "Link Apple";
+      if (config.available) {
+        status.textContent = isProAccount()
+          ? "Pro is active for this browser. Link Apple to use the same account on iOS and web."
+          : "Link Apple to use the same saved work on iOS and web.";
+      }
+      return;
+    }
+    if (account) return;
     signInButton.textContent = config.available ? "Sign in with Apple" : "Sign in";
     signInButton.disabled = !config.available && !config.browserFallbackAllowed;
     if (!config.available && !config.browserFallbackAllowed) {

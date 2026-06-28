@@ -2183,6 +2183,89 @@ function mergeMutations(existing, incoming) {
   };
 }
 
+function retargetRecordID(recordID, sourceUserID, targetUserID) {
+  const prefix = `${sourceUserID}:`;
+  return typeof recordID === "string" && recordID.startsWith(prefix)
+    ? `${targetUserID}:${recordID.slice(prefix.length)}`
+    : recordID;
+}
+
+function retargetMutationUser(mutation, sourceUserID, targetUserID) {
+  const { kind, record } = mutationKindAndRecord(mutation);
+  if (!kind || !record) {
+    return mutation;
+  }
+  const nextRecord = {
+    ...record,
+    userID: targetUserID
+  };
+  if (typeof nextRecord.id === "string") {
+    nextRecord.id = retargetRecordID(nextRecord.id, sourceUserID, targetUserID);
+  }
+  return { [kind]: nextRecord };
+}
+
+function mergeAccountInto(store, sourceUserID, targetUserID) {
+  if (!sourceUserID || !targetUserID || sourceUserID === targetUserID) {
+    return null;
+  }
+  const sourceAccount = store.users[sourceUserID];
+  const targetAccount = store.users[targetUserID];
+  if (!sourceAccount || !targetAccount) {
+    return null;
+  }
+
+  const sourceMutations = (store.mutationsByUserID[sourceUserID] || [])
+    .map((mutation) => retargetMutationUser(mutation, sourceUserID, targetUserID));
+  const targetMutations = store.mutationsByUserID[targetUserID] || [];
+  const mergedMutations = mergeMutations(targetMutations, sourceMutations);
+  store.mutationsByUserID[targetUserID] = mergedMutations.mutations;
+  delete store.mutationsByUserID[sourceUserID];
+
+  if (!store.entitlements[targetUserID] && store.entitlements[sourceUserID]) {
+    store.entitlements[targetUserID] = {
+      ...store.entitlements[sourceUserID],
+      grantedUserID: targetUserID,
+      transferredFromUserID: sourceUserID,
+      updatedAt: new Date().toISOString()
+    };
+  }
+  delete store.entitlements[sourceUserID];
+
+  if (!targetAccount.publicUsername && sourceAccount.publicUsername) {
+    targetAccount.publicUsername = sourceAccount.publicUsername;
+  }
+  if (!targetAccount.displayName && sourceAccount.displayName) {
+    targetAccount.displayName = sourceAccount.displayName;
+  }
+  targetAccount.migrationState = "localDataAttached";
+  targetAccount.mergedAccountIDs = Array.from(new Set([
+    ...(Array.isArray(targetAccount.mergedAccountIDs) ? targetAccount.mergedAccountIDs : []),
+    sourceUserID
+  ]));
+  store.users[targetUserID] = targetAccount;
+
+  const passkeyCredentials = store.passkeyCredentials || {};
+  for (const [credentialID, userID] of Object.entries(passkeyCredentials)) {
+    if (userID === sourceUserID) {
+      passkeyCredentials[credentialID] = targetUserID;
+    }
+  }
+  store.passkeyCredentials = passkeyCredentials;
+
+  delete store.sessions[sourceUserID];
+  delete store.users[sourceUserID];
+
+  return {
+    sourceUserID,
+    targetUserID,
+    movedMutationCount: sourceMutations.length,
+    acceptedMutationIDs: mergedMutations.acceptedMutationIDs,
+    rejectedMutationIDs: mergedMutations.rejectedMutationIDs,
+    transferredEntitlement: Boolean(store.entitlements[targetUserID]?.transferredFromUserID === sourceUserID)
+  };
+}
+
 function mutationKindAndRecord(mutation) {
   const [kind, record] = Object.entries(mutation)[0] || [];
   return { kind, record };
@@ -2282,10 +2365,21 @@ async function handleSignIn(request, response) {
     ? { ...account, ...existing, signedInAt: account.signedInAt, backendSessionToken: sessionToken }
     : { ...account, backendSessionToken: sessionToken };
   store.users[account.appUserID] = storedAccount;
+  let mergedAccount = null;
+  const linkFrom = body.linkFrom || {};
+  const sourceUserID = linkFrom.accountUserID || linkFrom.userID;
+  if (sourceUserID && sourceUserID !== account.appUserID) {
+    const sourceSessionToken = linkFrom.sessionToken || linkFrom.backendSessionToken;
+    if (!requireUserSession(request, response, store, sourceUserID, { backendSessionToken: sourceSessionToken })) {
+      return;
+    }
+    mergedAccount = mergeAccountInto(store, sourceUserID, account.appUserID);
+  }
   await writeStore(store);
   sendJSON(response, 200, {
-    account: storedAccount,
-    entitlement: store.entitlements[account.appUserID] ?? null
+    account: store.users[account.appUserID] || storedAccount,
+    entitlement: store.entitlements[account.appUserID] ?? null,
+    mergedAccount
   });
 }
 

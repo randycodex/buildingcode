@@ -251,6 +251,84 @@ async function main() {
     });
     assert(secondSignIn.response.ok, "Second account sign-in failed.");
 
+    const mergeWebSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "web",
+          providerUserID: "merge-web-smoke",
+          displayName: "Merge Web"
+        }
+      }
+    });
+    assert(mergeWebSignIn.response.ok, "Merge source web sign-in failed.");
+    const mergeSourceUserID = mergeWebSignIn.json.account.appUserID;
+    const mergeSourceToken = mergeWebSignIn.json.account.backendSessionToken;
+    const mergeAppleUserID = "apple:merge-apple-smoke";
+    const mergeGrant = await request("/admin/lifetime-grants/grant", {
+      method: "POST",
+      token: adminToken,
+      body: { userID: mergeSourceUserID }
+    });
+    assert(mergeGrant.response.ok, "Merge source lifetime grant failed.");
+    const mergeSavedMutation = {
+      savedItem: {
+        id: `${mergeSourceUserID}:saved:nyc-2022:101`,
+        userID: mergeSourceUserID,
+        codeVersion: "nyc-2022",
+        sectionID: 101,
+        updatedAt: new Date().toISOString()
+      }
+    };
+    const mergeSourcePush = await request("/sync/push", {
+      method: "POST",
+      token: mergeSourceToken,
+      body: {
+        auth: { accountUserID: mergeSourceUserID },
+        batch: {
+          user: { id: mergeSourceUserID },
+          mutations: [mergeSavedMutation]
+        }
+      }
+    });
+    assert(mergeSourcePush.response.ok, "Merge source push failed.");
+    const mergeAppleSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "merge-apple-smoke",
+          displayName: "Merge Apple"
+        },
+        linkFrom: {
+          accountUserID: mergeSourceUserID,
+          sessionToken: mergeSourceToken
+        }
+      }
+    });
+    assert(mergeAppleSignIn.response.ok, "Apple sign-in with linked web account failed.");
+    assert(mergeAppleSignIn.json.account.appUserID === mergeAppleUserID, "Merge returned the wrong Apple account.");
+    assert(mergeAppleSignIn.json.mergedAccount?.sourceUserID === mergeSourceUserID, "Merge source was not reported.");
+    assert(mergeAppleSignIn.json.entitlement?.grantedUserID === mergeAppleUserID, "Merge did not transfer entitlement.");
+    const mergeApplePull = await request("/sync/pull", {
+      method: "POST",
+      token: mergeAppleSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: mergeAppleUserID } }
+    });
+    assert(mergeApplePull.response.ok, "Merged Apple pull failed.");
+    const mergedSaved = mergeApplePull.json.mutations.find((mutation) => mutation.savedItem);
+    assert(mergedSaved?.savedItem.userID === mergeAppleUserID, "Merged saved item user ID was not retargeted.");
+    assert(
+      mergedSaved?.savedItem.id === `${mergeAppleUserID}:saved:nyc-2022:101`,
+      "Merged saved item ID was not retargeted."
+    );
+    const mergeSourcePull = await request("/sync/pull", {
+      method: "POST",
+      token: mergeSourceToken,
+      body: { auth: { accountUserID: mergeSourceUserID } }
+    });
+    assert(mergeSourcePull.response.status === 401, "Merged source account session still worked.");
+
     const clientEntitlementPush = await request("/sync/push", {
       method: "POST",
       token: secondSignIn.json.account.backendSessionToken,

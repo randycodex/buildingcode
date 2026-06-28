@@ -56,6 +56,8 @@ Return URL: https://permitext-sync.vercel.app/account/apple/callback
 
 Without `APPLE_SERVICE_ID`, production web sign-in is disabled instead of creating a browser-only account that cannot match iOS. Localhost can still use the browser-local fallback for development, or set `PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN=1` to allow it explicitly.
 
+If a browser already has a temporary `web:` account from the earlier checkout flow, the web app can link it during Apple sign-in. The backend retargets saved records to the new `apple:` account, transfers the server-owned entitlement, and invalidates the old browser session.
+
 Configure paid entitlement sources with:
 
 ```sh
