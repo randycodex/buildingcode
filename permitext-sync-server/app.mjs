@@ -1988,6 +1988,47 @@ function stripeSubscriptionExpiresAt(object) {
   return Number.isFinite(Number(timestamp)) ? new Date(Number(timestamp) * 1000).toISOString() : null;
 }
 
+function stripeSearchValue(value) {
+  return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
+async function stripeAPI(path, { method = "GET", body = null } = {}) {
+  const response = await fetch(`https://api.stripe.com${path}`, {
+    method,
+    headers: {
+      authorization: `Basic ${Buffer.from(`${process.env.STRIPE_SECRET_KEY}:`).toString("base64")}`,
+      ...(body ? { "content-type": "application/x-www-form-urlencoded" } : {})
+    },
+    body
+  });
+  const text = await response.text();
+  const json = text ? JSON.parse(text) : {};
+  if (!response.ok) {
+    throw new Error(json.error?.message || "Stripe API request failed.");
+  }
+  return json;
+}
+
+async function activeStripeSubscriptionForUserID(userID) {
+  if (!stripeConfigured() || !userID) {
+    return null;
+  }
+  const query = `metadata['accountUserID']:'${stripeSearchValue(userID)}'`;
+  const searchParams = new URLSearchParams({ query, limit: "10" });
+  const payload = await stripeAPI(`/v1/subscriptions/search?${searchParams.toString()}`);
+  return (payload.data || []).find((subscription) => ["active", "trialing"].includes(subscription.status)) || null;
+}
+
+async function transferStripeSubscriptionMetadata(subscriptionID, targetUserID) {
+  if (!stripeConfigured() || !subscriptionID || !targetUserID) {
+    return;
+  }
+  await stripeAPI(`/v1/subscriptions/${encodeURIComponent(subscriptionID)}`, {
+    method: "POST",
+    body: encodedFormBody({ metadata: { accountUserID: targetUserID } })
+  });
+}
+
 function appleStoreKitProductID() {
   return process.env.STOREKIT_PRO_PRODUCT_ID || "com.randycodex.permitext.pro.monthly";
 }
@@ -2499,7 +2540,22 @@ async function handleBrowserAccountLink(request, response) {
 
   const sourceUserID = `web:${browserCredentialID}`;
   const mergedAccount = mergeAccountInto(store, sourceUserID, targetUserID);
+  if (!store.entitlements[targetUserID]) {
+    const subscription = await activeStripeSubscriptionForUserID(sourceUserID);
+    if (subscription) {
+      grantServerEntitlement(store, targetUserID, "webSubscription", {
+        expiresAt: stripeSubscriptionExpiresAt(subscription),
+        provider: {
+          stripeCustomerID: stripeSubscriptionID(subscription.customer),
+          stripeSubscriptionID: stripeSubscriptionID(subscription.id),
+          restoredFromUserID: sourceUserID
+        }
+      });
+      await transferStripeSubscriptionMetadata(subscription.id, targetUserID);
+    }
+  }
   if (!mergedAccount) {
+    await writeStore(store);
     sendJSON(response, 200, {
       account: store.users[targetUserID],
       entitlement: store.entitlements[targetUserID] || null,
