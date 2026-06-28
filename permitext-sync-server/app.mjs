@@ -2475,8 +2475,8 @@ async function handleWebCheckout(request, response) {
   }
 
   const baseURL = configuredPublicBaseURL(request);
-  const successURL = body.successURL || `${baseURL}/web/?checkout=success`;
-  const cancelURL = body.cancelURL || `${baseURL}/web/?checkout=cancel`;
+  const successURL = body.successURL || `${baseURL}/?checkout=success`;
+  const cancelURL = body.cancelURL || `${baseURL}/?checkout=cancel`;
   const formBody = encodedFormBody({
     mode: "subscription",
     client_reference_id: userID,
@@ -2839,7 +2839,7 @@ export async function handleRequest(request, response) {
   try {
     const path = normalizePath(request.url);
 
-    if (request.method === "GET" && (path === "" || path === "web")) {
+    if (request.method === "GET" && (path === "" || path === "web" || path === "web/")) {
       await handleWebIndex(request, response);
       return;
     }

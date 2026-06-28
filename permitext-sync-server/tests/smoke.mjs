@@ -43,7 +43,7 @@ async function request(path, { method = "GET", body, token, headers = {}, rawBod
     body: rawBody ?? (body ? JSON.stringify(body) : undefined)
   });
   const text = await response.text();
-  const json = text ? JSON.parse(text) : null;
+  const json = text && response.headers.get("content-type")?.includes("application/json") ? JSON.parse(text) : null;
   return { response, json };
 }
 
@@ -91,6 +91,17 @@ async function main() {
     assert(
       aasa.json.webcredentials.apps.includes("ABCDE12345.com.randycodex.permitext"),
       "AASA payload did not include the configured app identifier."
+    );
+
+    const webRoot = await request("/");
+    assert(webRoot.response.ok, "Web root did not load.");
+    assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
+
+    const webCheckoutFallback = await request("/web/?checkout=success");
+    assert(webCheckoutFallback.response.ok, "Legacy checkout return URL did not load.");
+    assert(
+      webCheckoutFallback.response.headers.get("content-type")?.includes("text/html"),
+      "Legacy checkout return URL did not return HTML."
     );
 
     const unauthorizedStorageSummary = await request("/admin/storage/summary");
