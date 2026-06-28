@@ -695,7 +695,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                         var noteButton = document.createElement('button');
                         noteButton.type = 'button';
                         noteButton.className = 'nyccc-block-note-button';
-                        noteButton.setAttribute('aria-label', 'Open paragraph note');
+                        noteButton.hidden = true;
+                        noteButton.disabled = true;
+                        noteButton.tabIndex = -1;
+                        noteButton.setAttribute('aria-hidden', 'true');
+                        noteButton.setAttribute('aria-label', 'Paragraph note');
                         noteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>';
                         noteButton.addEventListener('click', function(event) {
                           event.preventDefault();
@@ -827,7 +831,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 var button = block.querySelector(':scope > .nyccc-block-note-button');
                 if (button) {
                   button.classList.toggle('nyccc-has-note', hasBlockNote);
-                  button.setAttribute('aria-label', hasBlockNote ? 'Open paragraph note' : 'Add paragraph note');
+                  button.hidden = !hasBlockNote;
+                  button.disabled = !hasBlockNote;
+                  button.tabIndex = hasBlockNote ? 0 : -1;
+                  button.setAttribute('aria-hidden', hasBlockNote ? 'false' : 'true');
+                  button.setAttribute('aria-label', hasBlockNote ? 'Open paragraph note' : 'Paragraph note');
                 }
               });
             })();
@@ -1392,6 +1400,9 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               -webkit-appearance: none !important;
               appearance: none !important;
             }
+            .nyccc-block-note-button[hidden] {
+              display: none !important;
+            }
             .nyccc-block-note-button svg {
               width: 0.95rem !important;
               height: 0.95rem !important;
@@ -1402,8 +1413,8 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               stroke-linecap: round !important;
               stroke-linejoin: round !important;
             }
-            .nyccc-note-block:hover .nyccc-block-note-button,
-            .nyccc-block-note-button:focus,
+            .nyccc-note-block:hover .nyccc-block-note-button.nyccc-has-note,
+            .nyccc-block-note-button.nyccc-has-note:focus,
             .nyccc-block-note-button.nyccc-has-note {
               opacity: 1 !important;
               color: \(accentHex) !important;
