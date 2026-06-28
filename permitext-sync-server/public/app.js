@@ -1133,46 +1133,19 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
 }
 
 async function signInWithAppleWeb(config) {
-  await loadAppleIDScript();
-  if (!window.AppleID?.auth) {
-    throw new Error("Sign in with Apple is unavailable in this browser.");
-  }
-  const stateToken = crypto.randomUUID();
-  const nonce = crypto.randomUUID();
-  window.AppleID.auth.init({
-    clientId: config.clientID,
-    scope: config.scope || "name email",
-    redirectURI: config.redirectURI,
-    state: stateToken,
-    nonce,
-    usePopup: true
-  });
-  const result = await window.AppleID.auth.signIn();
-  if (result.authorization?.state && result.authorization.state !== stateToken) {
-    throw new Error("Apple sign-in state did not match.");
-  }
-  const identityToken = result.authorization?.id_token;
-  if (!identityToken) {
-    throw new Error("Apple sign-in did not return an identity token.");
-  }
-  const tokenPayload = decodeJWTPart(identityToken.split(".")[1]);
-  const displayName = appleDisplayName(result.user) || tokenPayload.email || "Apple account";
   const existingAccount = activeAccount();
   const linkFrom = existingAccount && state.account?.authProvider === "web"
     ? { accountUserID: existingAccount.userID, sessionToken: existingAccount.sessionToken }
     : undefined;
-  const payload = await postJSON("/account/sign-in", {
-    credential: {
-      provider: "apple",
-      providerUserID: tokenPayload.sub || undefined,
-      displayName,
-      signedInAt: new Date().toISOString(),
-      identityToken,
-      authorizationCode: result.authorization?.code || undefined
-    },
-    linkFrom
-  });
-  return storeSignedInAccount(payload, displayName);
+  const payload = await postJSON("/account/apple/start", {
+    linkFrom,
+    successURL: `${window.location.pathname}${window.location.search}`
+  }, { token: existingAccount?.sessionToken });
+  if (!payload.authorizationURL) {
+    throw new Error("Apple sign-in did not return an authorization URL.");
+  }
+  window.location.href = payload.authorizationURL;
+  return new Promise(() => {});
 }
 
 async function signInWithBrowserFallback() {

@@ -1679,6 +1679,61 @@ function browserFallbackSignInAllowed(request) {
   return host.startsWith("localhost") || host.startsWith("127.0.0.1");
 }
 
+function appleWebOAuthStateSecret() {
+  return process.env.APPLE_WEB_OAUTH_STATE_SECRET ||
+    process.env.PERMITEXT_SYNC_ADMIN_TOKEN ||
+    process.env.STRIPE_WEBHOOK_SECRET ||
+    "permitext-local-apple-web-oauth-state";
+}
+
+function signOAuthStatePayload(payload) {
+  const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
+  const signature = createHmac("sha256", appleWebOAuthStateSecret()).update(encoded).digest("base64url");
+  return `${encoded}.${signature}`;
+}
+
+function verifyOAuthStateCookie(value) {
+  const [encoded, signature] = String(value || "").split(".");
+  if (!encoded || !signature) return null;
+  const expected = createHmac("sha256", appleWebOAuthStateSecret()).update(encoded).digest("base64url");
+  const supplied = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expected);
+  if (supplied.length !== expectedBuffer.length || !timingSafeEqual(supplied, expectedBuffer)) {
+    return null;
+  }
+  try {
+    const payload = JSON.parse(Buffer.from(encoded, "base64url").toString("utf8"));
+    const createdAt = Date.parse(payload.createdAt || 0);
+    if (!Number.isFinite(createdAt) || Date.now() - createdAt > 10 * 60 * 1000) {
+      return null;
+    }
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function cookieValue(request, name) {
+  const cookieHeader = request.headers.cookie || "";
+  return cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`))
+    ?.slice(name.length + 1);
+}
+
+function appleOAuthCookie(request, value = "", maxAge = 600) {
+  const secure = !((request.headers.host || "").startsWith("localhost") || (request.headers.host || "").startsWith("127.0.0.1"));
+  return [
+    `permitext_apple_oauth=${encodeURIComponent(value)}`,
+    `Max-Age=${maxAge}`,
+    "Path=/account/apple",
+    "HttpOnly",
+    "SameSite=Lax",
+    secure ? "Secure" : null
+  ].filter(Boolean).join("; ");
+}
+
 async function appleJWKS() {
   const now = Date.now();
   if (cachedAppleJWKS && cachedAppleJWKSExpiresAt > now) {
@@ -2939,8 +2994,76 @@ function handleAppleWebConfig(request, response) {
   });
 }
 
-function handleAppleWebCallback(_request, response) {
-  sendHTML(response, `<!doctype html>
+function htmlEscape(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function scriptJSON(value) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
+function sameOriginPath(request, value) {
+  try {
+    const baseURL = configuredPublicBaseURL(request);
+    const url = new URL(value || "/", baseURL);
+    if (url.origin !== new URL(baseURL).origin) {
+      return "/";
+    }
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return "/";
+  }
+}
+
+async function handleAppleWebStart(request, response) {
+  if (!appleWebSignInConfigured()) {
+    sendError(response, 503, "Apple web sign-in is not configured.");
+    return;
+  }
+
+  const body = await readJSON(request);
+  const store = await readStore();
+  const linkFromUserID = body.linkFrom?.accountUserID || body.linkFrom?.userID || null;
+  if (linkFromUserID) {
+    if (!requireUserSession(request, response, store, linkFromUserID, {
+      backendSessionToken: body.linkFrom?.sessionToken || body.linkFrom?.backendSessionToken
+    })) {
+      return;
+    }
+  }
+
+  const state = randomUUID();
+  const nonce = randomUUID();
+  const oauthState = signOAuthStatePayload({
+    state,
+    nonce,
+    createdAt: new Date().toISOString(),
+    successPath: sameOriginPath(request, body.successURL || "/"),
+    linkFrom: linkFromUserID ? { accountUserID: linkFromUserID } : null
+  });
+  const authorizeURL = new URL("https://appleid.apple.com/auth/authorize");
+  authorizeURL.searchParams.set("client_id", process.env.APPLE_SERVICE_ID.trim());
+  authorizeURL.searchParams.set("redirect_uri", appleWebRedirectURI(request));
+  authorizeURL.searchParams.set("response_type", "code id_token");
+  authorizeURL.searchParams.set("response_mode", "form_post");
+  authorizeURL.searchParams.set("scope", "name email");
+  authorizeURL.searchParams.set("state", state);
+  authorizeURL.searchParams.set("nonce", nonce);
+
+  response.writeHead(200, {
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": "no-store",
+    "set-cookie": appleOAuthCookie(request, oauthState)
+  });
+  response.end(JSON.stringify({ authorizationURL: authorizeURL.toString() }));
+}
+
+function appleCallbackHTML({ title, message, accountState = null, successPath = "/" }) {
+  return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -2948,14 +3071,113 @@ function handleAppleWebCallback(_request, response) {
     <title>permitext sign in</title>
   </head>
   <body>
-    <script>window.close();</script>
-    <p>Sign in completed. You can close this window and return to permitext.</p>
+    <p>${htmlEscape(message)}</p>
+    <script>
+      const accountState = ${scriptJSON(accountState)};
+      if (accountState) {
+        const workspaceKey = "permitext:webWorkspace:v1";
+        const saved = JSON.parse(localStorage.getItem(workspaceKey) || "{}");
+        saved.account = accountState;
+        localStorage.setItem(workspaceKey, JSON.stringify(saved));
+      }
+      window.location.replace(${scriptJSON(successPath)});
+    </script>
   </body>
-</html>`);
+</html>`;
+}
+
+async function handleAppleWebCallback(request, response) {
+  if (request.method !== "POST") {
+    sendHTML(response, appleCallbackHTML({
+      title: "permitext sign in",
+      message: "Return to permitext and use Link Apple from Settings.",
+      successPath: "/"
+    }));
+    return;
+  }
+
+  const form = new URLSearchParams((await readRawBody(request)).toString("utf8"));
+  const oauthState = verifyOAuthStateCookie(decodeURIComponent(cookieValue(request, "permitext_apple_oauth") || ""));
+  const clearCookie = appleOAuthCookie(request, "", 0);
+  const sendCallbackHTML = (html) => {
+    response.writeHead(200, {
+      "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store",
+      "set-cookie": clearCookie
+    });
+    response.end(html);
+  };
+
+  if (!oauthState || form.get("state") !== oauthState.state) {
+    sendCallbackHTML(appleCallbackHTML({
+      title: "permitext sign in",
+      message: "Apple sign-in could not be verified. Return to permitext and try again.",
+      successPath: "/?appleSignIn=failed"
+    }));
+    return;
+  }
+
+  const identityToken = form.get("id_token");
+  if (!identityToken) {
+    sendCallbackHTML(appleCallbackHTML({
+      title: "permitext sign in",
+      message: "Apple did not return an identity token. Return to permitext and try again.",
+      successPath: oauthState.successPath || "/"
+    }));
+    return;
+  }
+
+  try {
+    const user = JSON.parse(form.get("user") || "{}");
+    const displayName = [user.name?.firstName, user.name?.lastName]
+      .map((part) => String(part || "").trim())
+      .filter(Boolean)
+      .join(" ");
+    const store = await readStore();
+    const account = await accountFromCredential({
+      provider: "apple",
+      displayName: displayName || null,
+      signedInAt: new Date().toISOString(),
+      identityToken,
+      authorizationCode: form.get("code") || undefined
+    });
+    const sessionToken = store.sessions[account.appUserID] || randomUUID();
+    store.sessions[account.appUserID] = sessionToken;
+    const existing = store.users[account.appUserID];
+    const storedAccount = existing
+      ? { ...account, ...existing, signedInAt: account.signedInAt, backendSessionToken: sessionToken }
+      : { ...account, backendSessionToken: sessionToken };
+    store.users[account.appUserID] = storedAccount;
+    if (oauthState.linkFrom?.accountUserID) {
+      mergeAccountInto(store, oauthState.linkFrom.accountUserID, account.appUserID);
+    }
+    await writeStore(store);
+    const finalAccount = store.users[account.appUserID] || storedAccount;
+    sendCallbackHTML(appleCallbackHTML({
+      title: "permitext sign in",
+      message: "Apple sign-in completed. Returning to permitext...",
+      accountState: {
+        userID: finalAccount.appUserID,
+        sessionToken,
+        authProvider: finalAccount.authProvider || "apple",
+        displayName: finalAccount.displayName || displayName || "Apple account",
+        entitlement: store.entitlements[account.appUserID] || null
+      },
+      successPath: oauthState.successPath || "/"
+    }));
+  } catch (error) {
+    console.error(error);
+    sendCallbackHTML(appleCallbackHTML({
+      title: "permitext sign in",
+      message: "Apple sign-in failed. Return to permitext and try again.",
+      successPath: oauthState.successPath || "/"
+    }));
+  }
 }
 
 const handlers = {
   "account/sign-in": handleSignIn,
+  "account/apple/start": handleAppleWebStart,
   "account/attach-local-data": handleAttachLocalData,
   "account/profile": handleProfileUpdate,
   "account/passkeys/link": handlePasskeyLink,

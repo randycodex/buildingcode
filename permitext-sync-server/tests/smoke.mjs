@@ -111,6 +111,20 @@ async function main() {
       "Apple web sign-in config returned the wrong redirect URI."
     );
 
+    const appleWebStart = await request("/account/apple/start", {
+      method: "POST",
+      body: { successURL: "/" }
+    });
+    assert(appleWebStart.response.ok, "Apple web sign-in start failed.");
+    assert(
+      appleWebStart.json.authorizationURL?.startsWith("https://appleid.apple.com/auth/authorize?"),
+      "Apple web sign-in start did not return an Apple authorize URL."
+    );
+    assert(
+      appleWebStart.response.headers.get("set-cookie")?.includes("permitext_apple_oauth="),
+      "Apple web sign-in start did not set the OAuth state cookie."
+    );
+
     const appleWebCallback = await request("/account/apple/callback");
     assert(appleWebCallback.response.ok, "Apple web sign-in callback did not load.");
     assert(
