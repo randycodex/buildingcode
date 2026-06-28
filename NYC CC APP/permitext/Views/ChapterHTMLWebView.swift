@@ -1387,12 +1387,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-note-block {
               position: relative !important;
-              padding-right: 2.75rem !important;
+              padding-right: 4.65rem !important;
             }
             .nyccc-block-actions {
               position: absolute !important;
               top: 0.15rem !important;
-              right: 0 !important;
+              right: 1rem !important;
               display: inline-flex !important;
               flex-direction: column !important;
               align-items: center !important;
