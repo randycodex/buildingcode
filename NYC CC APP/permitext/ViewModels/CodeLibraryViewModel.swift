@@ -2232,7 +2232,6 @@ final class CodeLibraryViewModel: ObservableObject {
                 refreshCurrentEntitlement()
             }
         } catch {
-            if handleBackendSessionFailureIfNeeded(error) { return }
             statusMessage = "Pro is active on this device. Backend billing sync failed: \(error.localizedDescription)"
         }
     }
