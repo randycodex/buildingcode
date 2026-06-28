@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
+const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids.json");
 const webPublicPath = join(__dirname, "public");
 const chapterContentPath = join(
   __dirname,
@@ -75,6 +76,7 @@ const databaseURL =
 let cachedStoreAdapter = null;
 let cachedChapterIndex = null;
 let cachedChapterManifest = null;
+let cachedCanonicalSectionIDs = null;
 let cachedSearchIndex = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
@@ -1313,6 +1315,60 @@ async function chapterManifest() {
   return cachedChapterManifest;
 }
 
+async function canonicalSectionIDs() {
+  if (cachedCanonicalSectionIDs) {
+    return cachedCanonicalSectionIDs;
+  }
+  try {
+    cachedCanonicalSectionIDs = await readJSONFile(canonicalSectionIDsPath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+    cachedCanonicalSectionIDs = {
+      byCodeChapterSection: {},
+      legacyWebSectionID: {}
+    };
+  }
+  return cachedCanonicalSectionIDs;
+}
+
+function canonicalSectionKey(codePrefix, chapterNumber, sectionNumber) {
+  const prefix = String(codePrefix || "").trim().toUpperCase();
+  const chapter = String(chapterNumber || "").trim();
+  const section = String(sectionNumber || "").trim();
+  return prefix && chapter && section ? `${prefix}:${chapter}:${section}` : "";
+}
+
+async function canonicalSectionIDFor({ codePrefix, chapterNumber, sectionNumber, sectionID }) {
+  const map = await canonicalSectionIDs();
+  const keyed = map.byCodeChapterSection?.[canonicalSectionKey(codePrefix, chapterNumber, sectionNumber)];
+  if (Number.isInteger(keyed)) {
+    return keyed;
+  }
+  return null;
+}
+
+async function canonicalizeSectionPayload(section, chapterContext) {
+  const canonicalID = await canonicalSectionIDFor({
+    ...chapterContext,
+    sectionNumber: section.sectionNumber,
+    sectionID: section.id
+  });
+  if (!canonicalID || canonicalID === section.id) {
+    return section;
+  }
+  return {
+    ...section,
+    id: canonicalID,
+    webSectionID: section.id
+  };
+}
+
+async function canonicalizeChapterSections(sections, chapterContext) {
+  return Promise.all(sections.map((section) => canonicalizeSectionPayload(section, chapterContext)));
+}
+
 function codePrefixForChapter(chapter, manifestChapter = null) {
   const manifestPrefix = codeSectionIDPrefixMap.get(Number(manifestChapter?.codeSectionID));
   if (manifestPrefix) {
@@ -1426,8 +1482,13 @@ async function searchIndex() {
   for (const chapterSummary of chapters) {
     const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
     for (const section of flattenChapterSections(chapter)) {
+      const canonicalSection = await canonicalizeSectionPayload(section, {
+        codePrefix: chapterSummary.codePrefix,
+        chapterNumber: chapterSummary.chapterNumber
+      });
       sectionSummaries.push({
-        id: section.id,
+        id: canonicalSection.id,
+        webSectionID: section.id,
         chapterID: chapterSummary.id,
         codePrefix: chapterSummary.codePrefix,
         chapterNumber: chapterSummary.chapterNumber,
@@ -1444,7 +1505,7 @@ async function searchIndex() {
     const batch = sectionSummaries.slice(start, start + 150);
     const entries = await Promise.all(
       batch.map(async (section) => {
-        const body = await sectionBody(section.id, { allowMissing: true });
+        const body = await sectionBody(section.webSectionID || section.id, { allowMissing: true });
         const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
         return { ...section, plainText };
       })
@@ -1470,7 +1531,14 @@ async function sectionSummaryByID(sectionID) {
   const chapters = await chapterIndex();
   for (const chapterSummary of chapters) {
     const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
-    const section = flattenChapterSections(chapter).find((item) => String(item.id) === String(sectionID));
+    const sections = await canonicalizeChapterSections(flattenChapterSections(chapter), {
+      codePrefix: chapterSummary.codePrefix,
+      chapterNumber: chapterSummary.chapterNumber
+    });
+    const section = sections.find((item) =>
+      String(item.id) === String(sectionID) ||
+      String(item.webSectionID || "") === String(sectionID)
+    );
     if (section) {
       return {
         ...section,
@@ -1551,6 +1619,8 @@ async function handleCodeChapter(request, path, response) {
   const manifest = await chapterManifest();
   const manifestChapter = manifest.get(String(chapter.chapterID));
   const includeBody = requestURL(request).searchParams.get("include") === "body";
+  const codePrefix = codePrefixForChapter(chapter, manifestChapter);
+  const chapterNumber = manifestChapter?.chapterNumber || chapter.chapterNumber;
   const sections = flattenChapterSections(chapter);
   const sectionPayload = includeBody
     ? await Promise.all(sections.map(async (section) => ({
@@ -1558,19 +1628,23 @@ async function handleCodeChapter(request, path, response) {
         blocks: (await sectionBody(section.id, { allowMissing: true })).blocks || []
       })))
     : sections;
+  const canonicalSections = await canonicalizeChapterSections(sectionPayload, {
+    codePrefix,
+    chapterNumber
+  });
 
   sendJSON(response, 200, {
     chapter: {
       id: chapter.chapterID,
-      codePrefix: codePrefixForChapter(chapter, manifestChapter),
+      codePrefix,
       codeSectionID: manifestChapter?.codeSectionID || null,
-      chapterNumber: manifestChapter?.chapterNumber || chapter.chapterNumber,
+      chapterNumber,
       displayTitle: displayTitleForChapter({
         ...chapter,
-        chapterNumber: manifestChapter?.chapterNumber || chapter.chapterNumber
+        chapterNumber
       }),
       groups: chapter.groups || [],
-      sections: sectionPayload
+      sections: canonicalSections
     }
   });
 }
@@ -1581,22 +1655,29 @@ async function handleCodeSection(path, response) {
     sendError(response, 400, "Invalid section ID.");
     return;
   }
-  const body = await sectionBody(sectionID, { allowMissing: true });
+  const summary = await sectionSummaryByID(sectionID);
+  const body = await sectionBody(summary?.webSectionID || sectionID, { allowMissing: true });
   if (!body.blocks?.length) {
-    const summary = await sectionSummaryByID(sectionID);
     if (summary) {
       sendJSON(response, 200, {
         section: {
           blocks: [{ id: `${sectionID}-title`, kind: "title", plainText: summary.title || "" }],
           chapterNumber: summary.chapterNumber,
           schemaVersion: 1,
-          sectionID: Number(sectionID)
+          sectionID: Number(summary.id || sectionID),
+          webSectionID: summary.webSectionID || null
         }
       });
       return;
     }
   }
-  sendJSON(response, 200, { section: body });
+  sendJSON(response, 200, {
+    section: {
+      ...body,
+      sectionID: Number(summary?.id || body.sectionID || sectionID),
+      webSectionID: summary?.webSectionID || body.webSectionID || null
+    }
+  });
 }
 
 async function handleCodeSearch(request, response) {
@@ -2167,6 +2248,71 @@ function mutationRecordID(mutation) {
   return record.id || null;
 }
 
+function canonicalMutationRecordID(kind, record) {
+  const userID = record.userID;
+  const codeVersion = record.codeVersion || "nyc-2022";
+  const sectionID = record.sectionID;
+  if (kind === "savedItem") {
+    return [userID, "saved", codeVersion, sectionID].join(":");
+  }
+  if (kind === "annotation") {
+    return [
+      userID,
+      record.tags !== undefined ? "tags" : "note",
+      codeVersion,
+      sectionID,
+      String(record.blockID || "").trim() || null
+    ].filter(Boolean).join(":");
+  }
+  if (kind === "projectSection") {
+    return [
+      userID,
+      "project-section",
+      codeVersion,
+      record.folderClientID || record.localFolderID || null,
+      sectionID,
+      record.scope || null
+    ].filter(Boolean).join(":");
+  }
+  return record.id || null;
+}
+
+async function canonicalizeSectionRecord(kind, record) {
+  if (!["savedItem", "annotation", "projectSection"].includes(kind)) {
+    return record;
+  }
+  const canonicalID = await canonicalSectionIDFor({
+    codePrefix: record.codePrefix || "BC",
+    chapterNumber: record.chapterNumber,
+    sectionNumber: record.sectionNumber,
+    sectionID: record.sectionID
+  });
+  if (!canonicalID || canonicalID === record.sectionID) {
+    return record;
+  }
+  const normalized = {
+    ...record,
+    sectionID: canonicalID,
+    webSectionID: record.webSectionID || record.sectionID
+  };
+  const nextID = canonicalMutationRecordID(kind, normalized);
+  return nextID ? { ...normalized, id: nextID } : normalized;
+}
+
+async function canonicalizeMutation(mutation) {
+  const { kind, record } = mutationKindAndRecord(mutation);
+  if (!kind || !record) {
+    return mutation;
+  }
+  return {
+    [kind]: await canonicalizeSectionRecord(kind, record)
+  };
+}
+
+async function canonicalizeMutations(mutations) {
+  return Promise.all((mutations || []).map(canonicalizeMutation));
+}
+
 function mutationUpdatedAt(mutation) {
   const record = Object.values(mutation)[0] || {};
   return Date.parse(record.updatedAt || 0);
@@ -2667,7 +2813,7 @@ async function handlePush(request, response) {
     return;
   }
 
-  const incoming = body.batch?.mutations || [];
+  const incoming = await canonicalizeMutations(body.batch?.mutations || []);
   const validation = validateMutations(incoming, userID);
   if (!validation.ok) {
     sendError(response, 400, validation.message);
@@ -2709,7 +2855,7 @@ async function handlePull(request, response) {
     (Number.isFinite(since)
       ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since)
       : allMutations);
-  const mutations = expandPullMutationsWithDependencies(filteredMutations, allMutations);
+  const mutations = await canonicalizeMutations(expandPullMutationsWithDependencies(filteredMutations, allMutations));
   const latestEventID = await latestSyncEventID(userID);
   sendJSON(response, 200, {
     userID,
