@@ -2287,13 +2287,12 @@ async function canonicalizeSectionRecord(kind, record) {
     sectionNumber: record.sectionNumber,
     sectionID: record.sectionID
   });
-  if (!canonicalID || canonicalID === record.sectionID) {
-    return record;
-  }
   const normalized = {
     ...record,
-    sectionID: canonicalID,
-    webSectionID: record.webSectionID || record.sectionID
+    sectionID: canonicalID || record.sectionID,
+    webSectionID: canonicalID && canonicalID !== record.sectionID
+      ? record.webSectionID || record.sectionID
+      : record.webSectionID
   };
   const nextID = canonicalMutationRecordID(kind, normalized);
   return nextID ? { ...normalized, id: nextID } : normalized;

@@ -741,6 +741,7 @@ async function main() {
         updatedAt: "2026-06-04T00:00:00Z"
       }
     };
+    const savedSmokeRecordID = `${userID}:saved:nyc-2022:101`;
     const push = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -753,7 +754,7 @@ async function main() {
       }
     });
     assert(push.response.ok, "Sync push failed.");
-    assert(push.json.acceptedMutationIDs.includes("saved-smoke"), "Push did not accept the saved item mutation.");
+    assert(push.json.acceptedMutationIDs.includes(savedSmokeRecordID), "Push did not accept the saved item mutation.");
     assert(Number.isInteger(push.json.latestEventID), "Push did not return a latest event ID.");
     assert(push.json.syncRevision === push.json.latestEventID, "Push sync revision did not match latest event ID.");
 
@@ -774,8 +775,8 @@ async function main() {
       }
     });
     assert(stalePush.response.ok, "Stale push should report rejection without failing the request.");
-    assert(!stalePush.json.acceptedMutationIDs.includes("saved-smoke"), "Stale push was accepted.");
-    assert(stalePush.json.rejectedMutationIDs.includes("saved-smoke"), "Stale push was not reported as rejected.");
+    assert(!stalePush.json.acceptedMutationIDs.includes(savedSmokeRecordID), "Stale push was accepted.");
+    assert(stalePush.json.rejectedMutationIDs.includes(savedSmokeRecordID), "Stale push was not reported as rejected.");
 
     const pull = await request("/sync/pull", {
       method: "POST",
@@ -786,6 +787,89 @@ async function main() {
     assert(Number.isInteger(pull.json.latestEventID), "Pull did not return a latest event ID.");
     assert(pull.json.syncRevision === pull.json.latestEventID, "Pull sync revision did not match latest event ID.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
+
+    const webSavedMutation = {
+      savedItem: {
+        id: "web-saved-202",
+        userID,
+        codeVersion: "nyc-2022",
+        codePrefix: "BC",
+        sectionID: 202,
+        sectionNumber: "202",
+        title: "Definitions",
+        updatedAt: "2026-06-04T01:00:00Z"
+      }
+    };
+    const webSavePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [webSavedMutation]
+        }
+      }
+    });
+    const canonicalSavedRecordID = `${userID}:saved:nyc-2022:202`;
+    assert(webSavePush.response.ok, "Web-style saved push failed.");
+    assert(
+      webSavePush.json.acceptedMutationIDs.includes(canonicalSavedRecordID),
+      "Web-style saved push was not normalized to the shared saved record ID."
+    );
+
+    const iosAfterWebSavePull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(iosAfterWebSavePull.response.ok, "iOS pull after web save failed.");
+    assert(
+      iosAfterWebSavePull.json.mutations.some((item) =>
+        item.savedItem?.id === canonicalSavedRecordID &&
+        item.savedItem?.sectionID === 202 &&
+        !item.savedItem?.deletedAt
+      ),
+      "iOS pull did not receive the web-created saved section."
+    );
+
+    const iosDeleteMutation = {
+      savedItem: {
+        id: canonicalSavedRecordID,
+        userID,
+        codeVersion: "nyc-2022",
+        sectionID: 202,
+        updatedAt: "2026-06-04T02:00:00Z",
+        deletedAt: "2026-06-04T02:00:00Z"
+      }
+    };
+    const iosDeletePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [iosDeleteMutation]
+        }
+      }
+    });
+    assert(iosDeletePush.response.ok, "iOS delete push failed.");
+    assert(
+      iosDeletePush.json.acceptedMutationIDs.includes(canonicalSavedRecordID),
+      "iOS delete did not replace the web save record."
+    );
+
+    const webAfterIOSDeletePull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(webAfterIOSDeletePull.response.ok, "Web pull after iOS delete failed.");
+    const deletedSavedRecord = webAfterIOSDeletePull.json.mutations.find((item) =>
+      item.savedItem?.id === canonicalSavedRecordID
+    )?.savedItem;
+    assert(deletedSavedRecord?.deletedAt, "Web pull did not receive the iOS delete tombstone.");
 
     const cursorPull = await request("/sync/pull", {
       method: "POST",
@@ -821,6 +905,7 @@ async function main() {
         updatedAt: "2026-06-06T00:00:00Z"
       }
     };
+    const projectSectionRecordID = `${userID}:project-section:nyc-2022:project-client-smoke:101:manual`;
     const projectPush = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -834,7 +919,7 @@ async function main() {
     });
     assert(projectPush.response.ok, "Project sync push failed.");
     assert(projectPush.json.acceptedMutationIDs.includes("project-smoke"), "Project mutation was not accepted.");
-    assert(projectPush.json.acceptedMutationIDs.includes("project-section-smoke"), "Project section mutation was not accepted.");
+    assert(projectPush.json.acceptedMutationIDs.includes(projectSectionRecordID), "Project section mutation was not accepted.");
 
     const tagMutation = {
       annotation: {
@@ -848,6 +933,7 @@ async function main() {
         deletedAt: null
       }
     };
+    const tagRecordID = `${userID}:tags:nyc-2022:101`;
     const continuityMutation = {
       continuity: {
         userID,
@@ -876,7 +962,7 @@ async function main() {
       }
     });
     assert(fullStatePush.response.ok, "Full restore-state push failed.");
-    assert(fullStatePush.json.acceptedMutationIDs.includes("tags-smoke"), "Tag mutation was not accepted.");
+    assert(fullStatePush.json.acceptedMutationIDs.includes(tagRecordID), "Tag mutation was not accepted.");
     assert(
       fullStatePush.json.acceptedMutationIDs.includes(`${userID}:continuity:nyc-2022`),
       "Continuity mutation was not accepted."
@@ -963,7 +1049,7 @@ async function main() {
     assert(restoreChecklist.json.entitlement?.plan === "pro", "Restore checklist did not report the entitlement.");
     assert(restoreChecklist.json.hasSession === true, "Restore checklist did not report the session.");
     assert(restoreChecklist.json.passkeyCredentialCount === 1, "Restore checklist did not report the linked passkey.");
-    assert(restoreChecklist.json.mutationCounts.savedItem === 1, "Restore checklist did not count saved items.");
+    assert(restoreChecklist.json.mutationCounts.savedItem === 2, "Restore checklist did not count saved items and delete tombstones.");
     assert(restoreChecklist.json.mutationCounts.annotation === 1, "Restore checklist did not count annotations.");
     assert(restoreChecklist.json.mutationCounts.project === 1, "Restore checklist did not count projects.");
     assert(restoreChecklist.json.mutationCounts.projectSection === 1, "Restore checklist did not count project memberships.");
