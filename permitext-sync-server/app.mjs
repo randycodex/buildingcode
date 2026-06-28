@@ -15,6 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
 const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids.json");
 const webPublicPath = join(__dirname, "public");
+const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const chapterContentPath = join(
   __dirname,
   "..",
@@ -2250,7 +2251,7 @@ function mutationRecordID(mutation) {
 
 function canonicalMutationRecordID(kind, record) {
   const userID = record.userID;
-  const codeVersion = record.codeVersion || "nyc-2022";
+  const codeVersion = canonicalCodeVersion(record.codeVersion);
   const sectionID = record.sectionID;
   if (kind === "savedItem") {
     return [userID, "saved", codeVersion, sectionID].join(":");
@@ -2262,6 +2263,14 @@ function canonicalMutationRecordID(kind, record) {
       codeVersion,
       sectionID,
       String(record.blockID || "").trim() || null
+    ].filter(Boolean).join(":");
+  }
+  if (kind === "project") {
+    return [
+      userID,
+      "project",
+      codeVersion,
+      record.clientID || record.id || record.localFolderID || null
     ].filter(Boolean).join(":");
   }
   if (kind === "projectSection") {
@@ -2278,8 +2287,14 @@ function canonicalMutationRecordID(kind, record) {
 }
 
 async function canonicalizeSectionRecord(kind, record) {
-  if (!["savedItem", "annotation", "projectSection"].includes(kind)) {
+  if (!["savedItem", "annotation", "project", "projectSection"].includes(kind)) {
     return record;
+  }
+  const codeVersion = canonicalCodeVersion(record.codeVersion);
+  if (kind === "project") {
+    const normalized = { ...record, codeVersion };
+    const nextID = canonicalMutationRecordID(kind, normalized);
+    return nextID ? { ...normalized, id: nextID } : normalized;
   }
   const canonicalID = await canonicalSectionIDFor({
     codePrefix: record.codePrefix || "BC",
@@ -2289,6 +2304,7 @@ async function canonicalizeSectionRecord(kind, record) {
   });
   const normalized = {
     ...record,
+    codeVersion,
     sectionID: canonicalID || record.sectionID,
     webSectionID: canonicalID && canonicalID !== record.sectionID
       ? record.webSectionID || record.sectionID
@@ -2310,6 +2326,12 @@ async function canonicalizeMutation(mutation) {
 
 async function canonicalizeMutations(mutations) {
   return Promise.all((mutations || []).map(canonicalizeMutation));
+}
+
+function canonicalCodeVersion(value) {
+  const candidate = String(value || "").trim();
+  if (!candidate || candidate === "nyc-2022") return defaultSyncCodeVersion;
+  return candidate;
 }
 
 function mutationUpdatedAt(mutation) {
@@ -2447,7 +2469,7 @@ function retargetMutationUser(mutation, sourceUserID, targetUserID) {
   return { [kind]: nextRecord };
 }
 
-function mergeAccountInto(store, sourceUserID, targetUserID) {
+async function mergeAccountInto(store, sourceUserID, targetUserID) {
   if (!sourceUserID || !targetUserID || sourceUserID === targetUserID) {
     return null;
   }
@@ -2457,9 +2479,11 @@ function mergeAccountInto(store, sourceUserID, targetUserID) {
     return null;
   }
 
-  const sourceMutations = (store.mutationsByUserID[sourceUserID] || [])
-    .map((mutation) => retargetMutationUser(mutation, sourceUserID, targetUserID));
-  const targetMutations = store.mutationsByUserID[targetUserID] || [];
+  const sourceMutations = await canonicalizeMutations(
+    (store.mutationsByUserID[sourceUserID] || [])
+      .map((mutation) => retargetMutationUser(mutation, sourceUserID, targetUserID))
+  );
+  const targetMutations = await canonicalizeMutations(store.mutationsByUserID[targetUserID] || []);
   const mergedMutations = mergeMutations(targetMutations, sourceMutations);
   store.mutationsByUserID[targetUserID] = mergedMutations.mutations;
   delete store.mutationsByUserID[sourceUserID];
@@ -2615,7 +2639,7 @@ async function handleSignIn(request, response) {
     if (!requireUserSession(request, response, store, sourceUserID, { backendSessionToken: sourceSessionToken })) {
       return;
     }
-    mergedAccount = mergeAccountInto(store, sourceUserID, account.appUserID);
+    mergedAccount = await mergeAccountInto(store, sourceUserID, account.appUserID);
   }
   await writeStore(store);
   sendJSON(response, 200, {
@@ -2684,7 +2708,7 @@ async function handleBrowserAccountLink(request, response) {
   }
 
   const sourceUserID = `web:${browserCredentialID}`;
-  const mergedAccount = mergeAccountInto(store, sourceUserID, targetUserID);
+  const mergedAccount = await mergeAccountInto(store, sourceUserID, targetUserID);
   if (!store.entitlements[targetUserID]) {
     const subscription = await activeStripeSubscriptionForUserID(sourceUserID);
     if (subscription) {
@@ -2819,7 +2843,7 @@ async function handlePush(request, response) {
     return;
   }
 
-  const existing = store.mutationsByUserID[userID] || [];
+  const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
   const merge = mergeMutations(existing, incoming);
   store.mutationsByUserID[userID] = merge.mutations;
   await writeStore(store);
@@ -3468,7 +3492,7 @@ async function handleAppleWebCallback(request, response) {
       : { ...account, backendSessionToken: sessionToken };
     store.users[account.appUserID] = storedAccount;
     if (oauthState.linkFrom?.accountUserID) {
-      mergeAccountInto(store, oauthState.linkFrom.accountUserID, account.appUserID);
+      await mergeAccountInto(store, oauthState.linkFrom.accountUserID, account.appUserID);
     }
     await writeStore(store);
     const finalAccount = store.users[account.appUserID] || storedAccount;

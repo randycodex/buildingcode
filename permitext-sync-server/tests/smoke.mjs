@@ -10,6 +10,7 @@ const baseURL = `http://127.0.0.1:${port}`;
 const adminToken = "smoke-admin-token";
 const stripeWebhookSecret = "whsec_smoke";
 const userID = "apple:smoke-user";
+const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 
 function assert(condition, message) {
   if (!condition) {
@@ -399,7 +400,7 @@ async function main() {
     const mergedSaved = mergeApplePull.json.mutations.find((mutation) => mutation.savedItem);
     assert(mergedSaved?.savedItem.userID === mergeAppleUserID, "Merged saved item user ID was not retargeted.");
     assert(
-      mergedSaved?.savedItem.id === `${mergeAppleUserID}:saved:nyc-2022:101`,
+      mergedSaved?.savedItem.id === `${mergeAppleUserID}:saved:${defaultSyncCodeVersion}:101`,
       "Merged saved item ID was not retargeted."
     );
     const mergeSourcePull = await request("/sync/pull", {
@@ -741,7 +742,7 @@ async function main() {
         updatedAt: "2026-06-04T00:00:00Z"
       }
     };
-    const savedSmokeRecordID = `${userID}:saved:nyc-2022:101`;
+    const savedSmokeRecordID = `${userID}:saved:${defaultSyncCodeVersion}:101`;
     const push = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -811,7 +812,7 @@ async function main() {
         }
       }
     });
-    const canonicalSavedRecordID = `${userID}:saved:nyc-2022:202`;
+    const canonicalSavedRecordID = `${userID}:saved:${defaultSyncCodeVersion}:202`;
     assert(webSavePush.response.ok, "Web-style saved push failed.");
     assert(
       webSavePush.json.acceptedMutationIDs.includes(canonicalSavedRecordID),
@@ -905,7 +906,8 @@ async function main() {
         updatedAt: "2026-06-06T00:00:00Z"
       }
     };
-    const projectSectionRecordID = `${userID}:project-section:nyc-2022:project-client-smoke:101:manual`;
+    const projectRecordID = `${userID}:project:${defaultSyncCodeVersion}:project-client-smoke`;
+    const projectSectionRecordID = `${userID}:project-section:${defaultSyncCodeVersion}:project-client-smoke:101:manual`;
     const projectPush = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -918,7 +920,7 @@ async function main() {
       }
     });
     assert(projectPush.response.ok, "Project sync push failed.");
-    assert(projectPush.json.acceptedMutationIDs.includes("project-smoke"), "Project mutation was not accepted.");
+    assert(projectPush.json.acceptedMutationIDs.includes(projectRecordID), "Project mutation was not accepted.");
     assert(projectPush.json.acceptedMutationIDs.includes(projectSectionRecordID), "Project section mutation was not accepted.");
 
     const tagMutation = {
@@ -933,7 +935,7 @@ async function main() {
         deletedAt: null
       }
     };
-    const tagRecordID = `${userID}:tags:nyc-2022:101`;
+    const tagRecordID = `${userID}:tags:${defaultSyncCodeVersion}:101`;
     const continuityMutation = {
       continuity: {
         userID,

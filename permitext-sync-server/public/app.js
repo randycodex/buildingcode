@@ -15,6 +15,7 @@ const searchTemplate = document.querySelector("#search-template");
 const savedTemplate = document.querySelector("#saved-template");
 const analysisTemplate = document.querySelector("#analysis-template");
 const settingsTemplate = document.querySelector("#settings-template");
+const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 
 const codeOptions = [
   { prefix: "BC", label: "Building Code", theme: "building" },
@@ -1220,14 +1221,31 @@ function mutationUpdatedAt(mutation) {
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
+function mutationRecordID(mutation) {
+  const { kind, record } = mutationKindAndRecord(mutation);
+  if (!kind || !record) return null;
+  if (kind === "continuity") {
+    return [record.userID, "continuity", syncCodeVersion(record.codeVersion)].join(":");
+  }
+  if (kind === "codeVersionClear") {
+    return [record.userID, "code-version-clear", syncCodeVersion(record.codeVersion)].join(":");
+  }
+  return record.id || null;
+}
+
 function summarizeMutations(mutations = []) {
   const sorted = [...mutations].sort((left, right) => mutationUpdatedAt(right) - mutationUpdatedAt(left));
+  const latestByID = new Map();
+  sorted.forEach((mutation) => {
+    const id = mutationRecordID(mutation);
+    if (id && !latestByID.has(id)) latestByID.set(id, mutation);
+  });
   const projects = [];
   const savedItems = [];
   const annotations = [];
   const projectSections = [];
 
-  sorted.forEach((mutation) => {
+  latestByID.forEach((mutation) => {
     const { kind, record } = mutationKindAndRecord(mutation);
     if (!record || record.deletedAt) return;
     if (kind === "project") projects.push(record);
@@ -1239,6 +1257,12 @@ function summarizeMutations(mutations = []) {
   return { projects, savedItems, annotations, projectSections };
 }
 
+function syncCodeVersion(value) {
+  const candidate = String(value || "").trim();
+  if (!candidate || candidate === "nyc-2022") return defaultSyncCodeVersion;
+  return candidate;
+}
+
 function currentContentSummary() {
   const summary = syncedContent?.summary || summarizeMutations([]);
   const summarySavedItems = summary.savedItems || [];
@@ -1248,7 +1272,7 @@ function currentContentSummary() {
     .map((item) => ({
       id: `web-saved-${item.sectionID}`,
       userID: item.userID || "local-web",
-      codeVersion: item.codeVersion || "nyc-2022",
+      codeVersion: syncCodeVersion(item.codeVersion),
       codePrefix: item.codePrefix || "BC",
       chapterID: item.chapterID || "",
       chapterNumber: item.chapterNumber || "",
@@ -1356,7 +1380,7 @@ function savedRecordForSection(section, userID = "local-web", updatedAt = new Da
   return {
     id: `web-saved-${section.sectionID}`,
     userID,
-    codeVersion: "nyc-2022",
+    codeVersion: defaultSyncCodeVersion,
     codePrefix: section.codePrefix || "BC",
     chapterID: section.chapterID || "",
     chapterNumber: section.chapterNumber || "",
@@ -1375,7 +1399,7 @@ function projectSectionRecordForSection(project, sectionPayload) {
   return {
     id: `web-project-section-${folderClientID}-${sectionID}`,
     userID: account?.userID || "local-web",
-    codeVersion: "nyc-2022",
+    codeVersion: defaultSyncCodeVersion,
     codePrefix: sectionPayload.codePrefix || "BC",
     chapterID: sectionPayload.chapterID || "",
     chapterNumber: sectionPayload.chapterNumber || "",
@@ -1412,7 +1436,7 @@ function deletedProjectSectionMutationForItem(project, item) {
     projectSection: {
       id: item.id || record.id,
       userID: activeAccount()?.userID || item.userID || "local-web",
-      codeVersion: item.codeVersion || "nyc-2022",
+      codeVersion: syncCodeVersion(item.codeVersion),
       folderClientID: item.folderClientID || record.folderClientID,
       localFolderID: item.localFolderID || record.localFolderID,
       sectionID: Number(item.sectionID || item.savedSectionID || item.itemID),
@@ -1430,7 +1454,7 @@ function deletedSavedMutationForSection(section) {
     savedItem: {
       id: `web-saved-${section.sectionID}`,
       userID: account.userID,
-      codeVersion: "nyc-2022",
+      codeVersion: defaultSyncCodeVersion,
       sectionID: Number(section.sectionID),
       sectionNumber: section.sectionNumber,
       title: section.title,
@@ -1477,7 +1501,7 @@ function projectMutationForRecord(project, accountOverride = null) {
       clientID: project.clientID || project.id,
       localFolderID: numericLocalFolderID(project),
       userID: account?.userID || "local-web",
-      codeVersion: project.codeVersion || "nyc-2022",
+      codeVersion: syncCodeVersion(project.codeVersion),
       name: project.name || "Project",
       title: project.title || project.name || "Project",
       address: project.address || "",
@@ -1569,7 +1593,7 @@ async function createProjectFolder(details = {}) {
     id,
     clientID: id,
     localFolderID,
-    codeVersion: "nyc-2022",
+    codeVersion: defaultSyncCodeVersion,
     name,
     title: name,
     address,
@@ -1602,7 +1626,7 @@ async function updateProjectFolder(project, details = {}) {
     id: project.id || id,
     clientID: project.clientID || id,
     localFolderID: project.localFolderID || id,
-    codeVersion: project.codeVersion || "nyc-2022",
+    codeVersion: syncCodeVersion(project.codeVersion),
     name,
     title: name,
     address,
@@ -1717,7 +1741,7 @@ function safeAnnotationIDPart(value) {
 }
 
 function annotationRecordID(target) {
-  const codeVersion = target.codeVersion || "nyc-2022";
+  const codeVersion = syncCodeVersion(target.codeVersion);
   const sectionID = String(target.sectionID || "");
   const blockID = normalizeAnnotationBlockID(target.blockID);
   return `web-annotation-${codeVersion}-${sectionID}-${safeAnnotationIDPart(blockID)}`;
@@ -1798,7 +1822,7 @@ function annotationRecordForTarget(target, values = {}) {
   return {
     id: annotationRecordID(target),
     userID: activeAccount()?.userID || "local-web",
-    codeVersion: target.codeVersion || "nyc-2022",
+    codeVersion: syncCodeVersion(target.codeVersion),
     codePrefix: target.codePrefix || "BC",
     chapterID: target.chapterID || "",
     chapterNumber: target.chapterNumber || "",
@@ -1831,7 +1855,7 @@ function annotationMutationForRecord(record) {
   const annotation = {
     id: record.id,
     userID: account?.userID || record.userID || "local-web",
-    codeVersion: record.codeVersion || "nyc-2022",
+    codeVersion: syncCodeVersion(record.codeVersion),
     sectionID: Number(record.sectionID),
     blockID: normalizeAnnotationBlockID(record.blockID) || null,
     updatedAt: record.updatedAt || new Date().toISOString(),
@@ -1941,7 +1965,7 @@ function renderAnnotationTagEditor(container, target, options = {}) {
 
 function annotationTargetForSection(section, reader = null, overrides = {}) {
   return {
-    codeVersion: "nyc-2022",
+    codeVersion: defaultSyncCodeVersion,
     codePrefix: reader?.codePrefix || section.codePrefix || "BC",
     chapterID: reader?.chapterID || section.chapterID || "",
     chapterNumber: reader?.chapterNumber || section.chapterNumber || "",
@@ -2185,7 +2209,7 @@ function noteValueForSection(sectionID) {
 }
 
 function setSectionNoteValue(sectionID, value) {
-  setAnnotationNoteValue({ sectionID, codeVersion: "nyc-2022", blockID: "" }, value);
+  setAnnotationNoteValue({ sectionID, codeVersion: defaultSyncCodeVersion, blockID: "" }, value);
 }
 
 function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
@@ -2247,7 +2271,7 @@ function ensureReaderNotesSheet(panel, reader) {
   input.addEventListener("input", () => {
     const sectionID = sheet.dataset.sectionId || "";
     const blockID = sheet.dataset.blockId || "";
-    const target = sheet.__annotationTarget || { sectionID, blockID, codeVersion: "nyc-2022" };
+    const target = sheet.__annotationTarget || { sectionID, blockID, codeVersion: defaultSyncCodeVersion };
     setAnnotationNoteValue(target, input.value);
     syncReaderNoteControls(sectionID, blockID, input.value, { source: input });
   });
@@ -3481,7 +3505,7 @@ async function renderSectionDetail(searchID, detail) {
   sectionPayload.chapterNumber = detail.chapterNumber || chapter?.chapterNumber || "";
   const sectionTarget = {
     ...sectionPayload,
-    codeVersion: "nyc-2022",
+    codeVersion: defaultSyncCodeVersion,
     blockID: ""
   };
   const saved = isSectionSaved(detail.sectionID);
