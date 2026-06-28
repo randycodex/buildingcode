@@ -3222,7 +3222,8 @@ mark {
   letter-spacing: 0;
 }
 
-.account-summary {
+.account-summary,
+.account-plan-summary {
   display: grid;
   gap: var(--space-1);
   padding: var(--space-3);
@@ -3230,18 +3231,21 @@ mark {
   background: var(--surface);
 }
 
-.account-summary[hidden] {
+.account-summary[hidden],
+.account-plan-summary[hidden] {
   display: none;
 }
 
-.account-summary span {
+.account-summary span,
+.account-plan-summary span {
   color: var(--text-secondary);
   font-size: 10pt !important;
   font-weight: 500;
   text-transform: uppercase;
 }
 
-.account-summary strong {
+.account-summary strong,
+.account-plan-summary strong {
   min-width: 0;
   color: var(--text-primary);
   font-size: 12pt !important;

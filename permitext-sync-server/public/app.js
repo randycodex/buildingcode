@@ -1011,6 +1011,52 @@ function activeAccount() {
   return userID && sessionToken ? { userID, sessionToken } : null;
 }
 
+function currentEntitlement() {
+  return state.account?.entitlement || syncedContent?.entitlement || null;
+}
+
+function currentPlan() {
+  return currentEntitlement()?.plan === "pro" ? "pro" : "free";
+}
+
+function isProAccount() {
+  return currentPlan() === "pro";
+}
+
+function entitlementSourceLabel(entitlement = currentEntitlement()) {
+  if (!entitlement) return "Free";
+  if (entitlement.source === "webSubscription") return "Web subscription";
+  if (entitlement.source === "appleSubscription") return "Apple subscription";
+  if (entitlement.source === "lifetimeGrant") return "Lifetime Pro";
+  return entitlement.source || "Pro";
+}
+
+function storeAccountEntitlement(entitlement) {
+  if (!state.account) return;
+  state.account = { ...state.account, entitlement: entitlement || null };
+  saveWorkspaceState();
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
+async function refreshEntitlementAfterCheckoutReturn() {
+  const searchParams = new URLSearchParams(window.location.search);
+  if (searchParams.get("checkout") !== "success" || !activeAccount()) return;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    await loadSyncedContent({ force: true });
+    if (isProAccount()) {
+      await renderWorkspace();
+      return;
+    }
+    await delay(1500);
+  }
+  await renderWorkspace();
+}
+
 function browserCredentialID() {
   const existing = typeof state.browserCredentialID === "string" ? state.browserCredentialID.trim() : "";
   if (existing) return existing;
@@ -1040,7 +1086,8 @@ async function signInCurrentBrowser() {
     userID: account.appUserID,
     sessionToken: account.backendSessionToken,
     authProvider: account.authProvider || "web",
-    displayName: account.displayName || "Web browser"
+    displayName: account.displayName || "Web browser",
+    entitlement: payload.entitlement || null
   };
   syncedContent = null;
   saveWorkspaceState();
@@ -1136,9 +1183,11 @@ async function loadSyncedContent(options = {}) {
       syncedContent = {
         status: "connected",
         pulledAt: payload.pulledAt,
+        entitlement: payload.entitlement || null,
         mutations: payload.mutations || [],
         summary: summarizeMutations(payload.mutations || [])
       };
+      storeAccountEntitlement(payload.entitlement || null);
       return syncedContent;
     })
     .catch((error) => {
@@ -1163,6 +1212,7 @@ async function pushMutation(mutation) {
       mutations: [mutation]
     }
   }, { token: account.sessionToken });
+  storeAccountEntitlement(payload.entitlement || null);
   await loadSyncedContent({ force: true });
   return payload;
 }
@@ -4204,21 +4254,31 @@ function renderSettings() {
   wireReaderSettingsControls(panel);
   const summary = panel.querySelector(".account-summary");
   const displayName = panel.querySelector(".account-display-name");
+  const planSummary = panel.querySelector(".account-plan-summary");
+  const planLabel = panel.querySelector(".account-plan-label");
+  const planDetail = panel.querySelector(".account-plan-detail");
   const signInButton = panel.querySelector(".account-sign-in");
   const disconnectButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
   const status = panel.querySelector(".connector-status");
   const syncAccountState = () => {
     const account = activeAccount();
-    checkoutButton.disabled = !account;
+    const pro = isProAccount();
+    checkoutButton.disabled = !account || pro;
+    checkoutButton.textContent = pro ? "Pro active" : "Upgrade to Pro";
     disconnectButton.disabled = !account;
     signInButton.hidden = Boolean(account);
     disconnectButton.hidden = !account;
     summary.hidden = !account;
+    planSummary.hidden = !account;
     displayName.textContent = account ? accountDisplayName() : "";
+    planLabel.textContent = pro ? "Pro" : "Free";
+    planDetail.textContent = pro
+      ? `${entitlementSourceLabel()} active. Saved work, PDF export, tags, continuity, and sync are unlocked.`
+      : "Free keeps reading and search usable. Pro unlocks saved work, projects, tags, exports, continuity, and sync.";
   };
   status.textContent = activeAccount()
-    ? "Connected. Sync and checkout are ready for this browser."
+    ? (isProAccount() ? "Connected. Pro is active for this browser." : "Connected. Sync and checkout are ready for this browser.")
     : "Not signed in on this browser.";
   syncAccountState();
   signInButton.addEventListener("click", async () => {
@@ -4243,6 +4303,11 @@ function renderSettings() {
     const account = activeAccount();
     if (!account) {
       status.textContent = "Sign in before opening checkout.";
+      syncAccountState();
+      return;
+    }
+    if (isProAccount()) {
+      status.textContent = "Pro is already active for this account.";
       syncAccountState();
       return;
     }
@@ -4812,6 +4877,7 @@ async function start() {
     collapseToOneReader();
   });
   await renderWorkspace();
+  refreshEntitlementAfterCheckoutReturn();
 }
 
 start().catch((error) => {
