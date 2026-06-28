@@ -693,6 +693,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                       node.classList.add('nyccc-note-block');
                       node.dataset.nycccHeadingAnchor = heading.id || '';
                       node.dataset.nycccSectionNumber = sectionNumberForHeading(heading) || '';
+                      if (!node.querySelector(':scope > .nyccc-block-content')) {
+                        var contentWrapper = document.createElement('span');
+                        contentWrapper.className = 'nyccc-block-content';
+                        while (node.firstChild) {
+                          contentWrapper.appendChild(node.firstChild);
+                        }
+                        node.appendChild(contentWrapper);
+                      }
                       if (!node.querySelector(':scope > .nyccc-block-actions')) {
                         var actionRail = document.createElement('span');
                         actionRail.className = 'nyccc-block-actions';
@@ -1387,18 +1395,29 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-note-block {
               position: relative !important;
-              padding-right: 4.65rem !important;
+              display: grid !important;
+              grid-template-columns: minmax(0, 1fr) 1.55rem !important;
+              column-gap: 1rem !important;
+              align-items: start !important;
+              padding-right: 0 !important;
+            }
+            .nyccc-block-content {
+              display: block !important;
+              min-width: 0 !important;
+              grid-column: 1 !important;
+              grid-row: 1 !important;
             }
             .nyccc-block-actions {
-              position: absolute !important;
-              top: 0.15rem !important;
-              right: 1rem !important;
+              position: static !important;
+              grid-column: 2 !important;
+              grid-row: 1 !important;
               display: inline-flex !important;
               flex-direction: column !important;
               align-items: center !important;
               justify-content: center !important;
               gap: 0.28rem !important;
               width: 1.55rem !important;
+              margin-top: 0.15rem !important;
               pointer-events: none !important;
             }
             .nyccc-block-note-button,
