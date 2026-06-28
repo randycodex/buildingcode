@@ -2487,11 +2487,12 @@ function restoreReaderNotesSheet(panel, reader, sections) {
     return;
   }
   const blockID = normalizeAnnotationBlockID(reader?.activeNotesBlockID);
-  const block = blockID ? (section.blocks || []).find((item) =>
+  const blocks = annotatedBlocksForSection(section);
+  const block = blockID ? blocks.find((item) =>
     normalizeAnnotationBlockID(item?.id || item?.tableID || item?.imageID) === blockID
   ) : null;
   const target = block
-    ? annotationTargetForBlock(section, block, reader, Math.max(0, (section.blocks || []).indexOf(block)))
+    ? annotationTargetForBlock(section, block, reader, Math.max(0, blocks.indexOf(block)))
     : annotationTargetForSection(section, reader);
   openReaderNotesSheet(panel, section, reader, { instant: true, target });
 }
