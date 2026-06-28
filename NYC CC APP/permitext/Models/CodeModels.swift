@@ -825,6 +825,7 @@ struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     let pulledAt: Date
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
+    var entitlement: AppEntitlement? = nil
     let mutations: [ServerUserContentMutation]
 }
 

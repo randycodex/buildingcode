@@ -25,6 +25,7 @@ struct UserContentSyncPushReport: Hashable, Sendable {
     let acceptedMutationIDs: [String]
     let rejectedMutationIDs: [String]
     let latestEventID: Int64?
+    let entitlement: AppEntitlement?
 }
 
 struct UserContentSyncPullReport: Hashable, Sendable {
@@ -36,6 +37,7 @@ struct UserContentSyncPullReport: Hashable, Sendable {
     let accountUserID: String?
     let skippedReason: String?
     let mergePlan: UserContentMergePlan
+    let entitlement: AppEntitlement?
 
     var appliedRemoteContinuity: Bool {
         mergePlan.decisions.contains {
@@ -82,7 +84,8 @@ struct NoOpUserContentSyncBackend: UserContentSyncBackend {
             sampledItemIDs: batch.items.map(\.id),
             acceptedMutationIDs: serverBatch.mutations.map(\.recordID),
             rejectedMutationIDs: [],
-            latestEventID: nil
+            latestEventID: nil,
+            entitlement: nil
         )
     }
 
@@ -187,7 +190,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             sampledItemIDs: batch.items.map(\.id),
             acceptedMutationIDs: response.acceptedMutationIDs,
             rejectedMutationIDs: response.rejectedMutationIDs ?? [],
-            latestEventID: response.latestEventID ?? response.syncRevision
+            latestEventID: response.latestEventID ?? response.syncRevision,
+            entitlement: response.entitlement
         )
     }
 
@@ -289,7 +293,8 @@ struct UserContentSyncEngine {
                 backendName: backend.name,
                 accountUserID: nil,
                 skippedReason: "No signed-in account.",
-                mergePlan: UserContentMergePlan(decisions: [])
+                mergePlan: UserContentMergePlan(decisions: []),
+                entitlement: nil
             )
         }
 
@@ -326,7 +331,8 @@ struct UserContentSyncEngine {
                 backendName: backend.name,
                 accountUserID: account.appUserID,
                 skippedReason: nil,
-                mergePlan: mergePlan
+                mergePlan: mergePlan,
+                entitlement: incoming.entitlement
             )
         } catch {
             checkpointStore.save(checkpoint.markingFailed(error: error, at: Date()))
@@ -345,7 +351,8 @@ struct UserContentSyncEngine {
                 sampledItemIDs: [],
                 acceptedMutationIDs: [],
                 rejectedMutationIDs: [],
-                latestEventID: nil
+                latestEventID: nil,
+                entitlement: nil
             )
         }
 
@@ -356,6 +363,7 @@ struct UserContentSyncEngine {
         var acceptedMutationIDs: [String] = []
         var rejectedMutationIDs: [String] = []
         var latestEventID = checkpoint.latestEventID
+        var entitlement: AppEntitlement?
         var processedBatchCount = 0
 
         while processedBatchCount < maxBatches {
@@ -373,6 +381,7 @@ struct UserContentSyncEngine {
                 acceptedMutationIDs.append(contentsOf: report.acceptedMutationIDs)
                 rejectedMutationIDs.append(contentsOf: report.rejectedMutationIDs)
                 latestEventID = report.latestEventID ?? latestEventID
+                entitlement = report.entitlement ?? entitlement
                 let acceptedIDs = Set(report.acceptedMutationIDs)
                 let rejectedIDs = Set(report.rejectedMutationIDs)
                 for item in batch.items {
@@ -407,7 +416,8 @@ struct UserContentSyncEngine {
                 sampledItemIDs: [],
                 acceptedMutationIDs: [],
                 rejectedMutationIDs: [],
-                latestEventID: latestEventID
+                latestEventID: latestEventID,
+                entitlement: nil
             )
         }
 
@@ -421,7 +431,8 @@ struct UserContentSyncEngine {
             sampledItemIDs: Array(sampledItemIDs.prefix(100)),
             acceptedMutationIDs: acceptedMutationIDs,
             rejectedMutationIDs: rejectedMutationIDs,
-            latestEventID: latestEventID
+            latestEventID: latestEventID,
+            entitlement: entitlement
         )
     }
 

@@ -1787,10 +1787,7 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount = account
         Self.saveSignedInAccount(account)
         refreshUserContentSyncCheckpoint()
-        if let entitlement = backendRecord.entitlement {
-            LocalEntitlementService.setEntitlement(entitlement)
-            refreshCurrentEntitlement()
-        }
+        applyBackendEntitlementIfPresent(backendRecord.entitlement)
         await refreshStoreKitEntitlements()
         await attachLocalDataIfNeeded()
         await pullRemoteUserContentIfPossible()
@@ -1833,6 +1830,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let startedAt = Date()
             let report = try await syncEngine.processPendingWork(account: signedInAccount)
             let elapsed = Date().timeIntervalSince(startedAt)
+            applyBackendEntitlementIfPresent(report.entitlement)
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
@@ -1906,6 +1904,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         do {
             let report = try await syncEngine.pullRemoteChanges(account: signedInAccount, applySafeChanges: true)
+            applyBackendEntitlementIfPresent(report.entitlement)
             if report.appliedRemoteContinuity {
                 refreshContinuityStateFromStore()
             }
@@ -2172,6 +2171,12 @@ final class CodeLibraryViewModel: ObservableObject {
         let entitlement = entitlementService.currentEntitlement
         currentPlan = entitlement.plan
         currentEntitlementSource = entitlement.source
+    }
+
+    private func applyBackendEntitlementIfPresent(_ entitlement: AppEntitlement?) {
+        guard let entitlement else { return }
+        LocalEntitlementService.setEntitlement(entitlement)
+        refreshCurrentEntitlement()
     }
 
     private func applyStoreKitSnapshot(_ snapshot: StoreKitSubscriptionSnapshot) {
