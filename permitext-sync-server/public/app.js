@@ -1044,7 +1044,7 @@ async function signInCurrentBrowser() {
   };
   syncedContent = null;
   saveWorkspaceState();
-  await loadSyncedContent({ force: true });
+  loadSyncedContent({ force: true }).then(() => renderWorkspace());
   return state.account;
 }
 
