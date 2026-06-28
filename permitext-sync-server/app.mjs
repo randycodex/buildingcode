@@ -2776,6 +2776,77 @@ async function handleWebCheckout(request, response) {
   });
 }
 
+async function stripeSubscriptionFromRestoreID(restoreID) {
+  const trimmed = String(restoreID || "").trim();
+  if (!trimmed) {
+    throw new ClientAuthError(400, "Missing Stripe restore ID.");
+  }
+  if (trimmed.startsWith("sub_")) {
+    return stripeAPI(`/v1/subscriptions/${encodeURIComponent(trimmed)}`);
+  }
+  if (trimmed.startsWith("cs_")) {
+    const session = await stripeAPI(`/v1/checkout/sessions/${encodeURIComponent(trimmed)}`);
+    const subscriptionID = stripeSubscriptionID(session.subscription);
+    if (!subscriptionID) {
+      throw new ClientAuthError(404, "Checkout session has no subscription.");
+    }
+    return stripeAPI(`/v1/subscriptions/${encodeURIComponent(subscriptionID)}`);
+  }
+  throw new ClientAuthError(400, "Use a Stripe subscription ID or checkout session ID.");
+}
+
+async function handleStripeRestore(request, response) {
+  if (!stripeConfigured()) {
+    sendError(response, 503, "Stripe restore is not configured.");
+    return;
+  }
+
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, userID)) {
+    return;
+  }
+
+  let subscription;
+  try {
+    subscription = await stripeSubscriptionFromRestoreID(body.restoreID || body.subscriptionID || body.checkoutSessionID);
+  } catch (error) {
+    if (error instanceof ClientAuthError) {
+      sendError(response, error.statusCode, error.message);
+      return;
+    }
+    throw error;
+  }
+  if (!["active", "trialing"].includes(subscription.status)) {
+    sendError(response, 402, "Stripe subscription is not active.");
+    return;
+  }
+
+  grantServerEntitlement(store, userID, "webSubscription", {
+    expiresAt: stripeSubscriptionExpiresAt(subscription),
+    provider: {
+      stripeCustomerID: stripeSubscriptionID(subscription.customer),
+      stripeSubscriptionID: stripeSubscriptionID(subscription.id),
+      restoredManually: true
+    }
+  });
+  await transferStripeSubscriptionMetadata(subscription.id, userID);
+  await writeStore(store);
+  sendJSON(response, 200, {
+    entitlement: store.entitlements[userID],
+    subscription: {
+      id: subscription.id,
+      status: subscription.status
+    }
+  });
+}
+
 async function handleStripeWebhook(request, response) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
@@ -3286,6 +3357,7 @@ const handlers = {
   "account/profile": handleProfileUpdate,
   "account/passkeys/link": handlePasskeyLink,
   "billing/web/checkout": handleWebCheckout,
+  "billing/stripe/restore": handleStripeRestore,
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,
   "sync/push": handlePush,

@@ -240,6 +240,16 @@ async function main() {
     assert(browserLink.json.entitlement?.grantedUserID === appleRepairSignIn.json.account.appUserID, "Browser entitlement was not transferred to Apple.");
     assert(browserLink.json.mergedAccount?.sourceUserID === browserSignIn.json.account.appUserID, "Browser account link did not report the merged source.");
 
+    const restoreWithoutStripe = await request("/billing/stripe/restore", {
+      method: "POST",
+      token: appleRepairSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: appleRepairSignIn.json.account.appUserID },
+        restoreID: "sub_smoke"
+      }
+    });
+    assert(restoreWithoutStripe.response.status === 503, "Stripe restore should be disabled without Stripe checkout configuration.");
+
     const invalidAppleTokenSignIn = await request("/account/sign-in", {
       method: "POST",
       body: {

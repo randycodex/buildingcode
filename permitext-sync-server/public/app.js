@@ -4356,15 +4356,21 @@ function renderSettings() {
   const signInButton = panel.querySelector(".account-sign-in");
   const disconnectButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
+  const restorePanel = panel.querySelector(".account-restore");
+  const restoreInput = panel.querySelector(".account-restore-input");
+  const restoreButton = panel.querySelector(".account-restore-button");
   const status = panel.querySelector(".connector-status");
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
     const canLinkApple = Boolean(account && state.account?.authProvider === "web");
+    const canRestoreStripe = Boolean(account && state.account?.authProvider === "apple" && !pro);
     checkoutButton.disabled = !account || pro;
     checkoutButton.textContent = pro ? "Pro active" : "Upgrade to Pro";
     disconnectButton.disabled = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
+    restorePanel.hidden = !canRestoreStripe;
+    restoreButton.disabled = !canRestoreStripe;
     if (canLinkApple) {
       signInButton.textContent = "Link Apple";
     }
@@ -4445,6 +4451,36 @@ function renderSettings() {
       window.location.href = payload.url;
     } catch (error) {
       status.textContent = error.message || "Could not open checkout.";
+      syncAccountState();
+    }
+  });
+  restoreButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    const restoreID = restoreInput.value.trim();
+    if (!account) {
+      status.textContent = "Sign in before restoring Pro.";
+      syncAccountState();
+      return;
+    }
+    if (!restoreID) {
+      status.textContent = "Paste a Stripe subscription or checkout session ID.";
+      restoreInput.focus();
+      return;
+    }
+    restoreButton.disabled = true;
+    status.textContent = "Checking Stripe...";
+    try {
+      const payload = await postJSON("/billing/stripe/restore", {
+        auth: { accountUserID: account.userID },
+        restoreID
+      }, { token: account.sessionToken });
+      storeAccountEntitlement(payload.entitlement || null);
+      await loadSyncedContent({ force: true });
+      status.textContent = isProAccount() ? "Pro restored for this Apple account." : "Stripe restore finished, but Pro is not active.";
+      renderWorkspace();
+    } catch (error) {
+      status.textContent = error.message || "Could not restore Pro.";
+      restoreButton.disabled = false;
       syncAccountState();
     }
   });
