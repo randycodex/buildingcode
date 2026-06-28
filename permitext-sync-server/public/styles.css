@@ -3259,6 +3259,20 @@ mark {
   gap: var(--space-2);
 }
 
+.account-connector .connector-actions .ghost-button {
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid color-mix(in srgb, var(--text-secondary) 42%, transparent);
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-primary);
+}
+
+.account-connector .connector-actions .ghost-button:disabled {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
 @media (max-width: 760px) {
   :root {
     --header-height: 66px;
