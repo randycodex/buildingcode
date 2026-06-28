@@ -1343,6 +1343,17 @@ async function loadSyncedContent(options = {}) {
   return syncLoadPromise;
 }
 
+async function ensureSyncedContentForRender() {
+  if (!activeAccount()) {
+    if (syncedContent?.status !== "disconnected") {
+      syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
+    }
+    return syncedContent;
+  }
+  if (syncedContent?.status === "connected") return syncedContent;
+  return loadSyncedContent();
+}
+
 async function pushMutation(mutation) {
   const account = activeAccount();
   if (!account) {
@@ -4839,6 +4850,7 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
 }
 
 async function renderWorkspace() {
+  await ensureSyncedContentForRender();
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
   setUtilityButtonStates();
