@@ -691,7 +691,12 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     var blockID = node.id || '';
                     if (blockID && node.classList && node.classList.contains('Normal-Level')) {
                       node.classList.add('nyccc-note-block');
-                      if (!node.querySelector(':scope > .nyccc-block-note-button')) {
+                      node.dataset.nycccHeadingAnchor = heading.id || '';
+                      node.dataset.nycccSectionNumber = sectionNumberForHeading(heading) || '';
+                      if (!node.querySelector(':scope > .nyccc-block-actions')) {
+                        var actionRail = document.createElement('span');
+                        actionRail.className = 'nyccc-block-actions';
+                        actionRail.setAttribute('aria-hidden', 'false');
                         var noteButton = document.createElement('button');
                         noteButton.type = 'button';
                         noteButton.className = 'nyccc-block-note-button';
@@ -706,7 +711,13 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                           event.stopPropagation();
                           openNoteForBlock(heading, node);
                         });
-                        node.appendChild(noteButton);
+                        var bookmarkMarker = document.createElement('span');
+                        bookmarkMarker.className = 'nyccc-block-bookmark-indicator';
+                        bookmarkMarker.hidden = true;
+                        bookmarkMarker.setAttribute('aria-hidden', 'true');
+                        actionRail.appendChild(noteButton);
+                        actionRail.appendChild(bookmarkMarker);
+                        node.appendChild(actionRail);
                       }
                     }
                     node.addEventListener('click', function(event) {
@@ -796,39 +807,14 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 heading.classList.toggle('nyccc-noted-heading', hasNote);
                 heading.setAttribute('data-nyccc-section-number', sectionNumber || '');
 
-                if (isBookmarked || hasNote) {
-                  var h6 = heading.querySelector('h6') || heading;
-                  var badges = document.createElement('span');
-                  badges.className = 'nyccc-status-badges';
-                  badges.setAttribute('aria-hidden', 'true');
-                  if (hasNote) {
-                    var note = document.createElement('span');
-                    note.className = 'nyccc-status-badge nyccc-note-badge';
-                    var noteIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    noteIcon.setAttribute('viewBox', '0 0 24 24');
-                    noteIcon.setAttribute('aria-hidden', 'true');
-                    var notePage = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    notePage.setAttribute('d', 'M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z');
-                    var noteFold = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    noteFold.setAttribute('d', 'M15 3v5h5');
-                    noteIcon.appendChild(notePage);
-                    noteIcon.appendChild(noteFold);
-                    note.appendChild(noteIcon);
-                    badges.appendChild(note);
-                  }
-                  if (isBookmarked) {
-                    var bookmark = document.createElement('span');
-                    bookmark.className = 'nyccc-status-badge nyccc-bookmark-badge';
-                    badges.appendChild(bookmark);
-                  }
-                  h6.appendChild(badges);
-                }
               });
 
+              var bookmarkShownForSection = new Set();
+              var bookmarkFallbacks = new Map();
               document.querySelectorAll('.nyccc-note-block').forEach(function(block) {
                 var hasBlockNote = notedBlocks.has(block.id || '');
                 block.classList.toggle('nyccc-noted-block', hasBlockNote);
-                var button = block.querySelector(':scope > .nyccc-block-note-button');
+                var button = block.querySelector(':scope > .nyccc-block-actions > .nyccc-block-note-button');
                 if (button) {
                   button.classList.toggle('nyccc-has-note', hasBlockNote);
                   button.hidden = !hasBlockNote;
@@ -837,6 +823,27 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                   button.setAttribute('aria-hidden', hasBlockNote ? 'false' : 'true');
                   button.setAttribute('aria-label', hasBlockNote ? 'Open paragraph note' : 'Paragraph note');
                 }
+                var marker = block.querySelector(':scope > .nyccc-block-actions > .nyccc-block-bookmark-indicator');
+                if (marker) {
+                  var blockAnchorID = block.dataset.nycccHeadingAnchor || '';
+                  var blockSectionNumber = normalizeSectionNumber(block.dataset.nycccSectionNumber || '');
+                  var bookmarkKey = blockAnchorID || blockSectionNumber;
+                  var hasSectionBookmark = bookmarkedAnchors.has(blockAnchorID) || bookmarkedSections.has(blockSectionNumber);
+                  var showBookmark = hasSectionBookmark && hasBlockNote && bookmarkKey && !bookmarkShownForSection.has(bookmarkKey);
+                  marker.hidden = !showBookmark;
+                  marker.setAttribute('aria-hidden', showBookmark ? 'false' : 'true');
+                  if (showBookmark) {
+                    bookmarkShownForSection.add(bookmarkKey);
+                  } else if (hasSectionBookmark && bookmarkKey && !bookmarkFallbacks.has(bookmarkKey)) {
+                    bookmarkFallbacks.set(bookmarkKey, marker);
+                  }
+                }
+              });
+              bookmarkFallbacks.forEach(function(marker, bookmarkKey) {
+                if (bookmarkShownForSection.has(bookmarkKey)) { return; }
+                marker.hidden = false;
+                marker.setAttribute('aria-hidden', 'false');
+                bookmarkShownForSection.add(bookmarkKey);
               });
             })();
             """
@@ -1380,27 +1387,42 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-note-block {
               position: relative !important;
-              padding-right: 1.9rem !important;
+              padding-right: 2.75rem !important;
             }
-            .nyccc-block-note-button {
+            .nyccc-block-actions {
               position: absolute !important;
               top: 0.15rem !important;
               right: 0 !important;
+              display: inline-flex !important;
+              flex-direction: column !important;
+              align-items: center !important;
+              justify-content: center !important;
+              gap: 0.28rem !important;
+              width: 1.55rem !important;
+              pointer-events: none !important;
+            }
+            .nyccc-block-note-button,
+            .nyccc-block-bookmark-indicator {
               display: inline-flex !important;
               align-items: center !important;
               justify-content: center !important;
               width: 1.28rem !important;
               height: 1.28rem !important;
+              flex-shrink: 0 !important;
+            }
+            .nyccc-block-note-button {
               padding: 0 !important;
               border: 0 !important;
               border-radius: 999px !important;
               background: transparent !important;
               color: \(secondaryColor) !important;
               opacity: 0.38 !important;
+              pointer-events: auto !important;
               -webkit-appearance: none !important;
               appearance: none !important;
             }
-            .nyccc-block-note-button[hidden] {
+            .nyccc-block-note-button[hidden],
+            .nyccc-block-bookmark-indicator[hidden] {
               display: none !important;
             }
             .nyccc-block-note-button svg {
@@ -1424,7 +1446,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
               stroke: currentColor !important;
             }
             .nyccc-noted-block {
-              background: color-mix(in srgb, \(accentHex) 8%, transparent) !important;
+              background: transparent !important;
+            }
+            .nyccc-block-bookmark-indicator {
+              border-radius: 0.1rem 0.1rem 0.04rem 0.04rem !important;
+              color: \(accentHex) !important;
+              background: currentColor !important;
+              clip-path: polygon(22% 8%, 78% 8%, 78% 92%, 50% 70%, 22% 92%) !important;
+              width: 0.8rem !important;
+              height: 1.05rem !important;
             }
             .Section.nyccc-collapsible-heading h6::before {
               content: "" !important;
