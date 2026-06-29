@@ -1709,6 +1709,7 @@ final class CodeLibraryViewModel: ObservableObject {
                         providerUserID: credential.user,
                         displayName: displayName.isEmpty ? nil : displayName,
                         signedInAt: Date(),
+                        email: credential.email,
                         identityToken: identityToken,
                         authorizationCode: authorizationCode
                     )

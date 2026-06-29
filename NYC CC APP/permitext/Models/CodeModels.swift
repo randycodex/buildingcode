@@ -2020,6 +2020,7 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
     let providerUserID: String
     let displayName: String?
     let signedInAt: Date
+    let email: String?
     let identityToken: String?
     let authorizationCode: String?
 
@@ -2028,6 +2029,7 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
         providerUserID: String,
         displayName: String?,
         signedInAt: Date,
+        email: String? = nil,
         identityToken: String? = nil,
         authorizationCode: String? = nil
     ) {
@@ -2035,6 +2037,7 @@ struct AccountSignInCredential: Codable, Hashable, Sendable {
         self.providerUserID = providerUserID
         self.displayName = displayName
         self.signedInAt = signedInAt
+        self.email = email
         self.identityToken = identityToken
         self.authorizationCode = authorizationCode
     }
