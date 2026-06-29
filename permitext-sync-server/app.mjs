@@ -78,7 +78,7 @@ let cachedStoreAdapter = null;
 let cachedChapterIndex = null;
 let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
-let cachedCanonicalBlockIDsBySectionID = null;
+const cachedCanonicalBlockIDsBySectionID = new Map();
 let cachedSearchIndex = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
@@ -1343,31 +1343,25 @@ function htmlParagraphBlockIDs(block) {
   return matches.map((match) => String(match[1] || "").trim()).filter(Boolean);
 }
 
-async function canonicalBlockIDsBySectionID() {
-  if (cachedCanonicalBlockIDsBySectionID) {
-    return cachedCanonicalBlockIDsBySectionID;
+async function canonicalBlockIDsForSectionID(sectionID) {
+  const key = String(sectionID || "").trim();
+  if (!key) {
+    return [];
   }
-  const map = new Map();
+  if (cachedCanonicalBlockIDsBySectionID.has(key)) {
+    return cachedCanonicalBlockIDsBySectionID.get(key);
+  }
+  let blockIDs = [];
   try {
-    const files = await readdir(sectionContentPath);
-    await Promise.all(files.filter((file) => file.endsWith(".json")).map(async (file) => {
-      const payload = await readJSONFile(join(sectionContentPath, file));
-      const sectionID = Number(payload.sectionID || file.replace(/\.json$/i, ""));
-      if (!Number.isFinite(sectionID)) {
-        return;
-      }
-      const blockIDs = (payload.blocks || []).flatMap(htmlParagraphBlockIDs);
-      if (blockIDs.length) {
-        map.set(String(sectionID), blockIDs);
-      }
-    }));
+    const payload = await readJSONFile(join(sectionContentPath, `${key}.json`));
+    blockIDs = (payload.blocks || []).flatMap(htmlParagraphBlockIDs);
   } catch (error) {
     if (error.code !== "ENOENT") {
       throw error;
     }
   }
-  cachedCanonicalBlockIDsBySectionID = map;
-  return cachedCanonicalBlockIDsBySectionID;
+  cachedCanonicalBlockIDsBySectionID.set(key, blockIDs);
+  return blockIDs;
 }
 
 function canonicalSectionKey(codePrefix, chapterNumber, sectionNumber) {
@@ -1399,8 +1393,8 @@ async function canonicalBlockIDFor(sectionID, blockID) {
   if (!Number.isSafeInteger(blockIndex) || blockIndex < 0) {
     return normalized;
   }
-  const map = await canonicalBlockIDsBySectionID();
-  return map.get(String(sectionID))?.[blockIndex] || normalized;
+  const blockIDs = await canonicalBlockIDsForSectionID(sectionID);
+  return blockIDs[blockIndex] || normalized;
 }
 
 async function canonicalizeSectionPayload(section, chapterContext) {
