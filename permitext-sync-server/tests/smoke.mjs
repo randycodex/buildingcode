@@ -354,10 +354,10 @@ async function main() {
     assert(mergeGrant.response.ok, "Merge source lifetime grant failed.");
     const mergeSavedMutation = {
       savedItem: {
-        id: `${mergeSourceUserID}:saved:nyc-2022:101`,
+        id: `${mergeSourceUserID}:saved:nyc-2022:900001`,
         userID: mergeSourceUserID,
         codeVersion: "nyc-2022",
-        sectionID: 101,
+        sectionID: 900001,
         updatedAt: new Date().toISOString()
       }
     };
@@ -400,7 +400,7 @@ async function main() {
     const mergedSaved = mergeApplePull.json.mutations.find((mutation) => mutation.savedItem);
     assert(mergedSaved?.savedItem.userID === mergeAppleUserID, "Merged saved item user ID was not retargeted.");
     assert(
-      mergedSaved?.savedItem.id === `${mergeAppleUserID}:saved:${defaultSyncCodeVersion}:101`,
+      mergedSaved?.savedItem.id === `${mergeAppleUserID}:saved:${defaultSyncCodeVersion}:900001`,
       "Merged saved item ID was not retargeted."
     );
     const mergeSourcePull = await request("/sync/pull", {
@@ -802,12 +802,12 @@ async function main() {
         id: "saved-smoke",
         userID,
         codeVersion: "nyc-2022",
-        sectionID: 101,
+        sectionID: 900001,
         createdAt: "2026-06-04T00:00:00Z",
         updatedAt: "2026-06-04T00:00:00Z"
       }
     };
-    const savedSmokeRecordID = `${userID}:saved:${defaultSyncCodeVersion}:101`;
+    const savedSmokeRecordID = `${userID}:saved:${defaultSyncCodeVersion}:900001`;
     const push = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -860,6 +860,7 @@ async function main() {
         userID,
         codeVersion: "nyc-2022",
         codePrefix: "BC",
+        chapterNumber: "2",
         sectionID: 202,
         sectionNumber: "202",
         title: "Definitions",
@@ -877,7 +878,7 @@ async function main() {
         }
       }
     });
-    const canonicalSavedRecordID = `${userID}:saved:${defaultSyncCodeVersion}:202`;
+    const canonicalSavedRecordID = `${userID}:saved:${defaultSyncCodeVersion}:113`;
     assert(webSavePush.response.ok, "Web-style saved push failed.");
     assert(
       webSavePush.json.acceptedMutationIDs.includes(canonicalSavedRecordID),
@@ -893,7 +894,7 @@ async function main() {
     assert(
       iosAfterWebSavePull.json.mutations.some((item) =>
         item.savedItem?.id === canonicalSavedRecordID &&
-        item.savedItem?.sectionID === 202 &&
+        item.savedItem?.sectionID === 113 &&
         !item.savedItem?.deletedAt
       ),
       "iOS pull did not receive the web-created saved section."
@@ -904,7 +905,7 @@ async function main() {
         id: canonicalSavedRecordID,
         userID,
         codeVersion: "nyc-2022",
-        sectionID: 202,
+        sectionID: 113,
         updatedAt: "2026-06-04T02:00:00Z",
         deletedAt: "2026-06-04T02:00:00Z"
       }
@@ -949,11 +950,7 @@ async function main() {
               id: "web-annotation-legacy-540",
               userID,
               codeVersion: "nyc-2022",
-              codePrefix: "BC",
-              chapterNumber: "1",
               sectionID: 540,
-              sectionNumber: "101.4",
-              title: "101.4 Referenced codes.",
               blockID: "4-html-1",
               noteBody: "Legacy web note should land on the iOS paragraph.",
               updatedAt: "2026-06-04T03:00:00Z"
@@ -981,7 +978,11 @@ async function main() {
     const repairedLegacyAnnotation = cursorRepairPull.json.mutations.find((item) =>
       item.annotation?.id === canonicalLegacyAnnotationID
     )?.annotation;
-    assert(repairedLegacyAnnotation?.sectionID === 4, "Cursor pull did not repair the legacy web section ID.");
+    assert(
+      repairedLegacyAnnotation?.sectionID === 4,
+      "Cursor pull did not repair the legacy web section ID."
+    );
+    assert(repairedLegacyAnnotation?.webSectionID === 540, "Cursor pull did not preserve the legacy web section ID.");
     assert(
       repairedLegacyAnnotation?.blockID === "rid-0-0-0-164248",
       "Cursor pull did not repair the legacy web paragraph block ID."
@@ -1016,13 +1017,13 @@ async function main() {
         codeVersion: "nyc-2022",
         folderClientID: "project-client-smoke",
         localFolderID: 42,
-        sectionID: 101,
+        sectionID: 900001,
         scope: "manual",
         updatedAt: "2026-06-06T00:00:00Z"
       }
     };
     const projectRecordID = `${userID}:project:${defaultSyncCodeVersion}:project-client-smoke`;
-    const projectSectionRecordID = `${userID}:project-section:${defaultSyncCodeVersion}:project-client-smoke:101:manual`;
+    const projectSectionRecordID = `${userID}:project-section:${defaultSyncCodeVersion}:project-client-smoke:900001:manual`;
     const projectPush = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -1043,14 +1044,14 @@ async function main() {
         id: "tags-smoke",
         userID,
         codeVersion: "nyc-2022",
-        sectionID: 101,
+        sectionID: 900001,
         noteBody: null,
         tags: ["Concrete", "Permit"],
         updatedAt: "2026-06-07T00:00:00Z",
         deletedAt: null
       }
     };
-    const tagRecordID = `${userID}:tags:${defaultSyncCodeVersion}:101`;
+    const tagRecordID = `${userID}:tags:${defaultSyncCodeVersion}:900001`;
     const continuityMutation = {
       continuity: {
         userID,
@@ -1129,7 +1130,7 @@ async function main() {
       record: mutationRecord(mutation)
     }));
     assert(
-      reinstallRecords.some((item) => item.kind === "savedItem" && item.record.sectionID === 101),
+      reinstallRecords.some((item) => item.kind === "savedItem" && item.record.sectionID === 900001),
       "Reinstall pull did not restore the saved section."
     );
     assert(

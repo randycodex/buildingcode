@@ -1371,11 +1371,16 @@ function canonicalSectionKey(codePrefix, chapterNumber, sectionNumber) {
   return prefix && chapter && section ? `${prefix}:${chapter}:${section}` : "";
 }
 
-async function canonicalSectionIDFor({ codePrefix, chapterNumber, sectionNumber, sectionID }) {
+async function canonicalSectionIDFor({ codePrefix, chapterNumber, sectionNumber, sectionID, allowLegacySectionID = false }) {
   const map = await canonicalSectionIDs();
   const keyed = map.byCodeChapterSection?.[canonicalSectionKey(codePrefix, chapterNumber, sectionNumber)];
   if (Number.isInteger(keyed)) {
     return keyed;
+  }
+  const hasSectionNumber = Boolean(String(sectionNumber || "").trim());
+  const legacy = map.legacyWebSectionID?.[String(sectionID || "").trim()];
+  if (allowLegacySectionID && !hasSectionNumber && Number.isInteger(legacy)) {
+    return legacy;
   }
   return null;
 }
@@ -2430,7 +2435,10 @@ async function canonicalizeSectionRecord(kind, record) {
     codePrefix: record.codePrefix || "BC",
     chapterNumber: record.chapterNumber,
     sectionNumber: record.sectionNumber,
-    sectionID: record.sectionID
+    sectionID: record.sectionID,
+    allowLegacySectionID: kind === "annotation" &&
+      !record.webSectionID &&
+      /^\d+-html-\d+$/i.test(normalizedBlockID(record.blockID) || "")
   });
   const normalized = {
     ...record,
