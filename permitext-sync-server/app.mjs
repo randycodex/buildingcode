@@ -78,6 +78,7 @@ let cachedStoreAdapter = null;
 let cachedChapterIndex = null;
 let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
+let cachedCanonicalBlockIDsBySectionID = null;
 let cachedSearchIndex = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
@@ -1334,6 +1335,41 @@ async function canonicalSectionIDs() {
   return cachedCanonicalSectionIDs;
 }
 
+function htmlParagraphBlockIDs(block) {
+  if (block?.kind !== "html" || !block.html) {
+    return [];
+  }
+  const matches = [...String(block.html).matchAll(/<[^>]+\bid=["']([^"']+)["'][^>]*\bclass=["'][^"']*\bNormal-Level\b[^"']*["'][^>]*>/gi)];
+  return matches.map((match) => String(match[1] || "").trim()).filter(Boolean);
+}
+
+async function canonicalBlockIDsBySectionID() {
+  if (cachedCanonicalBlockIDsBySectionID) {
+    return cachedCanonicalBlockIDsBySectionID;
+  }
+  const map = new Map();
+  try {
+    const files = await readdir(sectionContentPath);
+    await Promise.all(files.filter((file) => file.endsWith(".json")).map(async (file) => {
+      const payload = await readJSONFile(join(sectionContentPath, file));
+      const sectionID = Number(payload.sectionID || file.replace(/\.json$/i, ""));
+      if (!Number.isFinite(sectionID)) {
+        return;
+      }
+      const blockIDs = (payload.blocks || []).flatMap(htmlParagraphBlockIDs);
+      if (blockIDs.length) {
+        map.set(String(sectionID), blockIDs);
+      }
+    }));
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+  cachedCanonicalBlockIDsBySectionID = map;
+  return cachedCanonicalBlockIDsBySectionID;
+}
+
 function canonicalSectionKey(codePrefix, chapterNumber, sectionNumber) {
   const prefix = String(codePrefix || "").trim().toUpperCase();
   const chapter = String(chapterNumber || "").trim();
@@ -1348,6 +1384,23 @@ async function canonicalSectionIDFor({ codePrefix, chapterNumber, sectionNumber,
     return keyed;
   }
   return null;
+}
+
+async function canonicalBlockIDFor(sectionID, blockID) {
+  const normalized = normalizedBlockID(blockID);
+  if (!normalized) {
+    return normalized;
+  }
+  const legacyMatch = normalized.match(/^\d+-html-(\d+)$/i);
+  if (!legacyMatch) {
+    return normalized;
+  }
+  const blockIndex = Number(legacyMatch[1]) - 1;
+  if (!Number.isSafeInteger(blockIndex) || blockIndex < 0) {
+    return normalized;
+  }
+  const map = await canonicalBlockIDsBySectionID();
+  return map.get(String(sectionID))?.[blockIndex] || normalized;
 }
 
 async function canonicalizeSectionPayload(section, chapterContext) {
@@ -2393,6 +2446,9 @@ async function canonicalizeSectionRecord(kind, record) {
       ? record.webSectionID || record.sectionID
       : record.webSectionID
   };
+  if (kind === "annotation") {
+    normalized.blockID = await canonicalBlockIDFor(normalized.sectionID, normalized.blockID);
+  }
   const nextID = canonicalMutationRecordID(kind, normalized);
   return nextID ? { ...normalized, id: nextID } : normalized;
 }
@@ -2956,12 +3012,9 @@ async function handlePull(request, response) {
   }
   const since = body.since ? Date.parse(body.since) : null;
   const allMutations = store.mutationsByUserID[userID] || [];
-  const sinceEventID = normalizedSinceEventID(body);
-  const eventMutations = sinceEventID === null ? null : await mutationsAfterSyncEventID(userID, sinceEventID);
-  const filteredMutations = eventMutations ??
-    (Number.isFinite(since)
-      ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since)
-      : allMutations);
+  // Return the current canonical state until clients send a content-map version.
+  // Otherwise old event checkpoints can hide server-side section ID repairs.
+  const filteredMutations = Number.isFinite(since) ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since) : allMutations;
   const mutations = await canonicalizeMutations(expandPullMutationsWithDependencies(filteredMutations, allMutations));
   const latestEventID = await latestSyncEventID(userID);
   sendJSON(response, 200, {

@@ -2005,9 +2005,13 @@ function splitAnnotatedCodeBlock(block, blockIndex = 0) {
   if (block?.kind !== "html" || !block.html || typeof document === "undefined") return [block];
   const wrapper = document.createElement("div");
   wrapper.innerHTML = rewriteCodeHTML(block.html);
-  const noteBlocks = Array.from(wrapper.querySelectorAll(".Normal-Level[id], .rbox[id]"))
+  const paragraphBlocks = Array.from(wrapper.querySelectorAll(".Normal-Level[id]"))
     .filter((node) => String(node.textContent || "").trim());
-  if (noteBlocks.length <= 1) return [block];
+  const noteBlocks = paragraphBlocks.length
+    ? paragraphBlocks
+    : Array.from(wrapper.querySelectorAll(".rbox[id]"))
+      .filter((node) => String(node.textContent || "").trim());
+  if (noteBlocks.length === 0) return [block];
   return noteBlocks.map((node, nodeIndex) => ({
     ...block,
     id: node.id || `${block.id || `block-${blockIndex + 1}`}-${nodeIndex + 1}`,

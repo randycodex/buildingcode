@@ -937,6 +937,56 @@ async function main() {
     )?.savedItem;
     assert(deletedSavedRecord?.deletedAt, "Web pull did not receive the iOS delete tombstone.");
 
+    const legacyWebAnnotationPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            annotation: {
+              id: "web-annotation-legacy-540",
+              userID,
+              codeVersion: "nyc-2022",
+              codePrefix: "BC",
+              chapterNumber: "1",
+              sectionID: 540,
+              sectionNumber: "101.4",
+              title: "101.4 Referenced codes.",
+              blockID: "4-html-1",
+              noteBody: "Legacy web note should land on the iOS paragraph.",
+              updatedAt: "2026-06-04T03:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    const canonicalLegacyAnnotationID = `${userID}:note:${defaultSyncCodeVersion}:4:rid-0-0-0-164248`;
+    assert(legacyWebAnnotationPush.response.ok, "Legacy web annotation push failed.");
+    assert(
+      legacyWebAnnotationPush.json.acceptedMutationIDs.includes(canonicalLegacyAnnotationID),
+      "Legacy web annotation was not normalized to the iOS section and paragraph IDs."
+    );
+
+    const cursorRepairPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sinceEventID: legacyWebAnnotationPush.json.latestEventID
+      }
+    });
+    assert(cursorRepairPull.response.ok, "Cursor repair pull failed.");
+    const repairedLegacyAnnotation = cursorRepairPull.json.mutations.find((item) =>
+      item.annotation?.id === canonicalLegacyAnnotationID
+    )?.annotation;
+    assert(repairedLegacyAnnotation?.sectionID === 4, "Cursor pull did not repair the legacy web section ID.");
+    assert(
+      repairedLegacyAnnotation?.blockID === "rid-0-0-0-164248",
+      "Cursor pull did not repair the legacy web paragraph block ID."
+    );
+
     const cursorPull = await request("/sync/pull", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -1117,7 +1167,7 @@ async function main() {
     assert(restoreChecklist.json.hasSession === true, "Restore checklist did not report the session.");
     assert(restoreChecklist.json.passkeyCredentialCount === 1, "Restore checklist did not report the linked passkey.");
     assert(restoreChecklist.json.mutationCounts.savedItem === 2, "Restore checklist did not count saved items and delete tombstones.");
-    assert(restoreChecklist.json.mutationCounts.annotation === 1, "Restore checklist did not count annotations.");
+    assert(restoreChecklist.json.mutationCounts.annotation === 2, "Restore checklist did not count annotations.");
     assert(restoreChecklist.json.mutationCounts.project === 1, "Restore checklist did not count projects.");
     assert(restoreChecklist.json.mutationCounts.projectSection === 1, "Restore checklist did not count project memberships.");
     assert(restoreChecklist.json.mutationCounts.continuity === 1, "Restore checklist did not count continuity.");
