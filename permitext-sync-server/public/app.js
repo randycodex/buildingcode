@@ -4307,7 +4307,7 @@ async function renderSaved(paneID = "utility:saved") {
   if (savedItems.length === 0) {
     appendMutedRow(content, "No saved sections", "Saved sections synced from iOS or saved in this web workspace will appear here.");
   } else {
-    renderSavedItemsByCode(content, savedItems.slice(0, 48), paneID);
+    renderSavedItemsByCode(content, savedItems.slice(0, 48), paneID, { removableSavedItems: true });
   }
 
   appendSectionLabel(content, "Notes and tags");
@@ -4320,7 +4320,19 @@ async function renderSaved(paneID = "utility:saved") {
   return panel;
 }
 
-function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved") {
+function removeIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18"></path>
+      <path d="M8 6V4h8v2"></path>
+      <path d="M19 6l-1 14H6L5 6"></path>
+      <path d="M10 11v5"></path>
+      <path d="M14 11v5"></path>
+    </svg>
+  `;
+}
+
+function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", options = {}) {
   const codeGroups = new Map();
   savedItems.forEach((item) => {
     const prefix = item.codePrefix || item.code || "BC";
@@ -4350,15 +4362,20 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved") {
       chapterLabel.textContent = String(chapterKey).startsWith("Chapter") ? chapterKey : `Chapter ${chapterKey}`;
       codeGroup.append(chapterLabel);
       chapterItems.forEach((item) => {
-        const row = document.createElement("button");
-        row.className = "saved-row saved-row-button saved-section-row";
-        row.type = "button";
+        const row = document.createElement("article");
+        row.className = "saved-row saved-section-row";
+        if (options.removableSavedItems) {
+          row.classList.add("has-remove-action");
+        }
+        const openButton = document.createElement("button");
+        openButton.className = "saved-row-button saved-section-open";
+        openButton.type = "button";
         const title = document.createElement("strong");
         title.textContent = sectionDisplayTitle(item.sectionNumber || item.sectionID || "", item.title || "");
         const heading = document.createElement("span");
         heading.className = "saved-section-heading";
         heading.append(title);
-        row.append(heading);
+        openButton.append(heading);
         const annotation = annotationForTarget(item.sectionID, item.blockID || "");
         if (annotation.tags.length) {
           const tags = document.createElement("span");
@@ -4369,9 +4386,34 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved") {
             chip.textContent = tag;
             tags.append(chip);
           });
-          row.append(tags);
+          openButton.append(tags);
         }
-        row.addEventListener("click", () => openSectionDetailForExistingSearch(item, { anchorPaneID: paneID }));
+        openButton.addEventListener("click", () => openSectionDetailForExistingSearch(item, { anchorPaneID: paneID }));
+        row.append(openButton);
+        if (options.removableSavedItems) {
+          const removeButton = document.createElement("button");
+          removeButton.className = "saved-row-remove";
+          removeButton.type = "button";
+          removeButton.title = "Remove saved section";
+          removeButton.setAttribute("aria-label", `Remove ${sectionDisplayTitle(item.sectionNumber || item.sectionID || "", item.title || "saved section")}`);
+          removeButton.innerHTML = `${removeIconSVG()}<span class="sr-only">Remove saved section</span>`;
+          removeButton.addEventListener("click", async () => {
+            removeButton.disabled = true;
+            removeButton.classList.remove("has-error");
+            row.classList.add("is-removing");
+            try {
+              await persistSectionBookmark(item, false);
+              await renderWorkspace();
+            } catch (error) {
+              removeButton.title = error.message || "Could not remove saved section";
+              removeButton.classList.add("has-error");
+              row.classList.remove("is-removing");
+            } finally {
+              removeButton.disabled = false;
+            }
+          });
+          row.append(removeButton);
+        }
         codeGroup.append(row);
       });
     });

@@ -3005,6 +3005,16 @@ mark {
   color: var(--text-primary);
 }
 
+.saved-section-row.has-remove-action {
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: center;
+  column-gap: var(--space-2);
+}
+
+.saved-section-row.is-removing {
+  opacity: 0.58;
+}
+
 .saved-section-heading {
   display: flex;
   align-items: center;
@@ -3017,12 +3027,50 @@ mark {
 
 .saved-row-button {
   width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   text-align: left;
   cursor: pointer;
 }
 
 .saved-row-button:hover {
-  border-color: color-mix(in srgb, var(--text-secondary) 40%, var(--border));
+  color: var(--code-accent);
+}
+
+.saved-row-remove {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.saved-row-remove:hover,
+.saved-row-remove:focus-visible {
+  color: var(--code-accent);
+  background: color-mix(in srgb, var(--code-accent) 10%, transparent);
+}
+
+.saved-row-remove.has-error {
+  color: var(--code-accent);
+}
+
+.saved-row-remove:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.saved-row-remove svg {
+  width: 16px;
+  height: 16px;
 }
 
 .analysis-content {
