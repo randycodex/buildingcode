@@ -2292,6 +2292,14 @@ select option:checked {
   color: inherit;
 }
 
+.search-result-limit {
+  margin: 0 0 var(--space-3);
+  color: var(--text-secondary);
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * var(--caption-scale)) !important;
+  line-height: var(--reader-line-height);
+}
+
 .result-row {
   display: block;
   width: 100%;

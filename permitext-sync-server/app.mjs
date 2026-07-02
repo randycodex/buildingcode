@@ -80,6 +80,7 @@ let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
 const cachedCanonicalBlockIDsBySectionID = new Map();
 let cachedSearchIndex = null;
+let cachedSearchIndexPromise = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
 
@@ -1530,6 +1531,19 @@ async function searchIndex() {
   if (cachedSearchIndex) {
     return cachedSearchIndex;
   }
+  if (cachedSearchIndexPromise) {
+    return cachedSearchIndexPromise;
+  }
+  cachedSearchIndexPromise = buildSearchIndex();
+  try {
+    cachedSearchIndex = await cachedSearchIndexPromise;
+    return cachedSearchIndex;
+  } finally {
+    cachedSearchIndexPromise = null;
+  }
+}
+
+async function buildSearchIndex() {
   const chapters = await chapterIndex();
   const sectionSummaries = [];
   for (const chapterSummary of chapters) {
@@ -1565,8 +1579,7 @@ async function searchIndex() {
     );
     index.push(...entries);
   }
-  cachedSearchIndex = index;
-  return cachedSearchIndex;
+  return index;
 }
 
 async function sectionBody(sectionID, options = {}) {
@@ -1736,6 +1749,10 @@ async function handleCodeSection(path, response) {
 async function handleCodeSearch(request, response) {
   const url = requestURL(request);
   const query = url.searchParams.get("q")?.trim() || "";
+  const requestedLimit = Number.parseInt(url.searchParams.get("limit") || "", 10);
+  const resultLimit = Number.isFinite(requestedLimit) && requestedLimit > 0
+    ? Math.min(requestedLimit, 500)
+    : 0;
   const codeFilter = new Set(
     (url.searchParams.get("code") || url.searchParams.get("codes") || "")
       .split(",")
@@ -1747,16 +1764,20 @@ async function handleCodeSearch(request, response) {
     return;
   }
   const normalizedQuery = query.toLowerCase();
-  const results = (await searchIndex())
-    .filter((section) => {
-      const matchesCode = codeFilter.size === 0 || codeFilter.has(section.codePrefix);
-      const matchesQuery =
-        section.title?.toLowerCase().includes(normalizedQuery) ||
-        section.sectionNumber?.toLowerCase().includes(normalizedQuery) ||
-        section.plainText.toLowerCase().includes(normalizedQuery);
-      return matchesCode && matchesQuery;
-    })
-    .map((section) => ({
+  const results = [];
+  let totalResults = 0;
+  for (const section of await searchIndex()) {
+    const matchesCode = codeFilter.size === 0 || codeFilter.has(section.codePrefix);
+    const sectionText = section.plainText || "";
+    const matchesQuery =
+      section.title?.toLowerCase().includes(normalizedQuery) ||
+      section.sectionNumber?.toLowerCase().includes(normalizedQuery) ||
+      sectionText.toLowerCase().includes(normalizedQuery);
+    if (!matchesCode || !matchesQuery) continue;
+
+    totalResults += 1;
+    if (resultLimit && results.length >= resultLimit) continue;
+    results.push({
       id: section.id,
       chapterID: section.chapterID,
       codePrefix: section.codePrefix,
@@ -1765,9 +1786,15 @@ async function handleCodeSearch(request, response) {
       title: section.title,
       headerLine: section.headerLine,
       headingLine: section.headingLine,
-      snippet: searchSnippet(section.plainText || section.title || "", query)
-    }));
-  sendJSON(response, 200, { query, results });
+      snippet: searchSnippet(sectionText || section.title || "", query)
+    });
+  }
+  sendJSON(response, 200, {
+    query,
+    results,
+    totalResults,
+    limited: Boolean(resultLimit && totalResults > results.length)
+  });
 }
 
 class ClientAuthError extends Error {

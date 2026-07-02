@@ -31,6 +31,8 @@ const defaultUtilityPaneWidth = 320;
 const defaultDetailPaneWidth = 320;
 const defaultSettingsPaneWidth = 340;
 const readerSearchFlashDurationMS = 2000;
+const readerInternalSearchDelayMS = 180;
+const maxRenderedSearchResults = 250;
 const repeatableUtilityKeys = new Set(["search", "saved", "analysis"]);
 
 const defaultReaderSettings = {
@@ -42,6 +44,7 @@ const defaultReaderSettings = {
 let chapters = [];
 let state = loadWorkspaceState();
 const searchTimers = new Map();
+const readerSearchTimers = new Map();
 let syncedContent = null;
 let syncLoadPromise = null;
 let draggedPaneID = "";
@@ -2874,22 +2877,24 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
 
   const results = document.createElement("section");
   results.className = "reader-internal-results";
-  const sections = (chapter.sections || []).filter((section) => {
+  const matches = [];
+  (chapter.sections || []).forEach((section) => {
     const title = sectionDisplayTitle(section.sectionNumber, section.title);
     const body = (section.blocks || []).map(plainTextForSearchBlock).join(" ");
-    return `${title} ${body}`.toLowerCase().includes(needle);
+    if (`${title} ${body}`.toLowerCase().includes(needle)) {
+      matches.push({ section, title, body });
+    }
   });
 
-  sections.forEach((section) => {
+  matches.forEach(({ section, title, body }) => {
     const row = document.createElement("button");
     row.className = "reader-internal-result";
     row.type = "button";
 
     const heading = document.createElement("strong");
-    appendHighlighted(heading, sectionDisplayTitle(section.sectionNumber, section.title), query);
+    appendHighlighted(heading, title, query);
 
     const snippet = document.createElement("p");
-    const body = (section.blocks || []).map(plainTextForSearchBlock).join(" ");
     appendHighlighted(snippet, snippetForMatch(body || section.title, query), query);
 
     row.append(heading, snippet);
@@ -3123,7 +3128,10 @@ async function renderReader(reader, options = {}) {
   internalSearchInput.addEventListener("input", () => {
     reader.internalSearchQuery = internalSearchInput.value;
     saveWorkspaceState();
-    renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
+    clearTimeout(readerSearchTimers.get(reader.id));
+    readerSearchTimers.set(reader.id, window.setTimeout(() => {
+      renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
+    }, readerInternalSearchDelayMS));
   });
 
   closeButton.addEventListener("click", () => {
@@ -3316,7 +3324,9 @@ async function renderSearchResults(panel, instance) {
 
   renderSearchPlaceholder(results, { title: "Searching", body: "Checking section titles and code text." });
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
-  const payload = await api(`/code/search?q=${encodeURIComponent(query)}${codeQuery}`);
+  const payload = await api(
+    `/code/search?q=${encodeURIComponent(query)}${codeQuery}&limit=${encodeURIComponent(String(maxRenderedSearchResults))}`
+  );
   if (
     searchInstance.query.trim() !== query ||
     normalizeSearchCodeFilters(searchInstance.codeFilters).join(",") !== selectedPrefixes.join(",")
@@ -3340,6 +3350,14 @@ async function renderSearchResults(panel, instance) {
     if (!groups.has(prefix)) groups.set(prefix, []);
     groups.get(prefix).push(result);
   });
+
+  const totalResults = Number.isFinite(payload.totalResults) ? payload.totalResults : filteredResults.length;
+  if (payload.limited || totalResults > filteredResults.length) {
+    const notice = document.createElement("p");
+    notice.className = "search-result-limit";
+    notice.textContent = `Showing ${filteredResults.length.toLocaleString()} of ${totalResults.toLocaleString()} matches. Narrow the search for more specific results.`;
+    results.append(notice);
+  }
 
   Array.from(groups.entries()).forEach(([prefix, groupResults]) => {
     const group = document.createElement("section");
