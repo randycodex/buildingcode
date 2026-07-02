@@ -2146,6 +2146,26 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
   scrollReaderContentToNode(content, target, behavior);
 }
 
+async function navigateReaderToSection(panel, reader, behavior = "auto") {
+  setTitle(panel, reader);
+  const sectionSelect = panel.querySelector(".section-select");
+  if (sectionSelect) sectionSelect.value = reader.sectionID || "";
+
+  const content = panel.querySelector(".reader-content");
+  const isSearchMode = content?.classList.contains("is-searching-reader");
+  const hasRenderedTarget = reader.sectionID && (
+    content?.querySelector(`[data-section-id="${CSS.escape(String(reader.sectionID))}"]`) ||
+    (reader.sectionNumber
+      ? content?.querySelector(`[data-section-number="${CSS.escape(String(reader.sectionNumber))}"]`)
+      : null)
+  );
+  if (!content || isSearchMode || (reader.sectionID && !hasRenderedTarget)) {
+    await renderSectionContent(panel, reader);
+    return;
+  }
+  scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
+}
+
 function renderAnnotatedCodeBlock(block, section, reader, target) {
   const wrapper = document.createElement("div");
   wrapper.className = "annotated-code-block";
@@ -3146,7 +3166,7 @@ async function renderReader(reader, options = {}) {
       reader.title = summary?.title || "Reader";
     }
     saveWorkspaceState();
-    await renderWorkspace();
+    await navigateReaderToSection(panel, reader);
   });
 
   if (options.isSearchResult && !reader.sectionID) {
