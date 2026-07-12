@@ -195,6 +195,8 @@ Response:
 `acceptedMutationIDs` confirms which local queue items can be marked synced.
 `rejectedMutationIDs` confirms which local queue items must stay unresolved because the server has newer data or refused the write.
 
+The iPhone queue recovers claims left `inFlight` for more than ten minutes and automatically retries transient failures with exponential delays from 5 through 40 seconds. After five failed attempts an item remains visible as failed until the user explicitly retries, preventing an unbounded retry loop.
+
 Supported mutation kinds:
 
 - `savedItem`: bookmarked/saved sections

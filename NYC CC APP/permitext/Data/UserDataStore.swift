@@ -38,6 +38,7 @@ protocol UserContentRepository {
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws
     func clearAllFolders(codeVersion: String) throws
     func pendingSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
+    func prepareSyncQueueForProcessing(now: Date) throws
     func markSyncQueueItemsInFlight(ids: [Int64]) throws
     func markSyncQueueItemSynced(id: Int64) throws
     func markSyncQueueItemFailed(id: Int64, errorMessage: String) throws
@@ -60,6 +61,8 @@ final class UserDataStore: UserContentRepository {
     private let inFlightQueueState = SyncQueueState.inFlight.rawValue
     private let failedQueueState = SyncQueueState.failed.rawValue
     private let syncedQueueState = SyncQueueState.synced.rawValue
+    private let staleInFlightInterval: TimeInterval = 10 * 60
+    private let maximumAutomaticSyncAttempts = 5
 
     init() throws {
         let fileManager = FileManager.default
@@ -844,6 +847,71 @@ final class UserDataStore: UserContentRepository {
         return items
     }
 
+    func prepareSyncQueueForProcessing(now: Date = Date()) throws {
+        let staleClaimCutoff = isoFormatter.string(from: now.addingTimeInterval(-staleInFlightInterval))
+        let recoverStatement = try connection.prepare(
+            """
+            UPDATE sync_queue
+            SET state = ?, updated_at = ?, last_error = ?
+            WHERE state = ? AND updated_at <= ?;
+            """
+        )
+        defer { connection.finalize(recoverStatement) }
+        try connection.bind(text: pendingQueueState, index: 1, to: recoverStatement)
+        try connection.bind(text: isoFormatter.string(from: now), index: 2, to: recoverStatement)
+        try connection.bind(text: "Recovered an interrupted sync attempt.", index: 3, to: recoverStatement)
+        try connection.bind(text: inFlightQueueState, index: 4, to: recoverStatement)
+        try connection.bind(text: staleClaimCutoff, index: 5, to: recoverStatement)
+        _ = try connection.step(recoverStatement)
+
+        let failedStatement = try connection.prepare(
+            """
+            SELECT id, attempt_count, updated_at
+            FROM sync_queue
+            WHERE state = ? AND attempt_count < ?
+            ORDER BY updated_at ASC, id ASC;
+            """
+        )
+        defer { connection.finalize(failedStatement) }
+        try connection.bind(text: failedQueueState, index: 1, to: failedStatement)
+        sqlite3_bind_int64(failedStatement, 2, Int64(maximumAutomaticSyncAttempts))
+
+        var retryItemIDs: [Int64] = []
+        while try connection.step(failedStatement) == SQLITE_ROW {
+            let itemID = connection.int64(at: 0, in: failedStatement)
+            let attemptCount = max(Int(connection.int64(at: 1, in: failedStatement)), 1)
+            let failedAt = isoFormatter.date(from: connection.string(at: 2, in: failedStatement)) ?? .distantPast
+            if now.timeIntervalSince(failedAt) >= automaticRetryDelay(attemptCount: attemptCount) {
+                retryItemIDs.append(itemID)
+            }
+        }
+        guard !retryItemIDs.isEmpty else { return }
+
+        let retryStatement = try connection.prepare(
+            """
+            UPDATE sync_queue
+            SET state = ?, updated_at = ?
+            WHERE id = ? AND state = ?;
+            """
+        )
+        defer { connection.finalize(retryStatement) }
+        let retryAt = isoFormatter.string(from: now)
+        for itemID in retryItemIDs {
+            sqlite3_reset(retryStatement)
+            sqlite3_clear_bindings(retryStatement)
+            try connection.bind(text: pendingQueueState, index: 1, to: retryStatement)
+            try connection.bind(text: retryAt, index: 2, to: retryStatement)
+            sqlite3_bind_int64(retryStatement, 3, itemID)
+            try connection.bind(text: failedQueueState, index: 4, to: retryStatement)
+            _ = try connection.step(retryStatement)
+        }
+    }
+
+    private func automaticRetryDelay(attemptCount: Int) -> TimeInterval {
+        let exponent = min(max(attemptCount - 1, 0), 6)
+        return min(5 * pow(2, Double(exponent)), 5 * 60)
+    }
+
     func markSyncQueueItemsInFlight(ids: [Int64]) throws {
         guard !ids.isEmpty else { return }
         let statement = try connection.prepare(
@@ -942,9 +1010,16 @@ final class UserDataStore: UserContentRepository {
             return ["Sync queue lifecycle validation failed to record failure."]
         }
 
-        try resetFailedSyncQueueItems()
+        try prepareSyncQueueForProcessing(now: failedItem.updatedAt.addingTimeInterval(automaticRetryDelay(attemptCount: failedItem.attemptCount) + 1))
         guard try syncQueueItem(id: itemID)?.state == .pending else {
-            return ["Sync queue lifecycle validation failed to reset retry."]
+            return ["Sync queue lifecycle validation failed to prepare automatic retry."]
+        }
+
+        try markSyncQueueItemsInFlight(ids: [itemID])
+        let interruptedItem = try syncQueueItem(id: itemID)
+        try prepareSyncQueueForProcessing(now: (interruptedItem?.updatedAt ?? Date()).addingTimeInterval(staleInFlightInterval + 1))
+        guard try syncQueueItem(id: itemID)?.state == .pending else {
+            return ["Sync queue lifecycle validation failed to recover an interrupted claim."]
         }
 
         try markSyncQueueItemSynced(id: itemID)

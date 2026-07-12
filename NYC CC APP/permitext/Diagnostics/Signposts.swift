@@ -241,6 +241,7 @@ struct UserContentSyncEngine {
                 sampledItemIDs: []
             )
         }
+        try repository.prepareSyncQueueForProcessing(now: Date())
         let items = try repository.pendingSyncQueueItems(limit: limit)
         return try backend.preview(items: items)
     }
@@ -249,6 +250,7 @@ struct UserContentSyncEngine {
         guard let repository else {
             return UserContentSyncBatch(items: [])
         }
+        try repository.prepareSyncQueueForProcessing(now: Date())
         let items = try repository.pendingSyncQueueItems(limit: limit)
         try repository.markSyncQueueItemsInFlight(ids: items.map(\.id))
         return UserContentSyncBatch(items: items)

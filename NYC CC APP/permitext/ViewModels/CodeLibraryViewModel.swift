@@ -134,6 +134,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
     private let foregroundAccountSyncInterval: TimeInterval = 45
+    private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
     private var pendingTabAssertionToken: Int = 0
@@ -1790,6 +1791,7 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
             refreshPendingUserContentSyncCount()
+            scheduleUserContentRetry()
         }
     }
 
@@ -1816,6 +1818,23 @@ final class CodeLibraryViewModel: ObservableObject {
         await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
         await pullRemoteUserContentIfPossible()
+    }
+
+    private func scheduleUserContentRetry() {
+        guard signedInAccount != nil else { return }
+        userContentAutoSyncTask?.cancel()
+        userContentAutoSyncTask = Task { [weak self] in
+            guard let self else { return }
+            for delay in self.automaticSyncRetryDelays {
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                guard !Task.isCancelled, self.signedInAccount != nil else { return }
+                guard !self.isAccountBusy else { continue }
+                await self.performAutomaticUserContentSync()
+                if self.userContentSyncCheckpoint?.lastErrorMessage == nil {
+                    return
+                }
+            }
+        }
     }
 
     private static func syncDurationText(_ interval: TimeInterval) -> String {
