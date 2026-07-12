@@ -1360,8 +1360,14 @@ async function loadSyncedContent(options = {}) {
   if (syncLoadPromise && !options.force) {
     return syncLoadPromise;
   }
+  const baseline = syncedContent?.status === "connected" && syncedContent?.userID === account.userID
+    ? syncedContent
+    : null;
+  const requestedEventID = Number.isSafeInteger(baseline?.latestEventID) ? baseline.latestEventID : null;
   syncLoadPromise = postJSON("/sync/pull", {
-    auth: { accountUserID: account.userID }
+    auth: { accountUserID: account.userID },
+    sinceEventID: requestedEventID,
+    contentMapVersion: Number(baseline?.contentMapVersion || 2)
   }, { token: account.sessionToken })
     .then(async (payload) => {
       let entitlement = payload.entitlement || null;
@@ -1369,12 +1375,21 @@ async function loadSyncedContent(options = {}) {
       if (repaired?.entitlement) {
         entitlement = repaired.entitlement;
       }
+      const contentMapVersion = Number(payload.contentMapVersion || 0);
+      const canMergeIncrementally = baseline && requestedEventID !== null &&
+        contentMapVersion === Number(baseline.contentMapVersion || 0);
+      const mutations = canMergeIncrementally
+        ? mergeSyncedMutations(baseline.mutations || [], payload.mutations || [])
+        : payload.mutations || [];
       syncedContent = {
         status: "connected",
+        userID: account.userID,
         pulledAt: payload.pulledAt,
+        latestEventID: payload.latestEventID ?? payload.syncRevision ?? requestedEventID,
+        contentMapVersion,
         entitlement,
-        mutations: payload.mutations || [],
-        summary: summarizeMutations(payload.mutations || [])
+        mutations,
+        summary: summarizeMutations(mutations)
       };
       storeAccountEntitlement(entitlement);
       return syncedContent;
@@ -1387,6 +1402,15 @@ async function loadSyncedContent(options = {}) {
       syncLoadPromise = null;
     });
   return syncLoadPromise;
+}
+
+function mergeSyncedMutations(existing, incoming) {
+  const byRecordID = new Map();
+  [...existing, ...incoming].forEach((mutation) => {
+    const recordID = syncMutationRecordID(mutation);
+    if (recordID) byRecordID.set(recordID, mutation);
+  });
+  return Array.from(byRecordID.values());
 }
 
 async function ensureSyncedContentForRender() {
