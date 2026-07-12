@@ -72,10 +72,18 @@ final class AuthoringViewModel: ObservableObject {
     @Published private(set) var isExportingPack = false
 
     private let authoringStore = EditorAuthoringStore()
-    private let iOSCodeContentRootURL = URL(
-        fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Resources/CodeContent",
-        isDirectory: true
-    )
+    private let canonicalCodeContentRootURL: URL = {
+        let workspaceRootURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return workspaceRootURL
+            .appendingPathComponent("NYC CC APP", isDirectory: true)
+            .appendingPathComponent("permitext", isDirectory: true)
+            .appendingPathComponent("Resources", isDirectory: true)
+            .appendingPathComponent("CodeContent", isDirectory: true)
+    }()
 
     init() {
         authoringProject = (try? authoringStore.load()) ?? EditorAuthoringProject()
@@ -686,11 +694,11 @@ final class AuthoringViewModel: ObservableObject {
         let selectedCodeIDSnapshot = selectedCodeID
         let selectedCodeSectionIDSnapshot = selectedCodeSectionID
         let selectedJurisdictionIDSnapshot = selectedJurisdictionID
-        let codeContentRootURL = iOSCodeContentRootURL
+        let codeContentRootURL = canonicalCodeContentRootURL
         let documentCount = documents.count
 
         isPublishing = true
-        statusMessage = "Publishing \(documentCount) open file(s) to the iOS app..."
+        statusMessage = "Publishing \(documentCount) open file(s) to shared app content..."
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             do {
@@ -720,7 +728,7 @@ final class AuthoringViewModel: ObservableObject {
                     self.persistAuthoringProject(project)
                     self.isPublishing = false
                     let preparedSectionCount = preparedManifest.chapters.reduce(0) { $0 + $1.preparedSectionCount }
-                    self.statusMessage = "Published \(documentCount) open file(s), including \(preparedSectionCount) prepared section file(s), to the iOS app."
+                    self.statusMessage = "Published \(documentCount) open file(s), including \(preparedSectionCount) prepared section file(s), to shared app content."
                 }
             } catch {
                 DispatchQueue.main.async {

@@ -1,8 +1,14 @@
 import Foundation
 
-private let outputURL = URL(
-    fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Resources/nyc_code_authored.json"
-)
+private let workspaceRootURL = URL(fileURLWithPath: #filePath)
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+    .deletingLastPathComponent()
+private let outputURL = workspaceRootURL
+    .appendingPathComponent("NYC CC APP", isDirectory: true)
+    .appendingPathComponent("permitext", isDirectory: true)
+    .appendingPathComponent("Resources", isDirectory: true)
+    .appendingPathComponent("nyc_code_authored.json", isDirectory: false)
 private let defaultHTMLDirectoryCandidates = [
     URL(
         fileURLWithPath: "/Users/randy/Documents/X_CODING/Building Code/New York City/2022 Construction Codes/Building Code"
