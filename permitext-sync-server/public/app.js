@@ -229,6 +229,19 @@ function newReaderState(overrides = {}) {
   };
 }
 
+function deepLinkedSectionIDFromLocation() {
+  const match = window.location.pathname.match(/^\/open\/section\/(\d+)\/?$/);
+  return match?.[1] || "";
+}
+
+function updateBrowserSectionURL(sectionID) {
+  const normalizedID = String(sectionID || "").trim();
+  if (!/^\d+$/.test(normalizedID)) return;
+  const nextPath = `/open/section/${normalizedID}`;
+  if (window.location.pathname === nextPath && !window.location.search && !window.location.hash) return;
+  window.history.replaceState({}, "", nextPath);
+}
+
 function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
@@ -3141,6 +3154,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       reader.pendingSearchHighlightQuery = query;
       panel.dataset.pendingSearchHighlightQuery = query;
       reader.shouldSmoothScrollToSection = true;
+      updateBrowserSectionURL(reader.sectionID);
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
       saveWorkspaceState();
@@ -3403,6 +3417,7 @@ async function renderReader(reader, options = {}) {
       const summary = sectionTitleFromID(reader.sectionID, chapter);
       reader.sectionNumber = summary?.sectionNumber || "";
       reader.title = summary?.title || "Reader";
+      updateBrowserSectionURL(reader.sectionID);
     }
     saveWorkspaceState();
     await navigateReaderToSection(panel, reader);
@@ -3655,6 +3670,9 @@ async function openSectionDetail(searchID, section, options = {}) {
     delete anchors[searchID];
   }
   state.searchResultReader = null;
+  if (options.updateURL !== false) {
+    updateBrowserSectionURL(sectionID);
+  }
   placeSectionDetailAfterPane(searchID, anchors[searchID] || paneIDForUtilityInstance({ key: "search", id: searchID }));
   updateLinkedReaderForSearch(searchID, details[searchID]);
   saveWorkspaceState();
@@ -5484,6 +5502,16 @@ async function start() {
     collapseToOneReader();
   });
   await renderWorkspace();
+  const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
+  if (deepLinkedSectionID) {
+    try {
+      const payload = await api(`/code/sections/${deepLinkedSectionID}`);
+      await openSectionDetailForExistingSearch(payload.section, { updateURL: false });
+    } catch (error) {
+      console.warn("Could not open shared section link.", error);
+      window.history.replaceState({}, "", "/");
+    }
+  }
   flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
   refreshEntitlementAfterCheckoutReturn();
 }

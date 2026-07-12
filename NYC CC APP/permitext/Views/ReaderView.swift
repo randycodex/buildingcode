@@ -118,7 +118,12 @@ struct ReaderView: View {
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                ShareLink(item: CodeLibraryViewModel.sharedSectionURL(sectionID: sectionID)) {
+                    Image(systemName: "square.and.arrow.up")
+                }
+                .accessibilityLabel("Share section")
+
                 Button {
                     toggleBookmark()
                 } label: {

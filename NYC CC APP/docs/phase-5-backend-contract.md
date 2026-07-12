@@ -257,6 +257,16 @@ Response:
 
 Hosted Postgres pulls honor `sinceEventID` only when `contentMapVersion` matches the canonical section-ID map. A missing or stale map version receives the full canonical state so server-side identifier repairs are not hidden behind an event checkpoint.
 
+## Shared section links
+
+Web and iPhone use the same canonical section URL:
+
+```text
+https://permitext-sync.vercel.app/open/section/<canonical-section-id>
+```
+
+The web route serves the workspace and resolves section metadata from the canonical chapter catalog. The iPhone universal-link handler switches to Search and pushes the same canonical ID into `ReaderView`, including when the link arrives while bundled content is still loading. Unknown section API IDs return `404` rather than opening an empty reader.
+
 The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten. Preview-only pulls and pulls with skipped or conflicted remote records must not advance the local pull checkpoint, otherwise unapplied server records could be hidden from later sync runs.
 
 When a pull includes a `projectSection` mutation, the backend should also include the parent `project` mutation when it can resolve one, even if the parent project is older than the requested `since` checkpoint. Fresh installs need the folder record before they can apply project membership safely.

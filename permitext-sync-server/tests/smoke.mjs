@@ -97,6 +97,13 @@ async function main() {
       aasa.json.webcredentials.apps.includes("ABCDE12345.com.randycodex.permitext"),
       "AASA payload did not include the configured app identifier."
     );
+    assert(
+      aasa.json.applinks.details.some((detail) =>
+        detail.appID === "ABCDE12345.com.randycodex.permitext" &&
+        detail.paths?.includes("/open/section/*")
+      ),
+      "AASA payload did not advertise section universal links."
+    );
 
     const webRoot = await request("/");
     assert(webRoot.response.ok, "Web root did not load.");
@@ -104,15 +111,27 @@ async function main() {
     assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
 
+    const sharedSectionLink = await request("/open/section/8881");
+    assert(sharedSectionLink.response.ok, "Shared section URL did not load the web workspace.");
+    assert(
+      sharedSectionLink.response.headers.get("content-type")?.includes("text/html"),
+      "Shared section URL did not return the web workspace HTML."
+    );
+
     const canonicalOverrideSection = await request("/code/sections/8881");
     assert(canonicalOverrideSection.response.ok, "Canonical section override did not load.");
     assert(canonicalOverrideSection.json.section.sectionID === 8881, "Canonical section override returned the wrong ID.");
+    assert(canonicalOverrideSection.json.section.chapterID, "Canonical section response omitted its chapter ID.");
+    assert(canonicalOverrideSection.json.section.codePrefix, "Canonical section response omitted its code prefix.");
+    assert(canonicalOverrideSection.json.section.sectionNumber, "Canonical section response omitted its section number.");
     assert(
       canonicalOverrideSection.json.section.blocks?.some((block) =>
         block.plainText?.includes("real time enforcement unit")
       ),
       "Web reader did not prefer the canonical iPhone section body."
     );
+    const missingSharedSection = await request("/code/sections/999999999");
+    assert(missingSharedSection.response.status === 404, "Unknown shared section did not return 404.");
 
     const duplicateNumberChapter = await request("/code/chapters/47");
     assert(duplicateNumberChapter.response.ok, "Duplicate-number appendix chapter did not load.");

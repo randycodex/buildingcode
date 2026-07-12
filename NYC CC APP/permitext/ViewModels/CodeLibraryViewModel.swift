@@ -73,6 +73,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var comparisonModeEnabled: Bool
     @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
+    @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
 
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
@@ -485,6 +486,13 @@ final class CodeLibraryViewModel: ObservableObject {
     #if DEBUG
     private func runStartupDiagnostics() {
         var messages = continuityStore.debugValidationMessages()
+        let validDeepLink = URL(string: "https://permitext-sync.vercel.app/open/section/8881")
+            .flatMap(Self.deepLinkedSectionID(from:))
+        let invalidDeepLink = URL(string: "https://example.com/open/section/8881")
+            .flatMap(Self.deepLinkedSectionID(from:))
+        if validDeepLink != 8881 || invalidDeepLink != nil {
+            messages.append("Shared section link parsing failed")
+        }
         if let userDataStore = userContentRepository as? UserDataStore {
             do {
                 messages.append(contentsOf: try userDataStore.debugSchemaValidationMessages())
@@ -1318,6 +1326,37 @@ final class CodeLibraryViewModel: ObservableObject {
         // Wrap on overflow — this is a sentinel counter, only the change
         // matters, not the absolute value.
         searchTabRetapCount &+= 1
+    }
+
+    func handleOpenURL(_ url: URL) {
+        guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
+        pendingDeepLinkedSectionID = sectionID
+        selectedTab = .search
+    }
+
+    func consumePendingDeepLinkedSectionID() -> Int64? {
+        defer { pendingDeepLinkedSectionID = nil }
+        return pendingDeepLinkedSectionID
+    }
+
+    static func deepLinkedSectionID(from url: URL) -> Int64? {
+        guard url.scheme?.lowercased() == "https",
+              url.host?.lowercased() == "permitext-sync.vercel.app" else {
+            return nil
+        }
+        let components = url.pathComponents.filter { $0 != "/" }
+        guard components.count == 3,
+              components[0] == "open",
+              components[1] == "section",
+              let sectionID = Int64(components[2]),
+              sectionID > 0 else {
+            return nil
+        }
+        return sectionID
+    }
+
+    static func sharedSectionURL(sectionID: Int64) -> URL {
+        URL(string: "https://permitext-sync.vercel.app/open/section/\(sectionID)")!
     }
 
     func recordRecentSearch(_ query: String) {

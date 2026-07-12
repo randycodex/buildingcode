@@ -13,14 +13,23 @@ async function main() {
   const text = await response.text();
   const json = text ? JSON.parse(text) : null;
   const apps = Array.isArray(json?.webcredentials?.apps) ? json.webcredentials.apps : [];
+  const applinkDetails = Array.isArray(json?.applinks?.details) ? json.applinks.details : [];
 
   assert(response.ok, `AASA check failed with HTTP ${response.status}.`);
   assert(apps.length > 0, "AASA webcredentials.apps is empty.");
+  assert(
+    applinkDetails.some((detail) => detail.paths?.includes("/open/section/*")),
+    "AASA applinks.details does not include /open/section/*."
+  );
 
   if (expectedAppID) {
     assert(
       apps.includes(expectedAppID),
       `Expected AASA app ID "${expectedAppID}", received: ${apps.join(", ")}.`
+    );
+    assert(
+      applinkDetails.some((detail) => detail.appID === expectedAppID),
+      `Expected AASA universal-link app ID "${expectedAppID}".`
     );
   }
 

@@ -108,6 +108,10 @@ struct ChapterHTMLReaderView: View {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
     }
 
+    private var sharedSectionID: Int64 {
+        openedSection?.id ?? rememberedNativeSectionID.wrappedValue ?? initialSection.id
+    }
+
     private var pageBackgroundColor: Color {
         colorScheme == .dark ? .black : Color(uiColor: .systemGroupedBackground)
     }
@@ -339,7 +343,17 @@ struct ChapterHTMLReaderView: View {
                 .multilineTextAlignment(.center)
             }
 
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                ShareLink(item: CodeLibraryViewModel.sharedSectionURL(sectionID: sharedSectionID)) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
+                        .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                        .background(Color(uiColor: .systemBackground))
+                        .clipShape(Capsule(style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Share current section")
+
                 chapterSearchToolbarButton
             }
         }

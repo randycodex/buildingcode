@@ -1852,7 +1852,8 @@ async function sectionSummaryByID(sectionID) {
       return {
         ...section,
         chapterID: chapterSummary.id,
-        chapterNumber: chapterSummary.chapterNumber
+        chapterNumber: chapterSummary.chapterNumber,
+        codePrefix: chapterSummary.codePrefix
       };
     }
   }
@@ -1973,23 +1974,34 @@ async function handleCodeSection(path, response) {
     canonicalSectionID: summary?.id || sectionID
   });
   if (!body.blocks?.length) {
-    if (summary) {
-      sendJSON(response, 200, {
-        section: {
-          blocks: [{ id: `${sectionID}-title`, kind: "title", plainText: summary.title || "" }],
-          chapterNumber: summary.chapterNumber,
-          schemaVersion: 1,
-          sectionID: Number(summary.id || sectionID),
-          webSectionID: summary.webSectionID || null
-        }
-      });
+    if (!summary) {
+      sendNotFound(response);
       return;
     }
+    sendJSON(response, 200, {
+      section: {
+        blocks: [{ id: `${sectionID}-title`, kind: "title", plainText: summary.title || "" }],
+        chapterNumber: summary.chapterNumber,
+        chapterID: summary.chapterID,
+        codePrefix: summary.codePrefix,
+        schemaVersion: 1,
+        sectionID: Number(summary.id || sectionID),
+        sectionNumber: summary.sectionNumber,
+        title: summary.title,
+        webSectionID: summary.webSectionID || null
+      }
+    });
+    return;
   }
   sendJSON(response, 200, {
     section: {
       ...body,
+      chapterID: summary?.chapterID || body.chapterID || null,
+      chapterNumber: summary?.chapterNumber || body.chapterNumber || "",
+      codePrefix: summary?.codePrefix || body.codePrefix || "",
       sectionID: Number(summary?.id || body.sectionID || sectionID),
+      sectionNumber: summary?.sectionNumber || body.sectionNumber || "",
+      title: summary?.title || body.title || "",
       webSectionID: summary?.webSectionID || body.webSectionID || null
     }
   });
@@ -3940,13 +3952,14 @@ async function handleStorageSummary(request, response) {
 function handleAppleAppSiteAssociation(_request, response) {
   const teamID = process.env.APPLE_TEAM_ID || "TEAMID";
   const bundleID = process.env.APPLE_BUNDLE_ID || "com.randycodex.permitext";
+  const appID = `${teamID}.${bundleID}`;
   sendRawJSON(response, 200, {
     webcredentials: {
-      apps: [`${teamID}.${bundleID}`]
+      apps: [appID]
     },
     applinks: {
       apps: [],
-      details: []
+      details: [{ appID, paths: ["/open/section/*"] }]
     }
   });
 }
@@ -4220,7 +4233,10 @@ export async function handleRequest(request, response) {
       return;
     }
 
-    if (request.method === "GET" && (path === "" || path === "web" || path === "web/")) {
+    if (
+      request.method === "GET" &&
+      (path === "" || path === "web" || path === "web/" || path.startsWith("open/section/"))
+    ) {
       await handleWebIndex(request, response);
       return;
     }

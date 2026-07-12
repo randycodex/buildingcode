@@ -84,6 +84,14 @@ The gate verifies all 118 chapter files, 12,890 unique published section IDs, ex
 
 iPhone and web search both use the shipped `prepared/searchIndex.json` token map. Results use the same rank, natural chapter/section ordering, code-section tie-break, and final section-ID tie-break on both platforms. The web server no longer rebuilds an index by opening every section body; both clients trust the validated index and resolve body text only for result snippets. The smoke suite runs every golden query through the web endpoint and compares its ordered IDs with the iPhone regression fixture.
 
+Canonical sections have a shared URL contract:
+
+```text
+https://permitext-sync.vercel.app/open/section/<canonical-section-id>
+```
+
+The same URL loads the section-detail workspace in a browser and opens `ReaderView` in the installed iPhone app. The AASA response advertises `/open/section/*`, and the iOS target includes both the `applinks:` and `webcredentials:` associated domains. Opening a section on web replaces the current address with its shared URL so it can be copied without serializing private workspace state.
+
 Configure paid entitlement sources with:
 
 ```sh
